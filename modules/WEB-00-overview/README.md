@@ -12,8 +12,9 @@ WEB-02の静的Web演習は、HTTPとWebサーバーを学ぶ途中段階です�
 | --- | --- | --- | --- |
 | リモートデスクトップ | 学生PC | EC2踏み台 | RDP3389、許可接続元 |
 | サーバー管理 | EC2踏み台 | DNS・Web・DB | SSH22、SG-Bastion以外を拒否 |
-| 名前解決 | Web（DNS演習は踏み台からも実施） | EC2上のDNS | 問い合わせ先、DBのIP回答 |
+| 名前解決 | Web・踏み台 | EC2上のDNS | Web用web.lab.test、DB用db.lab.testのIP回答 |
 | ページ取得 | 学生PCのブラウザ | EC2上のWeb・教員提供アプリ | HTTPの応答、Webのlog |
+| DNS演習のページ取得 | 踏み台上のブラウザ | EC2上のWeb | IP指定からweb.lab.test指定へ切り替えて同じページを表示 |
 | データ取得 | Web側の教員提供アプリ | EC2上のDB | DB接続、権限、問い合わせの結果 |
 
 Security Groupは必要な通信だけを許可します。実際のEC2台数、IP、portの開放範囲、アプリの起動方式は、AWS Academy Learner Labを学生権限で検証してから手順へ固定します。学生PCからHTTPで接続できるのは公開Webです。private DNS・DBと、各サーバーのSSH22を学生PCへ直接公開しません。
