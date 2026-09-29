@@ -2,9 +2,9 @@
 
 ## 対象と到達目標
 
-対象はLinux・Networkを学んだ初学者です。学生はUbuntu環境で、VPC、Nginx、BIND 9、Storage、PostgreSQLの役割を説明し、安全な通信経路を構築・観測します。正常動作の証拠を取り、一つの障害を切り分けて復旧します。
+対象はLinux・Networkを学んだ初学者です。学生はAWSのVPC内でEC2上のDNS・Web・DBと教員提供アプリを接続し、安全な通信経路を構築・観測します。正常動作の証拠を取り、一つの障害を切り分けて復旧します。
 
-HTML、Pythonなどのアプリ開発は扱いません。静的ファイルと架空のDBデータは教員が用意します。必要な設定ファイルの編集と基本SQLは、インフラの操作として扱います。
+HTML、Pythonなどのアプリ開発は学生に課しません。小さなアプリと架空のDBデータは教員が用意します。学生はサーバー、接続設定、Security Group、DBの権限を扱います。WEB-02では静的Webを基礎演習として扱い、後続単元でアプリとDBを接続します。
 
 ## 正本と教材単位
 
@@ -14,7 +14,7 @@ HTML、Pythonなどのアプリ開発は扱いません。静的ファイルと�
 
 ## 完成構成の読み方
 
-学生PCからAWS ConsoleとCloudShellを使って、検証済みの方法でUbuntu作業端末へ接続します。作業端末から内部DNS、Web、DBへの必要な通信を確認します。DNS queryとHTTP requestとpsql接続は別の通信です。静的WebはDBを使用しません。
+学生PCからAWSの管理画面を使い、検証済みの方法で学習環境へ接続します。VPC内のクライアントからEC2上のDNSへ問い合わせ、EC2上のWebへHTTPで接続します。Web側の教員提供アプリがEC2上のDBへ接続します。DNS、HTTP、DB通信は別々の通信ですが、一つのWebシステムを構成します。
 
 EC2台数、instance type、private環境のpackage取得、接続経路、予算はLearner Labの学生権限で確認してから手順に固定します。既存のLinux LabのCloudFormation、checker、採点条件は変更しません。
 

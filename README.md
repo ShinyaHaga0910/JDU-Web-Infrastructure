@@ -1,8 +1,8 @@
 # JDU Web Infrastructure
 
-JDUのWebインフラ構築教材です。2026年度は`Introduction-CyberSecurity`という統合科目の後半で使用します。2027年度以降は、この教材を独立した科目の入口として使用できる構成にします。
+JDUのWebインフラ構築教材です。今セミスターは`Introduction-CyberSecurity`という統合科目の後半で使用します。将来は、この教材を独立した科目の入口として使用できる構成にします。
 
-学生はUbuntu上に静的Web、内部DNS、PostgreSQLを構築し、通信経路、公開範囲、service、port、log、保存と復旧を確認します。アプリケーションをプログラミングする授業ではありません。
+学生はAWSのVPC内でEC2上のDNS・Web・DBを構築し、教員提供アプリをWebとDBへ接続します。通信経路、公開範囲、service、port、log、保存と復旧を確認します。学生がアプリケーションをプログラミングする授業ではありません。
 
 ## 学習の入口
 
@@ -11,7 +11,7 @@ JDUのWebインフラ構築教材です。2026年度は`Introduction-CyberSecuri
 - [WEB-00 完成像](modules/WEB-00-overview/README.md)
 - [WEB-02 HTTPとNginx](modules/WEB-02-http/README.md)
 
-教材は順次制作します。現在の`WEB-02`は初版の説明と実習原稿です。AWS Academy Learner Labで学生権限の通し試験は未実施です。実際のVPC、接続経路、予算と権限を検証してから正式な構築手順を配布します。
+教材は順次制作します。現在の`WEB-02`は静的Webを扱う基礎演習の初稿で、WebとDBを接続する完成形は未実装です。AWS Academy Learner Labで学生権限の通し試験も未実施です。実際のVPC、EC2台数、接続経路、予算と権限を検証してから正式な構築手順を配布します。
 
 ## 制作担当者
 

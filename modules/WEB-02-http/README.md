@@ -10,7 +10,7 @@
 
 ## この単位の目標
 
-教員配布の静的ファイルをNginxで返し、clientのHTTP response、Ubuntu上のservice・port・file、Nginxのaccess logを関連付けます。設定や接続を変えたときには、何が変わったかを観測で説明します。HTMLやアプリケーションのプログラミングは行いません。
+教員配布の静的ファイルをNginxで返し、clientのHTTP response、Ubuntu上のservice・port・file、Nginxのaccess logを関連付けます。設定や接続を変えたときには、何が変わったかを観測で説明します。HTMLやアプリケーションのプログラミングは行いません。この静的Web演習は基礎段階であり、後の[WEB-06](../WEB-06-app-integration/README.md)で教員提供アプリとDBを接続します。
 
 ## 教材
 
