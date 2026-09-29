@@ -15,3 +15,5 @@
 - サブエージェントを作成しません。
 
 図は送信元・宛先・port・protocol・実行場所を示します。練習の完全手順と自力課題の要件を分けます。変更時は本文・図・設定例・確認項目の整合を確認します。
+
+- 最新構成は公開subnetのEC2踏み台（Ubuntu＋xrdp＋ブラウザ）とprivate subnetのDNS・Web・DB。学生PC→RDP→踏み台から内部DNS名でWeb表示、内部SSH管理はSG-Bastionからのみ。CloudShellを通常の経路へ戻さない。実機構築・権限・別管理経路の制御は未検証。
