@@ -14,7 +14,7 @@ HTML、Pythonなどのアプリ開発は学生に課しません。小さなア�
 
 ## 完成構成の読み方
 
-学生PCからAWSの管理画面を使い、検証済みの方法で学習環境へ接続します。VPC内のクライアントからEC2上のDNSへ問い合わせ、EC2上のWebへHTTPで接続します。Web側の教員提供アプリがEC2上のDBへ接続します。DNS、HTTP、DB通信は別々の通信ですが、一つのWebシステムを構成します。
+学生PCのブラウザから公開WebへHTTPで接続します。管理操作はRDPで入った踏み台から各サーバーのSSH22へ接続します。Webが内部DNSでDBの名前を解決し、教員提供アプリがDBへ接続します。
 
 EC2台数、instance type、private環境のpackage取得、接続経路、予算はLearner Labの学生権限で確認してから手順に固定します。既存のLinux LabのCloudFormation、checker、採点条件は変更しません。
 
@@ -25,6 +25,6 @@ EC2台数、instance type、private環境のpackage取得、接続経路、予�
 
 ## 踏み台と内部DNSの演習構成（最新決定）
 
-一つのVPCの単一AZに、公開サブネットのEC2踏み台と、プライベートサブネットのEC2 DNS・Web・DBを配置します。踏み台はUbuntu＋軽量デスクトップ＋xrdp＋ブラウザを想定し、学生PCからRDPで接続します。WebへIP指定でアクセスした後、BIND9の内部DNSでweb.lab.testを解決して同じページを表示します。Webの教員提供アプリがDBへ接続します。
+一つのVPCの単一AZに、踏み台用の公開サブネット、Web用の公開サブネット、DNS・DB用のプライベートサブネットを配置します。踏み台とWebは別サブネットに置き、別々のSecurity Groupを関連付けます。学生PCのブラウザから公開WebへHTTPで接続し、Webの教員提供アプリが内部DNSでdb.lab.testを解決してDBへ接続します。管理者はRDPでUbuntu＋軽量デスクトップ＋xrdpの踏み台へ接続し、そこからWeb・DNS・DBをSSHで管理します。踏み台は通常のWeb閲覧経路に挟みません。
 
-RDP3389の入口は許可された接続元に限定します。内部サーバーのSSH22はSG-Bastionからのみ許可します。DNS53、HTTP、DBサービスの通信は用途別に許可し、DBサービスの接続元はSG-Webとします。通常の利用経路にCloudShellは挟みません。Session Manager等の代替管理経路を含めたIAM制御、学生権限、端末からの接続、GUI性能、予算、private環境のパッケージ取得は実機検証が必要です。構成図は演習目標であり、AWSリソースの作成完了を示しません。
+RDP3389の入口は許可された接続元に限定します。内部サーバーのSSH22はSG-Bastionからのみ許可します。Web用サブネットはInternet Gatewayへの経路とWebのpublic IPv4を持たせます。WebのHTTP80は授業で定める利用者の接続元から許可し、SSH22はSG-Bastionからのみ許可します。サブネット分離だけで管理制限が成立するとは扱いません。DNS53、DBサービスの通信は用途別に許可し、DBサービスの接続元はSG-Webとします。通常の利用経路にCloudShellは挟みません。Session Manager等の代替管理経路を含めたIAM制御、学生権限、端末からの接続、GUI性能、予算、private環境のパッケージ取得は実機検証が必要です。構成図は演習目標であり、AWSリソースの作成完了を示しません。
