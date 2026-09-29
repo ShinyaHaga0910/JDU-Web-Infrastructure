@@ -1,4 +1,4 @@
-# Webインフラ教材の方針
+# Webインフラストラクチャー教材の方針
 
 ## 対象と到達目標
 
@@ -28,3 +28,5 @@ EC2台数、instance type、private環境のpackage取得、接続経路、予�
 一つのVPCの単一AZに、踏み台・Webを置く一つの公開サブネットと、DNS・DBを置く一つのプライベートサブネットを配置します。四つのEC2には別々のSG-Bastion、SG-Web、SG-DNS、SG-DBを関連付けます。学生PCのブラウザから公開WebへHTTPで接続し、Webの教員提供アプリが内部DNSでdb.lab.testを解決してDBへ接続します。管理者はRDPでUbuntu＋軽量デスクトップ＋xrdpの踏み台へ接続し、そこからWeb・DNS・DBをSSHで管理します。踏み台は学生PCからの通常のWeb閲覧経路に挟みません。DNS演習では踏み台からDNSサーバへ問い合わせ、Webのprivate IPを返すweb.lab.testを設定し、踏み台上のブラウザでIP指定からドメイン指定へ切り替えて同じWeb表示を確認します。踏み台からのHTTP80はこの演習用の通信としてSG-Webで許可し、SSH22の管理通信とは区別します。学生PCからのHTTPとRDPはどちらもInternet Gatewayを経由します。
 
 RDP3389の入口は許可された接続元に限定します。内部サーバーのSSH22はSG-Bastionからのみ許可します。公開サブネットはInternet Gatewayへの経路を持たせ、Web・踏み台にpublic IPv4を割り当てます。WebのHTTP80は授業で定める利用者の接続元から許可し、SSH22はSG-Bastionからのみ許可します。サブネット分離だけで管理制限が成立するとは扱いません。DNS53、DBサービスの通信は用途別に許可し、DBサービスの接続元はSG-Webとします。通常の利用経路にCloudShellは挟みません。Session Manager等の代替管理経路を含めたIAM制御、学生権限、端末からの接続、GUI性能、予算、private環境のパッケージ取得は実機検証が必要です。構成図は演習目標であり、AWSリソースの作成完了を示しません。
+
+科目全体の期末テストはAI利用不可・提出一回のみです。授業中の課題はAI利用可・何度でも再提出可能です。
