@@ -27,9 +27,12 @@ Python3.12の専用環境に次の依存を入れ、repo rootから実行しま�
 python -m pip install -r course/labs/authoring/requirements.txt
 python -B course/labs/authoring/build.py --no-pdf
 python -B course/labs/authoring/validate.py
+python -B course/labs/authoring/qa_pdf.py
 ```
 
 --no-pdfは保存済みPDFを保持し、Markdown/HTML/zipを更新します。PDFも作り直す場合はWindowsのMS Gothic/Arial/Consolasを用意して--no-pdfを外します。公開署名資源はdevelopment/03_knowledge以下を既定で読みます。意図的に別の公開資源rootを使う場合だけJDU_WEB_PROJECT_ROOTで指定します。署名済みの原本を教材変更で書き換えません。
+
+qa_pdf.pyはPopplerのpdftotext/pdftoppmをPATH上へ用意して実行します。全ページをtmp/pdfs以下へ画像化し、本文の枠外文字・ページ数・空白画像を自動確認してrendering.public.jsonへ記録します。教師による目視承認・母語校閲の結果にはしません。
 
 ## GitHubへの反映
 

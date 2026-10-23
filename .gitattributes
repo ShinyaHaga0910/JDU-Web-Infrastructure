@@ -8,5 +8,5 @@
 *.asc -text
 *.tar.gz -text
 *.zip -text
-*.pdf -text
+*.pdf binary
 development/** -text

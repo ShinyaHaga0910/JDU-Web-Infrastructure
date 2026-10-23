@@ -17,10 +17,12 @@ PROJECT = Path(os.environ.get('JDU_WEB_PROJECT_ROOT', str(Path(__file__).resolve
 from markdown_it import MarkdownIt
 from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE
 from checks import CHECKS
+from explanations import LABELS, READING, ROUTES, MISSION_PLAN, MODULE_NOTES, STEP_NOTES, OUTPUT_EXAMPLES
 
 KIT = PROJECT / '03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2'
 EXPECTED_REGISTRY = '3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33'
 DIST_ID = 'web-course-class193548-20261023-r2'
+MATERIAL_REVISION = 'r1.1'
 L = {
  'practice': T('Web演習：練習P0〜P6と詳しい操作例', 'Web Infrastructure: практика P0–P6 с подробными шагами', 'Web Infrastructure: P0–P6 mashqlar va batafsil qadamlar'),
  'missions': T('Web演習：自力課題M0〜M6', 'Web Infrastructure: самостоятельные задания M0–M6', 'Web Infrastructure: M0–M6 mustaqil topshiriqlar'),
@@ -45,7 +47,7 @@ L = {
 }
 
 def emit_intro(lang, kind):
-    out = [f'# {L[kind][lang]}', '', f'2026-10-23 | D12 P/M r1 | {DIST_ID}', '', L['draft'][lang], '', L['translation'][lang], '']
+    out = [f'# {L[kind][lang]}', '', f'2026-10-23 | D12 P/M {MATERIAL_REVISION} | {DIST_ID}', '', L['draft'][lang], '', L['translation'][lang], '']
     out += [T('[日本語](../ja/' + kind + '.md) · [Русский](../ru/' + kind + '.md) · [O‘zbekcha](../uz/' + kind + '.md)',
               '[日本語](../ja/' + kind + '.md) · [Русский](../ru/' + kind + '.md) · [O‘zbekcha](../uz/' + kind + '.md)',
               '[日本語](../ja/' + kind + '.md) · [Русский](../ru/' + kind + '.md) · [O‘zbekcha](../uz/' + kind + '.md)')[lang], '']
@@ -149,11 +151,24 @@ def shell_lines(source):
 
 def make_markdown(reg, lang, kind):
     out = emit_intro(lang, kind)
+    out += ['## ' + LABELS['read'][lang], '']
+    out += [p[lang] + '\n' for p in READING]
+    out += ['## ' + LABELS['routes'][lang], '',
+        '| ' + T('送信元', 'Источник', 'Manba')[lang] + ' | ' + T('宛先', 'Назначение', 'Manzil')[lang] + ' | Protocol / port | ' + T('目的', 'Цель', 'Maqsad')[lang] + ' |',
+        '| --- | --- | --- | --- |']
+    out += [f'| {source} | {target} | {protocol} | {purpose[lang]} |' for source,target,protocol,purpose in ROUTES]
+    out += ['', T('初期環境で提供されたSSMは、CloudShellから各EC2へ入る管理経路。上のWeb利用経路とは別に使う。表の内部IP/portはこのLabの仕様で、一般のWebシステム全てに同じ値を要求するものではない。',
+        'SSM начальной среды — отдельный путь управления из CloudShell в EC2. Он не включён в путь обычного Web-запроса. Внутренние IP и порты таблицы заданы этим Lab, а не всеми Web-системами.',
+        'Boshlang‘ich SSM CloudShell dan EC2 ga alohida management yo‘lidir. U oddiy Web request yo‘liga qo‘shilmaydi. Jadvaldagi ichki IP va portlar shu Lab uchun, barcha Web tizimlari uchun emas.')[lang], '']
     tasks = {t['id']: t for t in reg['tasks']}
     if kind == 'practice':
         for m in MODULES:
             out += ['## ' + m['id'] + ' ' + m['title'][lang], '', '### ' + L['goal'][lang], '', m['goals'][lang], '', '### ' + L['problem'][lang], '', m['problem'][lang], '']
             out += task_spec(tasks[m['id']], reg, lang)
+            notes=MODULE_NOTES[m['id']]
+            out += ['### ' + LABELS['mechanism'][lang], '',
+                    '**' + LABELS['before'][lang] + ':** ' + notes['before'][lang], '',
+                    '**' + LABELS['after'][lang] + ':** ' + notes['after'][lang], '', notes['mechanism'][lang], '']
             out += ['### ' + L['solution'][lang], '']
             for i, s in enumerate(m['steps'], 1):
                 out += [f"#### {m['id']}.{i} {s['title'][lang]}", '', '**' + L['place'][lang] + ':** ' + PLACES[s['place']][lang], '', '**' + L['why'][lang] + ':** ' + s['why'][lang], '']
@@ -166,8 +181,16 @@ def make_markdown(reg, lang, kind):
                     if (m['id'], i) in {('P4', 6), ('P6', 1)}:
                         fence = 'text'
                     out += ['```' + fence, shell_lines(s['code']) if fence=='bash' else s['code'], '```', '']
+                out += ['**' + LABELS['meaning'][lang] + ':** ' + STEP_NOTES[f"{m['id']}.{i}"][lang], '']
                 out += ['**' + L['expect'][lang] + ':** ' + s['expect'][lang], '', '**' + L['trouble'][lang] + ':** ' + s['trouble'][lang], '']
+            if m['id'] in OUTPUT_EXAMPLES:
+                example,reading=OUTPUT_EXAMPLES[m['id']]
+                out += ['### ' + LABELS['output'][lang], '', '```text', example, '```', '', reading[lang], '']
+            out += ['### ' + LABELS['reflect'][lang], '', notes['question'][lang], '',
+                    '**' + LABELS['answer'][lang] + ':** ' + notes['answer'][lang], '']
     else:
+        out += ['## ' + LABELS['plan'][lang], '']
+        out += [p[lang] + '\n' for p in MISSION_PLAN]
         for number in range(7):
             task = tasks['M' + str(number)]
             title = MODULES[number]['title'][lang]
@@ -217,7 +240,7 @@ def render_html(md, lang, kind):
     body = re.sub(r'<h2>(.*?)</h2>', heading, body)
     links = ' · '.join(f'<a href="#{slug}">{text}</a>' for slug, text in toc)
     title = html.escape(L[kind][lang])
-    return f'<!doctype html><html lang="{lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><style>{CSS}</style></head><body><a class="skip" href="#content">{html.escape(L["intro"][lang])}</a><header><p>JDU · Web Infrastructure · D12 P/M r1</p><nav aria-label="Contents">{links}</nav></header><main id="content" tabindex="-1">{body}</main><footer>{DIST_ID} · 62 raw points · 2026-10-23</footer></body></html>'
+    return f'<!doctype html><html lang="{lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><style>{CSS}</style></head><body><a class="skip" href="#content">{html.escape(L["intro"][lang])}</a><header><p>JDU · Web Infrastructure · D12 P/M {MATERIAL_REVISION}</p><nav aria-label="Contents">{links}</nav></header><main id="content" tabindex="-1">{body}</main><footer>{DIST_ID} · 62 raw points · 2026-10-23</footer></body></html>'
 
 def make_pdf(md, lang, target):
     from reportlab.lib import colors
@@ -296,14 +319,17 @@ def make_pdf(md, lang, target):
                 if q.type=='inline':row.append(Paragraph(inline(q),small))
                 if q.type=='tr_close':rows.append(row)
                 j+=1
-            cols=len(rows[0]); widths=([width*.36,width*.64] if cols==2 else [width/cols]*cols)
+            cols=len(rows[0])
+            if cols==2:widths=[width*.36,width*.64]
+            elif cols==4:widths=[width*.18,width*.22,width*.16,width*.44]
+            else:widths=[width/cols]*cols
             table=Table(rows,colWidths=widths,repeatRows=1,hAlign='LEFT')
             table.setStyle(TableStyle([('BACKGROUND',(0,0),(-1,0),colors.HexColor('#e8f1f3')),('GRID',(0,0),(-1,-1),.35,colors.HexColor('#b8c6d0')),('VALIGN',(0,0),(-1,-1),'TOP'),('LEFTPADDING',(0,0),(-1,-1),5),('RIGHTPADDING',(0,0),(-1,-1),5),('TOPPADDING',(0,0),(-1,-1),5),('BOTTOMPADDING',(0,0),(-1,-1),5)]))
             flow.extend([table,Spacer(1,10)]);i=j
         i+=1
     def footer(canvas,doc):
         canvas.saveState();canvas.setFont(body_font,8);canvas.setFillColor(colors.HexColor('#415569'))
-        canvas.drawString(44,27,'JDU Web Infrastructure · D12 P/M r1 · '+lang.upper())
+        canvas.drawString(44,27,'JDU Web Infrastructure · D12 P/M '+MATERIAL_REVISION+' · '+lang.upper())
         canvas.drawRightString(A4[0]-44,27,str(doc.page));canvas.restoreState()
     doc=SimpleDocTemplate(str(target),pagesize=A4,rightMargin=44,leftMargin=44,topMargin=38,bottomMargin=43,
         title=md.splitlines()[0].removeprefix('# '),author='JDU',pageCompression=1)
@@ -315,7 +341,10 @@ def main():
     assert hashlib.sha256(reg_raw).hexdigest()==EXPECTED_REGISTRY
     reg=json.loads(reg_raw)
     assert set(CHECKS)=={c for t in reg['tasks'] if t['category']=='automated_mission' for c in t['progress_scored_checks']}
+    assert set(STEP_NOTES)=={f"{module['id']}.{i}" for module in MODULES for i in range(1,len(module['steps'])+1)}
     for m in MODULES:
+        assert m['id'] in MODULE_NOTES
+        assert all(set(p)==set(LANGS) and all(p.values()) for p in MODULE_NOTES[m['id']].values())
         for field in ('title','goals','problem'):
             assert set(m[field])==set(LANGS)
         for s in m['steps']:
@@ -367,7 +396,8 @@ def main():
             for path in sorted(members):
                 z.write(path,'web-lab-pm-r1/'+path.relative_to(ROOT).as_posix())
             z.writestr('web-lab-pm-r1/TEACHING-FILE-HASHES.json',json.dumps(inventory,indent=2))
-    print(json.dumps(dict(modules=len(MODULES),steps=sum(len(m['steps']) for m in MODULES),languages=list(LANGS),pdfs=outputs),ensure_ascii=False))
+    print(json.dumps(dict(material_revision=MATERIAL_REVISION,modules=len(MODULES),steps=sum(len(m['steps']) for m in MODULES),
+        explained_steps=len(STEP_NOTES),languages=list(LANGS),pdfs=outputs),ensure_ascii=False))
 
 if __name__=='__main__':
     main()

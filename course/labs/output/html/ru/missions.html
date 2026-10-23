@@ -12,8 +12,8 @@ th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:an
 p,li{overflow-wrap:anywhere}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1</p><nav aria-label="Contents"><a href="#section-1">Как пользоваться пособием</a> · <a href="#section-2">Среда и подготовка</a> · <a href="#section-3">M0 Своя среда и место выполнения команд (0)</a> · <a href="#section-4">M1 Выдача статического файла по HTTP (8)</a> · <a href="#section-5">M2 Внутренний DNS и системное разрешение имён (13)</a> · <a href="#section-6">M3 Данные при остановке и запуске (3)</a> · <a href="#section-7">M4 Подключение к PostgreSQL с аутентификацией (9)</a> · <a href="#section-8">M5 Соединить предоставленное приложение с Web и DB (13)</a> · <a href="#section-9">M6 Минимальные права и границы публикации (16)</a> · <a href="#section-10">Продолжение и повторная отправка</a> · <a href="#section-11">Источники и версия</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: самостоятельные задания M0-M6</h1>
-<p>2026-10-23 | D12 P/M r1 | web-course-class193548-20261023-r2</p>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.1</p><nav aria-label="Contents"><a href="#section-1">Как пользоваться пособием</a> · <a href="#section-2">Среда и подготовка</a> · <a href="#section-3">Как читать шаги</a> · <a href="#section-4">Система и пути соединений</a> · <a href="#section-5">Перед самостоятельной работой</a> · <a href="#section-6">M0 Своя среда и место выполнения команд (0)</a> · <a href="#section-7">M1 Выдача статического файла по HTTP (8)</a> · <a href="#section-8">M2 Внутренний DNS и системное разрешение имён (13)</a> · <a href="#section-9">M3 Данные при остановке и запуске (3)</a> · <a href="#section-10">M4 Подключение к PostgreSQL с аутентификацией (9)</a> · <a href="#section-11">M5 Соединить предоставленное приложение с Web и DB (13)</a> · <a href="#section-12">M6 Минимальные права и границы публикации (16)</a> · <a href="#section-13">Продолжение и повторная отправка</a> · <a href="#section-14">Источники и версия</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: самостоятельные задания M0-M6</h1>
+<p>2026-10-23 | D12 P/M r1.1 | web-course-class193548-20261023-r2</p>
 <p>Первая редакция для проверки преподавателем. Полное прохождение по пособию студентом ещё не проверено.</p>
 <p>Русский и узбекский тексты синхронизированы с японским оригиналом. Редактура носителями языка ещё не выполнена.</p>
 <p><a href="../ja/missions.html">日本語</a> · <a href="../ru/missions.html">Русский</a> · <a href="../uz/missions.html">O‘zbekcha</a></p>
@@ -63,14 +63,78 @@ p,li{overflow-wrap:anywhere}footer{font-size:.85rem;color:#415569;border-top:1px
 </table>
 <p>Для входа в каждый Ubuntu выполните в CloudShell aws ssm start-session --target i-СВОЙ-ID. Сразу проверяйте id -un и role из bootstrap.json. Для смены сервера один exit возвращает в CloudShell; затем подключайтесь к следующему ID. Переменные CloudShell не копируются на узел. ssm-user может sudo; RDP-пользователь labuser не администратор sudo.</p>
 <p>Редактор nano: открыть файл → ввести текст → Ctrl+O → Enter сохранить → Ctrl+X выйти. Блок конфигурации не выполняется как shell-команда. В psql меняется prompt; SQL/\password вводятся внутри, \q возвращает в Ubuntu. Не продолжайте после ошибки без проверки результата.</p>
-<h2 id="section-3">M0 Своя среда и место выполнения команд (0)</h2>
+<h2 id="section-3">Как читать шаги</h2>
+<p>В каждом P идут задание, объяснение, шаги и вопросы. Выполняйте команды по одной и читайте результат, не вставляйте весь раздел сразу. Обратная косая черта в конце строки означает продолжение: эта и следующая строки составляют одну команду.</p>
+<p>Блок bash вводится в терминале указанного узла. Блок text может содержать конфигурацию, ввод внутри psql или пример вывода: читайте пояснение перед ним. Строка с # - комментарий. Не добавляйте приглашение $ или postgres=# из своего терминала. Значения с YOUR- заменяйте своими.</p>
+<p>Проверяйте по порядку: сохранённый файл, синтаксис, применение к службе, реальное соединение. Правильный файл ещё не доказывает, что работающая служба уже использует его. Сопоставляйте HTTP-ответ, DNS-ответ или SQL-результат с журналом.</p>
+<h2 id="section-4">Система и пути соединений</h2>
+<table>
+<thead>
+<tr>
+<th scope="col">Источник</th>
+<th scope="col">Назначение</th>
+<th scope="col">Protocol / port</th>
+<th scope="col">Цель</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Windows PC</td>
+<td>Web public IPv4</td>
+<td>TCP/80</td>
+<td>Публичный доступ через Internet Gateway к каталогу и статическим файлам.</td>
+</tr>
+<tr>
+<td>Windows PC</td>
+<td>bastion public IPv4</td>
+<td>TCP/3389</td>
+<td>RDP из разрешённого CIDR к рабочему столу бастиона.</td>
+</tr>
+<tr>
+<td>bastion</td>
+<td>Web/DNS/DB/repo</td>
+<td>TCP/22</td>
+<td>Внутренний SSH для управления; приватный ключ остаётся на бастионе.</td>
+</tr>
+<tr>
+<td>bastion / Web</td>
+<td>DNS 10.20.2.10</td>
+<td>UDP+TCP/53</td>
+<td>Разрешение имён lab.test. DNS не выдаёт содержимое Web-страницы.</td>
+</tr>
+<tr>
+<td>Web app</td>
+<td>DB 10.20.2.20</td>
+<td>TCP/5432</td>
+<td>SQL от роли приложения. Прямое соединение Windows с DB не используется.</td>
+</tr>
+<tr>
+<td>bastion</td>
+<td>Web 10.20.1.20</td>
+<td>TCP/8080</td>
+<td>Администрирование через admin.lab.test отдельно от публичного порта 80.</td>
+</tr>
+<tr>
+<td>Nginx on Web</td>
+<td>127.0.0.1 on Web</td>
+<td>TCP/8000</td>
+<td>Передача приложению на том же Web; 127.0.0.1 - текущий локальный узел.</td>
+</tr>
+</tbody>
+</table>
+<p>SSM начальной среды - отдельный путь управления из CloudShell в EC2. Он не включён в путь обычного Web-запроса. Внутренние IP и порты таблицы заданы этим Lab, а не всеми Web-системами.</p>
+<h2 id="section-5">Перед самостоятельной работой</h2>
+<p>Из требований выпишите, на каком сервере меняется файл, имя, БД или роль. Сравните значения P и M и выберите объекты задания M. Таблица проверок описывает требуемое состояние, а не порядок команд.</p>
+<p>Затем решите, откуда и чем подтвердить каждое требование. Проверка файла и проверка соединения могут выполняться на разных узлах. Отдельно фиксируйте успех разрешённого пути и отказ запрещённого.</p>
+<p>После самопроверки отправьте результат и проверьте STORED. Функциональная проверка M5/M6 включает интерактивный ввод. --no-submit и личные заметки не являются отправкой. Вопросы на понимание и заметки не добавляют требований к оценке.</p>
+<h2 id="section-6">M0 Своя среда и место выполнения команд (0)</h2>
 <h3>Требуемый результат</h3>
 <p>Проверьте пять ролей, исходные instance, SSM/внутренний SSH и личную регистрацию. 0 баллов. См. P0, не пересоздавайте основу.</p>
 <h3>Проверка и отправка</h3>
 <pre><code class="language-bash">jdu-web-check M0 --no-submit
 jdu-web-check M0
 </code></pre>
-<h2 id="section-4">M1 Выдача статического файла по HTTP (8)</h2>
+<h2 id="section-7">M1 Выдача статического файла по HTTP (8)</h2>
 <h3>Требуемый результат</h3>
 <p>По навыкам P1 самостоятельно выдайте другой заданный файл и текст. Сохраните practice.txt. Проверяются файл, сервис, слушатель, local/bastion/public HTTP и журнал текущего запроса.</p>
 <ul>
@@ -127,7 +191,7 @@ jdu-web-check M0
 <pre><code class="language-bash">jdu-web-check M1 --no-submit
 jdu-web-check M1
 </code></pre>
-<h2 id="section-5">M2 Внутренний DNS и системное разрешение имён (13)</h2>
+<h2 id="section-8">M2 Внутренний DNS и системное разрешение имён (13)</h2>
 <h3>Требуемый результат</h3>
 <p>Добавьте шесть основных имён в ту же zone lab.test. guide/practice-db можно сохранить. Нужны обычный resolver бастиона/Web, HTTP M1 по имени, имя DB, UDP/TCP, forwarding, NXDOMAIN, ACL и запрет AXFR.</p>
 <table>
@@ -235,7 +299,7 @@ jdu-web-check M1
 <pre><code class="language-bash">jdu-web-check M2 --no-submit
 jdu-web-check M2
 </code></pre>
-<h2 id="section-6">M3 Данные при остановке и запуске (3)</h2>
+<h2 id="section-9">M3 Данные при остановке и запуске (3)</h2>
 <h3>Требуемый результат</h3>
 <p>Создайте отдельный marker M со своим Lab ID. Отдельно от P3 пройдите prepare-stop → AWS Stop → observe-stopped → AWS Start → M3. Нужны тот же Web и исходный root volume; reboot не подходит. Backup/restore и новый диск не нужны.</p>
 <ul>
@@ -274,7 +338,7 @@ payload=mission-storage-2026
 <pre><code class="language-bash">jdu-web-check M3 --no-submit
 jdu-web-check M3
 </code></pre>
-<h2 id="section-7">M4 Подключение к PostgreSQL с аутентификацией (9)</h2>
+<h2 id="section-10">M4 Подключение к PostgreSQL с аутентификацией (9)</h2>
 <h3>Требуемый результат</h3>
 <p>Самостоятельно настройте основную БД и роли. Разрешите db.lab.test обычным resolver M2 и выполните SELECT с Web runtime-role. HBA разрешает только Web/32 и правильную пару DB/role. Существующий пароль сохраните через helper mission на Web, отдельно от practice. Таблицы приложения пока не нужны.</p>
 <ul>
@@ -336,7 +400,7 @@ jdu-web-check M3
 <pre><code class="language-bash">jdu-web-check M4 --no-submit
 jdu-web-check M4
 </code></pre>
-<h2 id="section-8">M5 Соединить предоставленное приложение с Web и DB (13)</h2>
+<h2 id="section-11">M5 Соединить предоставленное приложение с Web и DB (13)</h2>
 <h3>Требуемый результат</h3>
 <p>Подключите то же приложение к БД mission. Используйте навыки P5 с profile=mission, не копируйте заново app/venv. После остановки сервиса: создать runtime mission → явно activate → создать setup mission; setup practice должен быть завершён в P6. Выполните migrations/seed/admin и grants в основной БД, добавьте две заданные записи. Сохраните P1/M1, оставьте mission активным.</p>
 <ul>
@@ -444,7 +508,7 @@ jdu-web-check M4
 <pre><code class="language-bash">jdu-web-check M5 --functional
 # STORED / PENDING: inspect delivery result
 </code></pre>
-<h2 id="section-9">M6 Минимальные права и границы публикации (16)</h2>
+<h2 id="section-12">M6 Минимальные права и границы публикации (16)</h2>
 <h3>Требуемый результат</h3>
 <p>Завершите минимальные права mission: catalog_setup NOLOGIN/password NULL, временные setup-файлы удалены. Проверьте root-код/venv, секреты 600, запрет admin на 80, успешный private8080, права admin только view/add/change, разделение публичных данных и SQL-права. --functional - автоматическая проверка, не личная демонстрация.</p>
 <ul>
@@ -564,14 +628,14 @@ jdu-web-check M4
 <pre><code class="language-bash">jdu-web-check M6 --functional
 # STORED / PENDING: inspect delivery result
 </code></pre>
-<h2 id="section-10">Продолжение и повторная отправка</h2>
+<h2 id="section-13">Продолжение и повторная отправка</h2>
 <p>На следующем занятии запустите свой Lab и те же пять узлов, проверьте running/SSM Online и текущие public IP. В CloudShell заново задайте LAB_ID/COURSE_ID/INSTALL, прочитайте activate.sh как в P0 и выполните M0 --no-submit. Не повторяйте создание/ключи/регистрацию; при истечении срока запросите обновление.</p>
 <p>STORED означает приём преподавателем. Для PENDING используйте исходный request-id и то же задание с --retry. --no-submit не является отправкой. UNKNOWN - измерение невозможно, а не автоматический ноль или успех. Оно не удаляет прежнюю оцениваемую попытку, но не доказывает текущую готовность. Используется последняя полностью оцениваемая попытка, не максимальная и не сумма PASS разных запусков.</p>
 <pre><code class="language-bash">jdu-web-check M2 --retry 'YOUR-ORIGINAL-REQUEST-ID'
 jdu-web-my-progress
 </code></pre>
 <p>Личный URL открывайте только сами. Не отправляйте в отчёт или чат пароль/token/cookie/ключ/env/URL преподавателя. Снимки не должны содержать секретов. Не проверяйте ошибки на чужом Lab.</p>
-<h2 id="section-11">Источники и версия</h2>
+<h2 id="section-14">Источники и версия</h2>
 <p>Критерии основаны на фиксированном registry и таблицах M. Текст сверен с принятой реализацией, но новый студент ещё не прошёл эти подробные шаги с нуля. Ещё нужны приёмка успешного ручного ввода пароля и stop/start всех пяти узлов после установки приложения. Редактирование пособия не делает CLASS_READY=true.</p>
 <p>Версии: web-course-class193548-20261023-r2; web-d11-2026-10-r1; registry SHA256 3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33.</p>
 <p>Подпись действует до 2026-10-27 14:24:57 UZT. Срок URL загрузки отличается от срока подписи; не меняйте даты для обхода. Ниже первичные документы общих функций, проверенные 2026-10-23. IP, задания и баллы Lab определены этим курсом.</p>

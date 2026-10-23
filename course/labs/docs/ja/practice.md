@@ -1,6 +1,6 @@
 # Web演習：練習P0〜P6と詳しい操作例
 
-2026-10-23 | D12 P/M r1 | web-course-class193548-20261023-r2
+2026-10-23 | D12 P/M r1.1 | web-course-class193548-20261023-r2
 
 教材初版・教師確認用。学生の最初からの通し試読は未実施。
 
@@ -36,6 +36,28 @@ M1=8、M2=13、M3=3、M4=9、M5=13、M6=16、合計62素点。M0は0点。本人
 
 nanoの編集：file名を指定して開く→本文を入力→Ctrl+O→Enterで保存→Ctrl+Xで終了。設定fileの枠はshell commandではない。psqlに入るとpromptが変わる。SQL/\passwordはその中へ入力し、\qでUbuntuへ戻る。失敗したcommandの次へ進まず、期待結果を確認する。
 
+## 操作例の読み方
+
+各Pは「課題→仕組み→操作例→理解の確認」の順で使う。操作例は一つのまとまりを貼り付けず、1コマンドずつ実行して表示を読む。末尾のバックスラッシュは次の行へ続く記号なので、その行と次の行を一つのコマンドとして扱う。
+
+bash枠は表示された実行場所の端末へ入力する。text枠は設定ファイルの本文・psql内の入力・出力例などで、直前の説明に従う。行頭が#の説明行はコメント。自分の端末に出る$、#、postgres=#などのpromptをコマンドへ付け足さない。YOUR-から始まる値だけを自分の値へ置き換える。
+
+設定を作るときは「保存したファイル→構文検査→サービスへの反映→実際の通信」の順で確認する。ファイルの内容が正しくても、実行中のサービスが古い設定を使うことがある。画面表示だけでなく、HTTP応答・DNS回答・SQL結果とlogを対応させる。
+
+## 完成像と通信経路
+
+| 送信元 | 宛先 | Protocol / port | 目的 |
+| --- | --- | --- | --- |
+| Windows PC | Web public IPv4 | TCP/80 | 一般利用。Internet Gatewayを通り、公開一覧と静的ファイルを読む。 |
+| Windows PC | bastion public IPv4 | TCP/3389 | 許可CIDRからRDPで入る。踏み台のデスクトップを操作する。 |
+| bastion | Web/DNS/DB/repo | TCP/22 | 内部SSHの管理経路。秘密鍵は踏み台内で保持する。 |
+| bastion / Web | DNS 10.20.2.10 | UDP+TCP/53 | lab.testの名前を解決する。DNSはWeb本文を返さない。 |
+| Web app | DB 10.20.2.20 | TCP/5432 | アプリのDB roleでSQLを実行する。WindowsからDBへ直接接続しない。 |
+| bastion | Web 10.20.1.20 | TCP/8080 | admin.lab.testの管理画面。公開80番の入口とは分ける。 |
+| Nginx on Web | 127.0.0.1 on Web | TCP/8000 | 同じWeb内のアプリへ渡す。127.0.0.1は実行中のそのホスト自身。 |
+
+初期環境で提供されたSSMは、CloudShellから各EC2へ入る管理経路。上のWeb利用経路とは別に使う。表の内部IP/portはこのLabの仕様で、一般のWebシステム全てに同じ値を要求するものではない。
+
 ## P0 自分の環境と実行場所
 
 ### 学ぶこと
@@ -45,6 +67,14 @@ CloudShell、Windows、5台のUbuntuを区別し、正しいサーバーへSSM�
 ### 課題
 
 自分のLab ID・配布ID・5役割のinstance IDを確認する。これは提供済み環境の確認で、0点。5台がまだない場合は先に初期配布手順を完了する。作成済みならcreate・鍵生成・採点再登録を繰り返さない。
+
+### 仕組みを理解する
+
+**始める前の状態:** 教師が初期配布と個別登録を終えた、本人の5台を使う。
+
+**このPで変えること:** 対象account・役割・実行場所を見分け、公開教材資源を準備する。
+
+AWSコンソールはAWS資源を管理する画面、CloudShellはAWS CLIを使う自分の端末、SSMは選んだEC2のOS内へ入る接続である。SSMへ入っても5台が一つのOSになるわけではない。Webの/var/wwwとDBの/var/wwwは別の保存先である。サーバーの役割と、そこで操作するOS userを別々に確認する。
 
 ### 操作例：一つずつ実行する
 
@@ -64,6 +94,8 @@ command -v jdu-web-check
 jdu-web-check --help
 ```
 
+**コマンド・設定値の意味:** LAB_IDとCOURSE_IDは端末内の変数。INSTALLはその値から作る保存先で、引用符は空白などを一つの値として扱うために付ける。sourceは現在のshellへ設定を読み込み、command -vは実行するコマンドの所在を調べる。
+
 **期待する結果と読み方:** AWS accountは教師から指定された自分のもの。コマンドのpathには同じCOURSE_IDとLAB_IDがある。P0〜P6/M0〜M6が表示される。
 
 **うまくいかないとき:** No such fileなら初期導入とinstallを確認する。旧版は全課題に対応しない。期限切れは教師へ更新を依頼し、日付の書換えで回避しない。
@@ -73,6 +105,8 @@ jdu-web-check --help
 **実行場所:** 学生本人のAWSコンソール
 
 **目的と操作:** EC2のInstances一覧で自分のLabIdとDeploymentIdのタグを照合し、bastion/web/dns/db/repoのinstance IDを手元の作業表へ記入する。名前だけで選ばない。公開IPv4はbastionとwebだけにある。SSM接続は公開IPではなくinstance IDを使う。
+
+**コマンド・設定値の意味:** instance IDはEC2を識別する値、roleは授業内の担当、公開IPは外から接続する宛先である。公開IPが変わっても同じinstance IDなら同じEC2として追跡できる。作業表には5役割とIDの組を記録する。
 
 **期待する結果と読み方:** 5台ともrunning、SSM Online。private IPは本書の共通表と一致する。公開IPv4は停止・起動後に変わることがある。
 
@@ -93,6 +127,8 @@ pwd
 exit
 ```
 
+**コマンド・設定値の意味:** 最初のstart-sessionだけをCloudShellで実行し、接続完了を待ってから残りを1行ずつ入力する。id -unはuser、hostnameはOSのhost名、roleは教材上の役割を読む。exitは現在の接続を1段だけ戻す。
+
 **期待する結果と読み方:** userはssm-user、roleはweb。以降もサーバーを替えるたびに確認する。SSHで入ったUbuntuのuserはubuntuになる場合がある。
 
 **うまくいかないとき:** TargetNotConnectedならrunning/SSM Online/region us-east-1を確認する。SGを全面開放したりWindowsへ鍵をダウンロードしない。
@@ -107,6 +143,8 @@ exit
 cd "$HOME/web-lab-pm-r1/resources"
 python3 -B stage_resources.py --installation "$INSTALL"
 ```
+
+**コマンド・設定値の意味:** 公開教材資源はアプリやSQLの材料であり、完成済みのサービスではない。stage_resources.pyをCloudShellで実行して初めてWeb/DBへ配置される。Windowsへzipを保存しただけではEC2内のファイルは増えない。
 
 **期待する結果と読み方:** PUBLIC_LESSON_RESOURCES_READY=web と =db。各台の/var/lib/jdu-web/lesson-resources-r1に公開ファイルがある。既存の異なるファイルは上書きしない。
 
@@ -124,6 +162,8 @@ jdu-web-check P0
 jdu-web-check M0 --no-submit
 ```
 
+**コマンド・設定値の意味:** 判定と送信は二つの結果である。自己確認でPASSでも、--no-submitならその回は教師へ保存されない。PENDINGは保存の確認がまだ取れていない状態なので、点数の増減と同一視しない。
+
 **期待する結果と読み方:** readiness/completeと送信表示を別々に読む。STOREDは受付済み、PENDINGは未送信、UNKNOWNは観測できない状態。
 
 **うまくいかないとき:** 失敗行のcheck ID・実行時刻・対象roleだけを相談に使う。token・password・本人用URLを共有しない。
@@ -138,9 +178,17 @@ jdu-web-check M0 --no-submit
 mstsc /prompt
 ```
 
+**コマンド・設定値の意味:** RDPは踏み台の画面と入力を運ぶ。踏み台内Firefoxからの通信の送信元はWindowsではなく踏み台になる。日本語/英語などのキー配列はpasswordの記号入力にも影響するため、表示言語と配列を区別する。
+
 **期待する結果と読み方:** UbuntuのXfceデスクトップとFirefoxが開く。これは踏み台内のbrowserであり、Windows側のbrowserとは別。RDPのlabuserにはsudo管理権限がないため、構築はCloudShellからSSM/ssm-userで行う。
 
 **うまくいかないとき:** Login failedならuser名と日本語/英語等のkeyboard配列を確認する。passwordを会話へ送らない。到達しない場合は現在のIPと許可された接続元CIDRを教師と確認し、3389を全公開しない。終了時はRDP内の自分の作業を保存し、接続を閉じる。
+
+### 理解の確認（採点外）
+
+WebへSSM接続したままDBの手順を入力すると、どのサーバーが変わるか？
+
+**考え方:** 現在接続中のWebが変わる。exitでCloudShellへ戻り、DBのinstance IDへ接続し直す。
 
 ## P1 HTTPで静的ファイルを返す
 
@@ -159,6 +207,14 @@ Webの/var/www/html/practice.txtから指定本文をHTTP200で返す。Web自�
 JDU WEB-02 practice: HTTP response verified.
 ```
 
+### 仕組みを理解する
+
+**始める前の状態:** Webは提供済みだが、練習用ファイルはまだ配信していない。
+
+**このPで変えること:** Nginxが公開80番でpractice.txtを返し、要求をlogへ残す。
+
+この練習では、URLの/practice.txtをWeb内の/var/www/html/practice.txtへ対応させる。最初の127.0.0.1での成功はWeb内部の確認で、踏み台やWindowsから届く証明にはならない。同じ本文を三つの位置から読み、どの経路まで正常かを切り分ける。[Nginxの一次資料](https://nginx.org/en/docs/beginners_guide.html)も参照。
+
 ### 操作例：一つずつ実行する
 
 #### P1.1 内部APTからNginxを導入する
@@ -172,6 +228,8 @@ cat /etc/apt/sources.list.d/jdu-web.sources
 sudo apt-get update -o APT::Update::Error-Mode=any
 sudo apt-get install --no-install-recommends nginx
 ```
+
+**コマンド・設定値の意味:** apt-get updateは利用可能なpackage一覧を更新し、installは選んだpackageを導入する。--no-install-recommendsは推奨packageを追加しない指定。Signed-Byは許可した署名鍵の指定であり、repoへ接続できただけでは署名確認の成功にならない。
 
 **期待する結果と読み方:** sourceに内部IPとSigned-Byがあり、署名エラーなしで終了する。インストール確認にYを入力する。
 
@@ -195,6 +253,8 @@ stat -c '%U:%G %a %n' /var/www/html/practice.txt
 cat /var/www/html/practice.txt
 ```
 
+**コマンド・設定値の意味:** nanoで編集する自分の作業fileと、Nginxが読む配信用fileを分ける。installはここではpackage導入ではなく、コピー時にroot:rootと0644を指定するコマンド。0644では所有者だけが書け、他のuserは読める。末尾の改行も本文の一部となる。
+
 **期待する結果と読み方:** root:root 644。本文は JDU WEB-02 practice: HTTP response verified. の1行である。大文字、小文字、空白、句点も判定対象。
 
 **うまくいかないとき:** 空白画面ならまだnano内。保存して終了してから次のcommandを実行する。既存のmission.txtは変更しない。
@@ -214,6 +274,8 @@ systemctl is-active nginx
 sudo ss -lntp
 ```
 
+**コマンド・設定値の意味:** nginx -Tは読込対象の設定を表示し、-tは構文を検査する。systemctlのenableは次回起動時、--nowは現在の起動を指定する。設定ファイルの保存だけで終わらず、reload後のserviceと待受portを読む。
+
 **期待する結果と読み方:** syntax is ok/test is successful、active、0.0.0.0:80等の待受。127.0.0.1:80だけでは他のサーバーから利用できない。
 
 **うまくいかないとき:** 失敗時はnginx -tのfile名・行番号を確認し、そのfileを直す。SGを変更しても構文エラーは直らない。
@@ -228,6 +290,8 @@ sudo ss -lntp
 curl --noproxy '*' -i http://127.0.0.1/practice.txt
 ```
 
+**コマンド・設定値の意味:** curl -iは本文に加えてHTTP headerを表示する。127.0.0.1はこのWeb自身なので、この要求はInternetを通らない。HTTP200と指定本文の両方を読み、別ページの200を成功と取り違えない。
+
 **期待する結果と読み方:** HTTP200と指定本文。404はfile/root/URLの関係、connection refusedはservice/listenを調べる。
 
 **うまくいかないとき:** Welcome to nginxが出るなら/ではなく/practice.txtを要求したか確認する。
@@ -241,6 +305,8 @@ curl --noproxy '*' -i http://127.0.0.1/practice.txt
 ```bash
 curl --noproxy '*' -i http://10.20.1.20/practice.txt
 ```
+
+**コマンド・設定値の意味:** 同じcurlでも踏み台から実行すれば内部通信の検査になる。WindowsのbrowserからはWebの現在の公開IPを使う。10.20.1.20をWindows側へ入力して到達できないことと、Webの停止を同一視しない。
 
 **期待する結果と読み方:** 両経路とも200/同じ本文。InternetからのHTTP80は公開、管理8080とDB5432は公開しない。
 
@@ -259,9 +325,27 @@ jdu-web-check P1 --no-submit
 jdu-web-check P1
 ```
 
+**コマンド・設定値の意味:** access logでは時刻・要求path・statusを直前のcurlと対応させる。tailは末尾の行を読む操作で、logを書き換えない。exitで戻ってからCloudShell用checkerを使い、Web内へcheckerを移さない。
+
 **期待する結果と読み方:** 練習8項目PASSと準備確認、送信STORED。P1は成績0点。M1は別file/本文で自分で構成する。
 
 **うまくいかないとき:** PENDINGなら表示されたrequest-idで再送する。checkerの期待本文を書き換えない。
+
+### 出力の読み取り例（入力しない）
+
+```text
+HTTP/1.1 200 OK
+
+JDU WEB-02 practice: HTTP response verified.
+```
+
+上は説明用に必要な行だけを抜き出した例。実際には日時などのheaderが加わる。200と本文を読み、access logのpath/statusとも照合する。
+
+### 理解の確認（採点外）
+
+Web自身では200、踏み台からは接続失敗。本文を作り直す前に何を確認するか？
+
+**考え方:** 要求先IP・待受アドレスとport・踏み台からWebへの通信許可を調べる。本文の正否と到達性を分ける。
 
 ## P2 内部DNSと通常の名前解決
 
@@ -278,6 +362,14 @@ guide.lab.test→10.20.1.20、practice-db.lab.test→10.20.2.20を設定する�
 | guide.lab.test | 10.20.1.20 |
 | practice-db.lab.test | 10.20.2.20 |
 
+### 仕組みを理解する
+
+**始める前の状態:** P1のHTTPがIP指定で使える。DNSはこれから設定する。
+
+**このPで変えること:** BINDの練習名を、踏み台とWebの通常resolverから使える。
+
+DNSの仕事は名前への回答で、HTTP本文の配信ではない。lab.testのzoneはBINDが管理し、A recordはIPv4を返す。digで問い合わせ先を明示した確認と、getentやbrowserがOSの設定を使う確認を分ける。名前解決後のHTTP接続は別の通信である。[BINDの一次資料](https://bind9.readthedocs.io/en/v9.18.39/chapter3.html)。
+
 ### 操作例：一つずつ実行する
 
 #### P2.1 BINDを導入し元設定を残す
@@ -292,6 +384,8 @@ sudo apt-get install --no-install-recommends bind9 bind9-utils
 sudo cp -an /etc/bind/named.conf.options /etc/bind/named.conf.options.before-p2
 sudo cp -an /etc/bind/named.conf.local /etc/bind/named.conf.local.before-p2
 ```
+
+**コマンド・設定値の意味:** namedはBINDのservice名、named-checkconf等は設定を検査する道具である。cp -anの-nは同名の控えを上書きしない指定なので、再実行して最初の控えを失うことを防ぐ。
 
 **期待する結果と読み方:** 内部repoから導入される。後のM2では同じDNSにrecordを追加し、P2のrecordを消さない。
 
@@ -319,6 +413,8 @@ options {
     allow-transfer { none; };
 };
 ```
+
+**コマンド・設定値の意味:** allow-queryは問い合わせを受ける相手、allow-recursionは外部名の再帰処理を認める相手を指定する。lab.testの回答は自分のzone、外部名はforwarderへ渡す。ここでは接続元を踏み台・Web・localhostへ限定する。
 
 **期待する結果と読み方:** これは設定fileの内容で、shellへ直接実行しない。10.20.0.2はAWS resolver、10.20.2.10は自分のBIND。
 
@@ -349,6 +445,8 @@ guide IN A 10.20.1.20
 practice-db IN A 10.20.2.20
 ```
 
+**コマンド・設定値の意味:** zone宣言とzone本文は別ファイルへ保存する。guideはzone名を補ってguide.lab.testとなり、末尾ドット付きのdns.lab.test.は完全な名前。TTLはcache時間、SOAのserialはzone更新を識別する番号で、IPアドレスではない。
+
 **期待する結果と読み方:** 二つの別fileへ分けて保存する。dnsのAはNS名の到達先。まだclientのresolverは変更しない。
 
 **うまくいかないとき:** 既存M2がある場合はzoneを置換せず、この練習2件を追加する。zone定義を二重登録しない。
@@ -368,6 +466,8 @@ dig @127.0.0.1 guide.lab.test A
 dig @127.0.0.1 guide.lab.test A +tcp
 ```
 
+**コマンド・設定値の意味:** 構文検査が成功してからserviceへ反映する。digの@は問い合わせ先DNSを指定する記号、AはIPv4のrecord種別。+tcpを付けた確認ではTCP53を使い、UDPで成功した場合とは別に読む。
+
 **期待する結果と読み方:** zone loaded/OK、status NOERROR、flagsにaa、A=10.20.1.20。aaはこのzoneの権威応答。
 
 **うまくいかないとき:** 失敗ならsudo journalctl -u named -n 30 --no-pagerで対象行を調べ、設定を直して再検査する。
@@ -385,6 +485,8 @@ dig @10.20.2.10 absent-p2.lab.test A
 dig @10.20.2.10 aws.amazon.com A
 dig @10.20.2.10 lab.test AXFR
 ```
+
+**コマンド・設定値の意味:** 存在する内部名・存在しない内部名・外部名・zone転送を別々に試す。存在しない名のNXDOMAINは正しい否定回答で、DNSへ届かないtimeoutとは異なる。AXFRはzone一括転送の要求で、このLabでは拒否されることを確かめる。
 
 **期待する結果と読み方:** 必要名は正しいA、absent-p2は権威NXDOMAIN、外部名は回答、AXFRは転送拒否。timeoutは意図した拒否成功としない。
 
@@ -408,6 +510,8 @@ network:
         addresses: [10.20.2.10]
 ```
 
+**コマンド・設定値の意味:** このNetplan設定はDNSサーバー側ではなく、名前を使う踏み台とWebへ入れる。dhcp4はIPの取得を継続し、use-dns: falseはDHCPからのDNS採用を止める。addressesの名前解決先と、EC2自身のIPを混同しない。
+
 **期待する結果と読み方:** IP/gatewayを手書きせずDHCPを保持。別DNSをfallbackに加えない。/etc/resolv.confを直接置換せず、/etc/hostsへ課題名を書かない。次の手順まで同じSSM端末を開いたままにする。
 
 **うまくいかないとき:** 同じinterfaceが複数YAMLにあると値がmergeされる。resolvectl dnsにAWS DNSが残る場合は、対応する全YAMLとruntimeの設定を確認する。
@@ -428,6 +532,8 @@ getent ahostsv4 practice-db.lab.test
 curl --noproxy '*' -i http://guide.lab.test/practice.txt
 ```
 
+**コマンド・設定値の意味:** netplan generateは設定の生成、applyは適用である。設定変更でSSMが切れた場合は同じinstanceへ接続し直す。resolvectlは選ばれたDNS、getentはOSの通常経路を読み、最後に名前指定のHTTPも確かめる。
+
 **期待する結果と読み方:** 実DNSの集合は10.20.2.10だけ。getentは期待IP、HTTPは200/練習本文。127.0.0.53はローカルstubであり、上流はresolvectlで確認する。
 
 **うまくいかないとき:** dig成功/getent失敗ならclient resolverを調べる。FirefoxはDoH無効の教師設定を維持する。
@@ -443,9 +549,26 @@ jdu-web-check P2 --no-submit
 jdu-web-check P2
 ```
 
+**コマンド・設定値の意味:** Firefoxの送信元は踏み台で、内部名guide.lab.testを使う。Windows側browserは同じ内部DNSを使う設定ではない。IPでの表示と名前での表示を比較し、P1のファイルが同じことを確認してから提出する。
+
 **期待する結果と読み方:** 13項目の練習確認。P1の現在機能も必要。次のM2で正式名6件を追加してからDB/appへ進む。
 
 **うまくいかないとき:** 名前が開かない原因をHTTP停止と決めつけず、IP指定→dig→getent→HTTPの順で比べる。
+
+### 出力の読み取り例（入力しない）
+
+```text
+status: NOERROR
+guide.lab.test.  300  IN  A  10.20.1.20
+```
+
+dig出力の説明用抜粋。Aの右が回答IPv4、300がTTL。回答が出ても、問い合わせ先SERVERが10.20.2.10かを別に確認する。
+
+### 理解の確認（採点外）
+
+dig @10.20.2.10は成功し、getentは失敗する。DNSのzoneだけが原因と言えるか？
+
+**考え方:** 言えない。明示したDNSへの回答と、OSが通常選ぶresolverは別なので、Netplanとresolvectlの実効設定を確認する。
 
 ## P3 保存内容と停止・再開
 
@@ -465,6 +588,14 @@ task=P3
 payload=practice-storage-2026
 ```
 
+### 仕組みを理解する
+
+**始める前の状態:** 同じWebの元root EBS上にmarkerを保存できる。
+
+**このPで変えること:** Webを停止・起動しても同じ保存内容が残ることを、停止前後の証拠で示す。
+
+起動中のメモリーとEBS上へ保存したファイルを区別する。今回は元root EBSを保持した同じWebのStop/Startを扱う。ファイルのhashとinstance/volume IDを比べ、boot IDの変化で新しい起動も確認する。自動割当のpublic IPv4は変わることがある。[EC2の停止・起動](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Stop_Start.html)。
+
 ### 操作例：一つずつ実行する
 
 #### P3.1 元の保存先と空きを調べる
@@ -479,6 +610,8 @@ lsblk -o NAME,TYPE,SIZE,MOUNTPOINTS,SERIAL
 df -h /var/lib
 cat /proc/sys/kernel/random/boot_id
 ```
+
+**コマンド・設定値の意味:** findmntはpathが載るfilesystem、lsblkはOSから見えるblock device、dfは空き容量を読む。それぞれ対象が違う。boot_idは今回の起動を識別し、保存ファイルのhashとは別の証拠になる。
 
 **期待する結果と読み方:** 元root volumeと対応し、空き20%以上かつ2GiB以上。boot_idはこの起動を区別する識別子として記録する。
 
@@ -503,6 +636,8 @@ stat -c '%U:%G %a %n' /var/lib/jdu-web/practice /var/lib/jdu-web/practice/storag
 sha256sum /var/lib/jdu-web/practice/storage.txt
 ```
 
+**コマンド・設定値の意味:** printfの%sへ自分のLAB_IDが入り、\nは改行になる。>は自分の作業fileを書き出す指定。install -dは親directoryを作り、続くinstallはmarkerの所有者と権限を揃える。hashは本文の一致確認に使う。
+
 **期待する結果と読み方:** 3行の本文と末尾改行、0755/0644。hashを控える。権限777にすると保存fileの条件から外れる。
 
 **うまくいかないとき:** YOUR-LAB-IDをそのまま残すと不一致。EC2名やメールではなく匿名Lab IDを使う。
@@ -517,6 +652,8 @@ sha256sum /var/lib/jdu-web/practice/storage.txt
 jdu-web-check P3 --prepare-stop
 ```
 
+**コマンド・設定値の意味:** --prepare-stopは停止前の対象・起動・markerを保存する操作で、EC2を停止するコマンドではない。保存が成功してからStopへ進む。この順序を逆にすると、停止前の比較材料を取れない。
+
 **期待する結果と読み方:** 停止前の証拠が保存される。記録後はmarkerを編集しない。
 
 **うまくいかないとき:** 失敗したまま停止すると有効な三段階の証拠にならない。先にfile/権限/SSMを直す。
@@ -530,6 +667,8 @@ jdu-web-check P3 --prepare-stop
 ```bash
 jdu-web-check P3 --observe-stopped
 ```
+
+**コマンド・設定値の意味:** AWSコンソールで対象WebをStopし、stoppedになった段階をCloudShellから--observe-stoppedで記録する。SSMが切れたことだけを停止完了の証拠にしない。再起動やTerminateとは違う操作を選ぶ。
 
 **期待する結果と読み方:** 同じinstanceがstoppedと記録される。この間WebへHTTP/SSM接続できないのは予定した停止。
 
@@ -546,9 +685,17 @@ jdu-web-check P3 --no-submit
 jdu-web-check P3
 ```
 
+**コマンド・設定値の意味:** 同じWebをStartし、runningとSSM Onlineを待つ。checkerは保存済みの停止前証拠と現在を比べるので、起動後にmarkerを作り直して証拠を上書きしない。以降の外部閲覧には更新後のWeb公開IPを使う。
+
 **期待する結果と読み方:** 練習3項目PASS。EC2のpublic IPv4が変われば外部HTTPの接続先も更新する。
 
 **うまくいかないとき:** 別instanceを作ると保持の証明にならない。P3/M3は別markerと別証拠を使う。
+
+### 理解の確認（採点外）
+
+起動後に同じ本文が読めれば、別のWebを作っても合格と言えるか？
+
+**考え方:** 同じ元instanceとvolumeの保持も条件なので言えない。本文だけでなく、対象の連続性と停止状態の観測が必要。
 
 ## P4 PostgreSQLへの認証接続
 
@@ -564,6 +711,14 @@ jdu_catalog_practice、catalog_practice_setup、catalog_practice_appを作る。
 - Database: jdu_catalog_practice
 - Setup role: catalog_practice_setup
 - Runtime role: catalog_practice_app
+### 仕組みを理解する
+
+**始める前の状態:** DBに教材資源があり、WebからDBへ許可された経路を使う。
+
+**このPで変えること:** 練習DBとsetup/runtime roleを作り、Webから認証付きSQLを実行する。
+
+接続には、通信の到達、DBの待受、HBAの許可、password、SQL権限がそれぞれ必要。ssm-userはOS userで、catalog_practice_appはDB roleである。HBAは上から最初に一致した行を使う。SQLへ接続できることと、tableを作成できることも別の権限である。[HBA](https://www.postgresql.org/docs/16/auth-pg-hba-conf.html)・[SQL権限](https://www.postgresql.org/docs/16/sql-grant.html)。
+
 ### 操作例：一つずつ実行する
 
 #### P4.1 DBを導入し教材SQLを展開する
@@ -580,6 +735,8 @@ pg_lsclusters
 sudo -u postgres psql -X -d postgres -c "SHOW data_directory;"
 ```
 
+**コマンド・設定値の意味:** packageの導入と、DB内の教材データ作成は別の段階。pg_lsclustersでversion・cluster・port・状態を読む。sudo -u postgresはOS userをpostgresへ切り替えて1コマンドを実行し、-Xは個人のpsql設定を読み込まない指定である。
+
 **期待する結果と読み方:** 16/main、data directory=/var/lib/postgresql/16/main。教材SQLは/var/lib/jdu-web/lesson-resources-r1/app/sqlにある。
 
 **うまくいかないとき:** 既存DBやroleは削除しない。すでに構築した場合は現在の状態を読み、未実施の手順だけ進める。
@@ -595,6 +752,8 @@ listen_addresses = '10.20.2.20'
 port = 5432
 password_encryption = 'scram-sha-256'
 ```
+
+**コマンド・設定値の意味:** listen_addressesはDBが接続を受ける自分側のIPで、接続元の許可リストではない。password_encryptionは新しく設定するDB passwordの保存方式。設定を保存しただけでは、稼働中の待受や既存passwordが自動で変わった証拠にはならない。
 
 **期待する結果と読み方:** 外部全addressを示す*は使わない。まだpasswordを設定せず、次のHBAを整えてからrestartする。
 
@@ -617,6 +776,8 @@ host all all 0.0.0.0/0 reject
 host all all ::/0 reject
 ```
 
+**コマンド・設定値の意味:** HBAのhost行は「DB名・DB role・接続元・認証方式」の組で読む。10.20.1.20/32はWeb1台だけ。末尾のrejectより前へ必要な許可を置く。localのpeerはDB内のOS postgres用で、WebからのTCP password認証とは別の行である。
+
 **期待する結果と読み方:** 接続許可はDB/role/送信元の組合せで判断する。0.0.0.0/0の行はrejectであり許可ではない。
 
 **うまくいかないとき:** trustへ変えて認証を省略しない。DB5432は基盤SGでもWebだけから許可される。
@@ -635,6 +796,8 @@ sudo -u postgres psql -X -d postgres -c "SHOW password_encryption;"
 sudo -u postgres psql -X -d postgres -c \
   "SELECT line_number,error FROM pg_hba_file_rules WHERE error IS NOT NULL;"
 ```
+
+**コマンド・設定値の意味:** postgresql@16-mainは実際のclusterのservice。再起動後はservice・待受・SHOWの実効値を組み合わせて確認する。pg_hba_file_rulesでerrorの行が0件でも、対象clientが接続できるかは次の実通信で確かめる。
 
 **期待する結果と読み方:** active、10.20.2.20:5432、scram-sha-256、HBA errorは0行。
 
@@ -655,6 +818,8 @@ python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u pos
   psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
 ```
 
+**コマンド・設定値の意味:** profile_sql.pyの最初の実行は生成SQLを読むだけ。|でpsqlへ渡した実行で初めてDBを変更する。--profile practiceは練習DB/roleを選び、ON_ERROR_STOP=1はSQLエラーの後へ処理が続くことを防ぐ。既存DBに同じ作成SQLを重ねない。
+
 **期待する結果と読み方:** CREATE ROLEが2回、CREATE DATABASE、schemaとCONNECT/USAGEの設定。appにsuperuser/CREATEDB等は付けない。
 
 **うまくいかないとき:** already existsなら成功済みの可能性。DROPで消さず\duと\lで対応を確認する。パイプ右側psqlにSQL errorがないことを確認する。
@@ -673,6 +838,8 @@ sudo -u postgres psql -X -d postgres
 \q
 ```
 
+**コマンド・設定値の意味:** sudoから始まる行をOS端末へ入力し、その後の\password・\du・\qをpsql内へ1行ずつ入れる。setupとappは別のDB roleなので、それぞれのpasswordを区別する。入力が表示されなくてもキー入力は受け付けられている。
+
 **期待する結果と読み方:** roleの属性にSuperuser/Create role/Create DB等がない。RDP用password、アプリ管理者password、採点tokenとは別の秘密である。
 
 **うまくいかないとき:** keyboard配列に注意。値を確認するために会話やエディタへ書き出さない。忘れた場合は教師と本人用復旧を行う。
@@ -688,6 +855,8 @@ sudo apt-get install --no-install-recommends postgresql-client-16
 psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
   'SELECT current_database(),current_user,1 AS value;'
 ```
+
+**コマンド・設定値の意味:** psqlの-hは接続先、-UはDB role、-dはDB名、-Wはpasswordの入力要求、-cは実行するSQL。これはWeb側から実行する。SELECT結果のDB名とuser名で、意図した練習環境へ入ったことを確認する。
 
 **期待する結果と読み方:** jdu_catalog_practice / catalog_practice_app / 1。portが開くだけ、pg_isreadyが成功するだけではこの認証SQLの代わりにならない。
 
@@ -707,9 +876,26 @@ jdu-web-check P4 --no-submit
 jdu-web-check P4
 ```
 
+**コマンド・設定値の意味:** database_secret.pyは今設定したruntime passwordを再入力し、Web内の保護された設定へ保存する。新しいpasswordの生成や変更ではない。setup用やRDP用の値を入れず、catalog_practice_appの既存値を使う。
+
 **期待する結果と読み方:** D11_EXISTING_DB_PASSWORD_STORED_LOCALLYと練習9項目。誤password・他DB/管理roleの拒否も正常接続との対照で確認される。
 
 **うまくいかないとき:** 既存fileありなら再生成しない。P5では同じDB passwordをapp設定にも入力する。M4はmission用の別DB/roleで構築する。
+
+### 出力の読み取り例（入力しない）
+
+```text
+current_database    | current_user         | value
+jdu_catalog_practice | catalog_practice_app | 1
+```
+
+SELECT結果の読み方の例。列の幅や罫線は実際と異なってよい。DB名・role名・value=1を確認する。table編集の許可を証明する結果ではない。
+
+### 理解の確認（採点外）
+
+psqlがpasswordを受け付けたのにtable作成が拒否される。必ずpasswordの誤りか？
+
+**考え方:** 認証とSQL権限は別。runtime roleの役割に合った拒否なら正常で、setup用の操作をruntimeへ追加しない。
 
 ## P5 教員アプリをWeb・DBへ接続する
 
@@ -732,6 +918,14 @@ practice profileで備品カタログを構築する。M2の正式DNSとP4が現
 | P5-PUBLIC-001 | Practice keyboard | 4 | Training shelf A | true |
 | P5-PRIVATE-001 | Practice mouse | 2 | Training shelf B | false |
 
+### 仕組みを理解する
+
+**始める前の状態:** M2のDNSとP4の練習DBが現在動作する。
+
+**このPで変えること:** 提供アプリをWeb内で動かし、公開一覧と踏み台限定の管理画面をDBへ接続する。
+
+NginxがHTTPの入口、GunicornがPythonアプリを実行するプロセス、PostgreSQLがデータの保存先となる。静的ファイルのP1と異なり、一覧の内容はDBから取得する。venvはアプリ用Python環境、systemd unitは起動方法の定義である。ここでは提供コードを読みながら配置し、プログラムを書き直す必要はない。
+
 ### 操作例：一つずつ実行する
 
 #### P5.1 必要なDNSと公開資源を確認する
@@ -748,6 +942,8 @@ sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py --wheels
 ls /var/lib/jdu-web/lesson-resources-r1/app
 ls /var/lib/jdu-web/lesson-resources-r1/wheels
 ```
+
+**コマンド・設定値の意味:** P5ではDB名をIPへ手で置き換えず、M2で設定した通常DNSを使う。--wheelsは固定版のPython package資源を用意する指定で、アプリの起動ではない。公開資源と、次に自分が作る秘密設定を分けて扱う。
 
 **期待する結果と読み方:** PUBLIC_APP_RESOURCES_VERIFIEDとSIGNED_OFFLINE_WHEELS_READY=7。app資源はroot管理の公開fileだけ。
 
@@ -770,6 +966,8 @@ sudo /opt/jdu-catalog/venv/bin/python -m pip --isolated --no-cache-dir install \
 sudo /opt/jdu-catalog/venv/bin/python -m pip check
 ```
 
+**コマンド・設定値の意味:** コードは/opt/jdu-catalog/app、Python環境は隣のvenvへ置く。--no-indexは外部package一覧を使わず、--find-linksはローカルwheelの場所、--require-hashesは期待hashとの一致を必須にする。最後のpip checkは導入後の依存関係を調べる。
+
 **期待する結果と読み方:** --no-indexは外部indexを使わない、--require-hashesはlockのhashを要求する。pip checkは依存矛盾なし。
 
 **うまくいかないとき:** 依存不足は教員の収録資源へ戻す。pip installで最新版へ更新しない。appコードは変更しない。
@@ -789,6 +987,8 @@ id catalog
 getent passwd catalog
 ```
 
+**コマンド・設定値の意味:** catalogはアプリを動かすOS service userで、DB roleのcatalog_practice_appとは別物。nologinは対話shellへ入らない指定で、serviceとして実行できない意味ではない。id catalogがすでに存在するなら、作成済みかを確認してから続ける。
+
 **期待する結果と読み方:** catalogはsudo groupになくshellは/usr/sbin/nologin。labuserやssm-userとは別user。
 
 **うまくいかないとき:** 権限errorをchmod -R 777やcatalogのsudo追加で解決しない。対象directoryとownerを照合する。
@@ -806,6 +1006,8 @@ sudo python3 -B /opt/jdu-catalog/app/configuration.py create-runtime --profile \
 sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
 ```
+
+**コマンド・設定値の意味:** runtime設定はアプリが通常使うDB接続と公開host名を持つ。PUBLIC_WEB_IPV4はStop/Start後の現在値にする。checkは値の妥当性、statは所有者・権限を読む。秘密を確認するためにapp.env全体をcatしない。
 
 **期待する結果と読み方:** CATALOG_ENV_CREATED=practice、VALID、root:root 600。DB_NAMEは練習DB、DB_USERは練習app roleとして生成される。
 
@@ -829,6 +1031,8 @@ sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase setup create_lab_admin
 ```
 
+**コマンド・設定値の意味:** migrateはアプリ用tableの構造を作り、seed_catalogは初期データ、create_lab_adminはアプリ管理者を作る。管理者のpasswordはDBやRDPのpasswordとは別。ここだけsetup接続を使い、通常起動へその権限を引き継がない。
+
 **期待する結果と読み方:** 固定11table、サンプル3件、staff管理者（superuserではない）。操作はcatalog OS userへ権限を落として実行される。
 
 **うまくいかないとき:** seedや管理者のalready existsは既存データ保護。初期化/resetせず次の状態確認へ進む。
@@ -845,6 +1049,8 @@ python3 -B profile_sql.py --profile practice 03_runtime_grants.sql
 python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u postgres \
   psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
 ```
+
+**コマンド・設定値の意味:** DB側へ戻り、作成済みtableに通常roleの権限を付ける。DBへ接続する権限と、table/sequenceを使う権限は別。練習profileのSQLを読んでから渡し、runtimeをsuperuserへ変更して解決しない。
 
 **期待する結果と読み方:** COMMITまで成功。catalog_itemはSELECT/INSERT/UPDATE、auth_userは参照とlast_login/password列だけの更新、session等は用途別。
 
@@ -868,6 +1074,8 @@ systemctl is-active jdu-catalog
 sudo ss -lntp
 ```
 
+**コマンド・設定値の意味:** collectstaticはアプリのCSS等を配信用の保存先へ集める。unit配置後のdaemon-reloadはsystemdにunit定義を読み直させる操作で、アプリ設定の編集とは異なる。待受8000はWeb内の127.0.0.1だけであることを読む。
+
 **期待する結果と読み方:** activeで、アプリ8000は127.0.0.1だけ。0.0.0.0:8000へ直接公開しない。
 
 **うまくいかないとき:** 起動errorはjournalctl -u jdu-catalogを見る。秘密設定本文をlogへ貼らず、configuration.py checkで形式を確認する。
@@ -890,6 +1098,8 @@ sudo systemctl reload nginx
 curl --noproxy '*' -i http://127.0.0.1/practice.txt
 ```
 
+**コマンド・設定値の意味:** sites-availableは保存した設定、sites-enabledのsymbolic linkは有効にする設定を指す。元defaultは控えへ移す。nginx -tが通ってからreloadし、アプリ追加後もP1の静的ファイルを配信できることを確認する。
+
 **期待する結果と読み方:** 構文成功、practice.txtは引き続き200。公開access logはjdu-catalog-public.access.logへ切り替わる。
 
 **うまくいかないとき:** duplicate default serverなら旧siteを確認。reload前に-t失敗を直す。管理portをpublic IPでlistenさせない。
@@ -904,6 +1114,8 @@ curl --noproxy '*' -i http://127.0.0.1/practice.txt
 P5-PUBLIC-001 | Practice keyboard | 4 | Training shelf A | is_public=true
 P5-PRIVATE-001 | Practice mouse | 2 | Training shelf B | is_public=false
 ```
+
+**コマンド・設定値の意味:** 2件はcode・name・quantity・location・is_publicの組で区別する。is_publicは公開一覧に出すかというアプリ内の値で、SGの公開設定ではない。非公開の1件もDBへ保存し、公開一覧からは見えないことを確かめる。
 
 **期待する結果と読み方:** demo3件を消す必要はない。指定2件は完成条件の部分集合で、他の正当な公開備品も許される。非公開備品は公開一覧に出ない。
 
@@ -923,6 +1135,8 @@ ORDER BY code;"
 psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c "$QUERY"
 ```
 
+**コマンド・設定値の意味:** SELECTはDB内の値を読み、WHEREは対象の2件へ絞り、ORDER BYは表示順を揃える。追加の正当なrecordがあっても消さない。browserとSQLで同じ値を見ることで、単なる見た目のページではなくDBの実データを確認する。
+
 **期待する結果と読み方:** 指定した2行が一致する。画面が出てもDB接続失敗を固定HTMLで隠す構成にはしない。
 
 **うまくいかないとき:** permission deniedならSQL03のprofile/対象DBを確認。superuserで通常接続を代用しない。
@@ -937,9 +1151,17 @@ psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c "$Q
 jdu-web-check P5 --functional
 ```
 
+**コマンド・設定値の意味:** --functionalは設定の有無だけでなく、指定された入力を使ってアプリの操作を確かめる。対話のpassword欄にはアプリ管理者の既存値を入力する。完了後は機能のPASS/FAIL/UNKNOWNと送信のSTORED/PENDINGを別々に読む。
+
 **期待する結果と読み方:** 練習13項目と送信状態を見る。passwordなしの通常確認では機能4項目がUNKNOWNになる。点数のために他回の結果を継ぎ足さない。
 
 **うまくいかないとき:** 誤passwordなら再生成せず正しい既存passwordを使う。新しい確認ごとにCK備品が1件増える。通信再送だけなら--retryを使う。
+
+### 理解の確認（採点外）
+
+公開一覧に非公開備品も表示された場合、HTTP200だけで正常と言えるか？
+
+**考え方:** 言えない。HTTPの到達、DBの値、is_publicによる表示の分離をそれぞれ確認する。
 
 ## P6 最小権限と公開範囲
 
@@ -962,6 +1184,14 @@ P5のpractice profileを使う。setup roleを無効化し、一時設定を片�
 | P5-PUBLIC-001 | Practice keyboard | 4 | Training shelf A | true |
 | P5-PRIVATE-001 | Practice mouse | 2 | Training shelf B | false |
 
+### 仕組みを理解する
+
+**始める前の状態:** P5の練習アプリが動作し、初期構築用のsetup接続が残る。
+
+**このPで変えること:** setupを終了し、通常アプリの成功と不要なアクセスの拒否を同時に確かめる。
+
+作成時だけ必要なsetup権限と、運用中に必要なruntime権限を分ける。setup roleをNOLOGINにし、一時setup設定を削除しても、通常アプリはruntime接続で動くことが目標。公開80番・管理8080番・loopback8000番も別の境界である。どこか一つを閉じれば全体が安全と決めず、正規操作の成功と対象を限定した拒否を組にする。
+
 ### 操作例：一つずつ実行する
 
 #### P6.1 DB roleとtable権限を読む
@@ -976,6 +1206,8 @@ sudo -u postgres psql -X -d jdu_catalog_practice
 \dp public.*
 \q
 ```
+
+**コマンド・設定値の意味:** \duはDB roleの属性、\dpはtable等のアクセス権を読む。OSのls -lとは別の権限表である。setupとruntimeの役割を比較し、runtimeに構造変更の権限が不要な理由を考える。
 
 **期待する結果と読み方:** runtimeはowner/superuserではない。Django sessionには必要なDELETEがあるが備品削除権限とは別。
 
@@ -993,6 +1225,8 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql
 python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u postgres \
   psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
 ```
+
+**コマンド・設定値の意味:** NOLOGINはsetup roleの新しい直接loginを止める指定で、DBやtableの削除ではない。runtimeは残す。適用前のSQLを読んで対象がpracticeであることを確認し、続く通常アプリの成功も検査する。
 
 **期待する結果と読み方:** ALTER ROLE成功。通常catalog_practice_appの動作を止めない。
 
@@ -1013,6 +1247,8 @@ sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env \
 sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
 ```
 
+**コマンド・設定値の意味:** setup.envとpractice.setup.envは一時構築用で、app.envとruntime用DB設定は運用に必要。rmの対象は示した2ファイルだけ。削除後は秘密本文を表示せず、残すファイルの権限とruntime設定のcheckで確認する。
+
 **期待する結果と読み方:** 通常fileはroot:root 600、runtime check成功。再開時setup fileが既に無ければ削除を繰り返さず次へ進む。
 
 **うまくいかないとき:** 違うprofileのsetup fileがあるなら止める。ワイルドカードやrm -rで秘密directory全体を消さない。
@@ -1030,6 +1266,8 @@ curl --noproxy '*' -i http://web.lab.test/app.env
 curl --noproxy '*' -i http://web.lab.test/static/app.env
 ```
 
+**コマンド・設定値の意味:** このcurlは踏み台から公開側80番の振る舞いを確かめる。/は成功し、/admin/や秘密のpathは情報を返さないことを読む。接続できないという一つの症状だけでは、意図した拒否かservice停止かを判断できない。
+
 **期待する結果と読み方:** 一覧は200、管理とenvは秘密を含まない拒否。公開用NginxがX-JDU-Entryを上書きして管理偽装を許さない。
 
 **うまくいかないとき:** もしenv本文が見えたら共有せず、その場で教師へ知らせ公開設定を修正する。
@@ -1045,9 +1283,17 @@ jdu-web-check P6 --functional
 jdu-web-my-progress
 ```
 
+**コマンド・設定値の意味:** 正しい管理操作の成功と、誤password・setup・不要経路の拒否を一緒に確認する。拒否だけの成功で満点と考えない。P6を終えてからmission profileへ進み、checkerが自動でprofileを戻すとは考えない。
+
 **期待する結果と読み方:** 練習16項目。本人用進捗URLは自分のbrowserだけで開く。P合格は成績に加えず、M6はmission profileで別に確認する。
 
 **うまくいかないとき:** PENDINGは元request-idで再送し、UNKNOWNは原因を直して再観測する。満点表示のためにgrade fileを編集しない。
+
+### 理解の確認（採点外）
+
+setupを閉じた後、アプリも停止した。setupを再び公開することが完成か？
+
+**考え方:** 完成ではない。runtimeの接続設定・role・必要なtable権限を確認し、setupなしで正規機能が動く状態にする。
 
 ## 次回の再開・送信の再試行
 

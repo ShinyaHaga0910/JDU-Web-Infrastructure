@@ -1,6 +1,6 @@
 # Web演習 D12：P/M課題教材
 
-2026-10-23、本人の「まずPとMだけ」「PはOS・Linux教材と同じ詳しい手順」の依頼に基づく初版。日本語原稿、ロシア語・ウズベク語の学生版を同じ構造とcommandから生成する。スライド・独立教科書・最終実演は今回作らない。
+2026-10-23更新、教材改訂r1.1。本人の「まずPとMだけ」「PはOS・Linux教材と同じ詳しい手順」の依頼に基づく教材。日本語原稿、ロシア語・ウズベク語の学生版を同じ構造とcommandから生成する。スライド・独立教科書・最終実演は今回作らない。
 
 - [閲覧入口：3言語HTML](output/html/index.html)
 - [配布zip：教材・公開準備資源・既存署名版3点](output/web-lab-pm-r1.zip)
@@ -13,6 +13,8 @@
 | O‘zbekcha | [Matn](docs/uz/practice.md) / [PDF](output/pdf/web_lab_practice_uz.pdf) | [Matn](docs/uz/missions.md) / [PDF](output/pdf/web_lab_missions_uz.pdf) |
 
 Pは課題文を先に置き、49段階に実行場所・目的と操作・期待結果・エラー時の確認先を付けた。接続/exit、nanoの保存、psqlとshellの区別、既存passwordの非表示入力、profileの切替を省略しない。Mは完成要件と62素点の固定check表を示し、完成command列を載せない。Pは成績外、M0は0点、本人実演なし。科目25点への換算は教師が別に行う。
+
+r1.1では全49段階へコマンド・設定値の説明を加え、各Pに開始状態・完成状態・仕組み・採点外の理解確認を用意した。HTTP/DNS/SQLの出力例、7経路の通信表、Mを始める前の作業計画も3言語で揃えた。操作コマンドと固定62check、署名ソフトウェアの版は維持する。ファイル名/展開先のweb-lab-pm-r1は同じ最新版を更新するための名前で、本文の教材改訂番号とは区別する。
 
 ## 教師の事前準備
 
@@ -28,9 +30,11 @@ Pは課題文を先に置き、49段階に実行場所・目的と操作・期�
 教材zipのTEACHING-FILE-HASHES.jsonは同梱内容の一致確認用で、OpenPGP署名の代わりではありません。初期環境・採点機能の3点セットは元の署名版をbyte単位で保持し、学生は展開前の署名検証を省略しません。
 
 - 日本語と対訳の原稿：authoring/content.py。実行commandは3言語で共通。
+- 仕組み・49段階の補足・出力読解・採点外の理解確認：authoring/explanations.py。
 - Mの日本語合格条件：正式署名r2内の固定registry。ロシア語/ウズベク語の同じ62check：authoring/checks.py。
 - 生成：authoring/build.py。Markdown→閲覧HTML/A4 PDF、同じ初期配布3点のbyte保持、配布zipを作る。
 - 自動確認：authoring/validate.py。版/hash/課題/点数/command同期、shell構文、公開資源・展開拒否、PDF/HTML/zipを検査する。
+- PDFの全ページ画像化と枠外確認：authoring/qa_pdf.py。画像はローカル作業用、結果はrendering.public.json。教師による目視承認とは分ける。
 
 生成にはPython3.12と[requirements.txt](authoring/requirements.txt)、PDFにはWindowsのMS Gothic/Arial/Consolasを使用。フォントをzipへ再配布しない。公開検証資源は同じrepoの[development](../../development/README.md)を既定で読み、特定PCの絶対pathを必要としない。学生配布zipにはauthoringや開発fixtureを含めない。再生成と確認は[BUILD.md](../../BUILD.md)に従う。
 

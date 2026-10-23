@@ -22,7 +22,8 @@ PROJECT=Path(os.environ.get('JDU_WEB_PROJECT_ROOT', str(Path(__file__).resolve()
 from markdown_it import MarkdownIt
 from pypdf import PdfReader
 from content import MODULES,LANGS
-from build import KIT,EXPECTED_REGISTRY
+from build import KIT,EXPECTED_REGISTRY,MATERIAL_REVISION
+from explanations import LABELS,STEP_NOTES,MODULE_NOTES,READING,ROUTES,MISSION_PLAN,OUTPUT_EXAMPLES
 
 
 class Page(HTMLParser):
@@ -52,12 +53,24 @@ def main():
         for kind in ('practice','missions'):
             path=ROOT/'docs'/lang/(kind+'.md');value=path.read_text(encoding='utf-8');docs[lang,kind]=value
             tokens=parser.parse(value)
+            ok(f'{lang}_{kind}_current_revision','D12 P/M '+MATERIAL_REVISION in value)
+            ok(f'{lang}_{kind}_working_guide',all(p[lang] in value for p in READING))
+            ok(f'{lang}_{kind}_routes',all(purpose[lang] in value for _,_,_,purpose in ROUTES))
             code[lang,kind]=[(t.info,t.content) for t in tokens if t.type=='fence']
             ok(f'{lang}_{kind}_tasks',all(re.search(r'^## '+prefix+str(n)+r'\b',value,re.M) for n in range(7) for prefix in [('P' if kind=='practice' else 'M')]))
             ok(f'{lang}_{kind}_no_private_student_data',not any(x in value for x in
                 ('965244652544','jdutestuser1@','?session=','X-Amz-Signature=','PRIVATE KEY','Fictional-Practice-Admin-Only')))
             if kind=='missions':
                 ok(f'{lang}_all_62_check_ids',all(value.count(cid)==1 for t in reg['tasks'] if t['category']=='automated_mission' for cid in t['progress_scored_checks']))
+                ok(f'{lang}_mission_planning',all(p[lang] in value for p in MISSION_PLAN))
+            else:
+                for module in MODULES:
+                    for i,step in enumerate(module['steps'],1):
+                        key=f"{module['id']}.{i}"
+                        block=re.search(r'^#### '+re.escape(key)+r'\b(.*?)(?=^#### |^## |\Z)',value,re.M|re.S)
+                        ok(f'{lang}_explains_{key}',block is not None and STEP_NOTES[key][lang] in block[0])
+                    ok(f'{lang}_understanding_{module["id"]}',all(MODULE_NOTES[module['id']][k][lang] in value
+                        for k in ('before','after','mechanism','question','answer')))
             pdf=PdfReader(ROOT/'output/pdf'/f'web_lab_{kind}_{lang}.pdf')
             text='\n'.join(page.extract_text() or '' for page in pdf.pages)
             ok(f'{lang}_{kind}_pdf_A4',all(abs(float(p.mediabox.width)-595.276)<1 and abs(float(p.mediabox.height)-841.890)<1 for p in pdf.pages))
@@ -133,7 +146,9 @@ def main():
         ok('zip_exact_inventory',set(z.namelist())=={'web-lab-pm-r1/'+p for p in hashes}|{'web-lab-pm-r1/TEACHING-FILE-HASHES.json'})
         ok('zip_all_hashes',all(hashlib.sha256(z.read('web-lab-pm-r1/'+p)).hexdigest()==v for p,v in hashes.items()))
     result=dict(scope='D12_P_M_materials_local_checks_not_AWS_walkthrough',checked_on='2026-10-23',
-        languages=list(LANGS),practice_tasks=7,practice_steps=49,mission_tasks=7,scored_checks=62,raw_points=62,
+        languages=list(LANGS),material_revision=MATERIAL_REVISION,practice_tasks=7,practice_steps=49,
+        explained_steps=len(STEP_NOTES),module_understanding_questions=len(MODULE_NOTES),communication_routes=len(ROUTES),
+        worked_output_examples=len(OUTPUT_EXAMPLES),mission_tasks=7,scored_checks=62,raw_points=62,
         checks_passed=len(checks),bash_blocks_syntax_checked=fences,
         pdfs={p.name:dict(pages=len(PdfReader(p).pages),bytes=p.stat().st_size) for p in (ROOT/'output/pdf').glob('*.pdf')},
         distribution_id=pins['distribution_id'],registry_sha256=EXPECTED_REGISTRY,package_sha256=hashlib.sha256(package.read_bytes()).hexdigest(),
