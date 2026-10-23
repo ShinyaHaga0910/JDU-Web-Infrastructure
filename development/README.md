@@ -10,6 +10,7 @@
 - [設計仕様](01_roles/cyber_security/system_requirements/)
 - [検証方法と範囲](TESTING.md)
 - [最後の改善課題：ブラウザから環境準備・採点確認](issues/WEB-PORTAL-001.md) / [GitHub Issue #1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1)
+- [Web Functionsの実現性と構成案](issues/WEB-PORTAL-001-feasibility.md)：End Lab後は入口/保存済み成績と、停止する演習EC2を分けて扱う。本人確認済みの前提と未実証の権限を区別。
 
 | コード群 | 内容 |
 | --- | --- |
