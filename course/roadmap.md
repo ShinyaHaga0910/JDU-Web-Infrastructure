@@ -6,11 +6,17 @@
 | WEB-01 | VPCと接続経路 | 管理・DNS・HTTP・DBの経路と拒否範囲 |
 | WEB-02 | [HTTPとNginx](../modules/WEB-02-http/README.md) | 静的ページ、HTTP status、service、port、log |
 | WEB-03 | 内部DNS | 問い合わせと回答、record、障害の切り分け |
-| WEB-04 | Storage | file system、保存先、容量、再起動時の保持 |
-| WEB-05 | PostgreSQL | 架空データ、role、基本SQL、backupと復旧 |
+| WEB-04 | Storage | 元root EBSのfile・権限、同じWebの停止/再開と保持（追加disk/backupは不要） |
+| WEB-05 | PostgreSQL | DB、role、SCRAM、Webだけの接続、認証SELECT |
 | WEB-06 | [教員提供アプリとDBの接続](../modules/WEB-06-app-integration/README.md) | Web側のアプリがDBへ接続し、結果をWebへ返す |
 | WEB-07 | 公開範囲と権限 | 正常経路の許可と不要な経路の拒否 |
 | WEB-08 | 観測と復旧 | 証拠に基づく原因特定と復旧確認 |
-| WEB-09 | 最終実演と引き継ぎ | 他者が読める構成・停止・再開手順と個人実演 |
+| WEB-09 | 完成確認と引き継ぎ | 他者が読める構成・停止・再開手順（本人実演の採点なし） |
 
 これは教材単位の順序であり、授業回番号ではありません。一つの単位に複数回かけても、一回で複数の単位へ進んでも構いません。
+
+## 2026-10-23 P/M教材の入口
+
+[練習P0-P6 / 自力課題M0-M6](labs/README.md)を現在の課題教材とします。推奨順はP0→M0→P1→M1→P2→M2→P3→M3→P4→M4→P5→P6→M5→M6。P5もM2の正式DNSを使い、practice→mission切替前にP6で一時setupを終了します。Pは成績外、M0は0点、M1-M6は8/13/3/9/13/16＝62素点で、25点への換算は教師が別に行います。課題番号とWEB教材単位番号は別です。
+
+今回は本人指示によりP/M課題教材を先行し、独立した教科書・投影資料は制作対象にしません。旧WEB-02の初稿より新P1/M1を優先します。

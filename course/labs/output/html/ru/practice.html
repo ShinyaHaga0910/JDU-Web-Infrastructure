@@ -1,0 +1,772 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Web Infrastructure: практика P0–P6 с подробными шагами</title><style>
+:root{color-scheme:light;font:17px/1.8 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:1000px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2rem}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1</p><nav aria-label="Contents"><a href="#section-1">Как пользоваться пособием</a> · <a href="#section-2">Среда и подготовка</a> · <a href="#section-3">P0 Своя среда и место выполнения команд</a> · <a href="#section-4">P1 Выдача статического файла по HTTP</a> · <a href="#section-5">P2 Внутренний DNS и системное разрешение имён</a> · <a href="#section-6">P3 Данные при остановке и запуске</a> · <a href="#section-7">P4 Подключение к PostgreSQL с аутентификацией</a> · <a href="#section-8">P5 Соединить предоставленное приложение с Web и DB</a> · <a href="#section-9">P6 Минимальные права и границы публикации</a> · <a href="#section-10">Продолжение и повторная отправка</a> · <a href="#section-11">Источники и версия</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: практика P0-P6 с подробными шагами</h1>
+<p>2026-10-23 | D12 P/M r1 | web-course-class193548-20261023-r2</p>
+<p>Первая редакция для проверки преподавателем. Полное прохождение по пособию студентом ещё не проверено.</p>
+<p>Русский и узбекский тексты синхронизированы с японским оригиналом. Редактура носителями языка ещё не выполнена.</p>
+<p><a href="../ja/practice.html">日本語</a> · <a href="../ru/practice.html">Русский</a> · <a href="../uz/practice.html">O‘zbekcha</a></p>
+<h2 id="section-1">Как пользоваться пособием</h2>
+<p>Сначала прочитайте задание P; при необходимости проходите подробный пример по шагам. P - тренировка без оценочных баллов. В M самостоятельно используйте другие объекты/значения. Номера заданий не являются номерами занятий; идите в своём темпе. Выполнение P не означает выполнение M.</p>
+<p>P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → M4 → P5 → P6 → M5 → M6</p>
+<p>P5 требует DNS из M2. P4 подключается по IP, а приложение - по db.lab.test. Перед переключением practice → mission завершите setup в P6. P - добровольная тренировка; checker оценивает текущие предпосылки M.</p>
+<p>M1=8, M2=13, M3=3, M4=9, M5=13, M6=16: всего 62 исходных балла. M0=0. Нет личной демонстрации, backup/restore, дополнительных дисков и разработки приложения. Пересчёт в 25 баллов делает преподаватель отдельно. Повторные отправки возможны до объявленного срока. PASS разных попыток не объединяются; максимум автоматически не выбирается.</p>
+<h2 id="section-2">Среда и подготовка</h2>
+<p>Сначала завершите проверку подписи начального комплекта, создание пяти узлов либо install в существующую среду, внутренний SSH и личную регистрацию. Инструкция - distribution/STUDENT.md в zip. Не храните приватные ключи в общем Windows; используйте CloudShell личного Academy account. Преподаватель выдаёт личный анонимный Lab ID, fingerprint и срок действия.</p>
+<p>Общие private IP ниже; public IPv4 не фиксируется. AWS region us-east-1, Ubuntu24.04/amd64. RDP: labuser; SSM: ssm-user; внутренний SSH: ubuntu. Не путайте пользователя и роль сервера.</p>
+<table>
+<thead>
+<tr>
+<th scope="col">Role</th>
+<th scope="col">Private IPv4</th>
+<th scope="col">Назначение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bastion</td>
+<td>10.20.1.10</td>
+<td>RDP3389 / Firefox / SSH</td>
+</tr>
+<tr>
+<td>web</td>
+<td>10.20.1.20</td>
+<td>HTTP80 / private8080 / loopback8000</td>
+</tr>
+<tr>
+<td>dns</td>
+<td>10.20.2.10</td>
+<td>BIND UDP/TCP53</td>
+</tr>
+<tr>
+<td>db</td>
+<td>10.20.2.20</td>
+<td>PostgreSQL5432</td>
+</tr>
+<tr>
+<td>repo</td>
+<td>10.20.2.30</td>
+<td>HTTP80 с заранее сохранёнными подписанными ресурсами</td>
+</tr>
+</tbody>
+</table>
+<p>Для входа в каждый Ubuntu выполните в CloudShell aws ssm start-session --target i-СВОЙ-ID. Сразу проверяйте id -un и role из bootstrap.json. Для смены сервера один exit возвращает в CloudShell; затем подключайтесь к следующему ID. Переменные CloudShell не копируются на узел. ssm-user может sudo; RDP-пользователь labuser не администратор sudo.</p>
+<p>Редактор nano: открыть файл → ввести текст → Ctrl+O → Enter сохранить → Ctrl+X выйти. Блок конфигурации не выполняется как shell-команда. В psql меняется prompt; SQL/\password вводятся внутри, \q возвращает в Ubuntu. Не продолжайте после ошибки без проверки результата.</p>
+<h2 id="section-3">P0 Своя среда и место выполнения команд</h2>
+<h3>Что изучаем</h3>
+<p>Различать CloudShell, Windows и пять Ubuntu-серверов; подключаться через SSM к нужному узлу и запускать самопроверку.</p>
+<h3>Задание</h3>
+<p>Проверьте свой Lab ID, ID комплекта и instance ID пяти ролей. Это проверка предоставленной среды, 0 баллов. Если пяти серверов ещё нет, сначала выполните начальную установку. Для готовой среды не повторяйте create, создание ключей и регистрацию.</p>
+<h3>Пример решения: выполняйте по одному шагу</h3>
+<h4>P0.1 Активировать комплект в своём CloudShell</h4>
+<p><strong>Место выполнения:</strong> CloudShell в личном AWS-аккаунте студента</p>
+<p><strong>Цель и действия:</strong> Откройте AWS из своего класса Academy, затем CloudShell. Замените значения в первых двух строках данными преподавателя. Знак доллара означает обращение к переменной и вводится как часть команды. activate.sh добавляет каталог нового проверяющего инструмента в PATH.</p>
+<pre><code class="language-bash">LAB_ID='YOUR-LAB-ID'
+COURSE_ID='web-course-class193548-20261023-r2'
+INSTALL=&quot;$HOME/.local/share/jdu-web/courses/$COURSE_ID/$LAB_ID&quot;
+source &quot;$INSTALL/activate.sh&quot;
+aws sts get-caller-identity --query Account --output text
+command -v jdu-web-check
+jdu-web-check --help
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Account соответствует вашему аккаунту, а путь команды содержит ваши COURSE_ID и LAB_ID. Справка перечисляет P0-P6/M0-M6.</p>
+<p><strong>Если не получилось:</strong> При No such file проверьте начальную установку и install. Старая команда поддерживает не все задания. Просроченный комплект обновляет преподаватель.</p>
+<h4>P0.2 Записать instance ID пяти серверов</h4>
+<p><strong>Место выполнения:</strong> AWS Console своего студенческого аккаунта</p>
+<p><strong>Цель и действия:</strong> В EC2 → Instances сверяйте теги LabId и DeploymentId. Запишите instance ID ролей bastion/web/dns/db/repo в рабочую таблицу. Не выбирайте только по имени. Public IPv4 есть у bastion и web. Для SSM нужен instance ID, а не публичный IP.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong> Все пять узлов running и SSM Online; private IP совпадают с общей таблицей. Public IPv4 может измениться после остановки и запуска.</p>
+<p><strong>Если не получилось:</strong> Не трогайте другой Lab, аккаунт или неизвестные узлы. Для остановленных серверов используйте инструкцию запуска. Не применяйте Reset или Terminate.</p>
+<h4>P0.3 Подключиться по SSM и вернуться</h4>
+<p><strong>Место выполнения:</strong> CloudShell в личном AWS-аккаунте студента</p>
+<p><strong>Цель и действия:</strong> Подставьте instance ID Web из EC2. После подключения вы работаете в Ubuntu, а не в CloudShell. id -un показывает управляющего пользователя SSM; role в bootstrap.json - роль сервера. Один exit возвращает в CloudShell.</p>
+<pre><code class="language-bash">aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
+id -un
+hostname
+python3 -c 'import json;print(json.load(open(&quot;/etc/jdu-web/bootstrap.json&quot;))[&quot;role&quot;])'
+pwd
+exit
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Ожидаются ssm-user и role web. Проверяйте их при каждом переходе. При SSH имя пользователя Ubuntu может быть ubuntu.</p>
+<p><strong>Если не получилось:</strong> При TargetNotConnected проверьте running, SSM Online и регион us-east-1. Не открывайте все порты SG и не скачивайте ключи в Windows.</p>
+<h4>P0.4 Подготовить только открытые учебные файлы</h4>
+<p><strong>Место выполнения:</strong> CloudShell в личном AWS-аккаунте студента</p>
+<p><strong>Цель и действия:</strong> Загрузите zip этого пособия через CloudShell → Actions → Upload file; распакуйте командой unzip web-lab-pm-r1.zip. Перейдите в resources и выполните команду. Инструмент сверяет личный подписанный комплект и исходные пять узлов; переносит открытые файлы приложения, SQL и инструмент скрытого ввода на Web/DB. Сервисы и БД он не создаёт, секреты не передаёт.</p>
+<pre><code class="language-bash">cd &quot;$HOME/web-lab-pm-r1/resources&quot;
+python3 -B stage_resources.py --installation &quot;$INSTALL&quot;
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Вывод содержит PUBLIC_LESSON_RESOURCES_READY=web и =db. Открытые файлы находятся в /var/lib/jdu-web/lesson-resources-r1; отличающиеся существующие файлы не заменяются.</p>
+<p><strong>Если не получилось:</strong> При незавершённой установке, другой версии или истечении срока остановитесь и сообщите преподавателю. Не используйте проверочные fixture, автоматически создающие готовое решение.</p>
+<h4>P0.5 Различать самопроверку и отправку</h4>
+<p><strong>Место выполнения:</strong> CloudShell в личном AWS-аккаунте студента</p>
+<p><strong>Цель и действия:</strong> Проверка наблюдает текущее состояние. --no-submit означает только самопроверку, без отправки. Обычный запуск передаёт и промежуточный результат. P0/M0 проверяют готовность, но не добавляют баллы к оценке.</p>
+<pre><code class="language-bash">jdu-web-check P0 --no-submit
+jdu-web-check P0
+jdu-web-check M0 --no-submit
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Читайте готовность/complete отдельно от доставки. STORED - принято; PENDING - ожидает отправки; UNKNOWN - состояние не удалось проверить.</p>
+<p><strong>Если не получилось:</strong> Для обращения запишите check ID, время и роль узла. Не передавайте token, пароль и личный URL.</p>
+<h4>P0.6 Открыть рабочий стол бастиона по RDP</h4>
+<p><strong>Место выполнения:</strong> Windows PC студента (общая учётная запись)</p>
+<p><strong>Цель и действия:</strong> Используйте текущий public IPv4 бастиона из EC2. Нажмите Windows+R, введите mstsc /prompt и Enter. В Computer укажите IP, пользователь labuser, пароль - свой RDP из начальной установки, не пароль Windows. Не выбирайте сохранение credentials. Если появится синий login xrdp, выберите Session=Xorg и labuser.</p>
+<pre><code class="language-powershell">mstsc /prompt
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Открываются Xfce и Firefox внутри Ubuntu-бастиона. Это не браузер Windows. labuser не имеет sudo: настройку выполняйте через CloudShell → SSM/ssm-user.</p>
+<p><strong>Если не получилось:</strong> При Login failed проверьте имя и раскладку клавиатуры. Не отправляйте пароль в чат. При недоступности сверьте текущий IP и разрешённый CIDR с преподавателем; не открывайте 3389 для всех. Перед закрытием RDP сохраните работу.</p>
+<h2 id="section-4">P1 Выдача статического файла по HTTP</h2>
+<h3>Что изучаем</h3>
+<p>Связать Nginx, файл, прослушивание порта, HTTP-ответ и access log.</p>
+<h3>Задание</h3>
+<p>Файл /var/www/html/practice.txt на Web должен возвращать заданный текст с HTTP 200: локально, с бастиона и извне.</p>
+<ul>
+<li>File: /var/www/html/practice.txt</li>
+<li>URL path: /practice.txt</li>
+</ul>
+<pre><code class="language-text">JDU WEB-02 practice: HTTP response verified.
+</code></pre>
+<h3>Пример решения: выполняйте по одному шагу</h3>
+<h4>P1.1 Установить Nginx из внутреннего APT</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Подключитесь по SSM к Web как в P0 и проверьте role=web. Проверьте APT source: используется только подписанный repo 10.20.2.30. update получает индекс, install устанавливает пакет. Не добавляйте внешние источники.</p>
+<pre><code class="language-bash">cat /etc/apt/sources.list.d/jdu-web.sources
+sudo apt-get update -o APT::Update::Error-Mode=any
+sudo apt-get install --no-install-recommends nginx
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> В source указаны внутренний IP и Signed-By; установка завершается без ошибки подписи. На запрос установки ответьте Y.</p>
+<p><strong>Если не получилось:</strong> При ошибке получения проверьте repo, его running/SSM и IP. Не обходите подпись через --allow-unauthenticated или внешний pip.</p>
+<h4>P1.2 Создать точный текст и права файла</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Создайте текст через nano: одна точная строка, указанная ниже, с переводом строки в конце. Ctrl+O → Enter сохраняет, Ctrl+X закрывает редактор. install копирует файл; -o/-g задают владельца и группу, -m - права.</p>
+<pre><code class="language-bash">cd ~
+mkdir -p jdu-web-practice/p1
+cd jdu-web-practice/p1
+pwd
+nano practice.txt
+# File content: JDU WEB-02 practice: HTTP response verified.
+sudo install -o root -g root -m 0644 practice.txt /var/www/html/practice.txt
+stat -c '%U:%G %a %n' /var/www/html/practice.txt
+cat /var/www/html/practice.txt
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Ожидается root:root 644 и ровно строка JDU WEB-02 practice: HTTP response verified. Регистр, пробелы, точка и конечный перевод строки важны.</p>
+<p><strong>Если не получилось:</strong> Если вы ещё в nano, сначала сохраните и выйдите. Не меняйте существующий mission.txt.</p>
+<h4>P1.3 Проверить Web root и запустить сервис</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Начальный сайт Ubuntu использует root /var/www/html. Через nginx -T найдите включённый /etc/nginx/sites-enabled/default, root и listen 80. При необходимости редактируйте sudo nano; reload выполняйте после успешной проверки. enable --now запускает сейчас и включает автозапуск.</p>
+<pre><code class="language-bash">sudo nginx -T
+sudo nginx -t
+sudo systemctl enable --now nginx
+sudo systemctl reload nginx
+systemctl is-active nginx
+sudo ss -lntp
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Ожидаются успешный синтаксис, active и слушатель вроде 0.0.0.0:80. Только 127.0.0.1:80 недоступен другим узлам.</p>
+<p><strong>Если не получилось:</strong> При ошибке используйте имя файла и строку из nginx -t. Изменение SG не исправит синтаксис.</p>
+<h4>P1.4 Посмотреть ответ на самом Web</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> curl - HTTP-клиент; -i показывает статус, заголовки и тело. 127.0.0.1 означает этот Web-сервер, не его public IP. Сравните ответ, а не только код завершения команды.</p>
+<pre><code class="language-bash">curl --noproxy '*' -i http://127.0.0.1/practice.txt
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> HTTP 200 и заданный текст. При 404 проверяйте файл/root/URL; при connection refused - сервис и слушатель.</p>
+<p><strong>Если не получилось:</strong> При Welcome to nginx проверьте, что запросили /practice.txt, а не /.</p>
+<h4>P1.5 Проверить тот же файл с бастиона и извне</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал бастиона: ssm-user</p>
+<p><strong>Цель и действия:</strong> Выйдите из Web через exit, откройте SSM бастиона из CloudShell и запросите URL ниже. Затем exit возвращает в CloudShell; там запросите тот же путь командой curl -i по текущему public IPv4 Web из EC2. Не путайте private 10.20.1.20 с public IPv4.</p>
+<pre><code class="language-bash">curl --noproxy '*' -i http://10.20.1.20/practice.txt
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> На обоих маршрутах 200 и одинаковый текст. HTTP 80 открыт, управляющий 8080 и DB 5432 не публикуются.</p>
+<p><strong>Если не получилось:</strong> Если внутренний запрос успешен, а внешний нет, проверьте текущий public IP и Lab. Не ослабляйте базовые SG.</p>
+<h4>P1.6 Связать запрос с журналом и отправить</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Вернитесь на Web. В access log найдите время, IP клиента, путь и статус. Журнал доказывает обработку запроса, а не только наличие файла. Затем exit в CloudShell и запустите P1.</p>
+<pre><code class="language-bash">sudo tail -n 20 /var/log/nginx/access.log
+exit
+jdu-web-check P1 --no-submit
+jdu-web-check P1
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Восемь учебных проверок PASS, готовность успешна и доставка STORED. P1 даёт 0 оценочных баллов; для M1 используются другой файл и текст.</p>
+<p><strong>Если не получилось:</strong> При PENDING повторно отправьте исходный request-id. Не меняйте ожидаемый текст в checker.</p>
+<h2 id="section-5">P2 Внутренний DNS и системное разрешение имён</h2>
+<h3>Что изучаем</h3>
+<p>Последовательно настроить zone, A-записи, ACL BIND и resolver клиентов.</p>
+<h3>Задание</h3>
+<p>Настройте guide.lab.test → 10.20.1.20 и practice-db.lab.test → 10.20.2.20; откройте HTTP из P1 по имени. Фиксированные IP не меняются.</p>
+<table>
+<thead>
+<tr>
+<th scope="col">DNS name</th>
+<th scope="col">A / IPv4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>guide.lab.test</td>
+<td>10.20.1.20</td>
+</tr>
+<tr>
+<td>practice-db.lab.test</td>
+<td>10.20.2.20</td>
+</tr>
+</tbody>
+</table>
+<h3>Пример решения: выполняйте по одному шагу</h3>
+<h4>P2.1 Установить BIND и сохранить исходные настройки</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал DNS-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Подключитесь к DNS, проверьте role=dns. cp -a сохраняет атрибуты исходного файла, -n не заменяет прежнюю копию. Это страховка при редактировании, не задание по backup/restore БД.</p>
+<pre><code class="language-bash">sudo apt-get update -o APT::Update::Error-Mode=any
+sudo apt-get install --no-install-recommends bind9 bind9-utils
+sudo cp -an /etc/bind/named.conf.options /etc/bind/named.conf.options.before-p2
+sudo cp -an /etc/bind/named.conf.local /etc/bind/named.conf.local.before-p2
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Установка использует внутренний repo. В M2 добавляйте записи в этот же DNS, сохраняя P2.</p>
+<p><strong>Если не получилось:</strong> Не копируйте целиком named.conf из чужого Lab. Если своя zone уже есть, сначала изучите её.</p>
+<h4>P2.2 Настроить клиентов и forwarder</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал DNS-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Откройте sudo nano /etc/bind/named.conf.options, введите и сохраните текст ниже. acl задаёт разрешённых клиентов; listen-on - адреса DNS; forward only передаёт внешние имена AWS DNS. И query, и recursion ограничены тремя источниками. dnssec-validation no соответствует изолированной учебной схеме forwarding.</p>
+<pre><code class="language-text">acl &quot;jdu_clients&quot; { 127.0.0.1; 10.20.1.10; 10.20.1.20; };
+options {
+    directory &quot;/var/cache/bind&quot;;
+    listen-on { 127.0.0.1; 10.20.2.10; };
+    listen-on-v6 { none; };
+    allow-query { jdu_clients; };
+    allow-recursion { jdu_clients; };
+    allow-query-cache { jdu_clients; };
+    recursion yes;
+    forward only;
+    forwarders { 10.20.0.2; };
+    dnssec-validation no;
+    allow-transfer { none; };
+};
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Это содержимое файла, не команды shell. 10.20.0.2 - resolver AWS, 10.20.2.10 - ваш BIND.</p>
+<p><strong>Если не получилось:</strong> Точки с запятой и фигурные скобки обязательны. Не расширяйте ACL до any или 0.0.0.0/0.</p>
+<h4>P2.3 Объявить zone и создать A-записи</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал DNS-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> В sudo nano /etc/bind/named.conf.local запишите первый блок zone. Создайте каталог командой sudo install -d -m 0755 /etc/bind/zones, затем откройте sudo nano /etc/bind/zones/db.lab.test и запишите остальной текст. SOA - служебные данные, NS - авторитетный DNS, A - имя/IPv4. Точка в конце обозначает полное имя; увеличивайте serial при изменениях.</p>
+<pre><code class="language-text">// /etc/bind/named.conf.local
+zone &quot;lab.test&quot; {
+    type primary;
+    file &quot;/etc/bind/zones/db.lab.test&quot;;
+    allow-transfer { none; };
+    allow-update { none; };
+};
+
+; /etc/bind/zones/db.lab.test
+$TTL 300
+@ IN SOA dns.lab.test. hostmaster.lab.test. (
+    2026102301 3600 600 604800 300 )
+@ IN NS dns.lab.test.
+dns IN A 10.20.2.10
+guide IN A 10.20.1.20
+practice-db IN A 10.20.2.20
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Сохраните как два отдельных файла. Запись dns задаёт адрес имени NS. Resolver клиентов пока не меняйте.</p>
+<p><strong>Если не получилось:</strong> Если M2 уже настроен, добавьте две учебные записи, не заменяя zone. Не объявляйте zone дважды.</p>
+<h4>P2.4 Проверить синтаксис и локальный DNS-ответ</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал DNS-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Переключение клиентов на неисправный DNS нарушит разрешение имён. Сначала добейтесь успешных named-checkconf и named-checkzone, затем проверьте UDP и TCP.</p>
+<pre><code class="language-bash">sudo named-checkconf -z
+sudo named-checkzone lab.test /etc/bind/zones/db.lab.test
+sudo systemctl enable --now named
+sudo systemctl restart named
+dig @127.0.0.1 guide.lab.test A
+dig @127.0.0.1 guide.lab.test A +tcp
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Ожидаются zone loaded/OK, NOERROR, флаг aa и A=10.20.1.20. aa означает авторитетный ответ этой zone.</p>
+<p><strong>Если не получилось:</strong> При ошибке изучите sudo journalctl -u named -n 30 --no-pager, исправьте конфигурацию и проверьте снова.</p>
+<h4>P2.5 Запросить DNS с бастиона и Web</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал бастиона: ssm-user</p>
+<p><strong>Цель и действия:</strong> Выполните команды и на бастионе, и на Web. @10.20.2.10 задаёт DNS только для данного запроса. Это ещё не доказывает, что браузер и приложение используют его по умолчанию.</p>
+<pre><code class="language-bash">dig @10.20.2.10 guide.lab.test A
+dig @10.20.2.10 practice-db.lab.test A +tcp
+dig @10.20.2.10 absent-p2.lab.test A
+dig @10.20.2.10 aws.amazon.com A
+dig @10.20.2.10 lab.test AXFR
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Нужные имена дают правильные A; absent-p2 - авторитетный NXDOMAIN; внешнее имя - ответ; AXFR запрещён. Таймаут не считается доказанным отказом.</p>
+<p><strong>Если не получилось:</strong> При недоступности различайте источник, UDP и TCP 53. Не добавляйте остальные private-узлы в ACL клиентов.</p>
+<h4>P2.6 Переключить системный resolver только на BIND</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал бастиона: ssm-user</p>
+<p><strong>Цель и действия:</strong> На бастионе и Web по одному узлу выполните ip -br link, затем networkctl status ИМЯ для определения интерфейса и Network File. Найдите его YAML через ls /etc/netplan и сохраните копию sudo cp -an. Через sudo nano добавьте к тому же интерфейсу dhcp4-overrides/use-dns:false и nameservers. Ниже схема: имя интерфейса и имеющиеся match/set-name/renderer сохраняйте из своего файла.</p>
+<pre><code class="language-text">network:
+  version: 2
+  ethernets:
+    ens5:
+      dhcp4: true
+      dhcp4-overrides:
+        use-dns: false
+      nameservers:
+        addresses: [10.20.2.10]
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> DHCP сохраняет IP и gateway. Не добавляйте резервный DNS, не заменяйте /etc/resolv.conf и не прописывайте имена задания в /etc/hosts. Оставьте SSM открытым.</p>
+<p><strong>Если не получилось:</strong> Несколько YAML одного интерфейса объединяются. Если resolvectl dns показывает ещё AWS DNS, проверьте все соответствующие YAML и действующую конфигурацию.</p>
+<h4>P2.7 После применения проверить обычный resolver и HTTP</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал бастиона: ssm-user</p>
+<p><strong>Цель и действия:</strong> На бастионе и Web сначала создайте конфигурацию, затем примените и проверьте. Оставьте второе окно SSH/RDP; при разрыве вернитесь по SSM и сравните с сохранённой копией. Применяйте apply только после проверки файла и успешного generate.</p>
+<pre><code class="language-bash">sudo netplan generate
+sudo netplan apply
+sudo systemctl restart systemd-resolved
+resolvectl dns
+getent ahostsv4 guide.lab.test
+getent ahostsv4 practice-db.lab.test
+curl --noproxy '*' -i http://guide.lab.test/practice.txt
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Единственный upstream DNS - 10.20.2.10. getent выдаёт нужные IP, HTTP - 200 и текст P1. 127.0.0.53 - локальный stub; upstream смотрите в resolvectl.</p>
+<p><strong>Если не получилось:</strong> Если dig успешен, а getent нет, проверяйте resolver клиента. Сохраняйте настройку Firefox с отключённым DoH.</p>
+<h4>P2.8 Сравнить IP и имя в браузере, затем отправить</h4>
+<p><strong>Место выполнения:</strong> Firefox на рабочем столе бастиона через RDP</p>
+<p><strong>Цель и действия:</strong> Откройте Firefox на бастионе через RDP. Сравните http://10.20.1.20/practice.txt и http://guide.lab.test/practice.txt. lab.test разрешается внутри бастиона, а не обычным DNS школьного PC. Затем запустите P2 в CloudShell.</p>
+<pre><code class="language-bash">jdu-web-check P2 --no-submit
+jdu-web-check P2
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> 13 учебных проверок; текущий P1 тоже должен работать. Перед DB/app добавьте шесть основных имён в M2.</p>
+<p><strong>Если не получилось:</strong> Не считайте любую ошибку имени остановкой HTTP: сравните IP → dig → getent → HTTP.</p>
+<h2 id="section-6">P3 Данные при остановке и запуске</h2>
+<h3>Что изучаем</h3>
+<p>Проверить файл и права на исходном EBS; доказать сохранение после stop/start того же Web.</p>
+<h3>Задание</h3>
+<p>Создайте marker P3 со своим анонимным Lab ID. Зафиксируйте состояние до остановки, stopped и после запуска. Дополнительный диск, mount и backup/restore не требуются.</p>
+<ul>
+<li>File: /var/lib/jdu-web/practice/storage.txt</li>
+</ul>
+<pre><code class="language-text">lab_id={lab_id}
+task=P3
+payload=practice-storage-2026
+</code></pre>
+<h3>Пример решения: выполняйте по одному шагу</h3>
+<h4>P3.1 Проверить исходный диск и свободное место</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> findmnt показывает файловую систему, lsblk - диски и разделы, df -h - свободное место. Используйте предоставленный root EBS; имя /dev/nvme не является причиной менять диск.</p>
+<pre><code class="language-bash">findmnt -T /var/lib
+lsblk -o NAME,TYPE,SIZE,MOUNTPOINTS,SERIAL
+df -h /var/lib
+cat /proc/sys/kernel/random/boot_id
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Соответствует исходному root volume; свободно не менее 20% и 2 GiB. Сохраните boot_id текущей загрузки.</p>
+<p><strong>Если не получилось:</strong> Недостаток места - проблема готовности. Не удаляйте другие материалы или диски ради баллов.</p>
+<h4>P3.2 Создать и разместить marker</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Задайте LAB_ID и в этом терминале. printf завершает строки переводом строки. install задаёт directory 0755 и файл 0644/root:root. Сначала проверьте существующий файл; не заменяйте отличающееся содержимое без выяснения причины.</p>
+<pre><code class="language-bash">LAB_ID='YOUR-LAB-ID'
+cd ~
+mkdir -p jdu-web-practice/p3
+cd jdu-web-practice/p3
+printf 'lab_id=%s\ntask=P3\npayload=practice-storage-2026\n' &quot;$LAB_ID&quot; &gt; storage.txt
+cat storage.txt
+sudo install -d -o root -g root -m 0755 /var/lib/jdu-web/practice
+sudo install -o root -g root -m 0644 storage.txt /var/lib/jdu-web/practice/storage.txt
+stat -c '%U:%G %a %n' /var/lib/jdu-web/practice /var/lib/jdu-web/practice/storage.txt
+sha256sum /var/lib/jdu-web/practice/storage.txt
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Три строки с конечным переводом строки, права 0755/0644. Запишите hash. Права 777 не подходят.</p>
+<p><strong>Если не получилось:</strong> Не оставляйте YOUR-LAB-ID. Используйте анонимный Lab ID, не имя EC2 и не email.</p>
+<h4>P3.3 Сохранить доказательство до остановки</h4>
+<p><strong>Место выполнения:</strong> CloudShell в личном AWS-аккаунте студента</p>
+<p><strong>Цель и действия:</strong> Выйдите из Web через exit в CloudShell. prepare-stop сохраняет instance/volume/hash marker/boot_id, но сам не останавливает EC2. Дождитесь успеха.</p>
+<pre><code class="language-bash">jdu-web-check P3 --prepare-stop
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Состояние до остановки сохранено. После этого marker не редактируйте.</p>
+<p><strong>Если не получилось:</strong> Остановка после неуспешной подготовки не даст полной цепочки доказательств. Сначала исправьте файл/права/SSM.</p>
+<h4>P3.4 Остановить тот же Web и зафиксировать stopped</h4>
+<p><strong>Место выполнения:</strong> AWS Console своего студенческого аккаунта</p>
+<p><strong>Цель и действия:</strong> Повторно сверьте instance ID Web. Выберите Instance state → Stop instance и дождитесь stopped. Не Reboot и не Terminate. Не запуская узел, выполните команду ниже в CloudShell. Остальные четыре сервера оставьте включёнными.</p>
+<pre><code class="language-bash">jdu-web-check P3 --observe-stopped
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Записано stopped того же instance. Во время остановки недоступность HTTP/SSM ожидаема.</p>
+<p><strong>Если не получилось:</strong> При stopping подождите. Если запустили раньше наблюдения, цепочку из трёх этапов потребуется повторить.</p>
+<h4>P3.5 Запустить, сравнить данные и отправить</h4>
+<p><strong>Место выполнения:</strong> AWS Console своего студенческого аккаунта</p>
+<p><strong>Цель и действия:</strong> Запустите тот же Web и дождитесь running/SSM Online. Через SSM проверьте текст/hash и boot_id. instance/volume/hash сохраняются, boot_id меняется. Затем запустите P3 из CloudShell.</p>
+<pre><code class="language-bash">jdu-web-check P3 --no-submit
+jdu-web-check P3
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Три учебные проверки PASS. Если public IPv4 изменился, используйте новый адрес для внешнего HTTP.</p>
+<p><strong>Если не получилось:</strong> Новый instance не доказывает сохранение. Для P3/M3 нужны отдельные marker и доказательства.</p>
+<h2 id="section-7">P4 Подключение к PostgreSQL с аутентификацией</h2>
+<h3>Что изучаем</h3>
+<p>Различать database, role и schema; выполнять SQL с Web по установленному паролю.</p>
+<h3>Задание</h3>
+<p>Создайте jdu_catalog_practice, catalog_practice_setup и catalog_practice_app. Разрешите SCRAM только с Web 10.20.1.20/32. Таблицы приложения на этапе P4 не нужны.</p>
+<ul>
+<li>Profile: practice</li>
+<li>Database: jdu_catalog_practice</li>
+<li>Setup role: catalog_practice_setup</li>
+<li>Runtime role: catalog_practice_app</li>
+</ul>
+<h3>Пример решения: выполняйте по одному шагу</h3>
+<h4>P4.1 Установить PostgreSQL и распаковать учебный SQL</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал DB-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Подключитесь к DB по SSM, проверьте role=db. Cluster PostgreSQL 16 - единица работы сервера БД. Инструмент распаковки проверяет приложение и извлекает SQL; сам он не создаёт БД или роли.</p>
+<pre><code class="language-bash">sudo apt-get update -o APT::Update::Error-Mode=any
+sudo apt-get install --no-install-recommends postgresql-16 postgresql-client-16
+sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py
+pg_lsclusters
+sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Cluster 16/main, data directory /var/lib/postgresql/16/main. Учебный SQL находится в /var/lib/jdu-web/lesson-resources-r1/app/sql.</p>
+<p><strong>Если не получилось:</strong> Не удаляйте существующие БД и роли. Если уже настроено, изучите состояние и выполняйте только недостающие шаги.</p>
+<h4>P4.2 Настроить прослушивание и SCRAM</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал DB-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Сохраните postgresql.conf через sudo cp -an. В sudo nano /etc/postgresql/16/main/postgresql.conf задайте три значения ниже. Если параметр встречается несколько раз, проверьте действующее значение через SHOW. Слушать нужно только private IP БД на 5432; password_encryption определяет хранение новых паролей.</p>
+<pre><code class="language-text">listen_addresses = '10.20.2.20'
+port = 5432
+password_encryption = 'scram-sha-256'
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Не используйте * для всех адресов. Пароли задаются после настройки HBA и restart.</p>
+<p><strong>Если не получилось:</strong> Это текст postgresql.conf, не SQL. SG и адрес прослушивания ОС - разные средства контроля.</p>
+<h4>P4.3 Ограничить источник, database и role в HBA</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал DB-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Сохраните pg_hba.conf, затем в sudo nano /etc/postgresql/16/main/pg_hba.conf запишите правила ниже. Действует первая совпавшая строка, поэтому прежние широкие разрешения не оставляйте. Системный postgres управляет через Unix socket/peer. Роли будущего M4 перечислены отдельно; учебной роли доступ к основной БД не даётся.</p>
+<pre><code class="language-text">local all postgres peer
+local all all reject
+host jdu_catalog_practice catalog_practice_setup 10.20.1.20/32 scram-sha-256
+host jdu_catalog_practice catalog_practice_app 10.20.1.20/32 scram-sha-256
+host jdu_catalog catalog_setup 10.20.1.20/32 scram-sha-256
+host jdu_catalog catalog_app 10.20.1.20/32 scram-sha-256
+host all all 0.0.0.0/0 reject
+host all all ::/0 reject
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Разрешение зависит от сочетания database/role/источник. Строка 0.0.0.0/0 содержит reject, то есть запрет.</p>
+<p><strong>Если не получилось:</strong> Не заменяйте метод на trust. Базовый SG также разрешает DB 5432 только с Web.</p>
+<h4>P4.4 Перезапустить и проверить действующие значения</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал DB-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> restart перечитывает настройки. SHOW и pg_hba_file_rules проверяют действующие значения, а не только текст файла. Параметр psql -X отключает личные startup-файлы.</p>
+<pre><code class="language-bash">sudo systemctl restart postgresql@16-main
+systemctl is-active postgresql@16-main
+sudo ss -lntp
+sudo -u postgres psql -X -d postgres -c &quot;SHOW password_encryption;&quot;
+sudo -u postgres psql -X -d postgres -c \
+  &quot;SELECT line_number,error FROM pg_hba_file_rules WHERE error IS NOT NULL;&quot;
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> active, 10.20.2.20:5432, scram-sha-256, ошибок HBA - 0 строк.</p>
+<p><strong>Если не получилось:</strong> active(exited) у postgresql.service не доказывает работу cluster. Изучайте journalctl -u postgresql@16-main.</p>
+<h4>P4.5 Создать учебную БД и две роли</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал DB-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> profile_sql.py только выводит фиксированный SQL с учебными именами. Сначала прочитайте вывод, затем передайте тот же текст psql. setup владеет БД/schema и создаёт таблицы; app используется приложением. Используйте предоставленный SQL: программировать приложение не требуется.</p>
+<pre><code class="language-bash">cd /var/lib/jdu-web/lesson-resources-r1/app
+python3 -B profile_sql.py --profile practice 01_create_roles.sql
+python3 -B profile_sql.py --profile practice 01_create_roles.sql | sudo -u postgres \
+  psql -X -v ON_ERROR_STOP=1 -d postgres
+python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u postgres \
+  psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Два CREATE ROLE, CREATE DATABASE, права schema/CONNECT/USAGE. app не получает superuser/CREATEDB.</p>
+<p><strong>Если не получилось:</strong> При already exists возможен повторный запуск. Не используйте DROP; проверьте роли и БД через \du и \l. Убедитесь, что psql справа от pipe не сообщил SQL error.</p>
+<h4>P4.6 Задать два пароля БД скрытым вводом</h4>
+<p><strong>Место выполнения:</strong> psql на DB-сервере от имени системного postgres</p>
+<p><strong>Цель и действия:</strong> Первая строка запускается в shell DB и открывает psql с postgres=#. Команды \password вводятся внутри psql. Для setup/app задайте разные пароли длиной от 16 символов, каждый дважды скрытым вводом. Не пишите значения в команду или отчёт. \q возвращает в shell DB.</p>
+<pre><code class="language-text">sudo -u postgres psql -X -d postgres
+\password catalog_practice_setup
+\password catalog_practice_app
+\du catalog_practice_*
+\q
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Нет Superuser/Create role/Create DB. Это отдельные секреты, не пароль RDP, не пароль администратора приложения и не token оценивания.</p>
+<p><strong>Если не получилось:</strong> Учитывайте раскладку клавиатуры. Не записывайте пароль в чат или редактор для проверки. При потере используйте личную процедуру восстановления с преподавателем.</p>
+<h4>P4.7 Выполнить SELECT с Web по паролю</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Закройте SSM DB через exit, вернитесь в CloudShell и откройте Web. У psql -h задаёт узел, -U - роль, -d - БД, -W запрашивает пароль. P4 использует private IP, чтобы не добавлять зависимость от DNS.</p>
+<pre><code class="language-bash">sudo apt-get install --no-install-recommends postgresql-client-16
+psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
+  'SELECT current_database(),current_user,1 AS value;'
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Результат jdu_catalog_practice / catalog_practice_app / 1. Открытый порт или успех pg_isready не заменяют этот SQL с аутентификацией.</p>
+<p><strong>Если не получилось:</strong> При отказе раздельно проверьте источник, БД, роль и пароль. Не публикуйте DB в Internet для диагностики.</p>
+<h4>P4.8 Сохранить существующий пароль для checker только на Web</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Инструмент дважды скрыто запрашивает существующий пароль catalog_practice_app и сохраняет его только на Web в root-файл 0600. Пароль БД не меняется. Не выводите env через cat и не выполняйте source. Затем exit в CloudShell и P4.</p>
+<pre><code class="language-bash">sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/database_secret.py --profile \
+  practice
+exit
+jdu-web-check P4 --no-submit
+jdu-web-check P4
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Вывод D11_EXISTING_DB_PASSWORD_STORED_LOCALLY и девять учебных проверок. Неверный пароль и запрещённые DB/admin-role проверяются вместе с успешным контрольным подключением.</p>
+<p><strong>Если не получилось:</strong> Если файл уже есть, не создавайте заново. В P5 тот же пароль вводится в настройку приложения. M4 использует отдельные БД/роли mission.</p>
+<h2 id="section-8">P5 Соединить предоставленное приложение с Web и DB</h2>
+<h3>Что изучаем</h3>
+<p>Без программирования связать offline-зависимости, сервисного пользователя, инициализацию БД, Nginx/systemd и реальный HTTP.</p>
+<h3>Задание</h3>
+<p>Постройте каталог в profile practice. Нужны действующие DNS из M2 и P4. БД/администраторы P и M различны, но приложение и порты на том же Web общие.</p>
+<ul>
+<li>Profile: practice</li>
+<li>Database: jdu_catalog_practice</li>
+<li>Setup role: catalog_practice_setup</li>
+<li>Runtime role: catalog_practice_app</li>
+<li>Application administrator: practice_admin</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th scope="col">code</th>
+<th scope="col">name</th>
+<th scope="col">quantity</th>
+<th scope="col">location</th>
+<th scope="col">is_public</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P5-PUBLIC-001</td>
+<td>Practice keyboard</td>
+<td>4</td>
+<td>Training shelf A</td>
+<td>true</td>
+</tr>
+<tr>
+<td>P5-PRIVATE-001</td>
+<td>Practice mouse</td>
+<td>2</td>
+<td>Training shelf B</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<h3>Пример решения: выполняйте по одному шагу</h3>
+<h4>P5.1 Проверить DNS и получить открытые ресурсы</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> На Web обычный resolver должен дать db.lab.test=10.20.2.20 и admin.lab.test=10.20.1.20. offline_assets получает семь wheel и lock из внутреннего repo, сверяя исходную подпись/hash. Он не запускает внешний pip и не настраивает DB/app.</p>
+<pre><code class="language-bash">getent ahostsv4 db.lab.test
+getent ahostsv4 admin.lab.test
+sudo apt-get install --no-install-recommends python3-venv python3-pip
+sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py --wheels
+ls /var/lib/jdu-web/lesson-resources-r1/app
+ls /var/lib/jdu-web/lesson-resources-r1/wheels
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> PUBLIC_APP_RESOURCES_VERIFIED и SIGNED_OFFLINE_WHEELS_READY=7. Файлы приложения открытые и контролируются root.</p>
+<p><strong>Если не получилось:</strong> Нужно и имя db.lab.test, не только practice-db. P5 зависит от M2, но не требует завершения основных заданий по каталогу.</p>
+<h4>P5.2 Разместить код и создать отдельный venv</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Код и venv контролирует root; пользователь catalog не должен их менять. Если app или venv уже существуют, не повторяйте создание - проверьте версию. cp переносит только проверенные открытые ресурсы. venv отделяет зависимости приложения от системного Python.</p>
+<pre><code class="language-bash">sudo install -d -o root -g root -m 0755 /opt/jdu-catalog/app
+sudo cp -a /var/lib/jdu-web/lesson-resources-r1/app/. /opt/jdu-catalog/app/
+sudo python3 -m venv /opt/jdu-catalog/venv
+sudo /opt/jdu-catalog/venv/bin/python -m pip --isolated --no-cache-dir install \
+  --no-index --find-links=/var/lib/jdu-web/lesson-resources-r1/wheels \
+  --only-binary=:all: --require-hashes -r \
+  /var/lib/jdu-web/lesson-resources-r1/requirements.lock
+sudo /opt/jdu-catalog/venv/bin/python -m pip check
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> --no-index запрещает внешний index; --require-hashes требует hash из lock. pip check не находит конфликтов.</p>
+<p><strong>Если не получилось:</strong> Недостающую зависимость решают через комплект преподавателя. Не обновляйте до latest через pip и не меняйте код приложения.</p>
+<h4>P5.3 Создать сервисного пользователя и каталог static</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> catalog предназначен для Gunicorn, не для входа человека. Создайте его с nologin и без sudo. Только каталог static принадлежит catalog для collectstatic; код/venv остаются root. Если catalog уже есть, проверьте id и shell вместо повторного useradd.</p>
+<pre><code class="language-bash">sudo useradd --system --user-group --home-dir /nonexistent --no-create-home --shell \
+  /usr/sbin/nologin catalog
+sudo install -d -o root -g root -m 0755 /var/lib/jdu-catalog
+sudo install -d -o catalog -g catalog -m 0755 /var/lib/jdu-catalog/static
+id catalog
+getent passwd catalog
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> catalog не входит в sudo, shell /usr/sbin/nologin. Это не labuser и не ssm-user.</p>
+<p><strong>Если не получилось:</strong> Не исправляйте права через chmod -R 777 или добавление catalog в sudo. Проверьте конкретный каталог и владельца.</p>
+<h4>P5.4 Создать runtime-настройки скрытым вводом</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Подставьте текущий public IPv4 Web из EC2. Runtime-инструмент дважды запрашивает существующий пароль catalog_practice_app из P4. Django secret генерируется для вашего Lab. Создаются root-only app.env и profile practice; содержимое не выводится.</p>
+<pre><code class="language-bash">PUBLIC_WEB_IPV4='YOUR-CURRENT-WEB-PUBLIC-IP'
+sudo python3 -B /opt/jdu-catalog/app/configuration.py create-runtime --profile \
+  practice --public-web-ipv4 &quot;$PUBLIC_WEB_IPV4&quot;
+sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
+sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> CATALOG_ENV_CREATED=practice, VALID, root:root 600. Выбраны учебная БД и учебная app-role.</p>
+<p><strong>Если не получилось:</strong> Не вводите пароль RDP или администратора приложения. Не удаляйте существующий файл; для уже созданного используйте check.</p>
+<h4>P5.5 Создать таблицы и администратора через временный setup</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> В create-setup введите пароль catalog_practice_setup из P4. migrate создаёт предоставленную структуру БД; seed однократно добавляет три вымышленных образца в пустой каталог. create_lab_admin создаёт practice_admin со скрытым вводом пароля. Обычное приложение не работает через setup.</p>
+<pre><code class="language-bash">sudo python3 -B /opt/jdu-catalog/app/configuration.py create-setup --profile practice
+sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
+  --phase setup check
+sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
+  --phase setup migrate
+sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
+  --phase setup seed_catalog
+sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
+  --phase setup create_lab_admin
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Фиксированные 11 таблиц, три образца и staff-администратор без superuser. Операции выполняются с правами системного catalog.</p>
+<p><strong>Если не получилось:</strong> already exists при seed/admin защищает существующие данные. Не делайте reset; проверьте текущее состояние.</p>
+<h4>P5.6 Выдать runtime-роли необходимые SQL-права</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал DB-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Выйдите из Web в CloudShell и откройте DB через SSM. Прочитайте SQL03: после проверки 11 таблиц и владельцев он выдаёт права по таблицам, столбцам и sequence. Владение и ALL PRIVILEGES роли app не даются.</p>
+<pre><code class="language-bash">cd /var/lib/jdu-web/lesson-resources-r1/app
+python3 -B profile_sql.py --profile practice 03_runtime_grants.sql
+python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u postgres \
+  psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Успех до COMMIT. catalog_item: SELECT/INSERT/UPDATE; auth_user: чтение и UPDATE только last_login/password; session и другие объекты - по назначению.</p>
+<p><strong>Если не получилось:</strong> Ошибка guard требует проверить migrations/owner. Не удаляйте защиту ради продолжения.</p>
+<h4>P5.7 Разместить static и unit systemd</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Вернитесь на Web. collectstatic собирает CSS и другие ресурсы для Nginx. Разместите unit и выполните daemon-reload. Прочитайте User=catalog, EnvironmentFile и bind 127.0.0.1:8000.</p>
+<pre><code class="language-bash">sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
+  --phase runtime collectstatic
+cat /opt/jdu-catalog/app/config/jdu-catalog.service
+sudo install -o root -g root -m 0644 /opt/jdu-catalog/app/config/jdu-catalog.service \
+  /etc/systemd/system/jdu-catalog.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now jdu-catalog
+systemctl is-active jdu-catalog
+sudo ss -lntp
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> active; приложение слушает 8000 только на 127.0.0.1. Не публикуйте его через 0.0.0.0:8000.</p>
+<p><strong>Если не получилось:</strong> При ошибке смотрите journalctl -u jdu-catalog. Не копируйте env в журнал; формат проверяется configuration.py check.</p>
+<h4>P5.8 Разделить публичный и управляющий входы Nginx</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> Прочитайте conf: 80 - список, private8080 - только /admin/, upstream - 8000. Сохраните ссылку начального default site под другим именем и отключите её. Если jdu-catalog уже включён, проверьте состояние вместо повторных переносов. Статические URL P1/M1 сохраняются.</p>
+<pre><code class="language-bash">cat /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf
+sudo install -o root -g root -m 0644 \
+  /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf \
+  /etc/nginx/sites-available/jdu-catalog
+sudo mv -n /etc/nginx/sites-enabled/default /etc/nginx/default-site.before-p5
+sudo ln -s /etc/nginx/sites-available/jdu-catalog /etc/nginx/sites-enabled/jdu-catalog
+sudo nginx -t
+sudo systemctl reload nginx
+curl --noproxy '*' -i http://127.0.0.1/practice.txt
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Синтаксис успешен, practice.txt по-прежнему даёт 200. Публичный журнал теперь jdu-catalog-public.access.log.</p>
+<p><strong>Если не получилось:</strong> При duplicate default server проверьте старый site. До reload исправьте -t. Управляющий port не должен слушать public IP.</p>
+<h4>P5.9 Добавить две учебные записи через admin</h4>
+<p><strong>Место выполнения:</strong> Firefox на рабочем столе бастиона через RDP</p>
+<p><strong>Цель и действия:</strong> В Firefox бастиона откройте http://admin.lab.test:8080/admin/, войдите как practice_admin со своим паролем приложения. Через Add добавьте две строки ниже с точными code/name/quantity/location. Is public включите только у публичной записи. На http://web.lab.test/ должна быть только публичная строка.</p>
+<pre><code class="language-text">P5-PUBLIC-001 | Practice keyboard | 4 | Training shelf A | is_public=true
+P5-PRIVATE-001 | Practice mouse | 2 | Training shelf B | is_public=false
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Удалять три demo не нужно. Две заданные записи - обязательное подмножество; другие корректные публичные записи разрешены. Непубличная запись не видна в списке.</p>
+<p><strong>Если не получилось:</strong> Открывайте admin.lab.test в Firefox внутри RDP, не на школьном PC. При CSRF проверьте host/port/proxy.</p>
+<h4>P5.10 Прочитать реальные строки БД и сравнить с экраном</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> На Web выполните SELECT учебной app-role. Так проверяется, что сохранение из admin действительно дошло до PostgreSQL. Для этой проверки не нужны UPDATE/DELETE.</p>
+<pre><code class="language-bash">QUERY=&quot;SELECT code,name,quantity,location,is_public
+FROM catalog_item
+WHERE code IN ('P5-PUBLIC-001','P5-PRIVATE-001')
+ORDER BY code;&quot;
+psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &quot;$QUERY&quot;
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Обе строки совпадают с заданием. Не подменяйте страницу фиксированным HTML при отказе БД.</p>
+<p><strong>Если не получилось:</strong> При permission denied проверьте profile и database SQL03. Не заменяйте обычную роль на superuser.</p>
+<h4>P5.11 Запустить функциональную проверку и отправить</h4>
+<p><strong>Место выполнения:</strong> CloudShell в личном AWS-аккаунте студента</p>
+<p><strong>Цель и действия:</strong> Выйдите с Web и выполните в CloudShell. --functional открывает интерактивный SSM для скрытого ввода существующего пароля practice_admin. Автоматика выполняет обычный HTTP login, создаёт одну запись CK-P-, меняет её количество, сверяет DB/страницу и делает logout. Заданные две записи не меняются, проверочная остаётся. Личная демонстрация не требуется.</p>
+<pre><code class="language-bash">jdu-web-check P5 --functional
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Проверьте 13 учебных пунктов и доставку. Без пароля обычная проверка оставляет четыре функциональных пункта UNKNOWN. Результаты разных попыток не объединяются.</p>
+<p><strong>Если не получилось:</strong> При неверном пароле используйте правильный существующий, не создавайте новый. Новая проверка добавляет одну CK-запись; для повторной доставки используйте --retry.</p>
+<h2 id="section-9">P6 Минимальные права и границы публикации</h2>
+<h3>Что изучаем</h3>
+<p>Сохранить штатную работу, запретив лишние admin-маршруты, SQL-права и раскрытие секретов.</p>
+<h3>Задание</h3>
+<p>Используйте practice из P5. Отключите setup-role, уберите временную конфигурацию и проверьте отказы при наличии успешного контрольного login. Не расширяйте SG/IAM.</p>
+<ul>
+<li>Profile: practice</li>
+<li>Database: jdu_catalog_practice</li>
+<li>Setup role: catalog_practice_setup</li>
+<li>Runtime role: catalog_practice_app</li>
+<li>Application administrator: practice_admin</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th scope="col">code</th>
+<th scope="col">name</th>
+<th scope="col">quantity</th>
+<th scope="col">location</th>
+<th scope="col">is_public</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P5-PUBLIC-001</td>
+<td>Practice keyboard</td>
+<td>4</td>
+<td>Training shelf A</td>
+<td>true</td>
+</tr>
+<tr>
+<td>P5-PRIVATE-001</td>
+<td>Practice mouse</td>
+<td>2</td>
+<td>Training shelf B</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<h3>Пример решения: выполняйте по одному шагу</h3>
+<h4>P6.1 Прочитать роли и права таблиц</h4>
+<p><strong>Место выполнения:</strong> psql на DB-сервере от имени системного postgres</p>
+<p><strong>Цель и действия:</strong> Откройте psql как postgres на DB. \dp показывает права таблиц, \du - атрибуты ролей. Сверьте с SQL03: UPDATE auth_user только last_login/password, без DELETE catalog_item; lookup только чтение, django_migrations без прав. Не вызывайте nextval/setval ради проверки.</p>
+<pre><code class="language-text">sudo -u postgres psql -X -d jdu_catalog_practice
+\du catalog_practice_*
+\dp public.*
+\q
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Runtime не владелец и не superuser. DELETE для Django session нужен, но не означает право удаления оборудования.</p>
+<p><strong>Если не получилось:</strong> При лишних правах пересмотрите SQL03 с сохранением guard. Не пробуйте отказ удалением реальных строк.</p>
+<h4>P6.2 Отключить вход setup-роли</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал DB-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> После инициализации вход setup не нужен. SQL04 задаёт NOLOGIN/password NULL и закрывает оставшиеся setup-подключения profile. Владельцем DB/table остаётся setup; роль не удаляется и владение app не передаётся.</p>
+<pre><code class="language-bash">cd /var/lib/jdu-web/lesson-resources-r1/app
+python3 -B profile_sql.py --profile practice 04_disable_setup.sql
+python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u postgres \
+  psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> ALTER ROLE успешен, работа catalog_practice_app сохраняется.</p>
+<p><strong>Если не получилось:</strong> Не включайте setup обратно для обычной работы. M5 инициализируется отдельной setup-role mission.</p>
+<h4>P6.3 Удалить только временную конфигурацию setup</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong> На Web проверьте только metadata. Удалите ровно два файла setup practice. app.env, practice.app.env, DB runtime, command-state, SSH-ключи и данные оценивания сохраняются. Содержимое секретных файлов через cat не выводится.</p>
+<pre><code class="language-bash">sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
+  /etc/jdu-catalog/profiles/practice.setup.env
+sudo rm -- /etc/jdu-catalog/setup.env /etc/jdu-catalog/profiles/practice.setup.env
+sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env \
+  /etc/jdu-catalog/profiles/practice.app.env /etc/jdu-web/db-practice.runtime.env
+sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Runtime-файлы root:root 600, check успешен. Если setup-файлы уже удалены, пропустите удаление.</p>
+<p><strong>Если не получилось:</strong> Если setup относится к другому profile, остановитесь. Не используйте wildcard или rm -r для всего каталога.</p>
+<h4>P6.4 Проверить запрет admin и секретов на публичном 80</h4>
+<p><strong>Место выполнения:</strong> SSM-терминал бастиона: ssm-user</p>
+<p><strong>Цель и действия:</strong> В SSM бастиона запросите обычный список на 80, затем /admin/ и env. Отдельно подтвердите штатный admin на 8080 в Firefox через RDP. Нужны нормальный ответ и явный отказ 404/403; таймаута недостаточно.</p>
+<pre><code class="language-bash">curl --noproxy '*' -i http://web.lab.test/
+curl --noproxy '*' -i http://web.lab.test/admin/
+curl --noproxy '*' -i http://web.lab.test/app.env
+curl --noproxy '*' -i http://web.lab.test/static/app.env
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> Список - 200; admin/env отклоняются без секретов. Публичный Nginx перезаписывает X-JDU-Entry и не допускает подмену входа.</p>
+<p><strong>Если не получилось:</strong> Если виден текст env, не распространяйте его: сообщите преподавателю и исправьте публикацию.</p>
+<h4>P6.5 Отправить успешный вход и отказы в одной проверке</h4>
+<p><strong>Место выполнения:</strong> CloudShell в личном AWS-аккаунте студента</p>
+<p><strong>Цель и действия:</strong> P6 --functional использует успешный login practice_admin как контроль и проверяет, что анонимные операции и неверный пароль отклоняются без изменения БД. Один 403 из-за CSRF не доказывает авторизацию. Staff имеет только view/add/change оборудования, без delete и управления пользователями.</p>
+<pre><code class="language-bash">jdu-web-check P6 --functional
+jdu-web-my-progress
+</code></pre>
+<p><strong>Ожидаемый результат и его смысл:</strong> 16 учебных пунктов. Личный URL прогресса открывайте только сами. P не даёт оценочных баллов; M6 проверяется отдельно в mission.</p>
+<p><strong>Если не получилось:</strong> PENDING повторно отправляется с исходным request-id; причину UNKNOWN нужно устранить и измерить заново. Не редактируйте grade-файлы.</p>
+<h2 id="section-10">Продолжение и повторная отправка</h2>
+<p>На следующем занятии запустите свой Lab и те же пять узлов, проверьте running/SSM Online и текущие public IP. В CloudShell заново задайте LAB_ID/COURSE_ID/INSTALL, прочитайте activate.sh как в P0 и выполните M0 --no-submit. Не повторяйте создание/ключи/регистрацию; при истечении срока запросите обновление.</p>
+<p>STORED означает приём преподавателем. Для PENDING используйте исходный request-id и то же задание с --retry. --no-submit не является отправкой. UNKNOWN - измерение невозможно, а не автоматический ноль или успех. Оно не удаляет прежнюю оцениваемую попытку, но не доказывает текущую готовность. Используется последняя полностью оцениваемая попытка, не максимальная и не сумма PASS разных запусков.</p>
+<pre><code class="language-bash">jdu-web-check M2 --retry 'YOUR-ORIGINAL-REQUEST-ID'
+jdu-web-my-progress
+</code></pre>
+<p>Личный URL открывайте только сами. Не отправляйте в отчёт или чат пароль/token/cookie/ключ/env/URL преподавателя. Снимки не должны содержать секретов. Не проверяйте ошибки на чужом Lab.</p>
+<h2 id="section-11">Источники и версия</h2>
+<p>Критерии основаны на фиксированном registry и таблицах M. Текст сверен с принятой реализацией, но новый студент ещё не прошёл эти подробные шаги с нуля. Ещё нужны приёмка успешного ручного ввода пароля и stop/start всех пяти узлов после установки приложения. Редактирование пособия не делает CLASS_READY=true.</p>
+<p>Версии: web-course-class193548-20261023-r2; web-d11-2026-10-r1; registry SHA256 3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33.</p>
+<p>Подпись действует до 2026-10-27 14:24:57 UZT. Срок URL загрузки отличается от срока подписи; не меняйте даты для обхода. Ниже первичные документы общих функций, проверенные 2026-10-23. IP, задания и баллы Lab определены этим курсом.</p>
+<ul>
+<li><a href="https://nginx.org/en/docs/beginners_guide.html">Nginx Beginner’s Guide</a></li>
+<li><a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BIND 9: configurations and zones</a></li>
+<li><a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">PostgreSQL 16: pg_hba.conf</a></li>
+<li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html">EC2 instance states</a></li>
+</ul>
+</main><footer>web-course-class193548-20261023-r2 · 62 raw points · 2026-10-23</footer></body></html>

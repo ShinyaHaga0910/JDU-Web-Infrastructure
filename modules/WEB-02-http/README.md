@@ -1,5 +1,7 @@
 # WEB-02 HTTPとNginx
 
+2026-10-23：現在の課題教材は[詳細練習P1](../../course/labs/docs/ja/practice.md)と[自力課題M1](../../course/labs/docs/ja/missions.md)。5台・内部署名repo・正式checkerに合わせた三言語HTML/PDFは[教材入口](../../course/labs/README.md)を使う。以下は9月制作の単元初稿であり、現在の配布/採点仕様は上記を優先する。
+
 状態: 教材の初版。Ubuntu 24.04 LTSでの学生権限・AWS Academy Learner Lab通し試験は未実施。VPCと接続経路はWEB-01で確定させる。
 
 ## 前提

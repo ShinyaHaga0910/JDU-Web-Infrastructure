@@ -1,0 +1,584 @@
+<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Web Infrastructure: M0–M6 mustaqil topshiriqlar</title><style>
+:root{color-scheme:light;font:17px/1.8 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:1000px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2rem}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1</p><nav aria-label="Contents"><a href="#section-1">Qo‘llanmadan foydalanish</a> · <a href="#section-2">Muhit va tayyorgarlik</a> · <a href="#section-3">M0 Shaxsiy muhit va buyruqlarni bajarish joyi (0)</a> · <a href="#section-4">M1 HTTP orqali statik faylni qaytarish (8)</a> · <a href="#section-5">M2 Ichki DNS va odatiy nom yechimi (13)</a> · <a href="#section-6">M3 To‘xtatish va qayta ishga tushirishda ma’lumotlar (3)</a> · <a href="#section-7">M4 PostgreSQL ga autentifikatsiya bilan ulanish (9)</a> · <a href="#section-8">M5 Berilgan app ni Web va DB bilan bog‘lash (13)</a> · <a href="#section-9">M6 Eng kam huquq va ochiq kirish chegarasi (16)</a> · <a href="#section-10">Davom ettirish va qayta yuborish</a> · <a href="#section-11">Manbalar va versiya</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: M0-M6 mustaqil topshiriqlar</h1>
+<p>2026-10-23 | D12 P/M r1 | web-course-class193548-20261023-r2</p>
+<p>O‘qituvchi tekshiruvi uchun birinchi nashr. Talabaning qo‘llanma bo‘yicha boshidan oxirigacha o‘tishi hali tekshirilmagan.</p>
+<p>Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga ega. Ona tili mutaxassisi tahriri hali bajarilmagan.</p>
+<p><a href="../ja/missions.html">日本語</a> · <a href="../ru/missions.html">Русский</a> · <a href="../uz/missions.html">O‘zbekcha</a></p>
+<h2 id="section-1">Qo‘llanmadan foydalanish</h2>
+<p>Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P - bahoga ball qo‘shmaydigan mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.</p>
+<p>P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → M4 → P5 → P6 → M5 → M6</p>
+<p>P5 uchun ham M2 DNS kerak. P4 IP bilan ulanadi, app esa db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating. P ixtiyoriy mashq; checker M ning joriy old shartlarini tekshiradi.</p>
+<p>M1=8, M2=13, M3=3, M4=9, M5=13, M6=16: jami 62 xom ball. M0=0. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.</p>
+<h2 id="section-2">Muhit va tayyorgarlik</h2>
+<p>Avval boshlang‘ich tarqatma imzosi, yangi beshta server yoki mavjud muhitga install, ichki SSH va shaxsiy ro‘yxatni tugating. Yo‘riqnoma zip dagi distribution/STUDENT.md da. Maxfiy kalitni umumiy Windows ga saqlamang; shaxsiy Academy hisobining CloudShell idan foydalaning. O‘qituvchi anonim Lab ID, fingerprint va muddatni beradi.</p>
+<p>Umumiy private IP quyida; public IPv4 doimiy emas. AWS region us-east-1, Ubuntu24.04/amd64. RDP: labuser; SSM: ssm-user; ichki SSH: ubuntu. User nomi va server rolini adashtirmang.</p>
+<table>
+<thead>
+<tr>
+<th scope="col">Role</th>
+<th scope="col">Private IPv4</th>
+<th scope="col">Vazifa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bastion</td>
+<td>10.20.1.10</td>
+<td>RDP3389 / Firefox / SSH</td>
+</tr>
+<tr>
+<td>web</td>
+<td>10.20.1.20</td>
+<td>HTTP80 / private8080 / loopback8000</td>
+</tr>
+<tr>
+<td>dns</td>
+<td>10.20.2.10</td>
+<td>BIND UDP/TCP53</td>
+</tr>
+<tr>
+<td>db</td>
+<td>10.20.2.20</td>
+<td>PostgreSQL5432</td>
+</tr>
+<tr>
+<td>repo</td>
+<td>10.20.2.30</td>
+<td>Oldindan saqlangan imzolangan resurslar HTTP80</td>
+</tr>
+</tbody>
+</table>
+<p>Har Ubuntu ga kirish uchun CloudShell da aws ssm start-session --target i-OZ-ID bajaring. Darhol id -un va bootstrap.json dagi role ni tekshiring. Server almashtirishda bitta exit bilan CloudShell ga qaytib keyingi ID ga ulang. CloudShell o‘zgaruvchilari serverga avtomatik ko‘chmaydi. ssm-user sudo qila oladi; RDP labuser sudo admin emas.</p>
+<p>Nano: faylni ochish → matn yozish → Ctrl+O → Enter bilan saqlash → Ctrl+X bilan chiqish. Sozlama bloki shell buyrug‘i emas. Psql ichida prompt o‘zgaradi; SQL/\password shu yerga yoziladi, \q Ubuntu ga qaytaradi. Xatodan keyin natijani tekshirmay davom etmang.</p>
+<h2 id="section-3">M0 Shaxsiy muhit va buyruqlarni bajarish joyi (0)</h2>
+<h3>Tayyor holat talablari</h3>
+<p>Beshta rol, asl instance, SSM/ichki SSH va shaxsiy ro‘yxat mosligini tekshiring. 0 ball. P0 ga qarang; asosni qayta yaratmang.</p>
+<h3>Tekshirish va yuborish</h3>
+<pre><code class="language-bash">jdu-web-check M0 --no-submit
+jdu-web-check M0
+</code></pre>
+<h2 id="section-4">M1 HTTP orqali statik faylni qaytarish (8)</h2>
+<h3>Tayyor holat talablari</h3>
+<p>P1 ko‘nikmasi bilan belgilangan boshqa fayl va matnni mustaqil tarqating. practice.txt ni saqlang. Fayl, service, listen, local/bastion/public HTTP va joriy so‘rov log i tekshiriladi.</p>
+<ul>
+<li>File: /var/www/html/mission.txt</li>
+<li>URL path: /mission.txt</li>
+</ul>
+<pre><code class="language-text">JDU WEB-02 mission: independent HTTP delivery.
+</code></pre>
+<h3>Shartlar: har tekshiruvga 1 xom ball</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID (o‘zgartirmang)</th>
+<th scope="col">Shart</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB02_NGINX_ACTIVE</td>
+<td>Nginx ishlaydi (active).</td>
+</tr>
+<tr>
+<td>WEB02_CONFIG_VALID</td>
+<td>nginx -t sozlamani muvaffaqiyatli tekshiradi.</td>
+</tr>
+<tr>
+<td>WEB02_LISTEN_80</td>
+<td>80 port private IP/barcha interface da tinglaydi, faqat loopback emas.</td>
+</tr>
+<tr>
+<td>WEB02_FILE</td>
+<td>Oddiy faylda aniq matn bor, egasi root:root, ruxsat 0644.</td>
+</tr>
+<tr>
+<td>WEB02_LOCAL_HTTP</td>
+<td>Web loopback orqali HTTP 200 va aniq matn oladi.</td>
+</tr>
+<tr>
+<td>WEB02_BASTION_HTTP</td>
+<td>Bastion private IP orqali HTTP 200 va aniq matn oladi.</td>
+</tr>
+<tr>
+<td>WEB02_PUBLIC_HTTP</td>
+<td>CloudShell public IP orqali HTTP 200 va aniq matn oladi.</td>
+</tr>
+<tr>
+<td>WEB02_ACCESS_LOG</td>
+<td>Access log aynan shu tekshiruv nonce li so‘rovni saqlaydi.</td>
+</tr>
+</tbody>
+</table>
+<p>Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.</p>
+<h3>Tekshirish va yuborish</h3>
+<pre><code class="language-bash">jdu-web-check M1 --no-submit
+jdu-web-check M1
+</code></pre>
+<h2 id="section-5">M2 Ichki DNS va odatiy nom yechimi (13)</h2>
+<h3>Tayyor holat talablari</h3>
+<p>Ayni lab.test zone ga oltita asosiy nomni qo‘shing. guide/practice-db qolishi mumkin. Bastion/Web odatiy resolver, nom orqali M1 HTTP, DB nomi, UDP/TCP, forwarding, NXDOMAIN, ACL va AXFR rad etilishi kerak.</p>
+<table>
+<thead>
+<tr>
+<th scope="col">DNS name</th>
+<th scope="col">A / IPv4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>admin.lab.test</td>
+<td>10.20.1.20</td>
+</tr>
+<tr>
+<td>bastion.lab.test</td>
+<td>10.20.1.10</td>
+</tr>
+<tr>
+<td>db.lab.test</td>
+<td>10.20.2.20</td>
+</tr>
+<tr>
+<td>dns.lab.test</td>
+<td>10.20.2.10</td>
+</tr>
+<tr>
+<td>repo.lab.test</td>
+<td>10.20.2.30</td>
+</tr>
+<tr>
+<td>web.lab.test</td>
+<td>10.20.1.20</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Joriy old shartlar: M1</li>
+</ul>
+<h3>Shartlar: har tekshiruvga 1 xom ball</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID (o‘zgartirmang)</th>
+<th scope="col">Shart</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB03_SERVICE</td>
+<td>BIND/named ishlaydi (active).</td>
+</tr>
+<tr>
+<td>WEB03_CONFIG_VALID</td>
+<td>Named va lab.test zone tekshiruvlari muvaffaqiyatli.</td>
+</tr>
+<tr>
+<td>WEB03_ZONE_AUTHORITY</td>
+<td>Lab.test SOA/NS va vakolatli javob tuzilmaga mos; NS - dns.lab.test.</td>
+</tr>
+<tr>
+<td>WEB03_REQUIRED_RECORDS</td>
+<td>Profile dagi barcha A record kerakli private IP beradi; bu bitta band.</td>
+</tr>
+<tr>
+<td>WEB03_UDP_RESPONSE</td>
+<td>Bastion ham, Web ham UDP 53 orqali to‘g‘ri javob oladi.</td>
+</tr>
+<tr>
+<td>WEB03_TCP_RESPONSE</td>
+<td>Bastion ham, Web ham TCP 53 orqali to‘g‘ri javob oladi.</td>
+</tr>
+<tr>
+<td>WEB03_NORMAL_RESOLVER</td>
+<td>Bastion/Web odatiy resolver faqat BIND dan foydalanadi; hosts yoki Firefox DoH bilan almashtirilmaydi.</td>
+</tr>
+<tr>
+<td>WEB03_NAMED_HTTP</td>
+<td>Bastiondan profile nomi va belgilangan path orqali HTTP 200 hamda to‘g‘ri matn qaytadi.</td>
+</tr>
+<tr>
+<td>WEB03_DB_NAME</td>
+<td>Web odatiy resolver profile DB nomini 10.20.2.20 ga yechadi.</td>
+</tr>
+<tr>
+<td>WEB03_FORWARD_ONLY</td>
+<td>Forward only faqat 10.20.0.2 ga yo‘naltirilgan; tashqi DNS nomi yechiladi. Tashqi HTTP shart emas.</td>
+</tr>
+<tr>
+<td>WEB03_NXDOMAIN</td>
+<td>Shu ishga tushirishdagi yangi mavjud bo‘lmagan nom vakolatli NXDOMAIN oladi.</td>
+</tr>
+<tr>
+<td>WEB03_CLIENT_ACL</td>
+<td>BIND query/recursion/cache faqat localhost, bastion va Web ga ruxsat; SG ning o‘zi yetmaydi.</td>
+</tr>
+<tr>
+<td>WEB03_AXFR_DENIED</td>
+<td>Ayni tekshiruv oddiy so‘rovlari o‘tgan holda bastion/Web AXFR aniq rad etiladi; timeout yetmaydi.</td>
+</tr>
+</tbody>
+</table>
+<p>Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.</p>
+<h3>Tekshirish va yuborish</h3>
+<pre><code class="language-bash">jdu-web-check M2 --no-submit
+jdu-web-check M2
+</code></pre>
+<h2 id="section-6">M3 To‘xtatish va qayta ishga tushirishda ma’lumotlar (3)</h2>
+<h3>Tayyor holat talablari</h3>
+<p>O‘z Lab ID bilan alohida M marker yarating. P3 dan alohida prepare-stop → AWS Stop → observe-stopped → AWS Start → M3 ketma-ketligini bajaring. Ayni Web va asl root volume kerak; oddiy reboot yetmaydi. Backup/restore va yangi disk kerak emas.</p>
+<ul>
+<li>File: /var/lib/jdu-web/mission/storage.txt</li>
+</ul>
+<pre><code class="language-text">lab_id={lab_id}
+task=M3
+payload=mission-storage-2026
+</code></pre>
+<p>{lab_id} ni o‘z anonim ID ga almashtiring. Fayl 0644/root:root, katalog 0755/root:root. Faqat ayni asl Web/volume ni to‘xtating.</p>
+<h3>Shartlar: har tekshiruvga 1 xom ball</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID (o‘zgartirmang)</th>
+<th scope="col">Shart</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB04_MARKER_CONTENT</td>
+<td>Marker path, shaxsiy Lab ID, task va aniq matn topshiriqqa mos.</td>
+</tr>
+<tr>
+<td>WEB04_MARKER_PERMISSIONS</td>
+<td>Fayl root:root 0644, ota katalog root:root 0755.</td>
+</tr>
+<tr>
+<td>WEB04_STOP_START_RETENTION</td>
+<td>Stop/start uch bosqichi isbotlangan: ayni instance/volume/hash, yangi boot_id va alohida kuzatilgan stopped.</td>
+</tr>
+</tbody>
+</table>
+<p>Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.</p>
+<h3>Tekshirish va yuborish</h3>
+<pre><code class="language-bash">jdu-web-check M3 --no-submit
+jdu-web-check M3
+</code></pre>
+<h2 id="section-7">M4 PostgreSQL ga autentifikatsiya bilan ulanish (9)</h2>
+<h3>Tayyor holat talablari</h3>
+<p>Asosiy DB va rollarni mustaqil quring. M2 db.lab.test ni odatiy resolver bilan yechib Web runtime role orqali SELECT bajaring. HBA faqat Web/32 va to‘g‘ri DB/role juftiga ruxsat beradi. Mavjud parolni Web mission helper orqali practice dan alohida saqlang. App jadvallari hali kerak emas.</p>
+<ul>
+<li>Profile: mission</li>
+<li>Database: jdu_catalog</li>
+<li>Setup role: catalog_setup</li>
+<li>Runtime role: catalog_app</li>
+<li>Joriy old shartlar: M2</li>
+</ul>
+<h3>Shartlar: har tekshiruvga 1 xom ball</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID (o‘zgartirmang)</th>
+<th scope="col">Shart</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB05_CLUSTER_ACTIVE</td>
+<td>PostgreSQL 16/main ishlaydi (active).</td>
+</tr>
+<tr>
+<td>WEB05_CLUSTER_CONFIG</td>
+<td>16/main sozlamasi, standart data directory va OS postgres socket/peer to‘g‘ri.</td>
+</tr>
+<tr>
+<td>WEB05_LISTEN_5432</td>
+<td>PostgreSQL 10.20.2.20:5432 da tinglaydi.</td>
+</tr>
+<tr>
+<td>WEB05_DATABASE_OWNER</td>
+<td>DB va public schema egasi tegishli setup role.</td>
+</tr>
+<tr>
+<td>WEB05_ROLE_ATTRIBUTES</td>
+<td>Runtime LOGIN; superuser/CREATEDB/CREATEROLE/REPLICATION/BYPASSRLS va huquq oshiruvchi membership yo‘q. Setup qurishda LOGIN yoki tugagach NOLOGIN.</td>
+</tr>
+<tr>
+<td>WEB05_HBA_SCRAM</td>
+<td>HBA faqat ko‘rsatilgan DB/role va Web /32 uchun SCRAM ga ruxsat beradi; keng ruxsat yo‘q.</td>
+</tr>
+<tr>
+<td>WEB05_WEB_SQL</td>
+<td>Web dan yangi autentifikatsiyali SELECT kerakli DB/user/qiymatni qaytaradi; P IP bilan, M odatiy DNS orqali.</td>
+</tr>
+<tr>
+<td>WEB05_BAD_PASSWORD_DENIED</td>
+<td>To‘g‘ri parol ishlagan ayni tekshiruvda bitta noto‘g‘ri parol aniq rad etiladi.</td>
+</tr>
+<tr>
+<td>WEB05_WRONG_TARGET_DENIED</td>
+<td>Web dan postgres role, begona DB va boshqa profile taqiqlangan; hali yaratilmagan practice DB majburiy emas.</td>
+</tr>
+</tbody>
+</table>
+<p>Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.</p>
+<h3>Tekshirish va yuborish</h3>
+<pre><code class="language-bash">jdu-web-check M4 --no-submit
+jdu-web-check M4
+</code></pre>
+<h2 id="section-8">M5 Berilgan app ni Web va DB bilan bog‘lash (13)</h2>
+<h3>Tayyor holat talablari</h3>
+<p>Ayni app ni mission DB ga ulang. P5 ko‘nikmasi bilan profile=mission tanlang, app/venv ni qayta joylamang. Service ni to‘xtatib: mission runtime yaratish → aniq activate → mission setup yaratish; practice setup P6 da tugatilgan bo‘lsin. Asosiy DB da migrations/seed/admin va grants ni bajaring, ikkita belgilangan yozuvni kiriting. P1/M1 ni saqlab mission ni active qoldiring.</p>
+<ul>
+<li>Profile: mission</li>
+<li>Database: jdu_catalog</li>
+<li>Setup role: catalog_setup</li>
+<li>Runtime role: catalog_app</li>
+<li>Application administrator: lab_admin</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th scope="col">code</th>
+<th scope="col">name</th>
+<th scope="col">quantity</th>
+<th scope="col">location</th>
+<th scope="col">is_public</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M5-PUBLIC-001</td>
+<td>Mission monitor</td>
+<td>6</td>
+<td>Lab cabinet C</td>
+<td>true</td>
+</tr>
+<tr>
+<td>M5-PRIVATE-001</td>
+<td>Mission router</td>
+<td>1</td>
+<td>Lab cabinet D</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Joriy old shartlar: M2, M4</li>
+</ul>
+<h3>Shartlar: har tekshiruvga 1 xom ball</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID (o‘zgartirmang)</th>
+<th scope="col">Shart</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB06_ARTIFACTS</td>
+<td>Kod va bog‘liqliklar berilgan aniq versiyaga mos.</td>
+</tr>
+<tr>
+<td>WEB06_SERVICE</td>
+<td>jdu-catalog active va enabled, catalog nomidan ishlaydi.</td>
+</tr>
+<tr>
+<td>WEB06_LOOPBACK</td>
+<td>Gunicorn faqat 127.0.0.1:8000 da tinglaydi.</td>
+</tr>
+<tr>
+<td>WEB06_PROFILE_DATABASE</td>
+<td>Faol process kerakli profile DB va runtime role dan foydalanadi.</td>
+</tr>
+<tr>
+<td>WEB06_MIGRATIONS</td>
+<td>Belgilangan migrations, 11 jadval va zarur sequence tanlangan DB da mavjud.</td>
+</tr>
+<tr>
+<td>WEB06_REQUIRED_RECORDS</td>
+<td>Ikkala majburiy yozuv profile qiymatlariga mos; boshqa to‘g‘ri yozuvlar mumkin.</td>
+</tr>
+<tr>
+<td>WEB06_PUBLIC_DATA</td>
+<td>Odatiy ochiq URL ishlayotgan DB dan to‘g‘ri yozuvlarni oladi.</td>
+</tr>
+<tr>
+<td>WEB06_ADMIN_ENTRY</td>
+<td>Bastiondan odatiy DNS orqali admin.lab.test:8080/admin/ haqiqiy login shakli ochiladi.</td>
+</tr>
+<tr>
+<td>WEB06_STATIC</td>
+<td>Static resurslar belgilangan yo‘l orqali ochiladi.</td>
+</tr>
+<tr>
+<td>WEB06_PASSWORD_LOGIN</td>
+<td>Funksional rejim haqiqiy password/CSRF/cookie login dan o‘tadi, autentifikatsiya chetlab o‘tilmaydi.</td>
+</tr>
+<tr>
+<td>WEB06_CREATE_REFLECT</td>
+<td>Shu tekshiruvda admin HTTP orqali bitta CK yozuv yaratilib, DB va ochiq sahifa qiymatlari mos keladi.</td>
+</tr>
+<tr>
+<td>WEB06_EDIT_REFLECT</td>
+<td>Aynan shu CK yozuv miqdori o‘zgartiriladi; DB va ochiq sahifa o‘zgarishni tasdiqlaydi.</td>
+</tr>
+<tr>
+<td>WEB06_LOGOUT</td>
+<td>POST logout session ni tugatadi: eski cookie bilan yana login talab etiladi.</td>
+</tr>
+</tbody>
+</table>
+<p>Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.</p>
+<h3>Tekshirish va yuborish</h3>
+<pre><code class="language-bash">jdu-web-check M5 --functional
+# STORED / PENDING: inspect delivery result
+</code></pre>
+<h2 id="section-9">M6 Eng kam huquq va ochiq kirish chegarasi (16)</h2>
+<h3>Tayyor holat talablari</h3>
+<p>Mission eng kam huquqini tugating: catalog_setup NOLOGIN/password NULL, vaqtinchalik setup fayllari qolmasin. Root kod/venv, 600 maxfiy fayl, 80 da admin rad etilishi, private8080 muvaffaqiyati, admin faqat view/add/change, ochiq/yopiq ma’lumot va SQL huquqlarini tekshiring. --functional shaxsiy namoyish emas, avtomatik tekshiruv.</p>
+<ul>
+<li>Profile: mission</li>
+<li>Database: jdu_catalog</li>
+<li>Setup role: catalog_setup</li>
+<li>Runtime role: catalog_app</li>
+<li>Application administrator: lab_admin</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th scope="col">code</th>
+<th scope="col">name</th>
+<th scope="col">quantity</th>
+<th scope="col">location</th>
+<th scope="col">is_public</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M5-PUBLIC-001</td>
+<td>Mission monitor</td>
+<td>6</td>
+<td>Lab cabinet C</td>
+<td>true</td>
+</tr>
+<tr>
+<td>M5-PRIVATE-001</td>
+<td>Mission router</td>
+<td>1</td>
+<td>Lab cabinet D</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Joriy old shartlar: M5</li>
+</ul>
+<h3>Shartlar: har tekshiruvga 1 xom ball</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID (o‘zgartirmang)</th>
+<th scope="col">Shart</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB07_PUBLIC_ADMIN_DENIED</td>
+<td>Ochiq 80 soxta Host/header bilan ham admin ni ochmaydi; private yo‘l esa ishlaydi.</td>
+</tr>
+<tr>
+<td>WEB07_SECRET_PERMISSIONS</td>
+<td>Maxfiy fayllar oddiy root:root 0600, link va qiymat ochilishi yo‘q.</td>
+</tr>
+<tr>
+<td>WEB07_CODE_PROTECTED</td>
+<td>Login/sudo siz catalog kod, venv va ularning boshqaruv kataloglarini o‘zgartira olmaydi.</td>
+</tr>
+<tr>
+<td>WEB07_SECRET_HTTP_DENIED</td>
+<td>Tekshiriladigan env/maxfiy path lar HTTP yoki static orqali ochilmaydi.</td>
+</tr>
+<tr>
+<td>WEB07_SETUP_RETIRED</td>
+<td>Setup role NOLOGIN/password NULL, session lari yopilgan, vaqtinchalik setup.env lar o‘chirilgan.</td>
+</tr>
+<tr>
+<td>WEB07_ITEM_PRIVILEGES</td>
+<td>catalog_item: faqat SELECT/INSERT/UPDATE; DELETE, TRUNCATE va huquq uzatish yo‘q.</td>
+</tr>
+<tr>
+<td>WEB07_AUTH_USER_PRIVILEGES</td>
+<td>auth_user: SELECT va faqat last_login/password UPDATE; user yaratish/o‘chirish yo‘q.</td>
+</tr>
+<tr>
+<td>WEB07_AUTH_LOOKUP_PRIVILEGES</td>
+<td>Guruh, permission, bog‘lanish va content type jadvallari faqat SELECT uchun.</td>
+</tr>
+<tr>
+<td>WEB07_SESSION_PRIVILEGES</td>
+<td>django_session: faqat kerakli SELECT/INSERT/UPDATE/DELETE; ortiqcha huquq yo‘q.</td>
+</tr>
+<tr>
+<td>WEB07_AUDIT_PRIVILEGES</td>
+<td>django_admin_log: faqat SELECT/INSERT.</td>
+</tr>
+<tr>
+<td>WEB07_MIGRATION_PRIVILEGES</td>
+<td>Runtime da django_migrations huquqi, schema CREATE, obyekt egaligi va belgilanmagan qo‘shimcha huquq yo‘q.</td>
+</tr>
+<tr>
+<td>WEB07_SEQUENCE_PRIVILEGES</td>
+<td>USAGE faqat jihoz va admin-log sequence lariga; ortiqcha SELECT/UPDATE/GRANT yo‘q.</td>
+</tr>
+<tr>
+<td>WEB07_ADMIN_PERMISSIONS</td>
+<td>Faol staff, superuser emas: faqat jihoz view/add/change; delete/user management yo‘q.</td>
+</tr>
+<tr>
+<td>WEB07_ANONYMOUS_DENIED</td>
+<td>Nazorat login o‘tgan holda anonim add/change DB ni o‘zgartirmay rad etiladi; faqat CSRF-403 yetmaydi.</td>
+</tr>
+<tr>
+<td>WEB07_BAD_PASSWORD_DENIED</td>
+<td>Bitta noto‘g‘ri app paroli rad etiladi, ayni paytda to‘g‘ri login ishlaydi.</td>
+</tr>
+<tr>
+<td>WEB07_PRIVATE_DATA_HIDDEN</td>
+<td>DB ishlagan holda topilgan barcha yopiq kodlar ochiq sahifada ko‘rinmaydi.</td>
+</tr>
+</tbody>
+</table>
+<p>Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.</p>
+<h3>Tekshirish va yuborish</h3>
+<pre><code class="language-bash">jdu-web-check M6 --functional
+# STORED / PENDING: inspect delivery result
+</code></pre>
+<h2 id="section-10">Davom ettirish va qayta yuborish</h2>
+<p>Keyingi safar shaxsiy Lab va ayni besh serverni ishga tushirib running/SSM Online hamda joriy public IP ni tekshiring. CloudShell da LAB_ID/COURSE_ID/INSTALL ni qayta belgilang, P0 dagi activate.sh ni o‘qing va M0 --no-submit bajaring. Yaratish/kalit/ro‘yxatni takrorlamang; muddat o‘tsa yangilashni so‘rang.</p>
+<p>STORED - o‘qituvchi qabul qilgan. PENDING bo‘lsa asl request-id va ayni topshiriq bilan --retry ishlating. --no-submit yuborish emas. UNKNOWN - o‘lchab bo‘lmagan, avtomatik nol yoki muvaffaqiyat emas. U oldingi baholanadigan urinishni o‘chirmaydi, lekin hozir tayyorlikni isbotlamaydi. Oxirgi to‘liq baholanadigan urinish olinadi; maksimum yoki turli urinish PASS yig‘indisi emas.</p>
+<pre><code class="language-bash">jdu-web-check M2 --retry 'YOUR-ORIGINAL-REQUEST-ID'
+jdu-web-my-progress
+</code></pre>
+<p>Shaxsiy URL ni faqat o‘zingiz oching. Hisobot/chat ga parol/token/cookie/kalit/env/o‘qituvchi URL ini yubormang. Screenshot da maxfiy maydon bo‘lmasin. Xatoni boshqa talaba Lab ida sinamang.</p>
+<h2 id="section-11">Manbalar va versiya</h2>
+<p>Shartlar belgilangan registry va M jadvallariga asoslangan. Matn qabul qilingan amalga oshirish bilan solishtirildi, ammo yangi talaba bu batafsil qadamlarni boshidan hali bajarmagan. To‘g‘ri parolni shaxsan kiritish va app o‘rnatilgach besh server stop/start qabul tekshiruvi qolgan. Qo‘llanma tahriri CLASS_READY=true degani emas.</p>
+<p>Versiyalar: web-course-class193548-20261023-r2; web-d11-2026-10-r1; registry SHA256 3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33.</p>
+<p>Imzo muddati: 2026-10-27 14:24:57 UZT. Yuklash URL muddati imzo muddatidan farq qiladi; chetlab o‘tish uchun sanani o‘zgartirmang. Quyida 2026-10-23 tekshirilgan umumiy funksiyalarning birlamchi hujjatlari. Lab IP, topshiriq va ballari ushbu kurs tomonidan belgilanadi.</p>
+<ul>
+<li><a href="https://nginx.org/en/docs/beginners_guide.html">Nginx Beginner’s Guide</a></li>
+<li><a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BIND 9: configurations and zones</a></li>
+<li><a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">PostgreSQL 16: pg_hba.conf</a></li>
+<li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html">EC2 instance states</a></li>
+</ul>
+</main><footer>web-course-class193548-20261023-r2 · 62 raw points · 2026-10-23</footer></body></html>
