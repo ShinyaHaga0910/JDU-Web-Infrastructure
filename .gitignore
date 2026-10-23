@@ -9,3 +9,11 @@ __pycache__/
 *.pem
 *.key
 *.private.asc
+*.plan.json
+*.state.json
+deployment-plan.json
+deployment-state.json
+payload-cache/
+signing-home/
+development/.cache/
+development/output/

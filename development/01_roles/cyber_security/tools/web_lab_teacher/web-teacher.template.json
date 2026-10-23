@@ -1,0 +1,440 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Separate Web teacher API and fixed-IP TLS passthrough. Linux progress unchanged.",
+  "Parameters": {
+    "VpcId": {
+      "Type": "AWS::EC2::VPC::Id"
+    },
+    "SubnetId": {
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "LambdaExecutionRoleName": {
+      "Type": "String",
+      "Default": "LabRole",
+      "AllowedPattern": "[A-Za-z0-9+=,.@_-]+"
+    },
+    "AdminKeyHash": {
+      "Type": "String",
+      "NoEcho": true,
+      "AllowedPattern": "[a-f0-9]{64}"
+    }
+  },
+  "Resources": {
+    "ProgressTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "Properties": {
+        "BillingMode": "PAY_PER_REQUEST",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "pk",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "sk",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "pk",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "sk",
+            "KeyType": "RANGE"
+          }
+        ],
+        "SSESpecification": {
+          "SSEEnabled": true
+        },
+        "TimeToLiveSpecification": {
+          "AttributeName": "expires_at",
+          "Enabled": true
+        }
+      }
+    },
+    "ProgressApi": {
+      "Type": "AWS::ApiGatewayV2::Api",
+      "Properties": {
+        "ProtocolType": "HTTP",
+        "Name": {
+          "Fn::Sub": "${AWS::StackName}-api"
+        }
+      }
+    },
+    "ProgressFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Runtime": "python3.12",
+        "Handler": "index.handler",
+        "Timeout": 20,
+        "MemorySize": 256,
+        "Role": {
+          "Fn::Sub": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/${LambdaExecutionRoleName}"
+        },
+        "Code": {
+          "ZipFile": "\"\"\"Separate Web Lab progress API. No Linux tables, functions or keys are used.\n\nStores anonymous Lab IDs and authenticated reports, not authoritative exam grades.\nThe teacher issues a unique credential before the student binds a five-node lab.\n\"\"\"\n\nimport base64\nfrom datetime import datetime, timezone\nimport hashlib\nimport hmac\nimport html\nimport json\nimport os\nimport re\nimport secrets\nimport time\nimport uuid\nfrom urllib.parse import quote\n\n\nLAB_RE = re.compile(r\"[a-z0-9][a-z0-9-]{2,31}\")\nRELEASE_RE = re.compile(r\"web-[0-9]{4}-[0-9]{2}-r[1-9][0-9]*\")\nINSTANCE_RE = re.compile(r\"i-[0-9a-f]{17}\")\nROLES = {\"bastion\", \"repo\", \"dns\", \"db\", \"web\"}\nSTATUSES = {\"PASS\", \"FAIL\", \"UNKNOWN\", \"NOT_APPLICABLE\"}\nMAX_BODY = 96 * 1024\n\n\ndef result_key(report):\n    return 'LATEST#' + ('BOOTSTRAP' if report['kind'] == 'bootstrap' else report['mission_id'])\n\n\nclass ApiError(Exception):\n    def __init__(self, status, message):\n        self.status, self.message = status, message\n\n\ndef digest(value):\n    return hashlib.sha256(value.encode()).hexdigest()\n\n\ndef encoded(value):\n    return json.dumps(value, sort_keys=True, separators=(\",\", \":\"), ensure_ascii=False)\n\n\ndef now_iso():\n    return datetime.now(timezone.utc).isoformat()\n\n\ndef require_keys(body, required, optional=()):\n    if type(body) is not dict or not set(required) <= body.keys() or body.keys() - set(required) - set(optional):\n        raise ApiError(400, \"invalid fields\")\n\n\ndef field(body, name, pattern=None, minimum=1, maximum=256):\n    value = body.get(name)\n    if type(value) is not str or not minimum <= len(value) <= maximum or (pattern and not pattern.fullmatch(value)):\n        raise ApiError(400, \"invalid \" + name)\n    return value\n\n\ndef uuid_field(body, name):\n    value = field(body, name, maximum=36)\n    try:\n        parsed = uuid.UUID(value)\n    except ValueError:\n        raise ApiError(400, \"invalid \" + name)\n    if str(parsed) != value or parsed.version != 4:\n        raise ApiError(400, \"invalid \" + name)\n    return value\n\n\ndef parse_body(event):\n    text = event.get(\"body\", \"\") or \"\"\n    if not isinstance(text, str) or len(text) > MAX_BODY * 2:\n        raise ApiError(413, \"request too large\")\n    try:\n        raw = base64.b64decode(text, validate=True) if event.get(\"isBase64Encoded\") else text.encode()\n        if len(raw) > MAX_BODY:\n            raise ApiError(413, \"request too large\")\n        def pairs(values):\n            result = {}\n            for key, value in values:\n                if key in result:\n                    raise ValueError(\"duplicate key\")\n                result[key] = value\n            return result\n        body = json.loads(raw, object_pairs_hook=pairs, parse_constant=lambda _: (_ for _ in ()).throw(ValueError()))\n        if type(body) is not dict:\n            raise ValueError()\n        return body\n    except (ValueError, UnicodeError, RecursionError):\n        raise ApiError(400, \"invalid JSON\")\n\n\ndef authorization(event):\n    headers = {str(k).lower(): v for k, v in event.get(\"headers\", {}).items()}\n    value = headers.get(\"authorization\", \"\")\n    return value[7:] if isinstance(value, str) and value.startswith(\"Bearer \") else \"\"\n\n\ndef response(status, body, content_type=\"application/json; charset=utf-8\"):\n    return {\"statusCode\": status, \"headers\": {\n        \"Content-Type\": content_type, \"Cache-Control\": \"no-store\", \"Referrer-Policy\": \"no-referrer\",\n        \"X-Content-Type-Options\": \"nosniff\", \"X-Frame-Options\": \"DENY\",\n        \"Content-Security-Policy\": \"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'\"},\n        \"body\": encoded(body) if not isinstance(body, str) else body}\n\n\nclass DynamoStore:\n    \"\"\"Conditional operations keep credential binding and report writes atomic.\"\"\"\n    def __init__(self, table_name):\n        import boto3\n        from boto3.dynamodb.types import TypeDeserializer, TypeSerializer\n        self.client = boto3.client(\"dynamodb\")\n        self.table = table_name\n        self.serializer, self.deserializer = TypeSerializer(), TypeDeserializer()\n\n    def pack(self, row):\n        return {k: self.serializer.serialize(v) for k, v in row.items()}\n\n    def get(self, pk, sk):\n        row = self.client.get_item(TableName=self.table, Key=self.pack({\"pk\": pk, \"sk\": sk}), ConsistentRead=True).get(\"Item\")\n        return {k: self.deserializer.deserialize(v) for k, v in row.items()} if row else None\n\n    def put_new(self, row):\n        try:\n            self.client.put_item(TableName=self.table, Item=self.pack(row), ConditionExpression=\"attribute_not_exists(pk)\")\n        except self.client.exceptions.ConditionalCheckFailedException:\n            return False\n        return True\n\n    def bind(self, pk, token_hash, release_id, deployment_id, instances):\n        try:\n            self.client.update_item(TableName=self.table, Key=self.pack({\"pk\": pk, \"sk\": \"META\"}),\n                UpdateExpression=\"SET deployment_id=:deployment, #instances=:instances, updated_at=:now\",\n                ConditionExpression=\"token_hash=:token AND release_id=:release AND #active=:active AND (attribute_not_exists(deployment_id) OR (deployment_id=:deployment AND #instances=:instances))\",\n                ExpressionAttributeNames={\"#active\":\"active\",\"#instances\":\"instances\"},\n                ExpressionAttributeValues=self.pack({\":token\": token_hash, \":release\": release_id, \":deployment\": deployment_id,\n                    \":instances\": instances, \":active\": True, \":now\": now_iso()}))\n        except self.client.exceptions.ConditionalCheckFailedException:\n            raise ApiError(409, \"lab binding conflict\")\n\n    def submit(self, meta, attempt, summary):\n        latest = dict(summary, pk=meta['pk'], sk=result_key(attempt['report']),\n                      checks=attempt['report']['checks'])\n        try:\n            self.client.transact_write_items(TransactItems=[\n                {\"Put\": {\"TableName\": self.table, \"Item\": self.pack(attempt), \"ConditionExpression\": \"attribute_not_exists(pk)\"}},\n                {\"Put\": {\"TableName\": self.table, \"Item\": self.pack(latest),\n                    \"ConditionExpression\": \"attribute_not_exists(received_at) OR received_at<=:now\",\n                    \"ExpressionAttributeValues\": self.pack({':now': attempt['received_at']})}},\n                {\"Update\": {\"TableName\": self.table, \"Key\": self.pack({\"pk\": meta[\"pk\"], \"sk\": \"META\"}),\n                    \"UpdateExpression\": \"SET last_result=:summary, updated_at=:now\",\n                    \"ConditionExpression\": \"token_hash=:token AND deployment_id=:deployment AND #active=:active AND updated_at<=:now\",\n                    \"ExpressionAttributeNames\":{\"#active\":\"active\"},\n                    \"ExpressionAttributeValues\": self.pack({\":summary\": summary, \":now\": attempt[\"received_at\"],\n                        \":token\": meta[\"token_hash\"], \":deployment\": meta[\"deployment_id\"], \":active\": True})}}])\n        except self.client.exceptions.TransactionCanceledException:\n            existing = self.get(attempt[\"pk\"], attempt[\"sk\"])\n            if existing and existing[\"body_sha256\"] == attempt[\"body_sha256\"]:\n                return existing[\"receipt\"]\n            raise ApiError(409, \"request conflict or credentials changed\")\n        return attempt[\"receipt\"]\n\n    def link_email(self, meta, email):\n        self.client.update_item(TableName=self.table, Key=self.pack({'pk': meta['pk'], 'sk': 'META'}),\n            UpdateExpression='SET student_email=:email, identity_updated_at=:now',\n            ConditionExpression='token_hash=:token AND #active=:active',\n            ExpressionAttributeNames={'#active': 'active'},\n            ExpressionAttributeValues=self.pack({':email': email, ':now': now_iso(),\n                                                ':token': meta['token_hash'], ':active': True}))\n\n    def labs(self, only_lab=None):\n        if only_lab:\n            row = self.get(\"LAB#\" + only_lab, \"META\")\n            if not row:\n                return []\n            row['results'] = []\n            cursor = None\n            while True:\n                args = dict(TableName=self.table, KeyConditionExpression='pk=:pk AND begins_with(sk,:prefix)',\n                    ExpressionAttributeValues=self.pack({':pk': row['pk'], ':prefix': 'LATEST#'}), ConsistentRead=True)\n                if cursor: args['ExclusiveStartKey'] = cursor\n                data = self.client.query(**args)\n                row['results'].extend({k: self.deserializer.deserialize(v) for k, v in item.items()} for item in data.get('Items', []))\n                cursor = data.get('LastEvaluatedKey')\n                if not cursor: break\n            return [row]\n        rows, cursor = [], None\n        while True:\n            args = {\"TableName\": self.table, \"FilterExpression\": \"sk=:meta OR begins_with(sk,:prefix)\",\n                    \"ExpressionAttributeValues\": self.pack({\":meta\": \"META\", ':prefix': 'LATEST#'})}\n            if cursor:\n                args[\"ExclusiveStartKey\"] = cursor\n            data = self.client.scan(**args)\n            rows.extend({k: self.deserializer.deserialize(v) for k, v in row.items()} for row in data.get(\"Items\", []))\n            if len(rows) > 100000:\n                raise ApiError(503, \"dashboard capacity exceeded\")\n            cursor = data.get(\"LastEvaluatedKey\")\n            if not cursor:\n                break\n        labs = [r for r in rows if r['sk'] == 'META']\n        if len(labs) > 1000:\n            raise ApiError(503, 'dashboard capacity exceeded')\n        by_pk = {}\n        for r in rows:\n            if r['sk'].startswith('LATEST#'):\n                by_pk.setdefault(r['pk'], []).append(r)\n        for lab in labs: lab['results'] = by_pk.get(lab['pk'], [])\n        return labs\n\n\nclass ProgressService:\n    def __init__(self, store, admin_hash, api_base_url):\n        self.store, self.admin_hash, self.base_url = store, admin_hash, api_base_url\n\n    def admin(self, event):\n        token = authorization(event)\n        if len(token) < 32 or not hmac.compare_digest(digest(token), self.admin_hash):\n            raise ApiError(401, \"unauthorized\")\n\n    def lab(self, event, body):\n        lab_id = field(body, \"lab_id\", LAB_RE, maximum=32)\n        token = authorization(event)\n        row = self.store.get(\"LAB#\" + lab_id, \"META\")\n        expected = row.get(\"token_hash\", \"\") if row else \"0\" * 64\n        if len(token) < 32 or not hmac.compare_digest(digest(token), expected) or not row or not row.get(\"active\"):\n            raise ApiError(401, \"unauthorized\")\n        return row\n\n    def issue(self, event):\n        self.admin(event)\n        body = parse_body(event)\n        require_keys(body, (\"lab_id\", \"release_id\", \"lab_token\"))\n        lab_id = field(body, \"lab_id\", LAB_RE, maximum=32)\n        release_id = field(body, \"release_id\", RELEASE_RE, maximum=64)\n        token = field(body, \"lab_token\", re.compile(r\"[A-Za-z0-9_-]+\"), minimum=43, maximum=128)\n        row = {\"pk\": \"LAB#\" + lab_id, \"sk\": \"META\", \"lab_id\": lab_id, \"release_id\": release_id,\n               \"token_hash\": digest(token), \"active\": True, \"created_at\": now_iso(), \"updated_at\": now_iso()}\n        if not self.store.put_new(row):\n            old = self.store.get(row[\"pk\"], \"META\")\n            if not old or old[\"token_hash\"] != row[\"token_hash\"] or old[\"release_id\"] != release_id or not old.get(\"active\"):\n                raise ApiError(409, \"lab already exists; credential replacement is not automatic\")\n        return response(200, {\"ok\": True, \"lab_id\": lab_id, \"release_id\": release_id})\n\n    def register(self, event):\n        body = parse_body(event)\n        require_keys(body, (\"lab_id\", \"release_id\", \"deployment_id\", \"instances\"))\n        row = self.lab(event, body)\n        deployment_id = uuid_field(body, \"deployment_id\")\n        if field(body, \"release_id\", RELEASE_RE, maximum=64) != row[\"release_id\"]:\n            raise ApiError(409, \"release mismatch\")\n        instances = body[\"instances\"]\n        if type(instances) is not dict or set(instances) != ROLES or any(type(v) is not str or not INSTANCE_RE.fullmatch(v) for v in instances.values()) or len(set(instances.values())) != 5:\n            raise ApiError(400, \"five distinct role instance IDs are required\")\n        if row.get(\"deployment_id\") and (row[\"deployment_id\"] != deployment_id or row.get(\"instances\") != instances):\n            raise ApiError(409, \"existing deployment must be retained\")\n        self.store.bind(row[\"pk\"], row[\"token_hash\"], row[\"release_id\"], deployment_id, instances)\n        return response(200, {\"ok\": True, \"lab_id\": row[\"lab_id\"], \"deployment_id\": deployment_id,\n                              \"release_id\": row[\"release_id\"], \"registered\": True})\n\n    def submit(self, event):\n        body = parse_body(event)\n        require_keys(body, (\"schema_version\", \"kind\", \"lab_id\", \"release_id\", \"deployment_id\", \"request_id\", \"checks\"), (\"mission_id\",))\n        row = self.lab(event, body)\n        deployment_id = uuid_field(body, \"deployment_id\")\n        request_id = uuid_field(body, \"request_id\")\n        if type(body[\"schema_version\"]) is not int or body[\"schema_version\"] != 1 or body[\"kind\"] not in (\"bootstrap\", \"assessment\"):\n            raise ApiError(400, \"invalid report type\")\n        if row.get(\"deployment_id\") != deployment_id or body[\"release_id\"] != row[\"release_id\"]:\n            raise ApiError(409, \"unregistered or mismatched deployment\")\n        if body[\"kind\"] == \"assessment\":\n            field(body, \"mission_id\", re.compile(r\"[PM][0-9]{1,2}\"), maximum=3)\n        elif \"mission_id\" in body:\n            raise ApiError(400, \"bootstrap reports do not award mission points\")\n        checks = body[\"checks\"]\n        if type(checks) is not list or not 1 <= len(checks) <= 100:\n            raise ApiError(400, \"invalid checks\")\n        seen = set()\n        for check in checks:\n            require_keys(check, (\"id\", \"role\", \"instance_id\", \"status\"))\n            identity = field(check, \"id\", re.compile(r\"[A-Z][A-Z0-9_-]{1,47}\"), maximum=48)\n            role = check[\"role\"]\n            if type(role) is not str or role not in ROLES or check[\"instance_id\"] != row[\"instances\"][role] or type(check[\"status\"]) is not str or check[\"status\"] not in STATUSES:\n                raise ApiError(400, \"check role, instance or status mismatch\")\n            if (role, identity) in seen:\n                raise ApiError(400, \"duplicate check\")\n            seen.add((role, identity))\n        stamp = now_iso()\n        receipt = {\"ok\": True, \"lab_id\": row[\"lab_id\"], \"deployment_id\": deployment_id, \"release_id\": row[\"release_id\"],\n                   \"request_id\": request_id, \"received_at\": stamp, \"kind\": body[\"kind\"], \"stored\": True}\n        attempt = {\"pk\": row[\"pk\"], \"sk\": \"REQUEST#\" + request_id, \"body_sha256\": digest(encoded(body)),\n                   \"received_at\": stamp, \"report\": body, \"receipt\": receipt}\n        summary = {\"kind\": body[\"kind\"], \"mission_id\": body.get(\"mission_id\", \"\"), \"request_id\": request_id,\n                   \"received_at\": stamp, \"passed\": sum(c[\"status\"] == \"PASS\" for c in checks), \"total\": len(checks),\n                   \"unknown\": sum(c[\"status\"] == \"UNKNOWN\" for c in checks)}\n        return response(200, self.store.submit(row, attempt, summary))\n\n    def link_email(self, event):\n        body = parse_body(event)\n        require_keys(body, ('lab_id', 'student_email'))\n        row = self.lab(event, body)\n        email = field(body, 'student_email', maximum=254).strip().lower()\n        if not re.fullmatch(r\"[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@jdu[.]uz\", email):\n            raise ApiError(400, 'use the confirmed JDU classroom email')\n        self.store.link_email(row, email)\n        return response(200, dict(ok=True, lab_id=row['lab_id'], email_linked=True))\n\n    def session(self, event, teacher=False):\n        body = parse_body(event)\n        require_keys(body, () if teacher else (\"lab_id\",))\n        if teacher:\n            self.admin(event)\n            lab_id, token_hash = \"\", \"\"\n        else:\n            row = self.lab(event, body)\n            lab_id, token_hash = row[\"lab_id\"], row[\"token_hash\"]\n        token = secrets.token_urlsafe(32)\n        expiry = int(time.time()) + (1800 if teacher else 900)\n        self.store.put_new({\"pk\": \"SESSION#\" + digest(token), \"sk\": \"SESSION\", \"role\": \"teacher\" if teacher else \"student\",\n                            \"lab_id\": lab_id, \"token_hash\": token_hash, \"expires_at\": expiry})\n        return response(200, {\"url\": self.base_url + \"/dashboard?session=\" + quote(token), \"expires_at\": expiry})\n\n    def dashboard(self, event):\n        token = (event.get(\"queryStringParameters\") or {}).get(\"session\", \"\")\n        if type(token) is not str or not 40 <= len(token) <= 128:\n            raise ApiError(401, \"session expired\")\n        session = self.store.get(\"SESSION#\" + digest(token), \"SESSION\")\n        if not session or session[\"expires_at\"] <= int(time.time()) or session[\"role\"] not in (\"teacher\", \"student\"):\n            raise ApiError(401, \"session expired\")\n        if session[\"role\"] == \"student\":\n            meta = self.store.get(\"LAB#\" + session[\"lab_id\"], \"META\")\n            if not meta or not meta.get(\"active\") or not hmac.compare_digest(meta[\"token_hash\"], session[\"token_hash\"]):\n                raise ApiError(401, \"session expired\")\n        labs = self.store.labs(session[\"lab_id\"] if session[\"role\"] == \"student\" else None)\n        query = event.get('queryStringParameters') or {}\n        return response(200, render_dashboard(labs, session['role'], token, query.get('lang', 'ja')), 'text/html; charset=utf-8')\n\n    def handle(self, event):\n        try:\n            route = event.get(\"routeKey\", \"\")\n            if route == \"GET /healthz\":\n                return response(200, {\"ok\": True, \"service\": \"jdu-web-progress\", \"schema_version\": 1})\n            if route == \"POST /api/web/admin/issue\":\n                return self.issue(event)\n            if route == \"POST /api/web/register\":\n                return self.register(event)\n            if route == \"POST /api/web/submit\":\n                return self.submit(event)\n            if route == 'POST /api/web/link-email':\n                return self.link_email(event)\n            if route == \"POST /api/web/admin/session\":\n                return self.session(event, teacher=True)\n            if route == \"POST /api/web/student/session\":\n                return self.session(event)\n            if route == \"GET /dashboard\":\n                return self.dashboard(event)\n            return response(404, {\"error\": \"not found\"})\n        except ApiError as exc:\n            return response(exc.status, {\"error\": exc.message})\n        except Exception:\n            # Never log request bodies, bearer tokens, identities or full exceptions.\n            return response(503, {\"error\": \"service unavailable\"})\n\n\nLABELS = {\n    'ja': dict(teacher='Web\u5b9f\u7fd2\u30fb\u6559\u5e2b\u7528\u9032\u6357', student='Web\u5b9f\u7fd2\u30fb\u81ea\u5206\u306e\u9032\u6357', language='\u8868\u793a\u8a00\u8a9e',\n        intro='\u5b66\u751f\u304c\u78ba\u8a8d\u30b3\u30de\u30f3\u30c9\u3067\u9001\u4fe1\u3057\u305f\u6700\u65b0\u306e\u7d50\u679c\u3067\u3059\u300230\u79d2\u3054\u3068\u306b\u66f4\u65b0\u3057\u307e\u3059\u3002',\n        table='\u5b66\u751f\u3054\u3068\u306e\u9032\u6357', identity='\u5b66\u751f\u30e1\u30fc\u30eb / Lab ID', missing_email='\u30e1\u30fc\u30eb\u672a\u767b\u9332',\n        foundation='\u57fa\u76e4\u78ba\u8a8d', completed='\u5b8c\u4e86 / \u63d0\u51fa\u6e08\u307f\u8ab2\u984c', updated='\u6700\u7d42\u53d7\u4fe1\uff08UTC\uff09',\n        none='\u672a\u63d0\u51fa', unknown='\u78ba\u8a8d\u4e0d\u80fd', details='\u78ba\u8a8d\u9805\u76ee', empty='\u767b\u9332\u3055\u308c\u305fLab\u306f\u3042\u308a\u307e\u305b\u3093\u3002',\n        note='\u57fa\u76e4\u78ba\u8a8d\u306f\u8ab2\u984c\u5b8c\u4e86\u6570\u306b\u542b\u3081\u307e\u305b\u3093\u3002\u904e\u53bb\u306e\u6700\u9ad8\u7d50\u679c\u3067\u306f\u306a\u304f\u3001\u8ab2\u984c\u3054\u3068\u306e\u6700\u65b0\u7d50\u679c\u3092\u8868\u793a\u3057\u307e\u3059\u3002',\n        footer='\u95b2\u89a7URL\u306f\u4e00\u5b9a\u6642\u9593\u3067\u5931\u52b9\u3057\u307e\u3059\u3002\u4ed6\u306e\u4eba\u3078\u5171\u6709\u305b\u305a\u3001\u5171\u7528PC\u3067\u306f\u95b2\u89a7\u5f8c\u306b\u9589\u3058\u3066\u304f\u3060\u3055\u3044\u3002'),\n    'uz': dict(teacher='Web amaliyoti \u2014 o\u2018qituvchi', student='Web amaliyoti \u2014 mening natijalarim', language='Til',\n        intro='Talaba tekshiruv buyrug\u2018i orqali yuborgan so\u2018nggi natijalar. Har 30 soniyada yangilanadi.',\n        table='Talabalar natijalari', identity='Talaba emaili / Lab ID', missing_email='Email kiritilmagan',\n        foundation='Muhit tekshiruvi', completed='Bajarilgan / yuborilgan topshiriqlar', updated='So\u2018nggi qabul (UTC)',\n        none='Yuborilmagan', unknown='Tekshirib bo\u2018lmadi', details='Tekshiruvlar', empty='Lab ro\u2018yxatdan o\u2018tmagan.',\n        note='Muhit tekshiruvi topshiriq soniga kirmaydi. Har bir topshiriqning eng yaxshi emas, eng so\u2018nggi natijasi ko\u2018rsatiladi.',\n        footer='Havola muddati cheklangan. Uni ulashmang va umumiy kompyuterda ko\u2018rgach sahifani yoping.'),\n    'ru': dict(teacher='Web-\u043f\u0440\u0430\u043a\u0442\u0438\u043a\u0443\u043c \u2014 \u043f\u0440\u0435\u043f\u043e\u0434\u0430\u0432\u0430\u0442\u0435\u043b\u044c', student='Web-\u043f\u0440\u0430\u043a\u0442\u0438\u043a\u0443\u043c \u2014 \u043c\u043e\u0439 \u043f\u0440\u043e\u0433\u0440\u0435\u0441\u0441', language='\u042f\u0437\u044b\u043a',\n        intro='\u041f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u044b, \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043d\u044b\u0435 \u043a\u043e\u043c\u0430\u043d\u0434\u043e\u0439 \u043f\u0440\u043e\u0432\u0435\u0440\u043a\u0438. \u041e\u0431\u043d\u043e\u0432\u043b\u0435\u043d\u0438\u0435 \u043a\u0430\u0436\u0434\u044b\u0435 30 \u0441\u0435\u043a\u0443\u043d\u0434.',\n        table='\u041f\u0440\u043e\u0433\u0440\u0435\u0441\u0441 \u0441\u0442\u0443\u0434\u0435\u043d\u0442\u043e\u0432', identity='Email \u0441\u0442\u0443\u0434\u0435\u043d\u0442\u0430 / Lab ID', missing_email='Email \u043d\u0435 \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d',\n        foundation='\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0441\u0440\u0435\u0434\u044b', completed='\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e / \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043e \u0437\u0430\u0434\u0430\u043d\u0438\u0439', updated='\u041f\u043e\u0441\u043b\u0435\u0434\u043d\u0435\u0435 \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u0438\u0435 (UTC)',\n        none='\u041d\u0435 \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043e', unknown='\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u043f\u0440\u043e\u0432\u0435\u0440\u0438\u0442\u044c', details='\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0438', empty='\u041d\u0435\u0442 \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0445 Lab.',\n        note='\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 \u0441\u0440\u0435\u0434\u044b \u043d\u0435 \u0432\u0445\u043e\u0434\u0438\u0442 \u0432 \u0447\u0438\u0441\u043b\u043e \u0437\u0430\u0434\u0430\u043d\u0438\u0439. \u041f\u043e\u043a\u0430\u0437\u0430\u043d\u044b \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435, \u0430 \u043d\u0435 \u043b\u0443\u0447\u0448\u0438\u0435 \u0440\u0435\u0437\u0443\u043b\u044c\u0442\u0430\u0442\u044b \u043a\u0430\u0436\u0434\u043e\u0433\u043e \u0437\u0430\u0434\u0430\u043d\u0438\u044f.',\n        footer='\u0421\u0441\u044b\u043b\u043a\u0430 \u0434\u0435\u0439\u0441\u0442\u0432\u0443\u0435\u0442 \u043e\u0433\u0440\u0430\u043d\u0438\u0447\u0435\u043d\u043d\u043e\u0435 \u0432\u0440\u0435\u043c\u044f. \u041d\u0435 \u043f\u0435\u0440\u0435\u0434\u0430\u0432\u0430\u0439\u0442\u0435 \u0435\u0451 \u0434\u0440\u0443\u0433\u0438\u043c \u0438 \u0437\u0430\u043a\u0440\u043e\u0439\u0442\u0435 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0443 \u043d\u0430 \u043e\u0431\u0449\u0435\u043c \u043a\u043e\u043c\u043f\u044c\u044e\u0442\u0435\u0440\u0435.'),\n}\n\n\ndef render_dashboard(labs, role, token, language='ja'):\n    language = language if language in LABELS else 'ja'\n    labels = LABELS[language]\n    title = labels['teacher' if role == 'teacher' else 'student']\n    esc = lambda v: html.escape(str(v), quote=True)\n    results = {}\n    missions = set()\n    for lab in labs:\n        latest = {r['sk'].removeprefix('LATEST#'): r for r in lab.get('results', [])}\n        old = lab.get('last_result')\n        if old:\n            latest.setdefault('BOOTSTRAP' if old['kind'] == 'bootstrap' else old['mission_id'], old)\n        results[lab['lab_id']] = latest\n        missions.update(k for k in latest if re.fullmatch(r'[PM][0-9]{1,2}', k))\n    missions = sorted(missions, key=lambda k: (int(k[1:]), k[0] != 'P'))\n\n    def cell(value):\n        if not value:\n            return '<td class=\"missing\">' + esc(labels['none']) + '</td>'\n        passed, total, unknown = (int(value.get(k, 0)) for k in ('passed', 'total', 'unknown'))\n        status = 'done' if total > 0 and passed == total and unknown == 0 else 'partial'\n        items = ''.join('<li>' + esc(c['role']) + ' \u00b7 ' + esc(c['id']) + ': <strong>' + esc(c['status']) + '</strong></li>'\n                        for c in value.get('checks', []) if c['status'] != 'PASS')\n        details = '<details><summary>' + esc(labels['details']) + '</summary><ul>' + items + '</ul></details>' if items else ''\n        return '<td class=\"' + status + '\"><strong>' + str(passed) + ' / ' + str(total) + '</strong>' + (\n            '<br><small>' + esc(labels['unknown']) + ': ' + str(unknown) + '</small>' if unknown else '') + details + '</td>'\n\n    rows = []\n    for lab in sorted(labs, key=lambda r: (r.get('student_email', ''), r['lab_id'])):\n        latest = results[lab['lab_id']]\n        submitted = [latest[m] for m in missions if m in latest]\n        completed = sum(int(v['total']) > 0 and int(v['passed']) == int(v['total']) and int(v['unknown']) == 0 for v in submitted)\n        identity = esc(lab.get('student_email') or labels['missing_email'])\n        rows.append('<tr><th scope=\"row\">' + identity + '<br><small>Lab ID: ' + esc(lab['lab_id']) + '</small></th>'\n            + cell(latest.get('BOOTSTRAP')) + ''.join(cell(latest.get(m)) for m in missions)\n            + '<td>' + str(completed) + ' / ' + str(len(submitted)) + '</td><td>'\n            + esc(lab.get('last_result', {}).get('received_at', '\u2014')) + '</td></tr>')\n    buttons = ''.join('<button type=\"submit\" name=\"lang\" value=\"' + code + '\" aria-pressed=\"'\n        + str(code == language).lower() + '\">' + text + '</button>'\n        for code, text in [('ja', '\u65e5\u672c\u8a9e'), ('uz', 'O\u2018zbekcha'), ('ru', '\u0420\u0443\u0441\u0441\u043a\u0438\u0439')])\n    headers = [labels['identity'], labels['foundation'], *missions, labels['completed'], labels['updated']]\n    head = ''.join('<th scope=\"col\">' + esc(h) + '</th>' for h in headers)\n    body = ''.join(rows) or '<tr><td colspan=\"' + str(len(headers)) + '\">' + esc(labels['empty']) + '</td></tr>'\n    return '''<!doctype html><html lang=\"''' + language + '''\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><meta http-equiv=\"refresh\" content=\"30\"><title>''' + esc(title) + '''</title><style>\nbody{font:1rem/1.6 system-ui,sans-serif;margin:0;background:#f4f6fa;color:#172338}main,header,footer{max-inline-size:90rem;margin:auto;padding:1rem 2rem}h1{font-size:1.7rem}form{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}button{font:inherit;min-block-size:2.5rem;border:1px solid #71839d;border-radius:.4rem;background:white;padding:.4rem .8rem;color:#172338;cursor:pointer}button[aria-pressed=true]{background:#174f83;color:white}button:focus-visible,summary:focus-visible,.wrap:focus-visible{outline:3px solid #a04400;outline-offset:3px}.wrap{overflow:auto;max-block-size:70vh;container-type:inline-size;background:white;border:1px solid #c7d0de;border-radius:.5rem}table{border-collapse:separate;border-spacing:0;min-inline-size:60rem;inline-size:100%}th,td{text-align:start;padding:.8rem 1rem;border-block-end:1px solid #d8deea;vertical-align:top}thead th{position:sticky;inset-block-start:0;background:#e8eef7;z-index:2}tbody th{position:sticky;inset-inline-start:0;background:white;z-index:1;min-inline-size:13rem}thead th:first-child{inset-inline-start:0;z-index:3}caption{text-align:start;padding:1rem;font-weight:600}.done{background:#e6f5eb;color:#175c31}.partial{background:#fff2d5;color:#714900}.missing,small,footer{color:#43516a}details{max-inline-size:24rem;overflow-wrap:anywhere}summary{cursor:pointer}ul{padding-inline-start:1.2rem}@container(width < 45rem){th,td{padding:.6rem}}\n</style></head><body><header><nav aria-label=\"''' + esc(labels['language']) + '''\"><form method=\"get\"><span>''' + esc(labels['language']) + '''</span><input type=\"hidden\" name=\"session\" value=\"''' + esc(token) + '''\">''' + buttons + '''</form></nav></header><main><h1>''' + esc(title) + '''</h1><p>''' + esc(labels['intro']) + '''</p><div class=\"wrap\" role=\"region\" aria-label=\"''' + esc(labels['table']) + '''\" tabindex=\"0\"><table><caption>''' + esc(labels['table']) + '''</caption><thead><tr>''' + head + '''</tr></thead><tbody>''' + body + '''</tbody></table></div><p>''' + esc(labels['note']) + '''</p></main><footer>''' + esc(labels['footer']) + '''</footer></body></html>'''\n\n\n_service = None\n\n\ndef handler(event, context):\n    global _service\n    if _service is None:\n        _service = ProgressService(DynamoStore(os.environ[\"TABLE_NAME\"]), os.environ[\"ADMIN_KEY_HASH\"], os.environ[\"API_BASE_URL\"])\n    return _service.handle(event)\n"
+        },
+        "Environment": {
+          "Variables": {
+            "TABLE_NAME": {
+              "Ref": "ProgressTable"
+            },
+            "ADMIN_KEY_HASH": {
+              "Ref": "AdminKeyHash"
+            },
+            "API_BASE_URL": {
+              "Fn::Sub": "https://${ProgressApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
+            }
+          }
+        }
+      }
+    },
+    "LogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": {
+          "Fn::Sub": "/aws/lambda/${ProgressFunction}"
+        },
+        "RetentionInDays": 14
+      }
+    },
+    "Integration": {
+      "Type": "AWS::ApiGatewayV2::Integration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "ProgressApi"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::GetAtt": [
+            "ProgressFunction",
+            "Arn"
+          ]
+        },
+        "PayloadFormatVersion": "2.0",
+        "TimeoutInMillis": 20000
+      }
+    },
+    "Stage": {
+      "Type": "AWS::ApiGatewayV2::Stage",
+      "Properties": {
+        "ApiId": {
+          "Ref": "ProgressApi"
+        },
+        "StageName": "$default",
+        "AutoDeploy": true,
+        "DefaultRouteSettings": {
+          "ThrottlingBurstLimit": 30,
+          "ThrottlingRateLimit": 10
+        }
+      }
+    },
+    "InvokePermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "FunctionName": {
+          "Ref": "ProgressFunction"
+        },
+        "SourceArn": {
+          "Fn::Sub": "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${ProgressApi}/*/*"
+        }
+      }
+    },
+    "TeacherSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VpcId"
+        },
+        "GroupDescription": "Teacher TLS to one fixed AWS API; no SSH",
+        "SecurityGroupIngress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 443,
+            "ToPort": 443,
+            "CidrIp": "0.0.0.0/0"
+          }
+        ],
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 80,
+            "ToPort": 80,
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 443,
+            "ToPort": 443,
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "TeacherInstance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-0fa5967347d08d2df",
+        "InstanceType": "t3a.small",
+        "CreditSpecification": {
+          "CPUCredits": "standard"
+        },
+        "MetadataOptions": {
+          "HttpTokens": "required",
+          "HttpEndpoint": "enabled",
+          "HttpPutResponseHopLimit": 1
+        },
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sda1",
+            "Ebs": {
+              "VolumeSize": 16,
+              "VolumeType": "gp3",
+              "Encrypted": true,
+              "DeleteOnTermination": true
+            }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeviceIndex": "0",
+            "SubnetId": {
+              "Ref": "SubnetId"
+            },
+            "AssociatePublicIpAddress": false,
+            "GroupSet": [
+              {
+                "Ref": "TeacherSecurityGroup"
+              }
+            ]
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Sub": [
+              "#cloud-config\n{\"package_update\": false, \"package_upgrade\": false, \"write_files\": [{\"path\": \"/var/lib/jdu-web-teacher/nginx.conf\", \"permissions\": \"0600\", \"content\": \"load_module /usr/lib/nginx/modules/ngx_stream_module.so;\\nuser www-data;\\nworker_processes auto;\\npid /run/nginx.pid;\\nerror_log /var/log/nginx/error.log warn;\\nevents { worker_connections 512; }\\nstream {\\n resolver 169.254.169.253 valid=60s ipv6=off;\\n map $ssl_preread_server_name $target {\\n  default \\\"\\\";\\n  ${ApiHost} ${ApiHost}:443;\\n }\\n limit_conn_zone $binary_remote_addr zone=per_ip:1m;\\n server {\\n  listen 443;\\n  ssl_preread on;\\n  proxy_pass $target;\\n  proxy_connect_timeout 10s;\\n  proxy_timeout 30s;\\n  limit_conn per_ip 20;\\n }\\n}\\n\"}, {\"path\": \"/var/lib/jdu-web-teacher/setup.sh\", \"permissions\": \"0700\", \"content\": \"set -eu\\nexport DEBIAN_FRONTEND=noninteractive\\nready=0\\nfor attempt in $(seq 1 30); do\\n if apt-get update -o APT::Update::Error-Mode=any && apt-get install -y --no-install-recommends nginx libnginx-mod-stream; then ready=1; break; fi\\n sleep 5\\ndone\\ntest \\\"$ready\\\" = 1\\ninstall -m 0644 /var/lib/jdu-web-teacher/nginx.conf /etc/nginx/nginx.conf\\nnginx -t\\nsystemctl enable nginx\\nsystemctl restart nginx\\nprintf 'JDU_WEB_TEACHER_PROXY_READY\\n' > /dev/ttyS0\\n\"}], \"runcmd\": [[\"bash\", \"/var/lib/jdu-web-teacher/setup.sh\"]]}\n",
+              {
+                "ApiHost": {
+                  "Fn::Sub": "${ProgressApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
+                }
+              }
+            ]
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "jdu-web-teacher-2026"
+          }
+        ]
+      }
+    },
+    "TeacherEip": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc"
+      }
+    },
+    "TeacherEipAssociation": {
+      "Type": "AWS::EC2::EIPAssociation",
+      "Properties": {
+        "AllocationId": {
+          "Fn::GetAtt": [
+            "TeacherEip",
+            "AllocationId"
+          ]
+        },
+        "InstanceId": {
+          "Ref": "TeacherInstance"
+        }
+      }
+    },
+    "Route0": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "ProgressApi"
+        },
+        "RouteKey": "GET /healthz",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "Integration"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "Route1": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "ProgressApi"
+        },
+        "RouteKey": "GET /dashboard",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "Integration"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "Route2": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "ProgressApi"
+        },
+        "RouteKey": "POST /api/web/admin/issue",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "Integration"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "Route3": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "ProgressApi"
+        },
+        "RouteKey": "POST /api/web/register",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "Integration"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "Route4": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "ProgressApi"
+        },
+        "RouteKey": "POST /api/web/submit",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "Integration"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "Route5": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "ProgressApi"
+        },
+        "RouteKey": "POST /api/web/admin/session",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "Integration"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "Route6": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "ProgressApi"
+        },
+        "RouteKey": "POST /api/web/student/session",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "Integration"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "Route7": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "ProgressApi"
+        },
+        "RouteKey": "POST /api/web/link-email",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "Integration"
+              }
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "ApiBaseUrl": {
+      "Value": {
+        "Fn::Sub": "https://${ProgressApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
+      }
+    },
+    "FixedIngressIpv4": {
+      "Value": {
+        "Ref": "TeacherEip"
+      }
+    },
+    "TeacherInstanceId": {
+      "Value": {
+        "Ref": "TeacherInstance"
+      }
+    },
+    "TableName": {
+      "Value": {
+        "Ref": "ProgressTable"
+      }
+    }
+  }
+}

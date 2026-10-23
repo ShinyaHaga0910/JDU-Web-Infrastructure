@@ -1,0 +1,32 @@
+{
+  "snapshot_utc": "2026-10-15T00:00:00Z",
+  "checked_at": "2026-10-15T11:03:39.662449+00:00",
+  "providers": {
+    "Uztelecom": {
+      "asns": [
+        "AS197486",
+        "AS201767",
+        "AS202175",
+        "AS202660",
+        "AS28910",
+        "AS34250",
+        "AS8193"
+      ],
+      "raw_prefixes": 142,
+      "collapsed_cidrs": 34,
+      "ipv4_addresses": 77824
+    },
+    "ISTTelecom": {
+      "asns": [
+        "AS34718",
+        "AS39032",
+        "AS47452"
+      ],
+      "raw_prefixes": 26,
+      "collapsed_cidrs": 16,
+      "ipv4_addresses": 42240
+    }
+  },
+  "combined_cidrs": 50,
+  "ipv4_addresses": 120064
+}

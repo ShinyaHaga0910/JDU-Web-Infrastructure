@@ -1,0 +1,88 @@
+{
+  "scope": "formal_web_student_distribution_acceptance",
+  "distribution_id": "web-course-class193548-20261023-r2",
+  "archive_sha256": "8d83ec96f05798b5b1fd0ef4ded318e286f88ab256c344cbd1722408bfd397e3",
+  "archive_size_bytes": 345264,
+  "release_sha256": "ab5e1f9edbd10c20f81b1cdd8bfb7deac1a42a60e9314849b775b32f98b18a99",
+  "file_count": 68,
+  "local_tests_passed": 13,
+  "teacher_and_student_outer_inner_signatures_verified": true,
+  "student_existing_install_and_idempotent_retry_verified": true,
+  "original_state_baseline_config_ssh_enrollment_preserved": true,
+  "new_command_checks": [
+    {
+      "task": "M0",
+      "submission": "SKIPPED",
+      "raw_earned": 0,
+      "raw_maximum": 0,
+      "unresolved": 0,
+      "readiness_ok": true,
+      "evaluable": true,
+      "complete": true,
+      "counts_toward_assessment": false
+    },
+    {
+      "task": "M1",
+      "submission": "SKIPPED",
+      "raw_earned": 8,
+      "raw_maximum": 8,
+      "unresolved": 0,
+      "readiness_ok": true,
+      "evaluable": true,
+      "complete": true,
+      "counts_toward_assessment": true
+    },
+    {
+      "task": "M4",
+      "submission": "SKIPPED",
+      "raw_earned": 9,
+      "raw_maximum": 9,
+      "unresolved": 0,
+      "readiness_ok": true,
+      "evaluable": true,
+      "complete": true,
+      "counts_toward_assessment": true
+    },
+    {
+      "task": "M6",
+      "submission": "STORED",
+      "raw_earned": 16,
+      "raw_maximum": 16,
+      "unresolved": 0,
+      "readiness_ok": true,
+      "evaluable": true,
+      "complete": true,
+      "counts_toward_assessment": true
+    }
+  ],
+  "own_progress_https_62_verified": true,
+  "teacher_private_s3_4_objects_get_verified": true,
+  "software_download_links_get_verified": true,
+  "teacher_course_export_rows": 0,
+  "teacher_course_csv_columns": 30,
+  "credentials_issued_or_rotated": false,
+  "student_home_protected_mode": "0700",
+  "fresh_five_node_creation_with_combined_kit_tested": false,
+  "successful_human_app_password_entry_tested": false,
+  "post_app_all_five_stop_start_tested": false,
+  "expires_at": "2026-10-27T09:24:57.194372+00:00",
+  "distribution_ready": true,
+  "class_ready": false,
+  "download_assets": [
+    {
+      "name": "jdu-web-course.tar.gz",
+      "sha256": "8d83ec96f05798b5b1fd0ef4ded318e286f88ab256c344cbd1722408bfd397e3",
+      "size_bytes": 345264
+    },
+    {
+      "name": "jdu-web-course.tar.gz.asc",
+      "sha256": "bf973a5c3924e6b7ff164cad56861bd5d69b57d18724d9eeaaa28e1eca14b201",
+      "size_bytes": 659
+    },
+    {
+      "name": "package-signing-public.asc",
+      "sha256": "79c8d4f7041568d5f0fded709100e2d818f26353d216ae8661054bc49b775d61",
+      "size_bytes": 1302
+    }
+  ]
+}

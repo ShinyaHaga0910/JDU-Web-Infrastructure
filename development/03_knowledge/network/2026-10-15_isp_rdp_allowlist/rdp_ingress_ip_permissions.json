@@ -1,0 +1,209 @@
+[
+  {
+    "IpProtocol": "tcp",
+    "FromPort": 3389,
+    "ToPort": 3389,
+    "IpRanges": [
+      {
+        "CidrIp": "5.133.120.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "45.150.24.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "62.209.128.0/19",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "80.80.208.0/20",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "83.222.6.0/23",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "84.54.64.0/19",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "84.54.96.0/20",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "84.54.112.0/21",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "84.54.124.0/24",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "86.62.0.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "87.192.224.0/20",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "87.192.240.0/21",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "87.192.248.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "87.192.252.0/23",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "87.237.232.0/21",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "89.104.102.0/24",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "89.126.208.0/21",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "89.126.220.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "89.223.3.0/24",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "89.236.192.0/18",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "89.249.60.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "90.156.160.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "90.156.192.0/21",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "92.63.204.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "93.188.80.0/21",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "94.141.64.0/24",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "94.141.68.0/23",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "94.141.70.0/24",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "94.141.76.0/24",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "94.141.80.0/21",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "94.141.89.0/24",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "94.141.92.0/23",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "94.141.95.0/24",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "94.230.232.0/24",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "109.94.172.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "144.124.192.0/20",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "185.4.160.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "185.6.40.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "185.74.4.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "185.100.52.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "185.139.136.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "185.203.236.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "185.248.44.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "194.55.92.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "194.93.24.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "195.69.188.0/22",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "195.158.0.0/19",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "198.163.192.0/20",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "213.230.64.0/18",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      },
+      {
+        "CidrIp": "217.30.160.0/20",
+        "Description": "Uztelecom IST Telecom 2026-10-15"
+      }
+    ]
+  }
+]

@@ -8,3 +8,29 @@
 6. 配布PDF・スライドを原稿から更新し、ページ数・リンク・図の読込を自動確認する。目視確認は教員が行う。
 
 自動検査のPASSだけで学生手順が完成したとは判断しません。CloudFormation、実環境の設定、予算を確認していない手順は、学生向けの確定手順として公開しません。
+
+## 構築・採点システムの開発
+
+コードの正本は[development](development/README.md)です。Linux/WSLでPython3とGPGを用意し、repo rootで実行します。
+
+```bash
+python3 -B development/run_local_checks.py
+```
+
+移管元byteの確認と選択したunit/mock検査であり、AWS資源を作成しません。前提・実機受入との区別は[TESTING.md](development/TESTING.md)を参照します。
+
+## P/M教材の生成と確認
+
+Python3.12の専用環境に次の依存を入れ、repo rootから実行します。
+
+```bash
+python -m pip install -r course/labs/authoring/requirements.txt
+python -B course/labs/authoring/build.py --no-pdf
+python -B course/labs/authoring/validate.py
+```
+
+--no-pdfは保存済みPDFを保持し、Markdown/HTML/zipを更新します。PDFも作り直す場合はWindowsのMS Gothic/Arial/Consolasを用意して--no-pdfを外します。公開署名資源はdevelopment/03_knowledge以下を既定で読みます。意図的に別の公開資源rootを使う場合だけJDU_WEB_PROJECT_ROOTで指定します。署名済みの原本を教材変更で書き換えません。
+
+## GitHubへの反映
+
+素材・コード・生成物・検証記録の関連差分を揃え、認証情報、秘密鍵、private plan/state、大容量cacheがないことを確認してコミット・pushします。今後の通常作業にもこの手順を適用します。

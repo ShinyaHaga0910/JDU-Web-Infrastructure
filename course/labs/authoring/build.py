@@ -13,10 +13,7 @@ import zipfile
 
 sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[1]
-PROJECT = Path('C:/Users/user/Documents/JUD project')
-DEPS = PROJECT / '.codex_tmp/d12deps'
-if DEPS.is_dir():
-    sys.path.insert(0, str(DEPS))
+PROJECT = Path(os.environ.get('JDU_WEB_PROJECT_ROOT', str(Path(__file__).resolve().parents[3] / 'development')))
 from markdown_it import MarkdownIt
 from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE
 from checks import CHECKS
@@ -349,9 +346,13 @@ def main():
     # Internal links in these reference instructions resolve to original signed tools,
     # not a duplicate executable distribution inside this teaching archive.
     # The reference handouts are read in the signed course kit, not executed here.
-    downloads=KIT.parent/(DIST_ID+'-download')
-    for name in ('jdu-web-course.tar.gz','jdu-web-course.tar.gz.asc','package-signing-public.asc'):
-        (ROOT/'distribution'/name).write_bytes((downloads/name).read_bytes())
+    public_assets={
+        'jdu-web-course.tar.gz':KIT.parent/(DIST_ID+'.tar.gz'),
+        'jdu-web-course.tar.gz.asc':KIT.parent/(DIST_ID+'.tar.gz.asc'),
+        'package-signing-public.asc':KIT.parent/'package-signing-public.asc',
+    }
+    for name,source in public_assets.items():
+        (ROOT/'distribution'/name).write_bytes(source.read_bytes())
     links=[]
     for lang in LANGS:
         label={'ja':'日本語','ru':'Русский','uz':'O‘zbekcha'}[lang]

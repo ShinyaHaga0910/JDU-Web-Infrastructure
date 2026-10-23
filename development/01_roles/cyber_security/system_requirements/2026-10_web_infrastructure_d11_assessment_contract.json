@@ -1,0 +1,1415 @@
+{
+  "schema_version": 2,
+  "schema_scope": "design_document_not_current_report_wire_schema",
+  "contract_id": "web-d11-2026-10-proposal-2",
+  "supersedes": "web-d11-2026-10-proposal-1",
+  "approval_status": "approved_for_implementation_2026-10-22",
+  "scope": "assessment_design_only",
+  "user_decisions": {
+    "personal_demonstration_required": false,
+    "teacher_manual_points": 0,
+    "system_score_capped_at_course_25": false,
+    "course_normalization_handled_by_teacher": true
+  },
+  "raw_points_max": 62,
+  "automated_points_max": 62,
+  "manual_points_max": 0,
+  "raw_points_by_mission": {
+    "M1": 8,
+    "M2": 13,
+    "M3": 3,
+    "M4": 9,
+    "M5": 13,
+    "M6": 16
+  },
+  "course_conversion": {
+    "location": "teacher_gradebook_outside_this_system",
+    "implemented_in_this_contract": false
+  },
+  "practice_included_in_assessment_raw_score": false,
+  "class_ready": false,
+  "runtime_capabilities": {
+    "live_existing_checkers": [
+      "P1",
+      "M1"
+    ],
+    "current_storage": "per_check_status_and_latest_passed_total_unknown_plus_attempts",
+    "canonical_registry_implemented": false,
+    "raw_score_projection_implemented": false,
+    "new_task_dispatch_implemented": false,
+    "practice_app_profile_implemented": false,
+    "interactive_app_acceptance_implemented": false,
+    "signed_d08_distribution_changed": false
+  },
+  "grading_policy": {
+    "unit": "one_independent_scored_check_one_raw_point",
+    "pass_points": 1,
+    "fail_points": 0,
+    "unknown_points": null,
+    "not_applicable_points": null,
+    "readiness_awards_points": false,
+    "fixed_denominator": true,
+    "attempt_requires_complete_canonical_check_set": true,
+    "incomplete_or_unknown_attempt": "provisional_pass_count_with_unresolved_count_not_final_zero",
+    "selected_attempt": "latest_received_fully_evaluable_attempt_per_mission_at_teacher_cutoff",
+    "latest_unresolved_attempt_does_not_erase_prior_evaluable_attempt": true,
+    "highest_score_automatically_selected": false,
+    "cross_attempt_check_union": false,
+    "current_status_separate_from_selected_attempt": true,
+    "resubmission": "unlimited_until_teacher_announced_deadline",
+    "practice_required_before_mission": false,
+    "exclude_verification_fixture_labs_from_course_grades": true,
+    "teacher_finalizes_grades": true,
+    "deadline": null,
+    "course_pass_mark": null,
+    "unsubmitted": "unsubmitted_not_complete_teacher_handles_at_cutoff",
+    "automatic_course_normalization": false
+  },
+  "shared_constraints": {
+    "node_count": 5,
+    "roles": [
+      "bastion",
+      "web",
+      "dns",
+      "db",
+      "repo"
+    ],
+    "all_nodes_ssm_retained": true,
+    "ssh_private_keys_exported_to_shared_windows": false,
+    "normal_checker_changes_student_configuration": false,
+    "checker_creates_records_or_markers": "read_only_default_no_markers_interactive_mode_own_nonce_record_only",
+    "checker_changes_sg_or_reboots": false,
+    "backup_restore_required": false,
+    "extra_disks_or_manual_mount_required": false,
+    "student_application_coding_required": false,
+    "extra_network_ports_required": false,
+    "public_http_port": 80,
+    "private_admin_port": 8080,
+    "loopback_app_port": 8000,
+    "general_prerequisites": [
+      "current_lab_deployment_and_registered_nodes_match",
+      "required_management_path_available",
+      "required_package_source_available"
+    ],
+    "initial_package_absence_is_not_coursework_prerequisite": true,
+    "app_required_records_are_subset_not_entire_table": true,
+    "other_legitimate_public_records_allowed": true,
+    "nonpublic_records_in_public_view_allowed": false,
+    "personal_demonstration_required": false,
+    "student_browser_operation_proven_by_automated_checks": false
+  },
+  "interactive_app_acceptance": {
+    "status": "design_only_not_implemented",
+    "entry_point": "interactive_ssm_terminal_on_bastion",
+    "password": "hidden_existing_app_password_in_process_memory_only_not_runcommand_payload_or_arguments",
+    "behavior": "real_http_login_create_own_nonce_record_edit_own_record_verify_db_and_public_logout",
+    "record_code_template": "CK-{P_or_M}-{nonce_12_hex}",
+    "maximum_code_length": 32,
+    "student_records_or_accounts_modified": false,
+    "own_probe_record_retained": true,
+    "expected_side_effects": [
+      "own_probe_row_insert_update",
+      "session_login_logout",
+      "admin_audit_log",
+      "id_sequence_advance"
+    ],
+    "create_delete_user_or_reset_password": false,
+    "authentication_bypass": false,
+    "result_validity": "same_run_identity_profile_nonce_challenge_all_canonical_checks_teacher_received",
+    "old_proof_combined_with_new_read_only_checks": false,
+    "no_interactive_mode_result": "four_m5_functional_checks_and_m6_positive_control_dependent_checks_unknown"
+  },
+  "profiles": {
+    "practice": {
+      "db_name": "jdu_catalog_practice",
+      "setup_role": "catalog_practice_setup",
+      "runtime_role": "catalog_practice_app",
+      "app_admin": "practice_admin",
+      "db_runtime_env": "/etc/jdu-web/db-practice.runtime.env",
+      "records": [
+        {
+          "code": "P5-PUBLIC-001",
+          "name": "Practice keyboard",
+          "quantity": 4,
+          "location": "Training shelf A",
+          "is_public": true
+        },
+        {
+          "code": "P5-PRIVATE-001",
+          "name": "Practice mouse",
+          "quantity": 2,
+          "location": "Training shelf B",
+          "is_public": false
+        }
+      ]
+    },
+    "mission": {
+      "db_name": "jdu_catalog",
+      "setup_role": "catalog_setup",
+      "runtime_role": "catalog_app",
+      "app_admin": "lab_admin",
+      "db_runtime_env": "/etc/jdu-web/db-mission.runtime.env",
+      "records": [
+        {
+          "code": "M5-PUBLIC-001",
+          "name": "Mission monitor",
+          "quantity": 6,
+          "location": "Lab cabinet C",
+          "is_public": true
+        },
+        {
+          "code": "M5-PRIVATE-001",
+          "name": "Mission router",
+          "quantity": 1,
+          "location": "Lab cabinet D",
+          "is_public": false
+        }
+      ]
+    }
+  },
+  "check_definitions": {
+    "WEB01_SELF_IDENTITY": {
+      "role": "bastion",
+      "raw_points": 0,
+      "title": "実行場所",
+      "pass_condition": "本人Labのhost/user/instanceとの対応を確認する。理解や本人操作経路の証明とはしない。"
+    },
+    "WEB01_ROLE_ENDPOINTS": {
+      "role": "bastion",
+      "raw_points": 0,
+      "title": "5台の対応",
+      "pass_condition": "登録したrole/private IP/instance IDが実資源と一致する。"
+    },
+    "WEB01_MANAGEMENT": {
+      "role": "bastion",
+      "raw_points": 0,
+      "title": "管理経路",
+      "pass_condition": "必要なSSM/内部SSH経路が使える。共有Windowsへ秘密鍵を出さない。"
+    },
+    "WEB_READY_IDENTITY": {
+      "role": "bastion",
+      "raw_points": 0,
+      "title": "本人配備との一致",
+      "pass_condition": "account/Lab/Deployment/登録5台を照合し、取り違えを拒否する。"
+    },
+    "WEB_READY_MANAGEMENT": {
+      "role": "bastion",
+      "raw_points": 0,
+      "title": "観測経路",
+      "pass_condition": "当該検査に必要なSSM/SSHと対象hostへの管理経路が使える。"
+    },
+    "WEB_READY_PACKAGE_SOURCE": {
+      "role": "repo",
+      "raw_points": 0,
+      "title": "配布元",
+      "pass_condition": "当該課題に必要な署名済み配布元が使える。導入済みpackageを初期未導入条件で拒否しない。"
+    },
+    "WEB_READY_NETWORK_BASELINE": {
+      "role": "bastion",
+      "raw_points": 0,
+      "title": "配布済み通信境界",
+      "pass_condition": "D08の全5台SSM・50 CIDR限定RDP・内部SSH・公開80・限定送信を確認。SG/route/全ENIを含み、自動提供した境界には加点しない。"
+    },
+    "WEB02_IDENTITY": {
+      "role": "web",
+      "raw_points": 0,
+      "title": "本人配備との一致",
+      "pass_condition": "既存HTTP checkerの登録Webとの一致。"
+    },
+    "WEB02_NGINX_ACTIVE": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "Nginx起動",
+      "pass_condition": "既存checkerでnginxのactiveを確認。"
+    },
+    "WEB02_CONFIG_VALID": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "Nginx構文",
+      "pass_condition": "既存checkerでnginx -tが成功。"
+    },
+    "WEB02_LISTEN_80": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "80番待受",
+      "pass_condition": "既存checkerでprivate/all-interfaceの80番待受を確認。"
+    },
+    "WEB02_FILE": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "配信file",
+      "pass_condition": "既存checkerどおり指定本文・通常file・root所有・0644を確認。"
+    },
+    "WEB02_LOCAL_HTTP": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "Web自身のHTTP",
+      "pass_condition": "既存checkerでloopbackの200と本文完全一致。"
+    },
+    "WEB02_BASTION_HTTP": {
+      "role": "bastion",
+      "raw_points": 1,
+      "title": "踏み台からHTTP",
+      "pass_condition": "既存checkerでprivate IP経由の200と本文完全一致。"
+    },
+    "WEB02_PUBLIC_HTTP": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "外部からHTTP",
+      "pass_condition": "既存checkerでCloudShellからpublic IP経由の200と本文完全一致。"
+    },
+    "WEB02_ACCESS_LOG": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "要求とlog",
+      "pass_condition": "既存checkerで今回のnonce付き要求がaccess logに残る。"
+    },
+    "WEB02_REPO_PREREQUISITE": {
+      "role": "web",
+      "raw_points": 0,
+      "title": "配布元",
+      "pass_condition": "既存checkerのrepo/release照合。"
+    },
+    "WEB03_SERVICE": {
+      "role": "dns",
+      "raw_points": 1,
+      "title": "BIND起動",
+      "pass_condition": "BINDがactiveである。"
+    },
+    "WEB03_CONFIG_VALID": {
+      "role": "dns",
+      "raw_points": 1,
+      "title": "DNS構文",
+      "pass_condition": "named設定とlab.test zoneの構文検査が成功する。"
+    },
+    "WEB03_ZONE_AUTHORITY": {
+      "role": "dns",
+      "raw_points": 1,
+      "title": "権威zone",
+      "pass_condition": "lab.testのSOA/NSと権威応答が設計と一致する。"
+    },
+    "WEB03_REQUIRED_RECORDS": {
+      "role": "dns",
+      "raw_points": 1,
+      "title": "必要なA record",
+      "pass_condition": "P/M別の必須record全件が期待private IPを返す。6名を6点へ水増ししない。追加の正当な練習名を許す。"
+    },
+    "WEB03_UDP_RESPONSE": {
+      "role": "dns",
+      "raw_points": 1,
+      "title": "UDP応答",
+      "pass_condition": "踏み台・Webの両方からUDP53で必要な回答が得られる。"
+    },
+    "WEB03_TCP_RESPONSE": {
+      "role": "dns",
+      "raw_points": 1,
+      "title": "TCP応答",
+      "pass_condition": "踏み台・Webの両方からTCP53で必要な回答が得られる。"
+    },
+    "WEB03_NORMAL_RESOLVER": {
+      "role": "bastion",
+      "raw_points": 1,
+      "title": "通常resolver",
+      "pass_condition": "踏み台/Webの通常resolverがBINDだけを使い、対象名をhostsやbrowser DoHで代用しない。"
+    },
+    "WEB03_NAMED_HTTP": {
+      "role": "bastion",
+      "raw_points": 1,
+      "title": "名前によるHTTP",
+      "pass_condition": "踏み台の通常resolverを使い、P/M別host名と既存HTTP fileで200/正しい本文を確認する。"
+    },
+    "WEB03_DB_NAME": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "DB名の通常解決",
+      "pass_condition": "Webの通常resolverでP/M別DB名が10.20.2.20になる。"
+    },
+    "WEB03_FORWARD_ONLY": {
+      "role": "dns",
+      "raw_points": 1,
+      "title": "外部名の転送",
+      "pass_condition": "forward only/転送先10.20.0.2の実効設定と外部名解決を確認する。外部Web接続成功は要求しない。"
+    },
+    "WEB03_NXDOMAIN": {
+      "role": "dns",
+      "raw_points": 1,
+      "title": "未登録名",
+      "pass_condition": "その回で作る未登録lab.test名に権威NXDOMAINが返る。"
+    },
+    "WEB03_CLIENT_ACL": {
+      "role": "dns",
+      "raw_points": 1,
+      "title": "問い合わせ制限",
+      "pass_condition": "BINDのquery/recursion/cache ACLがlocalhost・踏み台・Webのみを許す実効設定になっている。SGだけの遮断でBIND ACLの実証としない。"
+    },
+    "WEB03_AXFR_DENIED": {
+      "role": "dns",
+      "raw_points": 1,
+      "title": "zone転送拒否",
+      "pass_condition": "通常問い合わせが同じ回に成功する踏み台/WebからAXFRが明示拒否される。timeoutだけではPASSにしない。"
+    },
+    "WEB04_VOLUME_READINESS": {
+      "role": "web",
+      "raw_points": 0,
+      "title": "提供volumeの対応",
+      "pass_condition": "Webの対象pathが本人の元root volume上にあり、別volume/置換instanceでない。"
+    },
+    "WEB04_CAPACITY_READINESS": {
+      "role": "web",
+      "raw_points": 0,
+      "title": "提供容量",
+      "pass_condition": "空き20%以上かつ2GiB以上。提供済み容量を学生の構築点にしない。"
+    },
+    "WEB04_MARKER_CONTENT": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "保存内容",
+      "pass_condition": "学生が作ったP/M別markerのpath・匿名Lab ID・task・本文が一致する。"
+    },
+    "WEB04_MARKER_PERMISSIONS": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "保存fileの権限",
+      "pass_condition": "markerはroot:root/0644、親directoryは0755である。"
+    },
+    "WEB04_STOP_START_RETENTION": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "停止再開後の保持",
+      "pass_condition": "同じ配備の停止前/停止状態/再開後の証跡で、元instance/volumeとmarker hashが同じ、boot IDが変化したことを確認。単なるrebootや旧fixture記録では代用しない。"
+    },
+    "WEB05_CLUSTER_ACTIVE": {
+      "role": "db",
+      "raw_points": 1,
+      "title": "DB起動",
+      "pass_condition": "PostgreSQL16/mainがactiveである。"
+    },
+    "WEB05_CLUSTER_CONFIG": {
+      "role": "db",
+      "raw_points": 1,
+      "title": "cluster設定",
+      "pass_condition": "16/mainの設定・標準data directory・postgres/socket peer管理が妥当である。"
+    },
+    "WEB05_LISTEN_5432": {
+      "role": "db",
+      "raw_points": 1,
+      "title": "DB待受",
+      "pass_condition": "10.20.2.20:5432で待ち受ける。"
+    },
+    "WEB05_DATABASE_OWNER": {
+      "role": "db",
+      "raw_points": 1,
+      "title": "DBとschemaの所有者",
+      "pass_condition": "P/M別DBとpublic schemaのownerが対応するsetup roleである。"
+    },
+    "WEB05_ROLE_ATTRIBUTES": {
+      "role": "db",
+      "raw_points": 1,
+      "title": "DB role",
+      "pass_condition": "対応runtime roleはLOGIN。両roleにsuperuser/CREATEDB/CREATEROLE/REPLICATION/BYPASSRLSや昇格membershipがない。setupは構築中LOGIN/完成後NOLOGINの両段階を認める。"
+    },
+    "WEB05_HBA_SCRAM": {
+      "role": "db",
+      "raw_points": 1,
+      "title": "接続認証規則",
+      "pass_condition": "pg_hbaはWeb /32・列挙したprofile DB/roleだけにSCRAMを許可し、それ以外の広い許可がない。"
+    },
+    "WEB05_WEB_SQL": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "Webの認証SQL",
+      "pass_condition": "Pはprivate IP、Mは通常DNS名からruntime roleで新規認証接続し、current_database/current_user/SELECT結果が一致する。"
+    },
+    "WEB05_BAD_PASSWORD_DENIED": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "誤password拒否",
+      "pass_condition": "同じ回の正規接続を対照に、1回の誤password接続が明示認証拒否される。秘密値やhashは返さない。"
+    },
+    "WEB05_WRONG_TARGET_DENIED": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "他DB/管理role拒否",
+      "pass_condition": "Webからpostgres role・許可外DB・他profileへの接続をHBA等で明示拒否する。未作成practice DB自体は必須にしない。"
+    },
+    "WEB06_ARTIFACTS": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "アプリ資源",
+      "pass_condition": "教員配布コード・依存・固定版が一致する。学生はアプリコードを書かない。"
+    },
+    "WEB06_SERVICE": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "アプリservice",
+      "pass_condition": "systemd serviceがactive/enabledで、設計の専用catalog userで起動する。"
+    },
+    "WEB06_LOOPBACK": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "内部アプリ待受",
+      "pass_condition": "Gunicornが127.0.0.1:8000のみで待ち受ける。"
+    },
+    "WEB06_PROFILE_DATABASE": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "アプリDB接続",
+      "pass_condition": "app.envと実接続が選択profileのDB/runtime roleを通常DNSで使う。M4の単体SQL接続とは別にアプリ実接続を確認。"
+    },
+    "WEB06_MIGRATIONS": {
+      "role": "db",
+      "raw_points": 1,
+      "title": "tableとmigration",
+      "pass_condition": "教員固定migrationと11table/必要sequenceが対象DBに揃う。"
+    },
+    "WEB06_REQUIRED_RECORDS": {
+      "role": "db",
+      "raw_points": 1,
+      "title": "指定備品の保存",
+      "pass_condition": "P/M別の指定2件が対象DBに期待値で保存される。必須部分集合として照合する。"
+    },
+    "WEB06_PUBLIC_DATA": {
+      "role": "bastion",
+      "raw_points": 1,
+      "title": "一般画面のDB反映",
+      "pass_condition": "一般80のHTTP200と公開対象の値がDBと一致する。固定HTMLのみではPASSにしない。"
+    },
+    "WEB06_ADMIN_ENTRY": {
+      "role": "bastion",
+      "raw_points": 1,
+      "title": "管理入口",
+      "pass_condition": "通常DNSのadmin.lab.test:8080/admin/に踏み台から到達し、正しいログイン画面が返る。"
+    },
+    "WEB06_STATIC": {
+      "role": "bastion",
+      "raw_points": 1,
+      "title": "静的資源",
+      "pass_condition": "一般/管理画面に必要なCSS等が正しい入口から取得でき、Content-Typeも妥当である。"
+    },
+    "WEB06_PASSWORD_LOGIN": {
+      "role": "bastion",
+      "raw_points": 1,
+      "title": "実認証ログイン",
+      "pass_condition": "対話型自動確認で実passwordと正しいCSRF/session処理によって対象staffとしてHTTPログインする。force_loginやsession直書きを使わない。"
+    },
+    "WEB06_CREATE_REFLECT": {
+      "role": "bastion",
+      "raw_points": 1,
+      "title": "新規登録と反映",
+      "pass_condition": "同じ自動確認回で専用nonceの架空備品1件を管理HTTPから登録し、PostgreSQLと一般画面の値が一致する。"
+    },
+    "WEB06_EDIT_REFLECT": {
+      "role": "bastion",
+      "raw_points": 1,
+      "title": "編集と反映",
+      "pass_condition": "その回にchecker自身が作った専用備品だけの数量を変更し、DBと一般画面の更新が一致する。"
+    },
+    "WEB06_LOGOUT": {
+      "role": "bastion",
+      "raw_points": 1,
+      "title": "ログアウト",
+      "pass_condition": "同じsessionをPOSTでログアウトし、そのcookieを再使用しても管理画面は再認証を要求する。"
+    },
+    "WEB07_PUBLIC_ADMIN_DENIED": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "一般入口の管理拒否",
+      "pass_condition": "公開80の/adminおよび配下・表記揺れがNginx/アプリで拒否され、偽装headerでも管理画面を返さない。"
+    },
+    "WEB07_SECRET_PERMISSIONS": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "秘密fileの権限",
+      "pass_condition": "app.env/有効runtime秘密fileはroot:root0600、linkではなく、catalog等から読取り不可。内容は送信しない。"
+    },
+    "WEB07_CODE_PROTECTED": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "コード保護",
+      "pass_condition": "実行catalog userはコード/venv/親directoryを改変できず、非login・非sudoである。"
+    },
+    "WEB07_SECRET_HTTP_DENIED": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "秘密のHTTP非公開",
+      "pass_condition": "秘密をstatic/public配下へ置かず、固定した秘密path候補を一般HTTPで取得できない。"
+    },
+    "WEB07_SETUP_RETIRED": {
+      "role": "db",
+      "raw_points": 1,
+      "title": "初期化権限の終了",
+      "pass_condition": "対応setup roleはNOLOGIN/password NULL/既存sessionなし。一時setup.envも終了している。"
+    },
+    "WEB07_ITEM_PRIVILEGES": {
+      "role": "db",
+      "raw_points": 1,
+      "title": "備品tableの実効権限",
+      "pass_condition": "catalog_itemはSELECT/INSERT/UPDATEのみ。DELETE・権限委譲を許さない。所有者/PUBLIC/membership経由も含める。"
+    },
+    "WEB07_AUTH_USER_PRIVILEGES": {
+      "role": "db",
+      "raw_points": 1,
+      "title": "認証tableの列権限",
+      "pass_condition": "auth_userはSELECTとUPDATE(last_login,password)のみ。属性変更・table全体UPDATE/INSERT/DELETEを許さない。"
+    },
+    "WEB07_AUTH_LOOKUP_PRIVILEGES": {
+      "role": "db",
+      "raw_points": 1,
+      "title": "認証参照の権限",
+      "pass_condition": "auth_group/auth_permission/関連中間table/content_typeはSELECTのみ。"
+    },
+    "WEB07_SESSION_PRIVILEGES": {
+      "role": "db",
+      "raw_points": 1,
+      "title": "sessionの権限",
+      "pass_condition": "django_sessionはSELECT/INSERT/UPDATE/DELETEのみを許す。必要なDELETEを一律禁止しない。"
+    },
+    "WEB07_AUDIT_PRIVILEGES": {
+      "role": "db",
+      "raw_points": 1,
+      "title": "管理logの権限",
+      "pass_condition": "django_admin_logはSELECT/INSERTのみ。UPDATE/DELETEを許さない。"
+    },
+    "WEB07_MIGRATION_PRIVILEGES": {
+      "role": "db",
+      "raw_points": 1,
+      "title": "schema/migrationの保護",
+      "pass_condition": "runtimeはdjango_migrations権限・schema CREATE・アプリobject所有権を持たず、既定外の実効許可もない。"
+    },
+    "WEB07_SEQUENCE_PRIVILEGES": {
+      "role": "db",
+      "raw_points": 1,
+      "title": "sequenceの実効権限",
+      "pass_condition": "必要な備品/admin log ID sequenceはUSAGEだけ。他の過剰権限とsetvalを許すUPDATEがない。nextval/setvalを実行して試さない。"
+    },
+    "WEB07_ADMIN_PERMISSIONS": {
+      "role": "web",
+      "raw_points": 1,
+      "title": "アプリ管理者の範囲",
+      "pass_condition": "対象管理者はstaffかつ非superuser、備品view/add/changeのみ。削除・user/group管理権限やrouteがない。"
+    },
+    "WEB07_ANONYMOUS_DENIED": {
+      "role": "bastion",
+      "raw_points": 1,
+      "title": "匿名更新の拒否",
+      "pass_condition": "正規routeと妥当なCSRF条件で匿名の登録/編集を試し、認証を要求して対象DBを書き換えない。同じ回の正規ログイン/登録成功を対照にする。"
+    },
+    "WEB07_BAD_PASSWORD_DENIED": {
+      "role": "bastion",
+      "raw_points": 1,
+      "title": "アプリ誤認証の拒否",
+      "pass_condition": "正規認証の成功を対照に、1回の誤passwordで認証sessionが成立しない。既存passwordの変更や総当たりはしない。"
+    },
+    "WEB07_PRIVATE_DATA_HIDDEN": {
+      "role": "bastion",
+      "raw_points": 1,
+      "title": "非公開備品の保護",
+      "pass_condition": "対象DBの非公開備品が一般画面へ出ず、公開備品は同じ回に表示される。"
+    },
+    "WEB_READY_DEPENDENCIES": {
+      "role": "bastion",
+      "raw_points": 0,
+      "title": "現在の必要機能",
+      "pass_condition": "課題が利用するHTTP・通常DNS・DB・アプリの現在の必要機能を確認する。前提への再加点はしない。"
+    }
+  },
+  "check_sets": {
+    "introduction": [
+      "WEB01_SELF_IDENTITY",
+      "WEB01_ROLE_ENDPOINTS",
+      "WEB01_MANAGEMENT"
+    ],
+    "common_readiness": [
+      "WEB_READY_IDENTITY",
+      "WEB_READY_MANAGEMENT",
+      "WEB_READY_PACKAGE_SOURCE",
+      "WEB_READY_NETWORK_BASELINE"
+    ],
+    "http": [
+      "WEB02_IDENTITY",
+      "WEB02_NGINX_ACTIVE",
+      "WEB02_CONFIG_VALID",
+      "WEB02_LISTEN_80",
+      "WEB02_FILE",
+      "WEB02_LOCAL_HTTP",
+      "WEB02_BASTION_HTTP",
+      "WEB02_PUBLIC_HTTP",
+      "WEB02_ACCESS_LOG",
+      "WEB02_REPO_PREREQUISITE"
+    ],
+    "dns": [
+      "WEB03_SERVICE",
+      "WEB03_CONFIG_VALID",
+      "WEB03_ZONE_AUTHORITY",
+      "WEB03_REQUIRED_RECORDS",
+      "WEB03_UDP_RESPONSE",
+      "WEB03_TCP_RESPONSE",
+      "WEB03_NORMAL_RESOLVER",
+      "WEB03_NAMED_HTTP",
+      "WEB03_DB_NAME",
+      "WEB03_FORWARD_ONLY",
+      "WEB03_NXDOMAIN",
+      "WEB03_CLIENT_ACL",
+      "WEB03_AXFR_DENIED"
+    ],
+    "storage_readiness": [
+      "WEB04_VOLUME_READINESS",
+      "WEB04_CAPACITY_READINESS"
+    ],
+    "storage": [
+      "WEB04_MARKER_CONTENT",
+      "WEB04_MARKER_PERMISSIONS",
+      "WEB04_STOP_START_RETENTION"
+    ],
+    "database": [
+      "WEB05_CLUSTER_ACTIVE",
+      "WEB05_CLUSTER_CONFIG",
+      "WEB05_LISTEN_5432",
+      "WEB05_DATABASE_OWNER",
+      "WEB05_ROLE_ATTRIBUTES",
+      "WEB05_HBA_SCRAM",
+      "WEB05_WEB_SQL",
+      "WEB05_BAD_PASSWORD_DENIED",
+      "WEB05_WRONG_TARGET_DENIED"
+    ],
+    "application": [
+      "WEB06_ARTIFACTS",
+      "WEB06_SERVICE",
+      "WEB06_LOOPBACK",
+      "WEB06_PROFILE_DATABASE",
+      "WEB06_MIGRATIONS",
+      "WEB06_REQUIRED_RECORDS",
+      "WEB06_PUBLIC_DATA",
+      "WEB06_ADMIN_ENTRY",
+      "WEB06_STATIC",
+      "WEB06_PASSWORD_LOGIN",
+      "WEB06_CREATE_REFLECT",
+      "WEB06_EDIT_REFLECT",
+      "WEB06_LOGOUT"
+    ],
+    "security": [
+      "WEB07_PUBLIC_ADMIN_DENIED",
+      "WEB07_SECRET_PERMISSIONS",
+      "WEB07_CODE_PROTECTED",
+      "WEB07_SECRET_HTTP_DENIED",
+      "WEB07_SETUP_RETIRED",
+      "WEB07_ITEM_PRIVILEGES",
+      "WEB07_AUTH_USER_PRIVILEGES",
+      "WEB07_AUTH_LOOKUP_PRIVILEGES",
+      "WEB07_SESSION_PRIVILEGES",
+      "WEB07_AUDIT_PRIVILEGES",
+      "WEB07_MIGRATION_PRIVILEGES",
+      "WEB07_SEQUENCE_PRIVILEGES",
+      "WEB07_ADMIN_PERMISSIONS",
+      "WEB07_ANONYMOUS_DENIED",
+      "WEB07_BAD_PASSWORD_DENIED",
+      "WEB07_PRIVATE_DATA_HIDDEN"
+    ],
+    "dependency_readiness": [
+      "WEB_READY_DEPENDENCIES"
+    ]
+  },
+  "recommended_order": [
+    "P0",
+    "M0",
+    "P1",
+    "M1",
+    "P2",
+    "M2",
+    "P3",
+    "M3",
+    "P4",
+    "M4",
+    "P5",
+    "P6",
+    "M5",
+    "M6"
+  ],
+  "retired_task_ids": {
+    "M7": "manual_demonstration_removed_do_not_reassign_id"
+  },
+  "tasks": [
+    {
+      "id": "P0",
+      "module": "WEB-00/01",
+      "category": "practice",
+      "check_set": "introduction",
+      "requires_current": [],
+      "role_subset": [
+        "bastion",
+        "web"
+      ],
+      "progress_scored_checks": [],
+      "readiness_checks": [
+        "WEB01_SELF_IDENTITY",
+        "WEB01_ROLE_ENDPOINTS",
+        "WEB01_MANAGEMENT"
+      ],
+      "required_report_checks": [
+        "WEB01_SELF_IDENTITY",
+        "WEB01_ROLE_ENDPOINTS",
+        "WEB01_MANAGEMENT"
+      ],
+      "progress_points_max": 0,
+      "raw_points_max": 0
+    },
+    {
+      "id": "M0",
+      "module": "WEB-00/01",
+      "category": "readiness",
+      "check_set": "introduction",
+      "requires_current": [],
+      "role_subset": [
+        "bastion",
+        "web",
+        "dns",
+        "db",
+        "repo"
+      ],
+      "progress_scored_checks": [],
+      "readiness_checks": [
+        "WEB01_SELF_IDENTITY",
+        "WEB01_ROLE_ENDPOINTS",
+        "WEB01_MANAGEMENT"
+      ],
+      "required_report_checks": [
+        "WEB01_SELF_IDENTITY",
+        "WEB01_ROLE_ENDPOINTS",
+        "WEB01_MANAGEMENT"
+      ],
+      "progress_points_max": 0,
+      "raw_points_max": 0
+    },
+    {
+      "id": "P1",
+      "module": "WEB-02",
+      "category": "practice",
+      "check_set": "http",
+      "requires_current": [],
+      "expected": {
+        "file": "/var/www/html/practice.txt",
+        "path": "/practice.txt",
+        "body": "JDU WEB-02 practice: HTTP response verified.\n"
+      },
+      "progress_scored_checks": [
+        "WEB02_NGINX_ACTIVE",
+        "WEB02_CONFIG_VALID",
+        "WEB02_LISTEN_80",
+        "WEB02_FILE",
+        "WEB02_LOCAL_HTTP",
+        "WEB02_BASTION_HTTP",
+        "WEB02_PUBLIC_HTTP",
+        "WEB02_ACCESS_LOG"
+      ],
+      "readiness_checks": [
+        "WEB02_IDENTITY",
+        "WEB02_REPO_PREREQUISITE"
+      ],
+      "required_report_checks": [
+        "WEB02_IDENTITY",
+        "WEB02_NGINX_ACTIVE",
+        "WEB02_CONFIG_VALID",
+        "WEB02_LISTEN_80",
+        "WEB02_FILE",
+        "WEB02_LOCAL_HTTP",
+        "WEB02_BASTION_HTTP",
+        "WEB02_PUBLIC_HTTP",
+        "WEB02_ACCESS_LOG",
+        "WEB02_REPO_PREREQUISITE"
+      ],
+      "progress_points_max": 8,
+      "raw_points_max": 0
+    },
+    {
+      "id": "M1",
+      "module": "WEB-02",
+      "category": "automated_mission",
+      "check_set": "http",
+      "requires_current": [],
+      "expected": {
+        "file": "/var/www/html/mission.txt",
+        "path": "/mission.txt",
+        "body": "JDU WEB-02 mission: independent HTTP delivery.\n"
+      },
+      "progress_scored_checks": [
+        "WEB02_NGINX_ACTIVE",
+        "WEB02_CONFIG_VALID",
+        "WEB02_LISTEN_80",
+        "WEB02_FILE",
+        "WEB02_LOCAL_HTTP",
+        "WEB02_BASTION_HTTP",
+        "WEB02_PUBLIC_HTTP",
+        "WEB02_ACCESS_LOG"
+      ],
+      "readiness_checks": [
+        "WEB02_IDENTITY",
+        "WEB02_REPO_PREREQUISITE"
+      ],
+      "required_report_checks": [
+        "WEB02_IDENTITY",
+        "WEB02_NGINX_ACTIVE",
+        "WEB02_CONFIG_VALID",
+        "WEB02_LISTEN_80",
+        "WEB02_FILE",
+        "WEB02_LOCAL_HTTP",
+        "WEB02_BASTION_HTTP",
+        "WEB02_PUBLIC_HTTP",
+        "WEB02_ACCESS_LOG",
+        "WEB02_REPO_PREREQUISITE"
+      ],
+      "progress_points_max": 8,
+      "raw_points_max": 8
+    },
+    {
+      "id": "P2",
+      "module": "WEB-03",
+      "category": "practice",
+      "check_set": "dns",
+      "requires_current": [
+        "P1"
+      ],
+      "expected": {
+        "zone": "lab.test",
+        "records": {
+          "guide.lab.test": "10.20.1.20",
+          "practice-db.lab.test": "10.20.2.20"
+        },
+        "http_name": "guide.lab.test",
+        "http_path": "/practice.txt",
+        "db_name": "practice-db.lab.test"
+      },
+      "progress_scored_checks": [
+        "WEB03_SERVICE",
+        "WEB03_CONFIG_VALID",
+        "WEB03_ZONE_AUTHORITY",
+        "WEB03_REQUIRED_RECORDS",
+        "WEB03_UDP_RESPONSE",
+        "WEB03_TCP_RESPONSE",
+        "WEB03_NORMAL_RESOLVER",
+        "WEB03_NAMED_HTTP",
+        "WEB03_DB_NAME",
+        "WEB03_FORWARD_ONLY",
+        "WEB03_NXDOMAIN",
+        "WEB03_CLIENT_ACL",
+        "WEB03_AXFR_DENIED"
+      ],
+      "readiness_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB_READY_DEPENDENCIES"
+      ],
+      "required_report_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB03_SERVICE",
+        "WEB03_CONFIG_VALID",
+        "WEB03_ZONE_AUTHORITY",
+        "WEB03_REQUIRED_RECORDS",
+        "WEB03_UDP_RESPONSE",
+        "WEB03_TCP_RESPONSE",
+        "WEB03_NORMAL_RESOLVER",
+        "WEB03_NAMED_HTTP",
+        "WEB03_DB_NAME",
+        "WEB03_FORWARD_ONLY",
+        "WEB03_NXDOMAIN",
+        "WEB03_CLIENT_ACL",
+        "WEB03_AXFR_DENIED",
+        "WEB_READY_DEPENDENCIES"
+      ],
+      "progress_points_max": 13,
+      "raw_points_max": 0
+    },
+    {
+      "id": "M2",
+      "module": "WEB-03",
+      "category": "automated_mission",
+      "check_set": "dns",
+      "requires_current": [
+        "M1"
+      ],
+      "expected": {
+        "zone": "lab.test",
+        "records": {
+          "bastion.lab.test": "10.20.1.10",
+          "web.lab.test": "10.20.1.20",
+          "admin.lab.test": "10.20.1.20",
+          "dns.lab.test": "10.20.2.10",
+          "db.lab.test": "10.20.2.20",
+          "repo.lab.test": "10.20.2.30"
+        },
+        "http_name": "web.lab.test",
+        "http_path": "/mission.txt",
+        "db_name": "db.lab.test"
+      },
+      "progress_scored_checks": [
+        "WEB03_SERVICE",
+        "WEB03_CONFIG_VALID",
+        "WEB03_ZONE_AUTHORITY",
+        "WEB03_REQUIRED_RECORDS",
+        "WEB03_UDP_RESPONSE",
+        "WEB03_TCP_RESPONSE",
+        "WEB03_NORMAL_RESOLVER",
+        "WEB03_NAMED_HTTP",
+        "WEB03_DB_NAME",
+        "WEB03_FORWARD_ONLY",
+        "WEB03_NXDOMAIN",
+        "WEB03_CLIENT_ACL",
+        "WEB03_AXFR_DENIED"
+      ],
+      "readiness_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB_READY_DEPENDENCIES"
+      ],
+      "required_report_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB03_SERVICE",
+        "WEB03_CONFIG_VALID",
+        "WEB03_ZONE_AUTHORITY",
+        "WEB03_REQUIRED_RECORDS",
+        "WEB03_UDP_RESPONSE",
+        "WEB03_TCP_RESPONSE",
+        "WEB03_NORMAL_RESOLVER",
+        "WEB03_NAMED_HTTP",
+        "WEB03_DB_NAME",
+        "WEB03_FORWARD_ONLY",
+        "WEB03_NXDOMAIN",
+        "WEB03_CLIENT_ACL",
+        "WEB03_AXFR_DENIED",
+        "WEB_READY_DEPENDENCIES"
+      ],
+      "progress_points_max": 13,
+      "raw_points_max": 13
+    },
+    {
+      "id": "P3",
+      "module": "WEB-04",
+      "category": "practice",
+      "check_set": "storage",
+      "requires_current": [],
+      "expected": {
+        "role": "web",
+        "file": "/var/lib/jdu-web/practice/storage.txt",
+        "body_template": "lab_id={lab_id}\ntask=P3\npayload=practice-storage-2026\n",
+        "file_mode": "0644",
+        "directory_mode": "0755",
+        "owner": "root:root",
+        "minimum_free_gib": 2,
+        "minimum_free_percent": 20,
+        "restart_evidence": "same_instance_volume_hash_changed_boot_id_with_stopped_observation"
+      },
+      "progress_scored_checks": [
+        "WEB04_MARKER_CONTENT",
+        "WEB04_MARKER_PERMISSIONS",
+        "WEB04_STOP_START_RETENTION"
+      ],
+      "readiness_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB04_VOLUME_READINESS",
+        "WEB04_CAPACITY_READINESS"
+      ],
+      "required_report_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB04_VOLUME_READINESS",
+        "WEB04_CAPACITY_READINESS",
+        "WEB04_MARKER_CONTENT",
+        "WEB04_MARKER_PERMISSIONS",
+        "WEB04_STOP_START_RETENTION"
+      ],
+      "progress_points_max": 3,
+      "raw_points_max": 0
+    },
+    {
+      "id": "M3",
+      "module": "WEB-04",
+      "category": "automated_mission",
+      "check_set": "storage",
+      "requires_current": [],
+      "expected": {
+        "role": "web",
+        "file": "/var/lib/jdu-web/mission/storage.txt",
+        "body_template": "lab_id={lab_id}\ntask=M3\npayload=mission-storage-2026\n",
+        "file_mode": "0644",
+        "directory_mode": "0755",
+        "owner": "root:root",
+        "minimum_free_gib": 2,
+        "minimum_free_percent": 20,
+        "restart_evidence": "same_instance_volume_hash_changed_boot_id_with_stopped_observation"
+      },
+      "progress_scored_checks": [
+        "WEB04_MARKER_CONTENT",
+        "WEB04_MARKER_PERMISSIONS",
+        "WEB04_STOP_START_RETENTION"
+      ],
+      "readiness_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB04_VOLUME_READINESS",
+        "WEB04_CAPACITY_READINESS"
+      ],
+      "required_report_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB04_VOLUME_READINESS",
+        "WEB04_CAPACITY_READINESS",
+        "WEB04_MARKER_CONTENT",
+        "WEB04_MARKER_PERMISSIONS",
+        "WEB04_STOP_START_RETENTION"
+      ],
+      "progress_points_max": 3,
+      "raw_points_max": 3
+    },
+    {
+      "id": "P4",
+      "module": "WEB-05",
+      "category": "practice",
+      "check_set": "database",
+      "requires_current": [],
+      "profile": "practice",
+      "connection_host": "10.20.2.20",
+      "progress_scored_checks": [
+        "WEB05_CLUSTER_ACTIVE",
+        "WEB05_CLUSTER_CONFIG",
+        "WEB05_LISTEN_5432",
+        "WEB05_DATABASE_OWNER",
+        "WEB05_ROLE_ATTRIBUTES",
+        "WEB05_HBA_SCRAM",
+        "WEB05_WEB_SQL",
+        "WEB05_BAD_PASSWORD_DENIED",
+        "WEB05_WRONG_TARGET_DENIED"
+      ],
+      "readiness_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE"
+      ],
+      "required_report_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB05_CLUSTER_ACTIVE",
+        "WEB05_CLUSTER_CONFIG",
+        "WEB05_LISTEN_5432",
+        "WEB05_DATABASE_OWNER",
+        "WEB05_ROLE_ATTRIBUTES",
+        "WEB05_HBA_SCRAM",
+        "WEB05_WEB_SQL",
+        "WEB05_BAD_PASSWORD_DENIED",
+        "WEB05_WRONG_TARGET_DENIED"
+      ],
+      "progress_points_max": 9,
+      "raw_points_max": 0
+    },
+    {
+      "id": "M4",
+      "module": "WEB-05",
+      "category": "automated_mission",
+      "check_set": "database",
+      "requires_current": [
+        "M2"
+      ],
+      "profile": "mission",
+      "connection_host": "db.lab.test",
+      "app_tables_required_at_this_stage": false,
+      "setup_nologin_after_m5_is_valid": true,
+      "progress_scored_checks": [
+        "WEB05_CLUSTER_ACTIVE",
+        "WEB05_CLUSTER_CONFIG",
+        "WEB05_LISTEN_5432",
+        "WEB05_DATABASE_OWNER",
+        "WEB05_ROLE_ATTRIBUTES",
+        "WEB05_HBA_SCRAM",
+        "WEB05_WEB_SQL",
+        "WEB05_BAD_PASSWORD_DENIED",
+        "WEB05_WRONG_TARGET_DENIED"
+      ],
+      "readiness_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB_READY_DEPENDENCIES"
+      ],
+      "required_report_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB05_CLUSTER_ACTIVE",
+        "WEB05_CLUSTER_CONFIG",
+        "WEB05_LISTEN_5432",
+        "WEB05_DATABASE_OWNER",
+        "WEB05_ROLE_ATTRIBUTES",
+        "WEB05_HBA_SCRAM",
+        "WEB05_WEB_SQL",
+        "WEB05_BAD_PASSWORD_DENIED",
+        "WEB05_WRONG_TARGET_DENIED",
+        "WEB_READY_DEPENDENCIES"
+      ],
+      "progress_points_max": 9,
+      "raw_points_max": 9
+    },
+    {
+      "id": "P5",
+      "module": "WEB-06",
+      "category": "practice",
+      "check_set": "application",
+      "requires_current": [
+        "M2",
+        "P4"
+      ],
+      "profile": "practice",
+      "inactive_profile_result": "historical_practice_only_do_not_change_active_profile",
+      "progress_scored_checks": [
+        "WEB06_ARTIFACTS",
+        "WEB06_SERVICE",
+        "WEB06_LOOPBACK",
+        "WEB06_PROFILE_DATABASE",
+        "WEB06_MIGRATIONS",
+        "WEB06_REQUIRED_RECORDS",
+        "WEB06_PUBLIC_DATA",
+        "WEB06_ADMIN_ENTRY",
+        "WEB06_STATIC",
+        "WEB06_PASSWORD_LOGIN",
+        "WEB06_CREATE_REFLECT",
+        "WEB06_EDIT_REFLECT",
+        "WEB06_LOGOUT"
+      ],
+      "readiness_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB_READY_DEPENDENCIES"
+      ],
+      "required_report_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB06_ARTIFACTS",
+        "WEB06_SERVICE",
+        "WEB06_LOOPBACK",
+        "WEB06_PROFILE_DATABASE",
+        "WEB06_MIGRATIONS",
+        "WEB06_REQUIRED_RECORDS",
+        "WEB06_PUBLIC_DATA",
+        "WEB06_ADMIN_ENTRY",
+        "WEB06_STATIC",
+        "WEB06_PASSWORD_LOGIN",
+        "WEB06_CREATE_REFLECT",
+        "WEB06_EDIT_REFLECT",
+        "WEB06_LOGOUT",
+        "WEB_READY_DEPENDENCIES"
+      ],
+      "progress_points_max": 13,
+      "raw_points_max": 0,
+      "interactive_functional_mode_required": true
+    },
+    {
+      "id": "M5",
+      "module": "WEB-06",
+      "category": "automated_mission",
+      "check_set": "application",
+      "requires_current": [
+        "M2",
+        "M4"
+      ],
+      "profile": "mission",
+      "preserve_http_paths": [
+        "/practice.txt",
+        "/mission.txt"
+      ],
+      "progress_scored_checks": [
+        "WEB06_ARTIFACTS",
+        "WEB06_SERVICE",
+        "WEB06_LOOPBACK",
+        "WEB06_PROFILE_DATABASE",
+        "WEB06_MIGRATIONS",
+        "WEB06_REQUIRED_RECORDS",
+        "WEB06_PUBLIC_DATA",
+        "WEB06_ADMIN_ENTRY",
+        "WEB06_STATIC",
+        "WEB06_PASSWORD_LOGIN",
+        "WEB06_CREATE_REFLECT",
+        "WEB06_EDIT_REFLECT",
+        "WEB06_LOGOUT"
+      ],
+      "readiness_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB_READY_DEPENDENCIES"
+      ],
+      "required_report_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB06_ARTIFACTS",
+        "WEB06_SERVICE",
+        "WEB06_LOOPBACK",
+        "WEB06_PROFILE_DATABASE",
+        "WEB06_MIGRATIONS",
+        "WEB06_REQUIRED_RECORDS",
+        "WEB06_PUBLIC_DATA",
+        "WEB06_ADMIN_ENTRY",
+        "WEB06_STATIC",
+        "WEB06_PASSWORD_LOGIN",
+        "WEB06_CREATE_REFLECT",
+        "WEB06_EDIT_REFLECT",
+        "WEB06_LOGOUT",
+        "WEB_READY_DEPENDENCIES"
+      ],
+      "progress_points_max": 13,
+      "raw_points_max": 13,
+      "interactive_functional_mode_required": true
+    },
+    {
+      "id": "P6",
+      "module": "WEB-07",
+      "category": "practice",
+      "check_set": "security",
+      "requires_current": [
+        "P5"
+      ],
+      "profile": "practice",
+      "inactive_profile_result": "historical_practice_only_do_not_change_active_profile",
+      "progress_scored_checks": [
+        "WEB07_PUBLIC_ADMIN_DENIED",
+        "WEB07_SECRET_PERMISSIONS",
+        "WEB07_CODE_PROTECTED",
+        "WEB07_SECRET_HTTP_DENIED",
+        "WEB07_SETUP_RETIRED",
+        "WEB07_ITEM_PRIVILEGES",
+        "WEB07_AUTH_USER_PRIVILEGES",
+        "WEB07_AUTH_LOOKUP_PRIVILEGES",
+        "WEB07_SESSION_PRIVILEGES",
+        "WEB07_AUDIT_PRIVILEGES",
+        "WEB07_MIGRATION_PRIVILEGES",
+        "WEB07_SEQUENCE_PRIVILEGES",
+        "WEB07_ADMIN_PERMISSIONS",
+        "WEB07_ANONYMOUS_DENIED",
+        "WEB07_BAD_PASSWORD_DENIED",
+        "WEB07_PRIVATE_DATA_HIDDEN"
+      ],
+      "readiness_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB_READY_DEPENDENCIES"
+      ],
+      "required_report_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB07_PUBLIC_ADMIN_DENIED",
+        "WEB07_SECRET_PERMISSIONS",
+        "WEB07_CODE_PROTECTED",
+        "WEB07_SECRET_HTTP_DENIED",
+        "WEB07_SETUP_RETIRED",
+        "WEB07_ITEM_PRIVILEGES",
+        "WEB07_AUTH_USER_PRIVILEGES",
+        "WEB07_AUTH_LOOKUP_PRIVILEGES",
+        "WEB07_SESSION_PRIVILEGES",
+        "WEB07_AUDIT_PRIVILEGES",
+        "WEB07_MIGRATION_PRIVILEGES",
+        "WEB07_SEQUENCE_PRIVILEGES",
+        "WEB07_ADMIN_PERMISSIONS",
+        "WEB07_ANONYMOUS_DENIED",
+        "WEB07_BAD_PASSWORD_DENIED",
+        "WEB07_PRIVATE_DATA_HIDDEN",
+        "WEB_READY_DEPENDENCIES"
+      ],
+      "progress_points_max": 16,
+      "raw_points_max": 0,
+      "interactive_functional_mode_required": true
+    },
+    {
+      "id": "M6",
+      "module": "WEB-07",
+      "category": "automated_mission",
+      "check_set": "security",
+      "requires_current": [
+        "M5"
+      ],
+      "profile": "mission",
+      "progress_scored_checks": [
+        "WEB07_PUBLIC_ADMIN_DENIED",
+        "WEB07_SECRET_PERMISSIONS",
+        "WEB07_CODE_PROTECTED",
+        "WEB07_SECRET_HTTP_DENIED",
+        "WEB07_SETUP_RETIRED",
+        "WEB07_ITEM_PRIVILEGES",
+        "WEB07_AUTH_USER_PRIVILEGES",
+        "WEB07_AUTH_LOOKUP_PRIVILEGES",
+        "WEB07_SESSION_PRIVILEGES",
+        "WEB07_AUDIT_PRIVILEGES",
+        "WEB07_MIGRATION_PRIVILEGES",
+        "WEB07_SEQUENCE_PRIVILEGES",
+        "WEB07_ADMIN_PERMISSIONS",
+        "WEB07_ANONYMOUS_DENIED",
+        "WEB07_BAD_PASSWORD_DENIED",
+        "WEB07_PRIVATE_DATA_HIDDEN"
+      ],
+      "readiness_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB_READY_DEPENDENCIES"
+      ],
+      "required_report_checks": [
+        "WEB_READY_IDENTITY",
+        "WEB_READY_MANAGEMENT",
+        "WEB_READY_PACKAGE_SOURCE",
+        "WEB_READY_NETWORK_BASELINE",
+        "WEB07_PUBLIC_ADMIN_DENIED",
+        "WEB07_SECRET_PERMISSIONS",
+        "WEB07_CODE_PROTECTED",
+        "WEB07_SECRET_HTTP_DENIED",
+        "WEB07_SETUP_RETIRED",
+        "WEB07_ITEM_PRIVILEGES",
+        "WEB07_AUTH_USER_PRIVILEGES",
+        "WEB07_AUTH_LOOKUP_PRIVILEGES",
+        "WEB07_SESSION_PRIVILEGES",
+        "WEB07_AUDIT_PRIVILEGES",
+        "WEB07_MIGRATION_PRIVILEGES",
+        "WEB07_SEQUENCE_PRIVILEGES",
+        "WEB07_ADMIN_PERMISSIONS",
+        "WEB07_ANONYMOUS_DENIED",
+        "WEB07_BAD_PASSWORD_DENIED",
+        "WEB07_PRIVATE_DATA_HIDDEN",
+        "WEB_READY_DEPENDENCIES"
+      ],
+      "progress_points_max": 16,
+      "raw_points_max": 16,
+      "interactive_functional_mode_required": true
+    }
+  ],
+  "runtime_capabilities_snapshot": "D08 deployed capability snapshot before D11 implementation on 2026-10-22; current implementation/acceptance is tracked separately in tools/web_lab_assessment/implementation.public.json"
+}

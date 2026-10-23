@@ -1,0 +1,113 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Teacher-only Ubuntu base probe. No package installation, no public IP, no IAM profile, auto-stop after inventory. Not the five-node student lab.",
+  "Parameters": {
+    "VpcId": {
+      "Type": "AWS::EC2::VPC::Id"
+    },
+    "SubnetId": {
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "AmiId": {
+      "Type": "AWS::EC2::Image::Id"
+    },
+    "ProbeInstanceType": {
+      "Type": "String",
+      "AllowedPattern": "^t[1-9][0-9]*[a-z]*\\.micro$"
+    }
+  },
+  "Resources": {
+    "ProbeSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VpcId"
+        },
+        "GroupDescription": "Teacher AMI inventory only; inbound denied, outbound localhost only",
+        "SecurityGroupIngress": [],
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "-1",
+            "CidrIp": "127.0.0.1/32"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Purpose",
+            "Value": "jdu-web-ami-probe"
+          }
+        ]
+      }
+    },
+    "ProbeInstance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": {
+          "Ref": "AmiId"
+        },
+        "InstanceType": {
+          "Ref": "ProbeInstanceType"
+        },
+        "CreditSpecification": {
+          "CPUCredits": "standard"
+        },
+        "MetadataOptions": {
+          "HttpTokens": "required",
+          "HttpEndpoint": "enabled",
+          "HttpPutResponseHopLimit": 1
+        },
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sda1",
+            "Ebs": {
+              "VolumeSize": 8,
+              "VolumeType": "gp3",
+              "Encrypted": true,
+              "DeleteOnTermination": true
+            }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeviceIndex": "0",
+            "SubnetId": {
+              "Ref": "SubnetId"
+            },
+            "AssociatePublicIpAddress": false,
+            "GroupSet": [
+              {
+                "Ref": "ProbeSecurityGroup"
+              }
+            ]
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": "#cloud-config\n{\"package_update\": false, \"package_upgrade\": false, \"package_reboot_if_required\": false, \"write_files\": [{\"path\": \"/var/lib/jdu-ami-probe/probe.py\", \"owner\": \"root:root\", \"permissions\": \"0600\", \"encoding\": \"gz+b64\", \"content\": \"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\"}], \"runcmd\": [[\"bash\", \"-c\", \"set -o pipefail; python3 /var/lib/jdu-ami-probe/probe.py 2>&1 | tee /var/lib/jdu-ami-probe/console-report.txt > /dev/ttyS0\"]], \"power_state\": {\"mode\": \"poweroff\", \"delay\": 5, \"timeout\": 180, \"condition\": true}, \"final_message\": \"JDU_AMI_BASE_CLOUD_INIT_FINAL\"}\n"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "jdu-web-ami-probe-20261015"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "jdu-web-ami-probe"
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "ProbeInstanceId": {
+      "Value": {
+        "Ref": "ProbeInstance"
+      }
+    },
+    "ProbeSecurityGroupId": {
+      "Value": {
+        "Ref": "ProbeSecurityGroup"
+      }
+    }
+  }
+}

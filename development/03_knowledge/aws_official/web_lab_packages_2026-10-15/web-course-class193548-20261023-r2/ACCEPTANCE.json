@@ -1,0 +1,22 @@
+{
+  "assessment_archive_sha256": "2b3159bee267b1408abf94fe5c8929718264b0ab710f5d3428bce57ac67dbe68",
+  "class_ready": false,
+  "exact_report_receipt_pairs": 18,
+  "functional_success_real_http": true,
+  "interactive_hidden_input_and_wrong_password_rejection": true,
+  "mission_points": {
+    "M1": 8,
+    "M2": 13,
+    "M3": 3,
+    "M4": 9,
+    "M5": 13,
+    "M6": 16
+  },
+  "raw_maximum": 62,
+  "scope": "accepted_runtime_reference",
+  "student_evidence_sha256": "9f6e7d3886df2436c28b074563b89d716304489aa08b7dde6342bc250cb381e8",
+  "successful_human_password_entry_tested": false,
+  "teacher_evidence_sha256": "a35fb68ccac5695e9d58f87b6039e04f11c6eb2def879a1f25976515387cc589",
+  "test_student_identity_included": false,
+  "verification_excluded": true
+}

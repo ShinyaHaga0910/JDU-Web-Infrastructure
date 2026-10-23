@@ -1,0 +1,17 @@
+{
+  "scope": "git_index_source_publication_audit",
+  "date": "2026-10-23",
+  "indexed_files": 446,
+  "files_scanned_including_archives": 1260,
+  "archive_containers_scanned": 20,
+  "compressed_inline_payloads_scanned": 52,
+  "secret_matches": 0,
+  "known_invalid_key_rejection_fixture_files": 2,
+  "imported_source_files_verified": 378,
+  "exact_original_files": 376,
+  "anonymized_operational_documents": 2,
+  "git_preserves_published_source_bytes": true,
+  "zip_members_match_git_bytes": true,
+  "distribution_zip_sha256": "4c00cc08b5640eb3ade7b8b3c2ba037284ac63958682a58825915790a14e9c3a",
+  "aws_mutations": false
+}

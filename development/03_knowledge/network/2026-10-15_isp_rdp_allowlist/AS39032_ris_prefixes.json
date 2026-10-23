@@ -1,0 +1,51 @@
+{
+  "messages": [],
+  "see_also": [],
+  "version": "1.0",
+  "data_call_name": "ris-prefixes",
+  "data_call_status": "supported",
+  "cached": false,
+  "query_id": "20261015110338-0cd13261-d573-412d-8b24-f5481cb324de",
+  "process_time": 46,
+  "server_id": "app198",
+  "build_version": "v0.11.23-2026.10.12",
+  "pipeline": "1460464",
+  "status": "ok",
+  "status_code": 200,
+  "time": "2026-10-15T11:03:38.910830",
+  "data": {
+    "counts": {
+      "v4": {
+        "originating": 7
+      }
+    },
+    "prefixes": {
+      "v4": {
+        "originating": [
+          "89.236.216.0/22",
+          "94.141.68.0/23",
+          "94.141.81.0/24",
+          "94.141.92.0/24",
+          "94.141.76.0/24",
+          "217.30.160.0/20",
+          "87.237.232.0/21"
+        ]
+      }
+    },
+    "resource": "39032",
+    "query_time": "2026-10-15T00:00:00",
+    "list_prefixes": true,
+    "af": [
+      "v4"
+    ],
+    "types": [
+      "o"
+    ],
+    "noise": [
+      "filter"
+    ],
+    "cache": null,
+    "latest_time": "2026-10-15T08:00:00",
+    "earliest_time": "2021-12-12T00:00:00"
+  }
+}

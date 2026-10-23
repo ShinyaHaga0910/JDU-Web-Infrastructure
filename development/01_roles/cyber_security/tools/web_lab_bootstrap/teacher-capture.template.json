@@ -1,0 +1,111 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Teacher dependency collector only. No inbound or IAM; temporary Internet HTTP/HTTPS, public IPv4; encrypted 32 GiB. Never a student template.",
+  "Parameters": {
+    "VpcId": {
+      "Type": "AWS::EC2::VPC::Id"
+    },
+    "SubnetId": {
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "UploadConfigBase64": {
+      "Type": "String",
+      "NoEcho": true,
+      "AllowedPattern": "^[A-Za-z0-9+/=]+$"
+    }
+  },
+  "Resources": {
+    "CollectorSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VpcId"
+        },
+        "GroupDescription": "Teacher capture: no inbound; download-only HTTP HTTPS",
+        "SecurityGroupIngress": [],
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 80,
+            "ToPort": 80,
+            "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 443,
+            "ToPort": 443,
+            "CidrIp": "0.0.0.0/0"
+          }
+        ]
+      }
+    },
+    "CollectorInstance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-0fa5967347d08d2df",
+        "InstanceType": "t3a.small",
+        "CreditSpecification": {
+          "CPUCredits": "standard"
+        },
+        "MetadataOptions": {
+          "HttpTokens": "required",
+          "HttpEndpoint": "enabled",
+          "HttpPutResponseHopLimit": 1
+        },
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sda1",
+            "Ebs": {
+              "VolumeSize": 32,
+              "VolumeType": "gp3",
+              "Encrypted": true,
+              "DeleteOnTermination": true
+            }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeviceIndex": "0",
+            "SubnetId": {
+              "Ref": "SubnetId"
+            },
+            "AssociatePublicIpAddress": true,
+            "GroupSet": [
+              {
+                "Ref": "CollectorSecurityGroup"
+              }
+            ]
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Sub": "#cloud-config\n{\"package_update\": false, \"package_upgrade\": false, \"write_files\": [{\"path\": \"/var/lib/jdu-web-collector/collect_packages.py\", \"owner\": \"root:root\", \"permissions\": \"0600\", \"encoding\": \"gz+b64\", \"content\": \"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\"}, {\"path\": \"/var/lib/jdu-web-collector/package-profile.json\", \"owner\": \"root:root\", \"permissions\": \"0600\", \"encoding\": \"gz+b64\", \"content\": \"H4sIAAAAAAACCn1S247aMBB95ytQnjEKCckuVVsJWPoTq1Vk7IkxTcZeXyiw2n+v7XDZSqhPMz7jOXPm8jEajzPLdtDT5gDGSoXZt/FsEmEDHVALjeQByv7AlhR5UZNZTswsSz/81qPzMVrMp/l8AKlhO+mAOW8ghmjP62uolxe24JG8pdWifirnTzx/5gVvh0+9Osuuo00rUYDRRqKLGWW1Wi7zVVluFptVuah/VYv18rl8XuerZbXe1C/rupxVy3IgMaoDG9I+wiM8mer71NlrpjSgtTtiwYSGs8n4hrBOQqgVEH1yO4VldJk3XbKUMDBOtpJRF6gDJNBrkRwtDtEiRRWt1EZ5B0WiMorp9N3RVE2cpY72eCbeyS6F2M4oPEVvK5EvCEc7xN4mg34DWiX1KCQeb/CWWicvfR1bBvNEbPhQQBlx9VtpoFXH5Cp0lnDY04MnTIUd3UBUTj2E9r9vJYO0xjrPw6QaidbRrkvlk/B7B//K59uHOVpZJwzY947M6jSsOzAsI+JXknCAD1mGkdy3Rg6Ah69vHQZ+JXFAw7GbRmF3StlUu/sebhv9L1Vg+kxHNqCNgXcf5tsHYTZxvuwpCvXzRzUtJt+raboj4VGG0WJisyemtHgNo6Lm9DaIyy49Bbp4rYA8kjnjYfQ5+gtSvHjipwMAAA==\"}, {\"path\": \"/var/lib/jdu-web-collector/upload-config.json\", \"owner\": \"root:root\", \"permissions\": \"0600\", \"encoding\": \"b64\", \"content\": \"${UploadConfigBase64}\"}], \"bootcmd\": [[\"bash\", \"-c\", \"shutdown -P +90 >/dev/null 2>&1\"]], \"runcmd\": [[\"bash\", \"-c\", \"set -o pipefail; timeout 3600 python3 /var/lib/jdu-web-collector/collect_packages.py --profile /var/lib/jdu-web-collector/package-profile.json --output /srv/jdu-capture --upload-config /var/lib/jdu-web-collector/upload-config.json 2>&1 | tee /var/log/jdu-web-collector.log > /dev/ttyS0\"]], \"power_state\": {\"mode\": \"poweroff\", \"delay\": 10, \"timeout\": 60, \"condition\": true}, \"final_message\": \"JDU_CAPTURE_CLOUD_INIT_FINAL\"}\n"
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "jdu-web-teacher-collector-20261015"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "teacher-package-capture-only"
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "CollectorInstanceId": {
+      "Value": {
+        "Ref": "CollectorInstance"
+      }
+    },
+    "CollectorSecurityGroupId": {
+      "Value": {
+        "Ref": "CollectorSecurityGroup"
+      }
+    }
+  }
+}

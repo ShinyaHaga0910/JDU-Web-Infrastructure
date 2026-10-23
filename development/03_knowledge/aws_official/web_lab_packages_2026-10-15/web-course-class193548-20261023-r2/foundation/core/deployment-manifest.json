@@ -1,0 +1,138 @@
+{
+  "ami": {
+    "architecture": "x86_64",
+    "id": "ami-0fa5967347d08d2df",
+    "image_name": "ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-20261004",
+    "owner_id": "099720109477",
+    "root_device_name": "/dev/sda1",
+    "root_min_gib": 8,
+    "ubuntu": "24.04"
+  },
+  "artifacts": {
+    "controller_bundle": {
+      "path": "student-controller.tar.gz",
+      "sha256": "90a152c012f2e3a862f158e70629a578d68fa2c5f6535db8e976c87f6a723837",
+      "size_bytes": 51294
+    },
+    "controller_validation": {
+      "path": "controller_runtime.py",
+      "sha256": "3c4e1ef0e3413637b31b9ead6e32893b9e7b9ed11640c6b7ea34601285ac6489",
+      "size_bytes": 2422
+    },
+    "price_catalog": {
+      "path": "teacher-price-catalog.json",
+      "sha256": "24ae3a662d422f09985c3d2bbddd29db73965ddce035e5316f09eeafa9f3bb44",
+      "size_bytes": 862
+    },
+    "public_key": {
+      "path": "package-signing-public.asc",
+      "sha256": "79c8d4f7041568d5f0fded709100e2d818f26353d216ae8661054bc49b775d61",
+      "size_bytes": 1302
+    },
+    "repo_bundle": {
+      "path": "repo-bundle.tar.gz",
+      "sha256": "60fbd303712672e34848c02f2d7d697ce21318eb7af91bf67665c88688f4deeb",
+      "size_bytes": 741180532
+    },
+    "schema": {
+      "path": "deployment-manifest.schema.json",
+      "sha256": "99ab9d6d02e6497834b11c295a9f8b088e9312a3ed27a83151bd039e27870df9",
+      "size_bytes": 4354
+    },
+    "selector": {
+      "path": "select_instances.py",
+      "sha256": "f92ac3d7e0d4bb4f4b4ec625757c30507dc087babdda79431bd65131517a4710",
+      "size_bytes": 12322
+    },
+    "template": {
+      "path": "web-lab-ssm-all-nodes-c5.template.json",
+      "sha256": "b91e53ec887d4988ae4df531536a1e265fc7551e5bebef7312a6dd776f180c06",
+      "size_bytes": 51146
+    },
+    "validation": {
+      "path": "release_validation.py",
+      "sha256": "e9aebc2f1ed3d54df70e862e5a9aabe8e08970004106c8a89a6260da9e34096c",
+      "size_bytes": 15606
+    },
+    "wrapper": {
+      "path": "web_lab.py",
+      "sha256": "c6f181a0f6ae82ed49cf9f63b2f5199068fd31592b49dbeb4e23f19c00b85916",
+      "size_bytes": 16264
+    }
+  },
+  "bootstrap": {
+    "bucket": "jdu-web-class193548-170126527713",
+    "release_prefix": "teacher-candidates/web-2026-10-r1/c7/"
+  },
+  "created_at": "2026-10-20T09:24:57.194372+00:00",
+  "expires_at": "2026-10-27T09:24:57.194372+00:00",
+  "grading": {
+    "fqdn": "7ilp8ph6ki.execute-api.us-east-1.amazonaws.com",
+    "ipv4": "50.16.41.7",
+    "submit_path": "/api/web/submit"
+  },
+  "network": {
+    "private_subnet_cidr": "10.20.2.0/24",
+    "public_subnet_cidr": "10.20.1.0/24",
+    "rdp_ipv4_cidrs": [
+      "5.133.120.0/22",
+      "45.150.24.0/22",
+      "62.209.128.0/19",
+      "80.80.208.0/20",
+      "83.222.6.0/23",
+      "84.54.64.0/19",
+      "84.54.96.0/20",
+      "84.54.112.0/21",
+      "84.54.124.0/24",
+      "86.62.0.0/22",
+      "87.192.224.0/20",
+      "87.192.240.0/21",
+      "87.192.248.0/22",
+      "87.192.252.0/23",
+      "87.237.232.0/21",
+      "89.104.102.0/24",
+      "89.126.208.0/21",
+      "89.126.220.0/22",
+      "89.223.3.0/24",
+      "89.236.192.0/18",
+      "89.249.60.0/22",
+      "90.156.160.0/22",
+      "90.156.192.0/21",
+      "92.63.204.0/22",
+      "93.188.80.0/21",
+      "94.141.64.0/24",
+      "94.141.68.0/23",
+      "94.141.70.0/24",
+      "94.141.76.0/24",
+      "94.141.80.0/21",
+      "94.141.89.0/24",
+      "94.141.92.0/23",
+      "94.141.95.0/24",
+      "94.230.232.0/24",
+      "109.94.172.0/22",
+      "144.124.192.0/20",
+      "185.4.160.0/22",
+      "185.6.40.0/22",
+      "185.74.4.0/22",
+      "185.100.52.0/22",
+      "185.139.136.0/22",
+      "185.203.236.0/22",
+      "185.248.44.0/22",
+      "194.55.92.0/22",
+      "194.93.24.0/22",
+      "195.69.188.0/22",
+      "195.158.0.0/19",
+      "198.163.192.0/20",
+      "213.230.64.0/18",
+      "217.30.160.0/20"
+    ],
+    "s3_prefix_list_id": "pl-63a5400a",
+    "vpc_cidr": "10.20.0.0/16"
+  },
+  "region": "us-east-1",
+  "release_id": "web-2026-10-r1",
+  "schema_version": 1,
+  "signing": {
+    "primary_fingerprint": "65EC6784750CCFA703BA7179519284E45155EC2A"
+  }
+}

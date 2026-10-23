@@ -1,0 +1,25 @@
+[Unit]
+Description=JDU classroom inventory catalog
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=catalog
+Group=catalog
+WorkingDirectory=/opt/jdu-catalog/app
+EnvironmentFile=/etc/jdu-catalog/app.env
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/opt/jdu-catalog/venv/bin/gunicorn --workers 1 --bind 127.0.0.1:8000 --timeout 30 --error-logfile - jdu_catalog.wsgi:application
+Restart=on-failure
+RestartSec=5
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectHome=true
+ProtectSystem=strict
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=multi-user.target

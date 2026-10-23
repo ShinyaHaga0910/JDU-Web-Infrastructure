@@ -1,0 +1,74 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Teacher-only read-only recovery of the explicit capture volume root partition; gz+b64 config needs volume_id and root_partition=1 plus two scoped PUT URLs.",
+  "Parameters": {
+    "RecoveryConfigBase64": {
+      "Type": "String",
+      "NoEcho": true
+    }
+  },
+  "Resources": {
+    "RecoveryInstance": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "ImageId": "ami-0fa5967347d08d2df",
+        "InstanceType": "t3a.small",
+        "CreditSpecification": {
+          "CPUCredits": "standard"
+        },
+        "MetadataOptions": {
+          "HttpTokens": "required"
+        },
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sda1",
+            "Ebs": {
+              "VolumeSize": 8,
+              "VolumeType": "gp3",
+              "Encrypted": true,
+              "DeleteOnTermination": true
+            }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeviceIndex": "0",
+            "SubnetId": "subnet-01b518e6362ee568e",
+            "AssociatePublicIpAddress": true,
+            "GroupSet": [
+              "sg-024d3be441a8d01f6"
+            ]
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Sub": "#cloud-config\n{\"package_update\":false,\"package_upgrade\":false,\"write_files\":[{\"path\":\"/var/lib/jdu-capture-recovery/recover.py\",\"permissions\":\"0600\",\"encoding\":\"gz+b64\",\"content\":\"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\"},{\"path\":\"/var/lib/jdu-capture-recovery/config.json\",\"permissions\":\"0600\",\"encoding\":\"gz+b64\",\"content\":\"${RecoveryConfigBase64}\"}],\"runcmd\":[[\"bash\",\"-c\",\"set -o pipefail; python3 /var/lib/jdu-capture-recovery/recover.py 2>&1 | tee /var/log/jdu-capture-recovery.log > /dev/ttyS0\"]],\"power_state\":{\"mode\":\"poweroff\",\"delay\":10,\"timeout\":60,\"condition\":true}}\n"
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "jdu-web-capture-recovery-20261015"
+          }
+        ]
+      }
+    },
+    "CaptureAttachment": {
+      "Type": "AWS::EC2::VolumeAttachment",
+      "Properties": {
+        "Device": "/dev/sdf",
+        "InstanceId": {
+          "Ref": "RecoveryInstance"
+        },
+        "VolumeId": "vol-0f4c6d62f96b6d570"
+      }
+    }
+  },
+  "Outputs": {
+    "RecoveryInstanceId": {
+      "Value": {
+        "Ref": "RecoveryInstance"
+      }
+    }
+  }
+}

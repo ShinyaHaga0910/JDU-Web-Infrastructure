@@ -1,0 +1,27 @@
+{% load static %}<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ site_name }} — 備品一覧</title>
+  <link rel="stylesheet" href="{% static 'catalog/inventory.css' %}">
+</head>
+<body>
+<a class="skip-link" href="#inventory">一覧へ移動</a>
+<main>
+  <header><p class="eyebrow">{{ site_name }}</p><h1>備品一覧</h1><p>公開中の備品を閲覧できます。</p><span class="badge">閲覧専用</span></header>
+  <section id="inventory" aria-labelledby="list-title">
+    <h2 id="list-title">公開中の備品</h2>
+    <p id="scroll-help" class="hint">表が収まらない場合は、左右にスクロールできます。</p>
+    <div class="table-wrapper" tabindex="0" role="region" aria-label="公開備品一覧" aria-describedby="scroll-help">
+      <table>
+        <caption>備品コード・名前・数量・保管場所・説明</caption>
+        <thead><tr><th scope="col">備品コード</th><th scope="col">備品名</th><th scope="col">数量</th><th scope="col">保管場所</th><th scope="col">説明</th></tr></thead>
+        <tbody>{% for item in items %}<tr><th scope="row">{{ item.code }}</th><td>{{ item.name }}</td><td class="quantity">{{ item.quantity }}</td><td>{{ item.location }}</td><td>{{ item.description|default:'—' }}</td></tr>{% empty %}<tr><td colspan="5">現在、公開中の備品はありません。</td></tr>{% endfor %}</tbody>
+      </table>
+    </div>
+  </section>
+  <footer>授業用の架空の備品データです。</footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,1921 @@
+{
+  "scope": "versioned_web_development_source_migration",
+  "date": "2026-10-23",
+  "canonical_repository": "ShinyaHaga0910/JDU-Web-Infrastructure",
+  "source_root_description": "Original local JUD project workspace",
+  "relative_layout_preserved": true,
+  "files": [
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/accept_http_negative.py",
+      "sha256": "45c20278cd9ebfd8d2a51da6c8b29e11e8c6a216c8f9f54ccbc13510caabfcbc",
+      "size_bytes": 5036
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/accept_storage_cycle.py",
+      "sha256": "2c6cf58263448f65bb197e671188b6d457ef86fe99075a58cea6f750b6aaa3ab",
+      "size_bytes": 5459
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/accept_teacher_scores.py",
+      "sha256": "9129a9a743d557360fc8d42f9a1976cffad25c5d2e310fd250c3db1b1b47e56c",
+      "size_bytes": 4350
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/app_fixture_controller.py",
+      "sha256": "4c205ef6ada83341375dcff756a2f5ead7d80d70d911ddf78d801e414772e887",
+      "size_bytes": 14543
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/app_fixture_guest.py",
+      "sha256": "4ba1cce254269dc918486d37af6921ab4c18b650713170a5712bc70d230a0563",
+      "size_bytes": 14361
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/app_fixture_manager.py",
+      "sha256": "75461c0c5fbcae7bdf5f200b22af4a37325ded9f0f75eeedf255d61fca8f4d1f",
+      "size_bytes": 6918
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/app_probe.py",
+      "sha256": "90dd0ab14bb9b7217533c18d4967766368ef7dfca6cf06f2259c43978c83c373",
+      "size_bytes": 7678
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/assessment-registry.json",
+      "sha256": "3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33",
+      "size_bytes": 34605
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/assessment_check.py",
+      "sha256": "80e35aeec9ca91d9d18021cf28f4bcf3beccf558819b2c7a275f0fa1a5c3c3a1",
+      "size_bytes": 16151
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/aws_readiness.py",
+      "sha256": "659a15294915c4c8681f932e2a365d5f4d66c7de8fdde4a8d66219466772eb2b",
+      "size_bytes": 3482
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/build_candidate.py",
+      "sha256": "8caf061b4d83109a0859d5b9ebcba3766717f489a7a07130d68dd0310bae74aa",
+      "size_bytes": 3317
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/build_teacher.py",
+      "sha256": "00c3cf191109efb1b9a1c54a974f1b7052d053e4e073c083cd706a089c5e96c3",
+      "size_bytes": 3176
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/candidate_install.py",
+      "sha256": "6c052918a2d9e722a3c35ea6370b79db6e89237f45bc711cc242aa91230c5abe",
+      "size_bytes": 2980
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/dashboard.py",
+      "sha256": "fb1bb5f4a9879f3296532de85aba30bfafae8537526ba6db9a7b1686b2b99e99",
+      "size_bytes": 9642
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/database_secret.py",
+      "sha256": "0b3cab3c1b4a49902e908620a6f06c9b225bbadc88162bd1e70f37365ca4c36b",
+      "size_bytes": 2020
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/db_observer.py",
+      "sha256": "dd68a042398edd3ecd45dfc463fca39bb0a33fa75e400d0272343f4aa25b97a9",
+      "size_bytes": 15591
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/foundation_fixture.py",
+      "sha256": "1ce02aa4d47b8dc529fe37cad29022ce84746e5f36d8c9fcac6af1396317a2bc",
+      "size_bytes": 4609
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/foundation_fixture_guest.py",
+      "sha256": "0e1b7a1cb10402a4bedbaee2e84c2fddd72465037b4295f1f34566d14f75ec8b",
+      "size_bytes": 10206
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/freeze_registry.py",
+      "sha256": "2ca02f8379779b55efb2ecad6f9f1ac53b0122dfd9e9a3a0b029ae08d4e6291f",
+      "size_bytes": 1388
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/grading.py",
+      "sha256": "eadb82a8f7a0ab365a2e0d39e10bc833d5fd2a34a5a02f72c5210a328f285b24",
+      "size_bytes": 3117
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/http_guest_v2.py",
+      "sha256": "d88b67e03a9b7b12bc9bd154c1e28f13fe3f7cf4c3f0b542643e67edd51efa1b",
+      "size_bytes": 2601
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/implementation.public.json",
+      "sha256": "cb8a36ce08b3aa35b37e852a2d73f4bbbfa0903c274c939bd05afb2758ced229",
+      "size_bytes": 3344
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/network_checks.py",
+      "sha256": "e88ae871adb070987696aea17366dd2fc7516f554b68093cb2b082f516187626",
+      "size_bytes": 11734
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/prepare_local_practice.py",
+      "sha256": "0ff8eae93ad22bf50d6547cef8d13087371f314a6832617b21bc72cec2b8cf2c",
+      "size_bytes": 3910
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/progress_api_v2.py",
+      "sha256": "4a71af667b883aed2d016abc5e52b115a0d72aa5296779ce0fd6ffb3dcdc7cb5",
+      "size_bytes": 8788
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/README.md",
+      "sha256": "7a2bc85468e8b8ac9ffc6e9407251708c154b05d4372cb3fe431939b6992c5a3",
+      "size_bytes": 6960
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/refresh_fixture_observers.py",
+      "sha256": "c5b60ce9ce872b1d0cfab7fc4790cf226c4eec6679682e641d6d97d04847e81a",
+      "size_bytes": 3243
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/registry.py",
+      "sha256": "15f0624c07aff3f9cc2f931419ff1f2f2056400d470d08ca142b0f84a2bc1642",
+      "size_bytes": 5050
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/remote_guest.py",
+      "sha256": "ac9a2b144008992e6445649cb033cc6d4cd6f18b4f7666d5b4afd29663e0c91d",
+      "size_bytes": 14226
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/system_observer.py",
+      "sha256": "4896cb45d547a59151e65432e98d8120ccc3ecf581b411c3877211b92d69a4b7",
+      "size_bytes": 10584
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/teacher_cli.py",
+      "sha256": "9e6ec0d5c2326a72b3f4b474616d68510c745acd83ce408329a0a0c1f56f64b6",
+      "size_bytes": 3471
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/test_app_fixture.py",
+      "sha256": "ae0db09119fbfdd22230f4796c732e3decfdd4050958e0ca97695867501ecc8a",
+      "size_bytes": 4872
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/test_assessment.py",
+      "sha256": "58e3bca75f9443bfbd78c0cf6e0029395f99a10fe691e68d2b4f31157d066f5a",
+      "size_bytes": 10991
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/test_bind_services.py",
+      "sha256": "8bc661b752bf84f109a67c797bd81179109051624fbc94071b0468fee0af63f4",
+      "size_bytes": 5955
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/test_observers.py",
+      "sha256": "d453e97fbf886bb77cf8fbf2c0ad0231e8619114484502255d4e59261bb1904b",
+      "size_bytes": 10085
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/test_practice_services.py",
+      "sha256": "a795c76469802459df2dd58ba81180a440a07c657fc2907c357bbb865004be9c",
+      "size_bytes": 3676
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/test_real_services.py",
+      "sha256": "392e2157975095784e5c4679253ba2de0df8b7d3c9fd0594b409bbb5355d29c2",
+      "size_bytes": 5633
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/transport.py",
+      "sha256": "8056da7741dc773bc4ade3ed3bc38d141b5067bcd58e9bcd2a3a422233768c1c",
+      "size_bytes": 1724
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/upgrade_teacher.py",
+      "sha256": "45414aea1bb999126c8fec42cab0b04d61ab3dfec15c067a2fc22de09e559b4f",
+      "size_bytes": 5805
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/validate_design.py",
+      "sha256": "7893ca85c1ddadeb0bff848ddc9331851470fcbbab17d141d3285165acc6598e",
+      "size_bytes": 9360
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/.gitignore",
+      "sha256": "4130ee91d1d98169d0d166b3f58f37813bc95e4b54ce295fec6768a8c8b99129",
+      "size_bytes": 102
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/accept_post_enrollment_cycle.py",
+      "sha256": "2e62249957c73dffeffd56317425b4a5c81236e731339b2c43a101f2c84ac88e",
+      "size_bytes": 7592
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/adopt_all_nodes_ssm.py",
+      "sha256": "49c84413d3a20b0bf3f0289e5f26449e7d0c557f0bb6e1f9802fe1445bf40ecb",
+      "size_bytes": 8885
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/adopt_checker_cache_fix.py",
+      "sha256": "01426bc90313e2e22e947ef7a7e38f2d46d05696f70b5b51202343073279e29d",
+      "size_bytes": 7265
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/all_nodes_ssm.py",
+      "sha256": "a538b8a4d44bb5f4218982d40aef74b7c3f921d2cd6a5601d032968c64eb6b21",
+      "size_bytes": 1323
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/ami-probe.template.json",
+      "sha256": "9a8d64ffccf44f38c159c2d6f49024c0c54dd685d556aa78944a73b83bb0fd55",
+      "size_bytes": 5999
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/apply_candidate_delta.py",
+      "sha256": "e211b10e5fb6083216101b94c32947ae283c56c588a0536ffd0975141bb20b5d",
+      "size_bytes": 3607
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/assemble_cloudshell_candidate.py",
+      "sha256": "e7fb15832960ee28e9cb1a4b093cd7cb53e4f37e4073e4f8bcf20ae8ce3eadd4",
+      "size_bytes": 4984
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/boot_evidence_guest.py",
+      "sha256": "7601ad3e16dd99073ec50c10da3af49d7d51d5693b808c34fd70f7f68a949fd7",
+      "size_bytes": 6688
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/build_controller_bundle.py",
+      "sha256": "e77ad72be563e6c024f9b8e410e6ed3729f7a08e876a1533486baa48e64b939c",
+      "size_bytes": 2203
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/build_package_repository.py",
+      "sha256": "b4e00d2cac06c936504a69a144ca097bf93d81ff430cdb4d71389e0926484eba",
+      "size_bytes": 10323
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/build_student_tools.py",
+      "sha256": "50efa7807bba56bdebb68aea46833a62155fe9cb241d0010a8b94dbfdcaaadaa",
+      "size_bytes": 10722
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/check_rdp_password.py",
+      "sha256": "d1c4c32f94865d954edba8b183c98c4b2b2a9391f7d36bce32bfd8d971516b43",
+      "size_bytes": 3210
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/collect_packages.py",
+      "sha256": "add45cb15cf27f18245a152a0aeafd0a2f4ab376894b0343f615d02020a2f827",
+      "size_bytes": 12231
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/controller_runtime.py",
+      "sha256": "3c4e1ef0e3413637b31b9ead6e32893b9e7b9ed11640c6b7ea34601285ac6489",
+      "size_bytes": 2422
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/cycle_five_nodes.py",
+      "sha256": "0987d74abf818ac898243aaa007c33ab584af8c5cb96cd6084341e5b6ee48409",
+      "size_bytes": 5486
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/deploy_teacher_probe.py",
+      "sha256": "e152f978016655d5c0e2028618d9bc2e233637d4da9475f7f8ec6cb9b5d4bdf6",
+      "size_bytes": 6753
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/deployment-manifest.schema.json",
+      "sha256": "99ab9d6d02e6497834b11c295a9f8b088e9312a3ed27a83151bd039e27870df9",
+      "size_bytes": 4354
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/diagnose_rdp_login.py",
+      "sha256": "de53a7fcb94b7714f84db835588f9a02d9efb9566fa4f43349f4f7a45324a981",
+      "size_bytes": 15654
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/diagnose_teacher_node.py",
+      "sha256": "0567ee62264188bce3b4eb2cf3887ffe7c3b38a1d8755ab65b9ba1252b50620a",
+      "size_bytes": 8997
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/enable_ssm_probe.py",
+      "sha256": "59d9d4eea947d5971112993ec8f89096709fdca364927b4eec35cbdb16157ba9",
+      "size_bytes": 10252
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/export_signed_metadata.py",
+      "sha256": "e276c42903197a09a66e58b58424e6cc62721eae5dcca5f1691c44b9671f6779",
+      "size_bytes": 1122
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/inspect_teacher_probe.py",
+      "sha256": "bb4d9dfa7b6dc8ab13d308b571565fe0e9b7cc3f5fd6dc1115e438982f3c0f74",
+      "size_bytes": 16720
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/internal_ssh_guest.py",
+      "sha256": "d2e23f58e6bf1191906ddacf27615b56596c56860995efbf18c27437a8323101",
+      "size_bytes": 10114
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/lock_teacher_probe.py",
+      "sha256": "7f0a37c4b76ed14c158fda8642299a504104a65f3e1ce070ee02a684fcdd6af4",
+      "size_bytes": 4686
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/make_capture_template.py",
+      "sha256": "ea3acd6cfbb812d110e729c32f0ae650ce750386287d6a695dd71e6d69c6eda4",
+      "size_bytes": 3984
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/make_five_node_template.py",
+      "sha256": "c067316d7500a4ff2e79210d56565b4f5e99c307b0312ce1c4ef56ecf06d3811",
+      "size_bytes": 12428
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/make_offline_repo_template.py",
+      "sha256": "9363ef3249da7ad900afe596c7f8bc0a0734ba28ce832ffc2c8ed7fe5a3e60a6",
+      "size_bytes": 5945
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/network_probe.py",
+      "sha256": "0720fff6f8b1b9271bdb363f937bfea8addd977040324f6adcad252100f26d27",
+      "size_bytes": 3567
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/node_bootstrap.py",
+      "sha256": "a2853d384743735d0a2bf66bf43029bab2540b79ac073174a1146959c0187e64",
+      "size_bytes": 18457
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/node_evidence_guest.py",
+      "sha256": "611e4947fbf98d7be151c8554e337c0cca26569e49ac668745a383b961e74bde",
+      "size_bytes": 6091
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/node_loader.py",
+      "sha256": "cc9bec210fcf6aea6498598f6c058fea6a8dd38d4b804c9625a9093e4ab0b404",
+      "size_bytes": 3117
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/offline-repo-probe.template.json",
+      "sha256": "8d1794bf59e66c7025f67032ae0515b48465ff677efb54fb98ad67e0d3f28935",
+      "size_bytes": 12748
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/offline_repo_loader.py",
+      "sha256": "498a6003c71904f098916bf8a3b27aefbef90f62cde8b193178f647ba64f062a",
+      "size_bytes": 2564
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/package-profile.json",
+      "sha256": "583cb1b1964d93ad1e499e07f08f27509d2661bd9a11c264687860d07ba8a4e3",
+      "size_bytes": 935
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/payload_runtime.py",
+      "sha256": "fcaeacb1060e1f3b93811d4d9f2ca69d0c6004b78b77b0cd46aaabef84fc150e",
+      "size_bytes": 11149
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/post_restart_guest.py",
+      "sha256": "b0051bd767ac54ca6d03d197d7f04f6c5b69bfe94578ba4b4f1878c694eb07c3",
+      "size_bytes": 6626
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/prepare_c4_transition.py",
+      "sha256": "415e277e883fc8717231032de26feb27b40a3cecabe648f69ad9666233da9aab",
+      "size_bytes": 7672
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/prepare_teacher_probe.py",
+      "sha256": "f496b7c4c35b115884f8c1769ff822b7e02481ba10377d822713d5289f423b17",
+      "size_bytes": 5549
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/probe_offline_repo.py",
+      "sha256": "97d6fbea7b6cc29818237745dc86adb30ff2bb7b4a068cac43ae94de8b960407",
+      "size_bytes": 5454
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/probe_ubuntu_base.py",
+      "sha256": "12a7e8d493749c3ad75c48a9a92bd975bfb18c3efcc24beb57e3c6b2bdfed581",
+      "size_bytes": 5087
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/RDP_CONNECT.md",
+      "sha256": "c23a9feb4456ad624985ea9dfa73923707b30a8465104492ed1d19508ac09072",
+      "size_bytes": 2770
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/README.md",
+      "sha256": "5a7de6e016ac68d8edbc1178dd74ac1010469141f018addbe1b727dd0943d7f5",
+      "size_bytes": 29909
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/receive_public_artifact.py",
+      "sha256": "35b1b6a1a6311671b18954e6f52a7ed7f29d69a818e15d146a1097b8ebced46c",
+      "size_bytes": 2572
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/recover_capture.py",
+      "sha256": "20c2c6247af82586e96f18379a21f313b40166aa04dc800e3d0affcc2e6c0d54",
+      "size_bytes": 4482
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/refresh_rdp_allowlist.py",
+      "sha256": "970a2f3dc416052d37558502178909ee6cf5e687124237b2baea42ebb92545f0",
+      "size_bytes": 4986
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/release_validation.py",
+      "sha256": "e9aebc2f1ed3d54df70e862e5a9aabe8e08970004106c8a89a6260da9e34096c",
+      "size_bytes": 15606
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/restore_web_runtime_packages_guest.py",
+      "sha256": "970dd8a64a6670ba11a11c4fddcda6520d6d7a89b299844f148e5f859698178b",
+      "size_bytes": 4364
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/resume_teacher_probe.py",
+      "sha256": "ff25f2d445a66febcdc3972263b0221d1c551767a5470531ee0f890348ff066b",
+      "size_bytes": 8764
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/retry_teacher_probe.py",
+      "sha256": "53aa089a9d6035ccfca10498ee36416a11e25f16f08602be17bb129f04d960cf",
+      "size_bytes": 13952
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/reuse_node_diagnostic.py",
+      "sha256": "6a526510d837446ab86c443e750bc0a3036c917b9a3a174f3a5546c4dd5ca2bf",
+      "size_bytes": 9650
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/run_catalog_runtime_probe.py",
+      "sha256": "4beba36ab8e1d698d1ed51922747d50bf97f0b0354071dca0160a0465eac1808",
+      "size_bytes": 4418
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/setup_internal_ssh.py",
+      "sha256": "1d66bb79bdfb8fae8f56249bdd82c8d578ea9b2d05657195faee2edf1bfb4498",
+      "size_bytes": 10700
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/ssm_node_evidence.py",
+      "sha256": "f9657c8dcee834975661baad5054c77ac8cc9a04566087dc466a27a385fe6314",
+      "size_bytes": 2503
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/student_controller.py",
+      "sha256": "c96876d40ba36288b14757f63d0fb1522031a6657ac7c95c95c1bf3ea92064a4",
+      "size_bytes": 29808
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/teacher-capture-recovery.template.json",
+      "sha256": "085c900e2c65a459406bfc6496de492c79778b118d3657b35fd6452fb8ea446f",
+      "size_bytes": 5028
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/teacher-capture.template.json",
+      "sha256": "faed539f1b0b2dc494d439beffe735f04f93d4fd9e298e0828420bfd0d86efcc",
+      "size_bytes": 10586
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/temporary_ssm_recovery.py",
+      "sha256": "172be1a5f915bda448c018fed9c2178c1dfe4b6195269e1bffe78ed74861f07e",
+      "size_bytes": 14058
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_all_nodes_ssm.py",
+      "sha256": "f8a1c31c318adad703f220af8671a2893194bf0f6cbe3dd2a00993ed47e008e7",
+      "size_bytes": 6091
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_application_payload.py",
+      "sha256": "34416cbd15d192d8ff1c57c907e5fff0bee51e2f2b1a89ed78131155f38ddf71",
+      "size_bytes": 1510
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_bootstrap_failure_detail.py",
+      "sha256": "86a260aa152130b14395c229c733b582de957bbf0416a85a97ec320644cf1f4a",
+      "size_bytes": 1572
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_c4_transition.py",
+      "sha256": "c35b3e98fd9ae60f1760f0f55ec7632386f871d53a5c311edd2f042647b1fb76",
+      "size_bytes": 1359
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_catalog_runtime.py",
+      "sha256": "853e5c42833b2d3c258b5b37f53baf84851a00294a9a62e6d83f47f835c29d40",
+      "size_bytes": 1208
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_checker_cache.py",
+      "sha256": "8b4a544cc2ab57ec4b50e02864dc5d2f6c1eda87e9eae5fa5f3b5cc20e27720e",
+      "size_bytes": 1368
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_checker_migration.py",
+      "sha256": "dcc3a5de7a5749db2098d147e518fe07aec76c9f87967673d9c9fdad975428e7",
+      "size_bytes": 1565
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_cycle_five_nodes.py",
+      "sha256": "52a49b63afcf2f4061dd7d42add5805a0a3bf8caeb6a0248311e4461ab1e62fc",
+      "size_bytes": 2373
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_deploy_teacher_probe.py",
+      "sha256": "0249a4a29966de841772da8576d09c0d2ca22eb0714ad68be4e0d904cd8f3e3e",
+      "size_bytes": 5081
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_diagnostic_clone_guard.py",
+      "sha256": "21bdfe8371ad211a876f53c38faba8a454360060522b0c3a7d17e365cf3a41ff",
+      "size_bytes": 1673
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_diagnostic_resume.py",
+      "sha256": "7f50ae3864965f101d1916055c8994a3649b6671d5ae059bf72974e2858e91a1",
+      "size_bytes": 1360
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_enable_ssm_probe.py",
+      "sha256": "3d3d389cd7011bc34ff06d08b6b0f7c436e9cb6befc766feb85bff2c5345b2d1",
+      "size_bytes": 5087
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_five_node_template.py",
+      "sha256": "575a5d1891bdf4f05f263e8a5df6dfcda4ffc79f34c1e33dc6a2e467bc42f15c",
+      "size_bytes": 4426
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_inspect_ssm_probe.py",
+      "sha256": "0db755bf0e47e8b8415f2bba60bfe6ef54e6351b41ac99cbfd6d3d336957ff9d",
+      "size_bytes": 2146
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_inspect_teacher_probe.py",
+      "sha256": "dbf69d7a078c747fc9678d097edf8f73dd5f530bb5a8adde3818455bf8d524c7",
+      "size_bytes": 3586
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_internal_ssh.py",
+      "sha256": "ad02224fc097698e9828350ba5937e585a05fa1b6bd60da0facbd6e7d7655c7e",
+      "size_bytes": 5119
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_lock_teacher_probe.py",
+      "sha256": "939ebfa8225c7fa16af01b17270e4a0eae7e631b0873864662677f098ccdf6bc",
+      "size_bytes": 2214
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_node_bootstrap.py",
+      "sha256": "74fac51e72b0b3b9ba104b68423dce4cdbba26df3d9f002c75015c824c54338e",
+      "size_bytes": 4384
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_offline_repo_loader.py",
+      "sha256": "d189aa00f7221ca6609b22657ff4ce0157a032dd7bca7bc1c8be95e8f8f20c7a",
+      "size_bytes": 4011
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_payload_runtime.py",
+      "sha256": "7ba503219c7e6d5df4246efa200c12fb02735a248291ff2847eb97022e62b59c",
+      "size_bytes": 6137
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_rdp_login_diagnosis.py",
+      "sha256": "3a803c18472d439fae6aead85e22cc8032fb6e428875d0e12398c514d57db86f",
+      "size_bytes": 2597
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_resume_teacher_probe.py",
+      "sha256": "8844cb9053ae1b86346931864be3ffa976214f9a9036369aee4d8682be7be983",
+      "size_bytes": 2448
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_retry_teacher_probe.py",
+      "sha256": "c2ee515dbc83ad32fbde1234c84af10981b81fe0d494426f1c05ac900ca27f64",
+      "size_bytes": 4939
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_sshd_runtime.py",
+      "sha256": "e46faaa7a023bc61cc1b5b749eea4efd7e5e3ecd5ceb3b0907a13bcffeb53d10",
+      "size_bytes": 1702
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_student_controller.py",
+      "sha256": "7518d53964aff302ae6591121c7770eff9607823fe7f769ac670fca92a3f0ee5",
+      "size_bytes": 11662
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_student_create.py",
+      "sha256": "e228e64f4b24e274066cb4504cfb9eb20ca47babd2b8a508842f3bfa8dbb8317",
+      "size_bytes": 8362
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_teacher_endpoint_binding.py",
+      "sha256": "60122a9d52eadd9d79d66099bfc5a8023bf1f86fdf7d8f8ffe67d9347f025b95",
+      "size_bytes": 3596
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_temporary_ssm_recovery.py",
+      "sha256": "f43bcbe074758ae68137c5f1345ddf60f483726afdfa322f3d040d025b4344a5",
+      "size_bytes": 5906
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/test_web_lab.py",
+      "sha256": "ebad4786e58dcccfd967d4dfad0acef5ad25048f6044b05b81e12bde54e8d955",
+      "size_bytes": 25592
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/verify_app_startup_guest.py",
+      "sha256": "d070d8c682deab9ff9d68cb935a037f7a914158ab5914138da6f088e33b840f2",
+      "size_bytes": 4514
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/verify_catalog_runtime_guest.py",
+      "sha256": "fb60e052242fc8a18cc71e44042d8d07e12d151ddf543b7572884b7e05921122",
+      "size_bytes": 7371
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/verify_role_packages_guest.py",
+      "sha256": "bbd12a0789cc8daf3276b6f23adeb72ec98e96b675c030708fee28c397c00461",
+      "size_bytes": 6974
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/web-lab-c3.template.json",
+      "sha256": "a9ad6823f1b703f8a3041db51e80f653210f95ad7c1b31c6ff59c708bf20e277",
+      "size_bytes": 49872
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/web-lab.template.json",
+      "sha256": "b3df1e36b255a11a5026ad5695ce86613139c4bf3db62c654adbe628893c6bc7",
+      "size_bytes": 49872
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/web_lab.py",
+      "sha256": "c6f181a0f6ae82ed49cf9f63b2f5199068fd31592b49dbeb4e23f19c00b85916",
+      "size_bytes": 16264
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/.gitignore",
+      "sha256": "b267a40b2b0460432ff2956b337858f9e17ce09ebc469b73d2151001ad438225",
+      "size_bytes": 49
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/build_bundle.py",
+      "sha256": "51b285fd40a09c84e45a38bf62970df6f776bc4fd02040858e694c710ced9968",
+      "size_bytes": 3143
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/catalog/__init__.py",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "size_bytes": 1
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/catalog/admin.py",
+      "sha256": "d3ec48bb7f950eb27b89db53677b775c5c14a7527efc75e4a45c82de6db81e5e",
+      "size_bytes": 932
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/catalog/apps.py",
+      "sha256": "1c971f2342435527114e4997d3931d95b1a28fb01330b7a2ce054ec0109686fe",
+      "size_bytes": 174
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/catalog/management/__init__.py",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "size_bytes": 1
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/catalog/management/commands/__init__.py",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "size_bytes": 1
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/catalog/management/commands/create_lab_admin.py",
+      "sha256": "5ae3059c6f98e2d64210286bd94dd18e8dcca00a564b690a300e78aa3c37ec4e",
+      "size_bytes": 1461
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/catalog/management/commands/seed_catalog.py",
+      "sha256": "794f426b63831a88a53f65ef1d34fd12ed2eda77fa6f22edc6157c4f1b6b8f90",
+      "size_bytes": 1213
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/catalog/management/commands/set_lab_password.py",
+      "sha256": "4247a190585ab0260511bc29f7e3dde33786aba657b68c312d2a3c44d2ff07a8",
+      "size_bytes": 904
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/catalog/management/password_input.py",
+      "sha256": "b46f26c1a22ba4c5537652d45e6b125836c0235806e1d71310ea204862ff86bb",
+      "size_bytes": 703
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/catalog/migrations/0001_initial.py",
+      "sha256": "59dcb023f78449983486048797a87c3d6232ca9bd3dc8c0a8cb58bede251910e",
+      "size_bytes": 1250
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/catalog/migrations/__init__.py",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "size_bytes": 1
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/catalog/models.py",
+      "sha256": "656a28e36a42a1003aede248d62947bebe074e8de8ed68262e31ca80ebb2f16f",
+      "size_bytes": 923
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/catalog/static/catalog/inventory.css",
+      "sha256": "0a0c93a8546a90ac1f55b7ee9a2fac788e38acd4153465fdd728640ae34383b3",
+      "size_bytes": 1952
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/catalog/views.py",
+      "sha256": "0eea1657de8c8b1b49c75ce915e66c27c8eab02c7ce74f732e93b58afd969aa0",
+      "size_bytes": 390
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/config/app.env.example",
+      "sha256": "b0919a6f877c63ccb67d3458e4a9d8aa6d34e381f5c7ad142c7d1beae3f24647",
+      "size_bytes": 597
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/config/jdu-catalog.nginx.conf",
+      "sha256": "5d3a0275241e4260feaeb3e5691ad1b14b2d53dd2d4786aa05855c0ed8707e79",
+      "size_bytes": 1946
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/config/jdu-catalog.service",
+      "sha256": "faab8e502a0087ef54e79dea552c8b6b56d9f5c1ae6f3a5a02f5a6ca1d357dd1",
+      "size_bytes": 612
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/configuration.py",
+      "sha256": "427db320d4e6d700e296d6614b3b69ac26ae980bd11aab82afeb3b5dcece42e3",
+      "size_bytes": 9035
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/jdu_catalog/__init__.py",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "size_bytes": 1
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/jdu_catalog/middleware.py",
+      "sha256": "9ef3f5bd571ec26764bf1c68d5ed7d3e5d043ca82e9f6a91c71cd017646082d1",
+      "size_bytes": 564
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/jdu_catalog/settings.py",
+      "sha256": "f8fc646989ba544d2c73d85643ad28638705a7c02c5a2e94301d598bc0ebc83b",
+      "size_bytes": 3247
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/jdu_catalog/urls.py",
+      "sha256": "2aa8b9809603f9a4c61899a84be825ebc730f073532bed6e5d37b26e8005c255",
+      "size_bytes": 194
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/jdu_catalog/wsgi.py",
+      "sha256": "fe731f014221a9fae23d52f2bfde2ec8bebce6d311e8aba3e36d460eaa1cd9c3",
+      "size_bytes": 167
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/manage.py",
+      "sha256": "aaf429695f53906479ef9bec996423eb508a9b0c1c9c47de19a5ee1319e1861b",
+      "size_bytes": 250
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/manage_secure.py",
+      "sha256": "deb74929fb1aa5d2b9b69785214ff40bda79f019b93f772e04450239aa48ae70",
+      "size_bytes": 2387
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/profile_sql.py",
+      "sha256": "9993fa25b2b891fecd9a9dc6057f05170b55e504dc5f730f79b9807669e7533a",
+      "size_bytes": 986
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/README.md",
+      "sha256": "c37fed47fbd77a6fb7e4721b01a8342212e9b62fe385131b634ed2ce3f49759b",
+      "size_bytes": 8904
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/sql/01_create_roles.sql",
+      "sha256": "82c12e7d534651dc68d399f7a97fb9fd37b6ff9572c793d15dd7b53608af3f2f",
+      "size_bytes": 517
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/sql/02_prepare_schema.sql",
+      "sha256": "3fbdb5a74c09650881adb86f57096796675db9d26c1708785444625fa935575f",
+      "size_bytes": 487
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/sql/03_runtime_grants.sql",
+      "sha256": "14b34fb793da49767a00f0d7023d8274fb90022ea65c7b1068b91410b43b5035",
+      "size_bytes": 2730
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/sql/04_disable_setup.sql",
+      "sha256": "27ba60eb5b6c8e1e3e383f84eb8f4135dae43b1d785f51232e6cf6e296e12d45",
+      "size_bytes": 266
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/sql/check_item.sql",
+      "sha256": "5ce0b2324621358c321ea5322c53d9a31322af82dfe090d969fd14a0d980186e",
+      "size_bytes": 175
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/templates/admin/base_site.html",
+      "sha256": "892aeaf70d82cc39e5dfa7cd5c82fd79313b72c47c8543bd40d78243a33c5d0c",
+      "size_bytes": 343
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/templates/catalog/inventory.html",
+      "sha256": "4fff8394d77d25745ea6079f85615b89fff3f9adef55b06cd7d707d580d77654",
+      "size_bytes": 1609
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/tests/provision_fixture.py",
+      "sha256": "fd3a65fbf786070c311e0e0127faa94a54c2f712ef25224af90c2902284a477d",
+      "size_bytes": 2548
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/tests/test_bundle.py",
+      "sha256": "3721b230b2163f385742ccd9a66374d28ddb3e1971fae243977fc10e0e785d52",
+      "size_bytes": 1924
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/tests/test_configuration.py",
+      "sha256": "acb83cf18fd8c4d2807f36b124e7809ce86cd437fe39c8c528082895d749b464",
+      "size_bytes": 3510
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/tests/test_proxy.py",
+      "sha256": "8b038168789bb901314551a673d192c82e2cf7ef5d5904a95708bd0d486dcfc5",
+      "size_bytes": 6794
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/tests/test_runtime.py",
+      "sha256": "21b227beb365526a263a46b423c8e4185f982e00877106b3f68f632835fe5ccf",
+      "size_bytes": 10615
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/build_release.py",
+      "sha256": "4ec980b62dc47d6b7f9500305f4bfa3df7fbcf81add9107621bb036a3874da3f",
+      "size_bytes": 6938
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/distribution.py",
+      "sha256": "7c5be369978a5cfb72801098240c6703d7308d6afed46e8541ba8e826c20f78d",
+      "size_bytes": 22358
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/publish_release.py",
+      "sha256": "24852090988981de2a76e2a8c9e9e60928e25562f912e859e2db4a87365c8031",
+      "size_bytes": 5213
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/README.md",
+      "sha256": "186817eb38e67510ba70e552cc200715ee585b3f68ade2d04632cfabea2863b5",
+      "size_bytes": 3759
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/RELEASE.md",
+      "sha256": "7f9d4c1ecab645ccb4612b5363acf635298d89c47f4221acee10d4761a0a6e79",
+      "size_bytes": 1696
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/STUDENT.md",
+      "sha256": "bc5dc361a4e4c9bbc265b8d7ac4f45e18b2ce3d2b123fa8cc576bfa6001334f1",
+      "size_bytes": 6716
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/TEACHER.md",
+      "sha256": "41a1913e4613fc675ff062ec0e108e705911f9dc0d35b444a82796dbde307741",
+      "size_bytes": 6188
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/test_distribution.py",
+      "sha256": "d5c0dbd3e11b66cbe885dc5fccf39d95914258fecfde8267bf11a865dcbd8122",
+      "size_bytes": 9290
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/test_publication.py",
+      "sha256": "0be1584abd32c160441f08151ebfd96f89b84c246ed3dee6094b014b1a4c88e2",
+      "size_bytes": 2340
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_instance_selector/.gitignore",
+      "sha256": "6feaded4e28ea86e001a6751b4e3d960e8b7c31b9616ff9936b79297086e809b",
+      "size_bytes": 23
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_instance_selector/collect_price_catalog.py",
+      "sha256": "2942643770435f87be2d0191880cd2a7f1bb192850353047ba6e905544ca3db8",
+      "size_bytes": 4568
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_instance_selector/README.md",
+      "sha256": "8e10cc7dc861781de9d5214fdbd10772df32b184fa3e767cce8171bff27eeb10",
+      "size_bytes": 4506
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_instance_selector/select_instances.py",
+      "sha256": "f92ac3d7e0d4bb4f4b4ec625757c30507dc087babdda79431bd65131517a4710",
+      "size_bytes": 12322
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_instance_selector/test_collect_price_catalog.py",
+      "sha256": "8dae70a10c805323f31a6cccfc79446b94a7f5912b428a806454c2ca619562d2",
+      "size_bytes": 2320
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_instance_selector/test_select_instances.py",
+      "sha256": "8d25e920fc18a25f56a6ab8a803e924f423997b42f09fa4979235ad814f55668",
+      "size_bytes": 6210
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_release/build_release.py",
+      "sha256": "cfa763ba3527fff30054305b2c62d7f42380c89099c9943ec8f245df3eb52d13",
+      "size_bytes": 6392
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_release/README.md",
+      "sha256": "ea5c0c49412e2fae5bf50966e8258040d946641246a3d4b8aeba028709ebd294",
+      "size_bytes": 5119
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_release/RELEASE.md",
+      "sha256": "be2ba378f655312fffd1478ebf216e5d5992b4dd535ac776e9439a9bed8be9d0",
+      "size_bytes": 1993
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_release/release_tools.py",
+      "sha256": "f921c0f8e1bd860c1cc0c9dd27b67d9383941140099cc96b2fbe7975635a8fb6",
+      "size_bytes": 7869
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_release/STUDENT.md",
+      "sha256": "644e2f3801a7edf36b03be7a9d418cb035cbf8a75d100565bd3db4e91a26dbdc",
+      "size_bytes": 7209
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_release/student.py",
+      "sha256": "d238af47cad741e192831c9b61bebbb0f27cf94e26f278ec403cbc53fd8d5ab1",
+      "size_bytes": 10187
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_release/TEACHER.md",
+      "sha256": "0441572ee51fd68fd4508cfc00831800cb3836fb4009a990a111d0f2aee36708",
+      "size_bytes": 5063
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_release/teacher.py",
+      "sha256": "83aceaeab94ca20f51323f66ac7932f50a90c78a626ce08b8a35ae9399d94b58",
+      "size_bytes": 7815
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_release/test_release.py",
+      "sha256": "cc094082df3afc6746489df7e541451aa96cb9c7e90056ea5eb23b9289b22cb4",
+      "size_bytes": 12487
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/.gitignore",
+      "sha256": "f324f73c030ef38de956279b2a3cf196a62ecdde4ae413650a6d5ecee1ec02a5",
+      "size_bytes": 77
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/accept_candidate_v5.py",
+      "sha256": "545f1b0c928f6a64a0edcf8631e8d84161da1e3252d599232c573ee717cb6c11",
+      "size_bytes": 8485
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/accept_class193548_cycle.py",
+      "sha256": "b5edcbcda9f9f9307c1ffee72b406e5a088a091ab9d0b94383cb5ea73a474982",
+      "size_bytes": 9060
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/accept_class193548_web02.py",
+      "sha256": "27e62dde4a48d66db09142be05393fe939ba11cbcbd356cf987637920092b259",
+      "size_bytes": 6585
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/acceptance_web02_stage.py",
+      "sha256": "aa4d89f89e1843582258ed90f5370910fab0e7123a1661864937878c2455c29f",
+      "size_bytes": 6230
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/activate_class193548_commands.py",
+      "sha256": "b3a0f13e4fe1f2d4eb74613a0be75693ed33ab87c93081898ec6a7cffa80a56d",
+      "size_bytes": 5908
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/apply_candidate_registration.py",
+      "sha256": "e954018895c61ee9c09a59cc9f8e5d2a9bfdcb9c9bc9cb6a3319cd4ad47951df",
+      "size_bytes": 7284
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/bind_checker_commands.py",
+      "sha256": "aa6e63c1248222ab1a23aae6f892325309f4f39773ff7f9190fe18fb07185de2",
+      "size_bytes": 2812
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/bootstrap_submission_guest.py",
+      "sha256": "a272e00352be15e2c64082661edb0aee03df68a194ab0b3a4dbe619058d71683",
+      "size_bytes": 4515
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/build_checker_bundle.py",
+      "sha256": "09db9492b7adc417fa035ecc4f52d3cef8f3e5ac201ffcbff8cd60a1003373b7",
+      "size_bytes": 2746
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/build_template.py",
+      "sha256": "b749a1293b39c10a59b58ef3566656455a0281ce0b737653011f28803c999053",
+      "size_bytes": 6627
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/check_bootstrap.py",
+      "sha256": "3503b96ed464d1a0122aecb24e4537f60b27812ab82ea030636db51250f6811e",
+      "size_bytes": 6261
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/check_dispatch.py",
+      "sha256": "cdcada221310cac9e7b25caa24a53336beb05b05a263c9b0e350f39f6c00befc",
+      "size_bytes": 720
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/check_http.py",
+      "sha256": "c13c23b0bd4097bbacbe068c9c343c4faa33d13b0c059e31621c740bb7b60353",
+      "size_bytes": 5088
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/class_signed_tools.py",
+      "sha256": "e72a36239904fca0c2aaeb0c32fe1b85bfe44e2141c36c028bfd68be70932ad1",
+      "size_bytes": 9623
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/class_student_delivery.py",
+      "sha256": "1bbaf46daa1eed027e17e422e64ff0af5e8f24791d36df2f2379a57ff652a184",
+      "size_bytes": 14971
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/cross_account_storage.py",
+      "sha256": "2575de4f3fc88f6a1b72996080344ecca60cbb5f583200bc644bd66b95aedee4",
+      "size_bytes": 8956
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/deploy_teacher.py",
+      "sha256": "41b2f37ff00c388d885177679cc0bc3d664390b969b3a176195b6a5b2579a9a3",
+      "size_bytes": 4913
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/enroll_class193548_student.py",
+      "sha256": "a3d1443aad2ec349da638df742f539957484ada82c99437b05a0911635fb3fba",
+      "size_bytes": 7011
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/enroll_five_node_progress.py",
+      "sha256": "a280b1d90950f8dff9724593e2bc05b6ec21640149775ed77ee4fef5b0b38df9",
+      "size_bytes": 6902
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/http_fixture_guest.py",
+      "sha256": "3a3a4adb9ca95ddd23b6f696c9d795d66040bcde3af48a59bb09ddf10fd9cf47",
+      "size_bytes": 5777
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/http_task.py",
+      "sha256": "5f50d4b586630c93b0c4c3274dc8ac0bc05a4d6bba9d35f1145ecf2c24cb2462",
+      "size_bytes": 2999
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/http_task_guest.py",
+      "sha256": "d0f7e10575f2db17047df3b8fc22fbfb545e7bb4aa3d240d49f915135e326ac0",
+      "size_bytes": 5903
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/install_checker_bundle.py",
+      "sha256": "7ae8d507f337fb711b02fa6dbf50519fe746d576a57f225c327f0d7edd5fc9db",
+      "size_bytes": 3969
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/install_probe_commands.py",
+      "sha256": "6ad5bce2090c1c35ed6b0b76391275084f381c269c635db7ae38925649fd5914",
+      "size_bytes": 4620
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/live_acceptance.py",
+      "sha256": "8c5a6d4bbe5a4289fcb2adca1b2393e36a523cc0ef66ba589f0e6a7c8d8bbed9",
+      "size_bytes": 4175
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/live_progress_tracking.py",
+      "sha256": "4016db64cf16c367b4766854e8d97cc0be9db38643a96a152d2943214c4f4fee",
+      "size_bytes": 5881
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/prepare_class_teacher.py",
+      "sha256": "19217883f4a6f627618ac41637a5361f5f966fce11a39cd13f51b12608e37b38",
+      "size_bytes": 9260
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/progress_api.py",
+      "sha256": "3ccd2e1915c417b853d182d236be706e8fdcfa4bbd34f03452c3d221728de663",
+      "size_bytes": 27321
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/progress_enrollment_guest.py",
+      "sha256": "b69dedfd62a48faf7f6e5c8c353fef38c9aacc5ecb29b864b1a96296558e8816",
+      "size_bytes": 8459
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/README.md",
+      "sha256": "71224d933ac4b157d20ef64aa69402bfe38b6f0c250c84666834fc6ce39bb3e8",
+      "size_bytes": 26857,
+      "original_sha256": "f9b495a30cba81028bdfa1b332e5a32a60c3b735363d01d0c954dd0583be7d17",
+      "transformation": "Personal teacher/student email addresses anonymized before publication; executable code unchanged."
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/refresh_class_delivery.py",
+      "sha256": "6551fac76c84efe34f8019b534a6bec97f62a20b9f2798f0ca4c6819a5277f9a",
+      "size_bytes": 7387
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/review_class_environment.py",
+      "sha256": "3edbd177f2a730817d4a245fea6b96064ace6df0eb16a04f2447dae1f9d8ae15",
+      "size_bytes": 6767
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/run_web_fixture.py",
+      "sha256": "c06a523d1699a13711950579b671a4a1dd84e57d0404aeb1d9a564b430ff8ccd",
+      "size_bytes": 3678
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/start_class193548_student.sh",
+      "sha256": "e5218716b17206cbe9043aa6592a11eeb796a383a47090af4ada3b0cf978720f",
+      "size_bytes": 3061
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/start_class193548_student_20261022.sh",
+      "sha256": "a354ef71f3b1744efe89d2778a3fb06be39532d3538401d7a5caadb65939cbd8",
+      "size_bytes": 4901
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/STUDENT-CHECKER.md",
+      "sha256": "d7acfddbd90fabe9d0523b3d0515573d8ff29f21938802c2ff422083697887ce",
+      "size_bytes": 3000
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/submit_five_node_bootstrap.py",
+      "sha256": "ca345c7e2779239a39b22384437bde49d407177dfd9bfd503b39bf4a6b4f3d8f",
+      "size_bytes": 5442
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/test_bootstrap_submission.py",
+      "sha256": "a89703caf8a474f018dba60bfe87b3f12c5ffeffe44a92e9ecccac86a446377c",
+      "size_bytes": 2944
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/test_candidate_registration.py",
+      "sha256": "6fc6a63d75b03972953b16d60d280c14600abde0a5b593c2b55eea6dca4aeb66",
+      "size_bytes": 2804
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/test_check_command.py",
+      "sha256": "15d054a3103a05471c24463fb5f66d506a423197a06264f7794037d9e186f2ec",
+      "size_bytes": 4035
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/test_checker_binding.py",
+      "sha256": "9f0070786ecb58e56c65265d2af7d2f949c715373de531583c915808a86551ee",
+      "size_bytes": 2248
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/test_class193548_enrollment.py",
+      "sha256": "75cfdfc45b8db5f7d38edba1e1d1ef2540c66331464489d31c0ba479b7962992",
+      "size_bytes": 1389
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/test_class_environment_review.py",
+      "sha256": "2fa1f7a3bee18cb51737ec1b817c79cda45c78736c1844ad1cb50543b4c3570f",
+      "size_bytes": 4457
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/test_class_payload_transfer.py",
+      "sha256": "584e242f500933d9255b57162fc3d9183cb4f6f9bd9192a6d4fb33fc63304633",
+      "size_bytes": 2713
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/test_class_signed_tools.py",
+      "sha256": "1ba0fa038eba3d401475fffa47425009a7abdda1281b62e17dfef36eade55af6",
+      "size_bytes": 3797
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/test_class_student_delivery.py",
+      "sha256": "3293adaede86e55c291ade0a670ef17a7fc3a8bc56f7abd3a3b190a56cc7768c",
+      "size_bytes": 7121
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/test_class_teacher_plan.py",
+      "sha256": "3c918106a2cce37e971e977d7b1511f9830e251a48972f40c051f651c79b4989",
+      "size_bytes": 2851
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/test_cross_account_storage.py",
+      "sha256": "739258532945aeb5b30e28696da75e6dcebbd6bb87fc960b8e5cf602c362622a",
+      "size_bytes": 3987
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/test_http_checker.py",
+      "sha256": "f3dd8d4de4045a37366f3063b92af963933977e20d9c7693ab16a48136da608c",
+      "size_bytes": 5688
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/test_progress_api.py",
+      "sha256": "2a60a2f03f1b887f7080a72316a684393488fd50d13af97392cb8eadecd398fb",
+      "size_bytes": 14028
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/test_progress_enrollment.py",
+      "sha256": "16da5236231d0b05423cdd8fcdad43f7bd6a8c8830984ae57fff59e6d0331e62",
+      "size_bytes": 3864
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/test_progress_update.py",
+      "sha256": "a0ee3ff5fc162a81d814bac253679791a0a5a06dbf15429accea241b7a99a544",
+      "size_bytes": 2163
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/test_refresh_class_delivery.py",
+      "sha256": "6648972bd75a8459a6436717bb3cd52e238af4bf50e29a8fbe66bcf664816ba1",
+      "size_bytes": 8341
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/test_web_commands.py",
+      "sha256": "52a8a4f41a9916e7a0b0bff3e924cc4508e59974e9ea8e8544b2331373cc9c5e",
+      "size_bytes": 2417
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/transfer_class_payload.py",
+      "sha256": "35f6eb6620a58919f7c8ce21883bc269f153000c84643ca89403099b9ea1a7e1",
+      "size_bytes": 11603
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/update_progress_tracking.py",
+      "sha256": "328c5ec7b8dea0086fb8656d781b938f14ed27a4fb1405ccfc4b3b4c32bda64f",
+      "size_bytes": 7374
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/verify_class193548_pages.py",
+      "sha256": "19917a50e8a694bbe6a122a634730a806c249418d63247e5bb56dae761b5e8cf",
+      "size_bytes": 5458
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/web-teacher.template.json",
+      "sha256": "e1638632af38462d00a167945646d2f9daf121319bac5eee9a3b03975097467e",
+      "size_bytes": 42414
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/web_commands.py",
+      "sha256": "9950cb04359d5fafe46ae8053d245e86f173b2f316110a800994cbbb6347282c",
+      "size_bytes": 4283
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/web_progress.py",
+      "sha256": "a966bbe49eefdb4fc6f9ca1dc39d930532992490923fde155caf3ed5a5aed6a4",
+      "size_bytes": 7600
+    },
+    {
+      "path": "01_roles/cyber_security/system_requirements/2026-10_web_infrastructure_aws_operations_design.md",
+      "sha256": "dd58a14c7a9bb23cf722f0245737d4802a0220804a13721a29c6fe240e64ab7f",
+      "size_bytes": 23872
+    },
+    {
+      "path": "01_roles/cyber_security/system_requirements/2026-10_web_infrastructure_bootstrap_contract.md",
+      "sha256": "9b2923c2c9356188895d36444015a00a14b18ffc9f1c9dfe6f00f02bcba57334",
+      "size_bytes": 30748
+    },
+    {
+      "path": "01_roles/cyber_security/system_requirements/2026-10_web_infrastructure_catalog_app_spec.md",
+      "sha256": "e340116263fb10dc89743454c0636da601665c0fcf85e603a000e3ff7d65533a",
+      "size_bytes": 16817
+    },
+    {
+      "path": "01_roles/cyber_security/system_requirements/2026-10_web_infrastructure_d11_assessment_contract.json",
+      "sha256": "44e05467796b16384f38999d17e51320266b02ffe42947b6a2ddc4c7a90ec621",
+      "size_bytes": 46770
+    },
+    {
+      "path": "01_roles/cyber_security/system_requirements/2026-10_web_infrastructure_d11_assessment_spec.md",
+      "sha256": "fd44c04f286a1ff9b4ed45393614679613e0aa8510845fe10a8df6c166160741",
+      "size_bytes": 29178
+    },
+    {
+      "path": "01_roles/cyber_security/system_requirements/2026-10_web_infrastructure_d11_validation.public.json",
+      "sha256": "4b82d43bfefeab4da5c1db0d265a14aafcbf9c202edcde71fc216309e3e24d7a",
+      "size_bytes": 2993
+    },
+    {
+      "path": "01_roles/cyber_security/system_requirements/2026-10_web_infrastructure_database_design.md",
+      "sha256": "56420564f203537044e6b60f387196059ef84949934df818a35d93ebb551b5ec",
+      "size_bytes": 18720
+    },
+    {
+      "path": "01_roles/cyber_security/system_requirements/2026-10_web_infrastructure_design_decision_register.md",
+      "sha256": "4dc33a2472d0d91649ef76dcf8f9159003c27d1c82eb59a7281f908e40c42660",
+      "size_bytes": 26447
+    },
+    {
+      "path": "01_roles/cyber_security/system_requirements/2026-10_web_infrastructure_dns_design.md",
+      "sha256": "3103ed9f0f34fb7f08b95bf74af0349a080aa87b17b158a67084bcf3a3eb73ca",
+      "size_bytes": 11342
+    },
+    {
+      "path": "01_roles/cyber_security/system_requirements/2026-10_web_infrastructure_grading_transport_design.md",
+      "sha256": "d8112a09b9c22bc67f15591c44f3989cd772129ec59445e9e00c93416e3b3f0a",
+      "size_bytes": 10611
+    },
+    {
+      "path": "01_roles/cyber_security/system_requirements/2026-10_web_infrastructure_network_design.md",
+      "sha256": "23a676adbaf93dbfd698e09fa2a44cd63df3f213f645468c05169f441658d691",
+      "size_bytes": 28724
+    },
+    {
+      "path": "01_roles/cyber_security/system_requirements/2026-10_web_infrastructure_package_distribution_design.md",
+      "sha256": "f7f4f4f5bde31427b718b053c13f120287b01837224638ff703347f6d22b0242",
+      "size_bytes": 26310,
+      "original_sha256": "17f469a470302b5186d1d7770a8b3ed2167c1090d48f86b886f74f2186fe8fad",
+      "transformation": "Personal teacher/student email addresses anonymized before publication; executable code unchanged."
+    },
+    {
+      "path": "01_roles/cyber_security/system_requirements/2026-10_web_infrastructure_service_design.md",
+      "sha256": "a9537c9dbdcb18c587abe2bf472edf7fd0baf0d8bf2020a8fc64996b7d738e08",
+      "size_bytes": 14489
+    },
+    {
+      "path": "01_roles/cyber_security/lesson_plans/2026-10-13_web_infrastructure_exercises_and_autograding_design.md",
+      "sha256": "637e33bf4cf6e4c224e3b7f70f9c7db0937b7b516082be9b797bc50151e94356",
+      "size_bytes": 14246
+    },
+    {
+      "path": "01_roles/cyber_security/lesson_plans/2026-10-13_web_infrastructure_status_and_next_steps.md",
+      "sha256": "5db68d1d25af4a7c88690a9ab969ca51479047df66d2a3c44b4f0ded0f646feb",
+      "size_bytes": 17222
+    },
+    {
+      "path": "01_roles/cyber_security/lesson_plans/2026-10-13_web_infrastructure_final_system_inventory.md",
+      "sha256": "297871eb99601f69f7e854dd4f2590bcaf4c4f9a572f21e9f3d3b691f4b5a737",
+      "size_bytes": 23780
+    },
+    {
+      "path": "03_knowledge/network/2026-10-15_isp_rdp_allowlist/AS197486_ris_prefixes.json",
+      "sha256": "6ee561209d3b2a5a861da518d9c17884c35c2ea5d22370399847e7efe7640664",
+      "size_bytes": 869
+    },
+    {
+      "path": "03_knowledge/network/2026-10-15_isp_rdp_allowlist/AS201767_ris_prefixes.json",
+      "sha256": "85f974154fd737aa7bf589240c21ffa7e454eedf34a8d624663b74fb7750adf8",
+      "size_bytes": 1141
+    },
+    {
+      "path": "03_knowledge/network/2026-10-15_isp_rdp_allowlist/AS202175_ris_prefixes.json",
+      "sha256": "55a5ae3fa5bfad2f3c79bcf916e0a0c2f297fcc8b93a665a8addc1736fda618d",
+      "size_bytes": 1510
+    },
+    {
+      "path": "03_knowledge/network/2026-10-15_isp_rdp_allowlist/AS202660_ris_prefixes.json",
+      "sha256": "0a08dde958c0a8432e386e79069525490238ae860d835c7b1aedfbf20b8630e4",
+      "size_bytes": 1252
+    },
+    {
+      "path": "03_knowledge/network/2026-10-15_isp_rdp_allowlist/AS28910_ris_prefixes.json",
+      "sha256": "5080385b0d767cce0c49929dbd7c59bfb08e968b00220c1401554f7cca75bbe7",
+      "size_bytes": 1020
+    },
+    {
+      "path": "03_knowledge/network/2026-10-15_isp_rdp_allowlist/AS34250_ris_prefixes.json",
+      "sha256": "7005175d79b6ff71b78ea434a2807f526a835f5012f21c681bdbbf4c2fce0f83",
+      "size_bytes": 904
+    },
+    {
+      "path": "03_knowledge/network/2026-10-15_isp_rdp_allowlist/AS34718_ris_prefixes.json",
+      "sha256": "3083224cb835e34e86dfc67e3338f171a37b2c0bd0bf11dc61a5140eea96f124",
+      "size_bytes": 1411
+    },
+    {
+      "path": "03_knowledge/network/2026-10-15_isp_rdp_allowlist/AS39032_ris_prefixes.json",
+      "sha256": "e5e458217a8efc67ef93b6daeb44dd63033b1243bec2a0ca7d011cd23d46e7a2",
+      "size_bytes": 1075
+    },
+    {
+      "path": "03_knowledge/network/2026-10-15_isp_rdp_allowlist/AS47452_ris_prefixes.json",
+      "sha256": "3ff6b9a27d5248a1af1d75e69e956449c8c19b6167e80256f48e6cee3c1713a0",
+      "size_bytes": 868
+    },
+    {
+      "path": "03_knowledge/network/2026-10-15_isp_rdp_allowlist/AS8193_ris_prefixes.json",
+      "sha256": "7e85816fcd12be883f05417eabc3ddc34b3fb35af9a73f41ad4e6fa5f304c5b1",
+      "size_bytes": 3522
+    },
+    {
+      "path": "03_knowledge/network/2026-10-15_isp_rdp_allowlist/asn_origin_prefixes.json",
+      "sha256": "da8f8d22827baae3103878360aee96d3542f5501eb06011801240c849231dddd",
+      "size_bytes": 6340
+    },
+    {
+      "path": "03_knowledge/network/2026-10-15_isp_rdp_allowlist/coverage_validation.json",
+      "sha256": "1b51c269bac7b01655975d1f96567a2bb4c9b90bebeed6e97c8ce7de8efbe21f",
+      "size_bytes": 60
+    },
+    {
+      "path": "03_knowledge/network/2026-10-15_isp_rdp_allowlist/organization_asn_registration.json",
+      "sha256": "41c350ceb3c1bec7b46e85e18b62ed7dbe7b109a32d5633b7eee9405f23c984d",
+      "size_bytes": 888
+    },
+    {
+      "path": "03_knowledge/network/2026-10-15_isp_rdp_allowlist/rdp_ingress_ip_permissions.json",
+      "sha256": "d501ead9de56033e91a1eafd5cbdf85b45ee4da0bb162028af05c387a7ecdf4f",
+      "size_bytes": 5671
+    },
+    {
+      "path": "03_knowledge/network/2026-10-15_isp_rdp_allowlist/README.md",
+      "sha256": "8331623a0c02f044b482570b4691380bf5516dbbb0e0c5949189d16f2f595a27",
+      "size_bytes": 873
+    },
+    {
+      "path": "03_knowledge/network/2026-10-15_isp_rdp_allowlist/summary.json",
+      "sha256": "c4c71a0466f19c919d1d32aaadce3bb598df545bf1a67ac498bb72f864ebaae3",
+      "size_bytes": 635
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_ami_2026-10-15/teacher-price-catalog.json",
+      "sha256": "24ae3a662d422f09985c3d2bbddd29db73965ddce035e5316f09eeafa9f3bb44",
+      "size_bytes": 862
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_ami_2026-10-15/selected-price-rows.json",
+      "sha256": "02a9c1db552aaa356efab495e02dd79be8f3fc86b11c3303e3e688d2597155a1",
+      "size_bytes": 41665
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/package-signing-public.asc",
+      "sha256": "79c8d4f7041568d5f0fded709100e2d818f26353d216ae8661054bc49b775d61",
+      "size_bytes": 1302
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/requirements.lock",
+      "sha256": "bc9c9ec70795639d72d635a552c8f103a7f55bf302e2958622f02eb8d5091948",
+      "size_bytes": 680
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/python-packages.json",
+      "sha256": "11ebad13a627e0390db7e6d2e6b621a30ed74aecf4273b904335f597be3664d3",
+      "size_bytes": 1579
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/deb-packages.json",
+      "sha256": "50d1cba47f0d83b0a066aa90e1698fa4947cf73786efa3ca46738fc0349e4289",
+      "size_bytes": 457154
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/release.json",
+      "sha256": "0ba930867d6fc8dc83d3ea5010c1b715ed4dfe50ed6bcbac989d806841bb1068",
+      "size_bytes": 220534
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/SHA256SUMS",
+      "sha256": "85ef5bd0344db6dc54eec767e458542ff64372d04ed2baa1fa8e48cb70673d96",
+      "size_bytes": 133715
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/SHA256SUMS.asc",
+      "sha256": "55798c857cfff1008325c43a68e4085dbf7a029cc81d55ed2bfb351b6fd7a603",
+      "size_bytes": 659
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3.index.public.json",
+      "sha256": "9d12778ea5fd8dc3398b3380520780eaf36d6670ac49d3c4721831ab96ae6df6",
+      "size_bytes": 8583
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3.acceptance.public.json",
+      "sha256": "f011fc98b4c2db8cfc56d0a590997241c0cecdcc2335147e4785deda4028985c",
+      "size_bytes": 2092
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2.tar.gz",
+      "sha256": "8d83ec96f05798b5b1fd0ef4ded318e286f88ab256c344cbd1722408bfd397e3",
+      "size_bytes": 345264
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2.tar.gz.asc",
+      "sha256": "bf973a5c3924e6b7ff164cad56861bd5d69b57d18724d9eeaaa28e1eca14b201",
+      "size_bytes": 659
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2.public.json",
+      "sha256": "a5725bdb223d87ac725b26294cd4d39e31e9eeca6ad7cfb01d63fd59efab0c14",
+      "size_bytes": 503
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2.acceptance.public.json",
+      "sha256": "d6d8c490222f202e25c11ee7c97fb000efe56467a24ea1899cd7007d489136a1",
+      "size_bytes": 2690
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/candidate-c3/web-lab-ssm-c3.template.json",
+      "sha256": "62f51c62436da7c69f408e95cad66c48c2011d3bc9c6fdae17b64ae9cdc48ce9",
+      "size_bytes": 50974
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/candidate-c3/web-lab-repair-c3.template.json",
+      "sha256": "1ee32e2ba1e1649f01844c662f2b3bbc426a45854200bf910b7d3e83cfed48fa",
+      "size_bytes": 49902
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/ACCEPTANCE.json",
+      "sha256": "dd2cada8dd7d423a282103deadfbe5967e3da66afa7f49ceb2cec540b70eb8b5",
+      "size_bytes": 757
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/app_probe.py",
+      "sha256": "90dd0ab14bb9b7217533c18d4967766368ef7dfca6cf06f2259c43978c83c373",
+      "size_bytes": 7678
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/assessment-registry.json",
+      "sha256": "3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33",
+      "size_bytes": 34605
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/assessment_check.py",
+      "sha256": "80e35aeec9ca91d9d18021cf28f4bcf3beccf558819b2c7a275f0fa1a5c3c3a1",
+      "size_bytes": 16151
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/aws_readiness.py",
+      "sha256": "659a15294915c4c8681f932e2a365d5f4d66c7de8fdde4a8d66219466772eb2b",
+      "size_bytes": 3482
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/build_teacher.py",
+      "sha256": "00c3cf191109efb1b9a1c54a974f1b7052d053e4e073c083cd706a089c5e96c3",
+      "size_bytes": 3176
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/candidate_install.py",
+      "sha256": "6c052918a2d9e722a3c35ea6370b79db6e89237f45bc711cc242aa91230c5abe",
+      "size_bytes": 2980
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/catalog-app.tar.gz",
+      "sha256": "212cc8faf7a37bf0b3227de69993f5e2c5fa4e403b9b815ce280bf408dd53d24",
+      "size_bytes": 19486
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/D11-MANIFEST.json",
+      "sha256": "11afe7e838b7d6f1b397022afa117a92e99bcf74b237b2c628e06eb429b07414",
+      "size_bytes": 5927
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/dashboard.py",
+      "sha256": "fb1bb5f4a9879f3296532de85aba30bfafae8537526ba6db9a7b1686b2b99e99",
+      "size_bytes": 9642
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/database_secret.py",
+      "sha256": "0b3cab3c1b4a49902e908620a6f06c9b225bbadc88162bd1e70f37365ca4c36b",
+      "size_bytes": 2020
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/db_observer.py",
+      "sha256": "dd68a042398edd3ecd45dfc463fca39bb0a33fa75e400d0272343f4aa25b97a9",
+      "size_bytes": 15591
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/grading.py",
+      "sha256": "eadb82a8f7a0ab365a2e0d39e10bc833d5fd2a34a5a02f72c5210a328f285b24",
+      "size_bytes": 3117
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/http_guest_v2.py",
+      "sha256": "d88b67e03a9b7b12bc9bd154c1e28f13fe3f7cf4c3f0b542643e67edd51efa1b",
+      "size_bytes": 2601
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/legacy/bootstrap_inspection.py",
+      "sha256": "bb4d9dfa7b6dc8ab13d308b571565fe0e9b7cc3f5fd6dc1115e438982f3c0f74",
+      "size_bytes": 16720
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/legacy/bootstrap_submission_guest.py",
+      "sha256": "a272e00352be15e2c64082661edb0aee03df68a194ab0b3a4dbe619058d71683",
+      "size_bytes": 4515
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/legacy/build_template.py",
+      "sha256": "b749a1293b39c10a59b58ef3566656455a0281ce0b737653011f28803c999053",
+      "size_bytes": 6627
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/legacy/check_bootstrap.py",
+      "sha256": "3503b96ed464d1a0122aecb24e4537f60b27812ab82ea030636db51250f6811e",
+      "size_bytes": 6261
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/legacy/check_http.py",
+      "sha256": "c13c23b0bd4097bbacbe068c9c343c4faa33d13b0c059e31621c740bb7b60353",
+      "size_bytes": 5088
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/legacy/http_task.py",
+      "sha256": "5f50d4b586630c93b0c4c3274dc8ac0bc05a4d6bba9d35f1145ecf2c24cb2462",
+      "size_bytes": 2999
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/legacy/http_task_guest.py",
+      "sha256": "d0f7e10575f2db17047df3b8fc22fbfb545e7bb4aa3d240d49f915135e326ac0",
+      "size_bytes": 5903
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/legacy/internal_ssh_guest.py",
+      "sha256": "d2e23f58e6bf1191906ddacf27615b56596c56860995efbf18c27437a8323101",
+      "size_bytes": 10114
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/legacy/payload_runtime.py",
+      "sha256": "fcaeacb1060e1f3b93811d4d9f2ca69d0c6004b78b77b0cd46aaabef84fc150e",
+      "size_bytes": 11149
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/legacy/progress_api.py",
+      "sha256": "3ccd2e1915c417b853d182d236be706e8fdcfa4bbd34f03452c3d221728de663",
+      "size_bytes": 27321
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/legacy/release_validation.py",
+      "sha256": "e9aebc2f1ed3d54df70e862e5a9aabe8e08970004106c8a89a6260da9e34096c",
+      "size_bytes": 15606
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/legacy/setup_internal_ssh.py",
+      "sha256": "1d66bb79bdfb8fae8f56249bdd82c8d578ea9b2d05657195faee2edf1bfb4498",
+      "size_bytes": 10700
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/legacy/submit_five_node_bootstrap.py",
+      "sha256": "ca345c7e2779239a39b22384437bde49d407177dfd9bfd503b39bf4a6b4f3d8f",
+      "size_bytes": 5442
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/legacy/web_progress.py",
+      "sha256": "a966bbe49eefdb4fc6f9ca1dc39d930532992490923fde155caf3ed5a5aed6a4",
+      "size_bytes": 7600
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/network_checks.py",
+      "sha256": "e88ae871adb070987696aea17366dd2fc7516f554b68093cb2b082f516187626",
+      "size_bytes": 11734
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/progress_api_v2.py",
+      "sha256": "4a71af667b883aed2d016abc5e52b115a0d72aa5296779ce0fd6ffb3dcdc7cb5",
+      "size_bytes": 8788
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/README.md",
+      "sha256": "f5cf7c06ae17b4ceb27bd6cc5fb891e91a5b936cec64223f638c97d53adcda9f",
+      "size_bytes": 5881
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/registry.py",
+      "sha256": "15f0624c07aff3f9cc2f931419ff1f2f2056400d470d08ca142b0f84a2bc1642",
+      "size_bytes": 5050
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/remote_guest.py",
+      "sha256": "ac9a2b144008992e6445649cb033cc6d4cd6f18b4f7666d5b4afd29663e0c91d",
+      "size_bytes": 14226
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/system_observer.py",
+      "sha256": "4896cb45d547a59151e65432e98d8120ccc3ecf581b411c3877211b92d69a4b7",
+      "size_bytes": 10584
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/teacher_cli.py",
+      "sha256": "9e6ec0d5c2326a72b3f4b474616d68510c745acd83ce408329a0a0c1f56f64b6",
+      "size_bytes": 3471
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/transport.py",
+      "sha256": "8056da7741dc773bc4ade3ed3bc38d141b5067bcd58e9bcd2a3a422233768c1c",
+      "size_bytes": 1724
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment/upgrade_teacher.py",
+      "sha256": "45414aea1bb999126c8fec42cab0b04d61ab3dfec15c067a2fc22de09e559b4f",
+      "size_bytes": 5805
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment.tar.gz",
+      "sha256": "2b3159bee267b1408abf94fe5c8929718264b0ab710f5d3428bce57ac67dbe68",
+      "size_bytes": 114424
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/assessment.tar.gz.asc",
+      "sha256": "74fd167a985c7e096cc51494bc9d2cefa9fb4f3ac36774d18ee1adc5b324eadb",
+      "size_bytes": 659
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/course-release.json",
+      "sha256": "ab5e1f9edbd10c20f81b1cdd8bfb7deac1a42a60e9314849b775b32f98b18a99",
+      "size_bytes": 12471
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/course-release.json.asc",
+      "sha256": "55dba3e93c739b11fb4080b69200fc201f994778745bd11031a4247ef4d9d8b1",
+      "size_bytes": 659
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/ACCEPTANCE.json",
+      "sha256": "21903c966fcece21c782b1b28055eaae4f80f7873655357ee078a9dededdcf80",
+      "size_bytes": 721
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/core/controller_runtime.py",
+      "sha256": "3c4e1ef0e3413637b31b9ead6e32893b9e7b9ed11640c6b7ea34601285ac6489",
+      "size_bytes": 2422
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/core/deployment-manifest.json",
+      "sha256": "a00239fa1cb8efc09d8cad214c6e97f5c99f1436c9549c3f66bf09ea9ee4a3d2",
+      "size_bytes": 4082
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/core/deployment-manifest.json.asc",
+      "sha256": "4cbc8a68054978ff3a4c20dcab2477cba0dc3743ad36977850c6dd9819035a7c",
+      "size_bytes": 659
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/core/deployment-manifest.schema.json",
+      "sha256": "99ab9d6d02e6497834b11c295a9f8b088e9312a3ed27a83151bd039e27870df9",
+      "size_bytes": 4354
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/core/jdu-web-lab",
+      "sha256": "5a9069bd3bd7cfacbff3a64792d4f80da19b53fee8b7fd47425d4d765f27d3a8",
+      "size_bytes": 378
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/core/package-signing-public.asc",
+      "sha256": "79c8d4f7041568d5f0fded709100e2d818f26353d216ae8661054bc49b775d61",
+      "size_bytes": 1302
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/core/README.txt",
+      "sha256": "f4f24e2b3f7ec7a3c12d40a424fb4e0083ebcec097d07e27e4d12ab2fae36bbe",
+      "size_bytes": 1976
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/core/release_validation.py",
+      "sha256": "e9aebc2f1ed3d54df70e862e5a9aabe8e08970004106c8a89a6260da9e34096c",
+      "size_bytes": 15606
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/core/select_instances.py",
+      "sha256": "f92ac3d7e0d4bb4f4b4ec625757c30507dc087babdda79431bd65131517a4710",
+      "size_bytes": 12322
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/core/student-controller.tar.gz",
+      "sha256": "90a152c012f2e3a862f158e70629a578d68fa2c5f6535db8e976c87f6a723837",
+      "size_bytes": 51294
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/core/teacher-price-catalog.json",
+      "sha256": "24ae3a662d422f09985c3d2bbddd29db73965ddce035e5316f09eeafa9f3bb44",
+      "size_bytes": 862
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/core/web-lab-ssm-all-nodes-c5.template.json",
+      "sha256": "b91e53ec887d4988ae4df531536a1e265fc7551e5bebef7312a6dd776f180c06",
+      "size_bytes": 51146
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/core/web_lab.py",
+      "sha256": "c6f181a0f6ae82ed49cf9f63b2f5199068fd31592b49dbeb4e23f19c00b85916",
+      "size_bytes": 16264
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/distribution-release.json",
+      "sha256": "4d15fd4975404b12c5f0257752db086626b8301bb7af4670f1ade72bc39d86ec",
+      "size_bytes": 3822
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/distribution-release.json.asc",
+      "sha256": "467ede5b96e1af2d1fd94db36b40683438bd63ab38d390c68dae8d3b76031bcc",
+      "size_bytes": 659
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/distribution.py",
+      "sha256": "7c5be369978a5cfb72801098240c6703d7308d6afed46e8541ba8e826c20f78d",
+      "size_bytes": 22358
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/package-signing-public.asc",
+      "sha256": "79c8d4f7041568d5f0fded709100e2d818f26353d216ae8661054bc49b775d61",
+      "size_bytes": 1302
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/publish_release.py",
+      "sha256": "24852090988981de2a76e2a8c9e9e60928e25562f912e859e2db4a87365c8031",
+      "size_bytes": 5213
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/RELEASE.md",
+      "sha256": "7f9d4c1ecab645ccb4612b5363acf635298d89c47f4221acee10d4761a0a6e79",
+      "size_bytes": 1696
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/STUDENT.md",
+      "sha256": "bc5dc361a4e4c9bbc265b8d7ac4f45e18b2ce3d2b123fa8cc576bfa6001334f1",
+      "size_bytes": 6716
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/foundation/TEACHER.md",
+      "sha256": "41a1913e4613fc675ff062ec0e108e705911f9dc0d35b444a82796dbde307741",
+      "size_bytes": 6188
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/package-signing-public.asc",
+      "sha256": "79c8d4f7041568d5f0fded709100e2d818f26353d216ae8661054bc49b775d61",
+      "size_bytes": 1302
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/RELEASE.md",
+      "sha256": "be2ba378f655312fffd1478ebf216e5d5992b4dd535ac776e9439a9bed8be9d0",
+      "size_bytes": 1993
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/release_tools.py",
+      "sha256": "f921c0f8e1bd860c1cc0c9dd27b67d9383941140099cc96b2fbe7975635a8fb6",
+      "size_bytes": 7869
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/STUDENT.md",
+      "sha256": "644e2f3801a7edf36b03be7a9d418cb035cbf8a75d100565bd3db4e91a26dbdc",
+      "size_bytes": 7209
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/student.py",
+      "sha256": "d238af47cad741e192831c9b61bebbb0f27cf94e26f278ec403cbc53fd8d5ab1",
+      "size_bytes": 10187
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/TEACHER.md",
+      "sha256": "0441572ee51fd68fd4508cfc00831800cb3836fb4009a990a111d0f2aee36708",
+      "size_bytes": 5063
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2/teacher.py",
+      "sha256": "83aceaeab94ca20f51323f66ac7932f50a90c78a626ce08b8a35ae9399d94b58",
+      "size_bytes": 7815
+    }
+  ],
+  "excluded_operational_documents": [
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_assessment/RESUME.md",
+      "reason": "operational_history_or_deployed_snapshot"
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_bootstrap/offline-repo-probe.deployed-v1.template.json",
+      "reason": "operational_history_or_deployed_snapshot"
+    }
+  ],
+  "excluded_categories": [
+    "Python caches",
+    "large downloaded DEB/wheel payload archives",
+    "private plans/state/credentials",
+    "private signing keys"
+  ],
+  "note": "376 imported files retain original bytes; two operational documents anonymize personal email addresses. Synthetic fixtures are development-only and excluded from student distribution.",
+  "anonymized_document_count": 2
+}

@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+private/
+*.credentials.json
+*.session.json
+*.receipt.json

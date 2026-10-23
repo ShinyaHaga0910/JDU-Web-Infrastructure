@@ -1,0 +1,233 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Teacher-only one private repo package candidate. New isolated VPC, no Internet gateway/NAT/public IP or incoming access. Not a five-node student template.",
+  "Parameters": {
+    "AvailabilityZone": {
+      "Type": "AWS::EC2::AvailabilityZone::Name",
+      "Default": "us-east-1a"
+    },
+    "S3PrefixListId": {
+      "Type": "String",
+      "AllowedPattern": "^pl-[0-9a-f]+$"
+    },
+    "CaptureBucket": {
+      "Type": "String",
+      "AllowedPattern": "^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$"
+    },
+    "BundleUrl": {
+      "Type": "String",
+      "NoEcho": true,
+      "AllowedPattern": "^https://[^\\s\"\\\\]+\\.amazonaws\\.com/[^\\s\"\\\\]+$"
+    },
+    "BundleSha256": {
+      "Type": "String",
+      "AllowedPattern": "^[0-9a-f]{64}$"
+    }
+  },
+  "Resources": {
+    "ProbeVpc": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.20.0.0/16",
+        "EnableDnsSupport": true,
+        "EnableDnsHostnames": true,
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "jdu-web-offline-repo-probe-only"
+          }
+        ]
+      }
+    },
+    "ProbeSubnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {
+          "Ref": "ProbeVpc"
+        },
+        "CidrBlock": "10.20.2.0/24",
+        "AvailabilityZone": {
+          "Ref": "AvailabilityZone"
+        },
+        "MapPublicIpOnLaunch": false
+      }
+    },
+    "ProbeRouteTable": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "ProbeVpc"
+        }
+      }
+    },
+    "ProbeRouteAssociation": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "SubnetId": {
+          "Ref": "ProbeSubnet"
+        },
+        "RouteTableId": {
+          "Ref": "ProbeRouteTable"
+        }
+      }
+    },
+    "S3Endpoint": {
+      "Type": "AWS::EC2::VPCEndpoint",
+      "Properties": {
+        "VpcId": {
+          "Ref": "ProbeVpc"
+        },
+        "VpcEndpointType": "Gateway",
+        "ServiceName": {
+          "Fn::Sub": "com.amazonaws.${AWS::Region}.s3"
+        },
+        "RouteTableIds": [
+          {
+            "Ref": "ProbeRouteTable"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": "*",
+              "Action": "s3:GetObject",
+              "Resource": {
+                "Fn::Sub": "arn:aws:s3:::${CaptureBucket}/teacher-candidates/web-2026-10-r1/*"
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Principal": "*",
+              "Action": "s3:PutObject",
+              "Resource": "arn:aws:s3:::cloudformation-waitcondition-us-east-1/*"
+            }
+          ]
+        }
+      }
+    },
+    "ProbeSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "VpcId": {
+          "Ref": "ProbeVpc"
+        },
+        "GroupDescription": "Teacher private repo probe; no inbound, S3 HTTPS egress only",
+        "SecurityGroupIngress": [],
+        "SecurityGroupEgress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 443,
+            "ToPort": 443,
+            "DestinationPrefixListId": {
+              "Ref": "S3PrefixListId"
+            }
+          }
+        ]
+      }
+    },
+    "RepoHandle": {
+      "Type": "AWS::CloudFormation::WaitConditionHandle"
+    },
+    "ProbeInstance": {
+      "Type": "AWS::EC2::Instance",
+      "DependsOn": [
+        "S3Endpoint",
+        "ProbeRouteAssociation"
+      ],
+      "Properties": {
+        "ImageId": "ami-0fa5967347d08d2df",
+        "InstanceType": "t3a.small",
+        "CreditSpecification": {
+          "CPUCredits": "standard"
+        },
+        "MetadataOptions": {
+          "HttpTokens": "required",
+          "HttpPutResponseHopLimit": 1
+        },
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sda1",
+            "Ebs": {
+              "VolumeSize": 32,
+              "VolumeType": "gp3",
+              "Encrypted": true,
+              "DeleteOnTermination": true
+            }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeviceIndex": "0",
+            "SubnetId": {
+              "Ref": "ProbeSubnet"
+            },
+            "PrivateIpAddress": "10.20.2.30",
+            "AssociatePublicIpAddress": false,
+            "GroupSet": [
+              {
+                "Ref": "ProbeSecurityGroup"
+              }
+            ]
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Sub": "#cloud-config\n{\"package_update\":false,\"package_upgrade\":false,\"write_files\":[{\"path\":\"/var/lib/jdu-repo-acceptance/offline_repo_loader.py\",\"permissions\":\"0644\",\"encoding\":\"gz+b64\",\"content\":\"H4sIAAAAAAACCoVW31PbOBB+z1+h5h5kX4MTclznJje+GXoEmhsOmAB9YRiPbK9jtbbkSjKQdu5/v5VkkwTS1g8OXq325/ftMhwOr2tWVcSoVhvIiYG6qZgBUkmWg5qRrITsM0lbkVdASqZLkkIhlVfgYkW40eQBFC84qGg4HA543UhlnG7F0/7zk5ai/1vqQaFkTRpmrArpxFf42auoVjTr/sMwVfAK+s9WVXgrUvClBW0Gg0EOBakZF0HKNMQXUkA4GxB8pI7amunPwUROptPQyZyOdeW0iVSEjh+YGqPJ8ae8PVDQyAOWZdAYJjKg/lYmRcFXsc0ispnrwF0f00bxB6xXZE9oiEGxPDHwZIKwc+cqF3fKbG0vR5hQtPpKncIjN+WLlCL8lA2IwHu9o95IgmJ6PzK8Btma+HA6CQnTRIFupNAw8lqRu0mfUupOtcGQal8O567ESpK0ktnnWdxfdWEHh5Pp0a/2FW7U7eNNRI+KGwjczXAT+Y5T9R2nvOjhENlGJjlfYZqBVxtRXbLp7++weiU8dUfhm/hF8p3S/W5sinFs4kdWtTBXSqqAXnEhHJAZQlftILfmumYmK7ue/kJuyu6EY8xt01Qcb6ZrYlC+YYQ31DNjRIQ0vVIuH4XraGfwUlTuAGMyjxJbs2orpohNWhPWsQbyP0nRIukQJoplhktBmMjJ2dVZx6SMWWFn015rQCHpahudZx8X2iBvnV4fTM9CkkpMmhiJUuaJGG0a1pHJd8xXZ0TVDOHoWsdUVvIH2FS5hjoFpePuIFqB6URB+KyEMRHBahsXCXqYJ0hiC9aoWVN0ARUgCZIHVvHcxW3lL6GGShlWPb6rnc3aGuzcWRTVkfUSx721MVOGF1hDPU6lNAgo1ozpW6t0v2MY71aYb28f4XVoqW9b2cvuJvcR17Y2QWjPtuWaf4W/Dqd/OHrshrwfhf9yre10RDusTvmqla0mjYdm3yca7hhy3fFTxcYf/oTIe9nZN6lDlktmKw8/n/rR1D/bPrOyljmOy3dHR14J55swAf3n5Da5PD09X1zMk+X86jI5vzw+mS/j97cXJ+fz5MPx9Yfk+OIk+ThfLk4X82Xy/hJP6KioWl3GN6oFb87N9QjfiR3+dgI8z1GZQiKLouICEjuEHTxGVtX1nCaJnfFJgmUbDLCfiZMnSbx15Mtj1HoLv3YxeOfwZKc6mbsfxzptZRvdPcn6PJPT48X5/CSmb826gQAvhVHv/1WOr0LYv0DcDvrh7hn/bLn0D/KJedN5Wzc6+EavDTOtpjNqA79dzpGASyQMmpnRm26i+RVPCoYoyWdkb26v4EZvBccltcjRUDcaXdjo4ASjQGmGs8wyHA4kTkP6XxiByGQOwW7M3a6LX6y+pf99Xn2arwSrutXn8rSvUQ2mlHlMr25v6KgEm4iOv9G/pTAgzMENZoKhoPPXFPvOru2+n9frb7vb9TXxEILP+1O7cr+Jp5PJbM80OMUStzi1fTJu6vguQ741BF7Cc9flj7GJLU6uF2cXx+cdVOleWPrQrte42er5EzcB/lP0P54tqDMECgAA\"},{\"path\":\"/var/lib/jdu-repo-acceptance/probe_offline_repo.py\",\"permissions\":\"0644\",\"encoding\":\"gz+b64\",\"content\":\"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\"},{\"path\":\"/var/lib/jdu-repo-acceptance/archive-key.asc\",\"permissions\":\"0644\",\"content\":\"-----BEGIN PGP PUBLIC KEY BLOCK-----\\n\\nmQGNBGrQoLsBDADC4ccFPdSm6cOyeTa29+Robm5/NjSeLs6wlBuPyFXAZXoRNLE4\\nIjohyfC3h9sfkFX4qnk9tZeTEcqupTSYgaOQkeaSz8j1iHFY9WMQhLJqDBBYCzAK\\nvYnngzaDpb2TLUddgP+TKLsGV0givVSiSf9nrJStpu7e8DRL0AAum5YjwqQ9c++k\\n7kWc9X/RBnNQT5wtusCVNejavs6VzjxxsoR3jtzM04eb0vQKs9EC7mLVYjccbohg\\nenqEd7rilejygRc+cQ8RnONzz0myLLgHJPymhvOrcn9r2DqXy4eh5uFnP3oxT3we\\nQ1OtUWOoLdcAe2IGfN++X5LdJNGrZLE8cJ5Ke4rTyUCmnFAI2P/RqJw3WBw5pxBo\\nycN7ZwRrtoUCTTNm2KDtNmPdCZDK78ygZ+dq0tD9NQob7S7ABUt8ow4oTCrfpKNi\\nalGTo3+IMD15WfuBZBWbeUpgWgyLpyGBOEfQkXMN+RcZjo46syJXprNeIkACI7Hp\\nqo8rnp1/rq+5k/EAEQEAAbQbSkRVIFdlYiBMYWIgUGFja2FnZSBTaWduaW5niQHX\\nBBMBCgBBFiEEZexnhHUMz6cDunF5UZKE5FFV7CoFAmrQoLsCGwMFCQHhM4AFCwkI\\nBwICIgIGFQoJCAsCBBYCAwECHgcCF4AACgkQUZKE5FFV7CooVgv8Cc1u/JNiFpu4\\nDbcRhnYxKmTxgQFyfruOOxLveIi3dFZ+DHNpZp4+DAJYXsJNVFLsgWaEzhXcFBPo\\nB4EhkNwsTyLm3GFuB7gnJT9mXVATmVq8BIIxOQVWk3MyJi54KQuCK1KxPm01RBw0\\nKY6OU6IuBitvDpEKdX/PgFIZQqNPMV3E3L0KDKxRYGoKzFg2wDmHSD8bShyVjdtZ\\nmMI+Cm6h2PYypaTzpNlkVEWxJBrWaQ7Pf1GYvEw9iRGHqDzJMeGnnP71Y6kYpgbI\\nGglbDAiKV54ISBxMsPWFo7iZhTLu/QIb7hm+N6qYu88SBKYwEDb2fEXYndgKkZO1\\nfaHx+OrLSCpOsqo3+uV3hTjVuQnyfvypHigc/5aw2sqc2sXplfYgxk466gFVnH9C\\nIVC41oRdSyfVrDX3wcLWEHlS0Fjr6Id6t6g98QraXqoM2oxlPHIzoiqf908eM71l\\nlfUAnMUgS6HzbJYmx95BQR0ivQ6yI/kLrMDC8Eveb+55rNp4/iaN\\n=h2Vu\\n-----END PGP PUBLIC KEY BLOCK-----\\n\"},{\"path\":\"/var/lib/jdu-repo-acceptance/private.json\",\"permissions\":\"0600\",\"content\":\"{\\\"bundle_url\\\": \\\"${BundleUrl}\\\", \\\"bundle_sha256\\\": \\\"${BundleSha256}\\\", \\\"fingerprint\\\": \\\"65EC6784750CCFA703BA7179519284E45155EC2A\\\", \\\"release_id\\\": \\\"web-2026-10-r1\\\", \\\"teacher_ipv4\\\": \\\"44.216.176.215\\\", \\\"signal_url\\\": \\\"${RepoHandle}\\\"}\"}],\"bootcmd\":[[\"shutdown\",\"-P\",\"+75\"]],\"runcmd\":[[\"bash\",\"-c\",\"set -o pipefail; timeout 3300 python3 /var/lib/jdu-repo-acceptance/offline_repo_loader.py 2>&1 | tee /var/log/jdu-offline-repo.log > /dev/ttyS0\"]],\"power_state\":{\"mode\":\"poweroff\",\"delay\":10,\"timeout\":60,\"condition\":true}}\n"
+          }
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "jdu-web-offline-repo-probe-20261015"
+          }
+        ]
+      }
+    },
+    "RepoReady": {
+      "Type": "AWS::CloudFormation::WaitCondition",
+      "DependsOn": "ProbeInstance",
+      "Properties": {
+        "Handle": {
+          "Ref": "RepoHandle"
+        },
+        "Timeout": "3600",
+        "Count": 1
+      }
+    }
+  },
+  "Outputs": {
+    "ProbeInstanceId": {
+      "Value": {
+        "Ref": "ProbeInstance"
+      }
+    },
+    "VpcId": {
+      "Value": {
+        "Ref": "ProbeVpc"
+      }
+    },
+    "SubnetId": {
+      "Value": {
+        "Ref": "ProbeSubnet"
+      }
+    },
+    "S3EndpointId": {
+      "Value": {
+        "Ref": "S3Endpoint"
+      }
+    },
+    "SecurityGroupId": {
+      "Value": {
+        "Ref": "ProbeSecurityGroup"
+      }
+    },
+    "RouteTableId": {
+      "Value": {
+        "Ref": "ProbeRouteTable"
+      }
+    }
+  }
+}

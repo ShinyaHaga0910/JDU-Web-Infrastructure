@@ -1,0 +1,4 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ title }} | 備品管理{% endblock %}
+{% block branding %}<div id="site-name">JDU 備品管理</div>{% endblock %}
+{% block userlinks %}<form id="logout-form" method="post" action="{% url 'admin:logout' %}">{% csrf_token %}<button type="submit">ログアウト</button></form>{% endblock %}

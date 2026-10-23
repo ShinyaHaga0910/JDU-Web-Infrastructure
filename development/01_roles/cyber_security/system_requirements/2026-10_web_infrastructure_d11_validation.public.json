@@ -1,0 +1,77 @@
+{
+  "scope": "approved_d11_design_static_consistency_only_not_runtime_acceptance",
+  "date": "2026-10-23",
+  "contract_id": "web-d11-2026-10-proposal-2",
+  "approval_status": "approved_for_implementation_2026-10-22",
+  "task_count": 14,
+  "practice_count": 7,
+  "graded_missions": 6,
+  "raw_points_by_mission": {
+    "M1": 8,
+    "M2": 13,
+    "M3": 3,
+    "M4": 9,
+    "M5": 13,
+    "M6": 16
+  },
+  "raw_points_max": 62,
+  "one_point_scored_checks": 62,
+  "manual_points": 0,
+  "personal_demonstration_required": false,
+  "course_normalization": "teacher_external",
+  "all_checks_unique_and_fully_accounted": true,
+  "no_scored_check_reused_between_missions": true,
+  "no_provided_readiness_check_awards_points": true,
+  "p1_m1_existing_ten_ids_role_paths_and_bodies_preserved": true,
+  "http_initial_two_ready_passes_award_zero_of_eight": true,
+  "schema_document_version_not_wire_update": true,
+  "prerequisite_graph_and_profile_order_valid": true,
+  "optional_practice_not_required_for_m5": true,
+  "per_report_check_count_within_existing_api_limit": true,
+  "spec_tables_match_exact_canonical_scored_check_set": true,
+  "checked_local_links": 65,
+  "all_relative_links_resolve": true,
+  "d08_index_files_verified": 36,
+  "d08_index_file_hashes_unchanged": true,
+  "runtime_implementation_verified_by_this_static_check": false,
+  "interactive_functional_acceptance_not_verified_by_this_static_check": true,
+  "aws_resources_or_grade_records_changed": false,
+  "class_ready": false,
+  "files": [
+    {
+      "path": "01_roles/cyber_security/system_requirements/2026-10_web_infrastructure_d11_assessment_spec.md",
+      "size_bytes": 29178,
+      "sha256": "fd44c04f286a1ff9b4ed45393614679613e0aa8510845fe10a8df6c166160741"
+    },
+    {
+      "path": "01_roles/cyber_security/system_requirements/2026-10_web_infrastructure_d11_assessment_contract.json",
+      "size_bytes": 46770,
+      "sha256": "44e05467796b16384f38999d17e51320266b02ffe42947b6a2ddc4c7a90ec621"
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/http_task.py",
+      "size_bytes": 2999,
+      "sha256": "5f50d4b586630c93b0c4c3274dc8ac0bc05a4d6bba9d35f1145ecf2c24cb2462"
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/progress_api.py",
+      "size_bytes": 27321,
+      "sha256": "3ccd2e1915c417b853d182d236be706e8fdcfa4bbd34f03452c3d221728de663"
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_teacher/check_dispatch.py",
+      "size_bytes": 720,
+      "sha256": "cdcada221310cac9e7b25caa24a53336beb05b05a263c9b0e350f39f6c00befc"
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/tests/test_proxy.py",
+      "size_bytes": 6794,
+      "sha256": "8b038168789bb901314551a673d192c82e2cf7ef5d5904a95708bd0d486dcfc5"
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_catalog/tests/test_runtime.py",
+      "size_bytes": 10615,
+      "sha256": "21b227beb365526a263a46b423c8e4185f982e00877106b3f68f632835fe5ccf"
+    }
+  ]
+}

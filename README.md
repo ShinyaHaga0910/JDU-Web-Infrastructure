@@ -19,6 +19,8 @@ JDUのWebインフラストラクチャー構築教材です。今セミスタ�
 
 ## 制作担当者
 
+- [環境構築・配布・採点・教師側システムの開発コード](development/README.md)
+- [学生5台のCloudFormation](development/templates/web-lab-student.template.json) / [教師の採点受付のCloudFormation](development/templates/web-teacher-d11.template.json)
 - [制作方針](COURSE_POLICY.md)
 - [AI作業の入口](AGENTS.md)
 - [制作・検証の手順](BUILD.md)

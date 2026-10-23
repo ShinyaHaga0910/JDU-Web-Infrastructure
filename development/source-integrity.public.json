@@ -1,0 +1,9 @@
+{
+  "scope": "published_source_integrity_not_AWS",
+  "date": "2026-10-23",
+  "student_template_matches_signed_r2": true,
+  "teacher_template_matches_current_builder": true,
+  "application_manifest_matches_frozen_registry": true,
+  "application_archive_sha256": "212cc8faf7a37bf0b3227de69993f5e2c5fa4e403b9b815ce280bf408dd53d24",
+  "aws_mutations": false
+}

@@ -1,0 +1,13 @@
+{
+  "archive_sha256": "8d83ec96f05798b5b1fd0ef4ded318e286f88ab256c344cbd1722408bfd397e3",
+  "archive_size_bytes": 345264,
+  "class_ready": false,
+  "credentials_included": false,
+  "distribution_id": "web-course-class193548-20261023-r2",
+  "distribution_ready": true,
+  "expires_at": "2026-10-27T09:24:57.194372+00:00",
+  "file_count": 68,
+  "foundation_and_assessment_bytes_preserved": true,
+  "raw_maximum": 62,
+  "release_sha256": "ab5e1f9edbd10c20f81b1cdd8bfb7deac1a42a60e9314849b775b32f98b18a99"
+}

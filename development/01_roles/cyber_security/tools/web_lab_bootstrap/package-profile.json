@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "release_id": "web-2026-10-r1",
+  "ubuntu": "24.04",
+  "architecture": "amd64",
+  "ami_id": "ami-0fa5967347d08d2df",
+  "mozilla_fingerprint": "35BAA0B33E9EB396F59CA838C0BA5CE6DC6315A3",
+  "roles": {
+    "common": ["openssh-server", "openssh-client", "python3", "curl", "ca-certificates", "gnupg", "gpgv", "nano", "iproute2", "procps", "tar", "gzip", "xz-utils", "chrony", "bind9-dnsutils"],
+    "repo": ["nginx"],
+    "bastion": ["xfce4", "xrdp", "xorgxrdp", "firefox", "fonts-dejavu-core", "fonts-noto-core", "fonts-noto-cjk"],
+    "dns_student_install": ["bind9", "bind9-utils"],
+    "db_student_install": ["postgresql-16", "postgresql-client-16"],
+    "web_student_install": ["nginx", "python3-venv", "python3-pip"],
+    "teacher_only": ["apt-utils", "gnupg", "python3-venv", "python3-pip"]
+  },
+  "python_requirements": ["Django>=5.2,<5.3", "gunicorn", "psycopg[binary]"],
+  "install_recommends": true
+}

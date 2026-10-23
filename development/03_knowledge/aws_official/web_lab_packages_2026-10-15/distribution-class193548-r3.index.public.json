@@ -1,0 +1,187 @@
+{
+  "scope": "d08_distribution_source_and_artifact_index",
+  "distribution_id": "d08-class193548-20261022-r3",
+  "privacy_pattern_scan_passed": true,
+  "files": [
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/README.md",
+      "sha256": "21be1274ee7a83a22bac3a1515a9c70d7ad36fba6c6506c57989109c405264a7",
+      "size_bytes": 3503
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/RELEASE.md",
+      "sha256": "7f9d4c1ecab645ccb4612b5363acf635298d89c47f4221acee10d4761a0a6e79",
+      "size_bytes": 1696
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/STUDENT.md",
+      "sha256": "bc5dc361a4e4c9bbc265b8d7ac4f45e18b2ce3d2b123fa8cc576bfa6001334f1",
+      "size_bytes": 6716
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/TEACHER.md",
+      "sha256": "41a1913e4613fc675ff062ec0e108e705911f9dc0d35b444a82796dbde307741",
+      "size_bytes": 6188
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/build_release.py",
+      "sha256": "4ec980b62dc47d6b7f9500305f4bfa3df7fbcf81add9107621bb036a3874da3f",
+      "size_bytes": 6938
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/distribution.py",
+      "sha256": "7c5be369978a5cfb72801098240c6703d7308d6afed46e8541ba8e826c20f78d",
+      "size_bytes": 22358
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/publish_release.py",
+      "sha256": "24852090988981de2a76e2a8c9e9e60928e25562f912e859e2db4a87365c8031",
+      "size_bytes": 5213
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/test_distribution.py",
+      "sha256": "d5c0dbd3e11b66cbe885dc5fccf39d95914258fecfde8267bf11a865dcbd8122",
+      "size_bytes": 9290
+    },
+    {
+      "path": "01_roles/cyber_security/tools/web_lab_distribution/test_publication.py",
+      "sha256": "0be1584abd32c160441f08151ebfd96f89b84c246ed3dee6094b014b1a4c88e2",
+      "size_bytes": 2340
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/ACCEPTANCE.json",
+      "sha256": "21903c966fcece21c782b1b28055eaae4f80f7873655357ee078a9dededdcf80",
+      "size_bytes": 721
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/RELEASE.md",
+      "sha256": "7f9d4c1ecab645ccb4612b5363acf635298d89c47f4221acee10d4761a0a6e79",
+      "size_bytes": 1696
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/STUDENT.md",
+      "sha256": "bc5dc361a4e4c9bbc265b8d7ac4f45e18b2ce3d2b123fa8cc576bfa6001334f1",
+      "size_bytes": 6716
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/TEACHER.md",
+      "sha256": "41a1913e4613fc675ff062ec0e108e705911f9dc0d35b444a82796dbde307741",
+      "size_bytes": 6188
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/core/README.txt",
+      "sha256": "f4f24e2b3f7ec7a3c12d40a424fb4e0083ebcec097d07e27e4d12ab2fae36bbe",
+      "size_bytes": 1976
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/core/controller_runtime.py",
+      "sha256": "3c4e1ef0e3413637b31b9ead6e32893b9e7b9ed11640c6b7ea34601285ac6489",
+      "size_bytes": 2422
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/core/deployment-manifest.json",
+      "sha256": "a00239fa1cb8efc09d8cad214c6e97f5c99f1436c9549c3f66bf09ea9ee4a3d2",
+      "size_bytes": 4082
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/core/deployment-manifest.json.asc",
+      "sha256": "4cbc8a68054978ff3a4c20dcab2477cba0dc3743ad36977850c6dd9819035a7c",
+      "size_bytes": 659
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/core/deployment-manifest.schema.json",
+      "sha256": "99ab9d6d02e6497834b11c295a9f8b088e9312a3ed27a83151bd039e27870df9",
+      "size_bytes": 4354
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/core/jdu-web-lab",
+      "sha256": "5a9069bd3bd7cfacbff3a64792d4f80da19b53fee8b7fd47425d4d765f27d3a8",
+      "size_bytes": 378
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/core/package-signing-public.asc",
+      "sha256": "79c8d4f7041568d5f0fded709100e2d818f26353d216ae8661054bc49b775d61",
+      "size_bytes": 1302
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/core/release_validation.py",
+      "sha256": "e9aebc2f1ed3d54df70e862e5a9aabe8e08970004106c8a89a6260da9e34096c",
+      "size_bytes": 15606
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/core/select_instances.py",
+      "sha256": "f92ac3d7e0d4bb4f4b4ec625757c30507dc087babdda79431bd65131517a4710",
+      "size_bytes": 12322
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/core/student-controller.tar.gz",
+      "sha256": "90a152c012f2e3a862f158e70629a578d68fa2c5f6535db8e976c87f6a723837",
+      "size_bytes": 51294
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/core/teacher-price-catalog.json",
+      "sha256": "24ae3a662d422f09985c3d2bbddd29db73965ddce035e5316f09eeafa9f3bb44",
+      "size_bytes": 862
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/core/web-lab-ssm-all-nodes-c5.template.json",
+      "sha256": "b91e53ec887d4988ae4df531536a1e265fc7551e5bebef7312a6dd776f180c06",
+      "size_bytes": 51146
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/core/web_lab.py",
+      "sha256": "c6f181a0f6ae82ed49cf9f63b2f5199068fd31592b49dbeb4e23f19c00b85916",
+      "size_bytes": 16264
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/distribution-release.json",
+      "sha256": "4d15fd4975404b12c5f0257752db086626b8301bb7af4670f1ade72bc39d86ec",
+      "size_bytes": 3822
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/distribution-release.json.asc",
+      "sha256": "467ede5b96e1af2d1fd94db36b40683438bd63ab38d390c68dae8d3b76031bcc",
+      "size_bytes": 659
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/distribution.py",
+      "sha256": "7c5be369978a5cfb72801098240c6703d7308d6afed46e8541ba8e826c20f78d",
+      "size_bytes": 22358
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/package-signing-public.asc",
+      "sha256": "79c8d4f7041568d5f0fded709100e2d818f26353d216ae8661054bc49b775d61",
+      "size_bytes": 1302
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3/publish_release.py",
+      "sha256": "24852090988981de2a76e2a8c9e9e60928e25562f912e859e2db4a87365c8031",
+      "size_bytes": 5213
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3.tar.gz",
+      "sha256": "3848f9adb04cd7af37c4343e1c3c1dc695133cccace8f6fd8c14401c5b08d86d",
+      "size_bytes": 96301
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3.tar.gz.asc",
+      "sha256": "eda5c44503b81fdbc87fef9b77b7951cfbbf64d7f4a481a89801a31e34354c2b",
+      "size_bytes": 659
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3.public.json",
+      "sha256": "259023821ed7028f60434a17900520f6da4e71f02c9353096e7d887f639e33d5",
+      "size_bytes": 502
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3.acceptance.public.json",
+      "sha256": "f011fc98b4c2db8cfc56d0a590997241c0cecdcc2335147e4785deda4028985c",
+      "size_bytes": 2092
+    },
+    {
+      "path": "03_knowledge/aws_official/web_lab_packages_2026-10-15/distribution-class193548-r3.teacher.png",
+      "sha256": "4f355e53e808801edc58866256bd7631e916995c296696a7235fef8f64cbd074",
+      "size_bytes": 48019
+    }
+  ]
+}

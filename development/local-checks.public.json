@@ -1,0 +1,99 @@
+{
+  "scope": "imported_source_offline_regression_not_AWS",
+  "date": "2026-10-23",
+  "source_files_verified": 378,
+  "python_files_parsed": 216,
+  "groups": [
+    {
+      "group": "web_lab_instance_selector",
+      "modules": [
+        "test_select_instances",
+        "test_collect_price_catalog"
+      ],
+      "passed": true,
+      "tests_run": 13,
+      "skipped": 0,
+      "seconds": 0.61
+    },
+    {
+      "group": "web_lab_bootstrap",
+      "modules": [
+        "test_web_lab",
+        "test_five_node_template",
+        "test_all_nodes_ssm",
+        "test_student_create",
+        "test_student_controller",
+        "test_internal_ssh",
+        "test_checker_cache",
+        "test_bootstrap_failure_detail"
+      ],
+      "passed": true,
+      "tests_run": 65,
+      "skipped": 0,
+      "seconds": 7.18
+    },
+    {
+      "group": "web_lab_teacher",
+      "modules": [
+        "test_progress_api",
+        "test_web_commands",
+        "test_http_checker",
+        "test_checker_binding",
+        "test_class_student_delivery",
+        "test_refresh_class_delivery"
+      ],
+      "passed": true,
+      "tests_run": 53,
+      "skipped": 0,
+      "seconds": 7.38
+    },
+    {
+      "group": "web_lab_assessment",
+      "modules": [
+        "test_assessment",
+        "test_observers"
+      ],
+      "passed": true,
+      "tests_run": 25,
+      "skipped": 1,
+      "seconds": 0.62
+    },
+    {
+      "group": "web_lab_distribution",
+      "modules": [
+        "test_distribution",
+        "test_publication"
+      ],
+      "passed": true,
+      "tests_run": 10,
+      "skipped": 0,
+      "seconds": 4.45
+    },
+    {
+      "group": "web_lab_release",
+      "modules": [
+        "test_release"
+      ],
+      "passed": true,
+      "tests_run": 13,
+      "skipped": 0,
+      "seconds": 29.64
+    },
+    {
+      "group": "web_lab_catalog",
+      "modules": [
+        "tests.test_configuration",
+        "tests.test_bundle"
+      ],
+      "passed": true,
+      "tests_run": 5,
+      "skipped": 2,
+      "seconds": 1.54
+    }
+  ],
+  "tests_run": 184,
+  "tests_skipped": 3,
+  "all_passed": true,
+  "aws_mutations": false,
+  "import_baseline_checked": true
+}

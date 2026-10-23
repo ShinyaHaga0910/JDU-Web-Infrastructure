@@ -1,0 +1,187 @@
+{
+  "artifact": "jdu-web-d11",
+  "class_ready": false,
+  "contract_id": "web-d11-2026-10-r1",
+  "contract_sha256": "3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33",
+  "credentials_included": false,
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "f5cf7c06ae17b4ceb27bd6cc5fb891e91a5b936cec64223f638c97d53adcda9f",
+      "size_bytes": 5881
+    },
+    {
+      "path": "app_probe.py",
+      "sha256": "90dd0ab14bb9b7217533c18d4967766368ef7dfca6cf06f2259c43978c83c373",
+      "size_bytes": 7678
+    },
+    {
+      "path": "assessment-registry.json",
+      "sha256": "3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33",
+      "size_bytes": 34605
+    },
+    {
+      "path": "assessment_check.py",
+      "sha256": "80e35aeec9ca91d9d18021cf28f4bcf3beccf558819b2c7a275f0fa1a5c3c3a1",
+      "size_bytes": 16151
+    },
+    {
+      "path": "aws_readiness.py",
+      "sha256": "659a15294915c4c8681f932e2a365d5f4d66c7de8fdde4a8d66219466772eb2b",
+      "size_bytes": 3482
+    },
+    {
+      "path": "build_teacher.py",
+      "sha256": "00c3cf191109efb1b9a1c54a974f1b7052d053e4e073c083cd706a089c5e96c3",
+      "size_bytes": 3176
+    },
+    {
+      "path": "candidate_install.py",
+      "sha256": "6c052918a2d9e722a3c35ea6370b79db6e89237f45bc711cc242aa91230c5abe",
+      "size_bytes": 2980
+    },
+    {
+      "path": "catalog-app.tar.gz",
+      "sha256": "212cc8faf7a37bf0b3227de69993f5e2c5fa4e403b9b815ce280bf408dd53d24",
+      "size_bytes": 19486
+    },
+    {
+      "path": "dashboard.py",
+      "sha256": "fb1bb5f4a9879f3296532de85aba30bfafae8537526ba6db9a7b1686b2b99e99",
+      "size_bytes": 9642
+    },
+    {
+      "path": "database_secret.py",
+      "sha256": "0b3cab3c1b4a49902e908620a6f06c9b225bbadc88162bd1e70f37365ca4c36b",
+      "size_bytes": 2020
+    },
+    {
+      "path": "db_observer.py",
+      "sha256": "dd68a042398edd3ecd45dfc463fca39bb0a33fa75e400d0272343f4aa25b97a9",
+      "size_bytes": 15591
+    },
+    {
+      "path": "grading.py",
+      "sha256": "eadb82a8f7a0ab365a2e0d39e10bc833d5fd2a34a5a02f72c5210a328f285b24",
+      "size_bytes": 3117
+    },
+    {
+      "path": "http_guest_v2.py",
+      "sha256": "d88b67e03a9b7b12bc9bd154c1e28f13fe3f7cf4c3f0b542643e67edd51efa1b",
+      "size_bytes": 2601
+    },
+    {
+      "path": "legacy/bootstrap_inspection.py",
+      "sha256": "bb4d9dfa7b6dc8ab13d308b571565fe0e9b7cc3f5fd6dc1115e438982f3c0f74",
+      "size_bytes": 16720
+    },
+    {
+      "path": "legacy/bootstrap_submission_guest.py",
+      "sha256": "a272e00352be15e2c64082661edb0aee03df68a194ab0b3a4dbe619058d71683",
+      "size_bytes": 4515
+    },
+    {
+      "path": "legacy/build_template.py",
+      "sha256": "b749a1293b39c10a59b58ef3566656455a0281ce0b737653011f28803c999053",
+      "size_bytes": 6627
+    },
+    {
+      "path": "legacy/check_bootstrap.py",
+      "sha256": "3503b96ed464d1a0122aecb24e4537f60b27812ab82ea030636db51250f6811e",
+      "size_bytes": 6261
+    },
+    {
+      "path": "legacy/check_http.py",
+      "sha256": "c13c23b0bd4097bbacbe068c9c343c4faa33d13b0c059e31621c740bb7b60353",
+      "size_bytes": 5088
+    },
+    {
+      "path": "legacy/http_task.py",
+      "sha256": "5f50d4b586630c93b0c4c3274dc8ac0bc05a4d6bba9d35f1145ecf2c24cb2462",
+      "size_bytes": 2999
+    },
+    {
+      "path": "legacy/http_task_guest.py",
+      "sha256": "d0f7e10575f2db17047df3b8fc22fbfb545e7bb4aa3d240d49f915135e326ac0",
+      "size_bytes": 5903
+    },
+    {
+      "path": "legacy/internal_ssh_guest.py",
+      "sha256": "d2e23f58e6bf1191906ddacf27615b56596c56860995efbf18c27437a8323101",
+      "size_bytes": 10114
+    },
+    {
+      "path": "legacy/payload_runtime.py",
+      "sha256": "fcaeacb1060e1f3b93811d4d9f2ca69d0c6004b78b77b0cd46aaabef84fc150e",
+      "size_bytes": 11149
+    },
+    {
+      "path": "legacy/progress_api.py",
+      "sha256": "3ccd2e1915c417b853d182d236be706e8fdcfa4bbd34f03452c3d221728de663",
+      "size_bytes": 27321
+    },
+    {
+      "path": "legacy/release_validation.py",
+      "sha256": "e9aebc2f1ed3d54df70e862e5a9aabe8e08970004106c8a89a6260da9e34096c",
+      "size_bytes": 15606
+    },
+    {
+      "path": "legacy/setup_internal_ssh.py",
+      "sha256": "1d66bb79bdfb8fae8f56249bdd82c8d578ea9b2d05657195faee2edf1bfb4498",
+      "size_bytes": 10700
+    },
+    {
+      "path": "legacy/submit_five_node_bootstrap.py",
+      "sha256": "ca345c7e2779239a39b22384437bde49d407177dfd9bfd503b39bf4a6b4f3d8f",
+      "size_bytes": 5442
+    },
+    {
+      "path": "legacy/web_progress.py",
+      "sha256": "a966bbe49eefdb4fc6f9ca1dc39d930532992490923fde155caf3ed5a5aed6a4",
+      "size_bytes": 7600
+    },
+    {
+      "path": "network_checks.py",
+      "sha256": "e88ae871adb070987696aea17366dd2fc7516f554b68093cb2b082f516187626",
+      "size_bytes": 11734
+    },
+    {
+      "path": "progress_api_v2.py",
+      "sha256": "4a71af667b883aed2d016abc5e52b115a0d72aa5296779ce0fd6ffb3dcdc7cb5",
+      "size_bytes": 8788
+    },
+    {
+      "path": "registry.py",
+      "sha256": "15f0624c07aff3f9cc2f931419ff1f2f2056400d470d08ca142b0f84a2bc1642",
+      "size_bytes": 5050
+    },
+    {
+      "path": "remote_guest.py",
+      "sha256": "ac9a2b144008992e6445649cb033cc6d4cd6f18b4f7666d5b4afd29663e0c91d",
+      "size_bytes": 14226
+    },
+    {
+      "path": "system_observer.py",
+      "sha256": "4896cb45d547a59151e65432e98d8120ccc3ecf581b411c3877211b92d69a4b7",
+      "size_bytes": 10584
+    },
+    {
+      "path": "teacher_cli.py",
+      "sha256": "9e6ec0d5c2326a72b3f4b474616d68510c745acd83ce408329a0a0c1f56f64b6",
+      "size_bytes": 3471
+    },
+    {
+      "path": "transport.py",
+      "sha256": "8056da7741dc773bc4ade3ed3bc38d141b5067bcd58e9bcd2a3a422233768c1c",
+      "size_bytes": 1724
+    },
+    {
+      "path": "upgrade_teacher.py",
+      "sha256": "45414aea1bb999126c8fec42cab0b04d61ab3dfec15c067a2fc22de09e559b4f",
+      "size_bytes": 5805
+    }
+  ],
+  "raw_points_max": 62,
+  "schema_version": 1,
+  "scope": "candidate_62_raw_points"
+}

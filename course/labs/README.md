@@ -32,6 +32,6 @@ Pは課題文を先に置き、49段階に実行場所・目的と操作・期�
 - 生成：authoring/build.py。Markdown→閲覧HTML/A4 PDF、同じ初期配布3点のbyte保持、配布zipを作る。
 - 自動確認：authoring/validate.py。版/hash/課題/点数/command同期、shell構文、公開資源・展開拒否、PDF/HTML/zipを検査する。
 
-生成にはPython3.12、markdown-it-py、reportlab、pypdf、WindowsのMS Gothic/Arial/Consolasを使用。フォントをzipへ再配布しない。ローカル制作でJUD projectの公開検証資源を読むが、学生配布zipにはauthoringを含めず、利用時にJUD projectを参照しない。
+生成にはPython3.12と[requirements.txt](authoring/requirements.txt)、PDFにはWindowsのMS Gothic/Arial/Consolasを使用。フォントをzipへ再配布しない。公開検証資源は同じrepoの[development](../../development/README.md)を既定で読み、特定PCの絶対pathを必要としない。学生配布zipにはauthoringや開発fixtureを含めない。再生成と確認は[BUILD.md](../../BUILD.md)に従う。
 
 **教材初版は制作済み。母語校閲、教師の目視確認、学生が詳細手順を最初から辿る通し試験は未実施。全授業のCLASS_READYはfalseのまま。** 初期化や完成fixtureを教材受入のために学生環境へ再適用していない。

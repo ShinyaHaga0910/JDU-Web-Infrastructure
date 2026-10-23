@@ -9,3 +9,4 @@
 *.tar.gz -text
 *.zip -text
 *.pdf -text
+development/** -text

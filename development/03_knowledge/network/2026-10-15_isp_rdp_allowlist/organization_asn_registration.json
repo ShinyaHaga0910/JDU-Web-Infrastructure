@@ -1,0 +1,33 @@
+[
+  {
+    "organization": "ORG-UNCN1-RIPE",
+    "provider": "Uztelecom",
+    "asns": [
+      "AS202660",
+      "AS28910",
+      "AS8193"
+    ],
+    "source": "https://rest.db.ripe.net/search.json?inverse-attribute=org&query-string=ORG-UNCN1-RIPE&type-filter=aut-num&flags=no-referenced"
+  },
+  {
+    "organization": "ORG-JC7-RIPE",
+    "provider": "Uztelecom",
+    "asns": [
+      "AS197486",
+      "AS201767",
+      "AS202175",
+      "AS34250"
+    ],
+    "source": "https://rest.db.ripe.net/search.json?inverse-attribute=org&query-string=ORG-JC7-RIPE&type-filter=aut-num&flags=no-referenced"
+  },
+  {
+    "organization": "ORG-ET10-RIPE",
+    "provider": "ISTTelecom",
+    "asns": [
+      "AS34718",
+      "AS39032",
+      "AS47452"
+    ],
+    "source": "https://rest.db.ripe.net/search.json?inverse-attribute=org&query-string=ORG-ET10-RIPE&type-filter=aut-num&flags=no-referenced"
+  }
+]
