@@ -1,0 +1,32 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Internal-only read-only student grade projection; no public endpoint",
+  "Parameters": {
+    "ArtifactBucket": {"Type": "String"},
+    "ArtifactKey": {"Type": "String"},
+    "ArtifactVersion": {"Type": "String", "MinLength": 1},
+    "ExecutionRoleArn": {"Type": "String", "AllowedPattern": "arn:aws:iam::[0-9]{12}:role/LabRole"},
+    "GradeTableName": {"Type": "String", "MinLength": 3},
+    "BindingTableName": {"Type": "String", "MinLength": 3},
+    "SubjectKeySecretArn": {"Type": "String", "AllowedPattern": "arn:aws:secretsmanager:us-east-1:[0-9]{12}:secret:[A-Za-z0-9/_+=.@-]+"}
+  },
+  "Resources": {
+    "GradeReader": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Runtime": "python3.13",
+        "Handler": "identity_grade_handler.handler",
+        "Role": {"Ref": "ExecutionRoleArn"},
+        "Timeout": 15,
+        "MemorySize": 256,
+        "Code": {"S3Bucket": {"Ref": "ArtifactBucket"}, "S3Key": {"Ref": "ArtifactKey"}, "S3ObjectVersion": {"Ref": "ArtifactVersion"}},
+        "Environment": {"Variables": {
+          "GRADE_TABLE": {"Ref": "GradeTableName"},
+          "PORTAL_BINDING_TABLE": {"Ref": "BindingTableName"},
+          "PORTAL_SUBJECT_KEY_SECRET_ARN": {"Ref": "SubjectKeySecretArn"}
+        }}
+      }
+    }
+  },
+  "Outputs": {"FunctionArn": {"Value": {"Fn::GetAtt": ["GradeReader", "Arn"]}}}
+}

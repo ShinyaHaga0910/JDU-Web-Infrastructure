@@ -45,6 +45,7 @@
 - 別の架空データで `enrollment.py` 本体をSHA-256照合の上、実DynamoDBで実行。登録成功・連続再送の拒否・試験元データ不変を確認した。本人確認とchallenge読取りは模擬し、同一試用tableだけを使った。学生account連携・別tableをまたぐtransaction・期限切れは未受入。
 - 学内教材ポータルのGoogle Workspace認証方式を参照し、本人確認済みGoogle ID・教師承認済みLabの一対一登録と本人の62点読取りを内部処理として試作。架空IDで登録→読取り、他ID拒否・失効・登録競合を確認。Google認証、教師承認、秘密鍵の実運用とWeb入口への統合は未実装。
 - 教師AWSの試作用tableで `subject_binding.py` 本体をhash照合して実行し、2つの架空IDの同時登録は1つだけ成功、元データが不変と確認。本人確認・subject変換は模擬し、実学生の連携ではない。
+- 既存採点registryをbyteそのまま収録する内部Lambda候補とpackageを制作し、再現性・非公開構成をローカル検証。教師AWSでtemplateの構文受理を確認。呼出し元の権限制限、秘密鍵と本人確認の統合、実配備は未実施。
 - Web Functions配備、学生本人とAWS accountの認証済みbinding、固定ブラウザ画面、停止時/End Lab後の実証は未完了。既存配布版r2は2026-10-27 14:24:57 UZTで期限切れ。
 
 ## 受入条件
