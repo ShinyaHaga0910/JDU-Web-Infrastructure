@@ -37,7 +37,8 @@
 - 教師AWSから既存DBを直接読み、検証Labの62/62点を照合。教師EC2はrunningだったため、停止中・End Lab後は未受入。
 - 別学生AWSから、既存stateとStackおよび5台のID・タグの一致、5台running・SSM Onlineを読み取りで確認した。CloudShellの個別観測であり、Web画面の連携試験ではない。
 - 前回は `aws lambda list-web-functions` と誤ったサービス名で確認した。正しくは `aws lambda-web list-web-functions`。前回のエラーはCLI版やWeb Functionsの利用可否を示さない。正しいコマンドでの確認は未実施。以前の本人による利用確認を維持する。
-- 学生AWSの本人確認に使うSTS署名・短命nonce・再利用拒否の試作を追加。ローカルの模擬試験は12件合格。実AWSでの署名検証、永続的・原子的なnonce管理、ログインおよびLab/接続先との結び付けは未完了。ブラウザへの接続が応答せず実AWS確認は未実施。
+- 学生AWSの本人確認に使うSTS署名・短命nonce・再利用拒否の試作を追加。ローカルの模擬試験は15件合格。永続的・原子的なnonce管理の実機検証、ログインおよびLab/接続先との結び付けは未完了。
+- 再接続後、学生AWSのCloudShell内で署名付きSTS要求を確認。本人accountが返り、nonceを変更すると403。署名ヘッダー・60秒有効期間は試作の前提と一致した。教師・学生間の統合試験は未実施。正しい `lambda-web list-web-functions` は成功し、学生AWSの一覧は空。作成権限は未確認。
 - Web Functions配備、学生本人とAWS accountの認証済みbinding、固定ブラウザ画面、停止時/End Lab後の実証は未完了。既存配布版r2は2026-10-27 14:24:57 UZTで期限切れ。
 
 ## 受入条件

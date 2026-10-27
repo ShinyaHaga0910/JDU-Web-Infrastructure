@@ -6,7 +6,7 @@
 
 - `grade_reader.py` は既存の学生用lab tokenで認証し、既存 `project_lab` の62素点と現在／参照結果を返す。教師用APIの内部で使うための関数であり、HTTP入口やブラウザ認証を公開しない。生のtoken、メール、チェック明細は結果に含めない。
 - `status.py` は学生アカウント内の信頼済み既存bindingを受け、STSアカウント、CloudFormationのLab/Deploymentと5台のID、EC2タグを確認する。EC2とSSMを読取り、停止・取得不能を区別する。起動、停止、コマンド送信、採点データの更新は行わない。
-- `identity_proof.py` は、固定のAWS STSだけに短時間の署名付きGetCallerIdentityを送り、セッションに紐付く一回限りのnonceを検証する候補を試作する。模擬試験のみで実AWSの署名・nonceヘッダー検証は未確認。学生ログイン、信頼できる学生Labと接続先の決定は未実装であり、公開しない。
+- `identity_proof.py` は、固定のAWS STSだけに短時間の署名付きGetCallerIdentityを送り、セッションに紐付く一回限りのnonceを検証する候補を試作する。実AWSでの署名・nonceヘッダー自体は以下のように確認したが、このmoduleを使う教師・学生間の統合試験は未実施。学生ログイン、信頼できる学生Labと接続先の決定は未実装であり、公開しない。
 - `challenge_store.py` は、既に認証・認可されたセッション、学生account、Labと操作窓口の識別子を前提に、期限付きchallengeのハッシュを保存し条件付き更新で一度だけ消費する試作。DynamoDBの実環境・並行要求での試験、情報源の認可とWeb入口への組込みは未実施。
 - bindingはサーバー側で確立しなければならず、ブラウザからの任意入力をそのまま渡してはいけない。学生本人とAWSアカウント、Stack、ポータル認証の安全な結び付けは未実装。
 
@@ -21,6 +21,10 @@
 2026-10-27、Class 193548の教師AWSから既存DynamoDBを直接読み、既存Pythonの `project_lab` で検証用Labの保存済み成績が62/62、現在の未解決が0、検証用コンテキストであることを確認した。教師EC2を経由しない読取りだが、そのEC2は当時runningであり、**EC2停止中・End Lab後の実証ではない**。この確認はCloudShellで行い、新しいWeb Functionsや `grade_reader.py` のAWS配備を意味しない。
 
 同日、別の学生AWSのCloudShellからSTSのアカウント、保存済みstateとbaseline、CloudFormationのLab/Deploymentと5台のinstance ID、各EC2タグを照合した。5台ともrunning・SSM Onlineを確認。個別の読取り操作であり、`status.py` やブラウザ経由での実証ではない。学生ポータルとAWSアカウントの認証済み連携は引き続き未実装。
+
+同日、学生CloudShell内でbotocoreを使い、60秒有効・nonceヘッダーを含む署名付きSTS要求を生成。正しいnonceで学生AWS accountを確認し、nonceを変えた要求は403となった。署名対象ヘッダーは `host;x-jdu-nonce` で試作の期待値と一致。署名URLや認証情報は出力・保存しなかった。実験は同じCloudShell内で完結しており、教師側への送信、リプレイ対策を含む統合確認ではない。
+
+学生AWSの `aws lambda-web list-web-functions` は正常終了し、一覧は空だった。これは一覧読取り権限の確認であり、作成・配備権限を確認したものではない。
 
 ## 残る受入
 
