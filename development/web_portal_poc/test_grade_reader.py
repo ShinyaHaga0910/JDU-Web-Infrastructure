@@ -55,6 +55,22 @@ class GradeTest(unittest.TestCase):
                 student_grade(self.service, event)
         self.assertEqual(self.store.labs_calls, [])
 
+    def test_revoked_or_rebound_after_authentication_cannot_read(self):
+        original_labs = self.store.labs
+        def revoked(only_lab=None):
+            rows = original_labs(only_lab)
+            return [dict(rows[0], active=False)]
+        self.store.labs = revoked
+        with self.assertRaises(legacy.ApiError):
+            student_grade(self.service, self.event())
+
+        def rebound(only_lab=None):
+            rows = original_labs(only_lab)
+            return [dict(rows[0], deployment_id='different')]
+        self.store.labs = rebound
+        with self.assertRaises(legacy.ApiError):
+            student_grade(self.service, self.event())
+
 
 if __name__ == '__main__':
     unittest.main()
