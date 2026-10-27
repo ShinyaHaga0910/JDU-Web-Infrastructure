@@ -10,11 +10,12 @@
 - `challenge_store.py` は、既に認証・認可されたセッション、学生account、Labと操作窓口の識別子を前提に、期限付きchallengeのハッシュを保存し条件付き更新で一度だけ消費する試作。DynamoDBの実環境・並行要求での試験、情報源の認可とWeb入口への組込みは未実施。
 - `student_proof.py` は学生側のAWS実行環境内で、SDKを使って60秒有効の署名済みSTS要求を作る試作。要求には一時認証情報が含まれるため、ログ・ブラウザURL・共有PCに保存しない。信頼済み教師側への安全な配送は未実装。
 - `enrollment.py` は、認証・認可済みのサーバー内情報を受けてSTS署名を確認し、元のLab情報の一致確認、nonce消費、LabとAWS accountの重複防止登録をDynamoDBの一つのtransactionで行う試作。元の成績tableへの書込みはない。模擬環境で同時実行・重複・情報変更を試験し、SDKがrequest形式を受け付けることも確認した。実DynamoDBでは未受入で、入力情報の認可や窓口自体の確認は別途必要。
+- `binding-table.template.json` は登録と短期challengeを保管する独立したDynamoDB tableの候補。期限属性があるchallengeだけをTTLの対象とし、期限属性のない登録情報は保持する。従量課金、AWS管理の暗号化、stack削除時の保持を指定し、既存の成績table、IAMや公開入口には変更を加えない。配備や実AWSでのtransactionは未確認。
 - bindingはサーバー側で確立しなければならず、ブラウザからの任意入力をそのまま渡してはいけない。学生本人とAWSアカウント、Stack、ポータル認証の安全な結び付けは未実装。
 
 ## ローカル試験
 
-このdirectoryで `python -B -m unittest -v test_status test_grade_reader test_identity_proof test_challenge_store test_student_proof test_enrollment` を実行。架空のAWS応答で、5台停止、取得不能、別account/Stack/タグの拒否、62点と現在UNKNOWNの併存、他Lab/誤tokenの拒否、認証用nonceの期限・再利用・不正な接続先の拒否を検証する。botocoreを導入した環境では、架空資格情報を使った実SDKによる署名生成・request形式も確認する。実AWS試験ではない。
+このdirectoryで `python -B -m unittest -v test_status test_grade_reader test_identity_proof test_challenge_store test_student_proof test_enrollment test_binding_template` を実行。架空のAWS応答で、5台停止、取得不能、別account/Stack/タグの拒否、62点と現在UNKNOWNの併存、他Lab/誤tokenの拒否、認証用nonceの期限・再利用・不正な接続先の拒否を検証する。botocoreを導入した環境では、架空資格情報を使った実SDKによる署名生成・request形式も確認する。実AWS試験ではない。
 
 既存7群の回帰試験では、6群が合格（計3件skip）、配布群は固定署名版の期限切れにより2件のsetupで停止した。期限を回避したり署名を変更したりしていない。
 
@@ -27,6 +28,8 @@
 同日、学生CloudShell内でbotocoreを使い、60秒有効・nonceヘッダーを含む署名付きSTS要求を生成。正しいnonceで学生AWS accountを確認し、nonceを変えた要求は403となった。署名対象ヘッダーは `host;x-jdu-nonce` で試作の期待値と一致。署名URLや認証情報は出力・保存しなかった。実験は同じCloudShell内で完結しており、教師側への送信、リプレイ対策を含む統合確認ではない。
 
 学生AWSの `aws lambda-web list-web-functions` は正常終了し、一覧は空だった。これは一覧読取り権限の確認であり、作成・配備権限を確認したものではない。
+
+教師AWSのCloudShellから同等のtable templateをCloudFormation `ValidateTemplate` に渡し、受理されたことを確認した。転記した内容の検証であり、ローカルfileのbyte一致やstack作成、IAM権限、DynamoDBの動作を確認したものではない。
 
 ## 残る受入
 

@@ -1,6 +1,6 @@
 # WEB-PORTAL-001：学生の環境準備・採点確認をブラウザへ集約する
 
-- 状態: 実現性の検討済み・小規模実証待ち（実装/配備は未着手）。
+- 状態: 小規模実証の試作中。ローカル実装と個別のAWS読取り確認を実施、Web配備と統合受入は未実施。
 - 登録: 2026-10-23、本人依頼。
 - 着手順: D12の受入残件を保持し、2026-10-23の本人依頼で本Issueの構成検討を先行。Web演習の改善課題として実証・実装へ進める。
 - GitHub: [Issue #1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1)（非公開JDU-Web-Infrastructure）。
@@ -36,9 +36,11 @@
 - [読取り試作と実験記録](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/tree/main/development/web_portal_poc)を追加。架空データで認証拒否、62点とUNKNOWNの保持、5台停止/取得不能の扱いを8件確認した。
 - 教師AWSから既存DBを直接読み、検証Labの62/62点を照合。教師EC2はrunningだったため、停止中・End Lab後は未受入。
 - 別学生AWSから、既存stateとStackおよび5台のID・タグの一致、5台running・SSM Onlineを読み取りで確認した。CloudShellの個別観測であり、Web画面の連携試験ではない。
-- 前回は `aws lambda list-web-functions` と誤ったサービス名で確認した。正しくは `aws lambda-web list-web-functions`。前回のエラーはCLI版やWeb Functionsの利用可否を示さない。正しいコマンドでの確認は未実施。以前の本人による利用確認を維持する。
+- 前回は `aws lambda list-web-functions` と誤ったサービス名で確認した。正しくは `aws lambda-web list-web-functions`。前回のエラーはCLI版やWeb Functionsの利用可否を示さない。
 - 学生AWSの本人確認に使うSTS署名・短命nonce・再利用拒否の試作を追加。ローカルの模擬試験は15件合格。永続的・原子的なnonce管理の実機検証、ログインおよびLab/接続先との結び付けは未完了。
 - 再接続後、学生AWSのCloudShell内で署名付きSTS要求を確認。本人accountが返り、nonceを変更すると403。署名ヘッダー・60秒有効期間は試作の前提と一致した。教師・学生間の統合試験は未実施。正しい `lambda-web list-web-functions` は成功し、学生AWSの一覧は空。作成権限は未確認。
+- 成績原本の変更なしに、本人確認challengeの一回限りの消費とLab/accountの重複防止をまとめる登録処理と、独立したDynamoDB tableのtemplateを試作。ローカルで競合・期限・別accountなどを確認したが、実DynamoDB、信頼できるログイン、窓口の認可と統合試験は未実施。
+- 教師AWSでtable templateと同等の構成をCloudFormation `ValidateTemplate` が受理。stack作成や実DynamoDBの動作は未確認。
 - Web Functions配備、学生本人とAWS accountの認証済みbinding、固定ブラウザ画面、停止時/End Lab後の実証は未完了。既存配布版r2は2026-10-27 14:24:57 UZTで期限切れ。
 
 ## 受入条件
@@ -63,4 +65,4 @@ Web FunctionsのHTTPS入口はIamAuth又はApplicationManagedを選べる。前�
 - https://docs.aws.amazon.com/lambda/latest/dg/web-functions-endpoint-access-control.html
 - https://aws.amazon.com/blogs/compute/exploring-aws-lambda-web-functions-for-building-web-applications/
 
-今回の配布版やAWS構成には、このIssueのための新サービス/認証/権限を追加しない。
+既存の署名配布版・AWS構成は保持する。新サービスや権限を追加する際は対象と影響を明確にし、別途検証する。
