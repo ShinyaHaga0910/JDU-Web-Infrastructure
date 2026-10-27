@@ -1,4 +1,5 @@
 import { configFrom, cookies, cookie, login, callback, verifyGoogle, SESSION, FLOW } from './auth.mjs';
+import { ACCESS } from './sessions.mjs';
 
 const security = {
   'Cache-Control': 'private, no-store, max-age=0', 'Referrer-Policy': 'no-referrer',
@@ -10,17 +11,20 @@ const text = {
     login:'Googleでログイン', logout:'ログアウト', total:'保存済みの素点', current:'最新の確認', unknown:'確認できない項目があります',
     noRecord:'記録なし', currentOk:'確認済み', back:'トップへ戻る', unavailable:'成績を取得できません。しばらくしてから再度お試しください。',
     unbound:'本人の演習環境がまだ登録されていません。先生に確認してください。', mission:'課題', score:'保存済み', home:'トップ', checked:'確認日時', received:'保存日時',
-    notice:'環境の状態確認・構築と新しい採点の画面は準備中です。保存済み成績の閲覧ではサーバーを起動しません。' },
+    notice:'環境の状態確認・構築と新しい採点の画面は準備中です。保存済み成績の閲覧ではサーバーを起動しません。',
+    shared:'共有PCでは、使い終わったらこの画面とGoogleの両方からログアウトしてください。', signedout:'ログアウトしました。' },
   ru: { title:'Практика Web', grades:'Сохранённые результаты', intro:'Войдите с университетским аккаунтом Google.',
     login:'Войти через Google', logout:'Выйти', total:'Сохранённые баллы', current:'Последняя проверка', unknown:'Есть непроверенные пункты',
     noRecord:'Нет записи', currentOk:'Проверено', back:'На главную', unavailable:'Не удалось получить результат. Повторите попытку позже.',
     unbound:'Ваша учебная среда ещё не зарегистрирована. Обратитесь к преподавателю.', mission:'Задание', score:'Сохранено', home:'Главная', checked:'Время проверки', received:'Время сохранения',
-    notice:'Просмотр состояния, создание среды и новая проверка готовятся. Просмотр результатов не запускает серверы.' },
+    notice:'Просмотр состояния, создание среды и новая проверка готовятся. Просмотр результатов не запускает серверы.',
+    shared:'На общем компьютере после работы выйдите здесь и из аккаунта Google.', signedout:'Вы вышли из системы.' },
   uz: { title:'Web amaliyoti', grades:'Saqlangan natijalar', intro:'Universitet Google hisobingiz bilan kiring.',
     login:'Google orqali kirish', logout:'Chiqish', total:'Saqlangan ball', current:'Oxirgi tekshiruv', unknown:'Tekshirib bo‘lmagan bandlar bor',
     noRecord:'Natija yo‘q', currentOk:'Tekshirilgan', back:'Bosh sahifaga', unavailable:'Natijani olib bo‘lmadi. Keyinroq qayta urinib ko‘ring.',
     unbound:'Sizning amaliy muhitingiz hali ro‘yxatdan o‘tmagan. O‘qituvchiga murojaat qiling.', mission:'Vazifa', score:'Saqlangan', home:'Bosh sahifa', checked:'Tekshirilgan vaqt', received:'Saqlangan vaqt',
-    notice:'Holatni ko‘rish, muhit yaratish va yangi tekshiruv tayyorlanmoqda. Natijani ko‘rish serverlarni ishga tushirmaydi.' },
+    notice:'Holatni ko‘rish, muhit yaratish va yangi tekshiruv tayyorlanmoqda. Natijani ko‘rish serverlarni ishga tushirmaydi.',
+    shared:'Umumiy kompyuterda ish tugagach, bu yerdan va Google hisobidan chiqing.', signedout:'Tizimdan chiqdingiz.' },
 };
 const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const MISSION_MAXIMA=Object.freeze({M1:8,M2:13,M3:3,M4:9,M5:13,M6:16});
@@ -48,7 +52,7 @@ function gradeHtml(lang, grade) {
   return `<section><h2>${escape(t.total)}</h2><p class="num">${escape(total)}</p><p>${escape(summary)}</p><div class="table-wrap"><table><thead><tr><th scope="col">${escape(t.mission)}</th><th scope="col">${escape(t.score)}</th><th scope="col">${escape(t.current)}</th><th scope="col">${escape(t.checked)}</th><th scope="col">${escape(t.received)}</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
 }
 
-export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch, getGrade}={}) {
+export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch, getGrade, sessions}={}) {
   return async request => {
     const url=new URL(request.url), lang=language(url), t=text[lang];
     if (url.pathname === '/healthz') return new Response('ok',{headers:{...security,'Content-Type':'text/plain; charset=utf-8'}});
@@ -59,20 +63,40 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
       try {const flow=await login(config); return redirect(flow.location,[flow.flowCookie]);} catch {return response('Unavailable',503);}
     }
     if (url.pathname === '/auth/callback' && request.method === 'GET') {
-      try {const result=await callback(request,config,{exchange,verify}); return redirect('/',[result.sessionCookie,result.clearFlow]);}
+      if (!sessions) return response('Unavailable',503,{'Set-Cookie':cookie(FLOW,'',0)});
+      let result;
+      try {result=await callback(request,config,{exchange,verify});}
       catch {return response('Sign-in failed',403,{'Set-Cookie':cookie(FLOW,'',0)});}
+      try {
+        const prefix=SESSION+'=';
+        if (!result.sessionCookie.startsWith(prefix)) throw new Error('Invalid login');
+        const token=result.sessionCookie.slice(prefix.length).split(';',1)[0];
+        const identity=await verify(token,config);
+        const access=await sessions.issue(token,identity.exp);
+        return redirect('/',[cookie(SESSION,token,access.ttl),cookie(ACCESS,access.id,access.ttl),result.clearFlow]);
+      } catch {return response('Unavailable',503,{'Set-Cookie':cookie(FLOW,'',0)});}
     }
     if (url.pathname === '/auth/logout' && request.method === 'POST') {
       const origin=request.headers.get('origin');
       if (origin !== config.origin && !((origin===null||origin==='null') && request.headers.get('sec-fetch-site')==='same-origin')) return response('Forbidden',403);
-      return redirect('/signed-out',[cookie(SESSION,'',0),cookie(FLOW,'',0)]);
+      try {
+        const id=cookies(request).get(ACCESS);
+        if (id) {if (!sessions) throw new Error('Session store unavailable'); await sessions.revoke(id);}
+        return redirect('/signed-out',[cookie(SESSION,'',0),cookie(ACCESS,'',0),cookie(FLOW,'',0)]);
+      } catch {
+        const h=new Headers(security); for (const name of [SESSION,ACCESS,FLOW]) h.append('Set-Cookie',cookie(name,'',0));
+        h.set('Content-Type','text/plain; charset=utf-8'); return new Response('Unavailable',{status:503,headers:h});
+      }
     }
     if (!['GET','HEAD'].includes(request.method)) return response('Method not allowed',405);
-    if (url.pathname === '/signed-out') return response(page(lang,t.title,`<p>${escape(t.logout)}</p><a href="/auth/login">${escape(t.login)}</a>`));
-    let identity;
-    try { identity=await verify(cookies(request).get(SESSION),config); }
+    if (url.pathname === '/signed-out') return response(page(lang,t.title,`<p>${escape(t.signedout)}</p><p>${escape(t.shared)}</p><a href="/auth/login">${escape(t.login)}</a>`));
+    let identity, jar, token;
+    try {jar=cookies(request); token=jar.get(SESSION); identity=await verify(token,config);}
     catch {return url.pathname==='/' ? redirect('/auth/login') : response('Forbidden',403);}
-    if (url.pathname === '/') return response(page(lang,t.title,`<section><a href="/grades?lang=${lang}">${escape(t.grades)}</a></section><p>${escape(t.notice)}</p><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form>`));
+    if (!sessions) return response('Unavailable',503);
+    try {if (!await sessions.check(jar.get(ACCESS),token)) return url.pathname==='/' ? redirect('/auth/login') : response('Forbidden',403);}
+    catch {return response('Unavailable',503);}
+    if (url.pathname === '/') return response(page(lang,t.title,`<section><a href="/grades?lang=${lang}">${escape(t.grades)}</a></section><p>${escape(t.notice)}</p><p>${escape(t.shared)}</p><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form>`));
     if (url.pathname !== '/grades') return response('Not found',404);
     try {
       if (typeof identity?.sub !== 'string' || typeof getGrade !== 'function') throw new Error('Unavailable');

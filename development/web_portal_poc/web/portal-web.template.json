@@ -11,6 +11,7 @@
     "GoogleClientId": {"Type": "String", "Default": "disabled"},
     "GoogleClientSecret": {"Type": "String", "Default": "disabled", "NoEcho": true},
     "GradeReaderFunctionArn": {"Type": "String", "Default": "disabled"},
+    "BindingTableName": {"Type": "String", "Default": "disabled"},
     "ReleaseId": {"Type": "String", "AllowedPattern": "[a-f0-9]{40,64}"}
   },
   "Resources": {
@@ -21,7 +22,7 @@
       "BuildConfig": {"CodeConfig": {"S3Object": {"Bucket": {"Ref": "ArtifactBucket"}, "Key": {"Ref": "ArtifactKey"}, "VersionId": {"Ref": "ArtifactVersion"}}}, "RuntimeConfig": {"Runtime": "nodejs24.x"}},
       "ServiceConfig": {"ExecutionRoleArn": {"Ref": "LabRoleArn"}, "TimeoutSeconds": 15, "MaxConcurrencyPerEnvironment": 4,
         "EnvironmentVariables": {"PORTAL_MODE": {"Ref": "PortalMode"}, "PUBLIC_ORIGIN": {"Ref": "PublicOrigin"},
-          "GOOGLE_CLIENT_ID": {"Ref": "GoogleClientId"}, "GOOGLE_CLIENT_SECRET": {"Ref": "GoogleClientSecret"}, "GRADE_READER_FUNCTION_ARN": {"Ref": "GradeReaderFunctionArn"}},
+          "GOOGLE_CLIENT_ID": {"Ref": "GoogleClientId"}, "GOOGLE_CLIENT_SECRET": {"Ref": "GoogleClientSecret"}, "GRADE_READER_FUNCTION_ARN": {"Ref": "GradeReaderFunctionArn"}, "PORTAL_BINDING_TABLE": {"Ref": "BindingTableName"}},
         "TelemetryConfig": {"LoggingConfig": {"LogGroup": {"Ref": "LogGroup"}, "ApplicationLogLevel": "WARN", "SystemLogLevel": "WARN"}}}
     }},
     "Endpoint": {"Type": "AWS::Lambda::WebFunctionEndpoint", "Properties": {"FunctionName": {"Ref": "Portal"}, "EndpointName": "portal", "EndpointType": "HomeRegion", "AuthType": "ApplicationManaged",

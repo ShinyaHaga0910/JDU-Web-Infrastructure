@@ -47,6 +47,7 @@
 - 教師AWSの試作用tableで `subject_binding.py` 本体をhash照合して実行し、2つの架空IDの同時登録は1つだけ成功、元データが不変と確認。本人確認・subject変換は模擬し、実学生の連携ではない。
 - 既存採点registryをbyteそのまま収録する内部Lambda候補とpackageを制作し、再現性・非公開構成をローカル検証。教師AWSでtemplateの構文受理を確認。呼出し元の権限制限、秘密鍵と本人確認の統合、実配備は未実施。
 - 学内ポータルのGoogle認証を参照したJA/RU/UZ成績画面とWeb Functions候補を作成。架空データでChromeの言語切替、記録なし・UNKNOWN・確認/保存日時と限定読取りを確認。配備packageの再現性・AWS template構文を検査。実Google、成績Lambda、学生AWSとの統合と画面配備は未実施。
+- 共有PC向けに、最大10分のserver-side sessionとログアウト時の失効を試作。Google tokenとsession IDのハッシュだけを保存し、実token・メール・Google IDは保存しない。OAuth署名/state/nonce、期限、コピー済みcookieのログアウト後拒否を模擬環境で確認。Googleからのログアウトも必要で、実AWS・実ブラウザ受入は未実施。
 - Web Functions配備、学生本人とAWS accountの認証済みbinding、固定ブラウザ画面、停止時/End Lab後の実証は未完了。既存配布版r2は2026-10-27 14:24:57 UZTで期限切れ。
 
 ## 受入条件

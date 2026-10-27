@@ -7,6 +7,8 @@ import { createGradeClient } from './grade-client.mjs';
 const env={PORTAL_MODE:'enabled', PUBLIC_ORIGIN:'https://portal.example', GOOGLE_CLIENT_ID:'1234-example.apps.googleusercontent.com', GOOGLE_CLIENT_SECRET:'example-test-secret-only'};
 const subject='1234567890';
 const verified=async token => {if(token!=='valid')throw Error('no session');return {sub:subject};};
+const sessions={check:async(id,token)=>id==='session' && token==='valid',revoke:async()=>{}};
+const credentials='__Host-jdu-session=valid; __Host-jdu-access=session';
 const sample={raw_earned:34,raw_maximum:62,current_unresolved:['M5'],missing_or_unresolved:['M6'],
               current:{M5:{evaluable:false,checked_at:'2026-10-27T09:00:00Z'}},selected:{M1:{raw_earned:8},M2:{raw_earned:13},M5:{raw_earned:13,received_at:'2026-10-27T09:05:00Z'}}};
 const req=(path,options={})=>new Request(`https://portal.example${path}`,options);
@@ -19,8 +21,8 @@ test('score bounds match the existing assessment registry',async()=>{
 
 test('verified user sees only the server-resolved score and current unknown',async()=>{
   const calls=[];
-  const app=createApp({env,verify:verified,getGrade:async s=>{calls.push(s);return {status:'ok',grade:sample};}});
-  const res=await app(req('/grades?lang=uz&lab_id=another',{headers:{cookie:'__Host-jdu-session=valid'}}));
+  const app=createApp({env,verify:verified,sessions,getGrade:async s=>{calls.push(s);return {status:'ok',grade:sample};}});
+  const res=await app(req('/grades?lang=uz&lab_id=another',{headers:{cookie:credentials}}));
   const body=await res.text();
   assert.equal(res.status,200); assert.deepEqual(calls,[subject]);
   assert.match(body,/34 \/ 62/); assert.match(body,/Tekshirib bo‘lmagan/); assert.match(body,/2026-10-27 09:05 UTC/);
@@ -31,29 +33,70 @@ test('verified user sees only the server-resolved score and current unknown',asy
 
 test('unauthenticated and unbound users cannot read grades',async()=>{
   let count=0;
-  const app=createApp({env,verify:verified,getGrade:async()=>{count++;return {status:'unauthorized'};}});
+  const app=createApp({env,verify:verified,sessions,getGrade:async()=>{count++;return {status:'unauthorized'};}});
   assert.equal((await app(req('/grades'))).status,403); assert.equal(count,0);
-  const response=await app(req('/grades?lang=ru',{headers:{cookie:'__Host-jdu-session=valid'}}));
+  const response=await app(req('/grades?lang=ru',{headers:{cookie:credentials}}));
   assert.equal(response.status,403); assert.match(await response.text(),/не зарегистрирована/);
   assert.equal(count,1);
 });
 
 test('missing records do not display an invented zero and failures are generic',async()=>{
   let data={...sample,raw_earned:0,current_unresolved:[],missing_or_unresolved:['M1'],current:{},selected:{}};
-  const app=createApp({env,verify:verified,getGrade:async()=>({status:'ok',grade:data})});
-  let response=await app(req('/grades',{headers:{cookie:'__Host-jdu-session=valid'}}));
+  const app=createApp({env,verify:verified,sessions,getGrade:async()=>({status:'ok',grade:data})});
+  let response=await app(req('/grades',{headers:{cookie:credentials}}));
   assert.match(await response.text(),/記録なし/);
   data={...data,raw_earned:'<script>alert(1)</script>'};
-  response=await app(req('/grades',{headers:{cookie:'__Host-jdu-session=valid'}}));
+  response=await app(req('/grades',{headers:{cookie:credentials}}));
   assert.equal(response.status,503); assert.doesNotMatch(await response.text(),/<script>/);
 });
 
 test('logout requires same origin and invalid deployment stays closed',async()=>{
-  const app=createApp({env,verify:verified,getGrade:async()=>({})});
+  const app=createApp({env,verify:verified,sessions,getGrade:async()=>({})});
   assert.equal((await app(req('/auth/logout',{method:'POST',headers:{origin:'https://evil.example'}}))).status,403);
   const allowed=await app(req('/auth/logout',{method:'POST',headers:{origin:'https://portal.example'}}));
   assert.equal(allowed.status,303); assert.match(allowed.headers.get('set-cookie'),/Max-Age=0/);
   assert.equal((await createApp({env:{}})(req('/grades'))).status,503);
+});
+
+test('a Google token alone or unavailable session store never grants grade access',async()=>{
+  let calls=0;
+  const app=createApp({env,verify:verified,sessions,getGrade:async()=>{calls++;return {status:'ok',grade:sample};}});
+  assert.equal((await app(req('/grades',{headers:{cookie:'__Host-jdu-session=valid'}}))).status,403);
+  assert.equal((await createApp({env,verify:verified,getGrade:async()=>{calls++;}})(req('/grades',{headers:{cookie:credentials}}))).status,503);
+  const broken={...sessions,check:async()=>{throw Error('unavailable');}};
+  assert.equal((await createApp({env,verify:verified,sessions:broken})(req('/grades',{headers:{cookie:credentials}}))).status,503);
+  assert.equal(calls,0);
+});
+
+test('login binds a short session and logout invalidates a copied cookie',async()=>{
+  let active=false;
+  const id='a'.repeat(64);
+  const sessionStore={issue:async(token,exp)=>{assert.equal(token,'valid');assert.equal(exp,2000000000);active=true;return {id,ttl:600};},
+    check:async(sid,token)=>active && sid===id && token==='valid',revoke:async(sid)=>{assert.equal(sid,id);active=false;}};
+  const verify=async(token,config,options)=>{assert.equal(token,'valid');if(options?.nonce)assert.ok(options.nonce);return {sub:subject,exp:2000000000};};
+  const exchange=async()=>Response.json({id_token:'valid'});
+  const app=createApp({env,verify,exchange,sessions:sessionStore,getGrade:async()=>({status:'ok',grade:sample})});
+  const start=await app(req('/auth/login'));
+  const flow=start.headers.getSetCookie()[0].split(';')[0];
+  const state=new URL(start.headers.get('location')).searchParams.get('state');
+  const end=await app(req(`/auth/callback?code=fake&state=${state}`,{headers:{cookie:flow}}));
+  assert.equal(end.status,303);
+  const headers=end.headers.getSetCookie();
+  assert.equal(headers.length,3);
+  assert.ok(headers.slice(0,2).every(v=>v.includes('Max-Age=600')&&v.includes('HttpOnly')&&v.includes('Secure')));
+  const jar=headers.slice(0,2).map(v=>v.split(';')[0]).join('; ');
+  assert.equal((await app(req('/grades',{headers:{cookie:jar}}))).status,200);
+  const logout=await app(req('/auth/logout',{method:'POST',headers:{origin:'https://portal.example',cookie:jar}}));
+  assert.equal(logout.status,303); assert.equal(logout.headers.getSetCookie().length,3);
+  assert.equal((await app(req('/grades',{headers:{cookie:jar}}))).status,403);
+});
+
+test('failed server revocation clears browser cookies but signals failure',async()=>{
+  const broken={...sessions,revoke:async()=>{throw Error('database failed');}};
+  const app=createApp({env,verify:verified,sessions:broken});
+  const response=await app(req('/auth/logout',{method:'POST',headers:{origin:'https://portal.example',cookie:credentials}}));
+  assert.equal(response.status,503); assert.equal(response.headers.getSetCookie().length,3);
+  assert.ok(response.headers.getSetCookie().every(v=>v.includes('Max-Age=0')));
 });
 
 test('grade client invokes only fixed function with verified subject',async()=>{

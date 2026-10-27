@@ -12,7 +12,7 @@
 - `enrollment.py` は、認証・認可済みのサーバー内情報を受けてSTS署名を確認し、元のLab情報の一致確認、nonce消費、LabとAWS accountの重複防止登録をDynamoDBの一つのtransactionで行う試作。元の成績tableへの書込みはない。模擬環境で同時実行・重複・情報変更を試験し、SDKがrequest形式を受け付けることも確認した。実AWSでは本人確認などを模擬して試作本体を試したが、入力情報の認可や窓口自体の確認は別途必要。
 - `subject_binding.py` と `identity_grade.py` は、Googleで検証済みの本人IDと教師承認済みLabを一対一に結び付け、既存の62点計算で本人の成績のみを読む内部処理の試作。本人IDは秘密鍵を使ったHMACに変換し、元のメール・Google IDをtableに入れない。原本metadataと両方向のAWS bindingが一致していることをtransactionで条件確認し、同じLabへの別ID登録を拒否する。閲覧時も対応関係とactive/token/deploymentを確認し、原本や他Labには書き込まない。秘密鍵の管理・rotation、Google本人確認・教師承認・入口との統合、実AWS受入は未実施。これら関数にブラウザの自己申告値を直接渡してはならない。
 - `identity_grade_handler.py`、`build_grade_package.py`、`internal-grade.template.json` は、検証済みIDから既存成績を読む内部Lambdaの候補。指定Secrets ManagerからHMAC用keyを取得し、元のregistry bytesと既存採点コードをそのままZIPに含む。構成はFunction URL・API入口・IAM変更を作らないが、既存LabRoleを指定するためrole自体の権限を縮小するものではない。呼出し元のIAM制限とGoogle本人確認を完成させるまでは配備・公開しない。keyの発行、secret保管、配備や実データ読取りも未実施。
-- `web/` はWeb Functions向けの学生用成績画面の試作。既存JDU学内教材ポータルの `auth.mjs` を改行形式を除いてそのまま移し、学内Googleで検証したIDだけをサーバー内で固定の成績Lambdaへ渡す。JA/RU/UZの点数、最新の未確認、確認日時・保存日時を表示し、記録がない場合は0点に置き換えない。学生のAWS操作や新しい採点はまだつないでいない。OAuth client設定、IAMによる呼出し制限、教師承認、実学生ログインと実成績の表示は未実施。Web Functions入口はApplicationManagedであり、公開時の認証責任はアプリにある。
+- `web/` はWeb Functions向けの学生用成績画面の試作。既存JDU学内教材ポータルの `auth.mjs` を改行形式を除いてそのまま移し、学内Googleで検証したIDだけをサーバー内で固定の成績Lambdaへ渡す。JA/RU/UZの点数、最新の未確認、確認日時・保存日時を表示し、記録がない場合は0点に置き換えない。`sessions.mjs` は最大10分の独立したセッションを使い、tableにランダム値とGoogle tokenのハッシュのみを保存する。ログアウト時はサーバー側も失効し、期限切れやstore障害では成績を返さない。共有PCではGoogle自体からもログアウトするよう画面に表示する。学生のAWS操作や新しい採点はまだつないでいない。OAuth client設定、IAMによる呼出し制限、教師承認、実学生ログインと実成績の表示は未実施。Web Functions入口はApplicationManagedであり、公開時の認証責任はアプリにある。
 - `binding-table.template.json` は登録と短期challengeを保管する独立したDynamoDB table。期限属性があるchallengeだけをTTLの対象とし、期限属性のない登録情報は保持する。従量課金、AWS管理の暗号化、stack削除時の保持を指定し、既存の成績table、IAMや公開入口には変更を加えない。
 - `aws_synthetic_transaction.py` は下記の実AWS試験の操作記録。対応する条件式を使う独立した試験であり、`enrollment.py` の実行やSTS認証の統合確認ではない。架空accountの既存bindingがあれば再実行を拒否する。
 - bindingはサーバー側で確立しなければならず、ブラウザからの任意入力をそのまま渡してはいけない。学生本人とAWSアカウント、Stack、ポータル認証の安全な結び付けは未実装。
@@ -21,7 +21,7 @@
 
 このdirectoryで `python -B -m unittest -v test_status test_grade_reader test_identity_grade test_subject_binding test_identity_grade_handler test_grade_package test_identity_proof test_challenge_store test_student_proof test_enrollment test_binding_template` を実行。架空のAWS応答で、5台停止、取得不能、別account/Stack/タグの拒否、62点と現在UNKNOWNの併存、他Lab/誤tokenの拒否、認証用nonceの期限・再利用・不正な接続先の拒否を検証する。ID登録から既存採点の表示まで、別ID拒否、登録の失効・同時登録の競合も架空データで確認する。内部Lambda packageの再現性、元registry bytes、入口を公開しないtemplateも確認する。botocoreを導入した環境では、架空資格情報を使った実SDKによる署名生成・request形式も確認する。実AWS試験ではない。
 
-`web/` では `npm ci --omit=dev`、`npm test`、`python -B -m unittest -v test_web_package` で、認証済みidentityの限定利用、未登録拒否、UNKNOWN、言語、元registryと表示上限の一致、閉鎖初期設定と配備ZIPの再現性を確認する。依存関係は2026-10-27時点の `npm audit --omit=dev` で0件。Chromeのlocalhost表示と言語切替は架空データ・模擬認証で確認した。実Googleログインや本番ブラウザ受入を意味しない。
+`web/` では `npm ci --omit=dev`、`npm test`、`python -B -m unittest -v test_web_package` で、署名・組織・nonce検証、認証済みidentityの限定利用、ログアウト後の再利用拒否、期限とstore障害、未登録拒否、UNKNOWN、言語、元registryと表示上限の一致、閉鎖初期設定と配備ZIPの再現性を確認する。Google署名・セッション保存先は架空鍵・模擬DB。依存関係は2026-10-27時点の `npm audit --omit=dev` で0件。Chromeのlocalhost表示と言語切替は架空データ・模擬認証で確認した。実Googleログインや本番ブラウザ受入を意味しない。
 
 既存7群の回帰試験では、6群が合格（計3件skip）、配布群は固定署名版の期限切れにより2件のsetupで停止した。期限を回避したり署名を変更したりしていない。
 

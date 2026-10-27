@@ -9,12 +9,12 @@ from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 HERE = Path(__file__).resolve().parent
-SOURCE = ('index.js', 'auth.mjs', 'router.mjs', 'grade-client.mjs', 'package.json')
+SOURCE = ('index.js', 'auth.mjs', 'router.mjs', 'grade-client.mjs', 'sessions.mjs', 'package.json')
 
 
 def build(destination):
     modules = HERE / 'node_modules'
-    if not (modules / 'jose').is_dir() or not (modules / '@aws-sdk/client-lambda').is_dir():
+    if not all((modules / name).is_dir() for name in ('jose', '@aws-sdk/client-lambda', '@aws-sdk/client-dynamodb')):
         raise ValueError('run npm ci --omit=dev first')
     files = [(name, HERE / name) for name in SOURCE]
     for path in modules.rglob('*'):
