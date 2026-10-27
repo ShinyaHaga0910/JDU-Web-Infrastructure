@@ -1,4 +1,5 @@
 import copy
+from datetime import datetime, timezone
 import unittest
 from unittest.mock import Mock
 
@@ -41,6 +42,21 @@ class StatusTest(unittest.TestCase):
         self.assertEqual(result['instances'][1]['ssm_state'], 'unknown')
         self.ec2.start_instances.assert_not_called()
         self.ssm.send_command.assert_not_called()
+
+    def test_addresses_and_last_ssm_ping_are_observations(self):
+        ping = datetime(2026, 10, 27, 9, 0, tzinfo=timezone.utc)
+        instance_id = self.binding['nodes']['bastion']['instance_id']
+        self.ssm.describe_instance_information.return_value['InstanceInformationList'][0]['LastPingDateTime'] = ping
+        old_describe = self.ec2.describe_instances.side_effect
+        def describe(InstanceIds):
+            answer = old_describe(InstanceIds)
+            if InstanceIds[0] == instance_id:
+                answer['Reservations'][0]['Instances'][0].update(PrivateIpAddress='10.20.1.10', PublicIpAddress='192.0.2.10')
+            return answer
+        self.ec2.describe_instances.side_effect = describe
+        bastion = self.read()['instances'][0]
+        self.assertEqual(bastion['ssm_last_ping'], ping.isoformat())
+        self.assertEqual((bastion['private_ip'], bastion['public_ip']), ('10.20.1.10', '192.0.2.10'))
 
     def test_wrong_account_or_other_stack_is_rejected(self):
         self.sts.get_caller_identity.return_value = {'Account': '999999999999'}
