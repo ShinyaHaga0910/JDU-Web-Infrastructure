@@ -40,7 +40,9 @@
 - 学生AWSの本人確認に使うSTS署名・短命nonce・再利用拒否の試作を追加。ローカルの模擬試験は15件合格。永続的・原子的なnonce管理の実機検証、ログインおよびLab/接続先との結び付けは未完了。
 - 再接続後、学生AWSのCloudShell内で署名付きSTS要求を確認。本人accountが返り、nonceを変更すると403。署名ヘッダー・60秒有効期間は試作の前提と一致した。教師・学生間の統合試験は未実施。正しい `lambda-web list-web-functions` は成功し、学生AWSの一覧は空。作成権限は未確認。
 - 成績原本の変更なしに、本人確認challengeの一回限りの消費とLab/accountの重複防止をまとめる登録処理と、独立したDynamoDB tableのtemplateを試作。ローカルで競合・期限・別accountなどを確認したが、実DynamoDB、信頼できるログイン、窓口の認可と統合試験は未実施。
-- 教師AWSでtable templateと同等の構成をCloudFormation `ValidateTemplate` が受理。stack作成や実DynamoDBの動作は未確認。
+- 教師AWSでtable templateと同等の構成をCloudFormation `ValidateTemplate` が受理した。
+- 教師AWSに独立した試作用tableを作成し、TTL有効化を確認。架空データの同一transactionを同時送信すると1回だけ成功し、試験用元データが不変であることを確認。手組みの条件式による試験であり、`enrollment.py` 本体のAWS実行や学生accountとの統合受入ではない。試験tableと架空行は保持され、従量課金の対象となる。
+- 別の架空データで `enrollment.py` 本体をSHA-256照合の上、実DynamoDBで実行。登録成功・連続再送の拒否・試験元データ不変を確認した。本人確認とchallenge読取りは模擬し、同一試用tableだけを使った。学生account連携・別tableをまたぐtransaction・期限切れは未受入。
 - Web Functions配備、学生本人とAWS accountの認証済みbinding、固定ブラウザ画面、停止時/End Lab後の実証は未完了。既存配布版r2は2026-10-27 14:24:57 UZTで期限切れ。
 
 ## 受入条件

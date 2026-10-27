@@ -9,8 +9,9 @@
 - `identity_proof.py` は、固定のAWS STSだけに短時間の署名付きGetCallerIdentityを送り、セッションに紐付く一回限りのnonceを検証する候補を試作する。実AWSでの署名・nonceヘッダー自体は以下のように確認したが、このmoduleを使う教師・学生間の統合試験は未実施。学生ログイン、信頼できる学生Labと接続先の決定は未実装であり、公開しない。
 - `challenge_store.py` は、既に認証・認可されたセッション、学生account、Labと操作窓口の識別子を前提に、期限付きchallengeのハッシュを保存し条件付き更新で一度だけ消費する試作。DynamoDBの実環境・並行要求での試験、情報源の認可とWeb入口への組込みは未実施。
 - `student_proof.py` は学生側のAWS実行環境内で、SDKを使って60秒有効の署名済みSTS要求を作る試作。要求には一時認証情報が含まれるため、ログ・ブラウザURL・共有PCに保存しない。信頼済み教師側への安全な配送は未実装。
-- `enrollment.py` は、認証・認可済みのサーバー内情報を受けてSTS署名を確認し、元のLab情報の一致確認、nonce消費、LabとAWS accountの重複防止登録をDynamoDBの一つのtransactionで行う試作。元の成績tableへの書込みはない。模擬環境で同時実行・重複・情報変更を試験し、SDKがrequest形式を受け付けることも確認した。実DynamoDBでは未受入で、入力情報の認可や窓口自体の確認は別途必要。
-- `binding-table.template.json` は登録と短期challengeを保管する独立したDynamoDB tableの候補。期限属性があるchallengeだけをTTLの対象とし、期限属性のない登録情報は保持する。従量課金、AWS管理の暗号化、stack削除時の保持を指定し、既存の成績table、IAMや公開入口には変更を加えない。配備や実AWSでのtransactionは未確認。
+- `enrollment.py` は、認証・認可済みのサーバー内情報を受けてSTS署名を確認し、元のLab情報の一致確認、nonce消費、LabとAWS accountの重複防止登録をDynamoDBの一つのtransactionで行う試作。元の成績tableへの書込みはない。模擬環境で同時実行・重複・情報変更を試験し、SDKがrequest形式を受け付けることも確認した。実AWSでは本人確認などを模擬して試作本体を試したが、入力情報の認可や窓口自体の確認は別途必要。
+- `binding-table.template.json` は登録と短期challengeを保管する独立したDynamoDB table。期限属性があるchallengeだけをTTLの対象とし、期限属性のない登録情報は保持する。従量課金、AWS管理の暗号化、stack削除時の保持を指定し、既存の成績table、IAMや公開入口には変更を加えない。
+- `aws_synthetic_transaction.py` は下記の実AWS試験の操作記録。対応する条件式を使う独立した試験であり、`enrollment.py` の実行やSTS認証の統合確認ではない。架空accountの既存bindingがあれば再実行を拒否する。
 - bindingはサーバー側で確立しなければならず、ブラウザからの任意入力をそのまま渡してはいけない。学生本人とAWSアカウント、Stack、ポータル認証の安全な結び付けは未実装。
 
 ## ローカル試験
@@ -29,7 +30,11 @@
 
 学生AWSの `aws lambda-web list-web-functions` は正常終了し、一覧は空だった。これは一覧読取り権限の確認であり、作成・配備権限を確認したものではない。
 
-教師AWSのCloudShellから同等のtable templateをCloudFormation `ValidateTemplate` に渡し、受理されたことを確認した。転記した内容の検証であり、ローカルfileのbyte一致やstack作成、IAM権限、DynamoDBの動作を確認したものではない。
+教師AWSのCloudShellから転記したtable templateをCloudFormation `ValidateTemplate` に渡し、受理されたことを確認した。この段階ではbyte一致やstack作成を確認していなかった。
+
+続いてローカルtemplateのSHA-256をCloudShell内で照合し、教師AWSの独立した `jdu-web-portal-binding-poc-20261027` stackを作成、`CREATE_COMPLETE` とTTL `expires_at` の `ENABLED` を確認。従量課金の試作用tableは残っている。架空Lab・架空accountの行で、元データの条件確認、challenge消費、2つのbinding作成を同一transactionにまとめ、2つの同時要求のうち1つが成功、もう1つが拒否されることを実DynamoDBで確認した。架空の元データは不変。成績tableは使っていない。この並行試験は条件式を手作りしたもの。試験行は保持され、試験用challengeには長い期限が入っているため自動的にすぐ消えない。
+
+別の架空Lab・accountを用い、`enrollment.py` のSHA-256 `fe12707d604d834fb3cbc3f6bdfd8430dbfa5ed66ab6e388c15ff8b0e5306046` を確認した上で同ファイル本体をCloudShellのmemoryで実行。実DynamoDBへの登録が成功し、同じchallengeの連続再送は拒否、架空の元データは不変だった。本人確認とchallenge読取りは模擬し、成績の模擬元データとbindingは同じ試作用tableを使用。別tableをまたぐ実行、期限切れ、実学生STSとの結合は未確認で、授業受入ではない。
 
 ## 残る受入
 
