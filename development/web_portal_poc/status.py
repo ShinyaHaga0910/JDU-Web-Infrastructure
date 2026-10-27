@@ -56,13 +56,17 @@ def observe(sts, cloudformation, ec2, ssm, binding):
 
     try:
         infos = ssm.describe_instance_information(Filters=[{'Key': 'InstanceIds', 'Values': ids}]).get('InstanceInformationList', [])
-        online = {i['InstanceId']: i.get('PingStatus', 'unknown') for i in infos}
+        online = {i['InstanceId']: i for i in infos}
     except Exception:
         online = {}
     result = []
     for role, instance_id in zip(ROLES, ids):
+        ssm_info = online.get(instance_id, {})
+        ping = ssm_info.get('LastPingDateTime')
         entry = {'role': role, 'instance_id': instance_id, 'ec2_state': 'unknown',
-                 'ssm_state': online.get(instance_id, 'unknown'), 'public_ip': None}
+                 'ssm_state': ssm_info.get('PingStatus', 'unknown'),
+                 'ssm_last_ping': ping.isoformat() if isinstance(ping, datetime) else None,
+                 'public_ip': None, 'private_ip': None}
         try:
             reservations = ec2.describe_instances(InstanceIds=[instance_id]).get('Reservations', [])
             found = [i for r in reservations for i in r.get('Instances', [])]
@@ -74,6 +78,7 @@ def observe(sts, cloudformation, ec2, ssm, binding):
                 raise BindingError('instance tags differ from retained binding')
             entry['ec2_state'] = instance.get('State', {}).get('Name', 'unknown')
             entry['public_ip'] = instance.get('PublicIpAddress')
+            entry['private_ip'] = instance.get('PrivateIpAddress')
         except BindingError:
             raise
         except Exception:
