@@ -1,0 +1,31 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Closed-by-default JDU Web course portal candidate",
+  "Parameters": {
+    "ArtifactBucket": {"Type": "String"},
+    "ArtifactKey": {"Type": "String"},
+    "ArtifactVersion": {"Type": "String", "MinLength": 1},
+    "LabRoleArn": {"Type": "String", "AllowedPattern": "arn:aws:iam::[0-9]{12}:role/LabRole"},
+    "PortalMode": {"Type": "String", "Default": "closed", "AllowedValues": ["closed", "enabled"]},
+    "PublicOrigin": {"Type": "String", "Default": "https://closed.invalid", "AllowedPattern": "https://[^/]+/?"},
+    "GoogleClientId": {"Type": "String", "Default": "disabled"},
+    "GoogleClientSecret": {"Type": "String", "Default": "disabled", "NoEcho": true},
+    "GradeReaderFunctionArn": {"Type": "String", "Default": "disabled"},
+    "ReleaseId": {"Type": "String", "AllowedPattern": "[a-f0-9]{40,64}"}
+  },
+  "Resources": {
+    "LogGroup": {"Type": "AWS::Logs::LogGroup", "Properties": {"LogGroupName": {"Fn::Sub": "/jdu/web-course-portal/${AWS::StackName}"}, "RetentionInDays": 3}},
+    "Portal": {"Type": "AWS::Lambda::WebFunction", "Properties": {"FunctionName": {"Ref": "AWS::StackName"}}},
+    "Revision": {"Type": "AWS::Lambda::WebFunctionRevision", "Properties": {
+      "FunctionName": {"Ref": "Portal"}, "Description": {"Ref": "ReleaseId"},
+      "BuildConfig": {"CodeConfig": {"S3Object": {"Bucket": {"Ref": "ArtifactBucket"}, "Key": {"Ref": "ArtifactKey"}, "VersionId": {"Ref": "ArtifactVersion"}}}, "RuntimeConfig": {"Runtime": "nodejs24.x"}},
+      "ServiceConfig": {"ExecutionRoleArn": {"Ref": "LabRoleArn"}, "TimeoutSeconds": 15, "MaxConcurrencyPerEnvironment": 4,
+        "EnvironmentVariables": {"PORTAL_MODE": {"Ref": "PortalMode"}, "PUBLIC_ORIGIN": {"Ref": "PublicOrigin"},
+          "GOOGLE_CLIENT_ID": {"Ref": "GoogleClientId"}, "GOOGLE_CLIENT_SECRET": {"Ref": "GoogleClientSecret"}, "GRADE_READER_FUNCTION_ARN": {"Ref": "GradeReaderFunctionArn"}},
+        "TelemetryConfig": {"LoggingConfig": {"LogGroup": {"Ref": "LogGroup"}, "ApplicationLogLevel": "WARN", "SystemLogLevel": "WARN"}}}
+    }},
+    "Endpoint": {"Type": "AWS::Lambda::WebFunctionEndpoint", "Properties": {"FunctionName": {"Ref": "Portal"}, "EndpointName": "portal", "EndpointType": "HomeRegion", "AuthType": "ApplicationManaged",
+      "RevisionWeights": [{"RevisionId": {"Fn::GetAtt": ["Revision", "RevisionId"]}, "Weight": 100}], "ScalingConfig": {"MaxEnvironments": 2}, "ThrottleConfig": {"RateLimit": 100}}}
+  },
+  "Outputs": {"PortalUrl": {"Value": {"Fn::Sub": "https://${Endpoint.DomainName}"}}}
+}
