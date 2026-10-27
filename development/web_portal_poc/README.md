@@ -6,12 +6,13 @@
 
 - `grade_reader.py` は既存の学生用lab tokenで認証し、既存 `project_lab` の62素点と現在／参照結果を返す。教師用APIの内部で使うための関数であり、HTTP入口やブラウザ認証を公開しない。生のtoken、メール、チェック明細は結果に含めない。
 - `status.py` は学生アカウント内の信頼済み既存bindingを受け、STSアカウント、CloudFormationのLab/Deploymentと5台のID、EC2タグを確認する。EC2とSSMを読取り、停止・取得不能を区別する。起動、停止、コマンド送信、採点データの更新は行わない。
-- `identity_proof.py` は、固定のAWS STSだけに短時間の署名付きGetCallerIdentityを送り、セッションに紐付く一回限りのnonceを検証する候補を試作する。模擬試験のみで実AWSの署名・nonceヘッダー検証は未確認。永続・原子的なchallenge store、学生ログイン、学生Labと接続先への結び付けは未実装であり、公開しない。
+- `identity_proof.py` は、固定のAWS STSだけに短時間の署名付きGetCallerIdentityを送り、セッションに紐付く一回限りのnonceを検証する候補を試作する。模擬試験のみで実AWSの署名・nonceヘッダー検証は未確認。学生ログイン、信頼できる学生Labと接続先の決定は未実装であり、公開しない。
+- `challenge_store.py` は、既に認証・認可されたセッション、学生account、Labと操作窓口の識別子を前提に、期限付きchallengeのハッシュを保存し条件付き更新で一度だけ消費する試作。DynamoDBの実環境・並行要求での試験、情報源の認可とWeb入口への組込みは未実施。
 - bindingはサーバー側で確立しなければならず、ブラウザからの任意入力をそのまま渡してはいけない。学生本人とAWSアカウント、Stack、ポータル認証の安全な結び付けは未実装。
 
 ## ローカル試験
 
-このdirectoryで `python -B -m unittest -v test_status test_grade_reader test_identity_proof` を実行。架空のAWS応答で、5台停止、取得不能、別account/Stack/タグの拒否、62点と現在UNKNOWNの併存、他Lab/誤tokenの拒否、認証用nonceの期限・再利用・不正な接続先の拒否を検証する。実AWS試験ではない。
+このdirectoryで `python -B -m unittest -v test_status test_grade_reader test_identity_proof test_challenge_store` を実行。架空のAWS応答で、5台停止、取得不能、別account/Stack/タグの拒否、62点と現在UNKNOWNの併存、他Lab/誤tokenの拒否、認証用nonceの期限・再利用・不正な接続先の拒否を検証する。実AWS試験ではない。
 
 既存7群の回帰試験では、6群が合格（計3件skip）、配布群は固定署名版の期限切れにより2件のsetupで停止した。期限を回避したり署名を変更したりしていない。
 
