@@ -67,6 +67,8 @@
 
 次の教師End Lab試験に向け、閉鎖中だけ使うWeb Functionsの読取り可否probeと専用version管理付きS3/service許可を準備。外部へ返すのは3つの可否booleanと確認日時だけで、成績そのものは公開しない。Node21件・package3件・npm audit 0を確認したが、まだAWS未配備。新しい公開入口・実行権限の適用前確認後に進める。
 
+Web配布物を教師CloudShellへhash照合で搬入し、両templateのAWS構文受理と名前未使用を確認。専用S3/限定service許可のCREATE change setも準備済みで未適用。Web側のLogGroup/Function/Revision/HTTPS Endpointを合わせた6資源の計画。閉鎖状態で事前HTTP基準値を取り、その後教師Lab自体をEnd Labにして、cacheの確認日時が終了後になった応答を検査する。
+
 - [x] Learner LabでWeb Functionsが利用できることを確認（2026-10-23本人確認）。
 - [x] End Lab後もWeb Functions部分は利用できたことを確認（2026-10-23本人確認）。EC2の継続稼働とは区別する。
 - [x] 公式仕様・既存コードから構成案と実証の順番を整理。今回AWS操作なし。

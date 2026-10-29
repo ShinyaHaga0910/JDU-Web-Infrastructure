@@ -78,7 +78,9 @@
 
 `web/web-artifacts.template.json` は専用の暗号化・非公開・version管理付きS3と、同account内の指定Web Functionのrevisionだけへcodeを読ませるservice許可の候補。[AWSのcode搬入条件](https://docs.aws.amazon.com/lambda/latest/dg/web-functions-code-s3.html)に従い、既存のversion管理なしの教師S3を流用して設定変更しない。Web Functions側はNode24、1実行環境・同時2・毎秒2要求までとし、試験中の呼出しを抑える。
 
-Node 21件・Web package 3件が合格、npm auditの既知問題は0。ZIP SHA-256 `6a27a1d815b82b6e3d54dc6687b1e8ed1dca794cbcb00fbd637ccdf4485cd9fa`、3,271,147 bytes。新しい2 templateのAWS検査、service許可と公開HTTPS入口の適用前確認、実配備とHTTP受入はこれから。Google認証/本人bindingの受入を代替するものではない。
+Node 21件・Web package 3件が合格、npm auditの既知問題は0。ZIP SHA-256 `6a27a1d815b82b6e3d54dc6687b1e8ed1dca794cbcb00fbd637ccdf4485cd9fa`、3,271,147 bytes。Google認証/本人bindingの受入を代替するものではない。
+
+搬入ZIPのhash `a24dea1e7f00417865ae48992afcb940f794021460eb26b1295be276d7bc97b4` と3ファイルの内包名を教師CloudShellで照合し、両templateをAWS `ValidateTemplate` が受理した。教師側のWeb Functions一覧は空、新規2 Stack名も未使用だった。`jdu-web-portal-web-artifacts-20261029` のCREATE change set `private-web-artifacts` を準備し、S3とbucket policyだけが追加対象と確認。Web側は `jdu-web-portal-poc-20261029` にLogGroup/WebFunction/Revision/HTTPS Endpointを追加する計画で、合計6資源。**まだ適用していない**。新しいservice許可と公開HTTPS入口・LabRole利用の適用直前確認後に、artifact Stack作成→版付きcode搬入→閉鎖Web Stack作成→HTTP実測の順に進める。教師LabのEnd Labは、その事前HTTP基準値を取ってから行う。
 
 ### 2026-10-29の再開確認
 
