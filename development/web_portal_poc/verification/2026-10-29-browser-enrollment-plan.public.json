@@ -69,5 +69,12 @@
     "change_sets": 2,
     "validation_errors": 0,
     "executed": false
+  },
+  "per_action_operator_approval_received": true,
+  "execution_blocker": {
+    "stage": "Before execute",
+    "teacher_cloudshell": "Explicit deny by voc-cancel-cred",
+    "teacher_academy_body": "Blank after ordinary reload; human asked to restore Lab and console",
+    "new_permissions_applied": false
   }
 }
