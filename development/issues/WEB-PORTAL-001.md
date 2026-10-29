@@ -1,6 +1,6 @@
 # WEB-PORTAL-001：学生の環境準備・採点確認をブラウザへ集約する
 
-- 状態: 本人連携・EC2停止中/学生End Lab後の本人62点閲覧の小規模実証を実機受入。教師Lab開始が必要。新規5台のブラウザ構築・checker実行・教師進捗画面は未実装で、本Issue全体は継続中。
+- 状態: 2026-10-29本人指示で一時停止。課題確認jobの内部基盤を2f8e7eeまで実装・検査・push済み。全体は未完了。本人連携・EC2停止中/学生End Lab後の本人62点閲覧は小規模実証済みで、教師Lab開始が必要。
 - 登録: 2026-10-23、本人依頼。
 - 着手順: D12の受入残件を保持し、2026-10-23の本人依頼で本Issueの構成検討を先行。Web演習の改善課題として実証・実装へ進める。
 - GitHub: [Issue #1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1)（非公開JDU-Web-Infrastructure）。
@@ -8,6 +8,8 @@
 10/29課題確認の内部基盤：固定task/jobとSSM実行番号を永続化し、切断時には同じcommandを回収する処理、元request ID付きreport outbox、既存checker/HTTP外部確認のadapterを追加した。Moto/架空SSM/HTTP29件と既存62点API14件合格。公開中Web/AWSは変更なし。HTTPの確認実行・本人認可・実AWS preflight・正規採点送信とM3/M5M6はまだ接続していない。[内部検証](../web_portal_poc/verification/2026-10-29-assessment-job-core.public.json)。
 
 ## 学生の到達体験
+
+**10/29停止時の方針**：本人の「今実装しているところが完成したら一旦ストップ」「非機能要件をがちがちに実装しなくてもよい」に従い、内部job基盤の完成・GitHub反映で区切る。今回の29模擬試験と既存API14件は合格、AWSや公開画面への配備は行っていない。追加の実AWS preflight/採点送信/HTTP接続には着手せず、再開指示を待つ。再開後は授業に必要な学生の確認実行→結果保存→画面表示を優先し、本人限定・既存データ保持・取得不能を0点化しない最低限の保護を残す。非機能面の追加強化だけを独立した先行工程として増やさない。
 
 10/29最新受入：Web v4/学生側3資源は実配備完了。学校Google（本人指定の先生を学生役）→学生AWSの実署名→割当Lab登録→本人62/62点/5台停止の表示、実ログアウト拒否/再ログイン再利用を確認。本人が学生End Lab後、LMS Terminated/00:00で本人62点を閲覧し、状態unavailable後も62点を保持した。元成績全projection/全partition不変、教師EC2停止。JA/RU/UZ、Node44件。次はブラウザchecker/初期5台準備/教師の担当範囲つき一覧。[実受入](../web_portal_poc/verification/2026-10-29-authenticated-student-portal.public.json)、[全goal受入表](../web_portal_poc/PORTAL-ACCEPTANCE.md)。下記の未適用/未連携は各時点の履歴。
 

@@ -4,6 +4,8 @@
 
 ## 課題確認jobの内部基盤（2026-10-29、制作中）
 
+**現在は本人指示で一時停止（10/29）**。内部基盤はGitHub `2f8e7ee`まで検査・反映済み、実AWS/公開画面には未配備。ここで区切り、新しい接続処理には着手していない。再開後は授業に必要な機能の接続と実機確認を優先し、非機能面の作り込みは必要最小限にする。本人限定・秘密を出さない・既存成績/5台の保持は継続する。
+
 `assessment_command_jobs.py`に、本人/Lab/deployment/task/runを固定したDynamoDBの進捗、Lab単位の同時実行制限、SSM command IDの保存、再開と元reportのoutboxを追加した。SSM送信前にintentを条件付きで保存し、SDKの自動再送を禁止する。応答不明では新規送信せず、Comment/instance/Document/Parameters hashが一致する既存commandをページ単位で探す。未検出や一時的な取得失敗を終了扱いにせず、複数commandや不完全な検索は手動確認が必要となる。GET用の`current`は読取りだけで、`advance`は信頼されたworker専用。job UIは状態と日時だけを返し、report_readyを採点送信済みや得点獲得と扱わない。
 
 `assessment_observation.py`は既存HTTP guest/contractのbyte hashと、固定registryを含む同じtransportを使う。AWSから取得・保持した公開snapshotだけを受け、P1/M1の外部HTTP確認、P6/M6の外部管理/secret path拒否確認も既存CLIと同じ条件で補う。任意shell/宛先/期待本文/点数/passwordはブラウザから受けない。外部確認先にmetadata/private/loopback/hostname/IPv6を使わず、元SSH公開鍵/5 root volumes/専用private CIDRとjob snapshotを照合する。これはAPI認証ではなく、呼出元controllerはGoogle/本人登録と現在のAWSタグ/SSMを別に確認する必要がある。
