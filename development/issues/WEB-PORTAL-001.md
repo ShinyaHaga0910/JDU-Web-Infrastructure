@@ -1,6 +1,6 @@
 # WEB-PORTAL-001：学生の環境準備・採点確認をブラウザへ集約する
 
-- 状態: 2026-10-29本人指示で再開。今回の完成範囲はブラウザで固定課題を確認し結果を見る機能のAWS配備・実受入・GitHub反映。非機能面は必要最小限。全Issueの他機能は別残件。本人連携・EC2停止中/学生End Lab後の本人62点閲覧は小規模実証済みで、教師Lab開始が必要。
+- 状態: 今回の範囲（ブラウザで固定課題を実行して結果を見る）はAWS配備・実受入完了。M1 8/8、M2 13/13、M5 9/13＋未確認4、3言語・停止後の再表示・新規確認拒否・元62点保持を確認。全Issueは未完了で、原本への自動提出・M3/M5M6の特殊確認・新規5台準備・教師一覧・一般配布は別残件。教師Lab開始が必要。
 - 登録: 2026-10-23、本人依頼。
 - 着手順: D12の受入残件を保持し、2026-10-23の本人依頼で本Issueの構成検討を先行。Web演習の改善課題として実証・実装へ進める。
 - GitHub: [Issue #1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1)（非公開JDU-Web-Infrastructure）。
@@ -8,6 +8,8 @@
 10/29課題確認の内部基盤：固定task/jobとSSM実行番号を永続化し、切断時には同じcommandを回収する処理、元request ID付きreport outbox、既存checker/HTTP外部確認のadapterを追加した。Moto/架空SSM/HTTP29件と既存62点API14件合格。公開中Web/AWSは変更なし。HTTPの確認実行・本人認可・実AWS preflight・正規採点送信とM3/M5M6はまだ接続していない。[内部検証](../web_portal_poc/verification/2026-10-29-assessment-job-core.public.json)。
 
 ## 学生の到達体験
+
+10/29今回の実受入完了：承認済み学生4資源・教師2資源を配備し、既存Webは同じURLで更新。元5台/96GiB/認証/成績原本を保持し、結果は専用DBへ保存した。実M2はmap順序の修正後も同じcommand/request IDを回収、3件各1回のみ。M5の未確認は確定点と表示しない。停止中は保存M2を再表示し新M1を拒否、元成績62点/全partition不変。ブラウザ範囲を完了し、下記の旧準備/停止記述は履歴として保持する。[実受入](../web_portal_poc/verification/2026-10-29-browser-checks-accepted.public.json)。
 
 10/29再開：学生側の既存checker/永続job、教師側の本人登録確認、3言語の課題選択/待機/結果画面を接続。結合6件＋job/observer29件、画面新4件＋既存44件、Web package/計画5件合格。固定課題の確認結果を専用DBへ保存し、元成績の上書きは行わない。M3停止証拠/M5M6秘密入力は未確認と明示。AWSの学生4 Add・教師2 Add・既存Web2 Modifyの具体化を進め、まだ適用していない。[今回の完成条件](../web_portal_poc/CHECKS-ACCEPTANCE.md)。次は新しいアクセス追加の適用直前確認と、実ブラウザからの通し受入。以下の一時停止記述は履歴。
 

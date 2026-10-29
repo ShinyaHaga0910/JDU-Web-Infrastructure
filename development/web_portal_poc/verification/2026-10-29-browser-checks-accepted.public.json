@@ -1,0 +1,120 @@
+{
+  "date": "2026-10-29",
+  "phase": "scoped_browser_checks_accepted",
+  "scoped_feature_complete": true,
+  "entire_WEB_PORTAL_001_complete": false,
+  "scope": "Execute fixed read-only checks in the authenticated browser and view retained results for the existing verified Lab",
+  "identity_fixture": "Previously approved school Google identity acting as the verification student; raw identity omitted",
+  "portal_origin": "https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws",
+  "student_account": "965244652544",
+  "teacher_account": "170126527713",
+  "lab_id": "class193548-test1",
+  "deployment_id": "3ab82943-031d-4806-b4c0-c0b0e4554006",
+  "deployments": {
+    "student_stack": "jdu-web-portal-check-class193548-test1",
+    "student_status": "UPDATE_COMPLETE",
+    "student_checker_code_sha256": "b43b8ab023dc7d0da146946edd5fb98a60983327a4754d6c01565b2abf6bf926",
+    "teacher_stack": "jdu-web-portal-checker-20261029",
+    "teacher_status": "CREATE_COMPLETE",
+    "teacher_checker_code_sha256": "bae082aac9858c31a54626343509129fed29e96fc7a2a4077c08a60459482e65",
+    "web_status": "UPDATE_COMPLETE",
+    "web_code_sha256": "d7194d4bedfe8e85902433ce60f141c94dfb0f0245e9f703b5d8fb045bc62ea3",
+    "web_files": 4481,
+    "web_all_files_content_sha256": "4f02af4c285f1460992255fe5d72bfacb14a66df7b755db756151ef33de4d789",
+    "new_access_approved_by_user": true,
+    "student_teacher_invoke_scope_verified_unchanged_after_code_repair": true,
+    "private_checkers_have_no_function_urls": true,
+    "existing_LabRole_used": true
+  },
+  "actual_browser_acceptance": {
+    "fixed_task_selection_to_real_ssm_result": true,
+    "representative_jobs": [
+      {
+        "task_id": "M1",
+        "job_id": "30a90bac-2950-4ed6-9322-1cf14a8416d5",
+        "command_id": "67f9c508-84bd-4bfc-ad81-1a21cdd2d8db",
+        "request_id": "645e55ec-cc82-4082-af5d-ae3ea32b7c98",
+        "report_sha256": "fb650bdeb003798bf26cec64445a997c4d2b844f6d15ee5dcc5a6d35eb72f4e0",
+        "raw_earned": 8,
+        "raw_maximum": 8,
+        "unresolved": 0,
+        "evaluable": true,
+        "ssm_command_count": 1
+      },
+      {
+        "task_id": "M2",
+        "job_id": "5b15a547-45f2-484f-95bd-2a8ca287f313",
+        "command_id": "3a59822d-3391-4290-8b2b-192c45e3b439",
+        "request_id": "16fe6b14-6c63-4845-ab30-949a89b79fce",
+        "report_sha256": "b5fba7b3b89b656ff1d1c66a3b3f99362b17459e65f584b9ad4730d253e5b149",
+        "raw_earned": 13,
+        "raw_maximum": 13,
+        "unresolved": 0,
+        "evaluable": true,
+        "ssm_command_count": 1
+      },
+      {
+        "task_id": "M5",
+        "job_id": "6d0da3ad-0e5b-4d34-9d54-17987e0be649",
+        "command_id": "54abc0e0-6acd-4d7a-bdf0-3a35eb37c15a",
+        "request_id": "f875295e-bf53-428f-8b9e-13b14aa31ab2",
+        "report_sha256": "eae97720b2aa4c2649f9319e025a601ed281a69129a968cc77b7dd5863b09563",
+        "raw_earned": 9,
+        "raw_maximum": 13,
+        "unresolved": 4,
+        "evaluable": false,
+        "ssm_command_count": 1
+      }
+    ],
+    "JA_RU_UZ_same_M2_result": true,
+    "M2_recovered_without_resending_after_map_order_fix": true,
+    "M5_read_only_unknown_four_displayed_as_nonfinal": true,
+    "transient_result_read_recovered_by_same_job_refresh": true,
+    "short_session_expiry_denied_and_normal_google_login_reused_binding": true,
+    "after_original_five_stopped_new_read_of_retained_M2_shows_13_of_13": true,
+    "new_M1_while_stopped_rejected_without_job_or_zero_record": true,
+    "blocked_job_id": "7fb68587-5051-490b-92d4-f9363f3f091c",
+    "original_saved_grade_still_62_of_62": true
+  },
+  "preservation": {
+    "student_results_verified_at": "2026-10-29T12:08:01.797664+00:00",
+    "original_grade_verified_at": "2026-10-29T12:09:25.715285+00:00",
+    "whole_original_grade_partition_unchanged": true,
+    "full_original_grade_projection_unchanged": true,
+    "original_five_and_root_volumes_retained": true,
+    "root_gib": 96,
+    "all_original_roots_encrypted": true,
+    "credentials_reissued": false,
+    "final_student_ec2_states": [
+      "stopped",
+      "stopped",
+      "stopped",
+      "stopped",
+      "stopped"
+    ],
+    "teacher_ec2": "stopped",
+    "both_labs_last_started": true
+  },
+  "tests": {
+    "job_observer_owned_flow": 37,
+    "node": 49,
+    "web_package_and_plan_pre_repair": 5,
+    "failures": 0,
+    "skipped": 0
+  },
+  "code_sha256": {
+    "assessment_command_jobs.py": "b6e286b02e67a1361d05b2a1dc12789b08c07fcb88235bbae3261011d3ce712f",
+    "assessment_observation.py": "bb82294cc3b57fce383382f6838184b1522dc1a21eab8ec5ad665d76e79dde43",
+    "student_checker_handler.py": "0fc9b523c68edd3c2961f5a2dfdec45204edcc6f076002588cf9e85ba20c7ef0",
+    "portal_checker_handler.py": "a35f3bdd22576551a4c6160f5bb7e437a4f4cfd92a9d22eb08506b343c8437b6",
+    "update_checker.py": "1296271c18f79b6bcd5dd06536f69079bd34df36d748d413c281ea1ff3a885cc",
+    "web/router.mjs": "0efebe693d32889fcb5b4ecd7d27bb1831f56285288f77e6a869d7c39104d488",
+    "web/checks.mjs": "d15d476e84af5dbd60c6b597258ae4464a996ae82025aa258f39e310780d5d55"
+  },
+  "limits": [
+    "Only representative M1/M2/M5 browser runs accepted; no claim that all P/M tasks were run in this browser session",
+    "M3 stop-retention evidence and M5/M6 password functional checks remain unconfirmed in read_only",
+    "Current results are retained separately; no automatic submission to original grade records",
+    "New-five provisioning, teacher progress list, general student distribution and teacher-End browsing remain separate work"
+  ]
+}

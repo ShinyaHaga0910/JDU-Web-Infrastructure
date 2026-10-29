@@ -9,10 +9,22 @@ from pathlib import Path
 
 def inspect(value):
     rows=[r['ResourceChange'] for r in value.get('Changes',[])]
+    functions=[r for r in rows if r.get('LogicalResourceId')=='Checker']
+    # CloudFormation also marks the unchanged Permission's GetAtt as Dynamic
+    # when its function's code changes. This is the same function ARN and the
+    # same teacher principal; accept only that exact dependent reference.
+    permissions=[r for r in rows if r.get('LogicalResourceId')=='TeacherInvoke']
+    for row in permissions:
+        details=row.get('Details',[])
+        if (row.get('ResourceType')!='AWS::Lambda::Permission' or row.get('Action')!='Modify'
+                or row.get('Replacement')!='Conditional' or not details
+                or any(d.get('Target',{}).get('Name')!='FunctionName'
+                    or d.get('ChangeSource')!='ResourceAttribute' or d.get('CausingEntity')!='Checker.Arn' for d in details)):
+            raise ValueError('Invoke permission must remain the same function and principal')
     if (value.get('Status')!='CREATE_COMPLETE' or value.get('ExecutionStatus')!='AVAILABLE'
-            or len(rows)!=1 or rows[0].get('LogicalResourceId')!='Checker'
-            or rows[0].get('ResourceType')!='AWS::Lambda::Function' or rows[0].get('Action')!='Modify'
-            or rows[0].get('Replacement')!='False'):
+            or len(functions)!=1 or len(permissions)>1 or len(rows)!=len(functions)+len(permissions)
+            or functions[0].get('ResourceType')!='AWS::Lambda::Function' or functions[0].get('Action')!='Modify'
+            or functions[0].get('Replacement')!='False'):
         raise ValueError('Only existing checker Code may change')
 
 

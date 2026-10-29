@@ -61,3 +61,8 @@ Web v4でNode44件。native POSTのno-referrer/Origin:nullを個人情報のな�
 ## ブラウザ課題確認の接続候補（2026-10-29、AWS未適用）
 
 `test_browser_checks test_assessment_command_jobs test_assessment_observation`の35件、WebのNode48件（新4件）、package/計画5件合格。新結合試験は実job/HTTP adapterをMoto DDBと架空SSMへ接続し、本人承認、元request ID、結果再訪、GET非実行、停止前提拒否、既存成績不変を確認する。Windowsのpackage import試験はLinux標準pwdをダミーmoduleで補い、実Linux CloudShellでも同じZIPをimportして元5台のrunning/SSM Online/保持templateとnetwork baselineを読取り確認した。実SSM checker/実ブラウザ受入とは分ける。今回の完成条件はweb_portal_poc/CHECKS-ACCEPTANCE.md。
+
+
+## ブラウザ課題確認の実受入（2026-10-29）
+
+追加のmap順序/受付済みcommand再compile不要の回帰を含めPython37件、言語/同job再訪を含めNode49件合格。AWSでは実ブラウザM1 8/8、M2 13/13、M5 9/13＋未確認4、3件各SSM1回、元request/report保持を確認。M2のmap順序不具合は実機で特定し再送せず結果回収。M5の一時読取り失敗も同jobの更新で再表示できた。元5台停止後も保存M2を新GETで表示し、新規M1はjob/0点を作らず拒否。元62点・全partition/projection不変、96GiB/認証保持。全P/Mの新ブラウザ通し試験・原本への自動提出とは分ける。詳細はweb_portal_poc/verification/2026-10-29-browser-checks-accepted.public.json。
