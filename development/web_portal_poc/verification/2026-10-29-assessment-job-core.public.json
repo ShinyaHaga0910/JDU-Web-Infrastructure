@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-29",
+  "scope": "Durable observation job library and fixed existing-checker adapter; local tests only",
+  "code_sha256": {
+    "assessment_command_jobs.py": "d3a0094681d958505e20ff80b5cf51094edf23e6b6acf52c10447a88f2fb7dcb",
+    "assessment_observation.py": "913694215f42b075e666136b0e47cfb135731dc9a5a3974bec3362d31df47bc8",
+    "test_assessment_command_jobs.py": "27bbf6125ebf6231468558fa7369718fcb37bcd523247fe0304dee7a2beb0899",
+    "test_assessment_observation.py": "69645af759493a8ae9db9488c878855445ec48ecd340dca3fa670e4710b6714f"
+  },
+  "registry_sha256": "3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33",
+  "tests": {
+    "durable_command_job_moto_fake_ssm": 17,
+    "existing_checker_adapter_fake_http": 12,
+    "existing_62_point_api_regression": 14,
+    "failures": 0,
+    "skipped": 0
+  },
+  "observed_guards": [
+    "Persist intent before SendCommand; disable SDK retries",
+    "Unknown send outcome never launches another command",
+    "Exact Comment/instance/document/parameters digest recovery with pagination",
+    "One active check per Lab; first validated report retained with original request ID",
+    "Source/context changes and malformed/mismatched outputs denied",
+    "No raw output, identity, target, command or score in job UI projection",
+    "Original HTTP guest/contract hashes and registry bytes preserved",
+    "Public HTTP targets are validated IPv4, never metadata/private/loopback/hostnames",
+    "Read-only mode cannot assert successful functional password observations"
+  ],
+  "aws_resources_changed": false,
+  "public_web_changed": false,
+  "deployed": false,
+  "browser_checker_feature_complete": false,
+  "canonical_transport_change": "Explicit UTF-8 decoding; original signed archives unchanged",
+  "unfinished": [
+    "Authenticated HTTP acceptance and teacher-owned job mapping",
+    "Real retained AWS stack/tag/SSM preflight and worker deployment",
+    "Submission through original assessment service without exporting existing token",
+    "M3 stop evidence and M5/M6 secret-input integration",
+    "Real SSM interruption/retry and browser end-to-end acceptance"
+  ]
+}

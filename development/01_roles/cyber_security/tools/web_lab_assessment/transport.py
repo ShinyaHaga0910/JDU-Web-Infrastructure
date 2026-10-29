@@ -23,8 +23,8 @@ except Exception as exc:
 
 def sources(root=None):
     root = Path(root) if root else Path(__file__).resolve().parent
-    result = {m + '.py': (root / (m + '.py')).read_text() for m in MODULES}
-    result['assessment-registry.json'] = (root / 'assessment-registry.json').read_text()
+    result = {m + '.py': (root / (m + '.py')).read_text(encoding='utf-8') for m in MODULES}
+    result['assessment-registry.json'] = (root / 'assessment-registry.json').read_text(encoding='utf-8')
     result['loader'] = LOADER
     return result
 

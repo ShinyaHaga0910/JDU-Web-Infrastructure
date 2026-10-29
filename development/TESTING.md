@@ -52,3 +52,7 @@ python -B -m unittest -q test_portal_enrollment test_portal_enrollment_handler t
 ## 認証済み学生用画面の実機受入（2026-10-29）
 
 Web v4でNode44件。native POSTのno-referrer/Origin:nullを個人情報のないChrome formで再現し、登録成功ページだけsame-originにして厳密Origin/CSRFを維持した。実AWSでは人間が指定した先生Googleを学生役として、学生AWS965の署名、本人登録、JA/RU/UZの62点、5台停止、ログアウト拒否/再ログインを確認した。本人による学生End後、LMSのTerminated/00:00と本人62点の表示、状態取得不能後も62点保持を受入。教師Labは開始、教師EC2停止。10:19:45 UTCの検査で元成績全projection/全Lab partition不変。これを新規5台構築/ブラウザchecker/教師画面や実別identityの負例の受入に広げない。詳細はweb_portal_poc/PORTAL-ACCEPTANCE.mdと最新public JSON。
+
+## 課題確認job基盤の検査（2026-10-29、未配備）
+
+`web_portal_poc`でtest専用Moto/boto3を設定して、`python -B -m unittest -q test_assessment_command_jobs test_assessment_observation`を実行し29件合格。実Dynamo型のnumeric往復、並行worker、応答不明/既存command回収/ページング、停止前提の拒否、元report/request ID、既存HTTP source hash/registry bytes、外部HTTP/管理拒否とUNKNOWNを模擬検査する。SSMとHTTPはfakeであり、実コマンドやネットワークへの接続はない。既存assessmentの`test_assessment`14件も合格。ブラウザ実行/採点提出の実AWS受入とはしない。稼働Webや元署名版をこの検査で更新しない。

@@ -5,6 +5,8 @@
 - 着手順: D12の受入残件を保持し、2026-10-23の本人依頼で本Issueの構成検討を先行。Web演習の改善課題として実証・実装へ進める。
 - GitHub: [Issue #1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1)（非公開JDU-Web-Infrastructure）。
 
+10/29課題確認の内部基盤：固定task/jobとSSM実行番号を永続化し、切断時には同じcommandを回収する処理、元request ID付きreport outbox、既存checker/HTTP外部確認のadapterを追加した。Moto/架空SSM/HTTP29件と既存62点API14件合格。公開中Web/AWSは変更なし。HTTPの確認実行・本人認可・実AWS preflight・正規採点送信とM3/M5M6はまだ接続していない。[内部検証](../web_portal_poc/verification/2026-10-29-assessment-job-core.public.json)。
+
 ## 学生の到達体験
 
 10/29最新受入：Web v4/学生側3資源は実配備完了。学校Google（本人指定の先生を学生役）→学生AWSの実署名→割当Lab登録→本人62/62点/5台停止の表示、実ログアウト拒否/再ログイン再利用を確認。本人が学生End Lab後、LMS Terminated/00:00で本人62点を閲覧し、状態unavailable後も62点を保持した。元成績全projection/全partition不変、教師EC2停止。JA/RU/UZ、Node44件。次はブラウザchecker/初期5台準備/教師の担当範囲つき一覧。[実受入](../web_portal_poc/verification/2026-10-29-authenticated-student-portal.public.json)、[全goal受入表](../web_portal_poc/PORTAL-ACCEPTANCE.md)。下記の未適用/未連携は各時点の履歴。

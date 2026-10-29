@@ -9,7 +9,7 @@
 | 学生End Lab後の本人用成績閲覧 | 人間のEnd、LMS Terminated/00:00、本人62点、状態unavailable後も62点 | 教師Lab開始中の条件で合格 |
 | 5台の状態確認 | 本人画面で元5台stopped、End後は取得不能を表示 | 停止/取得不能合格。runningの本人ブラウザ表示は未受入（非公開probeのrunning実測とは区別） |
 | 初回の5台準備をブラウザから実行 | 既存CLI/署名controllerのD08受入のみ | 未実装。署名/期限/価格/閉鎖/SSM/内部SSH/認証/元stateを引き継ぐ必要あり |
-| 課題確認をブラウザで受付/進捗/再送 | 既存62checkとCLI/outboxの受入のみ | 未実装。固定taskだけ、永続jobと元request ID、正規checker結果の採点API送信を接続 |
+| 課題確認をブラウザで受付/進捗/再送 | 永続SSM job/元report outbox＋既存checker adapterの29模擬試験、既存62点API14件 | 内部基盤を制作。HTTP/本人認可/実AWS preflight/正規採点送信は未接続、実機未受入 |
 | M3の停止証拠、M5/M6の機能確認 | CLI/getpass/interactiveの既存実装のみ | ブラウザ経路未実装。勝手な起動/完成設定/秘密のSSM command本文保存は禁止 |
 | 教師が担当学生の進捗を一覧表示 | 既存教師CLI/JSON/CSVのみ | 新ポータル未実装。Googleメールの自称teacherや自由なLab指定では権限を与えない |
 | ログアウト/未登録/不正要求の拒否 | 実未ログイン/未連携/ログアウト拒否、Node44/Motoほか41件 | 検証済み範囲を保持。実別identity/domain/誤AWS/コピーcookieの通し負例は未受入 |

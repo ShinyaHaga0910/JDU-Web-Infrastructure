@@ -2,6 +2,18 @@
 
 2026-10-29更新。Issue [#1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1) の制作中。**学校Google→割当学生AWSの本人確認→本人の62点/5台停止状態表示→学生End Lab後も本人62点を閲覧**する小規模実証を実機受入した。本人指定の先生Google identityを学生役として使う検証で、一般学生への全配布受入ではない。当面は教師Labを開始して利用し、教師EC2は停止のまま閲覧できる。新規5台のブラウザ準備、checker実行、教師進捗画面は未実装。教師End Lab中の閲覧は本人決定で後続課題。全goalは未完了。下記の記録は各時点の履歴として読む。
 
+## 課題確認jobの内部基盤（2026-10-29、制作中）
+
+`assessment_command_jobs.py`に、本人/Lab/deployment/task/runを固定したDynamoDBの進捗、Lab単位の同時実行制限、SSM command IDの保存、再開と元reportのoutboxを追加した。SSM送信前にintentを条件付きで保存し、SDKの自動再送を禁止する。応答不明では新規送信せず、Comment/instance/Document/Parameters hashが一致する既存commandをページ単位で探す。未検出や一時的な取得失敗を終了扱いにせず、複数commandや不完全な検索は手動確認が必要となる。GET用の`current`は読取りだけで、`advance`は信頼されたworker専用。job UIは状態と日時だけを返し、report_readyを採点送信済みや得点獲得と扱わない。
+
+`assessment_observation.py`は既存HTTP guest/contractのbyte hashと、固定registryを含む同じtransportを使う。AWSから取得・保持した公開snapshotだけを受け、P1/M1の外部HTTP確認、P6/M6の外部管理/secret path拒否確認も既存CLIと同じ条件で補う。任意shell/宛先/期待本文/点数/passwordはブラウザから受けない。外部確認先にmetadata/private/loopback/hostname/IPv6を使わず、元SSH公開鍵/5 root volumes/専用private CIDRとjob snapshotを照合する。これはAPI認証ではなく、呼出元controllerはGoogle/本人登録と現在のAWSタグ/SSMを別に確認する必要がある。
+
+MotoのDDB＋架空SSM/HTTPでjob17件・既存checker接続12件、既存62点API14件が合格。切断後のcommand回収、二重worker、一時取消、別target、欠損/改変report、元request ID保持、8点/UNKNOWN、M6の外部拒否とread_onlyによる機能合格の偽装拒否を確認した。Windowsの既定文字コードで既存transportが日本語入りregistryを読めない問題は、UTF-8明示で修正し、同じregistry bytesを確認した。旧署名版/稼働AWSは変更していない。
+
+**未配備・未接続**。新しいHTTP受付、学生操作Lambda/永続store、実AWS preflight、教師側のjob/所有者認可と正規採点受付への送信、M3の専用保持証拠、M5/M6の秘密入力は次の実装。既存Bearer tokenを外へ取り出さず、同じ原本report/request IDを送る中継不要の経路を接続する。現行Webのボタンはまだ開放しない。[内部基盤の検証記録](verification/2026-10-29-assessment-job-core.public.json)。
+
+AWS仕様：[SendCommand](https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_SendCommand.html)、[ListCommands](https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_ListCommands.html)。同一commandの追跡と、API受付の再送は別として扱う。
+
 ## 本人用成績・学生End Labの実受入（最新）
 
 Web v4のUPDATE_COMPLETE、GitHubソースと全4,479file内容一致を確認した。フォーム修正後の実POSTで待機画面へ進み、資格情報のない固定コードURLを学生用Edgeで開いた。教師ではなく学生AWS 965244652544で、変更計画が接続確認Lambda・ログ・custom resourceの3 Addだけと確認し、本人の適用直前承認後に実行。10:14:26 UTCにCREATE_COMPLETE。AWS内部の短期署名が教師側で検証され、Google本人と割当Labの登録が完了した。ブラウザ/共有PCへのキー、パスワード、署名のコピーは行っていない。
