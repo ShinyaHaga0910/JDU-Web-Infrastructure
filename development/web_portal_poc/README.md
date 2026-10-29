@@ -6,20 +6,22 @@
 
 - `grade_reader.py` は既存の学生用lab tokenで認証し、既存 `project_lab` の62素点と現在／参照結果を返す。教師用APIの内部で使うための関数であり、HTTP入口やブラウザ認証を公開しない。生のtoken、メール、チェック明細は結果に含めない。
 - `status.py` は学生アカウント内の信頼済み既存bindingを受け、STSアカウント、CloudFormationのLab/Deploymentと5台のID、EC2タグを確認する。EC2とSSMを読取り、停止・取得不能を区別する。起動、停止、コマンド送信、採点データの更新は行わない。
+- `student_status_handler.py` と `student-status.template.json` は学生AWS内の状態確認専用Lambda候補。固定された本人account/Stack/5台だけを検証し、callerが別IDを指定する要求や起動・停止要求を拒否する。新Lambdaへの呼出しを指定した教師LabRoleに許可する設定を含み、公開URLは作らない。LabRole自体の広い権限は縮小しない。学生AWSへの配備・別accountからの実呼出しは未実施。
+- `status_gateway.py` は本人IDとLabの認可情報を再照合し、学生account/Labから決まる固定Lambda ARNだけを呼ぶ。戻った5台のID・状態・アドレスを検査し、通信不能や他環境の結果は状態不明として扱う。返答は学生側で変更可能な状態情報であり、採点結果や課題合格の証拠には使わない。
 - `identity_proof.py` は、固定のAWS STSだけに短時間の署名付きGetCallerIdentityを送り、セッションに紐付く一回限りのnonceを検証する候補を試作する。実AWSでの署名・nonceヘッダー自体は以下のように確認したが、このmoduleを使う教師・学生間の統合試験は未実施。学生ログイン、信頼できる学生Labと接続先の決定は未実装であり、公開しない。
 - `challenge_store.py` は、既に認証・認可されたセッション、学生account、Labと操作窓口の識別子を前提に、期限付きchallengeのハッシュを保存し条件付き更新で一度だけ消費する試作。DynamoDBの実環境・並行要求での試験、情報源の認可とWeb入口への組込みは未実施。
 - `student_proof.py` は学生側のAWS実行環境内で、SDKを使って60秒有効の署名済みSTS要求を作る試作。要求には一時認証情報が含まれるため、ログ・ブラウザURL・共有PCに保存しない。信頼済み教師側への安全な配送は未実装。
-- `enrollment.py` は、認証・認可済みのサーバー内情報を受けてSTS署名を確認し、元のLab情報の一致確認、nonce消費、LabとAWS accountの重複防止登録をDynamoDBの一つのtransactionで行う試作。元の成績tableへの書込みはない。模擬環境で同時実行・重複・情報変更を試験し、SDKがrequest形式を受け付けることも確認した。実AWSでは本人確認などを模擬して試作本体を試したが、入力情報の認可や窓口自体の確認は別途必要。
+- `enrollment.py` は、認証・認可済みのサーバー内情報を受けてSTS署名を確認し、元のLab情報の一致確認、nonce消費、Lab/accountの重複防止と固定Lambda ARNの登録をDynamoDBの一つのtransactionで行う試作。元の成績tableへの書込みはない。模擬環境で同時実行・重複・情報変更を試験し、SDKがrequest形式を受け付けることも確認した。固定ARN登録追加前の版を実AWSで試したが、追加後の版、入力情報の認可や窓口自体の確認は別途必要。
 - `subject_binding.py` と `identity_grade.py` は、Googleで検証済みの本人IDと教師承認済みLabを一対一に結び付け、既存の62点計算で本人の成績のみを読む内部処理の試作。本人IDは秘密鍵を使ったHMACに変換し、元のメール・Google IDをtableに入れない。原本metadataと両方向のAWS bindingが一致していることをtransactionで条件確認し、同じLabへの別ID登録を拒否する。閲覧時も対応関係とactive/token/deploymentを確認し、原本や他Labには書き込まない。秘密鍵の管理・rotation、Google本人確認・教師承認・入口との統合、実AWS受入は未実施。これら関数にブラウザの自己申告値を直接渡してはならない。
 - `identity_grade_handler.py`、`build_grade_package.py`、`internal-grade.template.json` は、検証済みIDから既存成績を読む内部Lambdaの候補。指定Secrets ManagerからHMAC用keyを取得し、元のregistry bytesと既存採点コードをそのままZIPに含む。構成はFunction URL・API入口・IAM変更を作らないが、既存LabRoleを指定するためrole自体の権限を縮小するものではない。呼出し元のIAM制限とGoogle本人確認を完成させるまでは配備・公開しない。keyの発行、secret保管、配備や実データ読取りも未実施。
-- `web/` はWeb Functions向けの学生用成績画面の試作。既存JDU学内教材ポータルの `auth.mjs` を改行形式を除いてそのまま移し、学内Googleで検証したIDだけをサーバー内で固定の成績Lambdaへ渡す。JA/RU/UZの点数、最新の未確認、確認日時・保存日時を表示し、記録がない場合は0点に置き換えない。`sessions.mjs` は最大10分の独立したセッションを使い、tableにランダム値とGoogle tokenのハッシュのみを保存する。ログアウト時はサーバー側も失効し、期限切れやstore障害では成績を返さない。共有PCではGoogle自体からもログアウトするよう画面に表示する。学生のAWS操作や新しい採点はまだつないでいない。OAuth client設定、IAMによる呼出し制限、教師承認、実学生ログインと実成績の表示は未実施。Web Functions入口はApplicationManagedであり、公開時の認証責任はアプリにある。
+- `web/` はWeb Functions向けの学生用成績・状態画面の試作。既存JDU学内教材ポータルの `auth.mjs` を改行形式を除いてそのまま移し、学内Googleで検証したIDだけをサーバー内で固定の内部Lambdaへ渡す。JA/RU/UZの点数、最新の未確認、確認日時・保存日時と5台の状態を表示し、記録がない場合は0点に置き換えない。`sessions.mjs` は最大10分の独立したセッションを使い、tableにランダム値とGoogle tokenのハッシュのみを保存する。ログアウト時はサーバー側も失効し、期限切れやstore障害では成績を返さない。共有PCではGoogle自体からもログアウトするよう画面に表示する。実際の学生AWSとの接続、環境構築や新しい採点はまだつないでいない。OAuth client設定、IAMによる呼出し制限、教師承認、実学生ログインと実成績の表示は未実施。Web Functions入口はApplicationManagedであり、公開時の認証責任はアプリにある。
 - `binding-table.template.json` は登録と短期challengeを保管する独立したDynamoDB table。期限属性があるchallengeだけをTTLの対象とし、期限属性のない登録情報は保持する。従量課金、AWS管理の暗号化、stack削除時の保持を指定し、既存の成績table、IAMや公開入口には変更を加えない。
 - `aws_synthetic_transaction.py` は下記の実AWS試験の操作記録。対応する条件式を使う独立した試験であり、`enrollment.py` の実行やSTS認証の統合確認ではない。架空accountの既存bindingがあれば再実行を拒否する。
 - bindingはサーバー側で確立しなければならず、ブラウザからの任意入力をそのまま渡してはいけない。学生本人とAWSアカウント、Stack、ポータル認証の安全な結び付けは未実装。
 
 ## ローカル試験
 
-このdirectoryで `python -B -m unittest -v test_status test_grade_reader test_identity_grade test_subject_binding test_identity_grade_handler test_grade_package test_identity_proof test_challenge_store test_student_proof test_enrollment test_binding_template` を実行。架空のAWS応答で、5台停止、取得不能、別account/Stack/タグの拒否、62点と現在UNKNOWNの併存、他Lab/誤tokenの拒否、認証用nonceの期限・再利用・不正な接続先の拒否を検証する。ID登録から既存採点の表示まで、別ID拒否、登録の失効・同時登録の競合も架空データで確認する。内部Lambda packageの再現性、元registry bytes、入口を公開しないtemplateも確認する。botocoreを導入した環境では、架空資格情報を使った実SDKによる署名生成・request形式も確認する。実AWS試験ではない。
+このdirectoryで `python -B -m unittest -v test_status test_student_status_handler test_status_package test_status_gateway test_status_flow test_grade_reader test_identity_grade test_subject_binding test_identity_grade_handler test_grade_package test_identity_proof test_challenge_store test_student_proof test_enrollment test_binding_template` を実行。架空のAWS応答で、登録→本人ID認証→固定窓口→学生5台の状態読取りの接続、停止、取得不能、別account/Stack/タグの拒否、62点と現在UNKNOWNの併存、他Lab/誤tokenの拒否、認証用nonceの期限・再利用・不正な接続先の拒否を検証する。ID登録から既存採点の表示まで、別ID拒否、登録の失効・同時登録の競合も架空データで確認する。内部Lambda packageの再現性、元registry bytes、入口を公開しないtemplateも確認する。botocoreを導入した環境では、架空資格情報を使った実SDKによる署名生成・request形式も確認する。実AWS試験ではない。
 
 `web/` では `npm ci --omit=dev`、`npm test`、`python -B -m unittest -v test_web_package` で、署名・組織・nonce検証、認証済みidentityの限定利用、ログアウト後の再利用拒否、期限とstore障害、未登録拒否、UNKNOWN、言語、元registryと表示上限の一致、閉鎖初期設定と配備ZIPの再現性を確認する。Google署名・セッション保存先は架空鍵・模擬DB。依存関係は2026-10-27時点の `npm audit --omit=dev` で0件。Chromeのlocalhost表示と言語切替は架空データ・模擬認証で確認した。実Googleログインや本番ブラウザ受入を意味しない。
 
@@ -47,7 +49,17 @@
 
 学生画面のWeb Functions templateもbyteのSHA-256を照合してCloudFormation `ValidateTemplate` を通過。作成時は閉鎖設定を初期値とするが、公開HTTPS endpoint自体は作成されるため、配備前に対象・権限と公開範囲の確認が必要。Web Functions/内部成績Lambdaはどちらも未配備。
 
+状態機能追加後、学生側Lambda・教師側内部Lambda・Web Functionsの3 templateを教師AWSでhash照合し `ValidateTemplate` に受理された。教師LabRoleから予定する学生側Lambda ARNへの `lambda:InvokeFunction` はIAM policy simulationで `allowed`。学生側のresource policy・実権限・実呼出しは確認しておらず、simulationだけではcross-account通信成功を意味しない。学生側Lambdaには、教師LabRoleだけへの新たな呼出し許可を含むため配備時に確認が必要。
+
 ## 残る受入
+
+### 2026-10-29の再開確認
+
+Chromeの教師用とEdgeの別学生用を、それぞれ予定したAWS accountとして確認。学生CloudShellで `status.py` と `plan_student_status.py` 本体を、転記payloadのSHA-256 `bfc77f14a4438975bff91aa872c9cbc839224161e4a81425d45fad042f460150` を照合して実行した。保存state/baseline、StackのLab/Deploymentと5台、EC2タグの一致、全5台running・SSM Onlineを確認。新Lambda/Stackの名前衝突もなかった。AWSリソースの変更は行っていない。
+
+学生の既存LabRoleはLambda serviceから引き受け可能な設定だった。学生accountに `jdu-` prefixのartifact bucketはなかった。教師側からの呼出し許可・実配備は別工程であり、この読取り成功をcross-account受入とは扱わない。
+
+同日のローカル検査はPython 102件（他のtest moduleからimportされたfixtureクラスの重複実行を含む）、Node 15件、Web配備package 2件が合格。模擬AWS/Googleを使う検査と実機結果を区別する。
 
 1. 教師・学生の実アカウントと既存5台を確認し、既存の保存済み成績と読取り結果を照合する。
 2. EC2非依存の経路をWeb Functionsへ接続し、EC2停止中とEnd Lab後の依存API/DBを別々に確認する。

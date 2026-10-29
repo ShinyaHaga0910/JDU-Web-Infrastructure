@@ -1,15 +1,16 @@
 import { createServer } from 'node:http';
 import { Readable } from 'node:stream';
 import { createApp } from './router.mjs';
-import { createGradeClient } from './grade-client.mjs';
+import { createGradeClient, createStatusClient } from './grade-client.mjs';
 import { createSessions } from './sessions.mjs';
 
 // A missing backend fails closed at request time; the server can still start
 // in the closed deployment mode without credentials or an active Lab.
-let getGrade, sessions;
+let getGrade, getStatus, sessions;
 try { getGrade=createGradeClient(); } catch { getGrade=undefined; }
+try { getStatus=createStatusClient(); } catch { getStatus=undefined; }
 try { sessions=createSessions(); } catch { sessions=undefined; }
-const app=createApp({getGrade,sessions});
+const app=createApp({getGrade,getStatus,sessions});
 const endpoint=process.env.AWS_LAMBDA_HTTP_ENDPOINT;
 const address=endpoint ? new URL(endpoint.includes('://') ? endpoint : `http://${endpoint}`) : new URL(`http://127.0.0.1:${process.env.PORT||8080}`);
 createServer(async (req,res) => {

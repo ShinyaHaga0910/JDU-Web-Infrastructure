@@ -1,0 +1,35 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Student-account read-only five-node status function, for one approved teacher role",
+  "Parameters": {
+    "ArtifactBucket": {"Type": "String"},
+    "ArtifactKey": {"Type": "String"},
+    "ArtifactVersion": {"Type": "String", "MinLength": 1},
+    "StudentRoleArn": {"Type": "String", "AllowedPattern": "arn:aws:iam::[0-9]{12}:role/LabRole"},
+    "TeacherRoleArn": {"Type": "String", "AllowedPattern": "arn:aws:iam::[0-9]{12}:role/LabRole"},
+    "LabId": {"Type": "String", "AllowedPattern": "[a-z0-9][a-z0-9-]{2,31}"},
+    "DeploymentId": {"Type": "String", "AllowedPattern": "[a-f0-9-]{36}"},
+    "StudentStackArn": {"Type": "String", "AllowedPattern": "arn:aws:cloudformation:us-east-1:[0-9]{12}:stack/.+"},
+    "BastionInstance": {"Type": "String", "AllowedPattern": "i-[0-9a-f]{17}"},
+    "WebInstance": {"Type": "String", "AllowedPattern": "i-[0-9a-f]{17}"},
+    "DnsInstance": {"Type": "String", "AllowedPattern": "i-[0-9a-f]{17}"},
+    "DbInstance": {"Type": "String", "AllowedPattern": "i-[0-9a-f]{17}"},
+    "RepoInstance": {"Type": "String", "AllowedPattern": "i-[0-9a-f]{17}"}
+  },
+  "Resources": {
+    "StatusFunction": {"Type": "AWS::Lambda::Function", "Properties": {
+      "FunctionName": {"Fn::Sub": "jdu-web-status-${LabId}"},
+      "Runtime": "python3.13", "Handler": "student_status_handler.handler", "Role": {"Ref": "StudentRoleArn"},
+      "Timeout": 30, "MemorySize": 256,
+      "Code": {"S3Bucket": {"Ref": "ArtifactBucket"}, "S3Key": {"Ref": "ArtifactKey"}, "S3ObjectVersion": {"Ref": "ArtifactVersion"}},
+      "Environment": {"Variables": {"STUDENT_ACCOUNT": {"Ref": "AWS::AccountId"}, "LAB_ID": {"Ref": "LabId"},
+        "DEPLOYMENT_ID": {"Ref": "DeploymentId"}, "STACK_ARN": {"Ref": "StudentStackArn"},
+        "INSTANCE_BASTION": {"Ref": "BastionInstance"}, "INSTANCE_WEB": {"Ref": "WebInstance"},
+        "INSTANCE_DNS": {"Ref": "DnsInstance"}, "INSTANCE_DB": {"Ref": "DbInstance"}, "INSTANCE_REPO": {"Ref": "RepoInstance"}}}
+    }},
+    "TeacherInvokePermission": {"Type": "AWS::Lambda::Permission", "Properties": {
+      "FunctionName": {"Fn::GetAtt": ["StatusFunction", "Arn"]}, "Action": "lambda:InvokeFunction", "Principal": {"Ref": "TeacherRoleArn"}
+    }}
+  },
+  "Outputs": {"StatusFunctionArn": {"Value": {"Fn::GetAtt": ["StatusFunction", "Arn"]}}}
+}

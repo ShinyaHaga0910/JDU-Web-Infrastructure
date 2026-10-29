@@ -11,13 +11,19 @@ import re
 
 import progress_api as legacy
 from identity_grade import identity_grade
+from status_gateway import student_status
 
 
-def serve(event, pepper, bindings, grades):
+def serve(event, pepper, bindings, grades, student_lambda=None):
     """Accept only a subject from the trusted invoking service; fail closed."""
-    if type(event) is not dict or set(event) != {'subject'}:
+    if type(event) is not dict or not (set(event) == {'subject'} or
+            (set(event) == {'subject', 'operation'} and event['operation'] == 'status')):
         return {'status': 'unauthorized'}
     try:
+        if event.get('operation') == 'status':
+            if student_lambda is None:
+                return {'status': 'unavailable'}
+            return student_status(event['subject'], pepper, bindings, grades, student_lambda)
         result = identity_grade(event['subject'], pepper, bindings, grades)
         return {'status': 'ok', 'grade': result}
     except legacy.ApiError as exc:
@@ -28,7 +34,8 @@ def serve(event, pepper, bindings, grades):
 
 def handler(event, context):
     """Resolve strongly consistent stores and a stable secret from AWS."""
-    if type(event) is not dict or set(event) != {'subject'}:
+    if type(event) is not dict or not (set(event) == {'subject'} or
+            (set(event) == {'subject', 'operation'} and event['operation'] == 'status')):
         return {'status': 'unauthorized'}
     try:
         import boto3
@@ -43,7 +50,8 @@ def handler(event, context):
         pepper = bytes.fromhex(encoded)
         bindings = legacy.DynamoStore(os.environ['PORTAL_BINDING_TABLE'])
         grades = AssessmentStore(os.environ['GRADE_TABLE'])
-        return serve(event, pepper, bindings, grades)
+        student_lambda = boto3.client('lambda', region_name='us-east-1') if event.get('operation') == 'status' else None
+        return serve(event, pepper, bindings, grades, student_lambda)
     except Exception:
         # No input, secrets, AWS errors or stack traces in the response or log.
         return {'status': 'unavailable'}

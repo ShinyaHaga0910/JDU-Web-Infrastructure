@@ -26,12 +26,12 @@ class MemoryDynamo:
         item = self.rows.get((TableName, Key['pk']['S'], Key['sk']['S']))
         return {'Item': copy.deepcopy(item)} if item else {}
     def transact_write_items(self, TransactItems):
-        check, update, lab, account = [next(iter(item.values())) for item in TransactItems]
+        check, update, *puts = [next(iter(item.values())) for item in TransactItems]
         with self.lock:
             vals = check['ExpressionAttributeValues']
             key = (update['TableName'], update['Key']['pk']['S'], update['Key']['sk']['S'])
             row = self.rows.get(key)
-            dests = [(p['TableName'], p['Item']['pk']['S'], p['Item']['sk']['S']) for p in (lab, account)]
+            dests = [(p['TableName'], p['Item']['pk']['S'], p['Item']['sk']['S']) for p in puts]
             u = update['ExpressionAttributeValues']
             if (not self.meta['active'] or self.meta['token_hash'] != vals[':token']['S']
                     or self.meta['deployment_id'] != vals[':deployment']['S']
@@ -42,7 +42,7 @@ class MemoryDynamo:
                     or any(d in self.rows for d in dests)):
                 raise Cancelled()
             self.rows[key]['used']['BOOL'] = True
-            for key, p in zip(dests, (lab, account)):
+            for key, p in zip(dests, puts):
                 self.rows[key] = copy.deepcopy(p['Item'])
 
 
@@ -53,7 +53,8 @@ class EnrollmentTests(unittest.TestCase):
                       'instances': {r: 'i-' + str(i) * 17 for i, r in enumerate(
                           ('bastion', 'web', 'dns', 'db', 'repo'), 1)}}
         self.client = MemoryDynamo(dict(self.grant, active=True))
-        self.store = ChallengeStore(self.client, 'bindings', 'test-lab', 'known-connector', clock=lambda: 1000)
+        self.arn = f'arn:aws:lambda:us-east-1:{ACCOUNT}:function:jdu-web-status-test-lab'
+        self.store = ChallengeStore(self.client, 'bindings', 'test-lab', self.arn, clock=lambda: 1000)
         self.nonce = self.store.issue('session', ACCOUNT)
     def run_enroll(self, fetch=lambda *_: ACCOUNT):
         return enroll(self.client, self.store, 'grade-table', self.grant, 'session', self.nonce,
@@ -66,6 +67,7 @@ class EnrollmentTests(unittest.TestCase):
         with self.assertRaises(EnrollmentError):
             self.run_enroll()
         self.assertIn(('bindings', 'LAB#test-lab', 'BINDING'), self.client.rows)
+        self.assertIn(('bindings', 'CONNECTOR#' + self.store.connector_digest, 'META'), self.client.rows)
 
     def test_changed_original_deployment_does_not_consume_challenge(self):
         self.client.meta['deployment_id'] = 'changed'
@@ -83,13 +85,21 @@ class EnrollmentTests(unittest.TestCase):
         self.run_enroll()
         other = dict(self.grant, lab_id='another-lab')
         self.client.meta = dict(other, active=True)
-        other_store = ChallengeStore(self.client, 'bindings', 'another-lab', 'known-connector', clock=lambda: 1000)
+        other_arn = f'arn:aws:lambda:us-east-1:{ACCOUNT}:function:jdu-web-status-another-lab'
+        other_store = ChallengeStore(self.client, 'bindings', 'another-lab', other_arn, clock=lambda: 1000)
         nonce = other_store.issue('second-session', ACCOUNT)
         with self.assertRaises(EnrollmentError):
             enroll(self.client, other_store, 'grade-table', other, 'second-session', nonce,
                    url(), now=NOW, fetch=lambda *_: ACCOUNT)
         self.assertTrue(other_store.is_pending(nonce, 'second-session', ACCOUNT))
         self.assertNotIn(('bindings', 'LAB#another-lab', 'BINDING'), self.client.rows)
+
+    def test_arbitrary_connector_is_rejected_before_consuming_nonce(self):
+        other = ChallengeStore(self.client, 'bindings', 'test-lab', 'https://attacker.invalid', clock=lambda: 1000)
+        nonce = other.issue('other-session', ACCOUNT)
+        with self.assertRaises(EnrollmentError):
+            enroll(self.client, other, 'grade-table', self.grant, 'other-session', nonce, url(), now=NOW, fetch=lambda *_: ACCOUNT)
+        self.assertTrue(other.is_pending(nonce, 'other-session', ACCOUNT))
 
     def test_two_concurrent_attempts_create_only_one_binding(self):
         barrier = threading.Barrier(2)
@@ -117,7 +127,8 @@ class AwsSdkShapeTests(unittest.TestCase):
         from botocore.stub import Stubber
         client = Session().create_client('dynamodb', region_name='us-east-1',
                                          aws_access_key_id='EXAMPLE', aws_secret_access_key='synthetic-secret')
-        challenge = ChallengeStore(client, 'bindings', 'test-lab', 'known-connector', clock=lambda: 1000)
+        arn = f'arn:aws:lambda:us-east-1:{ACCOUNT}:function:jdu-web-status-test-lab'
+        challenge = ChallengeStore(client, 'bindings', 'test-lab', arn, clock=lambda: 1000)
         grant = {'account': ACCOUNT, 'lab_id': 'test-lab', 'deployment_id': 'deployment',
                  'token_hash': 'c' * 64,
                  'instances': {r: 'i-' + str(i) * 17 for i, r in enumerate(
@@ -125,7 +136,7 @@ class AwsSdkShapeTests(unittest.TestCase):
         from challenge_store import _hash
         nonce = 'a' * 64
         item = {'session': {'S': _hash('session')}, 'account': {'S': ACCOUNT},
-                'lab': {'S': 'test-lab'}, 'connector': {'S': _hash('known-connector')},
+                'lab': {'S': 'test-lab'}, 'connector': {'S': _hash(arn)},
                 'used': {'BOOL': False}, 'expires_at': {'N': '1060'}}
         with Stubber(client) as stub:
             stub.add_response('get_item', {'Item': item})

@@ -48,9 +48,12 @@
 - 既存採点registryをbyteそのまま収録する内部Lambda候補とpackageを制作し、再現性・非公開構成をローカル検証。教師AWSでtemplateの構文受理を確認。呼出し元の権限制限、秘密鍵と本人確認の統合、実配備は未実施。
 - 学内ポータルのGoogle認証を参照したJA/RU/UZ成績画面とWeb Functions候補を作成。架空データでChromeの言語切替、記録なし・UNKNOWN・確認/保存日時と限定読取りを確認。配備packageの再現性・AWS template構文を検査。実Google、成績Lambda、学生AWSとの統合と画面配備は未実施。
 - 共有PC向けに、最大10分のserver-side sessionとログアウト時の失効を試作。Google tokenとsession IDのハッシュだけを保存し、実token・メール・Google IDは保存しない。OAuth署名/state/nonce、期限、コピー済みcookieのログアウト後拒否を模擬環境で確認。Googleからのログアウトも必要で、実AWS・実ブラウザ受入は未実施。
+- 本人の登録から固定ARNの学生側読取りLambda、本人5台の停止・SSM・公開IP表示までの接続を架空AWS応答で確認。異なるIDや任意ARN、別instance、壊れた応答は拒否し、読取り操作で起動しない。教師LabRoleの対象ARN呼出しはIAM simulationでallowed、3 templateのAWS構文も受理。学生側resource policyの作成・cross-account実呼出しとブラウザ統合受入は未実施。学生の自己管理する状態窓口の応答を採点の証拠には使わない。
 - Web Functions配備、学生本人とAWS accountの認証済みbinding、固定ブラウザ画面、停止時/End Lab後の実証は未完了。既存配布版r2は2026-10-27 14:24:57 UZTで期限切れ。
 
 ## 受入条件
+
+2026-10-29再開：教師Chrome・別学生EdgeのAWS accountを確認。学生CloudShellで `status.py` / `plan_student_status.py` 本体の転記hashを照合して実行し、元state/baseline/Stack/タグの一致、全5台running・SSM Online、新Lambda/Stack名の未使用を確認した。状態確認コード自体の学生AWS実行は成功。教師からの呼出し・ブラウザ統合・停止中とEnd Lab後は引き続き未受入。ローカルはPython 102件（importしたfixtureの重複を含む）・Node 15件・Web package 2件合格。
 
 - [x] Learner LabでWeb Functionsが利用できることを確認（2026-10-23本人確認）。
 - [x] End Lab後もWeb Functions部分は利用できたことを確認（2026-10-23本人確認）。EC2の継続稼働とは区別する。

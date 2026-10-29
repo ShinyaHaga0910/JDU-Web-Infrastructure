@@ -2,7 +2,8 @@
 
 Not a public API. All grant fields must come from a previously authenticated,
 authorized server-side enrollment, never directly from browser-supplied JSON.
-The connector identifier is a pre-approved opaque identifier, not a URL.
+The connector is restricted to the deterministic status Lambda ARN in the
+verified student account. The caller must still establish teacher approval.
 """
 import re
 
@@ -35,6 +36,9 @@ def enroll(client, challenge, grade_table, grant, session, nonce, proof_url, *, 
             or any(not isinstance(v, str) or not INSTANCE.fullmatch(v) for v in nodes.values())
             or len(set(nodes.values())) != 5):
         raise EnrollmentError('invalid authorized context')
+    connector_arn = f'arn:aws:lambda:us-east-1:{account}:function:jdu-web-status-{lab}'
+    if challenge.connector_digest != _hash(connector_arn):
+        raise EnrollmentError('invalid connector')
     path = identity_proof.validate(proof_url, nonce, now)
     if not challenge.is_pending(nonce, session, account):
         raise EnrollmentError('challenge unavailable')
@@ -66,6 +70,11 @@ def enroll(client, challenge, grade_table, grant, session, nonce, proof_url, *, 
                  'ConditionExpression': 'attribute_not_exists(pk)'}},
         {'Put': {'TableName': challenge.table,
                  'Item': {'pk': {'S': 'ACCOUNT#' + account}, 'sk': {'S': 'BINDING'}, **context},
+                 'ConditionExpression': 'attribute_not_exists(pk)'}},
+        {'Put': {'TableName': challenge.table,
+                 'Item': {'pk': {'S': 'CONNECTOR#' + challenge.connector_digest}, 'sk': {'S': 'META'},
+                          'arn': {'S': connector_arn}, 'account': {'S': account}, 'lab_id': {'S': lab},
+                          'deployment_id': {'S': deployment}, 'active': {'BOOL': True}},
                  'ConditionExpression': 'attribute_not_exists(pk)'}}]
     try:
         client.transact_write_items(TransactItems=writes)

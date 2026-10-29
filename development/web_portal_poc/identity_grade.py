@@ -22,8 +22,8 @@ def subject_key(subject, pepper):
     return 'SUBJECT#' + hmac.new(pepper, subject.encode('ascii'), hashlib.sha256).hexdigest()
 
 
-def identity_grade(verified_subject, pepper, bindings, grade_store):
-    """Resolve one subject to one current Lab and read only its grade.
+def resolve_student(verified_subject, pepper, bindings, grade_store):
+    """Resolve one subject to its current authorized Lab and metadata.
 
     `bindings.get` and `grade_store.get` must use strongly consistent reads;
     `grade_store.labs` is the existing assessment store's projection source.
@@ -80,4 +80,10 @@ def identity_grade(verified_subject, pepper, bindings, grade_store):
         row = bindings.get(pk, 'BINDING')
         if not isinstance(row, dict) or any(row.get(k) != v for k, v in expected.items()):
             denied()
+    return expected, latest
+
+
+def identity_grade(verified_subject, pepper, bindings, grade_store):
+    """Read the existing grade projection for one resolved student."""
+    _, latest = resolve_student(verified_subject, pepper, bindings, grade_store)
     return project_student(latest)

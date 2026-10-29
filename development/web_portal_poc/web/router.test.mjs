@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createApp, MISSION_MAXIMA } from './router.mjs';
-import { createGradeClient } from './grade-client.mjs';
+import { createGradeClient, createStatusClient } from './grade-client.mjs';
 
 const env={PORTAL_MODE:'enabled', PUBLIC_ORIGIN:'https://portal.example', GOOGLE_CLIENT_ID:'1234-example.apps.googleusercontent.com', GOOGLE_CLIENT_SECRET:'example-test-secret-only'};
 const subject='1234567890';
@@ -108,4 +108,25 @@ test('grade client invokes only fixed function with verified subject',async()=>{
   assert.deepEqual(JSON.parse(Buffer.from(calls[0].Payload).toString()),{subject});
   await assert.rejects(()=>read('invalid'));
   assert.throws(()=>createGradeClient({GRADE_READER_FUNCTION_ARN:'https://example.com'},client));
+  const status=createStatusClient({GRADE_READER_FUNCTION_ARN:'arn:aws:lambda:us-east-1:123456789012:function:grade-read'},client);
+  await status(subject);
+  assert.deepEqual(JSON.parse(Buffer.from(calls[1].Payload).toString()),{subject,operation:'status'});
+});
+
+test('status page requests only the verified identity and does not start a stopped server',async()=>{
+  const calls=[];
+  const observation={observed_at:'2026-10-27T09:00:00Z',instances:['bastion','web','dns','db','repo'].map(role=>
+    ({role,ec2_state:'stopped',ssm_state:'unknown',public_ip:null}))};
+  const app=createApp({env,verify:verified,sessions,getStatus:async s=>{calls.push(s);return {status:'ok',observation};}});
+  const result=await app(req('/status?lang=uz&account=other',{headers:{cookie:credentials}}));
+  assert.equal(result.status,200); const html=await result.text();
+  assert.match(html,/Muhit holati/); assert.match(html,/To‘xtagan/); assert.match(html,/Noma’lum/); assert.match(html,/2026-10-27 09:00 UTC/);
+  assert.doesNotMatch(html,/account=other/); assert.deepEqual(calls,[subject]);
+});
+
+test('malformed or unavailable status is shown as unavailable, not stopped',async()=>{
+  const app=createApp({env,verify:verified,sessions,getStatus:async()=>({status:'ok',observation:{instances:[],observed_at:'2026-10-27T09:00:00Z'}})});
+  const result=await app(req('/status',{headers:{cookie:credentials}}));
+  assert.equal(result.status,503); const html=await result.text();
+  assert.match(html,/状態を確認できません/); assert.doesNotMatch(html,/stopped/);
 });

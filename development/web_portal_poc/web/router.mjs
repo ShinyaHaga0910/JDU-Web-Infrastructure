@@ -11,23 +11,31 @@ const text = {
     login:'Googleでログイン', logout:'ログアウト', total:'保存済みの素点', current:'最新の確認', unknown:'確認できない項目があります',
     noRecord:'記録なし', currentOk:'確認済み', back:'トップへ戻る', unavailable:'成績を取得できません。しばらくしてから再度お試しください。',
     unbound:'本人の演習環境がまだ登録されていません。先生に確認してください。', mission:'課題', score:'保存済み', home:'トップ', checked:'確認日時', received:'保存日時',
-    notice:'環境の状態確認・構築と新しい採点の画面は準備中です。保存済み成績の閲覧ではサーバーを起動しません。',
+    status:'環境の状態', role:'サーバー', ec2:'稼働状態', ssm:'管理接続', publicIp:'公開IP', observed:'確認日時', statusUnavailable:'状態を確認できません。Learner Labと接続を確認してください。',
+    notice:'環境の構築と新しい採点の画面は準備中です。成績や状態の確認ではサーバーを起動しません。',
     shared:'共有PCでは、使い終わったらこの画面とGoogleの両方からログアウトしてください。', signedout:'ログアウトしました。' },
   ru: { title:'Практика Web', grades:'Сохранённые результаты', intro:'Войдите с университетским аккаунтом Google.',
     login:'Войти через Google', logout:'Выйти', total:'Сохранённые баллы', current:'Последняя проверка', unknown:'Есть непроверенные пункты',
     noRecord:'Нет записи', currentOk:'Проверено', back:'На главную', unavailable:'Не удалось получить результат. Повторите попытку позже.',
     unbound:'Ваша учебная среда ещё не зарегистрирована. Обратитесь к преподавателю.', mission:'Задание', score:'Сохранено', home:'Главная', checked:'Время проверки', received:'Время сохранения',
-    notice:'Просмотр состояния, создание среды и новая проверка готовятся. Просмотр результатов не запускает серверы.',
+    status:'Состояние среды', role:'Сервер', ec2:'Состояние', ssm:'Управление', publicIp:'Публичный IP', observed:'Время проверки', statusUnavailable:'Не удалось проверить состояние. Проверьте Learner Lab и подключение.',
+    notice:'Создание среды и новая проверка готовятся. Просмотр результатов и состояния не запускает серверы.',
     shared:'На общем компьютере после работы выйдите здесь и из аккаунта Google.', signedout:'Вы вышли из системы.' },
   uz: { title:'Web amaliyoti', grades:'Saqlangan natijalar', intro:'Universitet Google hisobingiz bilan kiring.',
     login:'Google orqali kirish', logout:'Chiqish', total:'Saqlangan ball', current:'Oxirgi tekshiruv', unknown:'Tekshirib bo‘lmagan bandlar bor',
     noRecord:'Natija yo‘q', currentOk:'Tekshirilgan', back:'Bosh sahifaga', unavailable:'Natijani olib bo‘lmadi. Keyinroq qayta urinib ko‘ring.',
     unbound:'Sizning amaliy muhitingiz hali ro‘yxatdan o‘tmagan. O‘qituvchiga murojaat qiling.', mission:'Vazifa', score:'Saqlangan', home:'Bosh sahifa', checked:'Tekshirilgan vaqt', received:'Saqlangan vaqt',
-    notice:'Holatni ko‘rish, muhit yaratish va yangi tekshiruv tayyorlanmoqda. Natijani ko‘rish serverlarni ishga tushirmaydi.',
+    status:'Muhit holati', role:'Server', ec2:'Ishlash holati', ssm:'Boshqaruv', publicIp:'Ommaviy IP', observed:'Tekshirilgan vaqt', statusUnavailable:'Holatni tekshirib bo‘lmadi. Learner Lab va ulanishni tekshiring.',
+    notice:'Muhit yaratish va yangi tekshiruv tayyorlanmoqda. Natija va holatni ko‘rish serverlarni ishga tushirmaydi.',
     shared:'Umumiy kompyuterda ish tugagach, bu yerdan va Google hisobidan chiqing.', signedout:'Tizimdan chiqdingiz.' },
 };
 const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const MISSION_MAXIMA=Object.freeze({M1:8,M2:13,M3:3,M4:9,M5:13,M6:16});
+const stateText={
+  ja:{running:'稼働中',stopped:'停止中',pending:'起動中',stopping:'停止処理中','shutting-down':'終了処理中',terminated:'終了済み',unknown:'確認できない',Online:'接続可',ConnectionLost:'接続なし',Inactive:'非アクティブ'},
+  ru:{running:'Работает',stopped:'Остановлен',pending:'Запускается',stopping:'Останавливается','shutting-down':'Завершается',terminated:'Завершён',unknown:'Неизвестно',Online:'Доступно',ConnectionLost:'Нет связи',Inactive:'Неактивно'},
+  uz:{running:'Ishlayapti',stopped:'To‘xtagan',pending:'Ishga tushmoqda',stopping:'To‘xtamoqda','shutting-down':'Tugatilmoqda',terminated:'Tugatilgan',unknown:'Noma’lum',Online:'Ulangan',ConnectionLost:'Aloqa yo‘q',Inactive:'Faol emas'},
+};
 const language = url => Object.hasOwn(text, url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'ja';
 const response = (body, status=200, extras={}) => new Response(body, {status, headers:{...security, 'Content-Type':'text/html; charset=utf-8', ...extras}});
 const redirect = (location, values=[]) => { const h=new Headers(security); h.set('Location',location); for(const v of values) h.append('Set-Cookie',v); return new Response(null,{status:303,headers:h}); };
@@ -52,7 +60,24 @@ function gradeHtml(lang, grade) {
   return `<section><h2>${escape(t.total)}</h2><p class="num">${escape(total)}</p><p>${escape(summary)}</p><div class="table-wrap"><table><thead><tr><th scope="col">${escape(t.mission)}</th><th scope="col">${escape(t.score)}</th><th scope="col">${escape(t.current)}</th><th scope="col">${escape(t.checked)}</th><th scope="col">${escape(t.received)}</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
 }
 
-export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch, getGrade, sessions}={}) {
+function statusHtml(lang, observation) {
+  const t=text[lang], roles=['bastion','web','dns','db','repo'];
+  const states=new Set(['pending','running','shutting-down','terminated','stopping','stopped','unknown']);
+  const ssm=new Set(['Online','ConnectionLost','Inactive','unknown']);
+  if (!observation || !Array.isArray(observation.instances) || observation.instances.length!==5 ||
+      typeof observation.observed_at!=='string' || !Number.isFinite(Date.parse(observation.observed_at))) throw new Error('Invalid status');
+  const rows=new Map();
+  for(const node of observation.instances) {
+    if (!node || !roles.includes(node.role) || rows.has(node.role) || !states.has(node.ec2_state) || !ssm.has(node.ssm_state) ||
+        (node.public_ip!==null && (typeof node.public_ip!=='string' || node.public_ip.length>45))) throw new Error('Invalid status');
+    rows.set(node.role,node);
+  }
+  const timestamp=new Date(observation.observed_at).toISOString().slice(0,16).replace('T',' ')+' UTC';
+  const body=roles.map(role=>{const node=rows.get(role);return `<tr><th scope="row">${escape(role)}</th><td>${escape(stateText[lang][node.ec2_state])}</td><td>${escape(stateText[lang][node.ssm_state])}</td><td>${escape(node.public_ip || '—')}</td></tr>`;}).join('');
+  return `<section><p>${escape(t.observed)}: ${escape(timestamp)}</p><div class="table-wrap"><table><thead><tr><th scope="col">${escape(t.role)}</th><th scope="col">${escape(t.ec2)}</th><th scope="col">${escape(t.ssm)}</th><th scope="col">${escape(t.publicIp)}</th></tr></thead><tbody>${body}</tbody></table></div></section>`;
+}
+
+export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch, getGrade, getStatus, sessions}={}) {
   return async request => {
     const url=new URL(request.url), lang=language(url), t=text[lang];
     if (url.pathname === '/healthz') return new Response('ok',{headers:{...security,'Content-Type':'text/plain; charset=utf-8'}});
@@ -96,8 +121,17 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
     if (!sessions) return response('Unavailable',503);
     try {if (!await sessions.check(jar.get(ACCESS),token)) return url.pathname==='/' ? redirect('/auth/login') : response('Forbidden',403);}
     catch {return response('Unavailable',503);}
-    if (url.pathname === '/') return response(page(lang,t.title,`<section><a href="/grades?lang=${lang}">${escape(t.grades)}</a></section><p>${escape(t.notice)}</p><p>${escape(t.shared)}</p><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form>`));
-    if (url.pathname !== '/grades') return response('Not found',404);
+    if (url.pathname === '/') return response(page(lang,t.title,`<section><p><a href="/grades?lang=${lang}">${escape(t.grades)}</a></p><p><a href="/status?lang=${lang}">${escape(t.status)}</a></p></section><p>${escape(t.notice)}</p><p>${escape(t.shared)}</p><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form>`));
+    if (url.pathname !== '/grades' && url.pathname !== '/status') return response('Not found',404);
+    if (url.pathname === '/status') {
+      try {
+        if (typeof identity?.sub !== 'string' || typeof getStatus !== 'function') throw new Error('Unavailable');
+        const result=await getStatus(identity.sub);
+        if (result?.status === 'unauthorized') return response(page(lang,t.status,`<p>${escape(t.unbound)}</p><a href="/?lang=${lang}">${escape(t.back)}</a>`),403);
+        if (result?.status !== 'ok') throw new Error('Unavailable');
+        return response(page(lang,t.status,statusHtml(lang,result.observation)+`<a href="/?lang=${lang}">${escape(t.back)}</a>`));
+      } catch {return response(page(lang,t.status,`<p>${escape(t.statusUnavailable)}</p><a href="/?lang=${lang}">${escape(t.back)}</a>`),503);}
+    }
     try {
       if (typeof identity?.sub !== 'string' || typeof getGrade !== 'function') throw new Error('Unavailable');
       const result=await getGrade(identity.sub);

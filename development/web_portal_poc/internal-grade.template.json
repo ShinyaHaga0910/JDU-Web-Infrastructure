@@ -17,7 +17,7 @@
         "Runtime": "python3.13",
         "Handler": "identity_grade_handler.handler",
         "Role": {"Ref": "ExecutionRoleArn"},
-        "Timeout": 15,
+        "Timeout": 40,
         "MemorySize": 256,
         "Code": {"S3Bucket": {"Ref": "ArtifactBucket"}, "S3Key": {"Ref": "ArtifactKey"}, "S3ObjectVersion": {"Ref": "ArtifactVersion"}},
         "Environment": {"Variables": {

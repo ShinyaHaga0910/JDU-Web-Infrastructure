@@ -36,3 +36,8 @@ class HandlerTest(unittest.TestCase):
     def test_missing_or_invalid_aws_configuration_fails_closed(self):
         with patch.dict(api.os.environ, {}, clear=True):
             self.assertEqual(api.handler({'subject': self.fixture.subject}, None), {'status': 'unavailable'})
+
+    def test_status_without_registered_client_fails_closed(self):
+        f = self.fixture
+        self.assertEqual(api.serve({'subject': f.subject, 'operation': 'status'}, f.pepper, f.bindings, f.store), {'status': 'unavailable'})
+        self.assertEqual(api.serve({'subject': f.subject, 'operation': 'start'}, f.pepper, f.bindings, f.store), {'status': 'unauthorized'})
