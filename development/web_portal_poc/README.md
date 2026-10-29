@@ -1,6 +1,6 @@
 # Webポータル：読取り処理の小規模試作
 
-2026-10-29更新。Issue [#1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1) の初期試作。閉鎖Web Functionsは配備済み。教師/学生のIAM接続と全EC2停止中の保存成績読取りを実測した。教師End Lab後はHTTPS入口だけ応答し成績読取りは失敗したため、本人決定により**当面は教師Lab開始中に利用する**。教師EC2は閲覧に不要。Google本人確認・実学生bindingと画面の統合は未受入で、授業で使える製品ではない。以下の実験記録は各時点の結果として読む。
+2026-10-29更新。Issue [#1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1) の初期試作。本人承認後、Googleログイン/ログアウトだけのWebを実配備し、教師の学内Google identityで成功・session失効を確認した。教師/学生IAM接続と全EC2停止中の保存成績読取りも別途実測済み。教師End Lab後はHTTPS入口だけ応答し成績読取りは失敗したため、**当面は教師Lab開始中に利用する**。教師EC2は閲覧に不要。実学生Google identity・本人AWS登録と成績画面の統合は未受入で、授業で使える製品ではない。以下の実験記録は各時点の結果として読む。
 
 ## 今回のコード
 
@@ -107,7 +107,7 @@ LabのStartはAcademy側が既存EC2を自動起動する場合がある。画�
 
 ### 本人ログインの次の準備
 
-本人がメール認証等の比較説明後、「簡単に作成できるなら学生のGoogle認証」と選択。既存project `jdu-learning-portal-test3` 内で本人が専用clientを作成し、既存のclientは変更していない。今回のsecretもSecrets Managerへ収録済み。次はARN参照候補を適用して実ログインを受入する段階で、Web側はまだ未適用。以下はGoogle試作の設定情報。
+本人がメール認証等の比較説明後、「簡単に作成できるなら学生のGoogle認証」と選択。既存project `jdu-learning-portal-test3` 内で本人が専用clientを作成し、既存のclientは変更していない。今回のsecretをSecrets Managerへ収録し、ARN参照版も本人承認後に適用。教師の学内identityで実ログイン/ログアウトを受入した。次は実学生Google identityとAWS環境の登録・成績readerへの接続。以下はGoogle試作の設定情報。
 
 Google側のAudienceは既存のInternalを確認。専用clientのWeb application・名前 `JDU Web Infrastructure Student 2026`・下記callbackを準備後、本人がCreateを実行した。JavaScript originsは空欄。既存2 clientやGoogle課金設定は変更していない。本人からsecretの適切な配置指示を受け、教師AWS Secrets Managerの専用保管先へ既存値を非表示入力で収録し、同一作成versionのreadback・AWSCURRENT一致を確認済み。[秘密を含まない保管・準備記録](verification/2026-10-29-google-secret-storage.public.json)。secretの再発行・rotationはしていない。
 
@@ -121,9 +121,17 @@ Google側のAudienceは既存のInternalを確認。専用clientのWeb applicati
 
 `store_google_oauth.py` は既存credentialだけを教師CloudShellのTTY非表示入力からSecrets Managerへ収録する。account/用途名/Google client/callbackを固定検査し、既存secretやreceiptを上書きしない。値を引数・環境・通常stdin・ファイルに保存せず、private receiptにもARN/versionと成否のみ。新versionを読み戻して照合し、失敗時は削除や再試行を自動化しない。4件のunit試験合格。実保管でも成功markerとversion一致を確認した。
 
-`web/secrets.mjs` はアプリ側の候補。CF/environmentには同accountのsecret ARNだけを渡し、enabledの認証要求で読む。指定用途・account・schema・callbackを照合し、最大5分memory cacheと同時要求の集約、期限切れ後の失敗では古いcredentialを返さない。closedでは保管先を読まない。Google client secretのCF parameter/environment渡しは削除した。Webの27件・package3件、依存のaudit 0を確認。既存LabRoleのGetSecretValueはsimulation allowedだが、実アプリの読取りはまだ受入していない。LabRole自体は既存の広いLab権限のままで、専用の最小権限roleを作ったとは扱わない。
+`web/secrets.mjs` はアプリ側の読取り処理。CF/environmentには同accountのsecret ARNだけを渡し、enabledの認証要求で読む。指定用途・account・schema・callbackを照合し、最大5分memory cacheと同時要求の集約、期限切れ後の失敗では古いcredentialを返さない。closedでは保管先を読まない。Google client secretのCF parameter/environment渡しは削除した。Webの27件・package3件、依存のaudit 0を確認。既存LabRoleのGetSecretValueはsimulation allowed、続く実Googleログインでもruntimeの値の利用が成功した。LabRole自体は既存の広いLab権限のままで、専用の最小権限roleを作ったとは扱わない。
 
-新codeを既存の非公開・version管理S3へhash照合で搬入し、Googleログイン/ログアウトだけを試すUPDATE change setを準備。AWS構文・事前検査は成功し、対象は既存Revisionの置換とEndpointのroute更新だけ。IAM・元EC2・成績DBの構成は変更しない。既存の試作用binding tableに短期sessionのhashを保存する計画。成績readerはdisabledのまま、学生の状態取得/構築/採点は接続しない。**まだ適用せず、ログイン入口とアプリ権限の適用直前確認待ち**。今回の本人の「自分で確認できた」は、Google作成/保管の確認として記録し、未実施の実アプリ受入と取り違えない。
+新codeを既存の非公開・version管理S3へhash照合で搬入し、Googleログイン/ログアウトだけを試すUPDATE change setを準備。AWS構文・事前検査は成功し、対象は既存Revisionの置換とEndpointのroute更新だけ。本人から適用直前承認を受領後、account・template・S3 codehash・2対象・試験範囲を照合してexecuteし、UPDATE_COMPLETEを確認した。IAM・元EC2・成績DBの構成変更なし。成績readerはdisabledのまま、学生の状態取得/構築/採点は接続していない。
+
+### Googleログイン実機試験の結果
+
+教師の学内Google accountをChromeで選択し、実Google→今回のcallback→Web演習menuへの復帰が成功。runtimeでSecrets Managerから取得した値がGoogleとの交換に使えたことを確認した。session tableに実作成された有効sessionは1件で、保存項目はkey/hash/expiry/activeだけ、残有効期間は最大600秒以内だった。Googleの生token、メール、subjectをsession行へ保存していない。
+
+アプリのログアウトを実行し、ブラウザに「ログアウトしました」、同じDDB行のactive=falseを確認。ログアウト後の `/grades` はForbidden。独立した未ログインHTTPでもgrades/status/引数なしcallbackは403、health 200、acceptanceは404、loginはGoogleへ303となった。redirect要求はopenid/emailだけ、flow cookieはSecure/HttpOnly/SameSite=Lax。Google account全体のログアウトは行っていない。[実測記録](verification/2026-10-29-google-login.public.json)。
+
+ログイン中もgrades/statusは未接続の取得不可メッセージで、点数やinstance状態は出なかった。元教師EC2はstopped、別経路の固定検証Lab62/62・全projection・全Lab partitionは不変。実学生Google account、実際の他domain Google account、コピー済cookieの実再送、実時間10分の期限切れは未試験。署名/domain/期限/失効の模擬回帰試験と区別する。次は検証identityと本人AWS account/Labの安全な登録と、非公開成績readerの接続。現在のログイン成功を本人の成績表示完了とは扱わない。
 
 ### 配備前の再開・準備記録（2026-10-29、履歴）
 

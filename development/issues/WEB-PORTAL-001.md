@@ -1,6 +1,6 @@
 # WEB-PORTAL-001：学生の環境準備・採点確認をブラウザへ集約する
 
-- 状態: 小規模実証と本人連携の統合を進行中。10/29本人決定により、当面は教師Lab開始中に利用する。閉鎖Web Functionsを実配備し、EC2停止中の保存成績読取りは成功。教師End Lab中の閲覧は後続課題とし、学生向け統合受入は未完了。
+- 状態: 小規模実証と本人連携の統合を進行中。当面は教師Lab開始中に利用。Googleログイン/ログアウトだけのWebを承認後に配備し、教師の学内identityで成功・実session失効を確認。成績readerと学生操作は未接続。教師End Lab中の閲覧は後続課題、学生向け統合受入は未完了。
 - 登録: 2026-10-23、本人依頼。
 - 着手順: D12の受入残件を保持し、2026-10-23の本人依頼で本Issueの構成検討を先行。Web演習の改善課題として実証・実装へ進める。
 - GitHub: [Issue #1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1)（非公開JDU-Web-Infrastructure）。
@@ -16,7 +16,7 @@
 - 教師Lab開始中：学生EC2停止中・学生Lab終了後でも、本人認証と登録を確認して保存済み成績を閲覧する。学生の現在状態が取得不能でも過去の成績を0点へ変えない。
 - 環境構築・最新状態・新しい採点：教師側に加え、学生本人のLabと必要なEC2/SSMが利用可能であることを確認する。
 - 教師側が利用不能：成績取得不可を表示し、0点・記録なしと取り違えない。画面からLabやEC2を自動起動しない。教師がAcademyで通常のStart Labを行い、復帰を確認する。
-- 通常の次工程：教師Lab再開後の読取り復帰、本人認証・AWS本人登録、本人だけの成績/状態画面の順に受入する。Google専用clientの作成と秘密の保管は完了。実ログイン・実学生bindingと個人成績画面の受入は未完了。
+- 通常の次工程：本人認証・AWS本人登録、本人だけの成績/状態画面の順に受入する。Google専用client・秘密の保管・教師の学内identityによる実ログイン/ログアウトは完了。実学生Google identity・AWS bindingと個人成績画面の受入は未完了。
 
 ### 本人ログイン方式の再検討（10/29本人質問）
 
@@ -29,6 +29,8 @@ Chromeの学校Google accountで既存の `JDU Learning Portal Test3`（project 
 その後本人がCreateを実行し、secretの適切な保管を指示。既存値を教師AWS Secrets Managerの専用保管先へ非表示入力で収録し、同一versionのreadbackとAWSCURRENT一致を確認。Git/会話/共有Windowsのファイル/CLI引数には値を出さず、IAMやresource policyも変更していない。Google secretを再発行していない。アプリがARNだけを設定として受け取る候補を追加し、Node27件・package3件・保管4件合格、audit0。実アプリによるsecret読取りとGoogle本人ログインは未実施。[保管と候補の記録](../web_portal_poc/verification/2026-10-29-google-secret-storage.public.json)。
 
 Googleログインだけの試験用UPDATE change setはCREATE_COMPLETE/AVAILABLE。既存Revision置換・Endpoint更新の2対象で、IAMや元EC2・成績DBの構成変更なし。既存の試用tableに短期session hashを保存する予定。成績readerはdisabled、学生操作も未接続。新しいログイン入口と認証情報利用の適用直前確認後に適用し、実Googleログイン/ログアウト/他domain拒否を確認する。本人の追加の「確認できた」はGoogle作成・保管についての確認として記録し、未適用のWeb統合受入とは区別する。
+
+その後本人がGoogleログイン試験の有効化を承認。計画を再照合しUPDATE_COMPLETEを確認した。教師の学内Google identityで実ログイン→menu表示→ログアウトが成功し、短期sessionにhash/expiry/activeだけが保存され、ログアウト後は同じ行が失効した。未ログインの成績/状態/callbackは403、元検証成績62/62と全projection・全partitionは不変、教師EC2 stoppedを確認。成績reader/学生操作は未接続のまま。[実Google受入記録](../web_portal_poc/verification/2026-10-29-google-login.public.json)。実学生Google account・実他domain account・実コピーcookie再送・実時間10分expiryは未試験。次は本人AWS環境との登録と非公開成績readerの接続。
 
 対象は、共通URLから学生本人の保存成績を見せ、将来は本人の環境操作につなぐための入口。従来はCloudShellのAWS認証・個別採点認証・専用URLを使っており、独立した学生ログイン画面はなかった。現在の可否probeには個人成績がなく、個人成績画面は閉鎖したまま。
 

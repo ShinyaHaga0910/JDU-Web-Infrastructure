@@ -1,0 +1,37 @@
+{
+  "verified_at": "2026-10-29T07:02:24.684515+00:00",
+  "scope": "Approved Google login/logout smoke test only",
+  "stack_update": "UPDATE_COMPLETE",
+  "code_sha256": "3671022130c241c2bf6f49493d53fb65b180a6afff0a0347b3ef04f576ef48c5",
+  "template_sha256": "54c68be20545e84a7578a2ede4caf5795e8812c07ee59ae83bb971b5b885662a",
+  "tester": "authorized teacher jdu.uz identity; no email or Google subject recorded here",
+  "google_browser_login": true,
+  "application_runtime_secret_read_accepted": true,
+  "application_browser_logout": true,
+  "same_persisted_session_revoked": true,
+  "browser_grades_after_logout": "Forbidden",
+  "session_storage": {
+    "active_session_count_before_logout": 1,
+    "only_key_hash_token_hash_expiry_active_fields": true,
+    "remaining_lifetime_within_600_seconds": true,
+    "raw_google_token_email_subject_not_stored_in_session_row": true
+  },
+  "public_http_without_login": [
+    {"path": "/healthz", "status": 200},
+    {"path": "/healthz/acceptance", "status": 404},
+    {"path": "/grades", "status": 403},
+    {"path": "/status", "status": 403},
+    {"path": "/auth/callback", "status": 403},
+    {"path": "/auth/login", "status": 303}
+  ],
+  "google_redirect": {"host": "accounts.google.com", "scopes": ["openid", "email"], "hosted_domain_hint": "jdu.uz", "flow_cookie_secure_httponly_samesite_lax": true},
+  "cache_control": "private, no-store, max-age=0",
+  "authenticated_unconnected_pages": {"grades": "Unavailable message; no score", "status": "Unavailable message; no instance state"},
+  "teacher_ec2": "stopped",
+  "full_grade_projection_unchanged": true,
+  "whole_lab_partition_unchanged": true,
+  "private_validation_baseline_grade": {"raw_earned": 62, "raw_maximum": 62},
+  "personal_grade_reader_configured": false,
+  "student_operations_configured": false,
+  "not_live_tested": ["Actual student Google account", "Other-domain Google account", "Copied-cookie replay", "Waiting the full ten-minute expiry period"]
+}
