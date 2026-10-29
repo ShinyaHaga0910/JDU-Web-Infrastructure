@@ -1,0 +1,2 @@
+# Local transaction emulation only. Never package Moto into an AWS Lambda.
+moto[dynamodb]==5.2.5

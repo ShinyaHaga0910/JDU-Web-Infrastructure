@@ -7,6 +7,8 @@
 
 ## 学生の到達体験
 
+10/29最新：Googleログインの実受入に続き、教師承認・有効session・nonce付きAWS署名・元5台の一致を一体で検査する登録候補を制作。9項目のtransactionで本人/AWSの両方向登録をまとめ、ログアウト/期限/別account/競合/原本変更による部分登録を防ぐ。新登録側22試験、既存読取りを含むPython53件と適用検査2件、Node34件、Web package3件合格（模擬環境）。登録フォーム/署名本文の接続は既定無効で未配備、学生AWSのブラウザ導入は未実装。教師AWSの非公開2 Lambda・鍵保管先・ログ2つを追加する5資源だけのCREATE change setがCREATE_COMPLETE/AVAILABLE、validation error 0。未execute、本人の最終操作待ち。公開中Web/元5台/元成績は変更なし。[計画記録](../web_portal_poc/verification/2026-10-29-portal-enrollment-plan.public.json)。本Issue全体は未完了。
+
 教師が案内する固定のWeb入口へ学生本人がログインし、自分の環境の準備・現在状態・課題確認・採点結果・送信履歴をブラウザだけで扱える。初回コマンドの手渡しや、CloudShellで生成したURLの転記を通常の導線から減らす。
 
 ## 現行の運用条件（2026-10-29本人決定）

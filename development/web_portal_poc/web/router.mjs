@@ -1,5 +1,7 @@
 import { configFrom, cookies, cookie, login, callback, verifyGoogle, SESSION, FLOW } from './auth.mjs';
 import { ACCESS } from './sessions.mjs';
+import { formToken, checkForm, operationId, tokenHash } from './enrollment-client.mjs';
+import { enrollmentHtml, enrollmentText, checkedEnrollment } from './enrollment-page.mjs';
 
 const security = {
   'Cache-Control': 'private, no-store, max-age=0', 'Referrer-Policy': 'no-referrer',
@@ -77,7 +79,7 @@ function statusHtml(lang, observation) {
   return `<section><p>${escape(t.observed)}: ${escape(timestamp)}</p><div class="table-wrap"><table><thead><tr><th scope="col">${escape(t.role)}</th><th scope="col">${escape(t.ec2)}</th><th scope="col">${escape(t.ssm)}</th><th scope="col">${escape(t.publicIp)}</th></tr></thead><tbody>${body}</tbody></table></div></section>`;
 }
 
-export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch, getGrade, getStatus, sessions, getAcceptanceHealth}={}) {
+export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch, getGrade, getStatus, sessions, getAcceptanceHealth, enroll}={}) {
   return async request => {
     const url=new URL(request.url), lang=language(url), t=text[lang];
     if (url.pathname === '/healthz') return new Response('ok',{headers:{...security,'Content-Type':'text/plain; charset=utf-8'}});
@@ -95,6 +97,26 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
     let config;
     try { config=configFrom(env); } catch { return response('Unavailable',503); }
     if (url.origin !== config.origin) return response('Forbidden',403);
+    const enrollmentEnabled=env.PORTAL_ENROLLMENT_ENABLED==='true' && typeof enroll==='function';
+    if (url.pathname==='/api/enrollment/complete') {
+      // Server-to-server signed proof only. The nonce was minted by an active,
+      // approved Google session; no self-declared Google identity is accepted.
+      if (!enrollmentEnabled) return response('Not found',404);
+      if (request.method!=='POST') return response('Method not allowed',405);
+      if (url.search || request.headers.get('content-type')?.split(';')[0]!=='application/json') return response('Forbidden',403);
+      try {
+        const body=await request.text();
+        if (Buffer.byteLength(body)>16384) return response('Payload too large',413);
+        const value=JSON.parse(body);
+        if (!value || Array.isArray(value) || Object.keys(value).sort().join(',')!=='pair_id,proof_url'
+            || !/^[a-f0-9]{64}$/.test(value.pair_id||'') || typeof value.proof_url!=='string' || value.proof_url.length>8192) return response('Forbidden',403);
+        const result=await enroll({operation:'complete',pair_id:value.pair_id,proof_url:value.proof_url});
+        if (result?.status==='unauthorized') return response('Forbidden',403);
+        if (result?.status!=='ok' || result.enrollment?.registered!==true
+            || !/^[a-z0-9][a-z0-9-]{2,31}$/.test(result.enrollment?.lab_id||'')) return response('Unavailable',503);
+        return new Response(JSON.stringify({registered:true}),{headers:{...security,'Content-Type':'application/json; charset=utf-8'}});
+      } catch {return response('Unavailable',503);}
+    }
     if (url.pathname === '/auth/login' && request.method === 'GET') {
       try {const flow=await login(config); return redirect(flow.location,[flow.flowCookie]);} catch {return response('Unavailable',503);}
     }
@@ -124,7 +146,8 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
         h.set('Content-Type','text/plain; charset=utf-8'); return new Response('Unavailable',{status:503,headers:h});
       }
     }
-    if (!['GET','HEAD'].includes(request.method)) return response('Method not allowed',405);
+    const enrollmentPost=url.pathname==='/enroll' && request.method==='POST' && enrollmentEnabled;
+    if (!['GET','HEAD'].includes(request.method) && !enrollmentPost) return response('Method not allowed',405);
     if (url.pathname === '/signed-out') return response(page(lang,t.title,`<p>${escape(t.signedout)}</p><p>${escape(t.shared)}</p><a href="/auth/login">${escape(t.login)}</a>`));
     let identity, jar, token;
     try {jar=cookies(request); token=jar.get(SESSION); identity=await verify(token,config);}
@@ -132,6 +155,34 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
     if (!sessions) return response('Unavailable',503);
     try {if (!await sessions.check(jar.get(ACCESS),token)) return url.pathname==='/' ? redirect('/auth/login') : response('Forbidden',403);}
     catch {return response('Unavailable',503);}
+    if (url.pathname==='/enroll') {
+      if (!enrollmentEnabled) return response('Not found',404);
+      const et=enrollmentText(lang);
+      const failure=(message,status)=>response(page(lang,et.title,`<p role="alert">${escape(message)}</p><a href="/?lang=${lang}">${escape(et.back)}</a>`),status);
+      try {
+        if (typeof identity?.sub!=='string' || typeof identity?.email!=='string' || identity.email_verified!==true || identity.hd!=='jdu.uz') return failure(et.denied,403);
+        const sessionId=jar.get(ACCESS);
+        const event={operation:enrollmentPost?'begin':'status',subject:identity.sub,email:identity.email,session_id:sessionId,token_hash:tokenHash(token)};
+        let requestId;
+        if (enrollmentPost) {
+          if (request.headers.get('origin')!==config.origin || request.headers.get('content-type')?.split(';')[0]!=='application/x-www-form-urlencoded') return failure(et.denied,403);
+          const body=await request.text();
+          if (Buffer.byteLength(body)>4096) return failure(et.denied,403);
+          const fields=new URLSearchParams(body);
+          if ([...fields.keys()].sort().join(',')!=='confirmed,csrf,request_id' || fields.get('confirmed')!=='yes') return failure(et.denied,403);
+          requestId=fields.get('request_id');
+          if (!checkForm(config,sessionId,token,requestId,fields.get('csrf'))) return failure(et.denied,403);
+          event.request_id=requestId;
+        }
+        const result=await enroll(event);
+        if (result?.status==='unauthorized') return failure(et.denied,403);
+        if (result?.status!=='ok') throw Error('Unavailable');
+        const value=checkedEnrollment(result.enrollment,{pending:enrollmentPost});
+        requestId ||= operationId();
+        const csrf=formToken(config,sessionId,token,requestId);
+        return response(page(lang,et.title,enrollmentHtml(lang,value,{requestId,csrf,pending:enrollmentPost})));
+      } catch {return failure(et.unavailable,503);}
+    }
     if (url.pathname === '/') return response(page(lang,t.title,`<section><p><a href="/grades?lang=${lang}">${escape(t.grades)}</a></p><p><a href="/status?lang=${lang}">${escape(t.status)}</a></p></section><p>${escape(t.notice)}</p><p>${escape(t.shared)}</p><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form>`));
     if (url.pathname !== '/grades' && url.pathname !== '/status') return response('Not found',404);
     if (url.pathname === '/status') {

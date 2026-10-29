@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-29",
+  "scope": "Atomic Google-session/AWS enrollment candidate and private service deployment plan only",
+  "teacher_account": "170126527713",
+  "stack": "jdu-web-portal-services-20261029",
+  "change_set": "private-enrollment-and-grades",
+  "change_set_status": "CREATE_COMPLETE",
+  "execution_status": "AVAILABLE",
+  "executed": false,
+  "changes": [
+    {"id":"SubjectKey","type":"AWS::SecretsManager::Secret","action":"Add"},
+    {"id":"EnrollmentService","type":"AWS::Lambda::Function","action":"Add"},
+    {"id":"GradeReader","type":"AWS::Lambda::Function","action":"Add"},
+    {"id":"EnrollmentLogs","type":"AWS::Logs::LogGroup","action":"Add"},
+    {"id":"GradeLogs","type":"AWS::Logs::LogGroup","action":"Add"}
+  ],
+  "validation_error_count": 0,
+  "unread_event_pages": false,
+  "code_sha256": "62a2e8251aae766323140eac26ff5fc7553ef718c713bd387eacb1ec4b1e5989",
+  "delivery_sha256": "f4931e0af48b89197bfcc880dd31d2e110e295c87255f1db9c8eabc843d158d6",
+  "delivery_files_verified": 19,
+  "existing_artifact_bucket": "private, versioned; protection verified before code upload",
+  "iam_changes": false,
+  "new_public_endpoints": false,
+  "existing_ec2_changes": false,
+  "original_grade_writes": false,
+  "current_web_changed": false,
+  "new_secret_created": false,
+  "student_approvals_created": false,
+  "local_checks": {
+    "new_transaction_moto": 13,
+    "new_private_adapter_package_template": 4,
+    "new_preparation_and_original_approval_source": 3,
+    "new_final_application_guards": 2,
+    "python_regression_subset_including_imported_fixtures": 53,
+    "node_total": 34,
+    "web_package": 3,
+    "skips_in_these_runs": 0
+  },
+  "not_accepted": [
+    "Real DynamoDB transaction across the original grade and binding tables",
+    "Actual Google identity paired to approved student AWS account",
+    "Real signed STS delivery through the new completion endpoint",
+    "Private identity grade reader deployment and browser grade rendering",
+    "Student browser-only AWS bootstrap",
+    "Environment preparation, new check execution and teacher progress UI"
+  ]
+}

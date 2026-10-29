@@ -2,6 +2,22 @@
 
 2026-10-29更新。Issue [#1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1) の初期試作。本人承認後、Googleログイン/ログアウトだけのWebを実配備し、教師の学内Google identityで成功・session失効を確認した。教師/学生IAM接続と全EC2停止中の保存成績読取りも別途実測済み。教師End Lab後はHTTPS入口だけ応答し成績読取りは失敗したため、**当面は教師Lab開始中に利用する**。教師EC2は閲覧に不要。実学生Google identity・本人AWS登録と成績画面の統合は未受入で、授業で使える製品ではない。以下の実験記録は各時点の結果として読む。
 
+## 本人AWS登録の統合候補（2026-10-29、未適用）
+
+Googleログインの実受入後、`portal_enrollment.py` を追加した。教師が元の成績metadataから承認した学校メール/AWS account/Lab/deployment/元5台だけを対象にする。メールとGoogle subjectは秘密鍵によるHMACへ変換し、元の値を登録tableへ保存しない。教師承認は`approve_portal_student.py`の独立したCloudShell操作だけで行い、公開HTTPや内部Lambdaのeventにapprove操作を作らない。
+
+Webで検証したGoogle identityと有効な10分sessionから5分間の登録試行を作る。AWS本人確認には60秒以内のnonce付きSTS署名を使い、固定STS以外へ送信しない。完了時に元metadata・教師承認・session・試行期限を再確認し、9項目のtransactionで両方向の本人/AWS登録と試行消費を一緒に確定する。別account、ログアウト、期限切れ、途中変更、重複登録では部分的な登録を残さない。同じ試行の再送は既存の結果を照合する。元の採点tableへの書込み、EC2起動/停止、新しい認証情報の学生PC保存はない。
+
+`identity_keys.py`へ既存と同じsubject HMACを共通化した。`identity_grade.py`は新登録に付くapproval参照も検査し、承認失効・対象変更を拒否する。従来の独立試作用bindingの扱いは維持する。既存の62素点registryのbytesとUNKNOWNの計算は変更していない。
+
+`web/enrollment-*.mjs`はJA/RU/UZの割当確認フォームと固定された同accountの非公開Lambdaへの接続候補。本人ID/メールはGoogle検証済みのserver側claimsだけから渡す。POSTはsession/token/操作に結び付くHMACのCSRF値、同一origin、明示確認、重複field拒否を検査する。完了用HTTPは署名をJSON本文で受け、URLや画面へ出さない。`request-body.mjs`は実HTTPのbodyを16KiBまでに制限する。**登録設定は既定false、公開中のWebにも未適用。** 学生AWS側のブラウザ導入・接続確認ボタンは未実装で、候補フォームの待機画面を通常の学生導線として開放しない。CloudShellへの署名コピーを最終の学生手順にしない。
+
+`portal_enrollment_handler.py`、`portal-services.template.json`、`build_portal_services_package.py`は非公開の登録Lambda/成績Lambda・HMAC鍵用Secrets Manager・3日保持のログ2つを追加する候補。既存LabRoleを2関数へ付けるためrole自体は広いLab権限のまま。Function URL、API Gateway、IAM policy/role変更は作らない。新鍵はAWS内で生成し、ARNだけを設定/receiptへ記録、stack削除時も鍵を保持する。`prepare_portal_services.py`は既存の非公開・version管理S3へcodeをhash照合で収録し、CREATE change setを作るだけ。`apply_portal_services.py`は具体的な計画の承認後の本人操作用で、対象5資源/parameters/template/codeを再照合し、実行結果が不明なときに自動で作り直さない。
+
+ローカルでは新登録のMoto transaction試験13件、adapter/package/template4件、計画/承認入力元3件、適用前検査2件が合格。MotoはAWS模擬で、STS応答はstubである。実AWS署名の統合受入ではない。既存読取りを含むPython53件（import fixtureの重複を含む）と適用2件、Node34件、Web package3件も合格。Motoは`pairing-test-requirements.txt`のtest専用依存で配備ZIPへ入れない。
+
+教師CloudShellで19ファイルと内包codeのhashを照合。AWSがtemplateを受理し、`jdu-web-portal-services-20261029`のCREATE change setはCREATE_COMPLETE/AVAILABLE、対象は上記5資源のAddだけ、DescribeEventsのvalidation errorは0・未取得pageなし。**まだexecuteしていない。** 元成績/元5台/公開中Webの変更はない。新しい非公開機能と鍵の作成は本人の最終操作待ちであり、実学生Googleとの紐付けや本人の成績表示は未受入。[秘密を含まない計画記録](verification/2026-10-29-portal-enrollment-plan.public.json)。
+
 ## 今回のコード
 
 - `grade_reader.py` は既存の学生用lab tokenで認証し、既存 `project_lab` の62素点と現在／参照結果を返す。教師用APIの内部で使うための関数であり、HTTP入口やブラウザ認証を公開しない。生のtoken、メール、チェック明細は結果に含めない。

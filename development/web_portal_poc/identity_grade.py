@@ -5,21 +5,12 @@ and pass the verified `sub` claim, never a browser-supplied identity. A trusted
 teacher-side process must create SUBJECT bindings; this module never creates or
 changes any binding or grades. Do not expose it as a public Lambda endpoint.
 """
-import hashlib
 import hmac
 import re
 
 import progress_api as legacy
 from grade_reader import project_student
-
-
-def subject_key(subject, pepper):
-    # A server-side secret prevents a published table snapshot from becoming
-    # a searchable directory of identity subjects. Rotation needs migration.
-    if (not isinstance(subject, str) or not re.fullmatch(r'[0-9]{1,128}', subject)
-            or not isinstance(pepper, bytes) or len(pepper) < 32):
-        raise ValueError('invalid verified identity or key')
-    return 'SUBJECT#' + hmac.new(pepper, subject.encode('ascii'), hashlib.sha256).hexdigest()
+from identity_keys import subject_key
 
 
 def resolve_student(verified_subject, pepper, bindings, grade_store):
@@ -63,6 +54,18 @@ def resolve_student(verified_subject, pepper, bindings, grade_store):
             or not isinstance(meta.get('token_hash'), str)
             or not hmac.compare_digest(meta['token_hash'], token)):
         denied()
+    approval = None
+    approval_pk = person.get('approval_pk')
+    if approval_pk is not None:
+        if not isinstance(approval_pk, str) or not re.fullmatch(r'APPROVAL#[a-f0-9]{64}', approval_pk):
+            denied()
+        approval = bindings.get(approval_pk, 'LAB')
+        grant = approval.get('grant') if isinstance(approval, dict) else None
+        if (not isinstance(approval, dict) or approval.get('active') is not True
+                or approval.get('bound_subject') != subject_pk or not isinstance(grant, dict)
+                or grant.get('account') != account
+                or any(grant.get(k) != meta.get(k) for k in ('lab_id', 'deployment_id', 'token_hash', 'instances'))):
+            denied()
     labs = grade_store.labs(lab)
     if len(labs) != 1:
         raise legacy.ApiError(503, 'grade unavailable')
@@ -75,6 +78,8 @@ def resolve_student(verified_subject, pepper, bindings, grade_store):
     if bindings.get(subject_pk, 'BINDING') != person:
         denied()
     if bindings.get('LAB#' + lab, 'SUBJECT') != mirror:
+        denied()
+    if approval is not None and bindings.get(approval_pk, 'LAB') != approval:
         denied()
     for pk in ('LAB#' + lab, 'ACCOUNT#' + account):
         row = bindings.get(pk, 'BINDING')

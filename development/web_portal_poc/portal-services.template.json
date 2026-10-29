@@ -1,0 +1,51 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Private portal enrollment and grade projection candidate; no public endpoints or IAM changes",
+  "Parameters": {
+    "ArtifactBucket": {"Type": "String"},
+    "ArtifactKey": {"Type": "String"},
+    "ArtifactVersion": {"Type": "String", "MinLength": 1},
+    "LabRoleArn": {"Type": "String", "AllowedPattern": "arn:aws:iam::[0-9]{12}:role/LabRole"},
+    "GradeTableName": {"Type": "String", "MinLength": 3},
+    "BindingTableName": {"Type": "String", "MinLength": 3},
+    "SecretScope": {"Type": "String", "AllowedPattern": "[a-z0-9-]{3,40}"}
+  },
+  "Resources": {
+    "SubjectKey": {
+      "Type": "AWS::SecretsManager::Secret", "DeletionPolicy": "Retain", "UpdateReplacePolicy": "Retain",
+      "Properties": {
+        "Name": {"Fn::Sub": "jdu/web-portal/${SecretScope}/subject-key"},
+        "Description": "HMAC key for approved portal identities; never expose to browser or logs",
+        "GenerateSecretString": {"PasswordLength": 64, "ExcludeUppercase": true, "ExcludePunctuation": true, "IncludeSpace": false, "ExcludeCharacters": "ghijklmnopqrstuvwxyz", "RequireEachIncludedType": false}
+      }
+    },
+    "EnrollmentService": {"Type": "AWS::Lambda::Function", "Properties": {
+      "Runtime": "python3.13", "Handler": "portal_enrollment_handler.handler", "Role": {"Ref": "LabRoleArn"},
+      "Timeout": 15, "MemorySize": 256,
+      "Code": {"S3Bucket": {"Ref": "ArtifactBucket"}, "S3Key": {"Ref": "ArtifactKey"}, "S3ObjectVersion": {"Ref": "ArtifactVersion"}},
+      "Environment": {"Variables": {
+        "PORTAL_AWS_ACCOUNT_ID": {"Ref": "AWS::AccountId"}, "PORTAL_SUBJECT_KEY_SECRET_ARN": {"Ref": "SubjectKey"},
+        "PORTAL_BINDING_TABLE": {"Ref": "BindingTableName"}, "GRADE_TABLE": {"Ref": "GradeTableName"}
+      }}
+    }},
+    "GradeReader": {"Type": "AWS::Lambda::Function", "Properties": {
+      "Runtime": "python3.13", "Handler": "identity_grade_handler.handler", "Role": {"Ref": "LabRoleArn"},
+      "Timeout": 40, "MemorySize": 256,
+      "Code": {"S3Bucket": {"Ref": "ArtifactBucket"}, "S3Key": {"Ref": "ArtifactKey"}, "S3ObjectVersion": {"Ref": "ArtifactVersion"}},
+      "Environment": {"Variables": {
+        "PORTAL_SUBJECT_KEY_SECRET_ARN": {"Ref": "SubjectKey"}, "PORTAL_BINDING_TABLE": {"Ref": "BindingTableName"}, "GRADE_TABLE": {"Ref": "GradeTableName"}
+      }}
+    }},
+    "EnrollmentLogs": {"Type": "AWS::Logs::LogGroup", "Properties": {
+      "LogGroupName": {"Fn::Sub": "/aws/lambda/${EnrollmentService}"}, "RetentionInDays": 3
+    }},
+    "GradeLogs": {"Type": "AWS::Logs::LogGroup", "Properties": {
+      "LogGroupName": {"Fn::Sub": "/aws/lambda/${GradeReader}"}, "RetentionInDays": 3
+    }}
+  },
+  "Outputs": {
+    "EnrollmentArn": {"Value": {"Fn::GetAtt": ["EnrollmentService", "Arn"]}},
+    "GradeReaderArn": {"Value": {"Fn::GetAtt": ["GradeReader", "Arn"]}},
+    "SubjectKeySecretArn": {"Value": {"Ref": "SubjectKey"}}
+  }
+}

@@ -26,3 +26,13 @@ python3 -B development/verify_source_integrity.py
 新しいD12の公開資源搬入と学生が49手順を最初から辿る試験、母語校閲、教師確認、本人の成功password手入力とapp後の全5台停止/再開は未受入のまま。[教材側の範囲](../course/labs/VALIDATION.md)を参照。全授業CLASS_READYはfalse。
 
 新しいコード変更では、対応するunit/mock regressionに加え、必要な実機受入を明示して行う。旧migration用の同じ実環境を無断で初期化しない。
+
+## Web本人登録のtransaction検査
+
+`development/web_portal_poc`で、隔離したtest用Python環境へ`pip install -r pairing-test-requirements.txt`を実行してから次を使う。Moto/boto3は配備ZIPに収録しない。新登録13件はMoto必須で、skipを合格と数えない。
+
+```bash
+python -B -m unittest -v test_portal_enrollment test_portal_enrollment_handler test_prepare_portal_services test_apply_portal_services
+```
+
+登録・本人/AWS重複防止・原本条件確認・session失効のtransaction、再送、期限、9項目のrollback、既存62点readerとの接続、公開入口のない配備候補、適用前の差分/版/hash照合を検査する。STS fetchはstubのため実署名の認証結果ではない。Google→本人AWS→実DynamoDB→ブラウザの受入は別に記録する。`web`の`npm test`はCSRF、同一origin、serverで検証したclaimsのみの利用、body上限、既定閉鎖も確認する。
