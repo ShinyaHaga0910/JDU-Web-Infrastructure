@@ -18,6 +18,24 @@
 - 教師側が利用不能：成績取得不可を表示し、0点・記録なしと取り違えない。画面からLabやEC2を自動起動しない。教師がAcademyで通常のStart Labを行い、復帰を確認する。
 - 通常の次工程：教師Lab再開後の読取り復帰、本人認証・AWS本人登録、本人だけの成績/状態画面の順に受入する。Googleの実設定と実学生bindingはまだ完了していない。
 
+### 本人ログイン方式の再検討（10/29本人質問）
+
+本人は当初Google Cloud project/OAuth clientを把握しておらず、Web Functions側でjdu.uzに限定する方式・本人メールによる認証ができるか質問した。Google方式は制作者が学内教材ポータルを参考に試作した案で、当初の必須指定ではなかった。その説明後、本人が「簡単に作成できるなら学生のGoogle認証でログインする方法」と選択したため、Google方式を第一候補として設定準備を進める。
+
+Chromeの学校Google accountで既存の `JDU Learning Portal Test3`（project ID `jdu-learning-portal-test3`）が開けた。プロジェクトが存在することは確認したが、今回のclientや作成権限の受入ではない。既存clientの再利用や変更をせず、同project内に今回専用clientを分けられるか確認する。以下のメール方式調査は比較の履歴として保持する。
+
+続いてAudienceのUser typeがInternalであること、既存clientが2つあることを読取り確認。新規作成フォームでWeb applicationを選び、専用名 `JDU Web Infrastructure Student 2026` と今回のcallback URLだけを入力した。JavaScript originsは使わないserver flowのため空欄、AI agent用途も選択しない。入力検査後Createは有効。**まだCreateを押していない**。新しい認証情報の発行・アクセス設定になるため、作成直前のフォームを保存して本人へ最終操作を引き継ぐ。既存client、Audience、scope、課金設定は変更していない。作成やGoogle本人ログインの成功を意味しない。
+
+対象は、共通URLから学生本人の保存成績を見せ、将来は本人の環境操作につなぐための入口。従来はCloudShellのAWS認証・個別採点認証・専用URLを使っており、独立した学生ログイン画面はなかった。現在の可否probeには個人成績がなく、個人成績画面は閉鎖したまま。
+
+Web FunctionsのApplicationManaged自体にはメール所有の確認機能がない。入力されたメールの末尾をjdu.uzに制限するだけでは認証にならず、メール到達確認又は認証サービスが確認したidentityが必要。メール確認後も、教師承認済みLab/accountとの紐付けを別に検査する。
+
+同日の教師CloudShell読取りでは、SES v2 GetAccount/ListEmailIdentitiesはAccessDeniedException。Cognito ListUserPoolsは成功し、us-east-1の一覧は空だった。これはメール送信やCognito作成の可否を実証したものではない。新規pool/client作成、登録、メール送信、権限変更は行っていない。
+
+AWS内の候補としてCognitoの初回メール確認＋パスワードを検討できる。公式仕様上、Cognito既定の送信元で初回確認メールを送る構成は独自のSES設定を要しないが送信量の制限がある。一方、毎回メールコードのみでログインするEMAIL_OTPはEssentials以上とSES設定が必要。今回の権限で作成・実送信・jdu.uz以外の拒否が通るかは未確認。Google専用の数値subjectを前提にした既存コードも変更・回帰確認が必要で、設定値だけでCognitoへ切り替えたとは扱わない。
+
+出典（2026-10-29確認）：[Web Functionsの認証責任](https://docs.aws.amazon.com/lambda/latest/dg/web-functions-best-practices.html)、[Cognitoの既定メールとOTP条件](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-email.html)。方式を決める前に、この説明と従来の入口との違いを本人へ共有する。
+
 ## 2026-10-23の検討結果
 
 実現できる見込みがある。推奨は**教師側の固定Web Functions入口＋学生本人account内の操作窓口＋既存の採点API/成績DB**。教師が学生roleをAssumeRoleできるとは仮定せず、最初に本人accountの結び付けと必要なLabRole権限を実証する。
