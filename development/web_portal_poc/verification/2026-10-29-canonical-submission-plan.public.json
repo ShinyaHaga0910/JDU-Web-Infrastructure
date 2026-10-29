@@ -1,6 +1,6 @@
 {
   "date": "2026-10-29",
-  "phase": "canonical_submission_plan_not_applied",
+  "phase": "paused_after_confirmation_before_apply",
   "checker_code_sha256": "e29ad4ec55b375a16534ed0c0c5a68e8482bc931419932f5f2f02a9de01dcdfa",
   "source_bundle_sha256": "48294e358ab9e8d7d0eb564e52393fac05d06f82d7c4d2c191669b3e43745985",
   "aws_web_code_sha256": "6c399ca8661e19ac9cdc91ba217edb280cce8559b42781f45dba3c45d52cf8bb",
@@ -35,7 +35,8 @@
   "GET_writes_grades": false,
   "unknown_replaces_eligible_grade": false,
   "same_request_retry_reorders_newer_grade": false,
-  "canonical_write_capability_confirmation_received": false,
+  "canonical_write_capability_confirmation_received": true,
   "deployed": false,
-  "real_browser_canonical_submission_accepted": false
+  "real_browser_canonical_submission_accepted": false,
+  "user_requested_execution_deferred_until_next_day": true
 }
