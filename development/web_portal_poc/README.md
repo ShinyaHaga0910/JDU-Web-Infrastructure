@@ -6,7 +6,7 @@
 
 - `grade_reader.py` は既存の学生用lab tokenで認証し、既存 `project_lab` の62素点と現在／参照結果を返す。教師用APIの内部で使うための関数であり、HTTP入口やブラウザ認証を公開しない。生のtoken、メール、チェック明細は結果に含めない。
 - `status.py` は学生アカウント内の信頼済み既存bindingを受け、STSアカウント、CloudFormationのLab/Deploymentと5台のID、EC2タグを確認する。EC2とSSMを読取り、停止・取得不能を区別する。起動、停止、コマンド送信、採点データの更新は行わない。
-- `student_status_handler.py` と `student-status.template.json` は学生AWS内の状態確認専用Lambda候補。固定された本人account/Stack/5台だけを検証し、callerが別IDを指定する要求や起動・停止要求を拒否する。新Lambdaへの呼出しを指定した教師LabRoleに許可する設定を含み、公開URLは作らない。LabRole自体の広い権限は縮小しない。学生AWSへの配備・別accountからの実呼出しは未実施。
+- `student_status_handler.py` と `student-status.template.json` は学生AWS内の状態確認専用Lambda。固定された本人account/Stack/5台だけを検証し、callerが別IDを指定する要求や起動・停止要求を拒否する。新Lambdaへの呼出しを指定した教師LabRoleに許可する設定を含み、公開URLは作らない。LabRole自体の広い権限は縮小しない。10月29日に別学生AWSへ配備し、同accountからの実呼出しを確認。別accountの許可対象外roleの拒否も確認した。指定教師LabRoleでの成功は未受入。
 - `deploy_student_status.py` は学生CloudShell用の配備入口。既定では元state/baselineとAWSを照合する計画確認だけを行う。`--apply` を付けた場合だけ、独立したartifact Stackと状態Lambda Stackを作る。artifactは暗号化・公開禁止・version管理付きS3へ収録する。既存artifact Stackは用途tagと状態・公開禁止・version管理を照合し、不明な同名資源を採用しない。元5台・IAM role・SG・採点DBには変更を加えず、新しい状態Stackも上書きしない。適用前に教師roleから学生Lambdaへの新アクセス許可の確認が必要。S3はStack削除時も保持するため、試作後の整理は別途必要。
 - `status_gateway.py` は本人IDとLabの認可情報を再照合し、学生account/Labから決まる固定Lambda ARNだけを呼ぶ。戻った5台のID・状態・アドレスを検査し、通信不能や他環境の結果は状態不明として扱う。返答は学生側で変更可能な状態情報であり、採点結果や課題合格の証拠には使わない。
 - `identity_proof.py` は、固定のAWS STSだけに短時間の署名付きGetCallerIdentityを送り、セッションに紐付く一回限りのnonceを検証する候補を試作する。実AWSでの署名・nonceヘッダー自体は以下のように確認したが、このmoduleを使う教師・学生間の統合試験は未実施。学生ログイン、信頼できる学生Labと接続先の決定は未実装であり、公開しない。
@@ -62,7 +62,15 @@ Chromeの教師用とEdgeの別学生用を、それぞれ予定したAWS accoun
 
 同日のローカル検査はPython 102件（他のtest moduleからimportされたfixtureクラスの重複実行を含む）、Node 15件、Web配備package 2件が合格。模擬AWS/Googleを使う検査と実機結果を区別する。
 
-続いて配備入口の模擬試験5件が合格。秘密を含まない7ファイルの搬入ZIP（SHA-256 `b6e8ce0b8b77fba2b7ce775157c4a5949a3d692cac1ed6eac6d1ee9f410005a6`）を学生CloudShellへuploadし、hash・内包名を確認して計画モードを実行した。Lambda用ZIPは2,693 bytes、SHA-256 `56fe94f2a0f2a9820748be047ba07e1523425991c66da23581e07604bcc32065`。計画が示す追加対象は独立した非公開S3、既存LabRoleを使う状態Lambda、指定教師LabRoleの呼出し許可で、公開endpointはない。この時点では適用していない。新S3の構文受理と新Lambdaの実呼出しも未実施。
+続いて配備入口の模擬試験5件が合格。秘密を含まない7ファイルの搬入ZIP（SHA-256 `b6e8ce0b8b77fba2b7ce775157c4a5949a3d692cac1ed6eac6d1ee9f410005a6`）を学生CloudShellへuploadし、hash・内包名を確認して計画モードを実行した。Lambda用ZIPは2,693 bytes、SHA-256 `56fe94f2a0f2a9820748be047ba07e1523425991c66da23581e07604bcc32065`。
+
+両templateのAWS構文受理後、本人が追加構成を承認。`jdu-web-portal-status-artifacts` と `jdu-web-portal-status-class193548-test1` の2 Stackを作成し、`CREATE_COMPLETE` を確認した。非公開S3、既存LabRoleを使う状態Lambda、指定教師LabRoleの呼出し許可が残り、従量課金の対象となる。新LambdaのCodeSha256が上記ZIPと一致し、Activeであること、実resource policyの許可先が指定教師LabRoleだけであることを確認。同じ学生accountから呼び出すと5台running・SSM Online、`operation=start` はunauthorized。元5台に作成/更新/起動/停止操作は行っていない。
+
+教師CloudShellのprincipalはLabRoleとは別の既存voclabs roleで、学生LambdaへのDryRunはAccessDeniedとなった。これは意図した許可対象外の拒否であり、教師LabRoleの呼出し成功を意味しない。教師側の既存EC2にはIAM instance profileがなく、これを変更して試す方法は採っていない。
+
+そのため `teacher_probe_handler.py` と `teacher-probe.template.json` を準備した。教師側のIAM経由だけで使う固定検証Lab専用Lambdaで、指定Labの保存成績と学生側状態の読取りを別々に呼ぶ。成績読取りは学生LambdaやEC2を呼ばない。Googleログインや学生向け認可の代用にはしない。模擬試験5件・packageの再現性/既存registry bytes/ロードが合格。ZIP SHA-256は `c53f93a644a2c7948e5cb175896150a37903c27917a12121f7c0f47155394d6c`。
+
+教師の既存S3は公開禁止4項目がtrue、version管理は無効だった。設定は変更せず、上書き禁止条件とSHA-256 checksumを付け、hash入りの別keyへ検証コードだけを収録した。教師CloudShellで転記hashとtemplateを確認し、`jdu-web-portal-teacher-probe-20261029` / `private-readonly-probe` のCREATE change setを準備。CREATE_COMPLETE/AVAILABLEで、変更はLambda 1つのAddだけ。**まだ実行していない**。教師LabRoleを新関数へ付けるため、適用前の確認が必要。新関数のCodeSha256照合・実呼出し・EC2停止中/End Lab後は未実施。
 
 1. 教師・学生の実アカウントと既存5台を確認し、既存の保存済み成績と読取り結果を照合する。
 2. EC2非依存の経路をWeb Functionsへ接続し、EC2停止中とEnd Lab後の依存API/DBを別々に確認する。

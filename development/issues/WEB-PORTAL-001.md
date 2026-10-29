@@ -57,6 +57,10 @@
 
 配備準備も追加。非公開・暗号化・version管理付きS3と読取りLambdaの2 Stackを別に作る入口を模擬試験5件で確認し、学生CloudShellで搬入hashを照合して計画モードを実行。元5台への変更なし。教師roleへの新規呼出し許可を含むため、適用直前確認後に進める。現時点で新資源の作成はしていない。
 
+その後、本人承認により学生側2 StackのCREATE_COMPLETEを確認。実Lambdaのcode hashと指定教師LabRoleだけのresource policyを照合。同accountから5台running/SSM Onlineを取得でき、起動要求はunauthorized。許可対象外の教師CloudShell roleからのDryRunはAccessDenied。指定教師LabRoleでの成功は次の試験。
+
+教師側の固定検証Lab専用・非公開Lambdaを準備し、模擬試験5件とpackage検査を通過。既存の非公開S3へhash付き別key/上書き禁止/checksum付きで収録し、AWSでtemplateとCREATE change setを確認。変更はLambda 1つの追加だけで、未適用。元EC2/DB/権限は変更しない。これを使ってEC2に依存しない保存成績読取りと指定LabRole間の実呼出しを試す。Google・教師承認・ブラウザ受入の代用にはしない。
+
 - [x] Learner LabでWeb Functionsが利用できることを確認（2026-10-23本人確認）。
 - [x] End Lab後もWeb Functions部分は利用できたことを確認（2026-10-23本人確認）。EC2の継続稼働とは区別する。
 - [x] 公式仕様・既存コードから構成案と実証の順番を整理。今回AWS操作なし。

@@ -1,0 +1,23 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Private IAM-only Web portal acceptance probe for one fixed test Lab",
+  "Parameters": {
+    "ArtifactBucket": {"Type": "String"},
+    "ArtifactKey": {"Type": "String"},
+    "ExecutionRoleArn": {"Type": "String", "AllowedPattern": "arn:aws:iam::[0-9]{12}:role/LabRole"},
+    "GradeTableName": {"Type": "String", "MinLength": 3},
+    "StudentAccount": {"Type": "String", "AllowedPattern": "[0-9]{12}"},
+    "LabId": {"Type": "String", "AllowedPattern": "[a-z0-9][a-z0-9-]{2,31}"},
+    "DeploymentId": {"Type": "String", "AllowedPattern": "[a-f0-9-]{36}"}
+  },
+  "Resources": {
+    "AcceptanceProbe": {"Type": "AWS::Lambda::Function", "Properties": {
+      "Runtime": "python3.13", "Handler": "teacher_probe_handler.handler",
+      "Role": {"Ref": "ExecutionRoleArn"}, "Timeout": 40, "MemorySize": 256,
+      "Code": {"S3Bucket": {"Ref": "ArtifactBucket"}, "S3Key": {"Ref": "ArtifactKey"}},
+      "Environment": {"Variables": {"GRADE_TABLE": {"Ref": "GradeTableName"},
+        "STUDENT_ACCOUNT": {"Ref": "StudentAccount"}, "LAB_ID": {"Ref": "LabId"}, "DEPLOYMENT_ID": {"Ref": "DeploymentId"}}}
+    }}
+  },
+  "Outputs": {"FunctionArn": {"Value": {"Fn::GetAtt": ["AcceptanceProbe", "Arn"]}}}
+}
