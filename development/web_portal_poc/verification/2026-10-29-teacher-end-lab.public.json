@@ -1,0 +1,32 @@
+{
+  "scope": "Closed-mode public availability probe; no personal-grade or Google identity acceptance",
+  "teacher_end_reported_by_user": true,
+  "teacher_end_confirmed_in_ui": {"aws_status": "Terminated", "timer": "00:00", "message": "Lab terminated"},
+  "teacher_end_confirmed_by_utc": "2026-10-29T05:40:35Z",
+  "student_lab_ended": true,
+  "teacher_lab_restarted_during_test": false,
+  "teacher_ec2_state_before_end": "stopped",
+  "current_ec2_state_read_after_end": false,
+  "http_observations": [
+    {"path": "/healthz", "status": 200, "body": "ok"},
+    {"path": "/healthz/acceptance", "status": 503, "body": {"storage": false, "savedGrades": false, "gradeService": false, "checkedAt": "2026-10-29T05:41:59.249Z"}},
+    {"path": "/grades", "status": 503, "body": "Unavailable"}
+  ],
+  "browser_observations": [
+    {"storage": false, "savedGrades": false, "gradeService": false, "checkedAt": "2026-10-29T05:40:49.489Z"},
+    {"storage": false, "savedGrades": false, "gradeService": false, "checkedAt": "2026-10-29T05:43:03.942Z"}
+  ],
+  "cache_control": "private, no-store, max-age=0",
+  "observation_separation_exceeds_30_second_internal_cache": true,
+  "code_sha256": "6a27a1d815b82b6e3d54dc6687b1e8ed1dca794cbcb00fbd637ccdf4485cd9fa",
+  "acceptance": {"http_application_remains_available": true, "saved_grade_read_after_teacher_end": false, "personal_grades_remain_closed": true},
+  "interpretation_limits": [
+    "savedGrades is checked only after the fixed metadata matches; false does not establish missing or deleted grade rows",
+    "The public endpoint suppresses backend error details; the underlying error code and exact cause were not identified",
+    "No claim about a cold start or persistence beyond the observed interval",
+    "No full grade projection or partition fingerprint could be compared through this availability-only endpoint"
+  ],
+  "aws_data_written_by_probe": false,
+  "permissions_relaxed": false,
+  "scores_changed_on_failure": false
+}

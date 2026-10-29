@@ -84,7 +84,15 @@ Node 21件・Web package 3件が合格、npm auditの既知問題は0。ZIP SHA-
 
 最初のWeb Stackは事前検査で `MaxEnvironments: 1` が最小値2未満としてROLLBACK_COMPLETEになった。`DescribeEvents` と実provider schemaから、環境上限を2、受付上限を最小の正数100/秒に修正。単なる `ValidateTemplate` の受理ではこの制約を保証しない。元失敗Stackの資源が空であることを確認し、削除せず記録を保持。Web Function名を独立parameterにし、S3許可対象の同じFunction名を保持して、新規wrapper Stack `jdu-web-portal-poc-20261029-r1` に4資源Addの検査済みchange setを適用した。追加のIAM・公開範囲変更はしていない。
 
-修正後はCREATE_COMPLETE。2026-10-29 05:35:22 UTC、ChromeとCloudShellの実HTTPで `/healthz` 200、`/healthz/acceptance` 200（3項目trueと日時だけ）、`/grades` 503を確認。教師EC2はstopped、教師Labは開始中、学生Labは終了済み。個人成績の公開やGoogle本人認証の受入ではない。[終了前の実測記録](verification/2026-10-29-web-before-teacher-end.public.json)。修正後のpackage検査3件合格。教師Lab本文の空白でEnd Labを操作できないため、本人へ手動再読み込み・End Labを依頼中。**教師End Lab後の応答は未確認**。終了後は内部30秒cacheを超えた `checkedAt` を必ず確認する。
+修正後はCREATE_COMPLETE。2026-10-29 05:35:22 UTC、ChromeとCloudShellの実HTTPで `/healthz` 200、`/healthz/acceptance` 200（3項目trueと日時だけ）、`/grades` 503を確認。教師EC2はstopped、教師Labは開始中、学生Labは終了済み。個人成績の公開やGoogle本人認証の受入ではない。[終了前の実測記録](verification/2026-10-29-web-before-teacher-end.public.json)。修正後のpackage検査3件合格。
+
+### 教師End Lab後の実測（2026-10-29）
+
+本人の終了操作後、教師LMSにTerminated/00:00/Lab terminatedが表示された。終了状態の確認後に、Chromeから05:40:49 UTCと05:43:03 UTC、既存CloudShellからAWS資格情報を使わない公開HTTPS要求で05:41:59 UTCに再観測した。いずれもstorage/savedGrades/gradeServiceがfalseで、内部30秒cacheを超えて日時が更新された。実HTTPはhealth 200、可否probe 503、個人成績503。[終了後の実測記録](verification/2026-10-29-teacher-end-lab.public.json)。
+
+**HTTPS入口は動くが、このLab内構成の保存成績閲覧は教師End Lab後に不合格**。3項目は公開可否指標であり、storage照合が成功しなければ成績行のQuery自体を行わないため、保存行の消失を示さない。内部エラーを公開しない設計なので、AWSの正確な拒否理由は未特定。cold startや長時間後の稼働も未確認。成績値・元DB・IAM制限は変更せず、教師Labを自動再開していない。全partition不変の再照合はこの公開入口からできない。
+
+次は教師側の保存・成績処理・本人認証をLab終了の影響がない運用先へ分離する判断が必要。通常AWS accountの有無を確認中で、未用意なら構成と費用の検討を先行する。移行も追加契約も行っていない。保存閲覧の成立条件を確定するまでは、Google本人連携の実配備を同じLabへ積み重ねて正式受入としない。ローカルで制作した本人連携・登録・状態表示の実装は保持する。
 
 ### 2026-10-29の再開確認
 

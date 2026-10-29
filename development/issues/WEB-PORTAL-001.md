@@ -1,6 +1,6 @@
 # WEB-PORTAL-001：学生の環境準備・採点確認をブラウザへ集約する
 
-- 状態: 小規模実証の試作中。ローカル実装と個別のAWS読取り確認を実施、Web配備と統合受入は未実施。
+- 状態: 小規模実証中。閉鎖Web Functionsを実配備。EC2停止中の成績読取りは成功したが、教師End Lab後はHTTPS入口だけ応答し、成績の読取りは不合格。本人連携・学生向け統合受入は未完了。
 - 登録: 2026-10-23、本人依頼。
 - 着手順: D12の受入残件を保持し、2026-10-23の本人依頼で本Issueの構成検討を先行。Web演習の改善課題として実証・実装へ進める。
 - GitHub: [Issue #1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1)（非公開JDU-Web-Infrastructure）。
@@ -69,7 +69,11 @@
 
 本人承認後、専用S3と閉鎖Web側の計6資源を配備。最初のWeb Stackは環境上限1がAWS最小値2未満として事前検査で停止し、資源は空。受付上限もAWS最小の正数100/秒へ修正し、同じFunction名・同じS3許可対象を維持して別wrapper StackでCREATE_COMPLETEになった。失敗記録は削除せず保持。package検査3件も合格。
 
-05:35:22 UTCの実HTTPで `/healthz` 200、可否probe 200/3項目true、個人成績 `/grades` は503を確認。教師EC2停止・学生Lab終了・教師Lab開始中の基準値であり、教師End Lab後の受入ではない。教師Lab本文が空白のため本人へ手動End Labを依頼中。終了後、30秒cacheより新しい確認日時で応答を検査する。[終了前の記録](../web_portal_poc/verification/2026-10-29-web-before-teacher-end.public.json)。
+05:35:22 UTCの実HTTPで `/healthz` 200、可否probe 200/3項目true、個人成績 `/grades` は503を確認。教師EC2停止・学生Lab終了・教師Lab開始中の基準値。[終了前の記録](../web_portal_poc/verification/2026-10-29-web-before-teacher-end.public.json)。
+
+その後本人が教師End Labを実施し、UIのTerminated/00:00/Lab terminatedを確認。05:40:49、05:41:59、05:43:03 UTCの新しい観測はいずれも3項目false。実HTTPは `/healthz` 200、可否probe 503、`/grades` 503だった。**Web入口の継続応答は成立するが、現在のLab内構成では教師End Lab後の成績閲覧を受入できない**。保存行の消失や正確なAWSエラー原因を示す結果ではなく、取得不能を0点化していない。Labを再開したり権限制限を解除したりせず記録した。[終了後の実測](../web_portal_poc/verification/2026-10-29-teacher-end-lab.public.json)。
+
+次の構成判断：教師側の保存・成績処理・本人認証をLab終了の影響を受けない運用先へ分離する案を検討する。通常AWS accountの有無を本人へ確認中。移行・新規契約・既存データのコピーは未実施。教師Lab開始中だけ使う暫定運用は元の終了後閲覧要件を満たさないため、明示的な判断が必要。
 
 - [x] Learner LabでWeb Functionsが利用できることを確認（2026-10-23本人確認）。
 - [x] End Lab後もWeb Functions部分は利用できたことを確認（2026-10-23本人確認）。EC2の継続稼働とは区別する。
