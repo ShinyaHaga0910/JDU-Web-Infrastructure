@@ -1,6 +1,6 @@
 # Webポータル：読取り処理の小規模試作
 
-2026-10-29更新。Issue [#1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1) の初期試作。**まだWeb Functionsに配備していない**。教師/学生のIAM接続とEC2全台停止中の読取りを実測し、学生End Lab後の制約も確認した。学生の画面・Google本人確認との統合・教師End Lab後は未受入で、授業で使える製品ではない。
+2026-10-29更新。Issue [#1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1) の初期試作。閉鎖Web Functionsは配備済み。教師/学生のIAM接続と全EC2停止中の保存成績読取りを実測した。教師End Lab後はHTTPS入口だけ応答し成績読取りは失敗したため、本人決定により**当面は教師Lab開始中に利用する**。教師EC2は閲覧に不要。Google本人確認・実学生bindingと画面の統合は未受入で、授業で使える製品ではない。以下の実験記録は各時点の結果として読む。
 
 ## 今回のコード
 
@@ -70,9 +70,9 @@
 
 その後もう一度学生LabをEnd Labにすると、まず学生Lambda内の `DescribeStacks` がAccessDenied、時間をおいた呼出しでは `Invoke` 段階でKMSAccessDeniedExceptionとなった。[実測記録](verification/2026-10-29-student-end-lab.public.json)。同じ時点でも保存成績全項目と元Lab全partitionは不変だった。公開画面へはこの診断を渡さず、状態取得不能とする。取消policyの解除やKMS/IAMの緩和はしていない。学生CloudShellの古い資格情報もvoc-cancel-credで拒否されたが、Lambda側と同一の取消機構だとは断定しない。
 
-**現在は学生Lab終了・教師Lab開始・教師EC2停止**。教師Lab自体の終了後に成績API/DBを読めることは未確認である。Web FunctionsのHTTPが残ることだけでは、依存先の継続利用は証明できない。
+この学生End Lab試験時点では学生Lab終了・教師Lab開始・教師EC2停止だった。教師Lab終了後の試験と、その後の本人決定は下記の記録を優先する。Web FunctionsのHTTPが残ることだけでは、依存先の継続利用は証明できない。
 
-### 次の教師End Lab試験用の候補（未配備）
+### 教師End Lab試験用の閉鎖Web（配備済み）
 
 `web/acceptance-health.mjs` と `/healthz/acceptance` は、明示的なclosed-mode試験設定だけで動く読取り候補。固定検証Labのmetadata/成績行の取得可否、既存Python成績projectionの呼出し可否を別々のbooleanで返す。点数・メール・token・AWSエラー本文を公開しない。通常の学生運用modeでは404、個別成績画面は閉鎖したままである。30秒の結果cacheは確認日時付きなので、End Lab後の試験では終了時刻より新しいcheckedAtを確認する。
 
@@ -92,9 +92,30 @@ Node 21件・Web package 3件が合格、npm auditの既知問題は0。ZIP SHA-
 
 **HTTPS入口は動くが、このLab内構成の保存成績閲覧は教師End Lab後に不合格**。3項目は公開可否指標であり、storage照合が成功しなければ成績行のQuery自体を行わないため、保存行の消失を示さない。内部エラーを公開しない設計なので、AWSの正確な拒否理由は未特定。cold startや長時間後の稼働も未確認。成績値・元DB・IAM制限は変更せず、教師Labを自動再開していない。全partition不変の再照合はこの公開入口からできない。
 
-次は教師側の保存・成績処理・本人認証をLab終了の影響がない運用先へ分離する判断が必要。通常AWS accountの有無を確認中で、未用意なら構成と費用の検討を先行する。移行も追加契約も行っていない。保存閲覧の成立条件を確定するまでは、Google本人連携の実配備を同じLabへ積み重ねて正式受入としない。ローカルで制作した本人連携・登録・状態表示の実装は保持する。
+本人はこの結果を受け「当面は教師Lab開始中の利用でよい」と決定した。通常AWS accountへの移行と教師End Lab中の保存閲覧は後続課題に移し、既存教師Lab内で本人連携・登録・状態表示の統合を続ける。移行や追加契約は行っていない。
 
-### 2026-10-29の再開確認
+### 現行の再開手順
+
+1. 教師がChromeのClass193548から通常のStart Labを行い、Readyを確認する。AWSを開くときは新しいセッションを使い、旧CloudShell資格情報の拒否を制限解除で回避しない。
+2. 公開可否probeの確認日時が再開後で、3項目trueへ復帰するか確認する。30秒cacheの前の結果を復帰と扱わない。教師EC2の状態は別に確認し、閲覧試験のため起動状態を必須にしない。
+3. 本人成績はGoogle本人認証・承認済みLab登録・内部成績readerの統合受入後に開く。可否probe成功だけでは `/grades` の閉鎖を解除しない。
+4. 学生の現在状態や新しい採点が必要な場合だけ、学生Labと対象EC2/SSMの利用可能性を確認する。学生Lab終了中の状態取得不可は、保存成績の削除や0点化の理由にしない。
+
+LabのStartはAcademy側が既存EC2を自動起動する場合がある。画面やprobeがEC2を自動起動する処理は追加しない。教師EC2の停止は明示的な試験操作として記録し、元ディスク・認証を保持する。
+
+10/29にこの再開を実行し、教師Ready後の05:50:03 UTCに可否3項目trueへ復帰。Academyで自動起動した元教師EC2を明示的に停止し、05:53:45 UTCにもHTTP可否200/3項目true、元の成績62/62・全成績projection・全Lab partitionの不変を確認した。学生Labは再開せず、学生5台の現状態は再観測していない。`/grades` は503のまま。[再開後の実測記録](verification/2026-10-29-teacher-restart.public.json)。
+
+### 本人ログインの次の準備
+
+学内Google認証はコードを用意した段階で、実OAuth clientは未設定。既存Google Cloud project/OAuth設定の有無を本人へ確認中。新しいclientやsecretは作成していない。
+
+- 登録対象のorigin：`https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws`
+- 現コードのcallback：`https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws/auth/callback`
+- 現コードの要求scope：`openid email`、許可対象：検証済み `jdu.uz` identity。AWS AcademyのログインメールとGoogle本人IDは別々に検証する。
+- Google client設定だけで開放しない。内部成績reader、subject鍵、session store、教師承認済みLab/account/subject登録がそろってから、本人・未登録・別人・失効・ログアウト・教師側取得不可と再開を実ブラウザで受入する。
+- secretや署名要求を会話、Git、URL、共有Windowsへ保存しない。新しい認証情報の設定は、具体的な計画を用意してから本人操作で行う。
+
+### 配備前の再開・準備記録（2026-10-29、履歴）
 
 Chromeの教師用とEdgeの別学生用を、それぞれ予定したAWS accountとして確認。学生CloudShellで `status.py` と `plan_student_status.py` 本体を、転記payloadのSHA-256 `bfc77f14a4438975bff91aa872c9cbc839224161e4a81425d45fad042f460150` を照合して実行した。保存state/baseline、StackのLab/Deploymentと5台、EC2タグの一致、全5台running・SSM Onlineを確認。新Lambda/Stackの名前衝突もなかった。AWSリソースの変更は行っていない。
 
@@ -113,7 +134,7 @@ Chromeの教師用とEdgeの別学生用を、それぞれ予定したAWS accoun
 教師の既存S3は公開禁止4項目がtrue、version管理は無効だった。設定は変更せず、上書き禁止条件とSHA-256 checksumを付け、hash入りの別keyへ検証コードだけを収録した。教師CloudShellで転記hashとtemplateを確認し、`jdu-web-portal-teacher-probe-20261029` / `private-readonly-probe` のCREATE change setを準備。CREATE_COMPLETE/AVAILABLEで、変更はLambda 1つのAddだけ。**まだ実行していない**。教師LabRoleを新関数へ付けるため、適用前の確認が必要。新関数のCodeSha256照合・実呼出し・EC2停止中/End Lab後は未実施。
 
 1. 教師・学生の実アカウントと既存5台を確認し、既存の保存済み成績と読取り結果を照合する。
-2. EC2非依存の経路をWeb Functionsへ接続し、EC2停止中とEnd Lab後の依存API/DBを別々に確認する。
+2. 教師Lab開始中のEC2非依存経路をWeb Functionsへ接続し、教師側の取得不可→通常再開後の復帰と、学生Lab終了後の保存閲覧を別々に確認する。教師End Lab中の閲覧は後続課題に保持する。
 3. 学生のAWS identityを検証して信頼済みbindingを確立し、他人のLabを拒否する。共有PCに秘密鍵や長期認証情報を残さない。
 4. 実5台のEC2/SSMとIP、署名期限をブラウザで確認する。試作はまだ署名期限を表示しない。署名版r2の期限は2026-10-27 14:24:57 UZTで、新規構築には更新が必要。
 

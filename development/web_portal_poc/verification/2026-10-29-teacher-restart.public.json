@@ -1,0 +1,25 @@
+{
+  "scope": "Teacher Lab restart and EC2-independent read recovery; personal browser login remains closed",
+  "operating_decision": "Use while the teacher Learner Lab is started; teacher End Lab browsing is deferred",
+  "teacher_lab_restart": "Normal Academy Start Lab, initiated explicitly by the operator; UI Ready confirmed",
+  "first_recovered_browser_observation": {"storage": true, "savedGrades": true, "gradeService": true, "checkedAt": "2026-10-29T05:50:03.847Z"},
+  "teacher_ec2_after_academy_restart": "running",
+  "teacher_ec2_test_action": "Explicit stop of the original teacher EC2 after identity and resource checks",
+  "verified_at": "2026-10-29T05:53:45.769560+00:00",
+  "teacher_ec2": "stopped",
+  "student_lab_restarted": false,
+  "student_current_ec2_state_observed": false,
+  "grade": {"raw_earned": 62, "raw_maximum": 62},
+  "full_grade_projection_unchanged": true,
+  "whole_lab_partition_unchanged": true,
+  "http": [
+    {"path": "/healthz", "status": 200, "body": "ok"},
+    {"path": "/healthz/acceptance", "status": 200, "body": {"storage": true, "savedGrades": true, "gradeService": true, "checkedAt": "2026-10-29T05:53:45.731Z"}},
+    {"path": "/grades", "status": 503, "body": "Unavailable"}
+  ],
+  "teacher_probe_code_sha256": "71e37ead8f52689b55726bcbde673acff8e9851ffca4d5dd362ff1876cf3fe26",
+  "web_code_sha256": "6a27a1d815b82b6e3d54dc6687b1e8ed1dca794cbcb00fbd637ccdf4485cd9fa",
+  "app_automatically_started_instances": false,
+  "grade_data_written": false,
+  "permissions_relaxed": false
+}
