@@ -7,6 +7,7 @@ import { createAcceptanceHealth } from './acceptance-health.mjs';
 import { createRuntimeEnv } from './secrets.mjs';
 import { createEnrollmentClient } from './enrollment-client.mjs';
 import { readBody } from './request-body.mjs';
+import { createBootstrapEnv } from './bootstrap-artifact.mjs';
 
 // A missing backend fails closed at request time; the server can still start
 // in the closed deployment mode without credentials or an active Lab.
@@ -17,6 +18,7 @@ try { sessions=createSessions(); } catch { sessions=undefined; }
 try { getAcceptanceHealth=createAcceptanceHealth(); } catch { getAcceptanceHealth=undefined; }
 try { enroll=createEnrollmentClient(); } catch { enroll=undefined; }
 const getRuntimeEnv=createRuntimeEnv();
+const getBootstrapEnv=createBootstrapEnv();
 const endpoint=process.env.AWS_LAMBDA_HTTP_ENDPOINT;
 const address=endpoint ? new URL(endpoint.includes('://') ? endpoint : `http://${endpoint}`) : new URL(`http://127.0.0.1:${process.env.PORT||8080}`);
 createServer(async (req,res) => {
@@ -27,7 +29,11 @@ createServer(async (req,res) => {
     // Static liveness remains available when the Lab's secret store is offline.
     // The acceptance endpoint independently rejects enabled deployments.
     const path=new URL(request.url).pathname;
-    const env=['/healthz','/healthz/acceptance'].includes(path) ? process.env : await getRuntimeEnv();
+    let env=['/healthz','/healthz/acceptance'].includes(path) ? process.env : await getRuntimeEnv();
+    if (path==='/enroll' && env.PORTAL_ENROLLMENT_ENABLED==='true') {
+      const bootstrap=await getBootstrapEnv();
+      env={...env,PORTAL_BOOTSTRAP_TEMPLATE_URL:bootstrap.PORTAL_BOOTSTRAP_TEMPLATE_URL};
+    }
     const app=createApp({env,getGrade,getStatus,sessions,getAcceptanceHealth,enroll});
     const result=await app(request);
     res.statusCode=result.status;

@@ -1,0 +1,73 @@
+{
+  "recorded_at": "2026-10-29",
+  "scope": "Prepared authenticated enrollment and own-grade/state update only; not executed",
+  "teacher_account": "170126527713",
+  "assigned_student_account": "965244652544",
+  "test_identity": "Previously verified school teacher identity, explicitly selected by the human as student role; raw email/subject omitted",
+  "lab_id": "class193548-test1",
+  "private_services": {
+    "stack_status": "UPDATE_COMPLETE",
+    "code_sha256": "f2cbc0cf821b0f0efbfb90b75875af312ae9dda48d1f6d105d135e7f7e7bd19b",
+    "real_identity_approval_written": false,
+    "real_identity_bound": false
+  },
+  "source_template_sha256": "61a70d19bc1aefbadc16f2313adfe11b74097e9b435452d96c8fbf701723f14f",
+  "web_candidate": {
+    "revision": "v3",
+    "aws_archive_sha256": "744b2d65452805a3c73ace7ff64affcfaa81ce651aec938b30882e0b6e1236a0",
+    "contents_sha256": "bac0a85735cd147154027dd1d4146948d284fa200a1c8541e88bea84de708d2c",
+    "members": 4479,
+    "all_file_contents_match_local": true,
+    "previous_v2_web_plan_superseded_unexecuted": true
+  },
+  "planned_changes": [
+    {
+      "stack": "jdu-web-portal-browser-link-20261029",
+      "resources_added": 2,
+      "purpose": "Private versioned source bucket and exact assigned-student object-read policy",
+      "executed": false
+    },
+    {
+      "stack": "jdu-web-portal-poc-20261029-r1",
+      "change_set_name": "verified-student-enrollment-and-grades-744b2d654528",
+      "resources_modified": [
+        "Revision",
+        "Endpoint"
+      ],
+      "executed": false
+    }
+  ],
+  "deployed_public_web": "Google login/logout only; grade reader and enrollment disabled",
+  "local_tests": {
+    "python_registration_deployment_helper": 41,
+    "node": 43,
+    "failures": 0,
+    "npm_audit_vulnerabilities": 0,
+    "real_google_student_aws_integration": false
+  },
+  "original_resources": {
+    "student_instance_ids_retained": 5,
+    "disk_gib_retained": 96,
+    "original_five_explicitly_stopped_after_normal_lab_start": true,
+    "teacher_ec2": "stopped",
+    "original_grade_writes": false,
+    "credential_rotation": false
+  },
+  "unfinished": [
+    "Per-action approval for source read access and authenticated application access",
+    "Actual school identity approval and AWS binding",
+    "Student helper creation and real browser own grades/status",
+    "Browser provisioning of new five servers",
+    "Browser checker execution",
+    "Teacher progress interface",
+    "Authenticated student-End-Lab grade acceptance"
+  ],
+  "operating_condition": "Teacher Learner Lab started; teacher-End-Lab browsing deferred by human",
+  "aws_preexecution_validation": {
+    "status": "CREATE_COMPLETE",
+    "execution_status": "AVAILABLE",
+    "change_sets": 2,
+    "validation_errors": 0,
+    "executed": false
+  }
+}

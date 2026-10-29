@@ -165,6 +165,27 @@ class PortalEnrollment:
         return bool(row and row.get('active') is True and row.get('arn') == connector
                     and all(row.get(k) == v for k, v in context.items() if k != 'connector'))
 
+    def pair_nonce(self, subject_pk, session_pk, request_hash):
+        return hmac.new(self.pepper, ('pair-v2|' + subject_pk + '|' + session_pk + '|' + request_hash).encode('ascii'), hashlib.sha256).hexdigest()
+
+    def pending(self, subject_pk, approval_pk, session_pk, token_hash, grant):
+        pointer = self.get(self.table, session_pk, 'ENROLLMENT')
+        if not pointer or pointer.get('expires_at', 0) <= int(self.clock()):
+            return None
+        context = {'subject_pk': subject_pk, 'approval_pk': approval_pk, 'session_pk': session_pk,
+                   'session_token_hash': token_hash, 'grant_digest': grant_digest(grant)}
+        if (any(pointer.get(k) != v for k, v in context.items()) or pointer.get('used') is not False
+                or not isinstance(pointer.get('request_hash'), str) or not HEX.fullmatch(pointer['request_hash'])):
+            raise EnrollmentDenied('Pending registration changed')
+        nonce = self.pair_nonce(subject_pk, session_pk, pointer['request_hash'])
+        pair = self.get(self.table, 'PAIR#' + digest(nonce), 'IDENTITY')
+        if (not pair or pointer.get('pair_pk') != pair.get('pk')
+                or pair.get('request_hash') != pointer['request_hash'] or pair.get('used') is not False
+                or pair.get('expires_at') != pointer['expires_at']
+                or any(pair.get(k) != v for k, v in context.items())):
+            raise EnrollmentDenied('Pending registration unavailable')
+        return nonce, pair
+
     def begin(self, subject, email, session_id, token_hash, request_id):
         if (not isinstance(session_id, str) or not HEX.fullmatch(session_id)
                 or not isinstance(request_id, str) or not HEX.fullmatch(request_id)):
@@ -178,17 +199,27 @@ class PortalEnrollment:
             return {'registered': True, 'lab_id': grant['lab_id'], 'account': grant['account']}
         if approval.get('bound_subject') is not None or approval.get('enrollment_deadline', 0) <= int(self.clock()):
             raise EnrollmentDenied('Approval already used or expired')
-        nonce = hmac.new(self.pepper, ('pair-v1|' + subject_pk + '|' + session_pk + '|' + request_id).encode('ascii'), hashlib.sha256).hexdigest()
+        existing = self.pending(subject_pk, approval_pk, session_pk, token_hash, grant)
+        if existing:
+            return self.pair_response(*existing, grant)
+        request_hash = digest(request_id)
+        nonce = self.pair_nonce(subject_pk, session_pk, request_hash)
         pk = 'PAIR#' + digest(nonce)
         old = self.get(self.table, pk, 'IDENTITY')
         context = {'subject_pk': subject_pk, 'approval_pk': approval_pk, 'session_pk': session_pk,
                    'session_token_hash': token_hash, 'grant_digest': grant_digest(grant)}
         if old:
-            if any(old.get(k) != v for k, v in context.items()) or old.get('used') is not False or old.get('expires_at', 0) <= int(self.clock()):
-                raise EnrollmentDenied('Registration attempt expired or changed')
-            return self.pair_response(nonce, old, grant)
+            # A complete attempt must also have its atomically stored session
+            # pointer. Missing/expired pointers never revive an old operation.
+            raise EnrollmentDenied('Registration attempt expired or changed')
         now = int(self.clock())
-        pair = {'pk': pk, 'sk': 'IDENTITY', **context, 'grant': grant, 'used': False, 'expires_at': now + PAIR_SECONDS}
+        pair = {'pk': pk, 'sk': 'IDENTITY', **context, 'grant': grant, 'used': False,
+                'request_hash': request_hash, 'expires_at': now + PAIR_SECONDS}
+        pointer = {'pk': session_pk, 'sk': 'ENROLLMENT', **context, 'pair_pk': pk,
+                   'request_hash': request_hash, 'used': False, 'expires_at': pair['expires_at']}
+        pointer_put = {'Put': {'TableName': self.table, 'Item': encoded(pointer),
+            'ConditionExpression': 'attribute_not_exists(pk) OR #expiry<=:now',
+            'ExpressionAttributeNames': {'#expiry': 'expires_at'}, 'ExpressionAttributeValues': encoded({':now': now})}}
         approval_check = {'ConditionCheck': {'TableName': self.table, 'Key': key(approval_pk, 'LAB'),
             'ConditionExpression': '#active=:yes AND #deadline>:now AND #digest=:digest AND attribute_not_exists(#bound)',
             'ExpressionAttributeNames': {'#active': 'active', '#deadline': 'enrollment_deadline', '#digest': 'grant_digest', '#bound': 'bound_subject'},
@@ -196,10 +227,19 @@ class PortalEnrollment:
         try:
             self.client.transact_write_items(TransactItems=[self.meta_condition(grant), approval_check,
                 self.session_condition(pair, now), {'Put': {'TableName': self.table, 'Item': encoded(pair),
-                                                            'ConditionExpression': 'attribute_not_exists(pk)'}}])
+                                                            'ConditionExpression': 'attribute_not_exists(pk)'}}, pointer_put])
         except self.client.exceptions.TransactionCanceledException:
-            # A retry with the same browser operation ID reads its existing
-            # attempt. Never restart an unknown-outcome registration here.
+            # Concurrent forms in the same session return the one committed
+            # attempt. Never issue another operation after an unknown result.
+            self.session(session_pk, token_hash)
+            latest, current = self.approval(approval_pk)
+            if current == grant:
+                if latest.get('bound_subject') == subject_pk and self.registered(subject_pk, grant, approval_pk):
+                    return {'registered': True, 'lab_id': grant['lab_id'], 'account': grant['account']}
+                if latest.get('bound_subject') is None:
+                    existing = self.pending(subject_pk, approval_pk, session_pk, token_hash, grant)
+                    if existing:
+                        return self.pair_response(*existing, grant)
             raise EnrollmentDenied('Registration is pending or context changed') from None
         return self.pair_response(nonce, pair, grant)
 
@@ -215,6 +255,12 @@ class PortalEnrollment:
         subject_pk, approval_pk = subject_key(subject, self.pepper), email_key(email, self.pepper)
         approval, grant = self.approval(approval_pk)
         bound = approval.get('bound_subject') == subject_pk and self.registered(subject_pk, grant, approval_pk)
+        if approval.get('bound_subject') is not None and not bound:
+            raise EnrollmentDenied('Approval already bound or registration changed')
+        if not bound and approval.get('enrollment_deadline', 0) > int(self.clock()):
+            existing = self.pending(subject_pk, approval_pk, 'SESSION#' + digest(session_id), token_hash, grant)
+            if existing:
+                return self.pair_response(*existing, grant)
         return {'registered': bound, 'lab_id': grant['lab_id'], 'account': grant['account']}
 
     def complete(self, nonce, proof_url):
@@ -229,6 +275,8 @@ class PortalEnrollment:
         if current != grant or pair.get('grant_digest') != grant_digest(grant):
             raise EnrollmentDenied('Approval context changed')
         self.session(pair['session_pk'], pair['session_token_hash'])
+        if not isinstance(pair.get('request_hash'), str) or not HEX.fullmatch(pair['request_hash']):
+            raise EnrollmentDenied('Registration unavailable')
         # Validation happens before network access; the only possible target is
         # the fixed STS host and the signature must bind this exact nonce.
         path = identity_proof.validate(proof_url, nonce, datetime.fromtimestamp(self.clock(), timezone.utc))
@@ -265,9 +313,16 @@ class PortalEnrollment:
             'ExpressionAttributeNames': {'#used': 'used', '#expiry': 'expires_at', '#subject': 'subject_pk', '#approval': 'approval_pk', '#session': 'session_pk', '#digest': 'grant_digest'},
             'ExpressionAttributeValues': encoded({':yes': True, ':no': False, ':now': now, ':subject': pair['subject_pk'],
                 ':approval': pair['approval_pk'], ':session': pair['session_pk'], ':digest': pair['grant_digest']})}}
+        pending_update = {'Update': {'TableName': self.table, 'Key': key(pair['session_pk'], 'ENROLLMENT'),
+            'UpdateExpression': 'SET #used=:yes',
+            'ConditionExpression': '#used=:no AND #expiry>:now AND #pair=:pair AND #subject=:subject AND #request=:request AND #token=:token',
+            'ExpressionAttributeNames': {'#used': 'used', '#expiry': 'expires_at', '#pair': 'pair_pk',
+                                         '#subject': 'subject_pk', '#request': 'request_hash', '#token': 'session_token_hash'},
+            'ExpressionAttributeValues': encoded({':yes': True, ':no': False, ':now': now, ':pair': pair['pk'],
+                ':subject': pair['subject_pk'], ':request': pair['request_hash'], ':token': pair['session_token_hash']})}}
         try:
             self.client.transact_write_items(TransactItems=[self.meta_condition(grant), self.session_condition(pair, now),
-                approval_update, pair_update, *[{'Put': {'TableName': self.table, 'Item': encoded(row),
+                approval_update, pair_update, pending_update, *[{'Put': {'TableName': self.table, 'Item': encoded(row),
                     'ConditionExpression': 'attribute_not_exists(pk)'}} for row in records]])
         except self.client.exceptions.TransactionCanceledException:
             # Another request may have committed the same scoped operation.

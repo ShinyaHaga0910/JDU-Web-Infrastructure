@@ -2,7 +2,29 @@
 
 2026-10-29更新。Issue [#1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1) の初期試作。本人承認後、Googleログイン/ログアウトだけのWebを実配備し、教師の学内Google identityで成功・session失効を確認した。教師/学生IAM接続と全EC2停止中の保存成績読取りも別途実測済み。教師End Lab後はHTTPS入口だけ応答し成績読取りは失敗したため、**当面は教師Lab開始中に利用する**。教師EC2は閲覧に不要。実学生Google identity・本人AWS登録と成績画面の統合は未受入で、授業で使える製品ではない。以下の実験記録は各時点の結果として読む。
 
-## 本人AWS登録の統合候補（2026-10-29、未適用）
+## 本人連携・成績画面の適用前計画（2026-10-29）
+
+非公開サービスv2の実配備・拒否試験を完了し、本人指定の教師Google identityを学生役として既存検証Labに結び付ける準備まで進んだ。実本人の承認行・bindingはまだ作っていない。公開Webはログイン/ログアウトだけの旧版のまま、個人成績への接続は無効である。
+
+最終候補v3のAWS配備ZIPはSHA-256 `744b2d65452805a3c73ace7ff64affcfaa81ce651aec938b30882e0b6e1236a0`。Windows/Linuxの圧縮差はあるが、全4,479ファイルの内容digest `bac0a85735cd147154027dd1d4146948d284fa200a1c8541e88bea84de708d2c` は双方で一致した。旧v2 Web change setは改行形式修正前の候補として未executeのまま保持し、適用しない。現行候補のchange set名にはZIP hashの先頭12桁を付けて区別する。
+
+教師AWSでは、導入JSON専用の非公開S3と学生account限定のGet許可（2 Add）、既存WebのRevision/Endpoint（2 Modify）の計画だけを準備した。まだexecuteしていない。導入JSONのSHA-256は `61a70d19bc1aefbadc16f2313adfe11b74097e9b435452d96c8fbf701723f14f`。Webは同じ教師所有bucketの固定hash pathから最大50KiBで読み、hashとVersionIdを検証してから、資格情報を含まないAWS確認画面へのリンクを作る。S3公開read・署名付きURL・任意template指定は使わない。runtimeのSDKは固定版client-s3を追加し、同時取得の集約・期限切れcacheの失敗時拒否も検査する。
+
+現在のローカル検査は登録/配備/学生helper関連Python41件、画面Node43件がすべて合格。Moto/模擬応答での結果で、Google→学生AWS→本人62点の実統合受入とは分ける。学生helperは接続確認Lambda・ログ・custom resourceの3資源だけで、元5台の新規構築や課題checkerは含まない。既存LabRoleを使うためrole自体には広いLab権限がある。
+
+適用前に、特定の学校identityを検証Labへ承認し、Webの本人登録と本人だけの成績/状態読取りを有効にするアクセス追加の確認を行う。学生helperの作成はAWS側の実際の確認画面から本人が確定する。元5台・96GiB・SSH/RDP/採点認証・元成績は変更しない。[適用前記録](verification/2026-10-29-browser-enrollment-plan.public.json)。新規5台のブラウザ準備、checker実行、教師進捗画面、実End Lab時の本人画面は引き続き未完了。
+
+## 本人AWS登録：非公開機能の実作成とブラウザ候補（2026-10-29）
+
+本人がv1作成を実行し、非公開2関数・鍵保管先・ログ2つのCREATE_COMPLETEを確認した。実AWSでcode hash/Active/LabRole/公開URLとresource policyなし、鍵metadata（値を取得しない検査）、未登録の架空IDの拒否、元成績全projection/全Lab partitionの不変、教師EC2 stoppedを受入。[v1実作成記録](verification/2026-10-29-private-services-v1.public.json)。これだけではGoogle本人と学生AWSの登録を受入したことにはならない。
+
+その後、sessionに紐付くpending pointerを登録試行と同時に保存し、GETや別の確認formからも同じ未完了の試行へ戻すv2を追加。完了時はpointer消費も含めた10項目のtransactionとなる。違うformの同時実行、pointer欠落/途中変更による部分登録も拒否する。v2は既存2 LambdaのCodeだけのUPDATEとして適用し、08:52:18 UTCに元データ不変と未登録拒否を再確認した。Secret/Role/table/公開Webへの変更なし。[v2の非公開受入](verification/2026-10-29-private-services-v2.public.json)。以下の9項目/未executeの記述はv1準備時の履歴として読む。
+
+ブラウザ導入候補は`browser_link_handler.py`と`build_browser_link_template.py`。既存5台の構築templateとは別に、学生AWSへ接続確認用Lambda・ログ・custom resourceだけを置く。60秒のSTS署名はAWS内のmemoryから固定教師HTTPSのJSON本文へ送り、ブラウザURL/CloudFormation出力/共有Windowsへ出さない。URLには単独では権限にならない公開の相関challengeだけを渡す。Createだけが登録を試し、Update/Delete/rollbackでは再登録・本人失効・EC2操作をしない。helperは既存LabRoleを使うためrole自体には広いLab権限がある。学生用新規5台の構築やchecker実行はこのhelperに含めない。
+
+`browser-link-artifacts.template.json`は導入コードだけの別S3候補。AES256/版管理/公開遮断を維持し、割当済み学生accountに特定hashのJSON 1つのGetObject/GetObjectVersionだけを許可する。公開read/List/Putや他の教師artifactの閲覧は許可しない。教師AWSの2資源CREATE change setまで準備し、**まだexecuteしていない**。現在の`web/`候補は、この固定source hashをAWS内で再照合し、実object versionの資格情報を含まないURLからAWSの確認画面へ案内する。表示/GETは登録やEC2を開始しない。新S3の適用、Webの接続有効化、本人登録、実CF helper作成と成績画面は引き続き未受入。
+
+本人は実機試験に、ログイン確認済みの教師Google identityを学生役として使うと指定した。対象は検証用学生AWSと既存Labだけ。実学生の個人成績データを増やす操作ではない。学生Labを通常Startし、08:37:36 UTCに元の5 ID/全running/SSM Onlineを照合後、同じLab/Deploymentの5台だけを明示停止しwaiterでstoppedを確認した。Reset/再配備/鍵再発行は行っていない。Google identityとの実紐付けはまだ作成していない。
 
 Googleログインの実受入後、`portal_enrollment.py` を追加した。教師が元の成績metadataから承認した学校メール/AWS account/Lab/deployment/元5台だけを対象にする。メールとGoogle subjectは秘密鍵によるHMACへ変換し、元の値を登録tableへ保存しない。教師承認は`approve_portal_student.py`の独立したCloudShell操作だけで行い、公開HTTPや内部Lambdaのeventにapprove操作を作らない。
 

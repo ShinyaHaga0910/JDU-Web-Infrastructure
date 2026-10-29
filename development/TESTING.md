@@ -36,3 +36,15 @@ python -B -m unittest -v test_portal_enrollment test_portal_enrollment_handler t
 ```
 
 登録・本人/AWS重複防止・原本条件確認・session失効のtransaction、再送、期限、9項目のrollback、既存62点readerとの接続、公開入口のない配備候補、適用前の差分/版/hash照合を検査する。STS fetchはstubのため実署名の認証結果ではない。Google→本人AWS→実DynamoDB→ブラウザの受入は別に記録する。`web`の`npm test`はCSRF、同一origin、serverで検証したclaimsのみの利用、body上限、既定閉鎖も確認する。
+
+## ブラウザ本人連携候補の検査（2026-10-29）
+
+上記test用依存を設定した`development/web_portal_poc`で次の41件が合格した。登録のpending pointerと完了時の10項目transaction、並行formの収束、原本変更・pointer変更のrollback、学生CloudFormation helperのCreate/Update/Delete、固定した接続先・署名・callback、非公開2関数のCodeだけの更新、readonly受入検査と専用S3の最小配布範囲を含む。Moto/署名stub/架空応答を含み、実本人連携の成功とはしない。
+
+```bash
+python -B -m unittest -q test_portal_enrollment test_portal_enrollment_handler test_prepare_portal_services test_apply_portal_services test_browser_link test_browser_link_publication test_update_portal_services test_verify_portal_services
+```
+
+`web`の`node --test`は43件合格。固定hashと版付きS3ソースの読取り、5分cache/同時要求/取得失敗、確認formのCSRFと同一origin・server identity、期限切れのAWSリンク拒否、session失効、62素点/UNKNOWNを検査する。SDKはlockfile固定、npm auditは0件。CloudShellのNode20で依存を収録する段階と、AWS Web実行時Node24を区別する。
+
+実AWSでは非公開v1/v2の実作成・Code更新と未登録拒否だけを受入した。公開Webは旧ログイン版、導入S3と新Web change setは未execute。最新の成果物と適用境界は`web_portal_poc/verification/2026-10-29-browser-enrollment-plan.public.json`、実測は同folderのprivate-services-v1/v2記録を参照する。

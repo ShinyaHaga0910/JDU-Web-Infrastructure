@@ -13,6 +13,8 @@
     "GradeReaderFunctionArn": {"Type": "String", "Default": "disabled"},
     "EnrollmentFunctionArn": {"Type": "String", "Default": "disabled"},
     "EnrollmentEnabled": {"Type": "String", "Default": "false", "AllowedValues": ["false", "true"]},
+    "BootstrapTemplateUrl": {"Type": "String", "Default": "disabled", "MaxLength": 2048},
+    "BootstrapTemplateDigest": {"Type": "String", "Default": "disabled", "AllowedPattern": "disabled|[a-f0-9]{64}"},
     "BindingTableName": {"Type": "String", "Default": "disabled"},
     "AcceptanceEnabled": {"Type": "String", "Default": "false", "AllowedValues": ["false", "true"]},
     "AcceptanceProbeArn": {"Type": "String", "Default": "disabled"},
@@ -31,6 +33,8 @@
         "EnvironmentVariables": {"PORTAL_MODE": {"Ref": "PortalMode"}, "PUBLIC_ORIGIN": {"Ref": "PublicOrigin"},
           "PORTAL_AWS_ACCOUNT_ID": {"Ref": "AWS::AccountId"}, "PORTAL_GOOGLE_OAUTH_SECRET_ARN": {"Ref": "GoogleOAuthSecretArn"}, "GRADE_READER_FUNCTION_ARN": {"Ref": "GradeReaderFunctionArn"}, "PORTAL_BINDING_TABLE": {"Ref": "BindingTableName"},
           "PORTAL_ENROLLMENT_FUNCTION_ARN": {"Ref": "EnrollmentFunctionArn"}, "PORTAL_ENROLLMENT_ENABLED": {"Ref": "EnrollmentEnabled"},
+          "PORTAL_BOOTSTRAP_TEMPLATE_URL": {"Ref": "BootstrapTemplateUrl"},
+          "PORTAL_BOOTSTRAP_TEMPLATE_DIGEST": {"Ref": "BootstrapTemplateDigest"},
           "PORTAL_ACCEPTANCE_ENABLED": {"Ref": "AcceptanceEnabled"}, "PORTAL_ACCEPTANCE_PROBE_ARN": {"Ref": "AcceptanceProbeArn"},
           "PORTAL_ACCEPTANCE_GRADE_TABLE": {"Ref": "AcceptanceGradeTableName"}, "PORTAL_ACCEPTANCE_LAB_ID": {"Ref": "AcceptanceLabId"}, "PORTAL_ACCEPTANCE_DEPLOYMENT_ID": {"Ref": "AcceptanceDeploymentId"}},
         "TelemetryConfig": {"LoggingConfig": {"LogGroup": {"Ref": "LogGroup"}, "ApplicationLogLevel": "WARN", "SystemLogLevel": "WARN"}}}

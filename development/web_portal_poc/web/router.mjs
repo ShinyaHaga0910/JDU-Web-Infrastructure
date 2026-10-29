@@ -2,6 +2,7 @@ import { configFrom, cookies, cookie, login, callback, verifyGoogle, SESSION, FL
 import { ACCESS } from './sessions.mjs';
 import { formToken, checkForm, operationId, tokenHash } from './enrollment-client.mjs';
 import { enrollmentHtml, enrollmentText, checkedEnrollment } from './enrollment-page.mjs';
+import { bootstrapTemplate, createBootstrapLink } from './bootstrap-link.mjs';
 
 const security = {
   'Cache-Control': 'private, no-store, max-age=0', 'Referrer-Policy': 'no-referrer',
@@ -44,7 +45,7 @@ const redirect = (location, values=[]) => { const h=new Headers(security); h.set
 
 function page(lang, title, content) {
   const nav = ['ja','ru','uz'].map(k => `<a href="?lang=${k}"${k===lang?' aria-current="page"':''}>${k.toUpperCase()}</a>`).join(' ');
-  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)}</title><style>body{font:1rem/1.6 system-ui,sans-serif;margin:0;background:#f5f7fa;color:#182435}main{max-width:64rem;margin:auto;padding:1.5rem}nav{display:flex;gap:1rem}a,button{color:#064ca4}button{font:inherit;background:white;border:1px solid #64748b;border-radius:.35rem;padding:.65rem 1rem;cursor:pointer}a:focus-visible,button:focus-visible{outline:3px solid #d34800;outline-offset:3px}section{background:white;border:1px solid #d6dee8;border-radius:.5rem;padding:1rem;margin-block:1rem}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:44rem}th,td{padding:.6rem;text-align:left;border-bottom:1px solid #d6dee8}.num{font-size:1.6rem;font-weight:700}footer{margin-top:2rem}</style></head><body><main><nav aria-label="Languages">${nav}</nav><h1>${escape(title)}</h1>${content}</main></body></html>`;
+  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)}</title><style>body{font:1rem/1.6 system-ui,sans-serif;margin:0;background:#f5f7fa;color:#182435}main{max-width:64rem;margin:auto;padding:1.5rem}nav{display:flex;gap:1rem}a,button{color:#064ca4}button{font:inherit;background:white;border:1px solid #64748b;border-radius:.35rem;padding:.65rem 1rem;cursor:pointer}a:focus-visible,button:focus-visible{outline:3px solid #d34800;outline-offset:3px}section{background:white;border:1px solid #d6dee8;border-radius:.5rem;padding:1rem;margin-block:1rem}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:44rem}th,td{padding:.6rem;text-align:left;border-bottom:1px solid #d6dee8}.num{font-size:1.6rem;font-weight:700}footer{margin-top:2rem}fieldset{border:1px solid #a9b6c7;border-radius:.35rem;padding:1rem;margin-block:1rem}.confirm{display:flex;align-items:flex-start;gap:.5rem;min-height:48px;padding-block:.5rem}input[type=checkbox]{width:1.25rem;height:1.25rem;margin:.2rem 0;flex-shrink:0}a.action{display:inline-flex;align-items:center;min-height:48px;padding:0 .75rem;border:1px solid #64748b;border-radius:.35rem}a.action:focus-visible,input:focus-visible{outline:3px solid #d34800;outline-offset:3px}</style></head><body><main><nav aria-label="Languages">${nav}</nav><h1>${escape(title)}</h1>${content}</main></body></html>`;
 }
 
 function gradeHtml(lang, grade) {
@@ -177,13 +178,18 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
         const result=await enroll(event);
         if (result?.status==='unauthorized') return failure(et.denied,403);
         if (result?.status!=='ok') throw Error('Unavailable');
-        const value=checkedEnrollment(result.enrollment,{pending:enrollmentPost});
+        const pending=!result.enrollment?.registered && Object.hasOwn(result.enrollment||{},'pair_id');
+        const value=checkedEnrollment(result.enrollment,{pending:enrollmentPost||pending});
+        // An unregistered student never receives a form that ends at a dead
+        // waiting screen. GET resumes an active attempt without creating one.
+        if (!value.registered) bootstrapTemplate(env);
+        const bootstrapLink=pending?createBootstrapLink(env,value):undefined;
         requestId ||= operationId();
         const csrf=formToken(config,sessionId,token,requestId);
-        return response(page(lang,et.title,enrollmentHtml(lang,value,{requestId,csrf,pending:enrollmentPost})));
+        return response(page(lang,et.title,enrollmentHtml(lang,value,{requestId,csrf,pending,bootstrapLink})));
       } catch {return failure(et.unavailable,503);}
     }
-    if (url.pathname === '/') return response(page(lang,t.title,`<section><p><a href="/grades?lang=${lang}">${escape(t.grades)}</a></p><p><a href="/status?lang=${lang}">${escape(t.status)}</a></p></section><p>${escape(t.notice)}</p><p>${escape(t.shared)}</p><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form>`));
+    if (url.pathname === '/') return response(page(lang,t.title,`<section>${enrollmentEnabled?`<p><a href="/enroll?lang=${lang}">${escape(enrollmentText(lang).title)}</a></p>`:''}<p><a href="/grades?lang=${lang}">${escape(t.grades)}</a></p><p><a href="/status?lang=${lang}">${escape(t.status)}</a></p></section><p>${escape(t.notice)}</p><p>${escape(t.shared)}</p><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form>`));
     if (url.pathname !== '/grades' && url.pathname !== '/status') return response('Not found',404);
     if (url.pathname === '/status') {
       try {

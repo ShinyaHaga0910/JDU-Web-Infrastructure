@@ -1,0 +1,20 @@
+{
+  "verified_at":"2026-10-29T08:52:18.331314+00:00",
+  "scope":"Private code update and unregistered-request denial only; no real identity enrollment",
+  "code_sha256":"f2cbc0cf821b0f0efbfb90b75875af312ae9dda48d1f6d105d135e7f7e7bd19b",
+  "stack_status":"UPDATE_COMPLETE",
+  "changed_properties":"Code on the two existing Lambda functions only",
+  "change_set_validation_errors":0,
+  "secret_role_table_changes":false,
+  "new_resources_verified":5,
+  "private_functions_verified":2,
+  "no_function_urls_or_resource_policies":true,
+  "key_metadata_verified_without_reading_value":true,
+  "unregistered_synthetic_requests_denied":true,
+  "approve_operation_not_exposed":true,
+  "full_grade_projection_unchanged":true,
+  "whole_lab_partition_unchanged":true,
+  "teacher_ec2":"stopped",
+  "web_configuration_changed_by_verifier":false,
+  "real_identity_enrollment_tested":false
+}

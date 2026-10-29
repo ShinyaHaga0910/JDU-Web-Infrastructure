@@ -19,6 +19,7 @@ class WebPackageTest(unittest.TestCase):
                 self.assertTrue(set(package.SOURCE) <= names)
                 self.assertIn('node_modules/jose/package.json', names)
                 self.assertIn('node_modules/@aws-sdk/client-lambda/package.json', names)
+                self.assertIn('node_modules/@aws-sdk/client-s3/package.json', names)
                 self.assertFalse(any(name.startswith('.env') or name.endswith('.test.mjs') for name in names))
                 archive.extractall(Path(directory) / 'contents')
             subprocess.run(['node', '--input-type=module', '-e',

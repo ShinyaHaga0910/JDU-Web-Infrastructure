@@ -5,7 +5,8 @@ import { createApp } from './router.mjs';
 import { formToken, createEnrollmentClient } from './enrollment-client.mjs';
 import { readBody } from './request-body.mjs';
 
-const env={PORTAL_MODE:'enabled',PUBLIC_ORIGIN:'https://portal.example',GOOGLE_CLIENT_ID:'1234-example.apps.googleusercontent.com',GOOGLE_CLIENT_SECRET:'synthetic-test-secret-only',PORTAL_ENROLLMENT_ENABLED:'true'};
+const env={PORTAL_MODE:'enabled',PUBLIC_ORIGIN:'https://portal.example',GOOGLE_CLIENT_ID:'1234-example.apps.googleusercontent.com',GOOGLE_CLIENT_SECRET:'synthetic-test-secret-only',PORTAL_ENROLLMENT_ENABLED:'true',
+  PORTAL_AWS_ACCOUNT_ID:'111111111111',PORTAL_BOOTSTRAP_TEMPLATE_URL:`https://jdu-web-portal-bootstrap-111111111111-${'a'.repeat(12)}.s3.us-east-1.amazonaws.com/bootstrap/${'a'.repeat(64)}/account-link.template.json?versionId=v1`};
 const config={origin:env.PUBLIC_ORIGIN,secret:env.GOOGLE_CLIENT_SECRET};
 const sid='a'.repeat(64), rid='b'.repeat(64), token='valid';
 const cookie=`__Host-jdu-access=${sid}; __Host-jdu-session=${token}`;
@@ -31,14 +32,36 @@ test('registration GET displays only approved scope and never starts a pairing',
 
 test('explicit same-origin form binds server-verified claims, no arbitrary target or raw token',async()=>{
   const calls=[];
-  const app=createApp({env,verify,sessions,enroll:async e=>{calls.push(e);return {status:'ok',enrollment:{...granted,pair_id:'d'.repeat(64),expires_at:2000000000}};}});
+  const app=createApp({env,verify,sessions,enroll:async e=>{calls.push(e);return {status:'ok',enrollment:{...granted,pair_id:'d'.repeat(64),expires_at:Math.floor(Date.now()/1000)+300}};}});
   const response=await app(req('/enroll',post()));
   assert.equal(response.status,200);assert.equal(calls.length,1);assert.equal(calls[0].operation,'begin');
   assert.equal(calls[0].request_id,rid);assert.equal(calls[0].token_hash.length,64);assert.ok(!JSON.stringify(calls).includes('"valid"'));
-  assert.doesNotMatch(await response.text(),new RegExp('d'.repeat(64))); // No nonce/credential in the page.
+  const html=await response.text();
+  assert.match(html,/target="_blank" rel="noopener noreferrer"/);
+  assert.match(html,new RegExp('param_PairId='+'d'.repeat(64))); // Public correlation only; no signed proof.
+  assert.doesNotMatch(html,/X-Amz-|__Host-jdu|synthetic@|GOOGLE_CLIENT_SECRET/);
   assert.equal((await app(req('/enroll',post(form({account:'attacker'}))))).status,403);
   assert.equal((await app(req('/enroll',post(form({subject:'attacker'}))))).status,403);
   assert.equal(calls.length,1);
+});
+
+test('GET resumes the same server-owned attempt without starting another registration',async()=>{
+  const calls=[];
+  const value={...granted,pair_id:'d'.repeat(64),expires_at:Math.floor(Date.now()/1000)+300};
+  const app=createApp({env,verify,sessions,enroll:async e=>{calls.push(e);return {status:'ok',enrollment:value};}});
+  const first=await app(req('/enroll',{headers:{cookie}}));
+  const second=await app(req('/enroll?pair_id=attacker',{headers:{cookie}}));
+  assert.equal(first.status,200);assert.equal(second.status,200);
+  assert.deepEqual(calls.map(e=>e.operation),['status','status']);
+  for (const result of [first,second]) {
+    const body=await result.text();assert.match(body,new RegExp('param_PairId='+'d'.repeat(64)));assert.doesNotMatch(body,/attacker/);
+  }
+});
+
+test('missing immutable template fails closed before presenting a form',async()=>{
+  const app=createApp({env:{...env,PORTAL_BOOTSTRAP_TEMPLATE_URL:'disabled'},verify,sessions,enroll:async()=>({status:'ok',enrollment:granted})});
+  const result=await app(req('/enroll',{headers:{cookie}}));
+  assert.equal(result.status,503);assert.doesNotMatch(await result.text(),/name="confirmed"/);
 });
 
 test('CSRF, consent, duplicate fields, session and identity substitutions fail before invocation',async()=>{

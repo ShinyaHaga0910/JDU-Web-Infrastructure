@@ -6,18 +6,29 @@ const words={
 };
 const escape=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const enrollmentText=lang=>words[lang];
+const browserWords={
+  ja:{open:'AWSの確認画面を開く（別タブ）',review:'AWS画面の右上が、上のAWSアカウント番号と一致することを確認してください。追加するのは接続確認用のLambda・ログ・確認処理です。既存LabRoleの広い権限を使い、従量料金が発生します。内容を確認してから作成してください。',return:'AWSでの作成が終わったら、このタブに戻り「登録を確認する」を押してください。秘密鍵・パスワードの入力やコピーは不要です。',expires:'この確認の有効期限（UTC）',expired:'期限が過ぎたら登録状態を確認し、未登録の場合だけ新しい確認を始めてください。'},
+  ru:{open:'Открыть проверку AWS (новая вкладка)',review:'Убедитесь, что аккаунт справа вверху AWS совпадает с номером выше. Добавляются Lambda, журнал и операция проверки. Используется существующая LabRole с широкими правами; возможна плата за использование. Проверьте состав перед созданием.',return:'После создания в AWS вернитесь сюда и нажмите «Проверить регистрацию». Вводить или копировать ключи и пароли не нужно.',expires:'Срок действия проверки (UTC)',expired:'После истечения срока проверьте регистрацию. Начинайте новую проверку только если среда не зарегистрирована.'},
+  uz:{open:'AWS tekshiruvini ochish (yangi varaq)',review:'AWS oynasining yuqori o‘ng tomonidagi hisob raqami yuqoridagi raqamga mosligini tekshiring. Lambda, log va tekshiruv amali qo‘shiladi. Keng huquqli mavjud LabRole ishlatiladi; foydalanish uchun to‘lov bo‘lishi mumkin. Yaratishdan oldin tarkibini tekshiring.',return:'AWS yaratish tugagach, bu varaqqa qayting va «Ro‘yxatdan o‘tishni tekshirish»ni bosing. Kalit yoki parol kiritish va nusxalash kerak emas.',expires:'Tekshiruv muddati (UTC)',expired:'Muddat tugagach, ro‘yxatdan o‘tishni tekshiring. Faqat ro‘yxatdan o‘tmagan bo‘lsa, yangi tekshiruvni boshlang.'},
+};
 export function checkedEnrollment(value,{pending=false}={}) {
   if (!value || typeof value.registered!=='boolean' || !/^[a-z0-9][a-z0-9-]{2,31}$/.test(value.lab_id||'')
       || !/^[0-9]{12}$/.test(value.account||'') || (pending && !value.registered &&
          (!/^[a-f0-9]{64}$/.test(value.pair_id||'') || !Number.isSafeInteger(value.expires_at)))) throw Error('Invalid registration');
   return value;
 }
-export function enrollmentHtml(lang,value,{requestId,csrf,pending=false}={}) {
+export function enrollmentHtml(lang,value,{requestId,csrf,pending=false,bootstrapLink}={}) {
   const t=words[lang]; checkedEnrollment(value,{pending});
   const context=`<dl><dt>${escape(t.account)}</dt><dd>${escape(value.account)}</dd><dt>${escape(t.lab)}</dt><dd>${escape(value.lab_id)}</dd></dl>`;
   let content;
   if (value.registered) content=`<p role="status">${escape(t.done)}</p>`;
-  else if (pending) content=`<p role="status">${escape(t.pending)}</p><p><a href="/enroll?lang=${lang}">${escape(t.refresh)}</a></p>`;
+  else if (pending) {
+    const b=browserWords[lang];
+    const link=new URL(bootstrapLink);
+    if (link.origin!=='https://us-east-1.console.aws.amazon.com' || link.pathname!=='/cloudformation/home') throw Error('Invalid AWS link');
+    const expires=new Date(value.expires_at*1000).toISOString();
+    content=`<p role="status">${escape(t.pending)}</p><ol><li><p>${escape(b.review)}</p><a class="action" href="${escape(link.toString())}" target="_blank" rel="noopener noreferrer">${escape(b.open)}</a></li><li><p>${escape(b.return)}</p><a class="action" href="/enroll?lang=${lang}">${escape(t.refresh)}</a></li></ol><p>${escape(b.expires)}: <time datetime="${expires}">${escape(expires.slice(0,19).replace('T',' '))}</time></p><p>${escape(b.expired)}</p>`;
+  }
   else {
     if (![requestId,csrf].every(v=>typeof v==='string' && /^[a-f0-9]{64}$/.test(v))) throw Error('Invalid form');
     content=`<form action="/enroll?lang=${lang}" method="post"><input type="hidden" name="request_id" value="${requestId}"><input type="hidden" name="csrf" value="${csrf}"><fieldset><legend>${escape(t.title)}</legend><label class="confirm"><input type="checkbox" name="confirmed" value="yes" required> ${escape(t.confirm)}</label></fieldset><button type="submit">${escape(t.begin)}</button></form>`;

@@ -7,7 +7,7 @@
 
 ## 学生の到達体験
 
-10/29最新：Googleログインの実受入に続き、教師承認・有効session・nonce付きAWS署名・元5台の一致を一体で検査する登録候補を制作。9項目のtransactionで本人/AWSの両方向登録をまとめ、ログアウト/期限/別account/競合/原本変更による部分登録を防ぐ。新登録側22試験、既存読取りを含むPython53件と適用検査2件、Node34件、Web package3件合格（模擬環境）。登録フォーム/署名本文の接続は既定無効で未配備、学生AWSのブラウザ導入は未実装。教師AWSの非公開2 Lambda・鍵保管先・ログ2つを追加する5資源だけのCREATE change setがCREATE_COMPLETE/AVAILABLE、validation error 0。未execute、本人の最終操作待ち。公開中Web/元5台/元成績は変更なし。[計画記録](../web_portal_poc/verification/2026-10-29-portal-enrollment-plan.public.json)。本Issue全体は未完了。
+10/29最新：非公開2 Lambda・HMAC鍵保管先・ログ2つの実作成を確認し、画面更新時に同じ登録試行へ戻るv2をCodeだけの2変更で適用、実AWSで未登録拒否・元成績全projection/全partition不変・教師EC2停止を受入した。学校identityは本人指定の教師アカウントを学生役として使う。まだ実承認行・bindingはない。ブラウザ候補は学生AWSへ接続確認用3資源を導入する方式。教師側の専用非公開S3＋学生account限定のGet許可2 Addと、既存WebのRevision/Endpoint 2 Modifyのchange setを準備し、未execute。Web最終候補v3と全4,479ファイルの内容を照合し、Python41件/Node43件が合格。公開中Webはログインだけ、成績reader/本人登録は無効のまま。実Google→学生AWS→本人62点・状態の受入は次工程。[適用前計画](../web_portal_poc/verification/2026-10-29-browser-enrollment-plan.public.json)、[非公開v2実受入](../web_portal_poc/verification/2026-10-29-private-services-v2.public.json)。本Issue全体は未完了。
 
 教師が案内する固定のWeb入口へ学生本人がログインし、自分の環境の準備・現在状態・課題確認・採点結果・送信履歴をブラウザだけで扱える。初回コマンドの手渡しや、CloudShellで生成したURLの転記を通常の導線から減らす。
 

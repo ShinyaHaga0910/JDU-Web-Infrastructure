@@ -1,0 +1,35 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Private immutable account-link template; read access for one assigned student account only",
+  "Parameters": {
+    "StudentAccount": {"Type":"String","AllowedPattern":"[0-9]{12}"},
+    "TemplateDigest": {"Type":"String","AllowedPattern":"[a-f0-9]{64}"},
+    "PublicationId": {"Type":"String","AllowedPattern":"[a-f0-9]{12}"}
+  },
+  "Resources": {
+    "BootstrapBucket": {
+      "Type":"AWS::S3::Bucket","DeletionPolicy":"Retain","UpdateReplacePolicy":"Retain",
+      "Properties": {
+        "BucketName":{"Fn::Sub":"jdu-web-portal-bootstrap-${AWS::AccountId}-${PublicationId}"},
+        "VersioningConfiguration":{"Status":"Enabled"},
+        "BucketEncryption":{"ServerSideEncryptionConfiguration":[{"ServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]},
+        "OwnershipControls":{"Rules":[{"ObjectOwnership":"BucketOwnerEnforced"}]},
+        "PublicAccessBlockConfiguration":{"BlockPublicAcls":true,"IgnorePublicAcls":true,"BlockPublicPolicy":true,"RestrictPublicBuckets":true}
+      }
+    },
+    "AssignedStudentRead": {
+      "Type":"AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket":{"Ref":"BootstrapBucket"},
+        "PolicyDocument":{"Version":"2012-10-17","Statement":[{
+          "Sid":"AssignedStudentTemplateReadOnly","Effect":"Allow",
+          "Principal":{"AWS":{"Fn::Sub":"arn:aws:iam::${StudentAccount}:root"}},
+          "Action":["s3:GetObject","s3:GetObjectVersion"],
+          "Resource":{"Fn::Sub":"${BootstrapBucket.Arn}/bootstrap/${TemplateDigest}/account-link.template.json"},
+          "Condition":{"Bool":{"aws:SecureTransport":"true"}}
+        }]}
+      }
+    }
+  },
+  "Outputs":{"BucketName":{"Value":{"Ref":"BootstrapBucket"}}}
+}

@@ -161,7 +161,7 @@ class PortalEnrollmentTest(unittest.TestCase):
         pair = self.begin()
         original = self.db.transact_write_items
         def race(**kwargs):
-            if len(kwargs['TransactItems']) == 9:
+            if len(kwargs['TransactItems']) == 10:
                 self.revoke_session()
             return original(**kwargs)
         self.db.transact_write_items = race
@@ -195,6 +195,49 @@ class PortalEnrollmentTest(unittest.TestCase):
         text = json.dumps(self.db.scan(TableName='bindings')['Items'])
         for value in (self.email, self.subject, self.sid, self.operation, pair['pair_id'], 'synthetic-google-token'):
             self.assertNotIn(value, text)
+
+    def test_status_and_a_new_form_resume_the_same_pending_operation_without_writes(self):
+        first = self.begin()
+        before = self.db.scan(TableName='bindings')['Items']
+        self.assertEqual(first, self.service.status(self.subject,self.email,self.sid,self.token_hash))
+        self.assertEqual(first, self.begin(request_id='f'*64))
+        self.assertEqual(before, self.db.scan(TableName='bindings')['Items'])
+
+    def test_concurrent_different_forms_return_the_single_committed_operation(self):
+        original = self.db.transact_write_items
+        winning = []
+        def raced(**kwargs):
+            if len(kwargs['TransactItems']) == 5 and not winning:
+                self.db.transact_write_items = original
+                winning.append(self.begin(request_id='f'*64))
+                self.db.transact_write_items = raced
+            return original(**kwargs)
+        self.db.transact_write_items = raced
+        result = self.begin()
+        self.assertEqual(result, winning[0])
+        pairs = [r for r in self.db.scan(TableName='bindings')['Items'] if r['sk']['S']=='IDENTITY']
+        self.assertEqual(len(pairs),1)
+        self.assertEqual(self.bindings(),[])
+
+    def test_missing_pending_pointer_cannot_revive_or_commit_a_partial_operation(self):
+        pair = self.begin()
+        self.db.delete_item(TableName='bindings',Key=key('SESSION#'+digest(self.sid),'ENROLLMENT'))
+        with self.assertRaises(EnrollmentDenied): self.begin()
+        with self.assertRaises(EnrollmentDenied): self.service.complete(pair['pair_id'],self.proof())
+        self.assertEqual(self.bindings(),[])
+        self.assertFalse(self.read('PAIR#'+digest(pair['pair_id']),'IDENTITY')['used'])
+
+    def test_pointer_changed_during_proof_rolls_back_all_registration_writes(self):
+        pair = self.begin()
+        def changed(*_):
+            self.db.update_item(TableName='bindings',Key=key('SESSION#'+digest(self.sid),'ENROLLMENT'),
+                UpdateExpression='SET pair_pk=:other',ExpressionAttributeValues=encoded({':other':'PAIR#'+'f'*64}))
+            return self.grant['account']
+        self.service.fetch = changed
+        with self.assertRaises(EnrollmentDenied): self.service.complete(pair['pair_id'],self.proof())
+        self.assertEqual(self.bindings(),[])
+        self.assertFalse(self.read('PAIR#'+digest(pair['pair_id']),'IDENTITY')['used'])
+        self.assertNotIn('bound_subject',self.read(email_key(self.email,self.pepper),'LAB'))
 
     def test_new_atomic_mapping_drives_existing_62_point_reader_and_rejects_other_identity(self):
         from identity_grade import identity_grade

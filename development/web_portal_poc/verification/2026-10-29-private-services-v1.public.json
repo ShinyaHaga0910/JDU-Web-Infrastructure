@@ -1,0 +1,19 @@
+{
+  "verified_at": "2026-10-29T08:21:15.294342+00:00",
+  "scope": "Created private functions and unregistered-request denial only; no real identity enrollment",
+  "operator_executed_approved_creation": true,
+  "stack_status": "CREATE_COMPLETE",
+  "code_sha256": "62a2e8251aae766323140eac26ff5fc7553ef718c713bd387eacb1ec4b1e5989",
+  "verifier_sha256": "156e97f7a69268a889d02657ef9f7a1bd38df62b5a753528782ced97f22d8ba4",
+  "new_resources_verified": 5,
+  "private_functions_verified": 2,
+  "no_function_urls_or_resource_policies": true,
+  "key_metadata_verified_without_reading_value": true,
+  "unregistered_synthetic_requests_denied": true,
+  "approve_operation_not_exposed": true,
+  "full_grade_projection_unchanged": true,
+  "whole_lab_partition_unchanged": true,
+  "teacher_ec2": "stopped",
+  "web_configuration_changed_by_verifier": false,
+  "real_identity_enrollment_tested": false
+}
