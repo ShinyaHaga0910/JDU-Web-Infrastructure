@@ -22,14 +22,16 @@ class WebPackageTest(unittest.TestCase):
                 self.assertFalse(any(name.startswith('.env') or name.endswith('.test.mjs') for name in names))
                 archive.extractall(Path(directory) / 'contents')
             subprocess.run(['node', '--input-type=module', '-e',
-                "await import('./router.mjs'); await import('./grade-client.mjs')"],
+                "await import('./router.mjs'); await import('./grade-client.mjs'); await import('./secrets.mjs')"],
                 cwd=Path(directory) / 'contents', capture_output=True, text=True, check=True)
 
     def test_template_defaults_closed_and_keeps_secret_out_of_outputs(self):
         template = json.loads((package.HERE / 'portal-web.template.json').read_text(encoding='utf-8'))
         self.assertEqual(template['Parameters']['PortalMode']['Default'], 'closed')
-        self.assertTrue(template['Parameters']['GoogleClientSecret']['NoEcho'])
-        self.assertNotIn('GoogleClientSecret', json.dumps(template['Outputs']))
+        self.assertNotIn('GoogleClientSecret', template['Parameters'])
+        variables = template['Resources']['Revision']['Properties']['ServiceConfig']['EnvironmentVariables']
+        self.assertNotIn('GOOGLE_CLIENT_SECRET', variables)
+        self.assertEqual(variables['PORTAL_GOOGLE_OAUTH_SECRET_ARN'], {'Ref': 'GoogleOAuthSecretArn'})
         self.assertEqual(template['Resources']['Endpoint']['Properties']['AuthType'], 'ApplicationManaged')
         self.assertEqual(template['Resources']['Portal']['Properties']['FunctionName'], {'Ref': 'WebFunctionName'})
         endpoint = template['Resources']['Endpoint']['Properties']

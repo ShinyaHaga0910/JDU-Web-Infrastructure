@@ -107,17 +107,23 @@ LabのStartはAcademy側が既存EC2を自動起動する場合がある。画�
 
 ### 本人ログインの次の準備
 
-学内Google認証はコードを用意した段階で、今回の実OAuth clientは未設定。本人がメール認証等の比較説明後、「簡単に作成できるなら学生のGoogle認証」と選択。Chromeの学校Google accountで既存project `jdu-learning-portal-test3` が確認できたため、既存clientを変更せず今回専用clientを分ける設定を準備する。まだ新しいclientやsecretは作成していない。以下は準備するGoogle試作の設定情報。
+本人がメール認証等の比較説明後、「簡単に作成できるなら学生のGoogle認証」と選択。既存project `jdu-learning-portal-test3` 内で本人が専用clientを作成し、既存のclientは変更していない。今回のsecretもSecrets Managerへ収録済み。次はARN参照候補を適用して実ログインを受入する段階で、Web側はまだ未適用。以下はGoogle試作の設定情報。
 
-Google側のAudienceは既存のInternalを確認。専用clientの作成フォームにWeb application・名前 `JDU Web Infrastructure Student 2026`・下記callbackのみを入力し、Create有効まで確認した。JavaScript originsは空欄。未送信で本人操作待ち。新規clientを発行したら、そのsecretを会話/Git/共有Windowsへ保存せず、教師CloudShellの非表示入力へ収録する次段階を用意する。現時点では認証情報を読取り・取得していない。既存2 clientやGoogle課金設定は変更していない。
+Google側のAudienceは既存のInternalを確認。専用clientのWeb application・名前 `JDU Web Infrastructure Student 2026`・下記callbackを準備後、本人がCreateを実行した。JavaScript originsは空欄。既存2 clientやGoogle課金設定は変更していない。本人からsecretの適切な配置指示を受け、教師AWS Secrets Managerの専用保管先へ既存値を非表示入力で収録し、同一作成versionのreadback・AWSCURRENT一致を確認済み。[秘密を含まない保管・準備記録](verification/2026-10-29-google-secret-storage.public.json)。secretの再発行・rotationはしていない。
 
 - 登録対象のorigin：`https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws`
 - 現コードのcallback：`https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws/auth/callback`
 - 現コードの要求scope：`openid email`、許可対象：検証済み `jdu.uz` identity。AWS AcademyのログインメールとGoogle本人IDは別々に検証する。
-- Google client設定だけで開放しない。内部成績reader、subject鍵、session store、教師承認済みLab/account/subject登録がそろってから、本人・未登録・別人・失効・ログアウト・教師側取得不可と再開を実ブラウザで受入する。
+- 本人成績と学生環境の操作はGoogle client設定だけで開放しない。内部成績reader、subject鍵、session store、教師承認済みLab/account/subject登録がそろってから、本人・未登録・別人・失効・ログアウト・教師側取得不可と再開を実ブラウザで受入する。認証だけのsmoke試験では成績readerをdisabledにしてログイン/ログアウトを先行する。
 - secretや署名要求を会話、Git、URL、共有Windowsへ保存しない。新しい認証情報の設定は、具体的な計画を用意してから本人操作で行う。
 
 本人ログインは共通URLから自分の成績・環境だけを扱うための入口で、Academy認証、RDP、従来の採点用tokenとは別の役割。メール入力だけを本人確認として扱わない。AWS内の候補・読取りで確認した権限・未実証は[Issueの認証方式再検討](../issues/WEB-PORTAL-001.md)を参照。SES読取りは拒否、Cognito一覧読取りは成功したが、作成・実メール送信の成功を意味しない。Cognito等へ変更する場合は署名検証、issuer/client、subject識別子、session、bindingの整合を先に検証する。
+
+`store_google_oauth.py` は既存credentialだけを教師CloudShellのTTY非表示入力からSecrets Managerへ収録する。account/用途名/Google client/callbackを固定検査し、既存secretやreceiptを上書きしない。値を引数・環境・通常stdin・ファイルに保存せず、private receiptにもARN/versionと成否のみ。新versionを読み戻して照合し、失敗時は削除や再試行を自動化しない。4件のunit試験合格。実保管でも成功markerとversion一致を確認した。
+
+`web/secrets.mjs` はアプリ側の候補。CF/environmentには同accountのsecret ARNだけを渡し、enabledの認証要求で読む。指定用途・account・schema・callbackを照合し、最大5分memory cacheと同時要求の集約、期限切れ後の失敗では古いcredentialを返さない。closedでは保管先を読まない。Google client secretのCF parameter/environment渡しは削除した。Webの27件・package3件、依存のaudit 0を確認。既存LabRoleのGetSecretValueはsimulation allowedだが、実アプリの読取りはまだ受入していない。LabRole自体は既存の広いLab権限のままで、専用の最小権限roleを作ったとは扱わない。
+
+新codeを既存の非公開・version管理S3へhash照合で搬入し、Googleログイン/ログアウトだけを試すUPDATE change setを準備。AWS構文・事前検査は成功し、対象は既存Revisionの置換とEndpointのroute更新だけ。IAM・元EC2・成績DBの構成は変更しない。既存の試作用binding tableに短期sessionのhashを保存する計画。成績readerはdisabledのまま、学生の状態取得/構築/採点は接続しない。**まだ適用せず、ログイン入口とアプリ権限の適用直前確認待ち**。今回の本人の「自分で確認できた」は、Google作成/保管の確認として記録し、未実施の実アプリ受入と取り違えない。
 
 ### 配備前の再開・準備記録（2026-10-29、履歴）
 

@@ -16,7 +16,7 @@
 - 教師Lab開始中：学生EC2停止中・学生Lab終了後でも、本人認証と登録を確認して保存済み成績を閲覧する。学生の現在状態が取得不能でも過去の成績を0点へ変えない。
 - 環境構築・最新状態・新しい採点：教師側に加え、学生本人のLabと必要なEC2/SSMが利用可能であることを確認する。
 - 教師側が利用不能：成績取得不可を表示し、0点・記録なしと取り違えない。画面からLabやEC2を自動起動しない。教師がAcademyで通常のStart Labを行い、復帰を確認する。
-- 通常の次工程：教師Lab再開後の読取り復帰、本人認証・AWS本人登録、本人だけの成績/状態画面の順に受入する。Googleの実設定と実学生bindingはまだ完了していない。
+- 通常の次工程：教師Lab再開後の読取り復帰、本人認証・AWS本人登録、本人だけの成績/状態画面の順に受入する。Google専用clientの作成と秘密の保管は完了。実ログイン・実学生bindingと個人成績画面の受入は未完了。
 
 ### 本人ログイン方式の再検討（10/29本人質問）
 
@@ -25,6 +25,10 @@
 Chromeの学校Google accountで既存の `JDU Learning Portal Test3`（project ID `jdu-learning-portal-test3`）が開けた。プロジェクトが存在することは確認したが、今回のclientや作成権限の受入ではない。既存clientの再利用や変更をせず、同project内に今回専用clientを分けられるか確認する。以下のメール方式調査は比較の履歴として保持する。
 
 続いてAudienceのUser typeがInternalであること、既存clientが2つあることを読取り確認。新規作成フォームでWeb applicationを選び、専用名 `JDU Web Infrastructure Student 2026` と今回のcallback URLだけを入力した。JavaScript originsは使わないserver flowのため空欄、AI agent用途も選択しない。入力検査後Createは有効。**まだCreateを押していない**。新しい認証情報の発行・アクセス設定になるため、作成直前のフォームを保存して本人へ最終操作を引き継ぐ。既存client、Audience、scope、課金設定は変更していない。作成やGoogle本人ログインの成功を意味しない。
+
+その後本人がCreateを実行し、secretの適切な保管を指示。既存値を教師AWS Secrets Managerの専用保管先へ非表示入力で収録し、同一versionのreadbackとAWSCURRENT一致を確認。Git/会話/共有Windowsのファイル/CLI引数には値を出さず、IAMやresource policyも変更していない。Google secretを再発行していない。アプリがARNだけを設定として受け取る候補を追加し、Node27件・package3件・保管4件合格、audit0。実アプリによるsecret読取りとGoogle本人ログインは未実施。[保管と候補の記録](../web_portal_poc/verification/2026-10-29-google-secret-storage.public.json)。
+
+Googleログインだけの試験用UPDATE change setはCREATE_COMPLETE/AVAILABLE。既存Revision置換・Endpoint更新の2対象で、IAMや元EC2・成績DBの構成変更なし。既存の試用tableに短期session hashを保存する予定。成績readerはdisabled、学生操作も未接続。新しいログイン入口と認証情報利用の適用直前確認後に適用し、実Googleログイン/ログアウト/他domain拒否を確認する。本人の追加の「確認できた」はGoogle作成・保管についての確認として記録し、未適用のWeb統合受入とは区別する。
 
 対象は、共通URLから学生本人の保存成績を見せ、将来は本人の環境操作につなぐための入口。従来はCloudShellのAWS認証・個別採点認証・専用URLを使っており、独立した学生ログイン画面はなかった。現在の可否probeには個人成績がなく、個人成績画面は閉鎖したまま。
 
