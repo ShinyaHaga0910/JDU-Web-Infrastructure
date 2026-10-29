@@ -37,12 +37,19 @@ test('GET result cannot advance; pending has manual fallback and bounded automat
   assert.equal(calls[0].operation,'result');assert.match(text,/data-check-progress/);assert.match(text,/method="post"/);assert.match(text,/check-progress.js/);
   assert.doesNotMatch(text,/今回の素点: 0/);
 });
+test('an interrupted POST retains a link to the same job rather than a second start',async()=>{
+  const app=createApp({...credentials,checker:async()=>{throw Error('temporary network loss');}});
+  const res=await app(request('/checks',{method:'POST',headers,body:body()}));
+  assert.equal(res.status,503);const text=await res.text();
+  assert.ok(text.includes(`task_id=M1&amp;job_id=${value.job_id}`));assert.doesNotMatch(text,/operation" value="start/);
+});
 test('completed checks show actual task points, UNKNOWN and escaped rows in all languages',async()=>{
   const result={status:'ok',job:{...value,phase:'report_ready'},result:{task_id:'M1',checked_at:'2026-10-29T12:00:00Z',saved_grade_changed:false,
     checks:[{id:'WEB02_PUBLIC_HTTP',status:'UNKNOWN'}],score:{raw_earned:7,raw_maximum:8,counts_toward_assessment:true,evaluable:false}}};
   const app=createApp({...credentials,checker:async()=>result});
   for(const lang of ['ja','ru','uz']){
     const res=await app(request(`/checks?lang=${lang}&task_id=M1&job_id=${value.job_id}`));assert.equal(res.status,200);const text=await res.text();assert.match(text,/7 \/ 8/);assert.match(text,/WEB02_PUBLIC_HTTP/);assert.doesNotMatch(text,/data-check-progress/);
+    assert.ok(text.includes(`?lang=ru&amp;task_id=M1&amp;job_id=${value.job_id}`));
   }
   result.result.checks[0].id='<script>';
   const malformed=await app(request(`/checks?task_id=M1&job_id=${value.job_id}`));assert.equal(malformed.status,503);assert.doesNotMatch(await malformed.text(),/<script>/);

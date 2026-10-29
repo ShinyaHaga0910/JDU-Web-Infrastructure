@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-29",
+  "phase": "code_repair_prepared",
+  "actual_before_repair": {
+    "M1_browser_raw_earned": 8,
+    "M1_raw_maximum": 8,
+    "M1_job_id": "30a90bac-2950-4ed6-9322-1cf14a8416d5",
+    "M2_job_id": "5b15a547-45f2-484f-95bd-2a8ca287f313",
+    "M2_command_id": "3a59822d-3391-4290-8b2b-192c45e3b439",
+    "M2_ssm_status": "Success",
+    "M2_elapsed_seconds": 3.062,
+    "M2_stdout_bytes": 2213,
+    "M2_same_source_parameters_digest_after_map_round_trip": false
+  },
+  "repair": [
+    "Canonicalize nested public snapshot maps before compiling fixed commands",
+    "Read already accepted command ID without recompiling source",
+    "Keep job context in language and interrupted-request links"
+  ],
+  "tests": {
+    "job_observer_owned_flow": 37,
+    "node": 49,
+    "failures": 0,
+    "skipped": 0
+  },
+  "checker_zip_sha256": "b43b8ab023dc7d0da146946edd5fb98a60983327a4754d6c01565b2abf6bf926",
+  "source_zip_sha256": "8d1ae211d8c38aead68cdb932711fa0e0a2e81a91cf591a0d76cf0d8548d0851",
+  "code_sha256": {
+    "assessment_command_jobs.py": "b6e286b02e67a1361d05b2a1dc12789b08c07fcb88235bbae3261011d3ce712f",
+    "assessment_observation.py": "bb82294cc3b57fce383382f6838184b1522dc1a21eab8ec5ad665d76e79dde43",
+    "update_checker.py": "4e1407dc5b24604290f568836815191c9f1771aef5476f7e255ef3af6f147e16",
+    "web/router.mjs": "0efebe693d32889fcb5b4ecd7d27bb1831f56285288f77e6a869d7c39104d488"
+  },
+  "new_access_permissions": false,
+  "original_grade_writes": false,
+  "pending_command_will_be_resent": false,
+  "real_M2_browser_result_accepted": false
+}

@@ -109,6 +109,14 @@ class ObservationTest(unittest.TestCase):
         self.assertEqual(self.probes[0][0:2], ('93.184.216.34', '/mission.txt'))
         self.assertEqual(self.probes[0][-1], self.spec['run_id'].replace('-', ''))
 
+    def test_nested_map_order_after_dynamodb_read_does_not_change_generic_command(self):
+        self.select('M2')
+        before = self.observer().command(self.spec)
+        self.snapshot = dict(reversed(list(self.snapshot.items())))
+        for field in ('private_ips', 'root_volumes'):
+            self.snapshot[field] = dict(reversed(list(self.snapshot[field].items())))
+        self.assertEqual(self.observer().command(self.spec), before)
+
     def test_practice_http_uses_its_own_fixed_body_and_stays_ungraded(self):
         self.select('P1')
         result = self.observer().finish(self.spec, json.dumps(self.legacy_http()))

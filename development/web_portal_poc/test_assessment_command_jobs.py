@@ -184,6 +184,13 @@ class CommandJobsTest(unittest.TestCase):
         self.assertEqual(self.jobs.advance(self.spec)['phase'], 'report_ready')
         self.assertEqual(len(self.ssm.sends), 1)
 
+    def test_accepted_command_recovers_without_recompiling_after_worker_update(self):
+        self.start()
+        self.jobs.build_command = lambda spec: (_ for _ in ()).throw(ValueError('No recompilation'))
+        self.assertEqual(self.jobs.advance(self.spec)['phase'], 'report_ready')
+        self.assertEqual(self.jobs.retained_report(self.spec), json.loads(self.ssm.output)['report'])
+        self.assertEqual(len(self.ssm.sends), 1)
+
     def test_pending_and_cancelling_are_not_terminal_or_retry_requests(self):
         self.start()
         for status in ('Pending', 'InProgress', 'Delayed', 'Cancelling', 'unrecognized'):

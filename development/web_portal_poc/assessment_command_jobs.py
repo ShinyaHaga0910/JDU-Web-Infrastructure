@@ -203,9 +203,13 @@ class CommandJobs:
         # Re-check current authoritative context before every AWS observation.
         if self.preflight(spec) is not True:
             raise JobDenied('Lab or required servers unavailable')
-        parameters = self.parameters(spec)
-        if sha(parameters) != row['command_sha256']:
-            raise JobDenied('Trusted command version changed; retained original job')
+        if row['phase'] in ('queued', 'dispatching'):
+            parameters = self.parameters(spec)
+            if sha(parameters) != row['command_sha256']:
+                raise JobDenied('Trusted command version changed; retained original job')
+        # Once AWS's exact command ID is retained, only read that invocation.
+        # Recompiling public source cannot make its already-finished output
+        # more authoritative and must not prevent recovery after an update.
         if row['phase'] == 'queued':
             claimed = self.transition(spec, row, 'dispatching', dispatch_started_at=int(self.clock()))
             if not claimed:

@@ -60,7 +60,10 @@ def checked_snapshot(spec, snapshot):
             raise ValueError('Wrong public key format')
     except (ValueError, TypeError):
         raise JobDenied('Invalid trusted observation snapshot') from None
-    return copy.deepcopy(snapshot)
+    # DynamoDB maps do not retain the input's insertion order. The transport
+    # embeds JSON in a shell command, so normalize nested public maps before
+    # compiling both the initial command and any later reconciliation.
+    return json.loads(canonical(snapshot))
 
 
 class Observation:

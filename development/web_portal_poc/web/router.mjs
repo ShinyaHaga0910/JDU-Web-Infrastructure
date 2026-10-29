@@ -44,8 +44,9 @@ const language = url => Object.hasOwn(text, url.searchParams.get('lang')) ? url.
 const response = (body, status=200, extras={}) => new Response(body, {status, headers:{...security, 'Content-Type':'text/html; charset=utf-8', ...extras}});
 const redirect = (location, values=[]) => { const h=new Headers(security); h.set('Location',location); for(const v of values) h.append('Set-Cookie',v); return new Response(null,{status:303,headers:h}); };
 
-function page(lang, title, content) {
-  const nav = ['ja','ru','uz'].map(k => `<a href="?lang=${k}"${k===lang?' aria-current="page"':''}>${k.toUpperCase()}</a>`).join(' ');
+function page(lang, title, content, selection) {
+  const tail=selection?`&amp;task_id=${selection.task_id}&amp;job_id=${selection.job_id}`:'';
+  const nav = ['ja','ru','uz'].map(k => `<a href="?lang=${k}${tail}"${k===lang?' aria-current="page"':''}>${k.toUpperCase()}</a>`).join(' ');
   return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)}</title><style>body{font:1rem/1.6 system-ui,sans-serif;margin:0;background:#f5f7fa;color:#182435}main{max-width:64rem;margin:auto;padding:1.5rem}nav{display:flex;gap:1rem}a,button{color:#064ca4}button{font:inherit;background:white;border:1px solid #64748b;border-radius:.35rem;padding:.65rem 1rem;cursor:pointer}a:focus-visible,button:focus-visible{outline:3px solid #d34800;outline-offset:3px}section{background:white;border:1px solid #d6dee8;border-radius:.5rem;padding:1rem;margin-block:1rem}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:44rem}th,td{padding:.6rem;text-align:left;border-bottom:1px solid #d6dee8}.num{font-size:1.6rem;font-weight:700}footer{margin-top:2rem}fieldset{border:1px solid #a9b6c7;border-radius:.35rem;padding:1rem;margin-block:1rem}.confirm{display:flex;align-items:flex-start;gap:.5rem;min-height:48px;padding-block:.5rem}input[type=checkbox]{width:1.25rem;height:1.25rem;margin:.2rem 0;flex-shrink:0}a.action{display:inline-flex;align-items:center;min-height:48px;padding:0 .75rem;border:1px solid #64748b;border-radius:.35rem}a.action:focus-visible,input:focus-visible{outline:3px solid #d34800;outline-offset:3px}.check-tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1rem}.check-tasks section{margin:0}</style></head><body><main><nav aria-label="Languages">${nav}</nav><h1>${escape(title)}</h1>${content}</main></body></html>`;
 }
 
@@ -163,9 +164,10 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
     if (url.pathname==='/checks') {
       if (!checkerEnabled) return response('Not found',404);
       const ct=checkWords[lang],extras={'Referrer-Policy':'same-origin','Content-Security-Policy':security['Content-Security-Policy']+"; script-src 'self'"};
-      const fail=(message,status=503)=>response(page(lang,ct.title,`<p role="alert">${escape(message)}</p><a href="/checks?lang=${lang}">${escape(ct.back)}</a>`),status,extras);
+      let selected;
+      const fail=(message,status=503)=>response(page(lang,ct.title,`<p role="alert">${escape(message)}</p>${validOperation(selected)?`<p><a href="/checks?lang=${lang}&amp;task_id=${selected.task_id}&amp;job_id=${selected.job_id}">${escape(ct.refresh)}</a></p>`:''}<a href="/checks?lang=${lang}">${escape(ct.back)}</a>`),status,extras);
       try {
-        let selected,result;
+        let result;
         if (checkerPost) {
           if (request.headers.get('origin')!==config.origin || request.headers.get('content-type')?.split(';')[0]!=='application/x-www-form-urlencoded') return fail(ct.denied,403);
           const body=await request.text(); if(Buffer.byteLength(body)>4096)return fail(ct.denied,403);
@@ -175,12 +177,13 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
           if (!validOperation(selected) || selected.operation==='result' || !verifyCheckToken(config,jar.get(ACCESS),token,selected,fields.get('csrf'))) return fail(ct.denied,403);
           result=await checker({subject:identity.sub,...selected});
           if(result?.status==='ok') return redirect(`/checks?lang=${lang}&task_id=${selected.task_id}&job_id=${selected.job_id}`);
+          if(result?.status!=='ok') return fail(result?.status==='busy'?ct.busy:result?.status==='unauthorized'?ct.denied:ct.unavailable,result?.status==='unauthorized'?403:503);
         } else if (url.searchParams.has('task_id') || url.searchParams.has('job_id')) {
           selected={operation:'result',task_id:url.searchParams.get('task_id'),job_id:url.searchParams.get('job_id')};
           if(!validOperation(selected))return fail(ct.denied,403);
           result=await checker({subject:identity.sub,...selected});
         }
-        return response(page(lang,ct.title,checkHtml(lang,{config,session:jar.get(ACCESS),token,selected,result})),result?.status==='unauthorized'?403:result && result.status!=='ok'?503:200,extras);
+        return response(page(lang,ct.title,checkHtml(lang,{config,session:jar.get(ACCESS),token,selected,result}),selected),result?.status==='unauthorized'?403:result && result.status!=='ok'?503:200,extras);
       } catch {return fail(ct.unavailable);}
     }
     if (url.pathname==='/enroll') {
