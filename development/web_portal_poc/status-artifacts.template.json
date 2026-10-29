@@ -1,0 +1,19 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Private versioned artifacts for the Web portal status experiment",
+  "Resources": {
+    "ArtifactBucket": {
+      "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "Properties": {
+        "BucketEncryption": {"ServerSideEncryptionConfiguration": [{"ServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]},
+        "OwnershipControls": {"Rules": [{"ObjectOwnership": "BucketOwnerEnforced"}]},
+        "PublicAccessBlockConfiguration": {"BlockPublicAcls": true, "IgnorePublicAcls": true, "BlockPublicPolicy": true, "RestrictPublicBuckets": true},
+        "VersioningConfiguration": {"Status": "Enabled"},
+        "Tags": [{"Key": "Purpose", "Value": "web-portal-status-poc"}]
+      }
+    }
+  },
+  "Outputs": {"BucketName": {"Value": {"Ref": "ArtifactBucket"}}}
+}

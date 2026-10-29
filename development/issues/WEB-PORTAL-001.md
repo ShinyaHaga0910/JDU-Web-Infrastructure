@@ -55,6 +55,8 @@
 
 2026-10-29再開：教師Chrome・別学生EdgeのAWS accountを確認。学生CloudShellで `status.py` / `plan_student_status.py` 本体の転記hashを照合して実行し、元state/baseline/Stack/タグの一致、全5台running・SSM Online、新Lambda/Stack名の未使用を確認した。状態確認コード自体の学生AWS実行は成功。教師からの呼出し・ブラウザ統合・停止中とEnd Lab後は引き続き未受入。ローカルはPython 102件（importしたfixtureの重複を含む）・Node 15件・Web package 2件合格。
 
+配備準備も追加。非公開・暗号化・version管理付きS3と読取りLambdaの2 Stackを別に作る入口を模擬試験5件で確認し、学生CloudShellで搬入hashを照合して計画モードを実行。元5台への変更なし。教師roleへの新規呼出し許可を含むため、適用直前確認後に進める。現時点で新資源の作成はしていない。
+
 - [x] Learner LabでWeb Functionsが利用できることを確認（2026-10-23本人確認）。
 - [x] End Lab後もWeb Functions部分は利用できたことを確認（2026-10-23本人確認）。EC2の継続稼働とは区別する。
 - [x] 公式仕様・既存コードから構成案と実証の順番を整理。今回AWS操作なし。
