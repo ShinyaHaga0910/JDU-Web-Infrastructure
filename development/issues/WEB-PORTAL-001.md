@@ -1,6 +1,6 @@
 # WEB-PORTAL-001：学生の環境準備・採点確認をブラウザへ集約する
 
-- 状態: 今回の範囲（ブラウザで固定課題を実行して結果を見る）はAWS配備・実受入完了。M1 8/8、M2 13/13、M5 9/13＋未確認4、3言語・停止後の再表示・新規確認拒否・元62点保持を確認。全Issueは未完了で、原本への自動提出・M3/M5M6の特殊確認・新規5台準備・教師一覧・一般配布は別残件。教師Lab開始が必要。
+- 状態: 原本への自動保存を制作中（10/29本人依頼）。ブラウザ確認/専用結果表示は前回受入済み。今回は既存採点処理へ接続し、原本保存/未確認時の点数保持/同report再送をAWSへ配備・受入する。全IssueのM3/M5M6特殊確認・新規5台準備・教師一覧・一般配布は別残件。教師Lab開始が必要。
 - 登録: 2026-10-23、本人依頼。
 - 着手順: D12の受入残件を保持し、2026-10-23の本人依頼で本Issueの構成検討を先行。Web演習の改善課題として実証・実装へ進める。
 - GitHub: [Issue #1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1)（非公開JDU-Web-Infrastructure）。
@@ -8,6 +8,8 @@
 10/29課題確認の内部基盤：固定task/jobとSSM実行番号を永続化し、切断時には同じcommandを回収する処理、元request ID付きreport outbox、既存checker/HTTP外部確認のadapterを追加した。Moto/架空SSM/HTTP29件と既存62点API14件合格。公開中Web/AWSは変更なし。HTTPの確認実行・本人認可・実AWS preflight・正規採点送信とM3/M5M6はまだ接続していない。[内部検証](../web_portal_poc/verification/2026-10-29-assessment-job-core.public.json)。
 
 ## 学生の到達体験
+
+10/29次工程：原本保存の共通処理と本人binding/承認を同時確認する保存を実装。新9件＋既存基盤でPython46件、既存API14件、Node51件合格。追加資源は作らず、既存の学生/教師checkerとWebのコードだけを更新する。今回の原本書込みはまだ有効にしていない。[自動保存の受入条件](../web_portal_poc/CANONICAL-SUBMISSION-ACCEPTANCE.md)。
 
 10/29今回の実受入完了：承認済み学生4資源・教師2資源を配備し、既存Webは同じURLで更新。元5台/96GiB/認証/成績原本を保持し、結果は専用DBへ保存した。実M2はmap順序の修正後も同じcommand/request IDを回収、3件各1回のみ。M5の未確認は確定点と表示しない。停止中は保存M2を再表示し新M1を拒否、元成績62点/全partition不変。ブラウザ範囲を完了し、下記の旧準備/停止記述は履歴として保持する。[実受入](../web_portal_poc/verification/2026-10-29-browser-checks-accepted.public.json)。
 

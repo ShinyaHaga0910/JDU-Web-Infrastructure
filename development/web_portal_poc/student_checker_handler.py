@@ -51,7 +51,7 @@ class StudentChecker:
 
     def serve(self, event):
         if (type(event) is not dict or set(event) != {'operation', 'spec'}
-                or event['operation'] not in ('start', 'advance', 'result')):
+                or event['operation'] not in ('start', 'advance', 'result', 'report')):
             return {'status': 'unauthorized'}
         try:
             spec = self.scope(event['spec'])
@@ -90,6 +90,10 @@ class StudentChecker:
             if view['phase'] == 'report_ready':
                 report = jobs.retained_report(spec)
                 validate_report(report, spec['instances'])
+                if event['operation'] == 'report':
+                    # IAM-only original report transfer to the teacher saver.
+                    # The public portal gateway never forwards this envelope.
+                    return {'status': 'ok', 'job': view, 'report': report}
                 answer['result'] = {'task_id': spec['task_id'], 'checked_at': report['checked_at'],
                     'request_id': report['request_id'], 'checks': [{'id': c['id'], 'status': c['status']} for c in report['checks']],
                     'score': score(report), 'saved_grade_changed': False}

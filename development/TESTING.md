@@ -66,3 +66,8 @@ Web v4でNode44件。native POSTのno-referrer/Origin:nullを個人情報のな�
 ## ブラウザ課題確認の実受入（2026-10-29）
 
 追加のmap順序/受付済みcommand再compile不要の回帰を含めPython37件、言語/同job再訪を含めNode49件合格。AWSでは実ブラウザM1 8/8、M2 13/13、M5 9/13＋未確認4、3件各SSM1回、元request/report保持を確認。M2のmap順序不具合は実機で特定し再送せず結果回収。M5の一時読取り失敗も同jobの更新で再表示できた。元5台停止後も保存M2を新GETで表示し、新規M1はjob/0点を作らず拒否。元62点・全partition/projection不変、96GiB/認証保持。全P/Mの新ブラウザ通し試験・原本への自動提出とは分ける。詳細はweb_portal_poc/verification/2026-10-29-browser-checks-accepted.public.json。
+
+
+## 原本への自動保存候補（2026-10-29、AWS未適用）
+
+`test_portal_submission`9件と既存checker/job接続を合わせた46件、既存採点API14件、Node51件合格。新試験はMotoで実canonical transactionを使い、M原本への保存、未知項目時の選択点保持、P/M0成績外、同requestの原受付再利用/新しい低得点の巻き戻し防止、原本write直前失効時の全書込み拒否、原本保存後の応答喪失→GETで元受付の読取りを確認する。POST完了で自動保存し、再送は元reportのままSSM再実行なし。新Node2件は原本保存済み/未確認/Pの区別と同job再送のPOSTを確認。今回の受入はweb_portal_poc/CANONICAL-SUBMISSION-ACCEPTANCE.md。

@@ -54,3 +54,26 @@ test('completed checks show actual task points, UNKNOWN and escaped rows in all 
   result.result.checks[0].id='<script>';
   const malformed=await app(request(`/checks?task_id=M1&job_id=${value.job_id}`));assert.equal(malformed.status,503);assert.doesNotMatch(await malformed.text(),/<script>/);
 });
+test('saved canonical receipt and unconfirmed/practice outcomes are shown accurately',async()=>{
+  const id='22222222-2222-4222-8222-222222222222';
+  for(const [task,counted,evaluable,word] of [['M1',true,true,'成績原本に保存'],['M5',true,false,'確定済みの成績は維持'],['P1',false,true,'成績外']]){
+    const result={status:'ok',job:{...value,task_id:task,phase:'report_ready'},result:{task_id:task,request_id:id,checked_at:'2026-10-29T12:00:00Z',
+      checks:[{id:'WEB02_PUBLIC_HTTP',status:'PASS'}],score:{raw_earned:8,raw_maximum:8,counts_toward_assessment:counted,evaluable}},
+      submission:{status:'saved',request_id:id,received_at:'2026-10-29T12:01:00Z',counts_toward_assessment:counted,evaluable}};
+    const app=createApp({...credentials,checker:async()=>result});
+    const res=await app(request(`/checks?task_id=${task}&job_id=${value.job_id}`));
+    assert.equal(res.status,200);const text=await res.text();assert.ok(text.includes(word));assert.match(text,/2026-10-29T12:01/);assert.doesNotMatch(text,/name="operation" value="submit"/);
+    result.submission.request_id='33333333-3333-4333-8333-333333333333';
+    assert.equal((await app(request(`/checks?task_id=${task}&job_id=${value.job_id}`))).status,503);
+  }
+});
+test('pending result offers a same-report POST retry without automatic GET writes',async()=>{
+  const calls=[];const ready={status:'ok',job:{...value,phase:'report_ready'},result:{task_id:'M1',checked_at:'2026-10-29T12:00:00Z',
+    checks:[{id:'WEB02_PUBLIC_HTTP',status:'PASS'}],score:{raw_earned:8,raw_maximum:8,counts_toward_assessment:true,evaluable:true}},submission:{status:'pending'}};
+  const app=createApp({...credentials,checker:async event=>{calls.push(event);return ready;}});
+  const get=await app(request(`/checks?task_id=M1&job_id=${value.job_id}`));const text=await get.text();
+  assert.match(text,/name="operation" value="submit"/);assert.doesNotMatch(text,/data-check-progress|<script/);assert.equal(calls[0].operation,'result');
+  const submit={...value,operation:'submit'};
+  assert.equal((await app(request('/checks',{method:'POST',headers,body:body(submit)}))).status,303);
+  assert.deepEqual(calls[1],{subject:'1234567890',...submit});
+});

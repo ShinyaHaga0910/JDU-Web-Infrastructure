@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-29",
+  "phase": "canonical_submission_plan_not_applied",
+  "checker_code_sha256": "e29ad4ec55b375a16534ed0c0c5a68e8482bc931419932f5f2f02a9de01dcdfa",
+  "source_bundle_sha256": "48294e358ab9e8d7d0eb564e52393fac05d06f82d7c4d2c191669b3e43745985",
+  "aws_web_code_sha256": "6c399ca8661e19ac9cdc91ba217edb280cce8559b42781f45dba3c45d52cf8bb",
+  "web_files": 4481,
+  "web_all_files_content_sha256": "d66feb209cf4db40659ea1b2e0b35770927317a82b291cb785f54650eed45189",
+  "code_sha256": {
+    "portal_submission.py": "78da9db538912db3395276125292e4cfa24c259d06235b51c6ac2181b9cc4b3a",
+    "portal_checker_handler.py": "3e7b0f0176ceebe5411952bd572201b9a9c7ce785fc7ba71e5beaf60aee4ecec",
+    "student_checker_handler.py": "fef70c690b61bb589372d944eb4ff93b642735d31da5f645e8cb2674009a4e6c",
+    "update_checker.py": "d2b23217e088399f589dbf4d758bdaf351efe3dc445495ed1467d177881091bd",
+    "web/checks.mjs": "32860359ff6037ffaa0253cbd1c4c3463a84619dcc0fd1f33ddd07b9d5f15283"
+  },
+  "shared_canonical_api_sha256": "b1003c4cb51d35db1b6055f8ba6876a606967717b8d7661c7730333fd136f606",
+  "tests": {
+    "new_canonical_submission_moto": 9,
+    "portal_and_observer_total_including_new": 46,
+    "existing_assessment_api": 14,
+    "node": 51,
+    "failures": 0,
+    "skipped": 0
+  },
+  "prepared_updates": [
+    "Existing student checker Code and unchanged teacher Invoke ARN reference",
+    "Existing teacher checker Code",
+    "Existing Web Revision and Endpoint"
+  ],
+  "new_resources": 0,
+  "new_IAM_policies": 0,
+  "new_credentials": 0,
+  "before_grade_rows_backed_up_in_teacher_CloudShell_only": 75,
+  "canonical_report_source": "Fixed IAM-invoked student checker retained outbox, never a browser report",
+  "GET_writes_grades": false,
+  "unknown_replaces_eligible_grade": false,
+  "same_request_retry_reorders_newer_grade": false,
+  "canonical_write_capability_confirmation_received": false,
+  "deployed": false,
+  "real_browser_canonical_submission_accepted": false
+}

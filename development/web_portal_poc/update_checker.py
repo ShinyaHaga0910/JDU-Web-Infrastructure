@@ -66,7 +66,7 @@ def run(mode, created_path, code_path, receipt):
         fn=lam.get_function_configuration(FunctionName=old['outputs']['CheckerArn'])
         if base64.b64decode(fn['CodeSha256']).hex()!=plan['code_sha256'] or fn['State']!='Active':
             raise ValueError('Updated code differs')
-        with receipt.with_name('student-checks.updated.private.json').open('x',encoding='utf-8') as f:
+        with receipt.with_name(plan['side']+'-checks.updated.private.json').open('x',encoding='utf-8') as f:
             json.dump({**plan,'stack_status':'UPDATE_COMPLETE'},f,indent=2)
         print('CHECKER_CODE_UPDATE_COMPLETE',plan['code_sha256'],flush=True)
 

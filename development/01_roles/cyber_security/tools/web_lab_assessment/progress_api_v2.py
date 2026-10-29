@@ -9,9 +9,8 @@ from registry import CONTRACT_ID, CONTRACT_SHA256, score, validate_report
 
 
 class AssessmentStore(legacy.DynamoStore):
-    def submit(self, meta, attempt, summary):
-        if attempt['report']['schema_version'] == 1:
-            return super().submit(meta, attempt, summary)
+    def submission_writes(self, meta, attempt, summary):
+        """Canonical v2 writes, also used by the private portal authorizer."""
         latest = dict(summary, pk=meta['pk'], sk=current_key(attempt['report']['mission_id']),
                       checks=attempt['report']['checks'])
         writes = [
@@ -30,6 +29,12 @@ class AssessmentStore(legacy.DynamoStore):
             writes.append({'Put': {'TableName': self.table, 'Item': self.pack(grade),
                                    'ConditionExpression': 'attribute_not_exists(received_at) OR received_at<=:now',
                                    'ExpressionAttributeValues': self.pack({':now': attempt['received_at']})}})
+        return writes
+
+    def submit(self, meta, attempt, summary):
+        if attempt['report']['schema_version'] == 1:
+            return super().submit(meta, attempt, summary)
+        writes = self.submission_writes(meta, attempt, summary)
         try:
             self.client.transact_write_items(TransactItems=writes)
         except self.client.exceptions.TransactionCanceledException:
@@ -65,29 +70,40 @@ class AssessmentStore(legacy.DynamoStore):
         return labs
 
 
+def assessment_attempt(row, body):
+    """Prepare one canonical report, after the caller has authorized its Lab.
+
+    This function is not authentication and does not write anything. HTTP uses
+    the existing Bearer authorizer; the private portal uses its approved owner
+    binding and checks that binding in the same transaction as these writes.
+    """
+    if row.get('deployment_id') != body.get('deployment_id') or body.get('release_id') != row['release_id']:
+        raise legacy.ApiError(409, 'unregistered or mismatched deployment')
+    try:
+        validate_report(body, row['instances'])
+    except (ValueError, TypeError, KeyError, AttributeError):
+        raise legacy.ApiError(400, 'invalid canonical assessment report')
+    stamp = legacy.now_iso()
+    summary = dict(kind='assessment', mission_id=body['mission_id'], request_id=body['request_id'],
+                       deployment_id=body['deployment_id'], received_at=stamp, checked_at=body['checked_at'],
+                       contract_id=CONTRACT_ID, contract_sha256=CONTRACT_SHA256,
+                       passed=sum(c['status'] == 'PASS' for c in body['checks']), total=len(body['checks']),
+                       unknown=sum(c['status'] not in ('PASS', 'FAIL') for c in body['checks']), **score(body))
+    receipt = dict(ok=True, stored=True, lab_id=row['lab_id'], deployment_id=body['deployment_id'],
+                       release_id=row['release_id'], request_id=body['request_id'], received_at=stamp,
+                       kind='assessment', contract_id=CONTRACT_ID, contract_sha256=CONTRACT_SHA256)
+    attempt = dict(pk=row['pk'], sk='REQUEST#' + body['request_id'], report=body, receipt=receipt,
+                       received_at=stamp, body_sha256=legacy.digest(legacy.encoded(body)))
+    return attempt, summary
+
+
 class AssessmentService(legacy.ProgressService):
     def submit(self, event):
         body = legacy.parse_body(event)
         if body.get('schema_version') == 1:
             return super().submit(event)
         row = self.lab(event, body)
-        if row.get('deployment_id') != body.get('deployment_id') or body.get('release_id') != row['release_id']:
-            raise legacy.ApiError(409, 'unregistered or mismatched deployment')
-        try:
-            validate_report(body, row['instances'])
-        except (ValueError, TypeError, KeyError, AttributeError):
-            raise legacy.ApiError(400, 'invalid canonical assessment report')
-        stamp = legacy.now_iso()
-        summary = dict(kind='assessment', mission_id=body['mission_id'], request_id=body['request_id'],
-                       deployment_id=body['deployment_id'], received_at=stamp, checked_at=body['checked_at'],
-                       contract_id=CONTRACT_ID, contract_sha256=CONTRACT_SHA256,
-                       passed=sum(c['status'] == 'PASS' for c in body['checks']), total=len(body['checks']),
-                       unknown=sum(c['status'] not in ('PASS', 'FAIL') for c in body['checks']), **score(body))
-        receipt = dict(ok=True, stored=True, lab_id=row['lab_id'], deployment_id=body['deployment_id'],
-                       release_id=row['release_id'], request_id=body['request_id'], received_at=stamp,
-                       kind='assessment', contract_id=CONTRACT_ID, contract_sha256=CONTRACT_SHA256)
-        attempt = dict(pk=row['pk'], sk='REQUEST#' + body['request_id'], report=body, receipt=receipt,
-                       received_at=stamp, body_sha256=legacy.digest(legacy.encoded(body)))
+        attempt, summary = assessment_attempt(row, body)
         return legacy.response(200, self.store.submit(row, attempt, summary))
 
     def classify(self, event):

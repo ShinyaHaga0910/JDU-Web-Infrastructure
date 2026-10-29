@@ -96,7 +96,8 @@ def prepare(directory,code_path,services,template_digest,receipt,sts,cfn,s3,*,ch
         'artifact':{'bucket':bucket,'key':key,'version':version}}
     write_new(receipt.with_name('enrollment-web.ready.private.json'),ready)
     print(json.dumps({'marker':'AUTHENTICATED_ENROLLMENT_WEB_PLAN_READY','executed':False,'changed_resources':2,
-        'origin':ORIGIN,'code_sha256':sha,'source_template_digest':template_digest,'original_grade_writes':False}),flush=True)
+        'origin':ORIGIN,'code_sha256':sha,'source_template_digest':template_digest,
+        'canonical_submission_enabled':checker_arn is not None}),flush=True)
 
 
 if __name__=='__main__':
