@@ -74,6 +74,9 @@ class GatewayTest(unittest.TestCase):
         self.assertEqual(self.run_gateway(), {'status': 'unauthorized'})
 
     def test_failed_or_large_response_does_not_become_a_stop_or_zero(self):
+        private = {'status': 'unavailable', 'diagnostic': {'code': 'AccessDenied', 'operation': 'DescribeStacks'}}
+        self.client.invoke.return_value = {'StatusCode': 200, 'Payload': io.BytesIO(json.dumps(private).encode())}
+        self.assertEqual(self.run_gateway(), {'status': 'unavailable'})
         self.client.invoke.return_value = {'StatusCode': 200, 'Payload': io.BytesIO(b'x' * 65537)}
         self.assertEqual(self.run_gateway(), {'status': 'unavailable'})
         self.client.invoke.side_effect = RuntimeError('sensitive internal text')

@@ -33,6 +33,20 @@ class WebPackageTest(unittest.TestCase):
         self.assertEqual(template['Resources']['Endpoint']['Properties']['AuthType'], 'ApplicationManaged')
         self.assertFalse(any(r['Type'].startswith('AWS::IAM::') for r in template['Resources'].values()))
 
+    def test_artifact_service_grant_is_scoped_to_one_same_account_function(self):
+        template = json.loads((package.HERE / 'web-artifacts.template.json').read_text(encoding='utf-8'))
+        resources = template['Resources']
+        self.assertEqual({v['Type'] for v in resources.values()}, {'AWS::S3::Bucket', 'AWS::S3::BucketPolicy'})
+        props = resources['ArtifactBucket']['Properties']
+        self.assertTrue(all(props['PublicAccessBlockConfiguration'].values()))
+        self.assertEqual(props['VersioningConfiguration']['Status'], 'Enabled')
+        statement = resources['LambdaCodeReadPolicy']['Properties']['PolicyDocument']['Statement'][0]
+        self.assertEqual(statement['Principal'], {'Service':'lambda.amazonaws.com'})
+        self.assertEqual(set(statement['Action']), {'s3:GetObject','s3:GetObjectVersion'})
+        self.assertEqual(statement['Resource'], {'Fn::Sub':'${ArtifactBucket.Arn}/portal/*'})
+        self.assertEqual(statement['Condition']['StringEquals']['aws:SourceAccount'], {'Ref':'AWS::AccountId'})
+        self.assertTrue(statement['Condition']['ArnLike']['aws:SourceArn']['Fn::Sub'].endswith('web-function/${WebFunctionName}/revision/*'))
+
 
 if __name__ == '__main__':
     unittest.main()

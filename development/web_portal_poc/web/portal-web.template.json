@@ -12,6 +12,11 @@
     "GoogleClientSecret": {"Type": "String", "Default": "disabled", "NoEcho": true},
     "GradeReaderFunctionArn": {"Type": "String", "Default": "disabled"},
     "BindingTableName": {"Type": "String", "Default": "disabled"},
+    "AcceptanceEnabled": {"Type": "String", "Default": "false", "AllowedValues": ["false", "true"]},
+    "AcceptanceProbeArn": {"Type": "String", "Default": "disabled"},
+    "AcceptanceGradeTableName": {"Type": "String", "Default": "disabled"},
+    "AcceptanceLabId": {"Type": "String", "Default": "disabled"},
+    "AcceptanceDeploymentId": {"Type": "String", "Default": "disabled"},
     "ReleaseId": {"Type": "String", "AllowedPattern": "[a-f0-9]{40,64}"}
   },
   "Resources": {
@@ -20,13 +25,15 @@
     "Revision": {"Type": "AWS::Lambda::WebFunctionRevision", "Properties": {
       "FunctionName": {"Ref": "Portal"}, "Description": {"Ref": "ReleaseId"},
       "BuildConfig": {"CodeConfig": {"S3Object": {"Bucket": {"Ref": "ArtifactBucket"}, "Key": {"Ref": "ArtifactKey"}, "VersionId": {"Ref": "ArtifactVersion"}}}, "RuntimeConfig": {"Runtime": "nodejs24.x"}},
-      "ServiceConfig": {"ExecutionRoleArn": {"Ref": "LabRoleArn"}, "TimeoutSeconds": 45, "MaxConcurrencyPerEnvironment": 4,
+      "ServiceConfig": {"ExecutionRoleArn": {"Ref": "LabRoleArn"}, "TimeoutSeconds": 45, "MaxConcurrencyPerEnvironment": 2,
         "EnvironmentVariables": {"PORTAL_MODE": {"Ref": "PortalMode"}, "PUBLIC_ORIGIN": {"Ref": "PublicOrigin"},
-          "GOOGLE_CLIENT_ID": {"Ref": "GoogleClientId"}, "GOOGLE_CLIENT_SECRET": {"Ref": "GoogleClientSecret"}, "GRADE_READER_FUNCTION_ARN": {"Ref": "GradeReaderFunctionArn"}, "PORTAL_BINDING_TABLE": {"Ref": "BindingTableName"}},
+          "GOOGLE_CLIENT_ID": {"Ref": "GoogleClientId"}, "GOOGLE_CLIENT_SECRET": {"Ref": "GoogleClientSecret"}, "GRADE_READER_FUNCTION_ARN": {"Ref": "GradeReaderFunctionArn"}, "PORTAL_BINDING_TABLE": {"Ref": "BindingTableName"},
+          "PORTAL_ACCEPTANCE_ENABLED": {"Ref": "AcceptanceEnabled"}, "PORTAL_ACCEPTANCE_PROBE_ARN": {"Ref": "AcceptanceProbeArn"},
+          "PORTAL_ACCEPTANCE_GRADE_TABLE": {"Ref": "AcceptanceGradeTableName"}, "PORTAL_ACCEPTANCE_LAB_ID": {"Ref": "AcceptanceLabId"}, "PORTAL_ACCEPTANCE_DEPLOYMENT_ID": {"Ref": "AcceptanceDeploymentId"}},
         "TelemetryConfig": {"LoggingConfig": {"LogGroup": {"Ref": "LogGroup"}, "ApplicationLogLevel": "WARN", "SystemLogLevel": "WARN"}}}
     }},
     "Endpoint": {"Type": "AWS::Lambda::WebFunctionEndpoint", "Properties": {"FunctionName": {"Ref": "Portal"}, "EndpointName": "portal", "EndpointType": "HomeRegion", "AuthType": "ApplicationManaged",
-      "RevisionWeights": [{"RevisionId": {"Fn::GetAtt": ["Revision", "RevisionId"]}, "Weight": 100}], "ScalingConfig": {"MaxEnvironments": 2}, "ThrottleConfig": {"RateLimit": 100}}}
+      "RevisionWeights": [{"RevisionId": {"Fn::GetAtt": ["Revision", "RevisionId"]}, "Weight": 100}], "ScalingConfig": {"MaxEnvironments": 1}, "ThrottleConfig": {"RateLimit": 2}}}
   },
   "Outputs": {"PortalUrl": {"Value": {"Fn::Sub": "https://${Endpoint.DomainName}"}}}
 }

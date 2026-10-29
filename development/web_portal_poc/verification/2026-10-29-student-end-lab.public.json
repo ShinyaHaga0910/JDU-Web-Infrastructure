@@ -1,0 +1,22 @@
+{
+  "verified_at": "2026-10-29T05:10:51.503366+00:00",
+  "scope": "Private IAM probe; browser identity integration is not tested",
+  "student_lab_ended": true,
+  "teacher_lab_ended": false,
+  "teacher_ec2": "stopped",
+  "grade": {"raw_earned": 62, "raw_maximum": 62},
+  "full_grade_projection_unchanged": true,
+  "whole_lab_partition_unchanged": true,
+  "student_status_read_accepted": false,
+  "student_status_result": {
+    "status": "unavailable",
+    "diagnostic": {"stage": "student_invoke", "code": "KMSAccessDeniedException"}
+  },
+  "earlier_observation_after_end": {
+    "status": "unavailable",
+    "diagnostic": {"stage": "student_observation", "code": "AccessDenied", "operation": "DescribeStacks"}
+  },
+  "teacher_probe_code_sha256": "71e37ead8f52689b55726bcbde673acff8e9851ffca4d5dd362ff1876cf3fe26",
+  "student_status_code_sha256": "d69a54c60c23556dd50160678adf4912e1f3064d50ecdf1f764718665f23f096",
+  "permissions_were_not_relaxed": true
+}

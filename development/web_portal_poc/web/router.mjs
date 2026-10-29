@@ -77,10 +77,21 @@ function statusHtml(lang, observation) {
   return `<section><p>${escape(t.observed)}: ${escape(timestamp)}</p><div class="table-wrap"><table><thead><tr><th scope="col">${escape(t.role)}</th><th scope="col">${escape(t.ec2)}</th><th scope="col">${escape(t.ssm)}</th><th scope="col">${escape(t.publicIp)}</th></tr></thead><tbody>${body}</tbody></table></div></section>`;
 }
 
-export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch, getGrade, getStatus, sessions}={}) {
+export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch, getGrade, getStatus, sessions, getAcceptanceHealth}={}) {
   return async request => {
     const url=new URL(request.url), lang=language(url), t=text[lang];
     if (url.pathname === '/healthz') return new Response('ok',{headers:{...security,'Content-Type':'text/plain; charset=utf-8'}});
+    if (url.pathname === '/healthz/acceptance') {
+      if (env.PORTAL_MODE!=='closed' || env.PORTAL_ACCEPTANCE_ENABLED!=='true' || typeof getAcceptanceHealth!=='function') return response('Not found',404);
+      if (!['GET','HEAD'].includes(request.method)) return response('Method not allowed',405);
+      let result;
+      try { result=await getAcceptanceHealth(); } catch { result={}; }
+      const clean=Object.fromEntries(['storage','savedGrades','gradeService'].map(key=>[key,result?.[key]===true]));
+      const healthy=Object.values(clean).every(Boolean);
+      clean.checkedAt=typeof result?.checkedAt==='string' && result.checkedAt.length<=40 && Number.isFinite(Date.parse(result.checkedAt)) ? new Date(result.checkedAt).toISOString() : null;
+      return new Response(JSON.stringify(clean),{status:healthy && clean.checkedAt?200:503,
+        headers:{...security,'Content-Type':'application/json; charset=utf-8'}});
+    }
     let config;
     try { config=configFrom(env); } catch { return response('Unavailable',503); }
     if (url.origin !== config.origin) return response('Forbidden',403);

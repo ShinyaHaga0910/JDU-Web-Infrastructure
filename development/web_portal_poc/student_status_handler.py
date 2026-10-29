@@ -6,6 +6,7 @@ CloudFormation resources and EC2 tags before any observations are returned.
 No API here can start, stop, create or modify instances, or run a command.
 """
 import os
+import re
 
 import status
 
@@ -24,9 +25,18 @@ def serve(event, env, sts, cloudformation, ec2, ssm):
         binding = read_binding(env)
         observation = status.observe(sts, cloudformation, ec2, ssm, binding)
         return {'status': 'ok', 'observation': observation}
-    except Exception:
+    except Exception as exc:
         # No raw event, credentials, private address or AWS error in logs.
-        return {'status': 'unavailable'}
+        answer = {'status': 'unavailable'}
+        response = getattr(exc, 'response', {})
+        code = response.get('Error', {}).get('Code') if isinstance(response, dict) else None
+        operation = getattr(exc, 'operation_name', None)
+        if (isinstance(code, str) and re.fullmatch(r'[A-Za-z0-9]{1,80}', code)
+                and isinstance(operation, str) and re.fullmatch(r'[A-Za-z0-9]{1,80}', operation)):
+            # Only the approved IAM caller receives these bounded names.
+            # The public status gateway discards diagnostics entirely.
+            answer['diagnostic'] = {'code': code, 'operation': operation}
+        return answer
 
 
 def handler(event, context):

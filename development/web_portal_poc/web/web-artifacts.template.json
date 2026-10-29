@@ -1,0 +1,23 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Private versioned Web Function code with a single-function service grant",
+  "Parameters": {"WebFunctionName": {"Type": "String", "AllowedPattern": "[A-Za-z0-9_-]{1,64}"}},
+  "Resources": {
+    "ArtifactBucket": {"Type": "AWS::S3::Bucket", "DeletionPolicy": "Retain", "UpdateReplacePolicy": "Retain", "Properties": {
+      "BucketEncryption": {"ServerSideEncryptionConfiguration": [{"ServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]},
+      "VersioningConfiguration": {"Status": "Enabled"},
+      "OwnershipControls": {"Rules": [{"ObjectOwnership": "BucketOwnerEnforced"}]},
+      "PublicAccessBlockConfiguration": {"BlockPublicAcls": true, "IgnorePublicAcls": true, "BlockPublicPolicy": true, "RestrictPublicBuckets": true}
+    }},
+    "LambdaCodeReadPolicy": {"Type": "AWS::S3::BucketPolicy", "Properties": {
+      "Bucket": {"Ref": "ArtifactBucket"}, "PolicyDocument": {"Version": "2012-10-17", "Statement": [{
+        "Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"},
+        "Action": ["s3:GetObject", "s3:GetObjectVersion"],
+        "Resource": {"Fn::Sub": "${ArtifactBucket.Arn}/portal/*"},
+        "Condition": {"StringEquals": {"aws:SourceAccount": {"Ref": "AWS::AccountId"}},
+          "ArnLike": {"aws:SourceArn": {"Fn::Sub": "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:web-function/${WebFunctionName}/revision/*"}}}
+      }]}
+    }}
+  },
+  "Outputs": {"BucketName": {"Value": {"Ref": "ArtifactBucket"}}}
+}

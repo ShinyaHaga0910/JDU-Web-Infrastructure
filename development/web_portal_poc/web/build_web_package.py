@@ -9,7 +9,7 @@ from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 HERE = Path(__file__).resolve().parent
-SOURCE = ('index.js', 'auth.mjs', 'router.mjs', 'grade-client.mjs', 'sessions.mjs', 'package.json')
+SOURCE = ('index.js', 'auth.mjs', 'router.mjs', 'grade-client.mjs', 'sessions.mjs', 'acceptance-health.mjs', 'package.json')
 
 
 def build(destination):

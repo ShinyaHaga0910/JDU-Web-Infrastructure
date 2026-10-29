@@ -55,6 +55,28 @@ class ProbeTest(unittest.TestCase):
         self.assertEqual(self.f.store.labs_calls, [])
         self.client.invoke.assert_not_called()
 
+    def test_private_probe_reports_only_bounded_aws_error_code(self):
+        from botocore.exceptions import ClientError
+        self.f.row['instances'] = {role: 'i-' + str(i)*17 for i,role in enumerate(('bastion','web','dns','db','repo'),1)}
+        self.client.invoke.side_effect = ClientError({'Error': {'Code': 'TooManyRequestsException',
+            'Message': 'sensitive raw detail must not be returned'}}, 'Invoke')
+        result = serve({'operation': 'status'}, self.env, self.f.store, self.client)
+        self.assertEqual(result, {'status': 'unavailable', 'diagnostic': {
+            'stage': 'student_invoke', 'code': 'TooManyRequestsException'}})
+        self.assertNotIn('sensitive', json.dumps(result))
+        self.assertEqual(serve({'operation':'grade'},self.env,self.f.store,self.client)['status'],'ok')
+
+    def test_student_diagnostics_are_bounded_and_do_not_become_a_zero(self):
+        self.f.row['instances'] = {role: 'i-' + str(i)*17 for i,role in enumerate(('bastion','web','dns','db','repo'),1)}
+        answer = {'status':'unavailable','diagnostic':{'code':'AccessDenied','operation':'DescribeStacks'}}
+        self.client.invoke.return_value = {'StatusCode':200,'Payload':io.BytesIO(json.dumps(answer).encode())}
+        self.assertEqual(serve({'operation':'status'},self.env,self.f.store,self.client),
+            {'status':'unavailable','diagnostic':{'stage':'student_observation',**answer['diagnostic']}})
+        self.assertEqual(serve({'operation':'grade'},self.env,self.f.store,self.client)['grade']['raw_earned'],62)
+        answer['diagnostic']['code'] = '<private message>'
+        self.client.invoke.return_value = {'StatusCode':200,'Payload':io.BytesIO(json.dumps(answer).encode())}
+        self.assertNotIn('private message',repr(serve({'operation':'status'},self.env,self.f.store,self.client)))
+
     def test_probe_package_is_reproducible_loadable_and_private(self):
         with tempfile.TemporaryDirectory() as directory:
             a, b = Path(directory)/'a.zip', Path(directory)/'b.zip'

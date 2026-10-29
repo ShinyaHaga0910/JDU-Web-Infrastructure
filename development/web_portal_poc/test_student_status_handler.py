@@ -53,3 +53,11 @@ class StudentHandlerTest(unittest.TestCase):
         self.assertEqual(result['status'], 'ok')
         self.assertTrue(all(v['ec2_state'] == v['ssm_state'] == 'unknown' for v in result['observation']['instances']))
         self.assertNotIn('private information', repr(result))
+
+    def test_private_diagnostic_contains_only_aws_operation_and_code(self):
+        from botocore.exceptions import ClientError
+        self.fixture.cfn.describe_stacks.side_effect = ClientError({'Error': {
+            'Code': 'AccessDenied', 'Message': 'private details must not leave the function'}}, 'DescribeStacks')
+        self.assertEqual(self.run_handler({'operation':'status'}), {'status':'unavailable',
+            'diagnostic': {'code':'AccessDenied','operation':'DescribeStacks'}})
+        self.fixture.ec2.describe_instances.assert_not_called()

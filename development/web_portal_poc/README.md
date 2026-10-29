@@ -1,6 +1,6 @@
 # Webポータル：読取り処理の小規模試作
 
-2026-10-27。Issue [#1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1) の初期試作。**まだWeb Functionsに配備していない**。学生の画面・学生AWSとの認証済み接続・End Lab後の実機受入は未実施で、授業で使える製品ではない。
+2026-10-29更新。Issue [#1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1) の初期試作。**まだWeb Functionsに配備していない**。教師/学生のIAM接続とEC2全台停止中の読取りを実測し、学生End Lab後の制約も確認した。学生の画面・Google本人確認との統合・教師End Lab後は未受入で、授業で使える製品ではない。
 
 ## 今回のコード
 
@@ -53,6 +53,32 @@
 状態機能追加後、学生側Lambda・教師側内部Lambda・Web Functionsの3 templateを教師AWSでhash照合し `ValidateTemplate` に受理された。教師LabRoleから予定する学生側Lambda ARNへの `lambda:InvokeFunction` はIAM policy simulationで `allowed`。学生側のresource policy・実権限・実呼出しは確認しておらず、simulationだけではcross-account通信成功を意味しない。学生側Lambdaには、教師LabRoleだけへの新たな呼出し許可を含むため配備時に確認が必要。
 
 ## 残る受入
+
+### 最新の実機到達点（2026-10-29）
+
+本人承認後、教師probe StackもCREATE_COMPLETEとなった。実CodeSha256と既存LabRoleの一致を確認し、その関数から既存の保存成績62/62点と、別学生AWSの5台running/SSM Onlineを取得した。読取り前後のLab全partitionのSHA-256は一致した。指定教師LabRole→学生LabRoleの実呼出し成功であり、CloudShellからの前述の拒否と区別する。
+
+続いて検証操作として教師の中継EC2と学生の元5台を明示的に停止した。元構成/ディスク/鍵の置換や再作成は行っていない。教師EC2 stoppedで同じ成績全項目を読めることを確認。その後 `verify_teacher_probe.py` 本体をhash照合して実行し、教師EC2と学生5台がすべてstoppedでも、保存成績62/62と全項目が一致、Lab全partitionが不変、probeの公開URLがないこと、起動要求/他Lab指定の拒否を確認した。5台のSSMはunknownと返り、その値を成績0点へ変えなかった。
+
+[全台停止時の実測記録](verification/2026-10-29-stopped.public.json)。検査コードは読取りだけを行い、実行するだけで停止/再開しない。既存の中継EC2も現在stoppedのため、従来の中継経由の提出は再開が必要。Web Functions配備、Google本人確認と学生AWSとの登録、学生向けブラウザ画面の実受入は未完了。
+
+### 学生End Lab後の結果と現在の境界
+
+本人が学生LabをEnd Labにし、画面のTerminated / Lab terminated / 00:00を確認。教師Labは開始したまま、教師EC2はstoppedの条件で、保存成績62/62と全項目を読めた。一方、学生状態はunavailableとなり、全項目の停止中受入scriptは合格しなかった。EC2だけの停止と、Labセッションの終了は同じ条件ではない。
+
+秘密を出さない限定診断を追加し、教師probeはv3（SHA-256 `71e37ead8f52689b55726bcbde673acff8e9851ffca4d5dd362ff1876cf3fe26`）、学生statusはv2（`d69a54c60c23556dd50160678adf4912e1f3064d50ecdf1f764718665f23f096`）へCodeだけを更新。IAM・元5台の構成は変更していない。学生Labの通常再開とAWS再ログイン後、同じ5台running/SSM Online、同じ成績全項目と全partitionを再確認した。
+
+その後もう一度学生LabをEnd Labにすると、まず学生Lambda内の `DescribeStacks` がAccessDenied、時間をおいた呼出しでは `Invoke` 段階でKMSAccessDeniedExceptionとなった。[実測記録](verification/2026-10-29-student-end-lab.public.json)。同じ時点でも保存成績全項目と元Lab全partitionは不変だった。公開画面へはこの診断を渡さず、状態取得不能とする。取消policyの解除やKMS/IAMの緩和はしていない。学生CloudShellの古い資格情報もvoc-cancel-credで拒否されたが、Lambda側と同一の取消機構だとは断定しない。
+
+**現在は学生Lab終了・教師Lab開始・教師EC2停止**。教師Lab自体の終了後に成績API/DBを読めることは未確認である。Web FunctionsのHTTPが残ることだけでは、依存先の継続利用は証明できない。
+
+### 次の教師End Lab試験用の候補（未配備）
+
+`web/acceptance-health.mjs` と `/healthz/acceptance` は、明示的なclosed-mode試験設定だけで動く読取り候補。固定検証Labのmetadata/成績行の取得可否、既存Python成績projectionの呼出し可否を別々のbooleanで返す。点数・メール・token・AWSエラー本文を公開しない。通常の学生運用modeでは404、個別成績画面は閉鎖したままである。30秒の結果cacheは確認日時付きなので、End Lab後の試験では終了時刻より新しいcheckedAtを確認する。
+
+`web/web-artifacts.template.json` は専用の暗号化・非公開・version管理付きS3と、同account内の指定Web Functionのrevisionだけへcodeを読ませるservice許可の候補。[AWSのcode搬入条件](https://docs.aws.amazon.com/lambda/latest/dg/web-functions-code-s3.html)に従い、既存のversion管理なしの教師S3を流用して設定変更しない。Web Functions側はNode24、1実行環境・同時2・毎秒2要求までとし、試験中の呼出しを抑える。
+
+Node 21件・Web package 3件が合格、npm auditの既知問題は0。ZIP SHA-256 `6a27a1d815b82b6e3d54dc6687b1e8ed1dca794cbcb00fbd637ccdf4485cd9fa`、3,271,147 bytes。新しい2 templateのAWS検査、service許可と公開HTTPS入口の適用前確認、実配備とHTTP受入はこれから。Google認証/本人bindingの受入を代替するものではない。
 
 ### 2026-10-29の再開確認
 

@@ -61,6 +61,12 @@
 
 教師側の固定検証Lab専用・非公開Lambdaを準備し、模擬試験5件とpackage検査を通過。既存の非公開S3へhash付き別key/上書き禁止/checksum付きで収録し、AWSでtemplateとCREATE change setを確認。変更はLambda 1つの追加だけで、未適用。元EC2/DB/権限は変更しない。これを使ってEC2に依存しない保存成績読取りと指定LabRole間の実呼出しを試す。Google・教師承認・ブラウザ受入の代用にはしない。
 
+**同日の最新結果**：本人承認後、教師probeも作成し、hashとLabRoleを照合。既存成績62/62点の読取りと、教師LabRole→別学生Lambda→実5台の取得に成功した。教師EC2と学生5台を検証操作で明示停止した後も、同じ成績全項目/全Lab partitionの不変、5台stopped、公開URLなし、起動/別Lab要求の拒否を `verify_teacher_probe.py` 本体で確認。状態取得時のSSM unknownを0点に変えていない。[実測記録](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/blob/main/development/web_portal_poc/verification/2026-10-29-stopped.public.json)。元6台はstoppedで保持し、新規2 Lambda/学生用S3/既存の試用tableは残っている。ブラウザ本人確認の受入や教師側End Lab後の実証は別項目。
+
+**学生End Labの実測（最新）**：教師Lab開始・教師EC2停止の条件で、学生Lab終了後も保存成績62/62と全項目、全Lab partitionの不変を確認。一方、学生状態は構成読取りのAccessDenied、その後はKMSAccessDeniedExceptionで取得不能。取消制限を緩めず、状態不明として扱う。Codeだけの限定診断更新と再開時の5台/成績不変も確認した。[終了後記録](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/blob/main/development/web_portal_poc/verification/2026-10-29-student-end-lab.public.json)。現在は学生Lab終了・教師Lab開始・教師EC2停止。教師Lab終了後とブラウザ本人確認は未受入。
+
+次の教師End Lab試験に向け、閉鎖中だけ使うWeb Functionsの読取り可否probeと専用version管理付きS3/service許可を準備。外部へ返すのは3つの可否booleanと確認日時だけで、成績そのものは公開しない。Node21件・package3件・npm audit 0を確認したが、まだAWS未配備。新しい公開入口・実行権限の適用前確認後に進める。
+
 - [x] Learner LabでWeb Functionsが利用できることを確認（2026-10-23本人確認）。
 - [x] End Lab後もWeb Functions部分は利用できたことを確認（2026-10-23本人確認）。EC2の継続稼働とは区別する。
 - [x] 公式仕様・既存コードから構成案と実証の順番を整理。今回AWS操作なし。

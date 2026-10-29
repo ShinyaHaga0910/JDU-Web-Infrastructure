@@ -1,0 +1,22 @@
+{
+  "verified_at": "2026-10-29T04:35:36.510372+00:00",
+  "scope": "Private teacher IAM acceptance probe; not browser authentication acceptance",
+  "teacher_ec2": "stopped",
+  "grade": {"raw_earned": 62, "raw_maximum": 62},
+  "full_grade_projection_unchanged": true,
+  "whole_lab_partition_unchanged": true,
+  "no_probe_public_endpoint": true,
+  "invalid_requests_rejected": true,
+  "student_nodes": [
+    {"role": "bastion", "ec2_state": "stopped", "ssm_state": "unknown"},
+    {"role": "web", "ec2_state": "stopped", "ssm_state": "unknown"},
+    {"role": "dns", "ec2_state": "stopped", "ssm_state": "unknown"},
+    {"role": "db", "ec2_state": "stopped", "ssm_state": "unknown"},
+    {"role": "repo", "ec2_state": "stopped", "ssm_state": "unknown"}
+  ],
+  "probe_code_sha256": "c53f93a644a2c7948e5cb175896150a37903c27917a12121f7c0f47155394d6c",
+  "verification_source_sha256": "dbaca0eadfa47a72c27476f6975650329122e102f799f5815cf64ee2c600bb7c",
+  "student_end_lab_verified_in_this_record": false,
+  "teacher_end_lab_verified_in_this_record": false,
+  "google_browser_auth_verified_in_this_record": false
+}

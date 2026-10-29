@@ -16,6 +16,7 @@ from status_gateway import _sanitize, ROLES, INSTANCE
 def serve(event, env, grades, student_lambda):
     if type(event) is not dict or event not in ({'operation': 'grade'}, {'operation': 'status'}):
         return {'status': 'unauthorized'}
+    stage = 'resolve_lab'
     try:
         lab_id, account = env['LAB_ID'], env['STUDENT_ACCOUNT']
         deployment = env['DEPLOYMENT_ID']
@@ -41,7 +42,9 @@ def serve(event, env, grades, student_lambda):
                     or len(set(instances.values())) != 5):
                 raise ValueError('invalid test instances')
             arn = f'arn:aws:lambda:us-east-1:{account}:function:jdu-web-status-{lab_id}'
+            stage = 'student_invoke'
             response = student_lambda.invoke(FunctionName=arn, InvocationType='RequestResponse', Payload=b'{"operation":"status"}')
+            stage = 'student_response'
             if response.get('StatusCode') != 200 or response.get('FunctionError'):
                 raise ValueError('status call failed')
             raw = response['Payload'].read(65537)
@@ -49,14 +52,26 @@ def serve(event, env, grades, student_lambda):
                 raise ValueError('large status response')
             answer = json.loads(raw)
             if not isinstance(answer, dict) or answer.get('status') != 'ok':
+                detail = answer.get('diagnostic') if isinstance(answer, dict) else None
+                if isinstance(detail, dict) and set(detail) == {'code', 'operation'} and all(
+                        isinstance(v, str) and re.fullmatch(r'[A-Za-z0-9]{1,80}', v) for v in detail.values()):
+                    return {'status': 'unavailable', 'diagnostic': {'stage': 'student_observation', **detail}}
                 raise ValueError('status unavailable')
             output = {'status': 'ok', 'observation': _sanitize(answer.get('observation'),
                       {'account': account, 'lab_id': lab_id}, instances)}
         if grades.get('LAB#' + lab_id, 'META') != original:
             raise ValueError('test Lab changed during read')
         return output
-    except Exception:
-        return {'status': 'unavailable'}
+    except Exception as exc:
+        result = {'status': 'unavailable'}
+        # This private IAM-only probe exposes bounded operation/error names,
+        # never AWS messages, ARNs, credentials, input or original grade data.
+        if event['operation'] == 'status':
+            response = getattr(exc, 'response', {})
+            code = response.get('Error', {}).get('Code') if isinstance(response, dict) else None
+            result['diagnostic'] = {'stage': stage, 'code': code if isinstance(code, str)
+                and re.fullmatch(r'[A-Za-z0-9]{1,80}', code) else 'Unspecified'}
+        return result
 
 
 def handler(event, context):
