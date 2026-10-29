@@ -1,0 +1,106 @@
+{
+  "verified_date": "2026-10-29",
+  "scope": "Real school Google identity (teacher acting as student by human choice), assigned student AWS ownership, own grades and state; not full portal completion",
+  "teacher_account": "170126527713",
+  "student_account": "965244652544",
+  "lab_id": "class193548-test1",
+  "teacher_lab_required": "Started",
+  "teacher_ec2": "stopped",
+  "web": {
+    "origin": "https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws",
+    "stack_status": "UPDATE_COMPLETE",
+    "code_sha256": "bc918f3aac58279b8922bf9e6ff5cc925518eab55e2be6b728eaff15ae6cc035",
+    "contents_sha256": "c505412cc90663d0fe9ecbf6f65545a905b0df1230d67e61511de593cc2f35f3",
+    "file_count": 4479,
+    "all_file_contents_match_local": true,
+    "strict_origin_and_csrf_retained": true
+  },
+  "student_connector_bootstrap": {
+    "resources_added": [
+      "AWS::Lambda::Function",
+      "AWS::Logs::LogGroup",
+      "Custom::JduPortalAccountLink"
+    ],
+    "status": "CREATE_COMPLETE",
+    "completed_at": "2026-10-29T10:14:26Z",
+    "public_endpoint_created": false,
+    "iam_role_or_policy_modified": false,
+    "existing_broad_labrole_used": true,
+    "new_ec2_created": false
+  },
+  "identity": {
+    "real_google_login": true,
+    "real_nonce_bound_student_sts_proof": true,
+    "teacher_school_identity_approved_as_student": true,
+    "approved_lab_and_account_only": true,
+    "raw_email_subject_token_or_credential_committed": false,
+    "single_pair_consumed_and_session_pointer_consumed": true,
+    "approval_subject_and_lab_mirror_match": true,
+    "browser_key_password_or_signature_copy_needed": false
+  },
+  "browser_acceptance": {
+    "unauthenticated_grade_denied": true,
+    "authenticated_unbound_grade_denied": true,
+    "native_registration_post_succeeded_after_scoped_referrer_fix": true,
+    "registered_refresh_does_not_start_new_pair": true,
+    "saved_raw_score": 62,
+    "maximum": 62,
+    "mission_scores": {
+      "M1": 8,
+      "M2": 13,
+      "M3": 3,
+      "M4": 9,
+      "M5": 13,
+      "M6": 16
+    },
+    "languages": [
+      "ja",
+      "ru",
+      "uz"
+    ],
+    "five_original_servers": "All stopped before End Lab; SSM unknown; no auto-start",
+    "real_logout_and_subsequent_grade_denial": true,
+    "normal_google_relogin_reuses_binding": true
+  },
+  "student_end_lab": {
+    "human_executed": true,
+    "lms_status": "Terminated",
+    "lms_timer": "00:00",
+    "lms_message": "Lab terminated",
+    "teacher_lab_still_started": true,
+    "authenticated_own_grade_62_read": true,
+    "current_status": "Unavailable displayed; not asserted stopped or Lab-ended from API result",
+    "own_grade_62_read_again_after_status_failure": true,
+    "grade_zeroed": false,
+    "student_lab_restarted_by_portal": false,
+    "final_read_only_verification_at": "2026-10-29T10:25:48.525344+00:00",
+    "full_grade_projection_and_whole_partition_unchanged": true
+  },
+  "original_data": {
+    "read_only_verifier_at": "2026-10-29T10:25:48.525344+00:00",
+    "full_grade_projection_unchanged": true,
+    "whole_lab_partition_unchanged": true,
+    "teacher_ec2": "stopped",
+    "private_functions_only": true,
+    "unregistered_synthetic_requests_denied": true,
+    "original_grade_writes": false,
+    "existing_five_disks_keys_and_tokens_preserved": true
+  },
+  "local_tests": {
+    "node_passed": 44,
+    "python_registration_and_deployment_passed": 41,
+    "npm_audit_vulnerabilities": 0
+  },
+  "not_accepted": [
+    "Browser-only new-five-server provisioning",
+    "Browser checker execution and exact retained-report delivery",
+    "Teacher progress UI and trusted teacher scope",
+    "General class onboarding and renewal of expired signed release",
+    "Real other school identity/domain or wrong AWS-account browser negative cases",
+    "Real copied-cookie replay; only synthetic test",
+    "Browser view of running five; private running observation is separate"
+  ],
+  "deferred_by_human": [
+    "Teacher-End-Lab grade browsing and normal AWS account migration"
+  ]
+}

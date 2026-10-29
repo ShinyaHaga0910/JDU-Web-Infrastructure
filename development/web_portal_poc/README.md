@@ -1,6 +1,18 @@
 # Webポータル：読取り処理の小規模試作
 
-2026-10-29更新。Issue [#1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1) の初期試作。本人承認後、Googleログイン/ログアウトだけのWebを実配備し、教師の学内Google identityで成功・session失効を確認した。教師/学生IAM接続と全EC2停止中の保存成績読取りも別途実測済み。教師End Lab後はHTTPS入口だけ応答し成績読取りは失敗したため、**当面は教師Lab開始中に利用する**。教師EC2は閲覧に不要。実学生Google identity・本人AWS登録と成績画面の統合は未受入で、授業で使える製品ではない。以下の実験記録は各時点の結果として読む。
+2026-10-29更新。Issue [#1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1) の制作中。**学校Google→割当学生AWSの本人確認→本人の62点/5台停止状態表示→学生End Lab後も本人62点を閲覧**する小規模実証を実機受入した。本人指定の先生Google identityを学生役として使う検証で、一般学生への全配布受入ではない。当面は教師Labを開始して利用し、教師EC2は停止のまま閲覧できる。新規5台のブラウザ準備、checker実行、教師進捗画面は未実装。教師End Lab中の閲覧は本人決定で後続課題。全goalは未完了。下記の記録は各時点の履歴として読む。
+
+## 本人用成績・学生End Labの実受入（最新）
+
+Web v4のUPDATE_COMPLETE、GitHubソースと全4,479file内容一致を確認した。フォーム修正後の実POSTで待機画面へ進み、資格情報のない固定コードURLを学生用Edgeで開いた。教師ではなく学生AWS 965244652544で、変更計画が接続確認Lambda・ログ・custom resourceの3 Addだけと確認し、本人の適用直前承認後に実行。10:14:26 UTCにCREATE_COMPLETE。AWS内部の短期署名が教師側で検証され、Google本人と割当Labの登録が完了した。ブラウザ/共有PCへのキー、パスワード、署名のコピーは行っていない。
+
+登録画面の再訪問は「登録しました」となり、新たなpairを作らない。実DynamoDBで学校approval/subject/Lab mirrorの対応、一つだけのpairとsession pointerの消費を確認し、元メール/subject/session IDの平文がそれらの行にないことを照合した。承認・本人/AWSの登録を作り直さない。期限でTTL削除されるpair/pointerを、後日の永続binding判定に必須としない。
+
+実本人画面で保存成績62/62、M1-M6＝8/13/3/9/13/16点を表示し、JA/RU/UZ、実ログアウト後の成績拒否、通常Google再ログイン後の同じbinding再利用を確認した。本人の5台は全stopped、SSMはunknownで表示し、閲覧で起動しない。10:19:45 UTCの読取り専用検査で元成績全projection/全Lab partitionは不変、教師EC2 stopped・非公開2関数/架空未登録拒否も保持した。
+
+その後、本人がEdgeの学生LabをEnd Labにした。LMSのTerminated/00:00/Lab terminatedを確認し、教師Lab開始中の条件で、認証済み本人の62点を表示できた。状態画面は「確認できません」とし、その後に戻った成績も62点のまま。10:25:48 UTCの終了後最終検査でも元成績全projection/全Lab partition不変・教師EC2 stoppedを確認。0点化、Lab/EC2の自動起動、IAM/KMSの緩和はない。学生Labは現在終了、教師Labは開始・教師EC2停止。画面確認のため学生をStartすると元5台が自動起動する可能性があるため、次の操作前に照合する。
+
+[最新の実受入](verification/2026-10-29-authenticated-student-portal.public.json)、[全goalの残件](PORTAL-ACCEPTANCE.md)。以下はそれ以前の配備/フォーム修正/計画の経過である。
 
 ## 本人連携の実配備とフォーム修正（2026-10-29）
 

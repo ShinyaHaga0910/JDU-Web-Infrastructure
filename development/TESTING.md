@@ -48,3 +48,7 @@ python -B -m unittest -q test_portal_enrollment test_portal_enrollment_handler t
 `web`の`node --test`は43件合格。固定hashと版付きS3ソースの読取り、5分cache/同時要求/取得失敗、確認formのCSRFと同一origin・server identity、期限切れのAWSリンク拒否、session失効、62素点/UNKNOWNを検査する。SDKはlockfile固定、npm auditは0件。CloudShellのNode20で依存を収録する段階と、AWS Web実行時Node24を区別する。
 
 実AWSでは非公開v1/v2の実作成・Code更新と未登録拒否だけを受入した。公開Webは旧ログイン版、導入S3と新Web change setは未execute。最新の成果物と適用境界は`web_portal_poc/verification/2026-10-29-browser-enrollment-plan.public.json`、実測は同folderのprivate-services-v1/v2記録を参照する。
+
+## 認証済み学生用画面の実機受入（2026-10-29）
+
+Web v4でNode44件。native POSTのno-referrer/Origin:nullを個人情報のないChrome formで再現し、登録成功ページだけsame-originにして厳密Origin/CSRFを維持した。実AWSでは人間が指定した先生Googleを学生役として、学生AWS965の署名、本人登録、JA/RU/UZの62点、5台停止、ログアウト拒否/再ログインを確認した。本人による学生End後、LMSのTerminated/00:00と本人62点の表示、状態取得不能後も62点保持を受入。教師Labは開始、教師EC2停止。10:19:45 UTCの検査で元成績全projection/全Lab partition不変。これを新規5台構築/ブラウザchecker/教師画面や実別identityの負例の受入に広げない。詳細はweb_portal_poc/PORTAL-ACCEPTANCE.mdと最新public JSON。

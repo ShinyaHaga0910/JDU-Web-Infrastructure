@@ -1,11 +1,13 @@
 # WEB-PORTAL-001：学生の環境準備・採点確認をブラウザへ集約する
 
-- 状態: 小規模実証と本人連携の統合を進行中。当面は教師Lab開始中に利用。Googleログイン/ログアウトだけのWebを承認後に配備し、教師の学内identityで成功・実session失効を確認。成績readerと学生操作は未接続。教師End Lab中の閲覧は後続課題、学生向け統合受入は未完了。
+- 状態: 本人連携・EC2停止中/学生End Lab後の本人62点閲覧の小規模実証を実機受入。教師Lab開始が必要。新規5台のブラウザ構築・checker実行・教師進捗画面は未実装で、本Issue全体は継続中。
 - 登録: 2026-10-23、本人依頼。
 - 着手順: D12の受入残件を保持し、2026-10-23の本人依頼で本Issueの構成検討を先行。Web演習の改善課題として実証・実装へ進める。
 - GitHub: [Issue #1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1)（非公開JDU-Web-Infrastructure）。
 
 ## 学生の到達体験
+
+10/29最新受入：Web v4/学生側3資源は実配備完了。学校Google（本人指定の先生を学生役）→学生AWSの実署名→割当Lab登録→本人62/62点/5台停止の表示、実ログアウト拒否/再ログイン再利用を確認。本人が学生End Lab後、LMS Terminated/00:00で本人62点を閲覧し、状態unavailable後も62点を保持した。元成績全projection/全partition不変、教師EC2停止。JA/RU/UZ、Node44件。次はブラウザchecker/初期5台準備/教師の担当範囲つき一覧。[実受入](../web_portal_poc/verification/2026-10-29-authenticated-student-portal.public.json)、[全goal受入表](../web_portal_poc/PORTAL-ACCEPTANCE.md)。下記の未適用/未連携は各時点の履歴。
 
 10/29実適用：教師再接続後、承認済み非公開S3とWeb v3は作成/更新完了、学校identityの検証Lab承認もHMAC登録した。実Googleログイン、未連携の成績拒否、割当済みAWS/Lab表示まで確認。native POSTの拒否はno-referrerとOrigin検査の不整合をChromeの架空formで再現し、登録画面だけsame-originにするv4を修正・44件合格。厳密なOrigin/CSRFは維持。学生AWSの本人確認/本人62点は未受入。[実適用と修正記録](../web_portal_poc/verification/2026-10-29-browser-link-rollout.public.json)。
 

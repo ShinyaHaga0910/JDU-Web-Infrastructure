@@ -36,11 +36,15 @@
   "v4_fix": {
     "scope": "Referrer-Policy same-origin on successful enrollment pages only; strict Origin and CSRF unchanged",
     "node_tests_passed": 44,
-    "deployed": false,
-    "contents_sha256": "c505412cc90663d0fe9ecbf6f65545a905b0df1230d67e61511de593cc2f35f3"
+    "deployed": true,
+    "contents_sha256": "c505412cc90663d0fe9ecbf6f65545a905b0df1230d67e61511de593cc2f35f3",
+    "aws_archive_sha256": "bc918f3aac58279b8922bf9e6ff5cc925518eab55e2be6b728eaff15ae6cc035",
+    "actual_native_post_succeeded": true
   },
   "teacher_original_proxy": "Explicitly stopped after normal Lab restart; original stack resource matched",
   "original_grade_writes": false,
-  "full_original_grade_post_rollout_verification": "Pending",
-  "actual_student_aws_ownership_bound": false
+  "full_original_grade_post_rollout_verification": "Full projection and partition unchanged at 2026-10-29T10:19:45.623857+00:00",
+  "actual_student_aws_ownership_bound": true,
+  "historical_record": true,
+  "superseded_by": "2026-10-29-authenticated-student-portal.public.json"
 }
