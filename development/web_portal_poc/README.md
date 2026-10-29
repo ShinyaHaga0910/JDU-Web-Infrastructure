@@ -2,6 +2,16 @@
 
 2026-10-29更新。Issue [#1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1) の初期試作。本人承認後、Googleログイン/ログアウトだけのWebを実配備し、教師の学内Google identityで成功・session失効を確認した。教師/学生IAM接続と全EC2停止中の保存成績読取りも別途実測済み。教師End Lab後はHTTPS入口だけ応答し成績読取りは失敗したため、**当面は教師Lab開始中に利用する**。教師EC2は閲覧に不要。実学生Google identity・本人AWS登録と成績画面の統合は未受入で、授業で使える製品ではない。以下の実験記録は各時点の結果として読む。
 
+## 本人連携の実配備とフォーム修正（2026-10-29）
+
+本人の適用直前承認後、教師Labを本人が通常Startし、教師AWSの新資格情報を確認した。専用非公開S3と割当学生だけのJSON読取り許可はCREATE_COMPLETE、公開readなし・版管理・source hashを再照合した。Web v3もUPDATE_COMPLETE。先生の学校Google identityを学生役とする検証Lab承認を、既存元metadataの5台と照合してHMACで登録した。既存の採点secret/RDP/SSH鍵の再発行はない。教師Lab再開で起動した元中継EC2だけをStack resourceと照合して明示停止した。
+
+実Googleログイン後、本人確認前の成績画面は「未登録」と拒否し、登録GETは割り当てた学生AWSとLabだけを表示した。一方、native POSTが拒否された。配信中の`Referrer-Policy: no-referrer`によりブラウザがOriginをnullにする仕様と、厳密なOrigin検査の不整合を特定。架空のローカルHTTP formを同じChromeで操作し、no-referrerではOrigin:null、same-originでは実originを送ることを確認した。資格情報を使う実ポータルのcookie/tokenを抽出したりコピーしたりしていない。
+
+修正版v4は、成功する登録画面の応答に限り`Referrer-Policy: same-origin`を指定する。他画面のno-referrer、外部リンクのnoreferrer、厳密なOrigin一致・CSRF/session/期限/教師承認は維持し、null-Originの例外許可は追加しない。回帰44件合格。v4の実配備と学生AWSのhelper/本人62点表示は、この記録時点では未受入。
+
+出典：[FetchのOrigin header生成規則](https://fetch.spec.whatwg.org/#origin-header)、[MDNのReferrer-PolicyとOrigin](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Referrer-Policy#effect_on_the_origin_header)。下記の「未execute/承認待ち」は計画準備時点の履歴として読む。
+
 ## 本人連携・成績画面の適用前計画（2026-10-29）
 
 本人から、このS3/本人登録/本人限定成績・状態表示の適用直前承認を受領した。ただし適用前に教師CloudShellの資格情報がvoc-cancel-credで取消済みとなり、まだexecuteしていない。教師Academy本文が空白のため、本人へ通常のLab再開と教師コンソール再表示を依頼中。同じ範囲の承認は保持する。接続復帰後も先にreceipt・未execute・対象hashを照合し、重複実行や権限緩和をしない。

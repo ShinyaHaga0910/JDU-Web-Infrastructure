@@ -7,6 +7,8 @@
 
 ## 学生の到達体験
 
+10/29実適用：教師再接続後、承認済み非公開S3とWeb v3は作成/更新完了、学校identityの検証Lab承認もHMAC登録した。実Googleログイン、未連携の成績拒否、割当済みAWS/Lab表示まで確認。native POSTの拒否はno-referrerとOrigin検査の不整合をChromeの架空formで再現し、登録画面だけsame-originにするv4を修正・44件合格。厳密なOrigin/CSRFは維持。学生AWSの本人確認/本人62点は未受入。[実適用と修正記録](../web_portal_poc/verification/2026-10-29-browser-link-rollout.public.json)。
+
 10/29適用待ち：本人から専用S3/本人連携/本人限定成績・状態表示の適用直前承認を受領。execute前に教師CloudShellがvoc-cancel-credで拒否され、Academy本文も空白のため、本人へ教師Labの通常再開を依頼中。applyは未実行、既存資源とデータを保持。再接続後は保存済みの同じ計画を再照合して続け、同じ承認は求め直さない。
 
 10/29最新：非公開2 Lambda・HMAC鍵保管先・ログ2つの実作成を確認し、画面更新時に同じ登録試行へ戻るv2をCodeだけの2変更で適用、実AWSで未登録拒否・元成績全projection/全partition不変・教師EC2停止を受入した。学校identityは本人指定の教師アカウントを学生役として使う。まだ実承認行・bindingはない。ブラウザ候補は学生AWSへ接続確認用3資源を導入する方式。教師側の専用非公開S3＋学生account限定のGet許可2 Addと、既存WebのRevision/Endpoint 2 Modifyのchange setを準備し、未execute。Web最終候補v3と全4,479ファイルの内容を照合し、Python41件/Node43件が合格。公開中Webはログインだけ、成績reader/本人登録は無効のまま。実Google→学生AWS→本人62点・状態の受入は次工程。[適用前計画](../web_portal_poc/verification/2026-10-29-browser-enrollment-plan.public.json)、[非公開v2実受入](../web_portal_poc/verification/2026-10-29-private-services-v2.public.json)。本Issue全体は未完了。

@@ -186,7 +186,10 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
         const bootstrapLink=pending?createBootstrapLink(env,value):undefined;
         requestId ||= operationId();
         const csrf=formToken(config,sessionId,token,requestId);
-        return response(page(lang,et.title,enrollmentHtml(lang,value,{requestId,csrf,pending,bootstrapLink})));
+        // Native POST under no-referrer sends Origin: null (Fetch standard).
+        // Keep exact Origin/CSRF checks; reveal referrers only to this same origin.
+        // OAuth pages and all cross-origin navigation retain no referrer disclosure.
+        return response(page(lang,et.title,enrollmentHtml(lang,value,{requestId,csrf,pending,bootstrapLink})),200,{'Referrer-Policy':'same-origin'});
       } catch {return failure(et.unavailable,503);}
     }
     if (url.pathname === '/') return response(page(lang,t.title,`<section>${enrollmentEnabled?`<p><a href="/enroll?lang=${lang}">${escape(enrollmentText(lang).title)}</a></p>`:''}<p><a href="/grades?lang=${lang}">${escape(t.grades)}</a></p><p><a href="/status?lang=${lang}">${escape(t.status)}</a></p></section><p>${escape(t.notice)}</p><p>${escape(t.shared)}</p><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form>`));

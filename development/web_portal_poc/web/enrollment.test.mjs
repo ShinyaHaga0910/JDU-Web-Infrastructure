@@ -30,6 +30,19 @@ test('registration GET displays only approved scope and never starts a pairing',
   assert.match(result.headers.get('cache-control'),/no-store/);
 });
 
+test('native enrollment form preserves exact Origin without exposing external referrers',async()=>{
+  let calls=0;
+  const app=createApp({env,verify,sessions,enroll:async()=>{calls++;return {status:'ok',enrollment:granted};}});
+  const formPage=await app(req('/enroll',{headers:{cookie}}));
+  assert.equal(formPage.headers.get('referrer-policy'),'same-origin');
+  assert.equal((await app(req('/',{headers:{cookie}}))).headers.get('referrer-policy'),'no-referrer');
+  assert.equal((await app(req('/grades',{headers:{cookie}}))).headers.get('referrer-policy'),'no-referrer');
+  for(const origin of ['null','https://evil.example']){
+    assert.equal((await app(req('/enroll',post(form(),{origin,'sec-fetch-site':'same-origin'})))).status,403);
+  }
+  assert.equal(calls,1); // No null-Origin fallback or weaker CSRF path.
+});
+
 test('explicit same-origin form binds server-verified claims, no arbitrary target or raw token',async()=>{
   const calls=[];
   const app=createApp({env,verify,sessions,enroll:async e=>{calls.push(e);return {status:'ok',enrollment:{...granted,pair_id:'d'.repeat(64),expires_at:Math.floor(Date.now()/1000)+300}};}});

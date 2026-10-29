@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-29",
+  "scope": "Approved source publication, Web v3 rollout and school identity approval; account ownership binding not complete",
+  "teacher_session_restored": true,
+  "source_publication": {
+    "status": "CREATE_COMPLETE",
+    "public_read_access": false,
+    "assigned_student_account": "965244652544",
+    "source_sha256": "61a70d19bc1aefbadc16f2313adfe11b74097e9b435452d96c8fbf701723f14f",
+    "versioned_get_hash_verified": true
+  },
+  "web_v3": {
+    "status": "UPDATE_COMPLETE",
+    "code_sha256": "744b2d65452805a3c73ace7ff64affcfaa81ce651aec938b30882e0b6e1236a0"
+  },
+  "school_identity_approval": {
+    "recorded": true,
+    "raw_email_or_subject_committed": false,
+    "identity": "Human-selected teacher Google identity acting as student",
+    "lab_id": "class193548-test1",
+    "student_account": "965244652544",
+    "existing_instances": 5
+  },
+  "browser_acceptance": {
+    "unauthenticated_grade_rejected": true,
+    "real_google_login_succeeded": true,
+    "authenticated_unbound_grade_rejected": true,
+    "registration_get_shows_assigned_account_lab": true,
+    "native_registration_post": "Denied; source policy produces null Origin"
+  },
+  "isolated_chrome_reproduction": {
+    "uses_real_identity_or_tokens": false,
+    "no_referrer_post_origin": "null",
+    "same_origin_post_origin": "http://127.0.0.1:18763"
+  },
+  "v4_fix": {
+    "scope": "Referrer-Policy same-origin on successful enrollment pages only; strict Origin and CSRF unchanged",
+    "node_tests_passed": 44,
+    "deployed": false,
+    "contents_sha256": "c505412cc90663d0fe9ecbf6f65545a905b0df1230d67e61511de593cc2f35f3"
+  },
+  "teacher_original_proxy": "Explicitly stopped after normal Lab restart; original stack resource matched",
+  "original_grade_writes": false,
+  "full_original_grade_post_rollout_verification": "Pending",
+  "actual_student_aws_ownership_bound": false
+}
