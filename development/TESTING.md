@@ -56,3 +56,8 @@ Web v4でNode44件。native POSTのno-referrer/Origin:nullを個人情報のな�
 ## 課題確認job基盤の検査（2026-10-29、未配備）
 
 `web_portal_poc`でtest専用Moto/boto3を設定して、`python -B -m unittest -q test_assessment_command_jobs test_assessment_observation`を実行し29件合格。実Dynamo型のnumeric往復、並行worker、応答不明/既存command回収/ページング、停止前提の拒否、元report/request ID、既存HTTP source hash/registry bytes、外部HTTP/管理拒否とUNKNOWNを模擬検査する。SSMとHTTPはfakeであり、実コマンドやネットワークへの接続はない。既存assessmentの`test_assessment`14件も合格。ブラウザ実行/採点提出の実AWS受入とはしない。稼働Webや元署名版をこの検査で更新しない。
+
+
+## ブラウザ課題確認の接続候補（2026-10-29、AWS未適用）
+
+`test_browser_checks test_assessment_command_jobs test_assessment_observation`の35件、WebのNode48件（新4件）、package/計画5件合格。新結合試験は実job/HTTP adapterをMoto DDBと架空SSMへ接続し、本人承認、元request ID、結果再訪、GET非実行、停止前提拒否、既存成績不変を確認する。Windowsのpackage import試験はLinux標準pwdをダミーmoduleで補い、実Linux CloudShellでも同じZIPをimportして元5台のrunning/SSM Online/保持templateとnetwork baselineを読取り確認した。実SSM checker/実ブラウザ受入とは分ける。今回の完成条件はweb_portal_poc/CHECKS-ACCEPTANCE.md。

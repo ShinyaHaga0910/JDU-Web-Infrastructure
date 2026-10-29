@@ -1,0 +1,18 @@
+{
+  "AWSTemplateFormatVersion":"2010-09-09",
+  "Description":"Private verified-owner gateway to existing student checks, no grade writes",
+  "Parameters":{
+    "ArtifactBucket":{"Type":"String"},"ArtifactKey":{"Type":"String"},"ArtifactVersion":{"Type":"String","MinLength":1},
+    "SubjectKeyArn":{"Type":"String"},"BindingTable":{"Type":"String"},"GradeTable":{"Type":"String"}
+  },
+  "Resources":{
+    "Checker":{"Type":"AWS::Lambda::Function","Properties":{
+      "FunctionName":"jdu-web-portal-checker-20261029","Runtime":"python3.13","Handler":"portal_checker_handler.handler",
+      "Role":{"Fn::Sub":"arn:aws:iam::${AWS::AccountId}:role/LabRole"},"MemorySize":256,"Timeout":120,
+      "Code":{"S3Bucket":{"Ref":"ArtifactBucket"},"S3Key":{"Ref":"ArtifactKey"},"S3ObjectVersion":{"Ref":"ArtifactVersion"}},
+      "Environment":{"Variables":{"PORTAL_SUBJECT_KEY_SECRET_ARN":{"Ref":"SubjectKeyArn"},"PORTAL_BINDING_TABLE":{"Ref":"BindingTable"},"GRADE_TABLE":{"Ref":"GradeTable"}}}
+    }},
+    "Logs":{"Type":"AWS::Logs::LogGroup","Properties":{"LogGroupName":{"Fn::Sub":"/aws/lambda/${Checker}"},"RetentionInDays":3}}
+  },
+  "Outputs":{"CheckerArn":{"Value":{"Fn::GetAtt":["Checker","Arn"]}}}
+}

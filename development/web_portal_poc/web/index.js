@@ -8,15 +8,17 @@ import { createRuntimeEnv } from './secrets.mjs';
 import { createEnrollmentClient } from './enrollment-client.mjs';
 import { readBody } from './request-body.mjs';
 import { createBootstrapEnv } from './bootstrap-artifact.mjs';
+import { createCheckerClient } from './checks.mjs';
 
 // A missing backend fails closed at request time; the server can still start
 // in the closed deployment mode without credentials or an active Lab.
-let getGrade, getStatus, sessions, getAcceptanceHealth, enroll;
+let getGrade, getStatus, sessions, getAcceptanceHealth, enroll, checker;
 try { getGrade=createGradeClient(); } catch { getGrade=undefined; }
 try { getStatus=createStatusClient(); } catch { getStatus=undefined; }
 try { sessions=createSessions(); } catch { sessions=undefined; }
 try { getAcceptanceHealth=createAcceptanceHealth(); } catch { getAcceptanceHealth=undefined; }
 try { enroll=createEnrollmentClient(); } catch { enroll=undefined; }
+try { checker=createCheckerClient(); } catch { checker=undefined; }
 const getRuntimeEnv=createRuntimeEnv();
 const getBootstrapEnv=createBootstrapEnv();
 const endpoint=process.env.AWS_LAMBDA_HTTP_ENDPOINT;
@@ -34,7 +36,7 @@ createServer(async (req,res) => {
       const bootstrap=await getBootstrapEnv();
       env={...env,PORTAL_BOOTSTRAP_TEMPLATE_URL:bootstrap.PORTAL_BOOTSTRAP_TEMPLATE_URL};
     }
-    const app=createApp({env,getGrade,getStatus,sessions,getAcceptanceHealth,enroll});
+    const app=createApp({env,getGrade,getStatus,sessions,getAcceptanceHealth,enroll,checker});
     const result=await app(request);
     res.statusCode=result.status;
     for (const [key,value] of result.headers) if (key!=='set-cookie') res.setHeader(key,value);

@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-29",
+  "phase": "candidate_prepared_not_deployed",
+  "scope": "Browser execution and retained read-only check results; original grades unchanged",
+  "code_sha256": {
+    "assessment_command_jobs.py": "d3a0094681d958505e20ff80b5cf51094edf23e6b6acf52c10447a88f2fb7dcb",
+    "assessment_observation.py": "913694215f42b075e666136b0e47cfb135731dc9a5a3974bec3362d31df47bc8",
+    "student_checker_handler.py": "0fc9b523c68edd3c2961f5a2dfdec45204edcc6f076002588cf9e85ba20c7ef0",
+    "portal_checker_handler.py": "a35f3bdd22576551a4c6160f5bb7e437a4f4cfd92a9d22eb08506b343c8437b6",
+    "prepare_checker.py": "8f02903f536ea701aa51e98fa2b933480b5bd793bfd3015a48a0e206e1056e94",
+    "execute_checker.py": "549b636ad4d6ae96b9d7d210d9dc8233141c4b1c1bc1246806adf782f6bbd96d",
+    "build_checker_package.py": "7e4189d64a9c616ec7b3cc6b2140f716cad9c7ddeb2206cc9a3e04a3eee2b22d",
+    "student-checker.template.json": "0c6db3bed8cb66e0195ee168a771d6d80494f53a8da34d44a7cf0a52ab6dab8a",
+    "teacher-checker.template.json": "8850f9a58eb8c5e4650c51b60f90aa013190f196a4698b9e6b6f17c132bfa997",
+    "web/checks.mjs": "d15d476e84af5dbd60c6b597258ae4464a996ae82025aa258f39e310780d5d55",
+    "web/check-labels.json": "f375c463b32f914eebfbc1b71ffc69e051eb5a3282bed6b7727ddc2e3b9eba23",
+    "web/router.mjs": "fa4dbb37107cfb0231b4547a7f504b03c05eb3fcdfe797632b244ef44af91088"
+  },
+  "checker_zip_sha256": "bae082aac9858c31a54626343509129fed29e96fc7a2a4077c08a60459482e65",
+  "source_zip_sha256": "a637395ee9875cffad97d5473a52ac7a97fb49c0d18f960f63ade7d60845efa3",
+  "aws_web_zip_sha256": "b225a56b66e0633654a006c382851473ae2448e9c550b49d252109710c10a983",
+  "web_file_count": 4481,
+  "web_all_files_content_sha256": "a7850aff7e59649ac5fedbd20fdf9554e28c1cdbdce68b6b28b8b6cc16fc6616",
+  "tests": {
+    "job_observer_and_owned_flow": 35,
+    "node_including_new_four": 48,
+    "web_package_and_plan": 5,
+    "failures": 0,
+    "skipped": 0
+  },
+  "aws_read_only_preflight": {
+    "original_five_running_and_online": true,
+    "network_baseline": true
+  },
+  "planned_additions": {
+    "student": [
+      "private_checker_lambda",
+      "encrypted_retained_results_table",
+      "three_day_logs",
+      "teacher_LabRole_Invoke_only"
+    ],
+    "teacher": [
+      "private_owned_gateway_lambda",
+      "three_day_logs"
+    ]
+  },
+  "existing_web_modifications": [
+    "Revision",
+    "Endpoint"
+  ],
+  "new_permissions_approval_received": false,
+  "deployed": false,
+  "real_browser_execution_accepted": false,
+  "original_grade_writes": false,
+  "limits": [
+    "M3 stop evidence and M5/M6 password functional checks remain UNKNOWN in read_only",
+    "No browser submission to original grade records",
+    "New-five provisioning and teacher progress list remain separate Issue work"
+  ]
+}

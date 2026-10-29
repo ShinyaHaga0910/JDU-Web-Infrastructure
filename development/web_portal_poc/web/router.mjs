@@ -3,6 +3,7 @@ import { ACCESS } from './sessions.mjs';
 import { formToken, checkForm, operationId, tokenHash } from './enrollment-client.mjs';
 import { enrollmentHtml, enrollmentText, checkedEnrollment } from './enrollment-page.mjs';
 import { bootstrapTemplate, createBootstrapLink } from './bootstrap-link.mjs';
+import { words as checkWords, validOperation, verifyCheckToken, checkHtml, progressScript } from './checks.mjs';
 
 const security = {
   'Cache-Control': 'private, no-store, max-age=0', 'Referrer-Policy': 'no-referrer',
@@ -45,7 +46,7 @@ const redirect = (location, values=[]) => { const h=new Headers(security); h.set
 
 function page(lang, title, content) {
   const nav = ['ja','ru','uz'].map(k => `<a href="?lang=${k}"${k===lang?' aria-current="page"':''}>${k.toUpperCase()}</a>`).join(' ');
-  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)}</title><style>body{font:1rem/1.6 system-ui,sans-serif;margin:0;background:#f5f7fa;color:#182435}main{max-width:64rem;margin:auto;padding:1.5rem}nav{display:flex;gap:1rem}a,button{color:#064ca4}button{font:inherit;background:white;border:1px solid #64748b;border-radius:.35rem;padding:.65rem 1rem;cursor:pointer}a:focus-visible,button:focus-visible{outline:3px solid #d34800;outline-offset:3px}section{background:white;border:1px solid #d6dee8;border-radius:.5rem;padding:1rem;margin-block:1rem}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:44rem}th,td{padding:.6rem;text-align:left;border-bottom:1px solid #d6dee8}.num{font-size:1.6rem;font-weight:700}footer{margin-top:2rem}fieldset{border:1px solid #a9b6c7;border-radius:.35rem;padding:1rem;margin-block:1rem}.confirm{display:flex;align-items:flex-start;gap:.5rem;min-height:48px;padding-block:.5rem}input[type=checkbox]{width:1.25rem;height:1.25rem;margin:.2rem 0;flex-shrink:0}a.action{display:inline-flex;align-items:center;min-height:48px;padding:0 .75rem;border:1px solid #64748b;border-radius:.35rem}a.action:focus-visible,input:focus-visible{outline:3px solid #d34800;outline-offset:3px}</style></head><body><main><nav aria-label="Languages">${nav}</nav><h1>${escape(title)}</h1>${content}</main></body></html>`;
+  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)}</title><style>body{font:1rem/1.6 system-ui,sans-serif;margin:0;background:#f5f7fa;color:#182435}main{max-width:64rem;margin:auto;padding:1.5rem}nav{display:flex;gap:1rem}a,button{color:#064ca4}button{font:inherit;background:white;border:1px solid #64748b;border-radius:.35rem;padding:.65rem 1rem;cursor:pointer}a:focus-visible,button:focus-visible{outline:3px solid #d34800;outline-offset:3px}section{background:white;border:1px solid #d6dee8;border-radius:.5rem;padding:1rem;margin-block:1rem}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:44rem}th,td{padding:.6rem;text-align:left;border-bottom:1px solid #d6dee8}.num{font-size:1.6rem;font-weight:700}footer{margin-top:2rem}fieldset{border:1px solid #a9b6c7;border-radius:.35rem;padding:1rem;margin-block:1rem}.confirm{display:flex;align-items:flex-start;gap:.5rem;min-height:48px;padding-block:.5rem}input[type=checkbox]{width:1.25rem;height:1.25rem;margin:.2rem 0;flex-shrink:0}a.action{display:inline-flex;align-items:center;min-height:48px;padding:0 .75rem;border:1px solid #64748b;border-radius:.35rem}a.action:focus-visible,input:focus-visible{outline:3px solid #d34800;outline-offset:3px}.check-tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1rem}.check-tasks section{margin:0}</style></head><body><main><nav aria-label="Languages">${nav}</nav><h1>${escape(title)}</h1>${content}</main></body></html>`;
 }
 
 function gradeHtml(lang, grade) {
@@ -80,10 +81,11 @@ function statusHtml(lang, observation) {
   return `<section><p>${escape(t.observed)}: ${escape(timestamp)}</p><div class="table-wrap"><table><thead><tr><th scope="col">${escape(t.role)}</th><th scope="col">${escape(t.ec2)}</th><th scope="col">${escape(t.ssm)}</th><th scope="col">${escape(t.publicIp)}</th></tr></thead><tbody>${body}</tbody></table></div></section>`;
 }
 
-export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch, getGrade, getStatus, sessions, getAcceptanceHealth, enroll}={}) {
+export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch, getGrade, getStatus, sessions, getAcceptanceHealth, enroll, checker}={}) {
   return async request => {
     const url=new URL(request.url), lang=language(url), t=text[lang];
     if (url.pathname === '/healthz') return new Response('ok',{headers:{...security,'Content-Type':'text/plain; charset=utf-8'}});
+    if (url.pathname==='/check-progress.js' && request.method==='GET') return new Response(progressScript,{headers:{...security,'Content-Type':'text/javascript; charset=utf-8'}});
     if (url.pathname === '/healthz/acceptance') {
       if (env.PORTAL_MODE!=='closed' || env.PORTAL_ACCEPTANCE_ENABLED!=='true' || typeof getAcceptanceHealth!=='function') return response('Not found',404);
       if (!['GET','HEAD'].includes(request.method)) return response('Method not allowed',405);
@@ -148,7 +150,9 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
       }
     }
     const enrollmentPost=url.pathname==='/enroll' && request.method==='POST' && enrollmentEnabled;
-    if (!['GET','HEAD'].includes(request.method) && !enrollmentPost) return response('Method not allowed',405);
+    const checkerEnabled=env.PORTAL_CHECKER_ENABLED==='true' && typeof checker==='function';
+    const checkerPost=url.pathname==='/checks' && request.method==='POST' && checkerEnabled;
+    if (!['GET','HEAD'].includes(request.method) && !enrollmentPost && !checkerPost) return response('Method not allowed',405);
     if (url.pathname === '/signed-out') return response(page(lang,t.title,`<p>${escape(t.signedout)}</p><p>${escape(t.shared)}</p><a href="/auth/login">${escape(t.login)}</a>`));
     let identity, jar, token;
     try {jar=cookies(request); token=jar.get(SESSION); identity=await verify(token,config);}
@@ -156,6 +160,29 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
     if (!sessions) return response('Unavailable',503);
     try {if (!await sessions.check(jar.get(ACCESS),token)) return url.pathname==='/' ? redirect('/auth/login') : response('Forbidden',403);}
     catch {return response('Unavailable',503);}
+    if (url.pathname==='/checks') {
+      if (!checkerEnabled) return response('Not found',404);
+      const ct=checkWords[lang],extras={'Referrer-Policy':'same-origin','Content-Security-Policy':security['Content-Security-Policy']+"; script-src 'self'"};
+      const fail=(message,status=503)=>response(page(lang,ct.title,`<p role="alert">${escape(message)}</p><a href="/checks?lang=${lang}">${escape(ct.back)}</a>`),status,extras);
+      try {
+        let selected,result;
+        if (checkerPost) {
+          if (request.headers.get('origin')!==config.origin || request.headers.get('content-type')?.split(';')[0]!=='application/x-www-form-urlencoded') return fail(ct.denied,403);
+          const body=await request.text(); if(Buffer.byteLength(body)>4096)return fail(ct.denied,403);
+          const fields=new URLSearchParams(body);
+          if ([...fields.keys()].sort().join(',')!=='csrf,job_id,operation,task_id') return fail(ct.denied,403);
+          selected=Object.fromEntries(['operation','task_id','job_id'].map(k=>[k,fields.get(k)]));
+          if (!validOperation(selected) || selected.operation==='result' || !verifyCheckToken(config,jar.get(ACCESS),token,selected,fields.get('csrf'))) return fail(ct.denied,403);
+          result=await checker({subject:identity.sub,...selected});
+          if(result?.status==='ok') return redirect(`/checks?lang=${lang}&task_id=${selected.task_id}&job_id=${selected.job_id}`);
+        } else if (url.searchParams.has('task_id') || url.searchParams.has('job_id')) {
+          selected={operation:'result',task_id:url.searchParams.get('task_id'),job_id:url.searchParams.get('job_id')};
+          if(!validOperation(selected))return fail(ct.denied,403);
+          result=await checker({subject:identity.sub,...selected});
+        }
+        return response(page(lang,ct.title,checkHtml(lang,{config,session:jar.get(ACCESS),token,selected,result})),result?.status==='unauthorized'?403:result && result.status!=='ok'?503:200,extras);
+      } catch {return fail(ct.unavailable);}
+    }
     if (url.pathname==='/enroll') {
       if (!enrollmentEnabled) return response('Not found',404);
       const et=enrollmentText(lang);
@@ -192,7 +219,7 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
         return response(page(lang,et.title,enrollmentHtml(lang,value,{requestId,csrf,pending,bootstrapLink})),200,{'Referrer-Policy':'same-origin'});
       } catch {return failure(et.unavailable,503);}
     }
-    if (url.pathname === '/') return response(page(lang,t.title,`<section>${enrollmentEnabled?`<p><a href="/enroll?lang=${lang}">${escape(enrollmentText(lang).title)}</a></p>`:''}<p><a href="/grades?lang=${lang}">${escape(t.grades)}</a></p><p><a href="/status?lang=${lang}">${escape(t.status)}</a></p></section><p>${escape(t.notice)}</p><p>${escape(t.shared)}</p><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form>`));
+    if (url.pathname === '/') return response(page(lang,t.title,`<section>${enrollmentEnabled?`<p><a href="/enroll?lang=${lang}">${escape(enrollmentText(lang).title)}</a></p>`:''}<p><a href="/grades?lang=${lang}">${escape(t.grades)}</a></p><p><a href="/status?lang=${lang}">${escape(t.status)}</a></p>${checkerEnabled?`<p><a href="/checks?lang=${lang}">${escape(checkWords[lang].title)}</a></p>`:''}</section>${checkerEnabled?'':`<p>${escape(t.notice)}</p>`}<p>${escape(t.shared)}</p><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form>`));
     if (url.pathname !== '/grades' && url.pathname !== '/status') return response('Not found',404);
     if (url.pathname === '/status') {
       try {

@@ -1,0 +1,28 @@
+{
+  "AWSTemplateFormatVersion":"2010-09-09",
+  "Description":"Fixed retained-Lab checks and results, no EC2 lifecycle or grade changes",
+  "Parameters":{
+    "LabId":{"Type":"String","AllowedPattern":"[a-z0-9][a-z0-9-]{2,31}"},
+    "ArtifactBucket":{"Type":"String"},"ArtifactKey":{"Type":"String"},"ArtifactVersion":{"Type":"String","MinLength":1},
+    "CheckConfig":{"Type":"String","MaxLength":3500},
+    "TeacherRoleArn":{"Type":"String","AllowedPattern":"arn:aws:iam::[0-9]{12}:role/LabRole"}
+  },
+  "Resources":{
+    "Results":{"Type":"AWS::DynamoDB::Table","DeletionPolicy":"Retain","UpdateReplacePolicy":"Retain","Properties":{
+      "BillingMode":"PAY_PER_REQUEST","SSESpecification":{"SSEEnabled":true},
+      "AttributeDefinitions":[{"AttributeName":"pk","AttributeType":"S"},{"AttributeName":"sk","AttributeType":"S"}],
+      "KeySchema":[{"AttributeName":"pk","KeyType":"HASH"},{"AttributeName":"sk","KeyType":"RANGE"}]
+    }},
+    "Checker":{"Type":"AWS::Lambda::Function","Properties":{
+      "FunctionName":{"Fn::Sub":"jdu-web-check-${LabId}"},"Runtime":"python3.13","Handler":"student_checker_handler.handler",
+      "Role":{"Fn::Sub":"arn:aws:iam::${AWS::AccountId}:role/LabRole"},"MemorySize":256,"Timeout":120,
+      "Code":{"S3Bucket":{"Ref":"ArtifactBucket"},"S3Key":{"Ref":"ArtifactKey"},"S3ObjectVersion":{"Ref":"ArtifactVersion"}},
+      "Environment":{"Variables":{"CHECK_CONFIG":{"Ref":"CheckConfig"},"CHECK_TABLE":{"Ref":"Results"}}}
+    }},
+    "Logs":{"Type":"AWS::Logs::LogGroup","Properties":{"LogGroupName":{"Fn::Sub":"/aws/lambda/${Checker}"},"RetentionInDays":3}},
+    "TeacherInvoke":{"Type":"AWS::Lambda::Permission","Properties":{
+      "FunctionName":{"Fn::GetAtt":["Checker","Arn"]},"Action":"lambda:InvokeFunction","Principal":{"Ref":"TeacherRoleArn"}
+    }}
+  },
+  "Outputs":{"CheckerArn":{"Value":{"Fn::GetAtt":["Checker","Arn"]}},"ResultsTable":{"Value":{"Ref":"Results"}}}
+}

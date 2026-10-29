@@ -32,7 +32,7 @@ def inspect(change):
         raise ValueError('Unexpected Web update')
 
 
-def prepare(directory,code_path,services,template_digest,receipt,sts,cfn,s3):
+def prepare(directory,code_path,services,template_digest,receipt,sts,cfn,s3,*,checker_arn=None):
     import re
     if (sts.get_caller_identity()['Account']!=ACCOUNT or receipt.exists()
             or services.get('phase')!='private-services-updated' or not re.fullmatch(r'[a-f0-9]{64}',template_digest)):
@@ -71,6 +71,10 @@ def prepare(directory,code_path,services,template_digest,receipt,sts,cfn,s3):
     overrides={'ArtifactKey':key,'ArtifactVersion':version,'ReleaseId':sha,
         'GradeReaderFunctionArn':outputs['GradeReaderArn'],'EnrollmentFunctionArn':outputs['EnrollmentArn'],
         'EnrollmentEnabled':'true','BootstrapTemplateUrl':'disabled','BootstrapTemplateDigest':template_digest}
+    if checker_arn is not None:
+        if checker_arn!=f'arn:aws:lambda:us-east-1:{ACCOUNT}:function:jdu-web-portal-checker-20261029':
+            raise ValueError('Wrong fixed checker service')
+        overrides.update(CheckerFunctionArn=checker_arn,CheckerEnabled='true')
     parameters=[]
     expected={}
     for name,definition in parsed['Parameters'].items():
@@ -103,9 +107,10 @@ if __name__=='__main__':
     parser.add_argument('--services',type=Path,required=True)
     parser.add_argument('--template-digest',required=True)
     parser.add_argument('--receipt',type=Path,required=True)
+    parser.add_argument('--checker-arn')
     args=parser.parse_args()
     try:
         prepare(args.directory,args.code,json.loads(args.services.read_text()),args.template_digest,args.receipt,
-                *(boto3.client(n,region_name='us-east-1') for n in ('sts','cloudformation','s3')))
+                *(boto3.client(n,region_name='us-east-1') for n in ('sts','cloudformation','s3')),checker_arn=args.checker_arn)
     except Exception:
         raise SystemExit('ENROLLMENT_WEB_PLAN_NOT_CONFIRMED: inspect receipts and change set; not executed') from None
