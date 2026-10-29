@@ -67,7 +67,9 @@
 
 次の教師End Lab試験に向け、閉鎖中だけ使うWeb Functionsの読取り可否probeと専用version管理付きS3/service許可を準備。外部へ返すのは3つの可否booleanと確認日時だけで、成績そのものは公開しない。Node21件・package3件・npm audit 0を確認したが、まだAWS未配備。新しい公開入口・実行権限の適用前確認後に進める。
 
-Web配布物を教師CloudShellへhash照合で搬入し、両templateのAWS構文受理と名前未使用を確認。専用S3/限定service許可のCREATE change setも準備済みで未適用。Web側のLogGroup/Function/Revision/HTTPS Endpointを合わせた6資源の計画。閉鎖状態で事前HTTP基準値を取り、その後教師Lab自体をEnd Labにして、cacheの確認日時が終了後になった応答を検査する。
+本人承認後、専用S3と閉鎖Web側の計6資源を配備。最初のWeb Stackは環境上限1がAWS最小値2未満として事前検査で停止し、資源は空。受付上限もAWS最小の正数100/秒へ修正し、同じFunction名・同じS3許可対象を維持して別wrapper StackでCREATE_COMPLETEになった。失敗記録は削除せず保持。package検査3件も合格。
+
+05:35:22 UTCの実HTTPで `/healthz` 200、可否probe 200/3項目true、個人成績 `/grades` は503を確認。教師EC2停止・学生Lab終了・教師Lab開始中の基準値であり、教師End Lab後の受入ではない。教師Lab本文が空白のため本人へ手動End Labを依頼中。終了後、30秒cacheより新しい確認日時で応答を検査する。[終了前の記録](../web_portal_poc/verification/2026-10-29-web-before-teacher-end.public.json)。
 
 - [x] Learner LabでWeb Functionsが利用できることを確認（2026-10-23本人確認）。
 - [x] End Lab後もWeb Functions部分は利用できたことを確認（2026-10-23本人確認）。EC2の継続稼働とは区別する。

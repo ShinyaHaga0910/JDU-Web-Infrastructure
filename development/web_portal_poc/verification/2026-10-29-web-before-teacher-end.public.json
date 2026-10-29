@@ -1,0 +1,19 @@
+{
+  "scope": "Closed-mode public availability probe only; personal grades remain closed",
+  "checked_at": "2026-10-29T05:35:22.116Z",
+  "teacher_lab_ended": false,
+  "student_lab_ended": true,
+  "teacher_ec2": "stopped",
+  "web_stack": "CREATE_COMPLETE",
+  "artifact_stack": "CREATE_COMPLETE",
+  "code_sha256": "6a27a1d815b82b6e3d54dc6687b1e8ed1dca794cbcb00fbd637ccdf4485cd9fa",
+  "template_sha256": "10489c809b8623b2c462a25f00cd4c04dabbc91d52e331b83e30eb6d2f7d1a63",
+  "http": {
+    "/healthz": {"status": 200, "body": "ok"},
+    "/healthz/acceptance": {"status": 200, "storage": true, "savedGrades": true, "gradeService": true},
+    "/grades": {"status": 503, "body": "Unavailable"}
+  },
+  "cache_control": "private, no-store, max-age=0",
+  "public_output_excludes_scores_and_identities": true,
+  "teacher_end_lab_acceptance": "pending"
+}

@@ -2,6 +2,7 @@
   "AWSTemplateFormatVersion": "2010-09-09",
   "Description": "Closed-by-default JDU Web course portal candidate",
   "Parameters": {
+    "WebFunctionName": {"Type": "String", "AllowedPattern": "[a-zA-Z0-9-_]{1,64}"},
     "ArtifactBucket": {"Type": "String"},
     "ArtifactKey": {"Type": "String"},
     "ArtifactVersion": {"Type": "String", "MinLength": 1},
@@ -21,7 +22,7 @@
   },
   "Resources": {
     "LogGroup": {"Type": "AWS::Logs::LogGroup", "Properties": {"LogGroupName": {"Fn::Sub": "/jdu/web-course-portal/${AWS::StackName}"}, "RetentionInDays": 3}},
-    "Portal": {"Type": "AWS::Lambda::WebFunction", "Properties": {"FunctionName": {"Ref": "AWS::StackName"}}},
+    "Portal": {"Type": "AWS::Lambda::WebFunction", "Properties": {"FunctionName": {"Ref": "WebFunctionName"}}},
     "Revision": {"Type": "AWS::Lambda::WebFunctionRevision", "Properties": {
       "FunctionName": {"Ref": "Portal"}, "Description": {"Ref": "ReleaseId"},
       "BuildConfig": {"CodeConfig": {"S3Object": {"Bucket": {"Ref": "ArtifactBucket"}, "Key": {"Ref": "ArtifactKey"}, "VersionId": {"Ref": "ArtifactVersion"}}}, "RuntimeConfig": {"Runtime": "nodejs24.x"}},
@@ -33,7 +34,7 @@
         "TelemetryConfig": {"LoggingConfig": {"LogGroup": {"Ref": "LogGroup"}, "ApplicationLogLevel": "WARN", "SystemLogLevel": "WARN"}}}
     }},
     "Endpoint": {"Type": "AWS::Lambda::WebFunctionEndpoint", "Properties": {"FunctionName": {"Ref": "Portal"}, "EndpointName": "portal", "EndpointType": "HomeRegion", "AuthType": "ApplicationManaged",
-      "RevisionWeights": [{"RevisionId": {"Fn::GetAtt": ["Revision", "RevisionId"]}, "Weight": 100}], "ScalingConfig": {"MaxEnvironments": 1}, "ThrottleConfig": {"RateLimit": 2}}}
+      "RevisionWeights": [{"RevisionId": {"Fn::GetAtt": ["Revision", "RevisionId"]}, "Weight": 100}], "ScalingConfig": {"MaxEnvironments": 2}, "ThrottleConfig": {"RateLimit": 100}}}
   },
   "Outputs": {"PortalUrl": {"Value": {"Fn::Sub": "https://${Endpoint.DomainName}"}}}
 }

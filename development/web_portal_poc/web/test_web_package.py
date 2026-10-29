@@ -31,6 +31,12 @@ class WebPackageTest(unittest.TestCase):
         self.assertTrue(template['Parameters']['GoogleClientSecret']['NoEcho'])
         self.assertNotIn('GoogleClientSecret', json.dumps(template['Outputs']))
         self.assertEqual(template['Resources']['Endpoint']['Properties']['AuthType'], 'ApplicationManaged')
+        self.assertEqual(template['Resources']['Portal']['Properties']['FunctionName'], {'Ref': 'WebFunctionName'})
+        endpoint = template['Resources']['Endpoint']['Properties']
+        # AWS provider's deployed schema requires at least two environments;
+        # the supported positive request-rate values start at 100.
+        self.assertEqual(endpoint['ScalingConfig']['MaxEnvironments'], 2)
+        self.assertEqual(endpoint['ThrottleConfig']['RateLimit'], 100)
         self.assertFalse(any(r['Type'].startswith('AWS::IAM::') for r in template['Resources'].values()))
 
     def test_artifact_service_grant_is_scoped_to_one_same_account_function(self):

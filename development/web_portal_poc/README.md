@@ -80,7 +80,11 @@
 
 Node 21件・Web package 3件が合格、npm auditの既知問題は0。ZIP SHA-256 `6a27a1d815b82b6e3d54dc6687b1e8ed1dca794cbcb00fbd637ccdf4485cd9fa`、3,271,147 bytes。Google認証/本人bindingの受入を代替するものではない。
 
-搬入ZIPのhash `a24dea1e7f00417865ae48992afcb940f794021460eb26b1295be276d7bc97b4` と3ファイルの内包名を教師CloudShellで照合し、両templateをAWS `ValidateTemplate` が受理した。教師側のWeb Functions一覧は空、新規2 Stack名も未使用だった。`jdu-web-portal-web-artifacts-20261029` のCREATE change set `private-web-artifacts` を準備し、S3とbucket policyだけが追加対象と確認。Web側は `jdu-web-portal-poc-20261029` にLogGroup/WebFunction/Revision/HTTPS Endpointを追加する計画で、合計6資源。**まだ適用していない**。新しいservice許可と公開HTTPS入口・LabRole利用の適用直前確認後に、artifact Stack作成→版付きcode搬入→閉鎖Web Stack作成→HTTP実測の順に進める。教師LabのEnd Labは、その事前HTTP基準値を取ってから行う。
+搬入ZIPのhash `a24dea1e7f00417865ae48992afcb940f794021460eb26b1295be276d7bc97b4` と3ファイルの内包名を教師CloudShellで照合し、両templateをAWS `ValidateTemplate` が受理した。本人から6資源の追加と教師End Lab後の試験の承認を受け、専用S3 Stackを作成。S3のversioningと公開遮断、版付きcodeのhashを確認した。
+
+最初のWeb Stackは事前検査で `MaxEnvironments: 1` が最小値2未満としてROLLBACK_COMPLETEになった。`DescribeEvents` と実provider schemaから、環境上限を2、受付上限を最小の正数100/秒に修正。単なる `ValidateTemplate` の受理ではこの制約を保証しない。元失敗Stackの資源が空であることを確認し、削除せず記録を保持。Web Function名を独立parameterにし、S3許可対象の同じFunction名を保持して、新規wrapper Stack `jdu-web-portal-poc-20261029-r1` に4資源Addの検査済みchange setを適用した。追加のIAM・公開範囲変更はしていない。
+
+修正後はCREATE_COMPLETE。2026-10-29 05:35:22 UTC、ChromeとCloudShellの実HTTPで `/healthz` 200、`/healthz/acceptance` 200（3項目trueと日時だけ）、`/grades` 503を確認。教師EC2はstopped、教師Labは開始中、学生Labは終了済み。個人成績の公開やGoogle本人認証の受入ではない。[終了前の実測記録](verification/2026-10-29-web-before-teacher-end.public.json)。修正後のpackage検査3件合格。教師Lab本文の空白でEnd Labを操作できないため、本人へ手動再読み込み・End Labを依頼中。**教師End Lab後の応答は未確認**。終了後は内部30秒cacheを超えた `checkedAt` を必ず確認する。
 
 ### 2026-10-29の再開確認
 
