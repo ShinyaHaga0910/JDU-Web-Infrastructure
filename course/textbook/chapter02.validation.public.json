@@ -2,7 +2,7 @@
   "chapter": 2,
   "language": "ja",
   "draft": "editable prose skeleton",
-  "pages": 10,
+  "pages": 11,
   "a4": true,
   "text_blocks_checked": 173,
   "missing_text": [],
@@ -11,5 +11,5 @@
   "teacher_visual_review": "not performed",
   "student_trial": "not performed",
   "aws_operations": "none",
-  "sha256": "140a6be1fa4bbc9359d58848dfca85e8fc9316897cf40ab76cc8819f8ea718c0"
+  "sha256": "8274e58d68ee59e287855f854845dc63b2b6f40fbcca2db158c0c79b2b757897"
 }
