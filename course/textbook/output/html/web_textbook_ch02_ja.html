@@ -28,10 +28,11 @@
 <h3 id="公開ipを使う場面">公開IPを使う場面</h3>
 <p><strong>公開IP（パブリックIP）</strong>は、インターネット側から接続するために使うアドレスである。今回は公開サブネットのWebと踏み台に公開IPを割り当てる。利用者PCから一般画面を見るときはWebの公開IP、RDPで管理用デスクトップを開くときは踏み台の公開IPを使う。</p>
 <p>Webは公開IPだけでなく、内部IP<code>10.20.1.20</code>も持つ。同じWebに対して、利用者PCは公開側から接続し、踏み台はVPC内の内部IPへ接続する。使うアドレスが異なっても、今回の構成では同じEC2 Webサーバーへの接続である。</p>
-<figure><img src="../../assets/figures/ch02-fig02-public-private.png" alt="利用者PCはInternet Gatewayを経由してWebの公開IPへ接続する。踏み台は同じWebの内部IPへ接続し、WebはDBの内部IPへ接続する。" width="1600" height="1020"></figure>
-<p><strong>図2-2 接続する場所によって使い分けるアドレス。</strong> 図中の<code>203.0.113.20</code>は説明用の公開IPの例である。実際の接続には、対象環境で割り当てられた公開IPを使う。<a href="https://www.rfc-editor.org/rfc/rfc5737.html">文書用IPアドレスの規定</a></p>
+<figure><img src="../../assets/figures/ch02-fig02-public-private.png" alt="利用者PCはInternet Gatewayを経由してWebの公開IPへ接続する。踏み台は同じWebの内部IPへ接続し、WebはDBの内部IPへ接続する。" width="1600" height="1180"></figure>
+<p><strong>図2-2 同じWebサーバーの公開IPと内部IP。</strong> 青色はインターネット側から指定するWebの公開IP、緑色はVPC内で指定するWebの内部IPを表す。AWSのInternet Gatewayで宛先が公開IPから内部IPへ変換され、同じWebへ届く。<code>203.0.113.20</code>は説明用の例であり、実際には対象環境で割り当てられた公開IPを使う。<a href="https://www.rfc-editor.org/rfc/rfc5737.html">文書用IPアドレスの規定</a></p>
 <h3 id="公開範囲とinternet-gateway">公開範囲とInternet Gateway</h3>
-<p><strong>Internet Gateway（IGW）</strong>は、VPCとインターネットの接続に使うAWSの機能である。図2-2の一般Web閲覧は、利用者PCからIGWを経由してWebへ届く。</p>
+<p><strong>ゲートウェイ</strong>は、異なるネットワークをつなぐ出入口を表す一般的な用語である。本書で<strong>Internet Gateway（IGW）</strong>と呼ぶものは、AWSがVPCとインターネットの接続のために提供する機能を指す。図2-2のIGWもAWS側にあり、利用者PCからWebへ向かう通信はここを経由する。</p>
+<p>今回のIPv4通信では、AWSのIGWがWebの公開IPと内部IPの対応を処理する。利用者PCが公開IP宛てに送った通信は、IGWで宛先をWebの内部IPへ変換してからVPC内へ届けられる。返答では、インターネット側へ送るときに送信元がWebの公開IPへ変換される。これが、公開IPと内部IPのどちらを使っても同じWebへ届く仕組みである。<a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html">AWS Internet Gatewayのアドレス変換</a></p>
 <p>非公開サブネットのDNS、DB、配布サーバーには公開IPを割り当てない。インターネットから直接接続する入口は用意せず、VPC内の必要なサーバーから利用する。例えば、公開サブネットのWebから非公開サブネットのDBへ接続し、非公開サブネットのDNSから配布サーバーへ必要な資源を取得する。</p>
 <p>公開・非公開は、インターネットとの接続の扱いである。VPC内の接続をどこまで許可するかは、後述するSGの条件で決める。公開IPを持つWebでも、公開するのは一般閲覧などに必要な入口である。<a href="https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html">AWSの公開・非公開サブネット</a>、<a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html">Internet Gateway</a></p>
 <h2 id="24-プロトコルとポートで使う機能を指定する">2.4 プロトコルとポートで使う機能を指定する</h2>
@@ -40,7 +41,7 @@
 <p>通信の約束や方式を<strong>プロトコル</strong>という。今回のHTTP、SSH、RDP、DB接続では、データを順序どおり届けるTCPという通信方式を使う。DNSの問い合わせではUDPとTCPの両方を使う。TCPとUDPの同じ番号は、別の通信窓口として扱う。</p>
 <p>例えば、Webの<code>10.20.1.20</code>へTCPの80番で接続すると一般のWeb入口を使う。踏み台から同じIPへTCPの22番で接続すると、SSHによる端末操作の入口を使う。接続先のサーバーは同じでも、使う機能が違う。</p>
 <div class="table-wrap"><table><thead><tr><th scope="col">用途</th><th scope="col">通信方式</th><th scope="col">宛先ポート</th></tr></thead><tbody><tr><td>一般WebのHTTP</td><td>TCP</td><td>80</td></tr><tr><td>踏み台のRDP</td><td>TCP</td><td>3389</td></tr><tr><td>サーバー管理のSSH</td><td>TCP</td><td>22</td></tr><tr><td>内部DNSへの問い合わせ</td><td>UDPとTCP</td><td>53</td></tr><tr><td>PostgreSQLへの接続</td><td>TCP</td><td>5432</td></tr><tr><td>Webの内部向け管理画面</td><td>TCP</td><td>8080</td></tr><tr><td>Web内のアプリへの要求転送</td><td>TCP</td><td>8000</td></tr></tbody></table></div>
-<p>これらは今回採用する設定である。例えば「8080番だから必ず管理画面になる」という意味ではなく、その番号で管理画面を受け付けるように設定する。</p>
+<p>ポート番号には、HTTPの80番やSSHの22番のように、標準や業界の慣習で用途が定まっているものがある。一方、実際にどのポートで接続を受け付けるかは、ソフトウェアの設定で指定できる。今回は一般向けのWebを80番、内部向けの管理画面を8080番で受け付けるように設定する。管理画面だから自動的に8080番になるのではなく、構築する側がその番号を選んでいる。<a href="https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml">IANAのサービス名とポート番号</a></p>
 <h3 id="ソフトウェアの待受">ソフトウェアの待受</h3>
 <p>サーバーが、指定したアドレスとポートで接続を受け付ける準備をすることを<strong>待受</strong>という。NginxがWebの80番で待ち受けていれば、その入口へHTTPの要求を送れる。</p>
 <p>待受には、ポートだけでなくアドレスも関わる。例えば、同じホスト内だけで使う<code>127.0.0.1:8000</code>と、VPC内から使う<code>10.20.1.20:8080</code>は、別の相手から利用する入口である。<code>127.0.0.1</code>の意味は2.7で詳しく説明する。</p>
@@ -50,24 +51,27 @@
 <p><strong>Security Group（SG）</strong>は、関連付けたサーバーなどのAWS資源について、許可する通信を定める仕組みである。今回は5台の役割に対応したSGを使う。</p>
 <p>サーバーへ入ってくる通信の条件を<strong>インバウンドルール（受信規則）</strong>、サーバーから出ていく通信の条件を<strong>アウトバウンドルール（送信規則）</strong>という。送信元から出る側と、宛先へ入る側の条件を組み合わせて考える。</p>
 <p>例えばWebからDBへ接続する場合、Webの送信側でDBへのTCP5432を許可し、DBの受信側でWebからのTCP5432を許可する。そのうえでDBが接続を受け付け、認証を行う。</p>
-<figure><img src="../../assets/figures/ch02-fig03-security-groups.png" alt="WebからDBへのTCP5432を、Webの送信規則とDBの受信規則で許可する。DBへの要求と、その接続への応答を分けて示す。" width="1600" height="850"></figure>
-<p><strong>図2-3 WebからDBへの接続とSG。</strong> 上の青い矢印は接続を始める方向、下の矢印はその接続への応答を示す。SGは相手とポートを許可し、DBの認証はPostgreSQLが行う。</p>
+<figure><img src="../../assets/figures/ch02-fig03-security-groups.png" alt="WebからDBへのTCP5432を、Webの送信規則とDBの受信規則で許可する。DBへの要求と、その接続への応答を分けて示す。" width="1800" height="920"></figure>
+<p><strong>図2-3 WebからDBへの接続とSG。</strong> オレンジ色の枠がSG、青色の枠がEC2である。Webに関連付けたSG-Webの送信規則と、DBに関連付けたSG-DBの受信規則で通信を許可する。SGはAWS側で通信を制御する仕組みであり、図ではEC2と分けて示している。青い矢印は接続を始める方向、緑の矢印はその接続への応答を表す。</p>
 <h3 id="許可条件を読む">許可条件を読む</h3>
 <p>受信規則では、主に「送信元」「プロトコル」「宛先ポート」を読む。次は今回のサービスに必要な受信規則の例である。</p>
 <div class="table-wrap"><table><thead><tr><th scope="col">対象のSG</th><th scope="col">送信元</th><th scope="col">許可する通信</th></tr></thead><tbody><tr><td>WebのSG</td><td>インターネット側のIPv4</td><td>TCP80：一般Web</td></tr><tr><td>踏み台のSG</td><td>許可された接続元IPの範囲</td><td>TCP3389：RDP</td></tr><tr><td>各内部管理先のSG</td><td>踏み台のSG</td><td>TCP22：SSH</td></tr><tr><td>DNSのSG</td><td>踏み台のSG、WebのSG</td><td>UDP53・TCP53：名前解決</td></tr><tr><td>DBのSG</td><td>WebのSG</td><td>TCP5432：DB接続</td></tr><tr><td>WebのSG</td><td>踏み台のSG</td><td>TCP8080：管理画面</td></tr><tr><td>配布サーバーのSG</td><td>必要な内部サーバーのSG</td><td>TCP80：資源の取得</td></tr></tbody></table></div>
 <p>送信元としてSGを指定する場合は、そのSGを関連付けたサーバーからの通信を許可する。例えばDBの受信規則でWebのSGを指定すると、今回そのSGを持つWebからの接続を許す。WebのSGに書かれた規則をDBへコピーする、という意味ではない。</p>
-<p>IPの範囲を使う規則もある。<code>/32</code>はIPv4の一つのアドレス、<code>0.0.0.0/0</code>はすべてのIPv4アドレスの範囲を表す。今回の一般WebのTCP80は後者を使い、管理用のRDPは許可された接続元に絞る。ここでの<code>0.0.0.0/0</code>は相手の範囲であり、前節の<code>0.0.0.0:80</code>という待受の指定とは用途が異なる。</p>
+<p>IPの範囲を使う規則もある。<code>/32</code>はIPv4の一つのアドレス、<code>0.0.0.0/0</code>はすべてのIPv4アドレスの範囲を表す。今回の一般WebのTCP80は後者を使い、管理用のRDPは許可された接続元に絞る。</p>
 <h3 id="許可されていない通信と応答">許可されていない通信と応答</h3>
 <p>SGでは、必要な通信の許可を追加する。今回のDBでWebからのTCP5432を許可しても、踏み台からのTCP5432やWebからの別のポートまで許可したことにはならない。VPC内にいるという条件だけで、すべての機能を使えるわけではない。</p>
 <p>SGは、許可した通信に対する応答を認識する。Webから始めたDB接続への返答について、同じ応答のために逆方向の規則を追加する必要はない。この性質を<strong>ステートフル</strong>という。これは、DBからWebへ新しい別の接続を始めることまで許可するという意味ではない。<a href="https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html">AWSのSGルール</a>、<a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html">応答通信の扱い</a></p>
-<p>この表のDNSはEC2で動かす内部DNSを指す。AWSが提供する基盤用DNSなどにはSGで制御できない通信もあるため、今回のBINDへの問い合わせと区別する。</p>
 <h2 id="26-利用と管理で異なる通信経路">2.6 利用と管理で異なる通信経路</h2>
 <h3 id="一般のweb閲覧">一般のWeb閲覧</h3>
-<p>備品一覧を見るときは、利用者PCのブラウザからWebの公開IPへHTTPで接続する。要求はIGWを経由してWebの一般入口へ届く。Web上のアプリがDBの値を必要とするときは、Webが内部DNSでDB名を解決し、DBの内部IPへTCP5432で接続する。</p>
-<p>このとき、ブラウザとWebの接続、WebからDNSへの問い合わせ、WebからDBへの接続は、それぞれ別の通信である。必要な通信ごとに送信元、宛先、プロトコル、宛先ポートを読む。</p>
-<h3 id="サーバーの管理">サーバーの管理</h3>
-<p>設定を変えるときは、RDPで利用者PCから管理用の踏み台へ接続する。踏み台のデスクトップを開き、そこからSSHで対象サーバーへ接続する。WebやDBのSSHを、利用者PCのインターネット接続先として直接公開しない構成である。</p>
-<p>アプリの管理画面を使うときは、踏み台のブラウザからWebの内部IPの8080番へ接続する。一般向けの80番と、内部向けの8080番を分けることで、管理画面へ到達できる相手を絞る。</p>
+<p>Webアプリ上で備品一覧を見るときは、利用者PCのブラウザがWebの公開IPへHTTPで接続する。要求はAWSのIGWを経由してWebの一般入口へ届く。Web上のアプリがDBの値を必要とするときは、Webが内部DNSでDB名を解決し、DBの内部IPへTCP5432で接続する。</p>
+<p>このとき、ブラウザとWebの接続、WebからDNSへの問い合わせ、WebからDBへの接続は、それぞれ別の通信である。必要な通信ごとに送信元、宛先、プロトコル、宛先ポートを読む必要がある。</p>
+<h3 id="サーバーのosやサービスを管理する">サーバーのOSやサービスを管理する</h3>
+<p>Nginxの設定を変える、サービスを再起動する、ログを調べるといった操作は、サーバーのOS上で行う。踏み台を使う場合は、まずRDPで利用者PCから管理用の踏み台へ接続してデスクトップを開く。次に踏み台の端末からSSHでWebやDBなどの対象サーバーへ接続し、コマンドで操作する。WebやDBのSSHを、インターネットから直接接続する入口として公開しない構成である。</p>
+<p>演習には、CloudShellからSSMで対象のEC2へ接続してOSを操作する方法もある。ここでは踏み台を使う経路を説明しているが、OSの管理手段はRDPとSSHだけに限らない。各接続方法の操作は第3章で扱う。</p>
+<h3 id="webアプリの管理画面を使う">Webアプリの管理画面を使う</h3>
+<p>Webアプリには、一般の利用者が情報を見る入口と、管理者が内容を登録・変更する入口を分けて用意することがある。今回の備品管理アプリも、一般画面では公開された備品の一覧を閲覧し、管理画面ではログインした管理者が備品の追加や、数量・保管場所などの変更を行う。</p>
+<p>管理画面を使う場合も、まずRDPで踏み台のデスクトップを開く。その後はSSHではなく、踏み台上のブラウザから<code>http://admin.lab.test:8080/admin/</code>を開く。内部DNSがこの名前をWebの内部IP<code>10.20.1.20</code>へ解決し、ブラウザがWebの8080番へHTTPで接続する。RDPは踏み台を操作するための接続であり、アプリの管理者としてのログインは、その先のWeb画面で行う。</p>
+<p>今回の構成では、一般向けの80番からは管理画面を開けない。管理用の8080番は踏み台からの接続だけを許可する。このように、同じ踏み台を利用しても、OSの設定変更はSSH、アプリ内の備品の登録・変更はブラウザと、目的によって使うソフトウェアと接続先が異なる。</p>
 <h3 id="送信元と宛先を一組で読む">送信元と宛先を一組で読む</h3>
 <p>例えば「DBのポートは5432」という情報だけでは、接続の全体は分からない。「Webから、DBの内部IPへ、TCP5432で接続する」と読めば、使う側と受け付ける側が明確になる。</p>
 <p>同じ考え方で、「踏み台からDNSへUDP53・TCP53」「DNSから配布サーバーへTCP80」「踏み台からWebへTCP8080」と整理する。通信表はポート番号の暗記表ではなく、必要な相手と機能を示す表として使う。</p>
@@ -76,7 +80,7 @@
 <p>Web上のNginxが<code>127.0.0.1:8000</code>へ接続すれば、Web自身の8000番へ向かう。今回のGunicornはその入口で待ち受けるため、同じWeb内のNginxからアプリへ要求を渡せる。</p>
 <p>一方、踏み台のブラウザで<code>127.0.0.1:8000</code>を指定すると、踏み台自身の8000番へ向かう。同じ数字を書いても、Web内のアプリを指すことにはならない。踏み台から管理画面を開く場合は、Webの内部IPと8080番を使う。</p>
 <figure><img src="../../assets/figures/ch02-fig04-loopback.png" alt="Web内で127.0.0.1:8000へ接続するとWeb自身のアプリへ届く。踏み台で同じアドレスを使うと、踏み台自身の8000番を指す。" width="1600" height="920"></figure>
-<p><strong>図2-4 ループバックが指す相手。</strong> <code>127.0.0.1</code>は共通のWebサーバー名ではなく、接続を実行するホスト自身を指す。左と右は別のEC2である。</p>
+<p><strong>図2-4 ループバックが指す相手。</strong> <code>127.0.0.1</code>は接続を実行するホスト自身を指す。赤い×印を付けた矢印は、踏み台でこのアドレスを指定してもWebへ向かわないことを示す。</p>
 <h2 id="28-接続に必要な条件を結び付ける">2.8 接続に必要な条件を結び付ける</h2>
 <p>Webを利用するためには、通信先のIPとポートを選び、そこまでの通信を許可し、目的のソフトウェアが待ち受けている必要がある。その後、受け取った要求をソフトウェアが処理して、ページやデータを返す。</p>
 <p>例えばSGでTCP80を許可しても、Nginxが停止していれば目的のWebサービスは使えない。また、Nginxが同じホスト内だけで待ち受けている場合は、外部向けの入口としては使えない。通信の許可と、サービスが応答することは、それぞれ設定する対象が違う。</p>
@@ -105,6 +109,7 @@
 <p class="bullet">・ <a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-ip-addressing.html">AWS IP addressing for your VPCs and subnets</a></p>
 <p class="bullet">・ <a href="https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html">AWS Subnets for your VPC</a></p>
 <p class="bullet">・ <a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html">AWS Internet Gateway</a></p>
+<p class="bullet">・ <a href="https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml">IANA Service Name and Transport Protocol Port Number Registry</a></p>
 <p class="bullet">・ <a href="https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html">AWS Security group rules</a></p>
 <p class="bullet">・ <a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html">AWS Security groups</a></p>
 <p class="bullet">・ <a href="https://man7.org/linux/man-pages/man7/ip.7.html">Linux man-pages ip(7)</a></p>

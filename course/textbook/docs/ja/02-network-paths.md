@@ -62,11 +62,13 @@ Webは公開IPだけでなく、内部IP`10.20.1.20`も持つ。同じWebに対�
 
 ![利用者PCはInternet Gatewayを経由してWebの公開IPへ接続する。踏み台は同じWebの内部IPへ接続し、WebはDBの内部IPへ接続する。](../../assets/figures/ch02-fig02-public-private.png)
 
-**図2-2 接続する場所によって使い分けるアドレス。** 図中の`203.0.113.20`は説明用の公開IPの例である。実際の接続には、対象環境で割り当てられた公開IPを使う。[文書用IPアドレスの規定](https://www.rfc-editor.org/rfc/rfc5737.html)
+**図2-2 同じWebサーバーの公開IPと内部IP。** 青色はインターネット側から指定するWebの公開IP、緑色はVPC内で指定するWebの内部IPを表す。AWSのInternet Gatewayで宛先が公開IPから内部IPへ変換され、同じWebへ届く。`203.0.113.20`は説明用の例であり、実際には対象環境で割り当てられた公開IPを使う。[文書用IPアドレスの規定](https://www.rfc-editor.org/rfc/rfc5737.html)
 
 ### 公開範囲とInternet Gateway
 
-**Internet Gateway（IGW）**は、VPCとインターネットの接続に使うAWSの機能である。図2-2の一般Web閲覧は、利用者PCからIGWを経由してWebへ届く。
+**ゲートウェイ**は、異なるネットワークをつなぐ出入口を表す一般的な用語である。本書で**Internet Gateway（IGW）**と呼ぶものは、AWSがVPCとインターネットの接続のために提供する機能を指す。図2-2のIGWもAWS側にあり、利用者PCからWebへ向かう通信はここを経由する。
+
+今回のIPv4通信では、AWSのIGWがWebの公開IPと内部IPの対応を処理する。利用者PCが公開IP宛てに送った通信は、IGWで宛先をWebの内部IPへ変換してからVPC内へ届けられる。返答では、インターネット側へ送るときに送信元がWebの公開IPへ変換される。これが、公開IPと内部IPのどちらを使っても同じWebへ届く仕組みである。[AWS Internet Gatewayのアドレス変換](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html)
 
 非公開サブネットのDNS、DB、配布サーバーには公開IPを割り当てない。インターネットから直接接続する入口は用意せず、VPC内の必要なサーバーから利用する。例えば、公開サブネットのWebから非公開サブネットのDBへ接続し、非公開サブネットのDNSから配布サーバーへ必要な資源を取得する。
 
@@ -92,7 +94,7 @@ IPアドレスでWebサーバーを選んだ後、その中のどの機能へ接
 | Webの内部向け管理画面 | TCP | 8080 |
 | Web内のアプリへの要求転送 | TCP | 8000 |
 
-これらは今回採用する設定である。例えば「8080番だから必ず管理画面になる」という意味ではなく、その番号で管理画面を受け付けるように設定する。
+ポート番号には、HTTPの80番やSSHの22番のように、標準や業界の慣習で用途が定まっているものがある。一方、実際にどのポートで接続を受け付けるかは、ソフトウェアの設定で指定できる。今回は一般向けのWebを80番、内部向けの管理画面を8080番で受け付けるように設定する。管理画面だから自動的に8080番になるのではなく、構築する側がその番号を選んでいる。[IANAのサービス名とポート番号](https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml)
 
 ### ソフトウェアの待受
 
@@ -114,7 +116,7 @@ IPアドレスでWebサーバーを選んだ後、その中のどの機能へ接
 
 ![WebからDBへのTCP5432を、Webの送信規則とDBの受信規則で許可する。DBへの要求と、その接続への応答を分けて示す。](../../assets/figures/ch02-fig03-security-groups.png)
 
-**図2-3 WebからDBへの接続とSG。** 上の青い矢印は接続を始める方向、下の矢印はその接続への応答を示す。SGは相手とポートを許可し、DBの認証はPostgreSQLが行う。
+**図2-3 WebからDBへの接続とSG。** オレンジ色の枠がSG、青色の枠がEC2である。Webに関連付けたSG-Webの送信規則と、DBに関連付けたSG-DBの受信規則で通信を許可する。SGはAWS側で通信を制御する仕組みであり、図ではEC2と分けて示している。青い矢印は接続を始める方向、緑の矢印はその接続への応答を表す。
 
 ### 許可条件を読む
 
@@ -132,7 +134,7 @@ IPアドレスでWebサーバーを選んだ後、その中のどの機能へ接
 
 送信元としてSGを指定する場合は、そのSGを関連付けたサーバーからの通信を許可する。例えばDBの受信規則でWebのSGを指定すると、今回そのSGを持つWebからの接続を許す。WebのSGに書かれた規則をDBへコピーする、という意味ではない。
 
-IPの範囲を使う規則もある。`/32`はIPv4の一つのアドレス、`0.0.0.0/0`はすべてのIPv4アドレスの範囲を表す。今回の一般WebのTCP80は後者を使い、管理用のRDPは許可された接続元に絞る。ここでの`0.0.0.0/0`は相手の範囲であり、前節の`0.0.0.0:80`という待受の指定とは用途が異なる。
+IPの範囲を使う規則もある。`/32`はIPv4の一つのアドレス、`0.0.0.0/0`はすべてのIPv4アドレスの範囲を表す。今回の一般WebのTCP80は後者を使い、管理用のRDPは許可された接続元に絞る。
 
 ### 許可されていない通信と応答
 
@@ -140,21 +142,27 @@ SGでは、必要な通信の許可を追加する。今回のDBでWebからのT
 
 SGは、許可した通信に対する応答を認識する。Webから始めたDB接続への返答について、同じ応答のために逆方向の規則を追加する必要はない。この性質を**ステートフル**という。これは、DBからWebへ新しい別の接続を始めることまで許可するという意味ではない。[AWSのSGルール](https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html)、[応答通信の扱い](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html)
 
-この表のDNSはEC2で動かす内部DNSを指す。AWSが提供する基盤用DNSなどにはSGで制御できない通信もあるため、今回のBINDへの問い合わせと区別する。
-
 ## 2.6 利用と管理で異なる通信経路
 
 ### 一般のWeb閲覧
 
-備品一覧を見るときは、利用者PCのブラウザからWebの公開IPへHTTPで接続する。要求はIGWを経由してWebの一般入口へ届く。Web上のアプリがDBの値を必要とするときは、Webが内部DNSでDB名を解決し、DBの内部IPへTCP5432で接続する。
+Webアプリ上で備品一覧を見るときは、利用者PCのブラウザがWebの公開IPへHTTPで接続する。要求はAWSのIGWを経由してWebの一般入口へ届く。Web上のアプリがDBの値を必要とするときは、Webが内部DNSでDB名を解決し、DBの内部IPへTCP5432で接続する。
 
-このとき、ブラウザとWebの接続、WebからDNSへの問い合わせ、WebからDBへの接続は、それぞれ別の通信である。必要な通信ごとに送信元、宛先、プロトコル、宛先ポートを読む。
+このとき、ブラウザとWebの接続、WebからDNSへの問い合わせ、WebからDBへの接続は、それぞれ別の通信である。必要な通信ごとに送信元、宛先、プロトコル、宛先ポートを読む必要がある。
 
-### サーバーの管理
+### サーバーのOSやサービスを管理する
 
-設定を変えるときは、RDPで利用者PCから管理用の踏み台へ接続する。踏み台のデスクトップを開き、そこからSSHで対象サーバーへ接続する。WebやDBのSSHを、利用者PCのインターネット接続先として直接公開しない構成である。
+Nginxの設定を変える、サービスを再起動する、ログを調べるといった操作は、サーバーのOS上で行う。踏み台を使う場合は、まずRDPで利用者PCから管理用の踏み台へ接続してデスクトップを開く。次に踏み台の端末からSSHでWebやDBなどの対象サーバーへ接続し、コマンドで操作する。WebやDBのSSHを、インターネットから直接接続する入口として公開しない構成である。
 
-アプリの管理画面を使うときは、踏み台のブラウザからWebの内部IPの8080番へ接続する。一般向けの80番と、内部向けの8080番を分けることで、管理画面へ到達できる相手を絞る。
+演習には、CloudShellからSSMで対象のEC2へ接続してOSを操作する方法もある。ここでは踏み台を使う経路を説明しているが、OSの管理手段はRDPとSSHだけに限らない。各接続方法の操作は第3章で扱う。
+
+### Webアプリの管理画面を使う
+
+Webアプリには、一般の利用者が情報を見る入口と、管理者が内容を登録・変更する入口を分けて用意することがある。今回の備品管理アプリも、一般画面では公開された備品の一覧を閲覧し、管理画面ではログインした管理者が備品の追加や、数量・保管場所などの変更を行う。
+
+管理画面を使う場合も、まずRDPで踏み台のデスクトップを開く。その後はSSHではなく、踏み台上のブラウザから`http://admin.lab.test:8080/admin/`を開く。内部DNSがこの名前をWebの内部IP`10.20.1.20`へ解決し、ブラウザがWebの8080番へHTTPで接続する。RDPは踏み台を操作するための接続であり、アプリの管理者としてのログインは、その先のWeb画面で行う。
+
+今回の構成では、一般向けの80番からは管理画面を開けない。管理用の8080番は踏み台からの接続だけを許可する。このように、同じ踏み台を利用しても、OSの設定変更はSSH、アプリ内の備品の登録・変更はブラウザと、目的によって使うソフトウェアと接続先が異なる。
 
 ### 送信元と宛先を一組で読む
 
@@ -172,7 +180,7 @@ Web上のNginxが`127.0.0.1:8000`へ接続すれば、Web自身の8000番へ向�
 
 ![Web内で127.0.0.1:8000へ接続するとWeb自身のアプリへ届く。踏み台で同じアドレスを使うと、踏み台自身の8000番を指す。](../../assets/figures/ch02-fig04-loopback.png)
 
-**図2-4 ループバックが指す相手。** `127.0.0.1`は共通のWebサーバー名ではなく、接続を実行するホスト自身を指す。左と右は別のEC2である。
+**図2-4 ループバックが指す相手。** `127.0.0.1`は接続を実行するホスト自身を指す。赤い×印を付けた矢印は、踏み台でこのアドレスを指定してもWebへ向かわないことを示す。
 
 ## 2.8 接続に必要な条件を結び付ける
 
@@ -227,6 +235,7 @@ IPアドレスは通信するホスト側の宛先を指定し、ポート番号
 - [AWS IP addressing for your VPCs and subnets](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-ip-addressing.html)
 - [AWS Subnets for your VPC](https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html)
 - [AWS Internet Gateway](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html)
+- [IANA Service Name and Transport Protocol Port Number Registry](https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml)
 - [AWS Security group rules](https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html)
 - [AWS Security groups](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html)
 - [Linux man-pages ip(7)](https://man7.org/linux/man-pages/man7/ip.7.html)
