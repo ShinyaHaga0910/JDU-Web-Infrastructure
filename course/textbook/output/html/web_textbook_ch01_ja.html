@@ -1,0 +1,128 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第1章 Webシステムを構成するもの</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第1章-webシステムを構成するもの">第1章 Webシステムを構成するもの</h1>
+<p>対応：P0/M0の共通準備。P1〜P6とM1〜M6を進めるための全体像。</p>
+<h2 id="この章で分かること">この章で分かること</h2>
+<p>この授業では、AWS上に用意したサーバーを使い、Web、DNS、DBを順につなげていく。最終的には、備品の情報をWeb画面から読み取り、管理画面で登録・変更できる小さなシステムを完成させる。</p>
+<p>最初からすべてを動かすのではなく、まずWebからファイルを返し、次に名前で接続できるようにし、DBとアプリを加える。本章では、その完成像と各部の役割を押さえる。</p>
+<p class="bullet">・ 利用者のPCとサーバーは、どのように仕事を分けるのか。</p>
+<p class="bullet">・ 5台のサーバーは、それぞれ何のためにあるのか。</p>
+<p class="bullet">・ AWS、EC2、Ubuntu、Webサーバーのソフトウェアは、どう違うのか。</p>
+<p class="bullet">・ ページを見る経路と、設定作業をする経路は、どう違うのか。</p>
+<p class="bullet">・ 最初の課題M1では、全体のどこを作るのか。</p>
+<h2 id="11-画面を開くときに起きていること">1.1 画面を開くときに起きていること</h2>
+<p>備品一覧をブラウザで開く場面を考える。ブラウザは「このページを送ってほしい」という要求を、ネットワークを通じてWebサーバーへ送る。Webサーバー側は要求を処理し、ページの内容を返す。ブラウザは受け取った内容を画面に表示する。</p>
+<p><strong>ブラウザ</strong>は、Webページを要求し、受け取った内容を表示するソフトウェアである。今回の利用者は、学生PC上のブラウザから一般向けの一覧を見る。管理画面を使うときは、後述する踏み台上のブラウザを使う。</p>
+<p><strong>クライアント</strong>は要求する側、<strong>サーバー</strong>は要求を受けて機能やデータを提供する側である。この呼び方は通信の役割を表す。特定の機種だけを意味するものではない。</p>
+<p>完成後のWeb側のアプリは、ブラウザからの要求を受ける一方で、DBへ「備品の名前と数量を読みたい」と問い合わせる。そのため、Web側はブラウザに対してはサービスを提供する側、DBに対してはクライアントになる。</p>
+<p>ここで大切なのは、一つの画面が一つのコンピューターだけで作られているとは限らないことである。画面を表示するPC、要求を受けるWeb、データを管理するDBが、それぞれの仕事を分担する。</p>
+<h2 id="12-サーバーを動かす土台">1.2 サーバーを動かす土台</h2>
+<h3 id="awsとec2">AWSとEC2</h3>
+<p><strong>AWS</strong>は、ネットワーク経由でコンピューターや保存領域などを利用できるクラウドサービスである。今回の授業では、その中の<strong>Amazon EC2</strong>を使ってサーバーを動かす。</p>
+<p>EC2で作成した一つの仮想サーバーを<strong>インスタンス</strong>という。実物のPCと同じように、CPU、メモリ、保存領域、ネットワークの機能を使える。机の上に5台のPCを置く代わりに、AWS内の5台の仮想サーバーをネットワーク越しに操作する、と考えるとよい。</p>
+<p>EC2自体が、DNSの回答やWebページの作成をすべて行うわけではない。EC2はソフトウェアを実行する土台であり、どのソフトウェアを入れて何を設定するかによって、サーバーの役割が決まる。<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html">AWSのEC2説明</a></p>
+<h3 id="ubuntuとebs">UbuntuとEBS</h3>
+<p>各EC2では、OSとして<strong>Ubuntu</strong>を使う。OSは、プログラムの実行、ファイル、ユーザーの権限、ネットワークなどを管理する。これまでOS・Linuxで学んだ操作は、WebやDBを設定するときにも使う。</p>
+<p>プログラム、設定ファイル、保存するデータなどは、各サーバーに接続された<strong>EBS</strong>という保存領域に置く。EC2が処理を動かすコンピューターに相当するのに対し、EBSはそのコンピューターが使うディスクに相当する。保存と停止・再開の詳しい関係は第8章で扱う。</p>
+<p>例えば「Webサーバー」は、EC2という実行環境の上でUbuntuが動き、その上にNginxなどのWeb用ソフトウェアを配置したものになる。実行環境、OS、ソフトウェア、担当する役割を区別しよう。</p>
+<h2 id="13-今回のシステムの全体図">1.3 今回のシステムの全体図</h2>
+<figure><img src="../../assets/figures/fig01-system-overview.png" alt="公開サブネットの踏み台とWeb、非公開サブネットのDNS・DB・配布サーバーを含む5台構成。学生PCからInternet Gatewayを経由してWebと踏み台へ接続する。" width="1600" height="1140"></figure>
+<p><strong>図1-1 システムの配置と主な経路。</strong> 青い実線は一般利用とDBへの要求、緑の破線は管理接続の方向を表す。矢印は要求方向で、応答は逆向きに戻る。名前解決と資源配布などの通信は、1.7の通信表で補う。この図は最終的な配置を示し、最初の課題ですべてのサービスを完成させるという意味ではない。</p>
+<p>図の中の5つのEC2は、すべて別のコンピューターである。同じような端末画面が開いていても、保存しているファイルや動いているプログラムは別々である。</p>
+<p><strong>IPアドレス</strong>は、ネットワーク上で通信先を指定するためのアドレスである。図に示した<code>10.20</code>で始まるアドレスは、この演習内で使う内部のIPv4アドレスである。学生PCから一般Webや踏み台へ接続する際は、それぞれの現在の公開IPv4アドレスを使う。</p>
+<p>図の箱は配置と役割を示している。箱の間に線があることだけで、すべての通信が許可されていると判断してはいけない。実際には、接続経路、許可する通信、サービスの待受設定が必要になる。</p>
+<h2 id="14-5台のサーバーは何をするのか">1.4 5台のサーバーは何をするのか</h2>
+<h3 id="踏み台サーバー：内部の作業を行うための端末">踏み台サーバー：内部の作業を行うための端末</h3>
+<p><strong>踏み台サーバー</strong>は、管理者が内部のサーバーを操作するための作業端末である。今回はUbuntuのデスクトップを使えるようにし、学生PCからリモートデスクトップで接続する。</p>
+<p><strong>リモートデスクトップ</strong>とは、離れたコンピューターの画面を手元に表示し、キーボードやマウスで操作する仕組みである。接続後に見えるデスクトップは、学生PCの中で動く別の画面ではなく、AWS内の踏み台で動いている画面である。</p>
+<p>踏み台からは、DNS・Web・DB・配布サーバーの端末へ接続して設定する。また、内部DNSの名前でWebを開いたり、内部向けのアプリ管理画面を使ったりする。</p>
+<p>内部の管理用入口を一台ずつインターネットへ公開する代わりに、踏み台からの管理通信へ絞るのが、この構成での役割である。ただし一般利用者がWeb一覧を見る際は、学生PCからWebへ直接アクセスする。踏み台は通常のWeb閲覧を中継するサーバーではない。</p>
+<h3 id="webサーバー：利用者からの要求を受ける入口">Webサーバー：利用者からの要求を受ける入口</h3>
+<p><strong>Webサーバー</strong>は、ブラウザなどからの要求を受け、ページやファイルを返す役割を持つ。今回の一般利用者が最初に接続する相手である。</p>
+<p>最初は、Web内に保存したテキストファイルをそのまま返す。この処理を担当するソフトウェアが<strong>Nginx</strong>である。ファイルの置き場所と要求の対応、読むための権限、通信を待ち受ける設定などを整える。</p>
+<p>後半では、同じWebの中に教員提供アプリを配置する。Nginxは要求を受け、必要に応じてアプリへ渡す。アプリはDBから備品データを読み、一覧を作って返す。Webの役割を増やしても、EC2をもう一台追加する構成ではない。</p>
+<h3 id="dnsサーバー：接続名に対応する情報を答える">DNSサーバー：接続名に対応する情報を答える</h3>
+<p><strong>DNS</strong>は、<code>web.lab.test</code>のような名前を通信に使うIPアドレスへ対応させる仕組みである。名前から接続先を調べることを<strong>名前解決</strong>という。</p>
+<p>例えばWeb上のアプリが<code>db.lab.test</code>へ接続するときは、Web側がDNSへその名前を問い合わせ、得たIPへDB接続を行う。人や設定ファイルは名前を使い、実際の通信ではアドレスを使うという役割分担になる。</p>
+<p>今回のDNSでは、内部の名前を答えるソフトウェアとして<strong>BIND 9</strong>を使う。DNSはWeb本文を返したり、DBの備品を検索したりするものではない。名前解決の後の通信は、WebやDBとの間で別に行われる。</p>
+<p>このDNSは演習内の名前を扱う。踏み台とWebは内部DNSを使うよう設定するが、学生PCの普段のDNSへ名前を公開登録するわけではない。内部名でのWeb閲覧は、踏み台側で扱う。<a href="https://bind9.readthedocs.io/en/v9.18.41/chapter3.html">BINDのゾーンと設定</a></p>
+<h3 id="dbサーバー：データを保存し、読み書きを管理する">DBサーバー：データを保存し、読み書きを管理する</h3>
+<p><strong>DB</strong>はデータベースの略で、データを整理して保存し、必要なものを検索・追加・変更できるようにする。今回の例では、備品の名前、数量、置き場所、公開するかどうかなどを保存する。</p>
+<p>このデータを管理するソフトウェアとして<strong>PostgreSQL</strong>を使う。アプリがデータを要求すると、PostgreSQLが要求を処理して結果を返す。DBにはデータを置くだけでなく、誰が接続でき、何を読んだり変更したりできるかを設定する。</p>
+<p>利用者のブラウザは、このDBへ直接接続しない。Web上のアプリがDBへ接続し、必要なデータを取り出してWeb画面にする。DBを内部に置き、接続できる相手を絞ることで、一般利用者にDB操作の入口を直接渡さない構成にする。<a href="https://www.postgresql.org/docs/16/tutorial-arch.html">PostgreSQLのクライアントとサーバー</a></p>
+<h3 id="配布サーバー：必要なソフトウェアを内部へ渡す">配布サーバー：必要なソフトウェアを内部へ渡す</h3>
+<p><strong>配布サーバー</strong>は、この授業で必要なパッケージやアプリ用の資源を、ほかのサーバーへ提供する。<strong>パッケージ</strong>は、ソフトウェアとその導入に必要な情報をまとめたものである。<strong>リポジトリ（repo）</strong>は、その取得元として使う保管先を指す。</p>
+<p>内部のサーバーがそれぞれ外部から別の版を取得すると、環境が揃わなかったり、授業中の外部接続に依存したりする。そこで、用意された資源を内部の配布サーバーから取得する。</p>
+<p>このサーバーは準備と導入を支える。一般利用者がページを開くたびに、要求が配布サーバーを通るわけではない。また、今回の配布repoと、教材の原稿や開発コードを管理するGitHubのリポジトリは用途が異なる。</p>
+<h2 id="15-webの中で動くソフトウェア">1.5 Webの中で動くソフトウェア</h2>
+<p>5台の役割を理解したら、Webの中を少し詳しく見よう。最終構成のWebでは、Nginxと教員提供アプリが連携する。</p>
+<figure><img src="../../assets/figures/fig02-web-and-app.png" alt="一般利用者の要求がNginxから同じWeb内のGunicorn・Djangoへ渡され、アプリが別のDBサーバーへ問い合わせ、結果をページとして返す。" width="1600" height="680"></figure>
+<p><strong>図1-2 Webの内部とDBの関係。</strong> Nginx、Gunicorn、Djangoは同じWeb用EC2で動く。DBは別のEC2で動く。これらを別々のEC2と数えない。</p>
+<p><strong>Nginx</strong>は、HTTPの要求を受ける入口となる。HTTPはWebの要求と応答をやり取りするための約束である。Nginxは保存済みのファイルを返すほか、別の処理担当へ要求を渡し、その結果を利用者へ返すこともできる。後者の働きを<strong>リバースプロキシ</strong>という。<a href="https://nginx.org/en/docs/beginners_guide.html">Nginxの静的配信とproxy</a></p>
+<p><strong>Gunicorn</strong>は、PythonのWebアプリを動かして要求を受け渡すサーバーソフトウェアである。今回はWeb自身の内部でだけ接続できる待受を使い、Nginxから渡された要求を受ける。</p>
+<p><strong>Django</strong>は、教員提供アプリが利用するWebアプリの仕組みである。備品一覧や管理画面などの機能は提供済みのコードに含まれる。学生は画面やプログラムを一から書くのではなく、配置、実行環境、接続先、起動方法、権限を整える。</p>
+<p>最初の課題のように保存済みファイルを返す方式を<strong>静的配信</strong>という。一方、要求を受けてDBの値から内容を作る方式が<strong>動的な応答</strong>である。動的な画面であっても、見た目を整えるCSSなどは保存済みの静的ファイルとして配信できる。</p>
+<h2 id="16-サーバーをつなぎ、公開範囲を決めるもの">1.6 サーバーをつなぎ、公開範囲を決めるもの</h2>
+<h3 id="vpcとサブネット">VPCとサブネット</h3>
+<p><strong>VPC</strong>は、AWSの中に作る論理的に分離されたネットワークである。その中のIP範囲を分けたまとまりが<strong>サブネット</strong>である。図1-1の5台は、一つのVPC内の二つのサブネットに配置する。</p>
+<p>公開サブネットには踏み台とWebを置く。インターネットへの経路を持ち、それぞれに公開IPを割り当て、必要な入口へ接続できるようにする。非公開サブネットにはDNS、DB、配布サーバーを置き、学生PCから直接接続する公開IPは持たせない。</p>
+<p>非公開のサーバーも、VPC内部の通信は必要である。非公開とは、すべての相手との通信を禁止するという意味ではない。例えばWebはDBと通信し、Webと踏み台はDNSへ問い合わせる。<a href="https://docs.aws.amazon.com/vpc/latest/userguide/how-it-works.html">AWSのVPCとサブネット</a></p>
+<h3 id="ルートとinternet-gateway">ルートとInternet Gateway</h3>
+<p><strong>ルート</strong>は、ある宛先への通信をどこへ送るかという経路の情報である。<strong>Internet Gateway（IGW）</strong>は、VPCとインターネットの間の通信に使うAWSの機能である。</p>
+<p>学生PCから公開WebへのHTTPも、踏み台へのリモートデスクトップもIGWを経由する。IGWはEC2ではなく、Webページを作ったり、管理用デスクトップを動かしたりするコンピューターではない。</p>
+<h3 id="security-groupとポート">Security Groupとポート</h3>
+<p><strong>Security Group（SG）</strong>は、関連付けたAWS資源に対して、許可する通信を定める仕組みである。今回は各サーバーの役割に対応した別のSGを使う。相手、通信方式、ポートを用途ごとに制限する。</p>
+<p><strong>ポート番号</strong>は、一つのホスト内のどの通信窓口へ接続するかを指定する番号である。例えば一般Webの入口にはTCPの80番、DB接続にはTCPの5432番を使う。TCPやUDPは通信方式の名前であり、名前解決ではUDPとTCPの両方の53番を扱う。</p>
+<p>経路があること、SGが許可すること、目的のソフトウェアがその宛先で接続を待つことは別々の条件である。SGを開くだけでWebやDBが動くわけではない。具体的な設定は第2章以降で扱う。</p>
+<h2 id="17-利用、管理、名前解決、配布の経路">1.7 利用、管理、名前解決、配布の経路</h2>
+<p>完成後の一般利用では、学生PCのブラウザからWebへ要求する。アプリがDBの値を必要とするときは、Web側からDBへ接続する。接続名の解決が必要なら、Web側が内部DNSへ問い合わせる。DNSはページ本文やSQLの通信を中継しない。</p>
+<p>管理者として設定を変えるときは、学生PCから踏み台のデスクトップへ入り、そこから対象サーバーへ接続する。<strong>SSH</strong>は離れたホストの端末を操作するための接続方式である。アプリ管理画面は、踏み台のブラウザからWebの内部向け入口を開く。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">用途</th><th scope="col">送信元から宛先</th><th scope="col">通信方式・ポート</th></tr></thead><tbody><tr><td>一般Web</td><td>学生PCからWebの公開IP</td><td>HTTP / TCP80</td></tr><tr><td>踏み台の画面操作</td><td>学生PCから踏み台の公開IP</td><td>RDP / TCP3389</td></tr><tr><td>内部サーバーの端末操作</td><td>踏み台からWeb・DNS・DB・配布サーバー</td><td>SSH / TCP22</td></tr><tr><td>内部の名前解決</td><td>踏み台・WebからDNS</td><td>DNS / UDP53・TCP53</td></tr><tr><td>DBの利用</td><td>Web上のアプリからDB</td><td>PostgreSQL接続 / TCP5432</td></tr><tr><td>アプリの管理画面</td><td>踏み台からWebの内部IP</td><td>HTTP / TCP8080</td></tr><tr><td>Web内の要求転送</td><td>Nginxから同じWeb内のアプリ</td><td>HTTP / TCP8000、同じホスト内のみ</td></tr><tr><td>パッケージ等の取得</td><td>踏み台・Web・DNS・DBから配布サーバー</td><td>HTTP / TCP80</td></tr></tbody></table></div>
+<p>この表の値は今回の演習の構成である。例えば8080番がどのWebシステムでも必ず管理画面になる、という意味ではない。ポートの用途はサービスの設定によって決まる。</p>
+<p>このほか、<strong>CloudShell</strong>と<strong>SSM（Session Manager）</strong>というAWSの管理機能を使う。CloudShellはAWS上でコマンドを実行する環境、Session Managerは対象EC2の端末へ入る管理手段である。今回の5台にはこの管理経路も用意される。CloudShellを操作することと、接続先Ubuntuで操作することは区別する。具体的な接続・終了は第3章で扱う。</p>
+<p>CloudShellとSSMは、利用者のページ要求が毎回通るサーバーではない。また、5台のEC2に加えて学生が構築する6台目・7台目のEC2として数えない。</p>
+<h2 id="18-学生が作る範囲と課題1の位置付け">1.8 学生が作る範囲と課題1の位置付け</h2>
+<p>個別の基盤として、VPC、サブネット、5台のEC2、所定の経路や管理接続、配布の仕組みを先に用意する。その土台を使って、学生がNginx、BIND、PostgreSQL、提供アプリの配置や接続設定を順に行う。</p>
+<p>サーバーが5台起動していることと、Webシステムが完成していることは違う。例えばWeb用EC2があっても、必要なソフトウェア、ファイル、設定が揃わなければ目的のページは返らない。学生が作業するのは、この土台を実際のサービスとして動かす部分である。</p>
+<figure><img src="../../assets/figures/fig03-first-mission.png" alt="課題1の要求がWebのNginxへ届き、保存済みのテキストファイルを返す。DNS、DB、アプリは後の課題で追加する。" width="1600" height="620"></figure>
+<p><strong>図1-3 最初の課題M1で作る範囲。</strong> 最初はIP指定でWebの静的ファイルを取得する。完成後の図1-2のうち、アプリやDBへ要求を渡す部分はまだ作らない。</p>
+<p>練習P1では、Nginxを導入し、配信するファイルと権限を整え、HTTPで本文を返して要求をログへ残す。自力課題M1では、P1とは別の指定ファイルを自分で配信し、P1のファイルも保持する。</p>
+<p>M1は、サービス、設定の構文、80番の待受、指定ファイル、Web自身からのHTTP、踏み台からのHTTP、公開IP経由のHTTP、アクセスログの8項目を採点する。公開経路の自動採点はCloudShellから行われる。学生PCのブラウザ表示と、どこから自動採点するかは区別する。</p>
+<p>学生は課題画面でM1の8/8を確認して、次のDNS単元へ進む。進行のために、別のサービス再確認や教師承認を追加することはない。NginxとHTTPの具体的な説明は第4〜5章、操作は既存の<a href="../../../labs/docs/ja/practice.md#p1-httpで静的ファイルを返す">練習P1</a>、完成要件は<a href="../../../labs/docs/ja/missions.md#m1-httpで静的ファイルを返す-8">自力課題M1</a>で扱う。</p>
+<h2 id="19-本章のまとめ">1.9 本章のまとめ</h2>
+<p>一般利用者はブラウザからWebへ接続する。Webは最初に静的ファイルを返し、後半では同じサーバー内のアプリを使ってDBの値を返す。DNSは接続名を解決し、DBはデータを管理する。踏み台は管理作業の端末、配布サーバーは必要資源の取得元である。</p>
+<p>それぞれの役割は、EC2、Ubuntu、EBSという実行と保存の土台の上で動く。VPC、サブネット、ルート、IGW、SGが配置・経路・通信の許可を支える。</p>
+<p>次の第2章では、全体図の配置と線を、ネットワークの設定へ結び付けて説明する。各章と課題の対応は<a href="../../README.md">教科書の入口</a>で参照できる。</p>
+<h2 id="章末問題">章末問題</h2>
+<h3 id="問1">問1</h3>
+<p>EC2、Ubuntu、Nginxは、それぞれ何を担当するか。Web用EC2を用意しただけで、目的のファイルを配信できるとは限らない理由も説明せよ。</p>
+<h3 id="問2">問2</h3>
+<p>学生PCで一般一覧を見る場合と、管理者が内部サーバーを設定する場合は、どの経路を使うか。踏み台の役割を含めて説明せよ。</p>
+<h3 id="問3">問3</h3>
+<p>Web上のアプリが<code>db.lab.test</code>へ接続するとき、DNSとDBはそれぞれ何を返すか。DNSがDBの問い合わせを中継すると考えてよいか。</p>
+<h3 id="問4">問4</h3>
+<p>一般Webの利用中に、配布サーバーが毎回ページの要求を中継するか。配布サーバーが必要になる場面を挙げよ。</p>
+<h3 id="問5">問5</h3>
+<p>Nginx、Gunicorn、Django、PostgreSQLを使うと、これらのためにEC2が4台必要になるか。今回の配置を答えよ。</p>
+<h3 id="問6">問6</h3>
+<p>最初の課題M1では、最終構成のどこを完成させるか。DNSやDBとの接続も同時に完成させる課題か。</p>
+<h2 id="章末解答">章末解答</h2>
+<h3 id="問1">問1</h3>
+<p>EC2は仮想サーバーという実行環境、Ubuntuはプログラム・ファイル・権限などを管理するOS、NginxはHTTP要求を受けてファイルを返すソフトウェアである。EC2だけでは目的のソフトウェア、ファイル、設定、通信条件が揃っているとは限らない。</p>
+<h3 id="問2">問2</h3>
+<p>一般一覧は学生PCからIGWを経由して公開Webへ接続する。管理作業は学生PCからIGWを経由して踏み台へRDP接続し、踏み台から対象サーバーへSSH接続する。踏み台は管理用の作業端末であり、通常のWeb閲覧を中継する相手ではない。</p>
+<h3 id="問3">問3</h3>
+<p>DNSは名前に対応するIPなどのDNS情報を返す。WebはそのIPへ別の接続を行い、DBへデータを問い合わせる。DBは要求されたデータや処理結果を返す。DNSはSQLの問い合わせや結果を中継しない。</p>
+<h3 id="問4">問4</h3>
+<p>中継しない。配布サーバーはNginxなどのパッケージや指定アプリ資源を取得するときに使う。通常のページ要求はWebが受け、必要ならアプリとDBで処理する。</p>
+<h3 id="問5">問5</h3>
+<p>必要ではない。Nginx、Gunicorn、Djangoを使うアプリは同じWeb用EC2に置き、PostgreSQLは別のDB用EC2で動かす。ソフトウェアの数とEC2の数は同じとは限らない。</p>
+<h3 id="問6">問6</h3>
+<p>Nginxで指定された静的ファイルをHTTP配信し、指定本文、待受、各経路の応答、ログなどを揃える。DNS、DB、提供アプリとの連携は後の課題で追加する。M1は8/8で完了する。</p>
+<h2 id="参考資料">参考資料</h2>
+<p>外部資料の確認日：2026-10-30。今回の配置・IP・課題条件は本リポジトリの現行仕様による。</p>
+<p class="bullet">・ <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html">AWS What is Amazon EC2?</a></p>
+<p class="bullet">・ <a href="https://docs.aws.amazon.com/vpc/latest/userguide/how-it-works.html">AWS How Amazon VPC works</a></p>
+<p class="bullet">・ <a href="https://nginx.org/en/docs/beginners_guide.html">Nginx Beginner’s Guide</a></p>
+<p class="bullet">・ <a href="https://bind9.readthedocs.io/en/v9.18.41/chapter3.html">BIND 9 Configurations and Zone Files</a></p>
+<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/tutorial-arch.html">PostgreSQL 16 Architectural Fundamentals</a></p>
+<p class="bullet">・ <a href="../../../labs/README.md">現行P/M教材</a></p>
+<p class="bullet">・ <a href="../../../../development/01_roles/cyber_security/tools/web_lab_catalog/README.md">教員提供アプリの配置と設定</a></p></main></body></html>
