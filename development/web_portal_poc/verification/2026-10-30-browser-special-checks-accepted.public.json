@@ -1,0 +1,126 @@
+{
+  "status": "accepted_for_agreed_scope",
+  "verified_on": "2026-10-30",
+  "scope": "existing_CloudFormation_initial_setup_then_browser_checks_results_grades_and_teacher_progress",
+  "code_commits": [
+    "ba1f531",
+    "6f83232",
+    "c10e11f"
+  ],
+  "deployment": {
+    "student_and_teacher_checker_sha256": "9c245021d6857304ac0f51ab202e439648cac1ebb4dc1b1e248b2b10d0f456e1",
+    "web_sha256": "a30978a0aa2f8631a78ac0c9860e88c28a52e5898ea07526c11c3a76531ef207",
+    "new_resources": 0,
+    "new_iam_grants": 0,
+    "existing_resources_only": true
+  },
+  "runtime_fix": {
+    "symptom": "warm Lambda reached 256MB and 120s timeout",
+    "change": "reuse SDK clients across invocations; do not run external denial probes during password-key preparation",
+    "after_fixed_read_seconds": [
+      2.86,
+      0.11,
+      0.18
+    ],
+    "memory_or_timeout_setting_increased": false
+  },
+  "checks": [
+    {
+      "task_id": "M3",
+      "job_id": "8832fc46-017b-421e-a1ad-98cb2a2fde7c",
+      "raw_earned": 3,
+      "raw_maximum": 3,
+      "same_web_stopped_and_restarted": true,
+      "original_volume_marker_and_changed_boot_verified": true,
+      "browser_automatic_canonical_save": true,
+      "saved_at_utc": "2026-10-30T10:17:03.114Z"
+    },
+    {
+      "task_id": "M5",
+      "job_id": "87bf3959-9f92-4324-8f71-929894d2f19c",
+      "case": "browser_wrong_password_canary",
+      "raw_earned": 9,
+      "raw_maximum": 13,
+      "unresolved": 3,
+      "evaluable": false,
+      "browser_automatic_canonical_save": true,
+      "selected_13_points_preserved": true,
+      "saved_at_utc": "2026-10-30T11:01:21.417Z"
+    },
+    {
+      "task_id": "M5",
+      "job_id": "072eaa7a-f5d5-4544-a945-be095ec5843c",
+      "case": "positive_existing_fixture",
+      "raw_earned": 13,
+      "raw_maximum": 13,
+      "unresolved": 0,
+      "real_login_create_edit_database_public_reflection_logout": true,
+      "browser_same_report_save": true,
+      "saved_at_utc": "2026-10-30T11:06:27.256Z"
+    },
+    {
+      "task_id": "M6",
+      "job_id": "a7ab472e-cdce-4c37-a7a9-f5570266b5b4",
+      "case": "positive_existing_fixture",
+      "raw_earned": 16,
+      "raw_maximum": 16,
+      "unresolved": 0,
+      "real_allowed_and_denied_actions": true,
+      "browser_same_report_save": true,
+      "saved_at_utc": "2026-10-30T10:59:10.218Z"
+    }
+  ],
+  "canonical_comparison": {
+    "verified_at_utc": "2026-10-30T11:12:04.868414+00:00",
+    "before_rows": 78,
+    "after_rows": 82,
+    "canonical_requests_added": 4,
+    "old_requests_and_unrelated_rows_preserved": true,
+    "original_registration_metadata_preserved": true,
+    "latest_and_selected_rules_verified": true,
+    "raw_earned": 62,
+    "raw_maximum": 62
+  },
+  "technical_acceptance": {
+    "original_five_and_roots_preserved": true,
+    "encrypted_root_gib": 96,
+    "all_five_running_and_ssm_online": true,
+    "browser_canary_absent_from_job_store": true,
+    "browser_canary_absent_from_decoded_ssm_payload": true,
+    "browser_password_delivery_rsa_ciphertext_bytes": 512
+  },
+  "browser_acceptance": {
+    "storage_workflow_JA_RU_UZ": true,
+    "own_grade_62_latest_M3_M5_M6": true,
+    "teacher_verification_list_62_latest_submission_1106_UTC": true,
+    "expired_login_help_and_Google_return_to_same_grades_page": true,
+    "login_duration_and_permissions_unchanged": true
+  },
+  "verification_method": {
+    "google_identity": "designated_teacher_used_as_student_role",
+    "student_aws": "965244652544",
+    "teacher_aws": "170126527713",
+    "lab_id": "class193548-test1",
+    "positive_password_delivery": "existing fictional fixture password encrypted inside bastion; plaintext never exported to CloudShell, shared PC, chat or GitHub",
+    "positive_human_browser_password_submission": "not_completed; original human attempt did not reach checker before session expiry",
+    "browser_password_form_path": "actual wrong-password canary submitted, decrypted, observed and saved; server-side RSA encryption/decryption tests also passed"
+  },
+  "local_checks": {
+    "python": 54,
+    "node": 80,
+    "native_Linux_OpenSSL": 4,
+    "web_package": 3
+  },
+  "not_repeated_or_not_performed": [
+    "independent student Google/AWS walkthrough",
+    "native-language review",
+    "separate real P3/P5/P6 repetition; shared browser coordinator and original profile-specific registry used",
+    "End Lab tests already accepted in previous evidence; teacher Lab must remain started"
+  ],
+  "excluded_by_latest_scope": [
+    "browser initial five-node automation",
+    "teacher End Lab availability",
+    "extra high availability monitoring load infrastructure",
+    "new instances or replacement of original nodes"
+  ]
+}

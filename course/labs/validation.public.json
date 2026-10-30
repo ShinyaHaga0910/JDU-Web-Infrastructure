@@ -1,6 +1,7 @@
 {
   "scope": "D12_P_M_materials_local_checks_not_AWS_walkthrough",
-  "checked_on": "2026-10-23",
+  "checked_on": "2026-10-30",
+  "browser_guide_revision": "2026-10-30",
   "languages": [
     "ja",
     "ru",
@@ -16,7 +17,7 @@
   "mission_tasks": 7,
   "scored_checks": 62,
   "raw_points": 62,
-  "checks_passed": 495,
+  "checks_passed": 510,
   "bash_blocks_syntax_checked": 48,
   "pdfs": {
     "web_lab_missions_ja.pdf": {
@@ -46,7 +47,7 @@
   },
   "distribution_id": "web-course-class193548-20261023-r2",
   "registry_sha256": "3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33",
-  "package_sha256": "d6d87d293669bd1ba74a351440c85fcbbc703aa2b36f1921de69421c8574d44d",
+  "package_sha256": "95f837422ce77de0e5f80f0ea6c8247ec3aea3c5efd791301ad0f326d2a73ec2",
   "new_material_AWS_walkthrough": false,
   "native_language_review": false,
   "teacher_visual_review": false,

@@ -1,4 +1,4 @@
-# WEB-PORTAL-001：今回の完成条件
+# WEB-PORTAL-001：完了（合意した範囲・指定検証環境）
 
 2026-10-30最新本人決定：**初期設定は既存CloudFormationを使う。構築後、学生がブラウザで課題を確認し、本人の成績を見て、教師が進捗を追えるところを完成させる。** 初回5台作成を全自動Web化する旧R1は今回の必須条件から外す。旧候補コード・署名物は保持するが、新12資源やworker配布許可を追加しない。旧repoを含む既存5台の削除・置換も行わない。
 
@@ -19,15 +19,17 @@
 | 通常の課題確認・原本保存 | 実M1/M2/M5、元report、未確認M5で選択13/合計62維持、再送・停止後閲覧。[確認](verification/2026-10-29-browser-checks-accepted.public.json)・[原本](verification/2026-10-30-canonical-submission-accepted.public.json) |
 | 教師一覧・学生別画面 | 担当の検証Labだけの62点/M5未確認、授業/検証分離、3言語、担当外/logout拒否。[証拠](verification/2026-10-30-teacher-progress-accepted.public.json) |
 
-## 今回残っている操作
+## 今回の完了記録
 
-| 旧ID | 作業 | 状態 |
+| 旧ID | 作業 | 結果 |
 | --- | --- | --- |
-| R1 | 初回5台の全自動Web化 | **今回対象外**。既存CloudFormationを利用する。新規5台の追加試験や旧環境削除は不要 |
-| R2 | P3/M3の停止前後確認をブラウザへ接続 | doing。CLIの専用証拠処理を再利用する。停止・起動は学生のAWSコンソールでの明示操作 |
-| R3/R4 | P5/M5・P6/M6の機能/権限確認をブラウザへ接続 | next。既存checkerを再利用し、既存アプリpasswordを非表示入力。この確認のためにpasswordを変更しない |
-| R5 | 利用手順の仕上げ | next。CloudFormation初期設定→本人連携→ブラウザ確認/成績→教師一覧という手順に揃える |
-| R6 | 残った操作の実機受入・完了判定 | next。既存の指定5台/先生Googleの学生役で不足部分を確認する。実施済みの通常確認・End Lab試験を理由なく繰り返さない |
+| R1 | 初回5台の全自動Web化 | 今回対象外。既存CloudFormation・個別の初期登録を使用。旧5台の削除・置換や新12資源は実施しない |
+| R2 | P3/M3停止前後のブラウザ確認 | done。実M3で同じWebの停止・元volume/marker保持・boot ID変化、3/3と原本保存 |
+| R3/R4 | P5/M5・P6/M6の機能/権限確認 | done。M5ブラウザ誤password経路と点数保持、EC2内の既存fixtureでM5 13/13・M6 16/16、ブラウザ結果表示/同report保存 |
+| R5 | 最小手順と配布入口 | done。[ブラウザ手順](BROWSER-CHECKS.md)、教材ZIP内のJA/RU/UZ追補。元P/M本文・署名物は保持し、採点CLIを追補で置き換える |
+| R6 | 指定環境の不足操作の受入 | done。原本78→82行、旧受付/登録不変、62/62、本人/教師最新表示、元5台/暗号化96GiB/全SSM Online、同画面へのGoogle再ログイン |
+
+[今回の詳細な実受入・試験方法・未実施](verification/2026-10-30-browser-special-checks-accepted.public.json)。正規passwordの成功試験は秘密をEC2内に保持するfixture経路、ブラウザのpassword送信は誤password canaryによる実経路で検証した。人による正規passwordフォームの成功を確認済みとは報告しない。旧R1は再開作業に戻さない。今回の制作・AWS反映は完了し、追加実装は新しい依頼を待つ。
 
 独立した学生Googleでの試読・通し試験は未実施と明記する。本人は別環境を用意できないため、新しいGoogle/AWSアカウントを今回の実装完了の条件に追加しない。一般学生への展開済みと、指定された検証環境での受入を区別する。
 

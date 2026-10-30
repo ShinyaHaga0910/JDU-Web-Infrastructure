@@ -15,6 +15,7 @@ sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = Path(os.environ.get('JDU_WEB_PROJECT_ROOT', str(Path(__file__).resolve().parents[3] / 'development')))
 from markdown_it import MarkdownIt
+from portal_guide import write_guides
 from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE
 from checks import CHECKS
 from explanations import LABELS, READING, ROUTES, MISSION_PLAN, MODULE_NOTES, STEP_NOTES, OUTPUT_EXAMPLES
@@ -382,11 +383,12 @@ def main():
     }
     for name,source in public_assets.items():
         (ROOT/'distribution'/name).write_bytes(source.read_bytes())
+    write_guides(ROOT,CSS)
     links=[]
     for lang in LANGS:
         label={'ja':'日本語','ru':'Русский','uz':'O‘zbekcha'}[lang]
-        links.append(f'<article><h2>{label}</h2><p><a href="{lang}/practice.html">P0–P6</a> · <a href="{lang}/missions.html">M0–M6</a></p><p><a href="../pdf/web_lab_practice_{lang}.pdf">P PDF</a> · <a href="../pdf/web_lab_missions_{lang}.pdf">M PDF</a></p></article>')
-    (ROOT/'output/html/index.html').write_text('<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JDU Web P/M 教材</title><style>'+CSS+'</style></head><body><main><h1>Web Infrastructure · P / M</h1><p>手順付き練習と自力課題 / Практика и задания / Mashqlar va topshiriqlar</p><p>2026-10-23 · 教師確認用初版 / Для проверки преподавателем / O‘qituvchi tekshiruvi uchun</p>'+''.join(links)+'<p>署名版の期限: 2026-10-27 14:24:57 UZT</p></main></body></html>',encoding='utf-8',newline='\n')
+        links.append(f'<article><h2>{label}</h2><p><a href="{lang}/portal.html">ブラウザ確認 / Проверка в браузере / Brauzerda tekshirish</a></p><p><a href="{lang}/practice.html">P0–P6</a> · <a href="{lang}/missions.html">M0–M6</a></p><p><a href="../pdf/web_lab_practice_{lang}.pdf">P PDF</a> · <a href="../pdf/web_lab_missions_{lang}.pdf">M PDF</a></p></article>')
+    (ROOT/'output/html/index.html').write_text('<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JDU Web P/M 教材</title><style>'+CSS+'</style></head><body><main><h1>Web Infrastructure · P / M</h1><p>手順付き練習と自力課題 / Практика и задания / Mashqlar va topshiriqlar</p><p>2026-10-23 · 教師確認用初版 / Для проверки преподавателем / O‘qituvchi tekshiruvi uchun</p>'+''.join(links)+'<p>2026-10-30: 初期設定後はブラウザ確認の追補を使用 / После начальной настройки используйте инструкцию проверки в браузере / Boshlang‘ich sozlashdan keyin brauzer yo‘riqnomasidan foydalaning.</p><p>同梱の旧署名版は2026-10-27で期限切れです。初期設定には教師が個別発行する有効版を使用 / Получите актуальный комплект у преподавателя / O‘qituvchidan amaldagi tarqatmani oling.</p></main></body></html>',encoding='utf-8',newline='\n')
     package=ROOT/'output/web-lab-pm-r1.zip'
     members=[p for folder in ('docs','resources','distribution','output/html','output/pdf') for p in (ROOT/folder).rglob('*') if p.is_file()]
     members += [ROOT/'README.md',ROOT/'VALIDATION.md']

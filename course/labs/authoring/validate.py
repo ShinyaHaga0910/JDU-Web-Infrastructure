@@ -1,5 +1,6 @@
 """Validate the authored P/M material and public-resource helpers. Does not use AWS."""
 import ast
+from datetime import date
 import hashlib
 from html.parser import HTMLParser
 import importlib.util
@@ -145,7 +146,7 @@ def main():
         hashes=json.loads(z.read('web-lab-pm-r1/TEACHING-FILE-HASHES.json'))
         ok('zip_exact_inventory',set(z.namelist())=={'web-lab-pm-r1/'+p for p in hashes}|{'web-lab-pm-r1/TEACHING-FILE-HASHES.json'})
         ok('zip_all_hashes',all(hashlib.sha256(z.read('web-lab-pm-r1/'+p)).hexdigest()==v for p,v in hashes.items()))
-    result=dict(scope='D12_P_M_materials_local_checks_not_AWS_walkthrough',checked_on='2026-10-23',
+    result=dict(scope='D12_P_M_materials_local_checks_not_AWS_walkthrough',checked_on=date.today().isoformat(),browser_guide_revision='2026-10-30',
         languages=list(LANGS),material_revision=MATERIAL_REVISION,practice_tasks=7,practice_steps=49,
         explained_steps=len(STEP_NOTES),module_understanding_questions=len(MODULE_NOTES),communication_routes=len(ROUTES),
         worked_output_examples=len(OUTPUT_EXAMPLES),mission_tasks=7,scored_checks=62,raw_points=62,

@@ -1,3 +1,5 @@
+> 2026-10-30追補：初期CloudFormation後のブラウザ確認をJA/RU/UZのportal.md / portal.htmlへ追加。元のP/M本文・PDFと初期署名物は参照版として保持し、採点CLI/URLコピーを追補の手順へ置き換えます。指定環境のM3/M5/M6・原本保存・本人/教師表示は[実受入](../../development/web_portal_poc/verification/2026-10-30-browser-special-checks-accepted.public.json)を参照。教材全手順の新規学生通し試験・母語校閲・教員目視確認を完了済みとはしません。
+
 # D12 P/M教材の確認範囲
 
 2026-10-23、教材改訂r1.1。P0-P6の49手順とM0-M6を日本語/ロシア語/ウズベク語で制作。49段階全ての説明、7つの仕組み/理解確認、HTTP/DNS/SQLの出力読解、7経路の通信表とMの作業計画を追加。初期配布と62素点checkerのAWS受入済み版へ照合する。

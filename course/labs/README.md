@@ -1,5 +1,7 @@
 # Web演習 D12：P/M課題教材
 
+2026-10-30追加：初期設定は既存CloudFormation、その後の課題確認・成績閲覧はブラウザを使います。まず[日本語の確認手順](output/html/ja/portal.html)・[Русский](output/html/ru/portal.html)・[O‘zbekcha](output/html/uz/portal.html)を読みます。本文/PDFのサーバー設定コマンドは維持し、課題確認用CLIとURLコピーをこの追補へ置き換えます。期限切れの署名版は使わず、教師が有効な版を個別発行します。
+
 2026-10-23更新、教材改訂r1.1。本人の「まずPとMだけ」「PはOS・Linux教材と同じ詳しい手順」の依頼に基づく教材。日本語原稿、ロシア語・ウズベク語の学生版を同じ構造とcommandから生成する。スライド・独立教科書・最終実演は今回作らない。
 
 - [閲覧入口：3言語HTML](output/html/index.html)
