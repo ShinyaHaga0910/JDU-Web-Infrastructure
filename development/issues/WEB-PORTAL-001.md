@@ -1,170 +1,25 @@
 # WEB-PORTAL-001：学生の環境準備・採点確認をブラウザへ集約する
 
-- 状態: 原本自動保存と教師用進捗一覧をAWSへ実配備・受入済み（2026-10-30）。教師は担当verification Lab1件/62点/詳細/3言語を閲覧し、授業用から検証を除外、担当外とlogout後を拒否。元成績78行/元binding/元5台・認証を保持。全体目標の新規5台ブラウザ準備・特殊checker・一般配布は残り、全IssueはOPEN。
-- 登録: 2026-10-23、本人依頼。
-- 着手順: D12の受入残件を保持し、2026-10-23の本人依頼で本Issueの構成検討を先行。Web演習の改善課題として実証・実装へ進める。
-- GitHub: [Issue #1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1)（非公開JDU-Web-Infrastructure）。
+更新：2026-10-30。**全体は未完了。残件はR1〜R6の6項目に固定する。** 完了条件・実行順・証拠は[全体完了表](../web_portal_poc/PORTAL-ACCEPTANCE.md)を正本とする。
 
-10/29課題確認の内部基盤：固定task/jobとSSM実行番号を永続化し、切断時には同じcommandを回収する処理、元request ID付きreport outbox、既存checker/HTTP外部確認のadapterを追加した。Moto/架空SSM/HTTP29件と既存62点API14件合格。公開中Web/AWSは変更なし。HTTPの確認実行・本人認可・実AWS preflight・正規採点送信とM3/M5M6はまだ接続していない。[内部検証](../web_portal_poc/verification/2026-10-29-assessment-job-core.public.json)。
+## 受入済み
 
-## 2026-10-30 教師用進捗一覧の実受入（最新）
+- 学校Googleと本人AWS/Labの連携（先生を学生役にも用いた検証）。
+- 本人の保存成績、学生EC2停止中/学生End Lab後の閲覧（教師Lab開始が条件）。
+- 通常の課題確認→成績原本の自動保存、未確認時の選択点数保持と同request再送。
+- 担当教師の一覧/学生別画面、授業/検証分離、3言語、担当外/ログアウト後の拒否。
 
-本人の適用直前承認後、既存非公開2 Codeと同じWebのUPDATE_COMPLETE、検証Lab1件だけの教師ACCESS行を確認。実Google→教師リンク→授業用0件/検証用1件→学生別62点/M5未確認、JA/RU/UZ、担当外拒否、実logout後拒否/通常reloginで同じscope再利用を受入した。元学生の5台停止表示/保存M1の元受付も保持し、元成績78行全体と元binding/承認は不変。新資源/IAM/認証情報なし、教師EC2停止。[実受入記録](../web_portal_poc/verification/2026-10-30-teacher-progress-accepted.public.json)。多実学生course/独立した別実teacher identityは未受入で、新規環境準備/特殊確認/一般配布を継続する。
+[本人連携](../web_portal_poc/verification/2026-10-29-authenticated-student-portal.public.json)・[原本保存](../web_portal_poc/verification/2026-10-30-canonical-submission-accepted.public.json)・[教師画面](../web_portal_poc/verification/2026-10-30-teacher-progress-accepted.public.json)。元5台・暗号化root96GiB・認証・常設SSM・原本を保持。検証用1件の成功を一般学生への配布完了と数えない。
 
-## 2026-10-30 教師用進捗一覧（適用前の履歴）
+## 残り6項目
 
-全体目標の継続により、教師の担当Labだけを読む一覧/学生別画面を追加した。原本の62点方式を共用し、授業/検証を分離、未提出と取得不可を区別する。教師は学校domainだけで認めず、教師CloudShellで独立した閲覧許可を作る。新Python13件、Node新8件/全59件、package/計画検査を合格。架空データのChrome表示を確認し、実AWSの2 Code/2 Web Modifyと検証Lab1件だけの教師許可の下書きを検査し、双方の更新計画はCREATE_COMPLETE/AVAILABLE。まだ新しい教師許可や画面を有効にしていない。[計画記録](../web_portal_poc/verification/2026-10-30-teacher-progress-plan.public.json)。[完成条件](../web_portal_poc/TEACHER-PROGRESS-ACCEPTANCE.md)。
+- [ ] **R1 ブラウザから初回5台を準備**：割当/本人AWS確認/資源確認→5台初期化/SSM/内部SSH/採点登録。学生にコマンド転記を要求せず、再読込みで重複作成しない。署名・期限の有効な資材を用いる。
+- [ ] **R2 M3/P3 停止前後確認**：同じWebの停止前記録/停止観測/再開後保持をブラウザ手順で確認する。
+- [ ] **R3 M5/P5 アプリ機能確認**：本人の非表示password入力から実ログイン/専用架空データ登録・編集/反映/logoutを確認し原本へ保存する。
+- [ ] **R4 M6/P6 権限確認**：匿名/誤password/管理入口の許可・拒否を既存条件で確認し原本へ保存する。
+- [ ] **R5 一般学生への配布・割当**：検証1件固定を外し、教師が指定した学校identity/AWS/Labだけへ配布・登録・担当許可を行う。正規署名版/固定入口/学生・教師手順を揃える。
+- [ ] **R6 最終の通し受入**：別の学生identity/対応Labで構築→確認→原本→本人/教師画面、稼働・停止・再開/学生End Lab後、他人データ拒否と元環境保持を照合し、AWS/GitHub/手順を揃える。
 
-## 2026-10-30 原本自動保存の実受入（最新）
+**6項目の合格で全体を終了する。** 非機能面の追加強化、教師End Lab中の閲覧、25点換算、ブラウザ内RDPは今回に追加しない。初回5台準備は未実装で、完成間近とは報告しない。
 
-承認済み候補ce896adを学生/教師checkerと同じWebへ適用した。新M1は実SSMの8/8を完了POSTで自動保存し、追加の保存クリックは不要。既存M1/M5も元report/request IDのまま保存。M5 9/13＋未確認4で選択13点・合計62点を保持した。原本75→78行、REQUEST3件だけ追加、旧受付/無関係な行/登録情報を保持。旧report再送は原受付を返し新M1を巻き戻さず、全partition不変。元4件はSSM各1回、JA/RU/UZ、停止後の保存結果と62点表示を受入した。M5保存後の一時取得失敗はGET再読込みで回復し、2回目の保存POSTやSSM再送は不要だった。元5台/96GiB/認証/SSMを保持し、教師EC2とともに停止済み。新資源/IAM/鍵なし。
-
-[実受入記録](../web_portal_poc/verification/2026-10-30-canonical-submission-accepted.public.json)、[完成条件](../web_portal_poc/CANONICAL-SUBMISSION-ACCEPTANCE.md)、[全体の残件](../web_portal_poc/PORTAL-ACCEPTANCE.md)。P/M0成績外と不正要求/失効拒否の今回追加試験はローカルで確認し、新たな実AWS負例としては数えない。教師Lab終了中の成績閲覧は引き続き後続課題。今回の完成で区切り、次機能には自動着手しない。以下は各時点の履歴。
-
-## 学生の到達体験
-
-**10/29本人指示で停止、原本への自動保存の適用は翌日へ延期。** 候補ce896ad/実変更計画を確認して本人承認を受領したが、その後に停止指示があったため、applyも原本書込みも行っていない。同じ対象/コード/計画の承認は保持し、再開指示後に資格情報と保存receiptを再確認して続ける。
-
-10/29次工程：原本保存の共通処理と本人binding/承認を同時確認する保存を実装。新9件＋既存基盤でPython46件、既存API14件、Node51件合格。追加資源は作らず、既存の学生/教師checkerとWebのコードだけを更新する。今回の原本書込みはまだ有効にしていない。[自動保存の受入条件](../web_portal_poc/CANONICAL-SUBMISSION-ACCEPTANCE.md)。
-
-10/29今回の実受入完了：承認済み学生4資源・教師2資源を配備し、既存Webは同じURLで更新。元5台/96GiB/認証/成績原本を保持し、結果は専用DBへ保存した。実M2はmap順序の修正後も同じcommand/request IDを回収、3件各1回のみ。M5の未確認は確定点と表示しない。停止中は保存M2を再表示し新M1を拒否、元成績62点/全partition不変。ブラウザ範囲を完了し、下記の旧準備/停止記述は履歴として保持する。[実受入](../web_portal_poc/verification/2026-10-29-browser-checks-accepted.public.json)。
-
-10/29再開：学生側の既存checker/永続job、教師側の本人登録確認、3言語の課題選択/待機/結果画面を接続。結合6件＋job/observer29件、画面新4件＋既存44件、Web package/計画5件合格。固定課題の確認結果を専用DBへ保存し、元成績の上書きは行わない。M3停止証拠/M5M6秘密入力は未確認と明示。AWSの学生4 Add・教師2 Add・既存Web2 Modifyの具体化を進め、まだ適用していない。[今回の完成条件](../web_portal_poc/CHECKS-ACCEPTANCE.md)。次は新しいアクセス追加の適用直前確認と、実ブラウザからの通し受入。以下の一時停止記述は履歴。
-
-**10/29停止時の方針**：本人の「今実装しているところが完成したら一旦ストップ」「非機能要件をがちがちに実装しなくてもよい」に従い、内部job基盤の完成・GitHub反映で区切る。今回の29模擬試験と既存API14件は合格、AWSや公開画面への配備は行っていない。追加の実AWS preflight/採点送信/HTTP接続には着手せず、再開指示を待つ。再開後は授業に必要な学生の確認実行→結果保存→画面表示を優先し、本人限定・既存データ保持・取得不能を0点化しない最低限の保護を残す。非機能面の追加強化だけを独立した先行工程として増やさない。
-
-10/29最新受入：Web v4/学生側3資源は実配備完了。学校Google（本人指定の先生を学生役）→学生AWSの実署名→割当Lab登録→本人62/62点/5台停止の表示、実ログアウト拒否/再ログイン再利用を確認。本人が学生End Lab後、LMS Terminated/00:00で本人62点を閲覧し、状態unavailable後も62点を保持した。元成績全projection/全partition不変、教師EC2停止。JA/RU/UZ、Node44件。次はブラウザchecker/初期5台準備/教師の担当範囲つき一覧。[実受入](../web_portal_poc/verification/2026-10-29-authenticated-student-portal.public.json)、[全goal受入表](../web_portal_poc/PORTAL-ACCEPTANCE.md)。下記の未適用/未連携は各時点の履歴。
-
-10/29実適用：教師再接続後、承認済み非公開S3とWeb v3は作成/更新完了、学校identityの検証Lab承認もHMAC登録した。実Googleログイン、未連携の成績拒否、割当済みAWS/Lab表示まで確認。native POSTの拒否はno-referrerとOrigin検査の不整合をChromeの架空formで再現し、登録画面だけsame-originにするv4を修正・44件合格。厳密なOrigin/CSRFは維持。学生AWSの本人確認/本人62点は未受入。[実適用と修正記録](../web_portal_poc/verification/2026-10-29-browser-link-rollout.public.json)。
-
-10/29適用待ち：本人から専用S3/本人連携/本人限定成績・状態表示の適用直前承認を受領。execute前に教師CloudShellがvoc-cancel-credで拒否され、Academy本文も空白のため、本人へ教師Labの通常再開を依頼中。applyは未実行、既存資源とデータを保持。再接続後は保存済みの同じ計画を再照合して続け、同じ承認は求め直さない。
-
-10/29最新：非公開2 Lambda・HMAC鍵保管先・ログ2つの実作成を確認し、画面更新時に同じ登録試行へ戻るv2をCodeだけの2変更で適用、実AWSで未登録拒否・元成績全projection/全partition不変・教師EC2停止を受入した。学校identityは本人指定の教師アカウントを学生役として使う。まだ実承認行・bindingはない。ブラウザ候補は学生AWSへ接続確認用3資源を導入する方式。教師側の専用非公開S3＋学生account限定のGet許可2 Addと、既存WebのRevision/Endpoint 2 Modifyのchange setを準備し、未execute。Web最終候補v3と全4,479ファイルの内容を照合し、Python41件/Node43件が合格。公開中Webはログインだけ、成績reader/本人登録は無効のまま。実Google→学生AWS→本人62点・状態の受入は次工程。[適用前計画](../web_portal_poc/verification/2026-10-29-browser-enrollment-plan.public.json)、[非公開v2実受入](../web_portal_poc/verification/2026-10-29-private-services-v2.public.json)。本Issue全体は未完了。
-
-教師が案内する固定のWeb入口へ学生本人がログインし、自分の環境の準備・現在状態・課題確認・採点結果・送信履歴をブラウザだけで扱える。初回コマンドの手渡しや、CloudShellで生成したURLの転記を通常の導線から減らす。
-
-## 現行の運用条件（2026-10-29本人決定）
-
-当面は教師が自分のLearner Labを開始してから利用する。教師EC2は成績閲覧の必須条件にしない。教師Lab終了中の保存成績閲覧と通常AWS accountへの移行は後続課題へ移し、今回の受入を止める条件にしない。終了後の接続失敗という実測結果は保持する。
-
-- 教師Lab開始中：学生EC2停止中・学生Lab終了後でも、本人認証と登録を確認して保存済み成績を閲覧する。学生の現在状態が取得不能でも過去の成績を0点へ変えない。
-- 環境構築・最新状態・新しい採点：教師側に加え、学生本人のLabと必要なEC2/SSMが利用可能であることを確認する。
-- 教師側が利用不能：成績取得不可を表示し、0点・記録なしと取り違えない。画面からLabやEC2を自動起動しない。教師がAcademyで通常のStart Labを行い、復帰を確認する。
-- 通常の次工程：本人認証・AWS本人登録、本人だけの成績/状態画面の順に受入する。Google専用client・秘密の保管・教師の学内identityによる実ログイン/ログアウトは完了。実学生Google identity・AWS bindingと個人成績画面の受入は未完了。
-
-### 本人ログイン方式の再検討（10/29本人質問）
-
-本人は当初Google Cloud project/OAuth clientを把握しておらず、Web Functions側でjdu.uzに限定する方式・本人メールによる認証ができるか質問した。Google方式は制作者が学内教材ポータルを参考に試作した案で、当初の必須指定ではなかった。その説明後、本人が「簡単に作成できるなら学生のGoogle認証でログインする方法」と選択したため、Google方式を第一候補として設定準備を進める。
-
-Chromeの学校Google accountで既存の `JDU Learning Portal Test3`（project ID `jdu-learning-portal-test3`）が開けた。プロジェクトが存在することは確認したが、今回のclientや作成権限の受入ではない。既存clientの再利用や変更をせず、同project内に今回専用clientを分けられるか確認する。以下のメール方式調査は比較の履歴として保持する。
-
-続いてAudienceのUser typeがInternalであること、既存clientが2つあることを読取り確認。新規作成フォームでWeb applicationを選び、専用名 `JDU Web Infrastructure Student 2026` と今回のcallback URLだけを入力した。JavaScript originsは使わないserver flowのため空欄、AI agent用途も選択しない。入力検査後Createは有効。**まだCreateを押していない**。新しい認証情報の発行・アクセス設定になるため、作成直前のフォームを保存して本人へ最終操作を引き継ぐ。既存client、Audience、scope、課金設定は変更していない。作成やGoogle本人ログインの成功を意味しない。
-
-その後本人がCreateを実行し、secretの適切な保管を指示。既存値を教師AWS Secrets Managerの専用保管先へ非表示入力で収録し、同一versionのreadbackとAWSCURRENT一致を確認。Git/会話/共有Windowsのファイル/CLI引数には値を出さず、IAMやresource policyも変更していない。Google secretを再発行していない。アプリがARNだけを設定として受け取る候補を追加し、Node27件・package3件・保管4件合格、audit0。実アプリによるsecret読取りとGoogle本人ログインは未実施。[保管と候補の記録](../web_portal_poc/verification/2026-10-29-google-secret-storage.public.json)。
-
-Googleログインだけの試験用UPDATE change setはCREATE_COMPLETE/AVAILABLE。既存Revision置換・Endpoint更新の2対象で、IAMや元EC2・成績DBの構成変更なし。既存の試用tableに短期session hashを保存する予定。成績readerはdisabled、学生操作も未接続。新しいログイン入口と認証情報利用の適用直前確認後に適用し、実Googleログイン/ログアウト/他domain拒否を確認する。本人の追加の「確認できた」はGoogle作成・保管についての確認として記録し、未適用のWeb統合受入とは区別する。
-
-その後本人がGoogleログイン試験の有効化を承認。計画を再照合しUPDATE_COMPLETEを確認した。教師の学内Google identityで実ログイン→menu表示→ログアウトが成功し、短期sessionにhash/expiry/activeだけが保存され、ログアウト後は同じ行が失効した。未ログインの成績/状態/callbackは403、元検証成績62/62と全projection・全partitionは不変、教師EC2 stoppedを確認。成績reader/学生操作は未接続のまま。[実Google受入記録](../web_portal_poc/verification/2026-10-29-google-login.public.json)。実学生Google account・実他domain account・実コピーcookie再送・実時間10分expiryは未試験。次は本人AWS環境との登録と非公開成績readerの接続。
-
-対象は、共通URLから学生本人の保存成績を見せ、将来は本人の環境操作につなぐための入口。従来はCloudShellのAWS認証・個別採点認証・専用URLを使っており、独立した学生ログイン画面はなかった。現在の可否probeには個人成績がなく、個人成績画面は閉鎖したまま。
-
-Web FunctionsのApplicationManaged自体にはメール所有の確認機能がない。入力されたメールの末尾をjdu.uzに制限するだけでは認証にならず、メール到達確認又は認証サービスが確認したidentityが必要。メール確認後も、教師承認済みLab/accountとの紐付けを別に検査する。
-
-同日の教師CloudShell読取りでは、SES v2 GetAccount/ListEmailIdentitiesはAccessDeniedException。Cognito ListUserPoolsは成功し、us-east-1の一覧は空だった。これはメール送信やCognito作成の可否を実証したものではない。新規pool/client作成、登録、メール送信、権限変更は行っていない。
-
-AWS内の候補としてCognitoの初回メール確認＋パスワードを検討できる。公式仕様上、Cognito既定の送信元で初回確認メールを送る構成は独自のSES設定を要しないが送信量の制限がある。一方、毎回メールコードのみでログインするEMAIL_OTPはEssentials以上とSES設定が必要。今回の権限で作成・実送信・jdu.uz以外の拒否が通るかは未確認。Google専用の数値subjectを前提にした既存コードも変更・回帰確認が必要で、設定値だけでCognitoへ切り替えたとは扱わない。
-
-出典（2026-10-29確認）：[Web Functionsの認証責任](https://docs.aws.amazon.com/lambda/latest/dg/web-functions-best-practices.html)、[Cognitoの既定メールとOTP条件](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-email.html)。方式を決める前に、この説明と従来の入口との違いを本人へ共有する。
-
-## 2026-10-23の検討結果
-
-実現できる見込みがある。推奨は**教師側の固定Web Functions入口＋学生本人account内の操作窓口＋既存の採点API/成績DB**。教師が学生roleをAssumeRoleできるとは仮定せず、最初に本人accountの結び付けと必要なLabRole権限を実証する。
-
-- 本人確認：**Web Functions部分はEnd Lab後も使えた**。演習用EC2はLab終了後に利用できない前提で設計する。
-- ポータルはEC2停止中でも教材と保存済み成績を見せる。新しいHTTP/DNS/DB/アプリ採点とRDP/SSMは再開待ち。成績API/DBをLab終了後に呼べることは別に受入する。
-- 現行の教師EC2は固定IPのTLS中継。新しい閲覧経路はこれに依存させず、既存サーバーレス採点APIへ接続する。旧提出経路の中継依存は、ポータルを置くだけでは解消しない。
-- 初回は本人のAWSコンソールから導入し、以後の環境準備・状態・採点をブラウザへ集約する。既存の署名確認/価格確認/内部SSH/個別登録/通信閉鎖を、CloudFormation直リンクだけで省略しない。
-- Web Functionsの現行runtimeはNode.js。Python製checker/APIは再利用し、TTY/password入力とCloudShellのprivate stateは接続方法を設計する。
-- EC2のstoppedだけでEnd Labと断定しない。ポータル表示で自動Start・新規5台作成・採点の0点化を起こさない。P3/M3の停止観測は専用フローを残す。
-
-[構成案・比較・既存コードとの対応・実証手順](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/blob/main/development/issues/WEB-PORTAL-001-feasibility.md)を正本とする。最初は①EC2に依存しない保存済み成績の閲覧、②学生窓口の導入/本人確認、③5台の状態読取りを実証し、成立後に初期構築・通常採点・対話採点へ広げる。
-
-## 調査と設計
-
-- AWS Lambda Web FunctionsはLearner Labで利用できることを本人が確認済み（2026-10-23）。この確認を前提とし、学生accountへの権限連携と具体的な構成に必要なLabRole/iam:PassRole等の範囲を設計する。本人のサービス利用確認と、未確認の別account操作権限を区別する。
-- Web画面へのログインと、学生本人のAWS accountの構築権限を分けて設計する。AcademyのSSO/API提供や、教師roleによる学生account操作を仮定しない。
-- ブラウザから既存署名手順を実行する方式、AWS Console/CloudFormationのブラウザ起動への誘導、固定の採点ポータルへのログインを比較する。新規・既存Lab・停止中・期限切れを区別する。
-- 学生本人の匿名Lab ID/account/deploymentにだけアクセスでき、教師は担当学生の進捗を確認できる。教師管理キーやAWSの長期credentialをブラウザ/共有Windowsへ配らない。
-- 長い構築処理は受付/job ID/進捗表示に分け、二重クリック・再読込・途中切断で重複構築しない。再開は元state/5台/鍵/採点認証を保持する。
-- 構築内容・利用資源・費用の確認を画面で提示し、実行/再開/採点確認を学生が区別できる。RDP/SSMの既存制限、署名・期限の確認、62素点/UNKNOWNの扱いを維持する。
-
-## 2026-10-27の小規模試作
-
-- [読取り試作と実験記録](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/tree/main/development/web_portal_poc)を追加。架空データで認証拒否、62点とUNKNOWNの保持、5台停止/取得不能の扱いを8件確認した。
-- 教師AWSから既存DBを直接読み、検証Labの62/62点を照合。教師EC2はrunningだったため、停止中・End Lab後は未受入。
-- 別学生AWSから、既存stateとStackおよび5台のID・タグの一致、5台running・SSM Onlineを読み取りで確認した。CloudShellの個別観測であり、Web画面の連携試験ではない。
-- 前回は `aws lambda list-web-functions` と誤ったサービス名で確認した。正しくは `aws lambda-web list-web-functions`。前回のエラーはCLI版やWeb Functionsの利用可否を示さない。
-- 学生AWSの本人確認に使うSTS署名・短命nonce・再利用拒否の試作を追加。ローカルの模擬試験は15件合格。永続的・原子的なnonce管理の実機検証、ログインおよびLab/接続先との結び付けは未完了。
-- 再接続後、学生AWSのCloudShell内で署名付きSTS要求を確認。本人accountが返り、nonceを変更すると403。署名ヘッダー・60秒有効期間は試作の前提と一致した。教師・学生間の統合試験は未実施。正しい `lambda-web list-web-functions` は成功し、学生AWSの一覧は空。作成権限は未確認。
-- 成績原本の変更なしに、本人確認challengeの一回限りの消費とLab/accountの重複防止をまとめる登録処理と、独立したDynamoDB tableのtemplateを試作。ローカルで競合・期限・別accountなどを確認したが、実DynamoDB、信頼できるログイン、窓口の認可と統合試験は未実施。
-- 教師AWSでtable templateと同等の構成をCloudFormation `ValidateTemplate` が受理した。
-- 教師AWSに独立した試作用tableを作成し、TTL有効化を確認。架空データの同一transactionを同時送信すると1回だけ成功し、試験用元データが不変であることを確認。手組みの条件式による試験であり、`enrollment.py` 本体のAWS実行や学生accountとの統合受入ではない。試験tableと架空行は保持され、従量課金の対象となる。
-- 別の架空データで `enrollment.py` 本体をSHA-256照合の上、実DynamoDBで実行。登録成功・連続再送の拒否・試験元データ不変を確認した。本人確認とchallenge読取りは模擬し、同一試用tableだけを使った。学生account連携・別tableをまたぐtransaction・期限切れは未受入。
-- 学内教材ポータルのGoogle Workspace認証方式を参照し、本人確認済みGoogle ID・教師承認済みLabの一対一登録と本人の62点読取りを内部処理として試作。架空IDで登録→読取り、他ID拒否・失効・登録競合を確認。Google認証、教師承認、秘密鍵の実運用とWeb入口への統合は未実装。
-- 教師AWSの試作用tableで `subject_binding.py` 本体をhash照合して実行し、2つの架空IDの同時登録は1つだけ成功、元データが不変と確認。本人確認・subject変換は模擬し、実学生の連携ではない。
-- 既存採点registryをbyteそのまま収録する内部Lambda候補とpackageを制作し、再現性・非公開構成をローカル検証。教師AWSでtemplateの構文受理を確認。呼出し元の権限制限、秘密鍵と本人確認の統合、実配備は未実施。
-- 学内ポータルのGoogle認証を参照したJA/RU/UZ成績画面とWeb Functions候補を作成。架空データでChromeの言語切替、記録なし・UNKNOWN・確認/保存日時と限定読取りを確認。配備packageの再現性・AWS template構文を検査。実Google、成績Lambda、学生AWSとの統合と画面配備は未実施。
-- 共有PC向けに、最大10分のserver-side sessionとログアウト時の失効を試作。Google tokenとsession IDのハッシュだけを保存し、実token・メール・Google IDは保存しない。OAuth署名/state/nonce、期限、コピー済みcookieのログアウト後拒否を模擬環境で確認。Googleからのログアウトも必要で、実AWS・実ブラウザ受入は未実施。
-- 本人の登録から固定ARNの学生側読取りLambda、本人5台の停止・SSM・公開IP表示までの接続を架空AWS応答で確認。異なるIDや任意ARN、別instance、壊れた応答は拒否し、読取り操作で起動しない。教師LabRoleの対象ARN呼出しはIAM simulationでallowed、3 templateのAWS構文も受理。学生側resource policyの作成・cross-account実呼出しとブラウザ統合受入は未実施。学生の自己管理する状態窓口の応答を採点の証拠には使わない。
-- Web Functions配備、学生本人とAWS accountの認証済みbinding、固定ブラウザ画面、停止時/End Lab後の実証は未完了。既存配布版r2は2026-10-27 14:24:57 UZTで期限切れ。
-
-## 受入条件
-
-2026-10-29再開：教師Chrome・別学生EdgeのAWS accountを確認。学生CloudShellで `status.py` / `plan_student_status.py` 本体の転記hashを照合して実行し、元state/baseline/Stack/タグの一致、全5台running・SSM Online、新Lambda/Stack名の未使用を確認した。状態確認コード自体の学生AWS実行は成功。教師からの呼出し・ブラウザ統合・停止中とEnd Lab後は引き続き未受入。ローカルはPython 102件（importしたfixtureの重複を含む）・Node 15件・Web package 2件合格。
-
-配備準備も追加。非公開・暗号化・version管理付きS3と読取りLambdaの2 Stackを別に作る入口を模擬試験5件で確認し、学生CloudShellで搬入hashを照合して計画モードを実行。元5台への変更なし。教師roleへの新規呼出し許可を含むため、適用直前確認後に進める。現時点で新資源の作成はしていない。
-
-その後、本人承認により学生側2 StackのCREATE_COMPLETEを確認。実Lambdaのcode hashと指定教師LabRoleだけのresource policyを照合。同accountから5台running/SSM Onlineを取得でき、起動要求はunauthorized。許可対象外の教師CloudShell roleからのDryRunはAccessDenied。指定教師LabRoleでの成功は次の試験。
-
-教師側の固定検証Lab専用・非公開Lambdaを準備し、模擬試験5件とpackage検査を通過。既存の非公開S3へhash付き別key/上書き禁止/checksum付きで収録し、AWSでtemplateとCREATE change setを確認。変更はLambda 1つの追加だけで、未適用。元EC2/DB/権限は変更しない。これを使ってEC2に依存しない保存成績読取りと指定LabRole間の実呼出しを試す。Google・教師承認・ブラウザ受入の代用にはしない。
-
-**同日の最新結果**：本人承認後、教師probeも作成し、hashとLabRoleを照合。既存成績62/62点の読取りと、教師LabRole→別学生Lambda→実5台の取得に成功した。教師EC2と学生5台を検証操作で明示停止した後も、同じ成績全項目/全Lab partitionの不変、5台stopped、公開URLなし、起動/別Lab要求の拒否を `verify_teacher_probe.py` 本体で確認。状態取得時のSSM unknownを0点に変えていない。[実測記録](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/blob/main/development/web_portal_poc/verification/2026-10-29-stopped.public.json)。元6台はstoppedで保持し、新規2 Lambda/学生用S3/既存の試用tableは残っている。ブラウザ本人確認の受入や教師側End Lab後の実証は別項目。
-
-**学生End Labの実測（最新）**：教師Lab開始・教師EC2停止の条件で、学生Lab終了後も保存成績62/62と全項目、全Lab partitionの不変を確認。一方、学生状態は構成読取りのAccessDenied、その後はKMSAccessDeniedExceptionで取得不能。取消制限を緩めず、状態不明として扱う。Codeだけの限定診断更新と再開時の5台/成績不変も確認した。[終了後記録](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/blob/main/development/web_portal_poc/verification/2026-10-29-student-end-lab.public.json)。現在は学生Lab終了・教師Lab開始・教師EC2停止。教師Lab終了後とブラウザ本人確認は未受入。
-
-次の教師End Lab試験に向け、閉鎖中だけ使うWeb Functionsの読取り可否probeと専用version管理付きS3/service許可を準備。外部へ返すのは3つの可否booleanと確認日時だけで、成績そのものは公開しない。Node21件・package3件・npm audit 0を確認したが、まだAWS未配備。新しい公開入口・実行権限の適用前確認後に進める。
-
-本人承認後、専用S3と閉鎖Web側の計6資源を配備。最初のWeb Stackは環境上限1がAWS最小値2未満として事前検査で停止し、資源は空。受付上限もAWS最小の正数100/秒へ修正し、同じFunction名・同じS3許可対象を維持して別wrapper StackでCREATE_COMPLETEになった。失敗記録は削除せず保持。package検査3件も合格。
-
-05:35:22 UTCの実HTTPで `/healthz` 200、可否probe 200/3項目true、個人成績 `/grades` は503を確認。教師EC2停止・学生Lab終了・教師Lab開始中の基準値。[終了前の記録](../web_portal_poc/verification/2026-10-29-web-before-teacher-end.public.json)。
-
-その後本人が教師End Labを実施し、UIのTerminated/00:00/Lab terminatedを確認。05:40:49、05:41:59、05:43:03 UTCの新しい観測はいずれも3項目false。実HTTPは `/healthz` 200、可否probe 503、`/grades` 503だった。**Web入口の継続応答は成立するが、現在のLab内構成では教師End Lab後の成績閲覧を受入できない**。保存行の消失や正確なAWSエラー原因を示す結果ではなく、取得不能を0点化していない。Labを再開したり権限制限を解除したりせず記録した。[終了後の実測](../web_portal_poc/verification/2026-10-29-teacher-end-lab.public.json)。
-
-この結果を受け、本人が「当面は教師Lab開始中の利用でよい」と決定。終了中の閲覧は後続課題として保持し、当面の実装は既存教師Lab内で続ける。移行・新規契約・既存データのコピーは未実施。
-
-教師Labを通常Start Labで再開すると、05:50:03 UTCに可否3項目trueへ復帰。Academyが自動起動した元教師EC2だけを明示的に停止し、05:53:45 UTCにも可否200/3項目true、保存成績62/62と全projection・全Lab partitionの不変を照合した。学生Labは再開せず、個人成績は503で閉鎖を維持。[再開後の記録](../web_portal_poc/verification/2026-10-29-teacher-restart.public.json)。これは固定Labの復帰受入であり、Googleログイン後の本人画面の受入ではない。次の実OAuth設定に必要な既存project/clientの有無を本人へ確認中。
-
-- [x] Learner LabでWeb Functionsが利用できることを確認（2026-10-23本人確認）。
-- [x] End Lab後もWeb Functions部分は利用できたことを確認（2026-10-23本人確認）。EC2の継続稼働とは区別する。
-- [x] 公式仕様・既存コードから構成案と実証の順番を整理。今回AWS操作なし。
-- [x] EC2中継に依存しない固定検証Labの保存成績読取りを、教師Lab開始・全EC2停止の条件で実測した。本人認証画面の受入とは区別する。
-- [ ] 教師Lab開始中に、本人だけの保存成績を学生EC2停止中・学生Lab終了後にも表示できる。
-- [ ] 教師側利用不能から通常のLab再開後に復帰し、0点化や自動EC2起動を起こさない。
-- [ ] 後続課題：教師End Lab中にも保存成績を閲覧する（当面の受入条件から除外、10/29本人決定）。
-- [ ] 採用する認証・権限連携方式を教師・別学生accountで受入する。
-- [ ] 固定URLから本人認証し、本人の環境/採点だけが表示される。他学生へのアクセスは拒否される。
-- [ ] 初期準備・構築状況・再開・課題確認・自分の採点まで、通常操作にコマンドやURL転記を要求しない。
-- [ ] 長時間処理・二重クリック・Lab停止/再開・セッション/署名期限切れから、安全に状態確認/再開できる。
-- [ ] EC2停止・停止理由不明・AWS API接続不能で勝手にStart/再作成/0点化しない。P3/M3の正規の停止観測は維持する。
-- [ ] 原本/receipt/参照成績・練習・検証Lab除外が既存採点と一致し、教師が進捗を追える。
-- [ ] 共有Windowsへ秘密鍵/採点token/AWS credentialを保存させない。
-- [ ] 教師/学生の実ブラウザで受入し、従来CloudShell入口への復帰手順も記録する。
-
-## 確認済みの公式情報（2026-10-23）
-
-Web FunctionsのHTTPS入口はIamAuth又はApplicationManagedを選べる。前者はIAM署名、後者はアプリ側の本人認証が必要で、学生accountの構築権限が自動的に得られるわけではない。採用方式は未決定。
-
-- https://docs.aws.amazon.com/lambda/latest/dg/web-functions-endpoint-access-control.html
-- https://aws.amazon.com/blogs/compute/exploring-aws-lambda-web-functions-for-building-web-applications/
-
-既存の署名配布版・AWS構成は保持する。新サービスや権限を追加する際は対象と影響を明確にし、別途検証する。
+進捗は完了ID/残りID/障害で報告し、同じ検査を理由なく繰り返さない。新しい要望は別Issueへ分ける。過去の経過はGit履歴とverification/の証拠を参照し、現在の完了表に矛盾する履歴を積み重ねない。
