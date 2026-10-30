@@ -64,7 +64,7 @@ def prepare(created,code_path,receipt,clients):
     fetched=s3.get_object(**owner,Key=key,VersionId=version)['Body'].read(len(code)+1)
     if hashlib.sha256(fetched).hexdigest()!=sha:raise ValueError('Uploaded code differs')
     updates={'ArtifactKey':key,'ArtifactVersion':version}
-    request=cfn.create_change_set(StackName=created['stack_id'],ChangeSetName=CHANGE,ChangeSetType='UPDATE',UsePreviousTemplate=True,
+    request=cfn.create_change_set(StackName=created['stack_id'],ChangeSetName=CHANGE+'-'+sha[:12],ChangeSetType='UPDATE',UsePreviousTemplate=True,
         Parameters=[{'ParameterKey':k,'ParameterValue':updates[k]} if k in updates else {'ParameterKey':k,'UsePreviousValue':True} for k in parameters])
     cfn.get_waiter('change_set_create_complete').wait(ChangeSetName=request['Id'],StackName=created['stack_id'],WaiterConfig={'Delay':5,'MaxAttempts':24})
     change=cfn.describe_change_set(ChangeSetName=request['Id'],StackName=created['stack_id'])

@@ -12,14 +12,21 @@ import re
 import progress_api as legacy
 from identity_grade import identity_grade
 from status_gateway import student_status
+from teacher_progress import read_teacher, valid as valid_teacher
+
+
+def valid(event):
+    return type(event) is dict and (set(event) == {'subject'} or
+        (set(event) == {'subject', 'operation'} and event['operation'] == 'status') or valid_teacher(event))
 
 
 def serve(event, pepper, bindings, grades, student_lambda=None):
     """Accept only a subject from the trusted invoking service; fail closed."""
-    if type(event) is not dict or not (set(event) == {'subject'} or
-            (set(event) == {'subject', 'operation'} and event['operation'] == 'status')):
+    if not valid(event):
         return {'status': 'unauthorized'}
     try:
+        if event.get('operation', '').startswith('teacher_'):
+            return {'status': 'ok', 'teacher': read_teacher(event, pepper, bindings, grades)}
         if event.get('operation') == 'status':
             if student_lambda is None:
                 return {'status': 'unavailable'}
@@ -34,8 +41,7 @@ def serve(event, pepper, bindings, grades, student_lambda=None):
 
 def handler(event, context):
     """Resolve strongly consistent stores and a stable secret from AWS."""
-    if type(event) is not dict or not (set(event) == {'subject'} or
-            (set(event) == {'subject', 'operation'} and event['operation'] == 'status')):
+    if not valid(event):
         return {'status': 'unauthorized'}
     try:
         import boto3

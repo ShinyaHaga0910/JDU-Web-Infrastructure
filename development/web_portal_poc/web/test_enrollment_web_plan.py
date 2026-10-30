@@ -2,7 +2,7 @@ import copy
 import unittest
 from unittest.mock import Mock
 
-from prepare_browser_enrollment_web import inspect
+from prepare_browser_enrollment_web import inspect, service_candidate
 from apply_browser_enrollment_web import apply
 
 
@@ -26,6 +26,15 @@ class PlanTest(unittest.TestCase):
         clients[0].get_caller_identity.return_value={'Account':'987654321098'}
         with self.assertRaises(ValueError):apply({},None,None,clients)
         clients[1].execute_change_set.assert_not_called()
+
+    def test_reviewed_service_update_may_be_prepared_but_unreviewed_or_wrong_account_is_denied(self):
+        plan={'phase':'code-update-ready','account':'170126527713','code_sha256':'a'*64,
+              'stack_id':'arn:aws:cloudformation:us-east-1:170126527713:stack/example/id'}
+        self.assertEqual(service_candidate(plan),plan)
+        legacy={k:v for k,v in plan.items() if k!='account'}
+        self.assertEqual(service_candidate(legacy),legacy)
+        for changed in ({'phase':'preparation-started'},{'account':'000000000000'},{'code_sha256':'bad'},{'stack_id':'wrong'}):
+            with self.assertRaises(ValueError):service_candidate({**plan,**changed})
 
 
 if __name__=='__main__':unittest.main()

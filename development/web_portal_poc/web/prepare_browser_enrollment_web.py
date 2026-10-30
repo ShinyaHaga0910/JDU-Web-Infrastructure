@@ -32,11 +32,28 @@ def inspect(change):
         raise ValueError('Unexpected Web update')
 
 
+def service_candidate(services):
+    """A reviewed code plan can precede Web preparation, never Web execution.
+
+    apply_browser_enrollment_web still checks the live internal functions have
+    the exact expected new code hash before it executes the Web update.
+    """
+    import re
+    if (services.get('phase') not in ('private-services-updated', 'code-update-ready')
+            or not re.fullmatch(r'[a-f0-9]{64}', services.get('code_sha256', ''))
+            or (services.get('phase') == 'code-update-ready' and
+                (services.get('account', ACCOUNT) != ACCOUNT or not services.get('stack_id', '').startswith(
+                    f'arn:aws:cloudformation:us-east-1:{ACCOUNT}:stack/')))):
+        raise ValueError('Reviewed internal service candidate required')
+    return services
+
+
 def prepare(directory,code_path,services,template_digest,receipt,sts,cfn,s3,*,checker_arn=None):
     import re
     if (sts.get_caller_identity()['Account']!=ACCOUNT or receipt.exists()
-            or services.get('phase')!='private-services-updated' or not re.fullmatch(r'[a-f0-9]{64}',template_digest)):
+            or not re.fullmatch(r'[a-f0-9]{64}',template_digest)):
         raise ValueError('Wrong Web preparation context')
+    service_candidate(services)
     stack=cfn.describe_stacks(StackName=STACK)['Stacks'][0]
     if stack['StackStatus'] not in ('CREATE_COMPLETE','UPDATE_COMPLETE'):raise ValueError('Web stack unavailable')
     previous={v['ParameterKey']:v['ParameterValue'] for v in stack['Parameters']}
@@ -93,6 +110,7 @@ def prepare(directory,code_path,services,template_digest,receipt,sts,cfn,s3,*,ch
         'change_set_id':request['Id'],'parameters':expected,'code_sha256':sha,
         'template_sha256':hashlib.sha256(template.encode()).hexdigest(),'source_template_digest':template_digest,
         'origin':ORIGIN,'internal_services':outputs,'services_code_sha256':services['code_sha256'],
+        'services_update_must_complete_before_apply':services['phase']=='code-update-ready',
         'artifact':{'bucket':bucket,'key':key,'version':version}}
     write_new(receipt.with_name('enrollment-web.ready.private.json'),ready)
     print(json.dumps({'marker':'AUTHENTICATED_ENROLLMENT_WEB_PLAN_READY','executed':False,'changed_resources':2,

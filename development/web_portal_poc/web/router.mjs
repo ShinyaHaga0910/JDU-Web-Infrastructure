@@ -4,6 +4,7 @@ import { formToken, checkForm, operationId, tokenHash } from './enrollment-clien
 import { enrollmentHtml, enrollmentText, checkedEnrollment } from './enrollment-page.mjs';
 import { bootstrapTemplate, createBootstrapLink } from './bootstrap-link.mjs';
 import { words as checkWords, validOperation, verifyCheckToken, checkHtml, progressScript } from './checks.mjs';
+import { teacherText, checkedTeacher, teacherListHtml } from './teacher-progress.mjs';
 
 const security = {
   'Cache-Control': 'private, no-store, max-age=0', 'Referrer-Policy': 'no-referrer',
@@ -45,15 +46,20 @@ const response = (body, status=200, extras={}) => new Response(body, {status, he
 const redirect = (location, values=[]) => { const h=new Headers(security); h.set('Location',location); for(const v of values) h.append('Set-Cookie',v); return new Response(null,{status:303,headers:h}); };
 
 function page(lang, title, content, selection) {
-  const tail=selection?`&amp;task_id=${selection.task_id}&amp;job_id=${selection.job_id}`:'';
+  const tail=selection?.teacher ? Object.entries(selection.params).map(([k,v])=>`&amp;${k}=${encodeURIComponent(v)}`).join('') : selection?`&amp;task_id=${selection.task_id}&amp;job_id=${selection.job_id}`:'';
   const nav = ['ja','ru','uz'].map(k => `<a href="?lang=${k}${tail}"${k===lang?' aria-current="page"':''}>${k.toUpperCase()}</a>`).join(' ');
-  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)}</title><style>body{font:1rem/1.6 system-ui,sans-serif;margin:0;background:#f5f7fa;color:#182435}main{max-width:64rem;margin:auto;padding:1.5rem}nav{display:flex;gap:1rem}a,button{color:#064ca4}button{font:inherit;background:white;border:1px solid #64748b;border-radius:.35rem;padding:.65rem 1rem;cursor:pointer}a:focus-visible,button:focus-visible{outline:3px solid #d34800;outline-offset:3px}section{background:white;border:1px solid #d6dee8;border-radius:.5rem;padding:1rem;margin-block:1rem}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:44rem}th,td{padding:.6rem;text-align:left;border-bottom:1px solid #d6dee8}.num{font-size:1.6rem;font-weight:700}footer{margin-top:2rem}fieldset{border:1px solid #a9b6c7;border-radius:.35rem;padding:1rem;margin-block:1rem}.confirm{display:flex;align-items:flex-start;gap:.5rem;min-height:48px;padding-block:.5rem}input[type=checkbox]{width:1.25rem;height:1.25rem;margin:.2rem 0;flex-shrink:0}a.action{display:inline-flex;align-items:center;min-height:48px;padding:0 .75rem;border:1px solid #64748b;border-radius:.35rem}a.action:focus-visible,input:focus-visible{outline:3px solid #d34800;outline-offset:3px}.check-tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1rem}.check-tasks section{margin:0}</style></head><body><main><nav aria-label="Languages">${nav}</nav><h1>${escape(title)}</h1>${content}</main></body></html>`;
+  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)}</title><style>body{font:1rem/1.6 system-ui,sans-serif;margin:0;background:#f5f7fa;color:#182435}main{max-width:64rem;margin:auto;padding:1.5rem}nav{display:flex;gap:1rem}a,button{color:#064ca4}button{font:inherit;background:white;border:1px solid #64748b;border-radius:.35rem;padding:.65rem 1rem;cursor:pointer}a:focus-visible,button:focus-visible{outline:3px solid #d34800;outline-offset:3px}section{background:white;border:1px solid #d6dee8;border-radius:.5rem;padding:1rem;margin-block:1rem}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:44rem}th,td{padding:.6rem;text-align:left;border-bottom:1px solid #d6dee8}.num{font-size:1.6rem;font-weight:700}footer{margin-top:2rem}fieldset{border:1px solid #a9b6c7;border-radius:.35rem;padding:1rem;margin-block:1rem}.confirm{display:flex;align-items:flex-start;gap:.5rem;min-height:48px;padding-block:.5rem}input[type=checkbox]{width:1.25rem;height:1.25rem;margin:.2rem 0;flex-shrink:0}a.action{display:inline-flex;align-items:center;min-height:48px;padding:0 .75rem;border:1px solid #64748b;border-radius:.35rem}a.action:focus-visible,input:focus-visible{outline:3px solid #d34800;outline-offset:3px}.check-tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1rem}.check-tasks section{margin:0}.teacher-table{max-block-size:70vh;overflow:auto}.teacher-table table{border-collapse:separate;border-spacing:0;min-width:68rem}.teacher-table caption{text-align:left;font-weight:700;padding-block:.75rem}.teacher-table thead th{position:sticky;inset-block-start:0;background:#eaf0f7;z-index:2}.teacher-table tbody th{position:sticky;inset-inline-start:0;background:white;z-index:1}.teacher-table thead th:first-child{inset-inline-start:0;z-index:3}.teacher-table:focus-visible{outline:3px solid #d34800;outline-offset:3px}</style></head><body><main><nav aria-label="Languages">${nav}</nav><h1>${escape(title)}</h1>${content}</main></body></html>`;
+}
+
+export function checkedGrade(grade) {
+  if (!grade || !Number.isInteger(grade.raw_earned) || grade.raw_maximum !== 62 || grade.raw_earned < 0 || grade.raw_earned > 62 || !Array.isArray(grade.current_unresolved) || !Array.isArray(grade.missing_or_unresolved) || !grade.selected || typeof grade.selected !== 'object') throw new Error('Invalid grade');
+  if (Object.keys(grade.selected).some(id => !Object.hasOwn(MISSION_MAXIMA,id) || !Number.isInteger(grade.selected[id]?.raw_earned) || grade.selected[id].raw_earned < 0 || grade.selected[id].raw_earned > MISSION_MAXIMA[id]) || Object.values(grade.selected).reduce((sum,row)=>sum+row.raw_earned,0)!==grade.raw_earned) throw new Error('Invalid selected scores');
+  return grade;
 }
 
 function gradeHtml(lang, grade) {
   const t=text[lang];
-  if (!grade || !Number.isInteger(grade.raw_earned) || grade.raw_maximum !== 62 || grade.raw_earned < 0 || grade.raw_earned > 62 || !Array.isArray(grade.current_unresolved) || !Array.isArray(grade.missing_or_unresolved) || !grade.selected || typeof grade.selected !== 'object') throw new Error('Invalid grade');
-  if (Object.keys(grade.selected).some(id => !Object.hasOwn(MISSION_MAXIMA,id) || !Number.isInteger(grade.selected[id]?.raw_earned) || grade.selected[id].raw_earned < 0 || grade.selected[id].raw_earned > MISSION_MAXIMA[id]) || Object.values(grade.selected).reduce((sum,row)=>sum+row.raw_earned,0)!==grade.raw_earned) throw new Error('Invalid selected scores');
+  checkedGrade(grade);
   const date = value => typeof value==='string' && value.length<=40 && Number.isFinite(Date.parse(value)) ? new Date(value).toISOString().slice(0,16).replace('T',' ')+' UTC' : t.noRecord;
   const rows = ['M1','M2','M3','M4','M5','M6'].map(id => {
     const saved=grade.selected[id];
@@ -82,7 +88,7 @@ function statusHtml(lang, observation) {
   return `<section><p>${escape(t.observed)}: ${escape(timestamp)}</p><div class="table-wrap"><table><thead><tr><th scope="col">${escape(t.role)}</th><th scope="col">${escape(t.ec2)}</th><th scope="col">${escape(t.ssm)}</th><th scope="col">${escape(t.publicIp)}</th></tr></thead><tbody>${body}</tbody></table></div></section>`;
 }
 
-export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch, getGrade, getStatus, sessions, getAcceptanceHealth, enroll, checker}={}) {
+export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch, getGrade, getStatus, sessions, getAcceptanceHealth, enroll, checker, getTeacher}={}) {
   return async request => {
     const url=new URL(request.url), lang=language(url), t=text[lang];
     if (url.pathname === '/healthz') return new Response('ok',{headers:{...security,'Content-Type':'text/plain; charset=utf-8'}});
@@ -161,6 +167,33 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
     if (!sessions) return response('Unavailable',503);
     try {if (!await sessions.check(jar.get(ACCESS),token)) return url.pathname==='/' ? redirect('/auth/login') : response('Forbidden',403);}
     catch {return response('Unavailable',503);}
+    const teacherIdentity=typeof identity?.sub==='string' && typeof identity?.email==='string' && identity.email_verified===true && identity.hd==='jdu.uz';
+    if (url.pathname==='/teacher' || url.pathname==='/teacher/student') {
+      const tt=teacherText[lang];
+      const fail=(message,status)=>response(page(lang,tt.title,`<p role="alert">${escape(message)}</p><a href="/?lang=${lang}">${escape(tt.home)}</a>`),status);
+      if(!teacherIdentity || typeof getTeacher!=='function')return fail(tt.denied,403);
+      const detail=url.pathname==='/teacher/student',context=url.searchParams.get('context')||'course',after=url.searchParams.get('after')||'';
+      const fields=detail?['lang','lab_id']:['lang','context','after'];
+      if([...url.searchParams.keys()].some(k=>!fields.includes(k)) || [...url.searchParams.keys()].some(k=>url.searchParams.getAll(k).length!==1)
+          || (!detail && (!['course','verification'].includes(context) || (after!=='' && !/^[a-z0-9][a-z0-9-]{2,31}$/.test(after))))
+          || (detail && !/^[a-z0-9][a-z0-9-]{2,31}$/.test(url.searchParams.get('lab_id')||'')))return fail(tt.denied,403);
+      try {
+        const event={subject:identity.sub,email:identity.email,operation:detail?'teacher_detail':'teacher_list',...(detail?{lab_id:url.searchParams.get('lab_id')}:{context,after})};
+        const result=await getTeacher(event);
+        if(result?.status==='unauthorized')return fail(tt.denied,403);
+        if(result?.status!=='ok')throw Error('Unavailable');
+        const value=checkedTeacher(result.teacher,{detail,context,after});
+        if(detail) {
+          const row=value.student;
+          if(row.lab_id!==event.lab_id)throw Error('Wrong student');
+          if(row.status!=='ok')return fail(tt.error,503);
+          if(row.grade?.lab_id!==row.lab_id)throw Error('Wrong grade');
+          return response(page(lang,tt.title,`<h2>${escape(row.lab_id)}</h2><p>${escape(tt[row.context])}</p>`+gradeHtml(lang,row.grade)+`<p><a href="/teacher?lang=${lang}&amp;context=${row.context}">${escape(tt.back)}</a></p>`,{teacher:true,params:{lab_id:row.lab_id}}));
+        }
+        for(const row of value.students)if(row.status==='ok' && row.grade?.lab_id!==row.lab_id)throw Error('Wrong grade');
+        return response(page(lang,tt.title,teacherListHtml(lang,value,{validateGrade:checkedGrade,maxima:MISSION_MAXIMA}),{teacher:true,params:{context,after}}));
+      } catch {return fail(tt.error,503);}
+    }
     if (url.pathname==='/checks') {
       if (!checkerEnabled) return response('Not found',404);
       const ct=checkWords[lang],extras={'Referrer-Policy':'same-origin','Content-Security-Policy':security['Content-Security-Policy']+"; script-src 'self'"};
@@ -222,7 +255,13 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
         return response(page(lang,et.title,enrollmentHtml(lang,value,{requestId,csrf,pending,bootstrapLink})),200,{'Referrer-Policy':'same-origin'});
       } catch {return failure(et.unavailable,503);}
     }
-    if (url.pathname === '/') return response(page(lang,t.title,`<section>${enrollmentEnabled?`<p><a href="/enroll?lang=${lang}">${escape(enrollmentText(lang).title)}</a></p>`:''}<p><a href="/grades?lang=${lang}">${escape(t.grades)}</a></p><p><a href="/status?lang=${lang}">${escape(t.status)}</a></p>${checkerEnabled?`<p><a href="/checks?lang=${lang}">${escape(checkWords[lang].title)}</a></p>`:''}</section>${checkerEnabled?'':`<p>${escape(t.notice)}</p>`}<p>${escape(t.shared)}</p><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form>`));
+    if (url.pathname === '/') {
+      let teacherLink='';
+      if(teacherIdentity && typeof getTeacher==='function') {
+        try {const result=await getTeacher({operation:'teacher_access',subject:identity.sub,email:identity.email});if(result?.status==='ok' && /^[0-9]{1,12}$/.test(result.teacher?.class_id||''))teacherLink=`<p><a href="/teacher?lang=${lang}">${escape(teacherText[lang].title)}</a></p>`;} catch {}
+      }
+      return response(page(lang,t.title,`<section>${enrollmentEnabled?`<p><a href="/enroll?lang=${lang}">${escape(enrollmentText(lang).title)}</a></p>`:''}<p><a href="/grades?lang=${lang}">${escape(t.grades)}</a></p><p><a href="/status?lang=${lang}">${escape(t.status)}</a></p>${checkerEnabled?`<p><a href="/checks?lang=${lang}">${escape(checkWords[lang].title)}</a></p>`:''}${teacherLink}</section>${checkerEnabled?'':`<p>${escape(t.notice)}</p>`}<p>${escape(t.shared)}</p><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form>`));
+    }
     if (url.pathname !== '/grades' && url.pathname !== '/status') return response('Not found',404);
     if (url.pathname === '/status') {
       try {

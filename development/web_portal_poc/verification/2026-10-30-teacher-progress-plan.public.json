@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-30",
+  "phase": "prepared-awaiting-teacher-access-confirmation",
+  "prepared_at": "2026-10-30T04:53:16.507026+00:00",
+  "teacher_account": "170126527713",
+  "student_account": "965244652544",
+  "source_zip_sha256": "27e8ffca89274f7ed99510d4d05f7b3c390fecb9ba82472a02d36eb3f157a1f4",
+  "web_files": 4482,
+  "web_content_manifest_sha256": "9652976dd3ca5fe637533b05c487da780a66f3189d1f6ebb013e5bd4f8f038d2",
+  "plans": [
+    {
+      "receipt": "services-v2.ready.private.json",
+      "change_set_id": "arn:aws:cloudformation:us-east-1:170126527713:changeSet/browser-resume-code-20261029-386f68fdbfa2/2f67c00a-c91d-4fd9-97fe-994a7ec0b987",
+      "status": "CREATE_COMPLETE",
+      "execution_status": "AVAILABLE",
+      "changes": [
+        {
+          "id": "EnrollmentService",
+          "type": "AWS::Lambda::Function",
+          "action": "Modify",
+          "replacement": "False"
+        },
+        {
+          "id": "GradeReader",
+          "type": "AWS::Lambda::Function",
+          "action": "Modify",
+          "replacement": "False"
+        }
+      ],
+      "code_sha256": "386f68fdbfa2d2e94af12d304131c60eab2f21a85a3d2e84d8ee4cf593b1ed3f"
+    },
+    {
+      "receipt": "enrollment-web.ready.private.json",
+      "change_set_id": "arn:aws:cloudformation:us-east-1:170126527713:changeSet/verified-student-enrollment-and-grades-00a4cce72be5/8f57862b-40ba-4ba0-b21b-73bc9e339519",
+      "status": "CREATE_COMPLETE",
+      "execution_status": "AVAILABLE",
+      "changes": [
+        {
+          "id": "Endpoint",
+          "type": "AWS::Lambda::WebFunctionEndpoint",
+          "action": "Modify",
+          "replacement": "False"
+        },
+        {
+          "id": "Revision",
+          "type": "AWS::Lambda::WebFunctionRevision",
+          "action": "Modify",
+          "replacement": "True"
+        }
+      ],
+      "code_sha256": "00a4cce72be52c9c2fe79d1b17805c73b477233451464dcf2f61c520a83cc40e"
+    }
+  ],
+  "teacher_access": {
+    "teacher_source_lab": "class193548-test1",
+    "class_id": "193548",
+    "assigned_labs": [
+      {
+        "lab_id": "class193548-test1",
+        "deployment_id": "3ab82943-031d-4806-b4c0-c0b0e4554006",
+        "context": "verification"
+      }
+    ],
+    "replaces_existing_access": false,
+    "read_only_progress": true,
+    "original_grade_writes": false,
+    "new_resources": 0
+  },
+  "teacher_access_exists": false,
+  "before_grade_rows": 78,
+  "teacher_ec2": "stopped",
+  "new_resources": 0,
+  "new_iam_policies": 0,
+  "new_credentials": 0,
+  "deployed": false,
+  "tests": {
+    "new_teacher_python": 13,
+    "new_teacher_node": 8,
+    "node_all": 59,
+    "web_package": 3,
+    "web_update_plan": 3,
+    "private_service_update_plan": 2
+  },
+  "local_browser_preview": "fictional Class 000000 list and student detail; not real AWS acceptance"
+}

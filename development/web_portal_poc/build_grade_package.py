@@ -12,7 +12,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 ROOT = Path(__file__).resolve().parents[1] / '01_roles/cyber_security/tools'
 HERE = Path(__file__).resolve().parent
 FILES = {
-    **{name: HERE / name for name in ('identity_grade_handler.py', 'identity_grade.py', 'identity_keys.py', 'grade_reader.py', 'status_gateway.py')},
+    **{name: HERE / name for name in ('identity_grade_handler.py', 'identity_grade.py', 'identity_keys.py', 'grade_reader.py', 'status_gateway.py', 'teacher_progress.py')},
     **{name: ROOT / 'web_lab_assessment' / name for name in
        ('progress_api_v2.py', 'dashboard.py', 'grading.py', 'registry.py', 'assessment-registry.json')},
     'progress_api.py': ROOT / 'web_lab_teacher' / 'progress_api.py',
