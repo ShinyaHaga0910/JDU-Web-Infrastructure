@@ -136,7 +136,7 @@ class Observation:
         if (any(report[k] != spec[k] for k in ('lab_id', 'release_id', 'deployment_id', 'run_id'))
                 or report['mission_id'] != spec['task_id'] or report['mode'] != report_mode(spec)):
             raise JobDenied('Wrong observer context')
-        if spec['task_id'] in ('P6', 'M6'):
+        if spec['task_id'] in ('P6', 'M6') and spec.get('check_mode')!='functional_prepare':
             self.public_denials(report)
         # Only the coordinator consumes preparation metadata; the original
         # collector and registry determine the final scored report.

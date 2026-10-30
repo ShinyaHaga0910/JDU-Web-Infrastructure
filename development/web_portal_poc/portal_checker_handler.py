@@ -2,6 +2,7 @@
 import json
 import os
 import re
+from functools import lru_cache
 
 import progress_api as legacy
 from identity_grade import resolve_student
@@ -86,18 +87,25 @@ def serve(event, pepper, bindings, grades, client, submissions=None):
         return {'status': 'unavailable'}
 
 
+@lru_cache(maxsize=1)
+def runtime():
+    import boto3
+    from progress_api_v2 import AssessmentStore
+    return (boto3.client('secretsmanager', region_name='us-east-1'),
+        legacy.DynamoStore(os.environ['PORTAL_BINDING_TABLE']),
+        AssessmentStore(os.environ['GRADE_TABLE']),
+        boto3.client('lambda', region_name='us-east-1'))
+
+
 def handler(event, context):
     try:
-        import boto3
-        from progress_api_v2 import AssessmentStore
         from portal_submission import PortalSubmissions
-        secret = boto3.client('secretsmanager', region_name='us-east-1').get_secret_value(
+        secrets, bindings, grades, client = runtime()
+        secret = secrets.get_secret_value(
             SecretId=os.environ['PORTAL_SUBJECT_KEY_SECRET_ARN']).get('SecretString', '')
         if not re.fullmatch(r'[a-f0-9]{64}', secret):
             return {'status': 'unavailable'}
-        bindings = legacy.DynamoStore(os.environ['PORTAL_BINDING_TABLE'])
-        grades = AssessmentStore(os.environ['GRADE_TABLE'])
         return serve(event, bytes.fromhex(secret), bindings, grades,
-            boto3.client('lambda', region_name='us-east-1'), PortalSubmissions(bindings, grades))
+            client, PortalSubmissions(bindings, grades))
     except Exception:
         return {'status': 'unavailable'}

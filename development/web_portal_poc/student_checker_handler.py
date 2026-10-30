@@ -6,6 +6,7 @@ password, key, score, lifecycle operation or grade write is accepted here.
 import copy
 import json
 import os
+from functools import lru_cache
 
 from assessment_command_jobs import CommandJobs, JobBusy, JobDenied, checked_spec, encoded, key, native, DE, no_retry_ssm, sha
 from assessment_observation import Observation
@@ -115,12 +116,19 @@ class StudentChecker:
             return {'status': 'unavailable'}
 
 
+@lru_cache(maxsize=1)
+def runtime():
+    # Reuse SDK model caches and connections across warm invocations. Reports,
+    # ownership and readiness remain fresh reads inside serve for every event.
+    import boto3
+    session = boto3.session.Session(region_name='us-east-1')
+    return StudentChecker(json.loads(os.environ['CHECK_CONFIG']), session.client('dynamodb'),
+        os.environ['CHECK_TABLE'], *(session.client(n) for n in ('sts', 'cloudformation', 'ec2')),
+        no_retry_ssm(session))
+
+
 def handler(event, context):
     try:
-        import boto3
-        session = boto3.session.Session(region_name='us-east-1')
-        return StudentChecker(json.loads(os.environ['CHECK_CONFIG']), session.client('dynamodb'),
-            os.environ['CHECK_TABLE'], *(session.client(n) for n in ('sts', 'cloudformation', 'ec2')),
-            no_retry_ssm(session)).serve(event)
+        return runtime().serve(event)
     except Exception:
         return {'status': 'unavailable'}
