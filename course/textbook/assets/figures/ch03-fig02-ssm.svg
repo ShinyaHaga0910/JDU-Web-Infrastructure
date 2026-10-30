@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1030" viewBox="0 0 1600 1030" role="img">
+<title>CloudShellからSession Managerを使ってWebへ接続する操作の流れ</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図3-2  CloudShellからSSM接続したときの操作先</text>
+<rect x="25" y="200" width="300" height="200" rx="18" fill="#f5f7fa" stroke="#a9b8c7" stroke-width="2"/>
+<text x="175" y="225" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">利用者PC</text>
+<text x="175" y="282" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">ブラウザで</text>
+<text x="175" y="329" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">画面を表示</text>
+<rect x="385" y="90" width="1180" height="830" rx="18" fill="#f8fafc" stroke="#7991aa" stroke-width="2"/>
+<text x="415" y="109" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">AWS</text>
+<rect x="450" y="195" width="400" height="290" rx="18" fill="#fff3df" stroke="#9d651a" stroke-width="2"/>
+<text x="650" y="213" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="middle">CloudShell</text>
+<text x="650" y="280" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">ここで接続を開始</text>
+<text x="650" y="338" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">aws ssm start-session</text>
+<text x="650" y="390" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">対象はWebのインスタンスID</text>
+<polyline points="325,300 450,300" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="450,300 435.5928463623572,306.9594485457797 435.5928463623572,293.0405514542203" fill="#16745b"/>
+<rect x="1010" y="170" width="440" height="180" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
+<text x="1230" y="187" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">AWS Systems Manager</text>
+<text x="1230" y="236" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">Session Manager</text>
+<text x="1230" y="294" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">対象EC2への管理接続</text>
+<polyline points="850,280 1010,280" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="1010,280 995.5928463623571,286.9594485457797 995.5928463623571,273.0405514542203" fill="#16745b"/>
+<rect x="950" y="465" width="560" height="380" rx="18" fill="#ffffff" stroke="#7991aa" stroke-width="2"/>
+<text x="976" y="483" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">VPC</text>
+<rect x="1010" y="540" width="440" height="260" rx="18" fill="#f1f7f3" stroke="#16745b" stroke-width="2"/>
+<text x="1230" y="551" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
+<text x="1230" y="595" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="middle">Webサーバー</text>
+<text x="1230" y="654" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">接続後はWebで実行</text>
+<text x="1230" y="713" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">OSユーザー：ssm-user</text>
+<polyline points="1230,350 1230,540" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="1230,540 1223.0405514542203,525.5928463623571 1236.9594485457797,525.5928463623571" fill="#16745b"/>
+<text x="1257" y="405" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">SSM接続</text>
+<text x="40" y="960" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">CloudShellで対象を選び、SSM接続後は対象のWebでコマンドを実行する。</text>
+</svg>

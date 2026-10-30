@@ -15,7 +15,7 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle, PageBreak, Preformatted
 from pypdf import PdfReader
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -288,7 +288,8 @@ def blocks(text):
         yield ('paragraph',''.join(para))
 
 
-def build(*, source=SOURCE, chapter=1, diagram_builder=figures, report_name='validation.public.json'):
+def build(*, source=SOURCE, chapter=1, diagram_builder=figures, report_name='validation.public.json',
+          new_page_headings=('章末解答',)):
     source=Path(source)
     source_text=source.read_text(encoding='utf-8')
     book_title=next(value[1] for kind,value in blocks(source_text) if kind=='heading' and value[0]==1)
@@ -305,15 +306,24 @@ def build(*, source=SOURCE, chapter=1, diagram_builder=figures, report_name='val
             2:ParagraphStyle('H2',parent=body,fontName='JSans',fontSize=15,leading=23,spaceBefore=17,spaceAfter=10,keepWithNext=True),
             3:ParagraphStyle('H3',parent=body,fontName='JSans',fontSize=12,leading=20,spaceBefore=12,spaceAfter=7,keepWithNext=True)}
     cell_style=ParagraphStyle('Cell',parent=body,fontName='JSans',fontSize=8.7,leading=14,spaceAfter=0)
-    story=[]; web=[]; textual=[]; figure_count=0
+    code_style=ParagraphStyle('Code',fontName='JSans',fontSize=9,leading=15,spaceBefore=4,spaceAfter=12,
+                              backColor=colors.HexColor('#edf2f7'),borderPadding=7)
+    story=[]; web=[]; textual=[]; figure_count=0; code_count=0
     width=A4[0]-36*mm
     for kind,value in blocks(source_text):
         if kind=='heading':
             level,title=value
-            if title=='章末解答': story.append(PageBreak())
+            if title in new_page_headings: story.append(PageBreak())
             story.append(Paragraph(inline(title,True),styles.get(level,styles[3])))
             anchor=re.sub(r'[^\w\-\u3000-\u9fff\uf900-\uffef ]','',title).lower().replace(' ','-')
             web.append(f'<h{level} id="{anchor}">{inline(title)}</h{level}>'); textual.append(title)
+        elif kind=='code':
+            code_count+=1
+            if any(pdfmetrics.stringWidth(line,'JSans',code_style.fontSize)>width-14 for line in value.splitlines()):
+                raise ValueError('Code line exceeds reading width: '+value)
+            story.append(Preformatted(value,code_style))
+            web.append('<pre><code>'+html.escape(value)+'</code></pre>')
+            textual.append(value)
         elif kind=='image':
             figure_count+=1
             alt,relative=value; path=(source.parent/relative).resolve()
@@ -332,10 +342,14 @@ def build(*, source=SOURCE, chapter=1, diagram_builder=figures, report_name='val
             textual.extend(c for row in value for c in row)
         else:
             prefix='・ ' if kind=='bullet' else ''
-            story.append(Paragraph(prefix+inline(value,True),body))
+            paragraph=Paragraph(prefix+inline(value,True),body)
+            if value.startswith(('**実行場所','**表示例')): paragraph.keepWithNext=True
+            story.append(paragraph)
             web.append('<p'+(' class="bullet"' if kind=='bullet' else '')+'>'+prefix+inline(value)+'</p>')
             textual.append(value)
     css='''body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}'''
+    if code_count:
+        css+='pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}'
     (HTML_OUT/(output_stem+'.html')).write_text('<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>'+html.escape(book_title)+'</title><style>'+css+'</style></head><body><a class="skip" href="#main">本文へ</a><main id="main">'+'\n'.join(web)+'</main></body></html>',encoding='utf-8')
     pdfpath=PDF_OUT/(output_stem+'.pdf')
     def footer(canvas,doc):
@@ -351,6 +365,7 @@ def build(*, source=SOURCE, chapter=1, diagram_builder=figures, report_name='val
     sizes_ok=all(abs(float(p.mediabox.width)-A4[0])<1 and abs(float(p.mediabox.height)-A4[1])<1 for p in reader.pages)
     answer_pages=[i+1 for i,p in enumerate(reader.pages) if '章末解答' in (p.extract_text() or '')]
     report={'chapter':chapter,'language':'ja','draft':'editable prose skeleton','pages':len(reader.pages),'a4':sizes_ok,'text_blocks_checked':len(textual),'missing_text':missing,'figures':figure_count,'answer_starts_on_new_page':False,'teacher_visual_review':'not performed','student_trial':'not performed','aws_operations':'none','sha256':hashlib.sha256(pdfpath.read_bytes()).hexdigest()}
+    if code_count: report['code_blocks']=code_count
     # Footer is painted first; inspect content text after that footer for the answer heading.
     if answer_pages:
         page_text=reader.pages[answer_pages[0]-1].extract_text() or ''
