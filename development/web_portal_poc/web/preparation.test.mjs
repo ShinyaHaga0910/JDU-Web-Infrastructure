@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createApp } from './router.mjs';
-import { preparationToken } from './preparation.mjs';
+import { preparationToken, checkedPreparation } from './preparation.mjs';
 
 const deployment='f30a05e6-8356-4a65-8765-e5f4f031525b';
 const sid='a'.repeat(64),rid='b'.repeat(64),token='synthetic-token-only';
@@ -110,4 +110,42 @@ test('expired, unavailable, resource ceiling and running creation are not shown 
   const app=createApp({env,verify,sessions,enroll:async()=>({status:'unavailable',private:'private-error-canary'})});
   const result=await app(request('/prepare',{headers:{cookie}}));
   assert.equal(result.status,503);assert.doesNotMatch(await result.text(),/private-error-canary/);
+});
+
+test('setup GET only observes; explicit advance resumes the same deployment without a password',async()=>{
+  let value={...approved,stage:'CREATE_REQUESTED',initial:{stage:'SETUP_PENDING',setup_phase:'ssh_verify',
+    can_advance:true,lab_ready:false,ssh_completed_roles:2,available_after:Math.floor(Date.now()/1000)+60,setup_result:'pending'}};
+  const calls=[];
+  const app=createApp({env,verify,sessions,enroll:async e=>{
+    calls.push(e);
+    if(e.operation==='prepare_advance')value={...value,initial:{...value.initial,stage:'REGISTRATION_PENDING',
+      setup_phase:'registration_pending',can_advance:false,ssh_completed_roles:4,foundation_ready:true}};
+    return {status:'ok',preparation:value};
+  }});
+  for(const lang of ['ja','ru','uz']){
+    const html=await (await app(request(`/prepare?lang=${lang}`,{headers:{cookie}}))).text();
+    assert.match(html,/name="operation" value="advance"/);assert.match(html,/2 \/ 4/);
+    assert.doesNotMatch(html,/type="password"|name="plan_digest"/);
+  }
+  assert.deepEqual(calls.map(e=>e.operation),['prepare_status','prepare_status','prepare_status']);
+  const result=await app(request('/prepare',post('advance')));
+  assert.equal(result.status,303);
+  assert.deepEqual(calls.find(e=>e.operation==='prepare_advance'),{operation:'prepare_advance',
+    subject:identity.sub,email:identity.email,session_id:sid,token_hash:await import('./enrollment-client.mjs').then(m=>m.tokenHash(token))});
+  const html=await (await app(request('/prepare',{headers:{cookie}}))).text();
+  assert.match(html,/採点登録はまだ完了していません/);assert.doesNotMatch(html,/name="operation" value="advance"/);
+  assert.equal((await app(request('/prepare',post('advance')))).status,403);
+  assert.equal(calls.filter(e=>e.operation==='prepare_advance').length,1);
+});
+
+test('busy and invalid setup states cannot display a new mutation button or a ready claim',async()=>{
+  const value={...approved,stage:'CREATE_REQUESTED',initial:{stage:'SETUP_OBSERVATION_REQUIRED',setup_phase:'ssh_init',can_advance:false,lab_ready:false}};
+  const calls=[];
+  const app=createApp({env,verify,sessions,enroll:async e=>{calls.push(e);return {status:'ok',preparation:value};}});
+  const html=await (await app(request('/prepare',{headers:{cookie}}))).text();
+  assert.match(html,/前の処理の完了を確認/);assert.doesNotMatch(html,/name="operation" value="advance"/);
+  assert.equal((await app(request('/prepare',post('advance')))).status,403);
+  assert.deepEqual(calls.map(e=>e.operation),['prepare_status','prepare_status']);
+  for(const change of [{setup_phase:'arbitrary'},{lab_ready:true},{ssh_completed_roles:5},{can_advance:'yes'},{available_after:-1}])
+    assert.throws(()=>checkedPreparation({...value,initial:{...value.initial,...change}}));
 });

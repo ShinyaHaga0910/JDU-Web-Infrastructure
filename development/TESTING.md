@@ -1,5 +1,11 @@
 # 移管ソースの検証
 
+## R1の作成後基盤準備候補（2026-10-30、AWS未適用）
+
+`web_portal_poc`でMoto/boto3等のtest依存を設定し、`python -B -m unittest -q test_initial_ssm test_initial_setup test_initial_stack test_initial_worker test_initial_package test_portal_preparation test_browser_link test_portal_enrollment_handler test_portal_enrollment`の77件が合格。元template/selector/closure validator/node照合/guest command compilerとMotoを使い、SSM/EIC/EC2/CFN/STS等は模擬応答。基盤検査→S3閉鎖→内部4台SSH→一時鍵期限後確認、元root保持、同command回収、GET非実行、本人限定advance、旧controller契約拒否を検査した。Windowsのpwd/fcntlはimport専用fixtureで、Linuxの実権限・鍵・SSHの受入ではない。
+
+元bootstrapのcollector/closure/全台SSMの21件、Web Node67件、Web package3件も合格。Chromeの架空JA/RU/UZ画面でPOST後の同要求進捗・採点登録未完を確認。R1実配備・採点登録・新署名配布・実機通し受入は未完。詳細：[R1候補記録](web_portal_poc/verification/2026-10-30-initial-setup.public.json)。
+
 ## ローカルの確認
 
 Linux/WSLのPython3とGPGで、repository rootから次を実行する。選択したunit/mock regressionだけを実行し、AWSへの配備・変更は行わない。

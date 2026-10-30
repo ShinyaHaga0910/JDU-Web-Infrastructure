@@ -314,3 +314,11 @@ class PortalPreparation:
             raise EnrollmentDenied('Review your own initial plan first')
         initial = self.initial(row['grant'], 'create', plan_digest=plan_digest, password=password, confirmation=confirmation)
         return {**self.view(row), 'initial': initial, 'resources_created': initial.get('resources_created', False)}
+
+    def advance(self, subject, email, session_id, token_hash):
+        row,person,_=self.current(subject,email,session_id,token_hash)
+        self.live(row)
+        if self.initial is None or row.get('bound_subject')!=person or row['stage']!='CREATE_REQUESTED':
+            raise EnrollmentDenied('Own confirmed setup request required')
+        initial=self.initial(row['grant'],'advance')
+        return {**self.view(row),'initial':initial,'resources_created':initial.get('resources_created',False)}

@@ -22,15 +22,15 @@ def valid(event):
     if isinstance(operation, str) and operation.startswith('prepare_'):
         # Explicit whitelist below still rejects approve/revoke/worker actions.
         operation = operation.removeprefix('prepare_')
-        if operation not in ('begin', 'status', 'complete', 'confirm', 'plan', 'create'):
+        if operation not in ('begin', 'status', 'complete', 'confirm', 'plan', 'create','advance'):
             return False
     if operation == 'complete':
         return (set(event) == {'operation', 'pair_id', 'proof_url'}
                 and isinstance(event['pair_id'], str) and HEX.fullmatch(event['pair_id'])
                 and isinstance(event['proof_url'], str) and len(event['proof_url']) <= 8192)
     extra = {'request_id'} if operation == 'begin' else {'plan_digest', 'password', 'confirmation'} if operation == 'create' else set()
-    if (operation not in ('begin', 'status', 'confirm', 'plan', 'create')
-            or operation in ('confirm', 'plan', 'create') and event['operation'] != 'prepare_' + operation
+    if (operation not in ('begin', 'status', 'confirm', 'plan', 'create','advance')
+            or operation in ('confirm', 'plan', 'create','advance') and event['operation'] != 'prepare_' + operation
             or set(event) != IDENTITY | {'operation'} | extra):
         return False
     if operation == 'create' and (not isinstance(event['plan_digest'], str) or not HEX.fullmatch(event['plan_digest'])
@@ -85,7 +85,7 @@ def handler(event, context):
         from initial_gateway import InitialGateway
         from botocore.config import Config
         initial = InitialGateway(boto3.client('lambda', region_name='us-east-1', config=Config(
-            connect_timeout=3, read_timeout=65, retries={'total_max_attempts':1})))
+            connect_timeout=3, read_timeout=100, retries={'total_max_attempts':1})))
         return serve(event, service, PortalPreparation(service, initial))
     except Exception:
         return {'status': 'unavailable'}

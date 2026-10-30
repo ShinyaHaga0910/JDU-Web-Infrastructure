@@ -11,7 +11,7 @@
 
 [本人連携](../web_portal_poc/verification/2026-10-29-authenticated-student-portal.public.json)・[原本保存](../web_portal_poc/verification/2026-10-30-canonical-submission-accepted.public.json)・[教師画面](../web_portal_poc/verification/2026-10-30-teacher-progress-accepted.public.json)。元5台・暗号化root96GiB・認証・常設SSM・原本を保持。検証用1件の成功を一般学生への配布完了と数えない。
 
-R1の[画面・実行worker](../web_portal_poc/INITIAL-PREPARATION.md)を接続し、ローカル検査・架空Chrome表示とAWSの構文検査まで完了。新署名配布/実配備/作成後の初期化・SSH・採点登録は未完で、AWSには未適用。初期自動準備は基盤のみとし、学生自身が各サーバーに入り、導入・設定変更・反映を行う演習を代行しない。
+R1の[画面・実行workerと作成後処理](../web_portal_poc/INITIAL-PREPARATION.md)を接続し、初期状態確認・S3閉鎖・内部SSHの模擬検査と架空Chrome表示まで完了。新署名配布/実配備/採点登録と教材資源配置は未完で、AWSには未適用。初期自動準備は基盤のみとし、学生自身が各サーバーに入り、導入・設定変更・反映を行う演習を代行しない。
 
 ## 残り6項目
 
@@ -22,6 +22,6 @@ R1の[画面・実行worker](../web_portal_poc/INITIAL-PREPARATION.md)を接続�
 - [ ] **R5 一般学生への配布・割当**：検証1件固定を外し、教師が指定した学校identity/AWS/Labだけへ配布・登録・担当許可を行う。正規署名版/固定入口/学生・教師手順を揃える。
 - [ ] **R6 最終の通し受入**：別の学生identity/対応Labで構築→確認→原本→本人/教師画面、稼働・停止・再開/学生End Lab後、他人データ拒否と元環境保持を照合し、AWS/GitHub/手順を揃える。
 
-**6項目の合格で全体を終了する。** 非機能面の追加強化、教師End Lab中の閲覧、25点換算、ブラウザ内RDPは今回に追加しない。初回5台準備は未実装で、完成間近とは報告しない。
+**6項目の合格で全体を終了する。** 非機能面の追加強化、教師End Lab中の閲覧、25点換算、ブラウザ内RDPは今回に追加しない。初回5台準備は候補実装・未受入で、完成間近とは報告しない。
 
 進捗は完了ID/残りID/障害で報告し、同じ検査を理由なく繰り返さない。新しい要望は別Issueへ分ける。過去の経過はGit履歴とverification/の証拠を参照し、現在の完了表に矛盾する履歴を積み重ねない。

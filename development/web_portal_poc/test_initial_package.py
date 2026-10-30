@@ -6,7 +6,7 @@ from pathlib import Path
 import subprocess
 import sys
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from zipfile import ZipFile
 
 import test_initial_stack as fixtures
@@ -61,7 +61,7 @@ class InitialPackageTest(unittest.TestCase):
         self.assertEqual(verified['files']['template'].read_bytes(),self.f.path.read_bytes())
         # The imported helpers need Linux fcntl, not an actual filesystem lock
         # in this import-only Windows check. No crypt/AWS call is made.
-        code="import sys,types;sys.modules['fcntl']=types.SimpleNamespace();import initial_worker,initial_stack,student_controller,web_lab;print('INITIAL_PACKAGE_IMPORT_OK')"
+        code="import sys,types;sys.modules['fcntl']=types.SimpleNamespace();import initial_worker,initial_stack,initial_setup,initial_ssm,student_controller,web_lab;print('INITIAL_PACKAGE_IMPORT_OK')"
         result=subprocess.run([sys.executable,'-B','-c',code],cwd=package,capture_output=True,text=True,check=True)
         self.assertEqual(result.stdout.strip(),'INITIAL_PACKAGE_IMPORT_OK')
 
@@ -80,6 +80,15 @@ class InitialPackageTest(unittest.TestCase):
              'INITIAL_PROGRESS_TABLE':'jdu-web-initial-'+f.grant['lab_id']+'-progress'}
         (root/'package/teacher-price-catalog.json').write_text('{"changed":true}')
         with self.assertRaises(EnrollmentDenied):runtime_files(root/'package',env)
+
+    def test_old_controller_without_bounded_sdk_collector_is_not_packaged(self):
+        from controller_runtime import controller_files
+        files=controller_files(self.f.verified['files']['controller_bundle'].read_bytes())
+        files['inspect_teacher_probe.py']=b'def collect(state_path,template_path):\n    return {}\n'
+        with patch.object(builder,'controller_files',return_value=files):
+            with self.assertRaisesRegex(ValueError,'SDK collector contract'):
+                self.build(self.f.path.parent/'old-controller.zip')
+        self.assertFalse((self.f.path.parent/'old-controller.zip').exists())
 
     def test_template_has_only_five_helper_resources_and_one_teacher_role_no_public_url(self):
         value=builder.template(self.f.grant,self.origin,self.teacher,self.code)

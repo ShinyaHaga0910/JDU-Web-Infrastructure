@@ -224,5 +224,19 @@ class PreparationTest(unittest.TestCase):
         self.assertEqual(initial.call_args.args, (self.row()['grant'], 'create'))
         self.assertEqual(initial.call_args.kwargs['plan_digest'],'f'*64)
 
+    def test_advance_requires_live_own_confirmed_request_and_forwards_no_commands(self):
+        initial=Mock(return_value={'stage':'SETUP_PENDING','setup_phase':'ssh_init','lab_ready':False})
+        self.prep.initial=initial
+        with self.assertRaises(EnrollmentDenied):self.prep.advance(**self.claims())
+        self.confirmed();self.prep.confirm(**self.claims())
+        event={'operation':'prepare_advance',**self.claims()}
+        self.assertEqual(serve(event,self.auth,self.prep)['preparation']['initial']['setup_phase'],'ssh_init')
+        self.assertEqual(initial.call_args.args,(self.row()['grant'],'advance'))
+        self.assertEqual(initial.call_args.kwargs,{})
+        initial.reset_mock()
+        self.assertEqual(serve({**event,'commands':['anything']},self.auth,self.prep),{'status':'unauthorized'})
+        self.assertEqual(serve({**event,'subject':'987654321'},self.auth,self.prep),{'status':'unauthorized'})
+        initial.assert_not_called()
+
 
 if __name__ == '__main__': unittest.main()

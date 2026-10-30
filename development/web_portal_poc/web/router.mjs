@@ -240,7 +240,7 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
           if (Buffer.byteLength(body)>4096) return fail(pt.denied,403);
           fields=new URLSearchParams(body);operation=fields.get('operation');
           const expected=['confirmed','csrf','deployment_id','operation','request_id',...(operation==='create'?['confirmation','password','plan_digest']:[])].sort().join(',');
-          if (!['begin','plan','create'].includes(operation) || [...fields.keys()].sort().join(',')!==expected || fields.get('confirmed')!=='yes') return fail(pt.denied,403);
+          if (!['begin','plan','create','advance'].includes(operation) || [...fields.keys()].sort().join(',')!==expected || fields.get('confirmed')!=='yes') return fail(pt.denied,403);
           requestId=fields.get('request_id');
           const context={operation,requestId,deploymentId:fields.get('deployment_id'),planDigest:operation==='create'?fields.get('plan_digest'):''};
           if (!checkPreparationToken(config,session,token,context,fields.get('csrf'))) return fail(pt.denied,403);
@@ -252,6 +252,7 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
         const value=checkedPreparation(observed.preparation);
         if (preparationPost) {
           if (value.deployment_id!==fields.get('deployment_id') || !value.can_continue) return fail(pt.denied,403);
+          if (operation==='advance' && value.initial?.can_advance!==true) return fail(pt.denied,403);
           const event={operation:`prepare_${operation}`,...claims};
           if (operation==='begin')event.request_id=requestId;
           if (operation==='create')Object.assign(event,{plan_digest:fields.get('plan_digest'),password:fields.get('password'),confirmation:fields.get('confirmation')});

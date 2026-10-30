@@ -127,13 +127,18 @@ def expected_permissions(template,refs,phase):
     return {k:{d:permissions(p) for d,p in v.items()} for k,v in groups.items()}
 
 
-def collect(state_path,template_path):
-    import boto3
+def collect(state_path,template_path,*,clients=None):
+    # The Lambda setup adapter supplies bounded SDK clients. Existing CLI
+    # callers keep the same behaviour; no signed artifact is edited in place.
+    default_clients=clients is None
+    if default_clients:
+        import boto3
+        clients={name:boto3.client(name,region_name='us-east-1') for name in ('sts','cloudformation','ec2')}
     state=json.loads(Path(state_path).read_text());template_bytes=Path(template_path).read_bytes();template=json.loads(template_bytes)
     expected_stack='jdu-web-'+state['lab_id'] if state.get('scope')=='student_payload_candidate' else 'jdu-web-five-node-probe-20261015'
-    if state['account']!=boto3.client('sts').get_caller_identity()['Account'] or state['stack_name']!=expected_stack:raise ValueError('Wrong probe identity')
+    if state['account']!=clients['sts'].get_caller_identity()['Account'] or state['stack_name']!=expected_stack:raise ValueError('Wrong probe identity')
     if hashlib.sha256(template_bytes).hexdigest()!=state['template_sha256']:raise ValueError('Reviewed template changed')
-    cfn=boto3.client('cloudformation',region_name='us-east-1');ec2=boto3.client('ec2',region_name='us-east-1')
+    cfn=clients['cloudformation'];ec2=clients['ec2']
     stack=cfn.describe_stacks(StackName=state['stack_id'])['Stacks'][0]
     if stack['StackId']!=state['stack_id']:raise ValueError('Stack identity differs')
     params={v['ParameterKey']:v['ParameterValue'] for v in stack['Parameters']}
@@ -143,7 +148,7 @@ def collect(state_path,template_path):
     refs={r['LogicalResourceId']:r.get('PhysicalResourceId') for r in resources};refs.update(params)
     managed={role:refs[label+'Instance'] for role,label in NAMES.items()
         if refs.get(label+'Instance') and template['Resources'][label+'Instance']['Properties'].get('IamInstanceProfile')}
-    ssm=boto3.client('ssm',region_name='us-east-1') if managed else None
+    ssm=(boto3.client('ssm',region_name='us-east-1') if default_clients else clients['ssm']) if managed else None
     infos={x['InstanceId']:x for x in ssm.describe_instance_information(Filters=[{'Key':'InstanceIds',
         'Values':list(managed.values())}])['InstanceInformationList']} if managed else {}
     report={'scope':'teacher_five_node_package_probe_not_class_acceptance','checked_at':datetime.now(timezone.utc).isoformat(),

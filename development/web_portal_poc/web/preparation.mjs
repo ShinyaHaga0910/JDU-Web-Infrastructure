@@ -51,7 +51,7 @@ export const preparationText={
 };
 
 export function preparationToken(config,session,token,{operation,requestId,deploymentId,planDigest=''}) {
-  if (!['begin','plan','create'].includes(operation) || !hex(session) || !hex(requestId) || !uuid(deploymentId)
+  if (!['begin','plan','create','advance'].includes(operation) || !hex(session) || !hex(requestId) || !uuid(deploymentId)
       || (operation==='create' && !hex(planDigest))) throw Error('Invalid preparation form');
   return createHmac('sha256',config.secret).update(JSON.stringify(['jdu-portal/prepare/v1',config.origin,
     session,tokenHash(token),operation,requestId,deploymentId,planDigest])).digest('hex');
@@ -67,7 +67,8 @@ export function checkedPreparation(v) {
   if (v.pair_id!==undefined && (v.stage!=='APPROVED' || !hex(v.pair_id) || !Number.isSafeInteger(v.expires_at))) throw Error('Invalid preparation');
   if (v.initial!==undefined) {
     const i=v.initial;
-    if (!i || !['NOT_REQUESTED','PLAN_READY','PLAN_EXPIRED','CREATE_REQUESTED','CREATE_OBSERVATION_REQUIRED','STACK_OBSERVED','RESOURCE_BUDGET'].includes(i.stage)) throw Error('Invalid initial state');
+    if (!i || !['NOT_REQUESTED','PLAN_READY','PLAN_EXPIRED','CREATE_REQUESTED','CREATE_OBSERVATION_REQUIRED','STACK_OBSERVED','RESOURCE_BUDGET',
+      'SETUP_REQUIRED','SETUP_PENDING','SETUP_OBSERVATION_REQUIRED','REGISTRATION_PENDING'].includes(i.stage)) throw Error('Invalid initial state');
     if (['PLAN_READY','PLAN_EXPIRED'].includes(i.stage) && (!hex(i.plan_digest) || i.account!==v.account || i.lab_id!==v.lab_id || i.deployment_id!==v.deployment_id
         || i.root_gib!==96 || i.new_nodes!==5 || !/^us-east-1[a-z]$/.test(i.availability_zone||'')
         || !i.instance_types || Object.keys(i.instance_types).sort().join(',')!=='Bastion,Db,Dns,Package,Web'
@@ -75,6 +76,14 @@ export function checkedPreparation(v) {
         || typeof i.compute_hourly_usd!=='string' || !/^\d+(?:\.\d+)?$/.test(i.compute_hourly_usd)
         || !(Number(i.compute_hourly_usd)>0) || !Number.isFinite(Number(i.compute_hourly_usd)))) throw Error('Invalid initial plan');
     if (i.stack_status!==undefined && (typeof i.stack_status!=='string' || !/^[A-Z_]{1,64}$/.test(i.stack_status))) throw Error('Invalid stack state');
+    if (['SETUP_REQUIRED','SETUP_PENDING','SETUP_OBSERVATION_REQUIRED','REGISTRATION_PENDING'].includes(i.stage)) {
+      if (!['check_foundation','close_prepare','close_plan_sent','close_apply_sent','ssh_discover','ssh_init','ssh_enroll','ssh_verify','registration_pending'].includes(i.setup_phase)
+          || typeof i.can_advance!=='boolean'
+          || (i.available_after!==undefined && (!Number.isSafeInteger(i.available_after) || i.available_after<0))
+          || (i.ssh_completed_roles!==undefined && (!Number.isSafeInteger(i.ssh_completed_roles) || i.ssh_completed_roles<0 || i.ssh_completed_roles>4))
+          || (i.setup_result!==undefined && !['ok','pending','unavailable'].includes(i.setup_result))
+          || i.lab_ready!==false) throw Error('Invalid setup state');
+    }
   }
   return v;
 }
@@ -96,7 +105,8 @@ export function preparationHtml(lang,v,{config,session,token,requestId,bootstrap
   const form=(operation,body='')=>{
     const context={operation,requestId,deploymentId:v.deployment_id,planDigest:operation==='create'?initial.plan_digest:''};
     const csrf=preparationToken(config,session,token,context);
-    return `<form action="/prepare?lang=${lang}" method="post"><input type="hidden" name="operation" value="${operation}"><input type="hidden" name="deployment_id" value="${v.deployment_id}"><input type="hidden" name="request_id" value="${requestId}"><input type="hidden" name="csrf" value="${csrf}">${body}<label class="confirm"><input type="checkbox" name="confirmed" value="yes" required> ${escape(operation==='begin'?t.confirmAccount:operation==='plan'?t.confirmPlan:t.review)}</label><button type="submit">${escape(t[operation])}</button></form>`;
+    const confirm=operation==='advance'?'<input type="hidden" name="confirmed" value="yes">':`<label class="confirm"><input type="checkbox" name="confirmed" value="yes" required> ${escape(operation==='begin'?t.confirmAccount:operation==='plan'?t.confirmPlan:t.review)}</label>`;
+    return `<form action="/prepare?lang=${lang}" method="post"><input type="hidden" name="operation" value="${operation}"><input type="hidden" name="deployment_id" value="${v.deployment_id}"><input type="hidden" name="request_id" value="${requestId}"><input type="hidden" name="csrf" value="${csrf}">${body}${confirm}<button type="submit">${escape(operation==='advance'?setupText[lang].advance:t[operation])}</button></form>`;
   };
   const context=`<dl><dt>${escape(t.account)}</dt><dd>${escape(v.account)}</dd><dt>${escape(t.lab)}</dt><dd>${escape(v.lab_id)}</dd></dl>`;
   let content;
@@ -114,8 +124,34 @@ export function preparationHtml(lang,v,{config,session,token,requestId,bootstrap
     content=`<h2>${escape(t.resources)}</h2><div class="table-wrap"><table><thead><tr><th scope="col">${escape(t.server)}</th><th scope="col">${escape(t.type)}</th></tr></thead><tbody>${rows}</tbody></table></div><dl><dt>${escape(t.disk)}</dt><dd>96 GiB</dd><dt>${escape(t.zone)}</dt><dd>${escape(initial.availability_zone)}</dd><dt>${escape(t.price)}</dt><dd>${escape(initial.compute_hourly_usd)}</dd></dl><p>${escape(t.otherCosts)}</p>`;
     const fields=`<input type="hidden" name="plan_digest" value="${initial.plan_digest}"><fieldset><legend>RDP</legend><p id="rdp-password-note">${escape(t.passwordNote)}</p><label for="rdp-password">${escape(t.password)}</label><input id="rdp-password" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" required aria-describedby="rdp-password-note"><label for="rdp-confirmation">${escape(t.confirmation)}</label><input id="rdp-confirmation" name="confirmation" type="password" autocomplete="new-password" minlength="12" maxlength="128" required></fieldset>`;
     content+=form('create',fields);
+  } else if (initial?.setup_phase) {
+    const st=setupText[lang];
+    content=`<h2>${escape(st.title)}</h2><p role="status">${escape(st.phases[initial.setup_phase])}</p>`;
+    if (initial.ssh_completed_roles!==undefined)content+=`<p>${escape(st.peers)}: ${initial.ssh_completed_roles} / 4</p>`;
+    if (initial.stage==='SETUP_OBSERVATION_REQUIRED')content+=`<p role="alert">${escape(st.observation)}</p>`;
+    else if (initial.stage==='REGISTRATION_PENDING')content+=`<p role="status">${escape(st.registration)}</p>`;
+    else if (initial.can_advance)content+=`${initial.setup_result==='unavailable'?`<p role="alert">${escape(t.unavailable)}</p>`:''}<p>${escape(st.continueNote)}</p>${form('advance')}`;
+    else content+=`<p role="alert">${escape(t.unavailable)}</p>`;
   } else content=`<p role="status">${escape(initial?.stage==='CREATE_OBSERVATION_REQUIRED'?t.observationUnknown:initial?t.building:t.queued)}</p>${initial?.stack_status?.endsWith('_FAILED')?`<p role="alert">${escape(t.unavailable)}</p>`:''}`;
   const step=v.stage==='APPROVED'?0:v.stage==='AWS_CONFIRMED'||['NOT_REQUESTED','PLAN_READY','PLAN_EXPIRED','RESOURCE_BUDGET'].includes(initial?.stage)?1:2;
   const progress=`<ol>${t.steps.map((s,k)=>`<li${k===step?' aria-current="step"':''}>${escape(s)}</li>`).join('')}</ol>`;
   return `${progress}<section>${context}<p>${escape(t.scope)}</p>${content}</section><p><a class="action" href="/prepare?lang=${lang}">${escape(t.refresh)}</a></p><a href="/?lang=${lang}">${escape(t.home)}</a>`;
 }
+
+const setupText={
+  ja:{title:'作成後の基盤準備',advance:'基盤準備を続ける',peers:'内部SSHの確認済みサーバー',
+    continueNote:'同じ5台の準備を続けます。途中で時間がかかった場合も、この画面から続けられます。内部SSHの確認では一時鍵の期限が切れるまで約1分待つ場合があります。',
+    observation:'前の処理の完了を確認する必要があります。作り直さず進捗を更新してください。変わらない場合は先生へ連絡してください。',
+    registration:'基盤と内部SSHを確認しました。採点登録はまだ完了していません。',
+    phases:{check_foundation:'5台の初期状態と通信を確認します。',close_prepare:'教材の取込み完了を確認し、初期取込み用の通信を閉じる準備をします。',close_plan_sent:'初期取込み用の通信だけを閉じる変更内容を確認します。',close_apply_sent:'通信制限の反映と、同じ5台・ディスクが保持されていることを確認します。',ssh_discover:'内部サーバーの接続先を確認します。',ssh_init:'踏み台の中で内部接続用の鍵を準備します。',ssh_enroll:'踏み台から内部4台へのSSH接続を設定します。',ssh_verify:'一時鍵の期限後も内部SSHが使えることを確認します。',registration_pending:'採点登録待ち'}},
+  ru:{title:'Подготовка после создания',advance:'Продолжить подготовку основы',peers:'Серверы с проверенным внутренним SSH',
+    continueNote:'Продолжается подготовка тех же пяти серверов. Если операция заняла время, продолжайте с этой страницы. Проверка SSH может потребовать около минуты для истечения временного ключа.',
+    observation:'Нужно подтвердить завершение предыдущей операции. Обновите состояние, не создавая среду заново. Если состояние не меняется, сообщите преподавателю.',
+    registration:'Основа и внутренний SSH проверены. Регистрация для оценивания ещё не завершена.',
+    phases:{check_foundation:'Проверка начального состояния и соединений пяти серверов.',close_prepare:'Проверка загрузки материалов и подготовка закрытия доступа для первоначальной загрузки.',close_plan_sent:'Проверка изменений, закрывающих только первоначальную загрузку.',close_apply_sent:'Проверка ограничения доступа и сохранения тех же серверов и дисков.',ssh_discover:'Проверка адресатов внутренних соединений.',ssh_init:'Подготовка ключа внутренних соединений внутри bastion.',ssh_enroll:'Настройка SSH с bastion к четырём внутренним серверам.',ssh_verify:'Проверка SSH после истечения временного ключа.',registration_pending:'Ожидается регистрация для оценивания'}},
+  uz:{title:'Yaratilgandan keyingi tayyorlash',advance:'Asosni tayyorlashni davom ettirish',peers:'Ichki SSH tekshirilgan serverlar',
+    continueNote:'Xuddi shu besh server tayyorlanadi. Amal vaqt olsa, shu sahifadan davom eting. SSH tekshiruvida vaqtinchalik key muddati tugashi uchun taxminan bir daqiqa kutish mumkin.',
+    observation:'Oldingi amal tugaganini tasdiqlash kerak. Muhitni qayta yaratmasdan holatni yangilang. Holat o‘zgarmasa, o‘qituvchiga ayting.',
+    registration:'Asos va ichki SSH tekshirildi. Baholash uchun ro‘yxatdan o‘tish hali tugamagan.',
+    phases:{check_foundation:'Besh serverning dastlabki holati va ulanishlarini tekshirish.',close_prepare:'Materiallar yuklanganini tekshirish va dastlabki yuklash ulanishini yopishga tayyorlash.',close_plan_sent:'Faqat dastlabki yuklash ulanishini yopadigan o‘zgarishlarni tekshirish.',close_apply_sent:'Ulanish cheklovi hamda o‘sha serverlar va disklar saqlanganini tekshirish.',ssh_discover:'Ichki ulanish manzillarini tekshirish.',ssh_init:'Ichki ulanish keyini bastion ichida tayyorlash.',ssh_enroll:'Bastiondan to‘rtta ichki serverga SSH ulanishini sozlash.',ssh_verify:'Vaqtinchalik key muddati tugagach SSHni tekshirish.',registration_pending:'Baholash uchun ro‘yxatdan o‘tish kutilmoqda'}},
+};

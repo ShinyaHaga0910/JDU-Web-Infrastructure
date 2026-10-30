@@ -46,8 +46,9 @@ def hash_password(password, confirmation):
 
 
 class InitialWorker:
-    def __init__(self, stack, *, planner=make_plan, password_hasher=hash_password):
+    def __init__(self, stack, *, planner=make_plan, password_hasher=hash_password, setup=None):
         self.stack, self.planner, self.password_hasher = stack, planner, password_hasher
+        self.setup = setup
 
     def saved_plan(self):
         from boto3.dynamodb.types import TypeDeserializer
@@ -110,17 +111,22 @@ class InitialWorker:
             return {'status': 'unauthorized'}
         operation = event.get('operation')
         fields = {'operation', 'grant_digest'} | ({'plan_digest', 'password', 'confirmation'} if operation == 'create' else set())
-        if operation not in ('plan', 'observe', 'create') or set(event) != fields:
+        if operation not in ('plan', 'observe', 'create', 'advance') or set(event) != fields:
             return {'status': 'unauthorized'}
         try:
             if self.stack.sts.get_caller_identity()['Account'] != self.stack.grant['account']:
                 raise EnrollmentDenied('Wrong student AWS account')
             if operation == 'observe':
-                initial = self.stack.current()
+                initial = self.setup.current() if self.setup is not None else self.stack.current()
                 saved = self.saved_plan()
                 if saved and initial['stage'] == 'NOT_REQUESTED':
                     initial = {'stage': 'PLAN_READY' if self.plan_current(saved) else 'PLAN_EXPIRED', **self.view_plan(saved)}
                 return {'status': 'ok', 'initial': initial}
+            if operation == 'advance':
+                if self.setup is None:
+                    raise EnrollmentDenied('Setup adapter unavailable')
+                self.stack.checked_files()
+                return {'status':'ok','initial':self.setup.advance()}
             if operation == 'plan':
                 return self.plan()
             if self.stack.saved():
@@ -182,6 +188,12 @@ def handler(event, context):
             session.client('cloudformation', config=Config(connect_timeout=3, read_timeout=20,
                                                           retries={'total_max_attempts':1})),
             session.client('ec2'), session.client('sts'), session.client('iam'), session.client('s3'), clock=time.time)
-        return InitialWorker(s).serve(event)
+        from initial_setup import InitialSetup
+        worker=InitialWorker(s)
+        worker.setup=InitialSetup(s,worker.saved_plan,
+            session.client('ssm',config=Config(connect_timeout=3,read_timeout=5,retries={'total_max_attempts':1})),
+            session.client('ec2-instance-connect',config=Config(connect_timeout=3,read_timeout=5,retries={'total_max_attempts':1})),
+            remaining=context.get_remaining_time_in_millis)
+        return worker.serve(event)
     except Exception:
         return {'status': 'unavailable'}

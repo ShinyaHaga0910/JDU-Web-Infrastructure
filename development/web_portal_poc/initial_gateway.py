@@ -7,7 +7,8 @@ from portal_preparation import checked_assignment
 INITIAL_FIELDS = {'stage', 'stack_id', 'stack_status', 'stack_created', 'resources_created', 'lab_ready',
     'plan_digest', 'planned_at', 'account', 'lab_id', 'deployment_id', 'resource_budget', 'root_gib',
     'new_nodes', 'availability_zone', 'instance_types', 'compute_hourly_usd',
-    'price_includes_disks_ipv4_endpoints', 'initial_state'}
+    'price_includes_disks_ipv4_endpoints', 'initial_state','setup_phase','setup_result','can_advance',
+    'available_after','ssh_completed_roles','foundation_ready'}
 
 
 class InitialGateway:
@@ -17,7 +18,7 @@ class InitialGateway:
     def __call__(self, grant, operation, **fields):
         grant = checked_assignment(grant)
         required = {'plan_digest', 'password', 'confirmation'} if operation == 'create' else set()
-        if operation not in ('plan', 'observe', 'create') or set(fields) != required:
+        if operation not in ('plan', 'observe', 'create','advance') or set(fields) != required:
             raise EnrollmentDenied('Invalid initial operation')
         arn = f'arn:aws:lambda:us-east-1:{grant["account"]}:function:jdu-web-initial-{grant["lab_id"]}'
         result = self.client.invoke(FunctionName=arn, InvocationType='RequestResponse', Payload=json.dumps({

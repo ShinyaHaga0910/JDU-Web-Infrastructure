@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-30T07:05:37Z",
+  "scope": "portal_r1_post_create_foundation_and_internal_ssh_candidate",
+  "r1_complete": false,
+  "deployed": false,
+  "implementation": [
+    "explicit_post_advance_and_read_only_status",
+    "original_five_node_foundation_collector_with_bounded_sdk_clients",
+    "exact_two_resource_nonreplacement_bootstrap_s3_closure",
+    "original_instance_root_volume_and_security_group_identity_checks",
+    "pinned_peer_hosts_and_bastion_only_private_key",
+    "four_internal_ssh_enrollments_and_independent_verification_after_ephemeral_expiry",
+    "durable_command_intent_handle_and_lost_acceptance_reply_recovery",
+    "registration_pending_is_explicitly_not_lab_ready"
+  ],
+  "local_checks": {
+    "python_related": {
+      "passed": 77,
+      "skipped": 0,
+      "command": "python -B -m unittest -q test_initial_ssm test_initial_setup test_initial_stack test_initial_worker test_initial_package test_portal_preparation test_browser_link test_portal_enrollment_handler test_portal_enrollment",
+      "scope": "Moto, original template/selector/closure validator/node identity checks/guest-command compiler; fake EC2/CFN/SSM/EIC/STS and password hashing"
+    },
+    "legacy_collector_closure_ssm": {
+      "passed": 21,
+      "skipped": 0,
+      "command": "python -B -m unittest -q test_inspect_teacher_probe test_inspect_ssm_probe test_lock_teacher_probe test_all_nodes_ssm"
+    },
+    "web_node": {"passed": 67, "skipped": 0, "command": "node --test"},
+    "web_package": {"passed": 3, "skipped": 0, "command": "python -B -m unittest -q test_web_package"},
+    "platform_limits": "Windows import-only pwd/fcntl shims in tests; Linux account, lock, real SSH and real key operations not exercised"
+  },
+  "specific_assertions": [
+    "GET never sends SSM or pushes a key",
+    "all five initial reports required before closure",
+    "changed roots or replacement change set rejected before execution",
+    "closure retains all previous parameters except DeploymentPhase",
+    "four ephemeral public key pushes and nine retained mutating SSM command handles in synthetic full flow",
+    "no independent SSH verification before 63 seconds",
+    "pending invocation resumes same command ID without resending",
+    "lost acceptance reply searched with exact comment instance document and parameters including pagination",
+    "unobserved or ambiguous acceptance never triggers another send",
+    "busy setup cannot be concurrently advanced",
+    "old signed-controller contract cannot silently be used with new setup",
+    "no RDP hash presigned bundle URL private SSH key or raw guest source stored in setup journal",
+    "unconfirmed registration never claims readiness"
+  ],
+  "browser_preview": {
+    "browser": "Chrome",
+    "languages": ["ja", "ru", "uz"],
+    "real_google": false,
+    "real_aws": false,
+    "observed": ["same_deployment_post_to_get", "two_of_four_then_four_of_four_ssh_display", "registration_pending_not_completed", "student_service_configuration_preserved"],
+    "temporary_tab_closed": true,
+    "temporary_server_stopped": true
+  },
+  "aws_changes": {
+    "new_resources": false,
+    "new_access_grants": false,
+    "credential_issuance": false,
+    "grade_writes": false,
+    "instance_lifecycle_operations": false,
+    "old_signed_archives_changed": false
+  },
+  "pending_r1": [
+    "grading_enrollment_and_canonical_identity_finalization",
+    "public_teaching_asset_staging_and_existing_checker_connection",
+    "fresh_valid_signed_release_and_versioned_publication",
+    "control_plane_template_flags_and_timeout_update_plan",
+    "real_worker_role_hashing_setup_and_enrollment_acceptance",
+    "fresh_account_provisioning_test_preserving_original_five"
+  ]
+}
