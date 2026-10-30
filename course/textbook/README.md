@@ -27,6 +27,8 @@ Pは手順付きの練習、Mは別の対象を自分で設定する課題であ
 - [第1章 閲覧用HTML](output/html/web_textbook_ch01_ja.html)
 - [第1章 A4縦PDF](output/pdf/web_textbook_ch01_ja.pdf)
 - [全体構成図 PNG](assets/figures/fig01-system-overview.png) / [SVG](assets/figures/fig01-system-overview.svg)
+- [SSHとRDPの比較図](assets/figures/fig04-ssh-rdp.png)
+- [VPC・公開範囲・SGの関係図](assets/figures/fig05-network-boundaries.png)
 - [制作・確認の記録](VALIDATION.md)
 
 第1章はP0/M0のための共通導入であり、第1章だけを読んでM1へ直行する構成ではない。M1に必要なHTTPとNginxの説明は第4〜5章で扱う。

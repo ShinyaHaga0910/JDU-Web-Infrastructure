@@ -3,7 +3,7 @@
 <rect width="100%" height="100%" fill="white"/>
 <text x="40" y="14" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図1-1  システムの全体構成</text>
 <rect x="60" y="75" width="380" height="125" rx="18" fill="#f5f7fa" stroke="#a9b8c7" stroke-width="2"/>
-<text x="250" y="94" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">学生PC</text>
+<text x="250" y="94" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">利用者PC</text>
 <text x="250" y="142" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">ブラウザ / RDP</text>
 <text x="640" y="85" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">一般閲覧：HTTP / TCP80</text>
 <text x="640" y="140" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">管理接続：RDP / TCP3389</text>

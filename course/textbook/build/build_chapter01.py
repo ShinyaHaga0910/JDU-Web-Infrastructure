@@ -45,6 +45,9 @@ class Scene:
     def text(self, x, y, value, size=26, color=INK, center=False):
         font = ImageFont.truetype(str(SANS), size)
         anchor = 'mt' if center else 'lt'
+        bbox=self.draw.textbbox((x,y),value,font=font,anchor=anchor)
+        if bbox[0]<0 or bbox[1]<0 or bbox[2]>self.width or bbox[3]>self.height:
+            raise ValueError(f'Diagram text outside canvas: {value}')
         self.draw.text((x, y), value, font=font, fill=color, anchor=anchor)
         self.svg.append(f'<text x="{x}" y="{y}" fill="{color}" font-family="Noto Sans JP, sans-serif" font-size="{size}" dominant-baseline="text-before-edge" text-anchor="{"middle" if center else "start"}">{html.escape(value)}</text>')
 
@@ -83,7 +86,7 @@ def figures():
     s = Scene(1600, 1340, 'AWS内のInternet Gatewayと5台の配置、閲覧と管理の独立した経路')
     s.text(40, 14, '図1-1  システムの全体構成', 36)
     s.rect(60, 75, 380, 125, '#f5f7fa')
-    s.text(250, 94, '学生PC', 32, center=True)
+    s.text(250, 94, '利用者PC', 32, center=True)
     s.text(250, 142, 'ブラウザ / RDP', 25, center=True)
     s.text(640, 85, '一般閲覧：HTTP / TCP80', 27, BLUE)
     s.text(640, 140, '管理接続：RDP / TCP3389', 27, GREEN)
@@ -122,19 +125,21 @@ def figures():
     s.save('fig01-system-overview')
 
     s = Scene(1600, 680, 'Web内のNginx・Gunicorn・アプリと別EC2のDB')
-    s.text(40, 16, '図1-2  Webの内部とDBの関係',36)
+    s.text(40, 16, '図1-3  Webの内部とDBの関係',36)
     s.rect(290,110,940,400,'#edf5fc','#9ebed8')
-    s.text(320,128,'同じWeb用EC2 / Ubuntu',29)
+    s.text(760,126,'EC2',26,center=True)
+    s.text(760,169,'Webサーバー',32,center=True)
     for x,w,title,sub in [(325,270,'Nginx','HTTPの入口'),(720,455,'Gunicorn + Django','教員提供アプリを実行')]:
         s.rect(x,245,w,140)
         s.text(x+w/2,268,title,29,center=True)
         s.text(x+w/2,318,sub,24,center=True)
     s.rect(20,245,220,140,'#f5f7fa')
-    s.text(130,265,'学生PC',27,center=True)
+    s.text(130,265,'利用者PC',27,center=True)
     s.text(130,310,'ブラウザ',26,center=True)
     s.rect(1280,245,300,140,'#f1f7f3')
-    s.text(1430,261,'別のDB用EC2',27,center=True)
-    s.text(1430,310,'PostgreSQL',29,center=True)
+    s.text(1430,257,'EC2',24,center=True)
+    s.text(1430,295,'DBサーバー',27,center=True)
+    s.text(1430,340,'PostgreSQL',23,center=True)
     s.arrow([(240,315),(325,315)])
     s.text(245,195,'80',24,BLUE)
     s.arrow([(595,315),(720,315)])
@@ -147,13 +152,14 @@ def figures():
     s.text(50,603,'数値はTCPのポート。IGW等の経路、DNS、管理8080、静的資源は省略。',24)
     s.save('fig02-web-and-app')
 
-    s = Scene(1600, 620, '課題M1はNginxで静的ファイルを返す段階')
-    s.text(40,18,'図1-3  課題1で実装する部分',36)
+    s = Scene(1600, 620, 'EC2 Webサーバーで静的ファイルを配信する構成')
+    s.text(40,18,'図1-5  ファイルを配信するWebの構成',36)
     s.rect(40,165,330,155,'#f5f7fa')
     s.text(205,188,'HTTPクライアント',28,center=True)
     s.text(205,239,'IP指定でファイルを要求',25,center=True)
     s.rect(570,110,975,335,'#edf5fc','#9ebed8')
-    s.text(600,128,'Web用EC2 / Ubuntu',29)
+    s.text(1057,121,'EC2',26,center=True)
+    s.text(1057,164,'Webサーバー',32,center=True)
     s.rect(610,215,290,140)
     s.text(755,236,'Nginx',32,center=True)
     s.text(755,287,'静的ファイルを配信',24,center=True)
@@ -165,9 +171,85 @@ def figures():
     s.arrow([(900,285),(1090,285)])
     s.text(926,237,'読み取り',24,BLUE)
     s.text(610,385,'要求に対応するアクセスログもWeb内へ残る。',26)
-    s.text(55,493,'Web自身・踏み台・公開IP経由の応答を、既存の課題が採点する。',27)
-    s.text(55,548,'DNS・DB・提供アプリとの連携は、後の課題で追加する。',27)
+    s.text(55,493,'Nginxが保存したファイルを読み取り、HTTPの応答として内容を返す。',27)
+    s.text(55,548,'この図は静的配信の例。DBの値から画面を作る構成は図1-3を参照。',27)
     s.save('fig03-first-mission')
+
+    s = Scene(1600, 850, 'SSHのCLI操作とRDPのGUI操作の比較')
+    s.text(40,18,'図1-2  SSHとRDPによる操作の比較',36)
+    for x,title in [(40,'SSH：端末でCLI操作'),(820,'RDP：デスクトップでGUI操作')]:
+        s.rect(x,90,740,670,'#f8fafc')
+        s.text(x+30,108,title,30)
+    s.rect(85,175,650,70)
+    s.text(410,191,'管理用の踏み台',28,center=True)
+    s.rect(865,175,650,70)
+    s.text(1190,191,'利用者PC',28,center=True)
+    s.arrow([(410,245),(410,325)],GREEN)
+    s.text(435,265,'SSH / TCP22',24,GREEN)
+    s.arrow([(1190,245),(1190,325)],GREEN,True)
+    s.text(1215,265,'RDP / TCP3389',24,GREEN)
+    for x,role in [(85,'Webサーバー'),(865,'踏み台サーバー')]:
+        s.rect(x,325,650,360,'#edf5fc','#9ebed8')
+        s.text(x+325,340,'EC2',26,center=True)
+        s.text(x+325,380,role,30,center=True)
+    s.rect(120,435,580,195,'#193047','#193047',8)
+    s.text(145,457,'ubuntu@web:~$ hostname',25,'#ffffff')
+    s.text(145,501,'web',25,'#ffffff')
+    s.text(145,545,'ubuntu@web:~$ pwd',25,'#ffffff')
+    s.text(145,589,'/home/ubuntu',25,'#ffffff')
+    s.rect(900,435,580,195,'#f0ecfa','#b3a4ce',8)
+    s.rect(900,435,580,36,'#ddd5ed','#b3a4ce',8)
+    s.text(920,440,'Ubuntu デスクトップ',20)
+    for x,label in [(925,'ファイル'),(1110,'ブラウザ'),(1295,'端末')]:
+        s.rect(x,492,145,65,'#ffffff','#b3a4ce',8)
+        s.text(x+72,509,label,22,center=True)
+    s.text(925,587,'アイコンやボタンをマウスで操作',24)
+    s.text(70,709,'文字のコマンドを入力して操作する',28)
+    s.text(850,709,'画面のボタンやアイコンを操作する',28)
+    s.text(50,790,'今回の使い方を比較したイメージ。RDPのデスクトップ内でも端末を使える。',25)
+    s.save('fig04-ssh-rdp')
+
+    s = Scene(1600,1150,'VPCの公開・非公開サブネットと通信許可の例')
+    red='#ac3747'
+    s.text(40,18,'図1-4  公開・非公開サブネットと通信の許可',34)
+    s.rect(40,100,300,135,'#f5f7fa')
+    s.text(190,120,'利用者PC',28,center=True)
+    s.text(190,167,'インターネット側',24,center=True)
+    s.rect(400,80,1150,980,'#f8fafc','#7991aa')
+    s.text(425,94,'AWS',30)
+    s.rect(850,125,360,130)
+    s.text(1030,143,'Internet Gateway',27,center=True)
+    s.text(1030,189,'VPCとInternetの接続',24,center=True)
+    s.rect(440,300,1060,730,'#ffffff','#7991aa')
+    s.text(470,315,'VPC（Virtual Private Cloud）',27)
+    s.rect(480,380,980,220,'#edf5fc','#9ebed8')
+    s.text(500,393,'公開サブネット',27)
+    s.rect(480,680,980,340,'#f1f7f3','#a7c2af')
+    s.text(500,695,'非公開サブネット',27)
+    s.rect(770,435,300,135)
+    s.text(920,446,'EC2',24,center=True)
+    s.text(920,485,'Webサーバー',28,center=True)
+    s.text(920,530,'SG-Web',21,center=True)
+    for x,y,role,sg in [(1070,730,'DBサーバー','SG-DB'),(510,870,'DNSサーバー','SG-DNS'),(1070,870,'配布サーバー','SG-Repo')]:
+        s.rect(x,y,300,125)
+        s.text(x+150,y+9,'EC2',24,center=True)
+        s.text(x+150,y+46,role,28,center=True)
+        s.text(x+150,y+91,sg,20,center=True)
+    s.arrow([(340,165),(850,165)])
+    s.text(495,126,'HTTP / TCP80',24,BLUE)
+    s.arrow([(1210,190),(1490,190),(1490,495),(1070,495)])
+    s.text(1230,250,'HTTP / TCP80',23,BLUE)
+    s.arrow([(920,570),(920,640),(1220,640),(1220,730)])
+    s.text(940,605,'SG-DB：WebからのTCP5432を許可',23,BLUE)
+    s.arrow([(810,935),(1070,935)])
+    s.text(825,882,'SG-Repoで許可',23,BLUE)
+    s.text(850,970,'TCP80',23,BLUE)
+    s.arrow([(340,215),(380,215),(380,805),(1020,805)],red,True)
+    s.text(990,769,'×',51,red,center=True)
+    s.text(45,306,'インターネットから',25,red)
+    s.text(45,350,'DBへ直接接続不可',25,red)
+    s.text(50,1092,'青：許可する通信の例　　赤と×：直接接続できない　　VPC内でもSGの許可が必要',25)
+    s.save('fig05-network-boundaries')
 
 
 def inline(text, pdf=False):
@@ -218,7 +300,7 @@ def build():
             2:ParagraphStyle('H2',parent=body,fontName='JSans',fontSize=15,leading=23,spaceBefore=17,spaceAfter=10,keepWithNext=True),
             3:ParagraphStyle('H3',parent=body,fontName='JSans',fontSize=12,leading=20,spaceBefore=12,spaceAfter=7,keepWithNext=True)}
     cell_style=ParagraphStyle('Cell',parent=body,fontName='JSans',fontSize=8.7,leading=14,spaceAfter=0)
-    story=[]; web=[]; textual=[]
+    story=[]; web=[]; textual=[]; figure_count=0
     width=A4[0]-36*mm
     for kind,value in blocks(SOURCE.read_text(encoding='utf-8')):
         if kind=='heading':
@@ -228,6 +310,7 @@ def build():
             anchor=re.sub(r'[^\w\-\u3000-\u9fff\uf900-\uffef ]','',title).lower().replace(' ','-')
             web.append(f'<h{level} id="{anchor}">{inline(title)}</h{level}>'); textual.append(title)
         elif kind=='image':
+            figure_count+=1
             alt,relative=value; path=(SOURCE.parent/relative).resolve()
             with PILImage.open(path) as im: w,h=im.size
             picture=Image(str(path),width=width,height=width*h/w)
@@ -262,7 +345,7 @@ def build():
     missing=[plain(t)[:80] for t in textual if normalized(plain(t)) not in extracted]
     sizes_ok=all(abs(float(p.mediabox.width)-A4[0])<1 and abs(float(p.mediabox.height)-A4[1])<1 for p in reader.pages)
     answer_pages=[i+1 for i,p in enumerate(reader.pages) if '章末解答' in (p.extract_text() or '')]
-    report={'chapter':1,'language':'ja','draft':'editable prose skeleton','pages':len(reader.pages),'a4':sizes_ok,'text_blocks_checked':len(textual),'missing_text':missing,'figures':3,'answer_starts_on_new_page':False,'teacher_visual_review':'not performed','student_trial':'not performed','aws_operations':'none','sha256':hashlib.sha256(pdfpath.read_bytes()).hexdigest()}
+    report={'chapter':1,'language':'ja','draft':'editable prose skeleton','pages':len(reader.pages),'a4':sizes_ok,'text_blocks_checked':len(textual),'missing_text':missing,'figures':figure_count,'answer_starts_on_new_page':False,'teacher_visual_review':'not performed','student_trial':'not performed','aws_operations':'none','sha256':hashlib.sha256(pdfpath.read_bytes()).hexdigest()}
     # Footer is painted first; inspect content text after that footer for the answer heading.
     if answer_pages:
         page_text=reader.pages[answer_pages[0]-1].extract_text() or ''

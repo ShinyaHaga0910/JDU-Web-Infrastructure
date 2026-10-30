@@ -1,16 +1,15 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第1章 Webシステムを構成するもの</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第1章-webシステムを構成するもの">第1章 Webシステムを構成するもの</h1>
-<p>対応：P0/M0の共通準備。P1〜P6とM1〜M6を進めるための全体像。</p>
 <h2 id="この授業で作るシステム">この授業で作るシステム</h2>
 <p>今回は、<strong>学校の中で使う備品管理システム</strong>を作ることを想定する。学校にあるパソコン、モニター、ルーターなどについて、名前、数量、置き場所を管理するシステムである。利用者はブラウザで備品の一覧を見て、管理担当者は管理画面から備品を登録・変更する。</p>
-<p>ただし、この授業では<strong>アプリそのもののプログラミングは行わない</strong>。備品を一覧表示したり、登録・変更したりするアプリは教員が用意する。学生は、そのアプリを動かすためのコンピューター、ネットワーク、ソフトウェア、保存先と接続設定を整える。このような、アプリの動作を支える土台を<strong>インフラストラクチャー</strong>という。</p>
-<p>授業では、AWS上のサーバーを使ってこの土台を組み立てる。最初の課題ではファイルをWebで配信し、その後、名前での接続、データの保存、アプリとデータベースの連携へ進む。最後に、備品の情報をWeb画面で読み取り、管理画面で登録・変更できる状態を目指す。</p>
+<p>ただし、この授業では<strong>アプリそのもののプログラミングは行わない</strong>。備品を一覧表示したり、登録・変更したりするアプリは教員が用意する。そのアプリを動かすためのコンピューター、ネットワーク、ソフトウェア、保存先と接続設定を整えていく。このような、アプリの動作を支える土台を<strong>インフラストラクチャー</strong>という。</p>
+<p>授業では、AWS上のサーバーを使ってこの土台を組み立てる。まずファイルをWebで配信し、その後、名前での接続、データの保存、アプリとデータベースの連携へ進む。最後に、備品の情報をWeb画面で読み取り、管理画面で登録・変更できる状態を目指す。</p>
 <h2 id="この章で分かること">この章で分かること</h2>
 <p>本章では、まず普段のWeb閲覧で何が起きるかを説明し、次に今回作るシステムの全体図と、各部の役割を見ていく。</p>
 <p class="bullet">・ 利用者のPCとサーバーは、どのように仕事を分けるのか。</p>
 <p class="bullet">・ 5台のサーバーは、それぞれ何のためにあるのか。</p>
 <p class="bullet">・ AWS、EC2、Ubuntu、Webサーバーのソフトウェアは、どう違うのか。</p>
 <p class="bullet">・ ページを見る経路と、設定作業をする経路は、どう違うのか。</p>
-<p class="bullet">・ 最初の課題M1では、全体のどこを作るのか。</p>
+<p class="bullet">・ ファイルを配信するWebサーバーは、全体のどこに当たるのか。</p>
 <h2 id="11-ブラウザでホームページを見るときに何が起きているのか">1.1 ブラウザでホームページを見るときに何が起きているのか</h2>
 <p>大学のホームページでお知らせを読んだり、ニュースサイトで記事を開いたりする場面を考えてみよう。画面にページが現れるまでには、手元のソフトウェアと、ページを提供する相手が通信している。ここでは、一般的なWeb閲覧に登場する<strong>ブラウザ、Webサーバー、ネットワーク</strong>の三つを順に説明する。仕組みを単純化すると、次のようなことが起きている。</p>
 <p>まず、皆さんが普段使っている<strong>Google Chrome、Safari、Microsoft Edge</strong>などを思い浮かべてほしい。これらは、ホームページを表示したり、その中のリンクやボタンを操作したりするためのソフトウェアで、まとめて<strong>Webブラウザ</strong>、または<strong>ブラウザ</strong>と呼ぶ。例えばChromeで大学のホームページを開き、「お知らせ」をクリックして記事を読むとき、手元でその操作を受け付け、ページを表示しているのがブラウザである。</p>
@@ -33,19 +32,22 @@
 <p><strong>Amazon EBS（Elastic Block Store）</strong>は、AWS上でEC2に接続して使うストレージを提供するサービスの名前である。EBSで用意した保存領域は<strong>ボリューム</strong>と呼ばれ、EC2のOSからディスクとして利用できる。今回の構成では、パソコンのハードディスクやSSDに相当する役割をEBSのボリュームが担い、そこへUbuntuやソフトウェア、設定、データを保存する。「ストレージ」は一般的な呼び方で、「EBS」はAWSのサービス名である。<a href="https://docs.aws.amazon.com/ebs/latest/userguide/what-is-ebs.html">AWSのEBS説明</a></p>
 <p>例えば「Webサーバー」は、EC2という実行環境でUbuntuが動き、Web配信用のソフトウェアが要求を処理し、必要なファイルをEBSへ保存するという組合せになる。保存と停止・再開の詳しい関係は第8章で扱う。</p>
 <h2 id="13-今回のシステムの全体図">1.3 今回のシステムの全体図</h2>
-<figure><img src="../../assets/figures/fig01-system-overview.png" alt="AWSの枠内にInternet GatewayとVPCを配置した5台構成。学生PCからGatewayへのWeb閲覧と管理接続を、それぞれ青と緑の独立した矢印で示す。" width="1600" height="1340"></figure>
+<figure><img src="../../assets/figures/fig01-system-overview.png" alt="AWSの枠内にInternet GatewayとVPCを配置した5台構成。利用者PCからGatewayへのWeb閲覧と管理接続を、それぞれ青と緑の独立した矢印で示す。" width="1600" height="1340"></figure>
 <p><strong>図1-1 システムの配置と主な経路。</strong> 青い実線は一般利用とDBへの要求、緑の破線は管理接続の方向を表す。矢印は要求方向で、応答は逆向きに戻る。Internet GatewayはAWSが提供し、VPCに接続する機能としてAWSの枠内に示している。名前解決と資源配布などの通信は、1.7の通信表で補う。</p>
 <p>図の中の5つのEC2は、すべて別のコンピューターである。同じような端末画面が開いていても、保存しているファイルや動いているプログラムは別々である。</p>
-<p><strong>IPアドレス</strong>は、ネットワーク上で通信先を指定するためのアドレスである。図に示した<code>10.20</code>で始まるアドレスは、この演習内で使う内部のIPv4アドレスである。学生PCから一般Webや踏み台へ接続する際は、それぞれの現在の公開IPv4アドレスを使う。</p>
+<p><strong>IPアドレス</strong>は、ネットワーク上で通信先を指定するためのアドレスである。図に示した<code>10.20</code>で始まるアドレスは、このネットワーク内で使う内部のIPv4アドレスである。利用者PCから一般Webや踏み台へ接続する際は、それぞれの現在の公開IPv4アドレスを使う。</p>
 <h2 id="14-5台のサーバーは何をするのか">1.4 5台のサーバーは何をするのか</h2>
 <h3 id="踏み台サーバー：内部の作業を行うための端末">踏み台サーバー：内部の作業を行うための端末</h3>
 <p><strong>踏み台サーバー</strong>は、管理者がほかのサーバーを設定・保守するために経由するサーバーである。サーバー管理の入口を集約し、インターネットから各サーバーの管理用入口へ直接接続させないための、重要な役割を持つ。</p>
 <p>例えば、DNS、DB、配布サーバーそれぞれの管理用入口をインターネットへ公開すると、外部から接続を試される入口が増える。そこで今回の構成では、各サーバーの管理用SSH接続を直接公開せず、踏み台からの接続だけを許可する。管理者は、許可された接続元からまず踏み台へ入り、そこから対象サーバーへ接続する。</p>
 <p>このように入口を集約すると、接続元の制限や認証、入口の監視を集中させやすくなる。接続の記録を適切に残せば、いつ、どのアカウントで管理用の接続が行われたかを調べる手掛かりにもなる。調査では踏み台と接続先のサーバーのログを合わせて使う。接続履歴や操作内容を調べるための記録は、必要な内容が残るよう設定し、保存する。踏み台自身も、接続元の制限、認証、ソフトウェアの更新によって保護する。<a href="https://aws.amazon.com/blogs/security/how-to-record-ssh-sessions-established-through-a-bastion-host/">AWSの踏み台と記録の説明</a></p>
-<p>今回は踏み台を作業端末としても使い、Ubuntuのデスクトップへ学生PCからリモートデスクトップで接続する。</p>
-<p><strong>リモートデスクトップ</strong>とは、離れたコンピューターの画面を手元に表示し、キーボードやマウスで操作する仕組みである。接続後に見えるデスクトップは、学生PCの中で動く別の画面ではなく、AWS内の踏み台で動いている画面である。</p>
+<p>今回は踏み台を作業端末としても使い、Ubuntuのデスクトップへ利用者PCからリモートデスクトップで接続する。</p>
+<p><strong>リモートデスクトップ</strong>とは、離れたコンピューターの画面を手元に表示し、キーボードやマウスで操作する仕組みである。手元の画面には、AWS内の踏み台で動くデスクトップが表示される。今回使う接続方式は<strong>RDP（Remote Desktop Protocol）</strong>である。</p>
+<p>SSHでリモートの端末へ接続すると、コマンドを入力する<strong>CLI（文字による操作）</strong>でサーバーを操作できる。一方、RDPではリモートのデスクトップ画面を表示し、ボタンやアイコンを使う<strong>GUI（画面上での操作）</strong>で操作できる。どちらも、実際の処理は接続先のコンピューターで行われる。</p>
+<figure><img src="../../assets/figures/fig04-ssh-rdp.png" alt="左は踏み台からSSHでEC2 WebサーバーのCLIを操作する例、右は利用者PCからRDPでEC2踏み台サーバーのGUIを操作する例。" width="1600" height="850"></figure>
+<p><strong>図1-2 SSHとRDPによる操作の比較。</strong> 今回はSSHで各サーバーの端末を使い、RDPで管理用の踏み台のデスクトップを使う。RDPで開いたデスクトップの中でも、端末を起動してコマンドを入力できる。</p>
 <p>踏み台からは、DNS・Web・DB・配布サーバーの端末へ接続して設定する。また、内部DNSの名前でWebを開いたり、内部向けのアプリ管理画面を使ったりする。</p>
-<p>踏み台を経由させるのは管理用の接続である。一般利用者が備品一覧を見るときは、学生PCからWebサーバーの公開入口へアクセスする。この一般閲覧と、管理者がサーバーの設定を変えるための接続を分けて考える。</p>
+<p>踏み台を経由させるのは管理用の接続である。一般利用者が備品一覧を見るときは、利用者PCからWebサーバーの公開入口へアクセスする。この一般閲覧と、管理者がサーバーの設定を変えるための接続を分けて考える。</p>
 <h3 id="webサーバー：利用者からの要求を受ける入口">Webサーバー：利用者からの要求を受ける入口</h3>
 <p><strong>Webサーバー</strong>は、ブラウザなどからの要求を受け、ページやファイルを返す役割を持つ。今回の一般利用者が最初に接続する相手である。</p>
 <p>この役割を実現するには、コンピューターにWebサーバー用のソフトウェアを導入する。そのソフトウェアが、ブラウザからの要求を受け取り、どのページやファイルを返すかを処理する。この授業で使うWebサーバー用ソフトウェアの製品名が、<strong>Nginx（エンジンエックス）</strong>である。</p>
@@ -66,78 +68,79 @@
 <h3 id="配布サーバー：必要なソフトウェアを内部へ渡す">配布サーバー：必要なソフトウェアを内部へ渡す</h3>
 <p><strong>配布サーバー</strong>は、この授業で必要なパッケージやアプリ用の資源を、ほかのサーバーへ提供する。<strong>パッケージ</strong>は、ソフトウェアとその導入に必要な情報をまとめたものである。<strong>リポジトリ（repo）</strong>は、その取得元として使う保管先を指す。</p>
 <p>内部のサーバーがそれぞれ外部から別の版を取得すると、環境が揃わなかったり、授業中の外部接続に依存したりする。そこで、用意された資源を内部の配布サーバーから取得する。</p>
-<p>このサーバーは準備と導入を支える。一般利用者がページを開くたびに、要求が配布サーバーを通るわけではない。また、今回の配布repoと、教材の原稿や開発コードを管理するGitHubのリポジトリは用途が異なる。</p>
+<p>配布サーバーには、ソフトウェアの入手と導入を安全に管理する役割もある。インターネット上には、配布元のソフトウェアを複製して提供する<strong>ミラーサーバー</strong>もある。もし外部の配布元やミラーサーバーが改ざんされ、ウイルスなどの悪意あるプログラムを含んだファイルを、検証せずに導入すると、自分たちのシステムにも不正なプログラムを取り込む危険がある。</p>
+<p>そこで、内部へ保存する前に、信頼できる配布元であること、署名やハッシュが期待するものと一致することを確かめる。さらに、組織のセキュリティ方針に沿った検査や承認を行い、使用を認めたソフトウェアを内部の配布サーバーへ保管する。署名・ハッシュによる配布元や内容の照合と、悪意あるプログラムや脆弱性に関する検査は、それぞれの役割に応じて行う。</p>
+<p>各サーバーへの導入・更新では、この内部の配布サーバーを使う。更新するソフトウェアにも同じ検査と承認の手順を適用することで、どの版を、どの確認を経て配布したかを管理できる。<a href="https://manpages.debian.org/bookworm/apt/apt-secure.8.en.html">APTの配布元と署名の確認</a>、<a href="https://csrc.nist.gov/pubs/sp/800/218/final">NISTの安全なソフトウェア開発・取得の指針</a></p>
 <h2 id="15-webの中で動くソフトウェア">1.5 Webの中で動くソフトウェア</h2>
 <p>5台の役割を理解したら、Webの中を少し詳しく見よう。最終構成のWebでは、Nginxと教員提供アプリが連携する。</p>
 <figure><img src="../../assets/figures/fig02-web-and-app.png" alt="一般利用者の要求がNginxから同じWeb内のGunicorn・Djangoへ渡され、アプリが別のDBサーバーへ問い合わせ、結果をページとして返す。" width="1600" height="680"></figure>
-<p><strong>図1-2 Webの内部とDBの関係。</strong> Nginx、Gunicorn、Djangoは同じWeb用EC2で動く。DBは別のEC2で動く。これらを別々のEC2と数えない。</p>
+<p><strong>図1-3 Webの内部とDBの関係。</strong> Nginx、Gunicorn、DjangoはEC2 Webサーバーで動く。PostgreSQLはEC2 DBサーバーで動く。</p>
 <p><strong>Nginx</strong>は、HTTPの要求を受ける入口となる。HTTPはWebの要求と応答をやり取りするための約束である。Nginxは保存済みのファイルを返すほか、別の処理担当へ要求を渡し、その結果を利用者へ返すこともできる。後者の働きを<strong>リバースプロキシ</strong>という。<a href="https://nginx.org/en/docs/beginners_guide.html">Nginxの静的配信とproxy</a></p>
 <p><strong>Gunicorn</strong>は、PythonのWebアプリを動かして要求を受け渡すサーバーソフトウェアである。今回はWeb自身の内部でだけ接続できる待受を使い、Nginxから渡された要求を受ける。</p>
-<p><strong>Django</strong>は、教員提供アプリが利用するWebアプリの仕組みである。備品一覧や管理画面などの機能は提供済みのコードに含まれる。学生は画面やプログラムを一から書くのではなく、配置、実行環境、接続先、起動方法、権限を整える。</p>
-<p>最初の課題のように保存済みファイルを返す方式を<strong>静的配信</strong>という。一方、要求を受けてDBの値から内容を作る方式が<strong>動的な応答</strong>である。動的な画面であっても、見た目を整えるCSSなどは保存済みの静的ファイルとして配信できる。</p>
+<p><strong>Django</strong>は、教員提供アプリが利用するWebアプリの仕組みである。備品一覧や管理画面などの機能は提供済みのコードに含まれる。このアプリの配置、実行環境、接続先、起動方法、権限を整えて動かしていく。</p>
+<p>保存済みのファイルを返す方式を<strong>静的配信</strong>という。一方、要求を受けてDBの値から内容を作る方式が<strong>動的な応答</strong>である。動的な画面であっても、見た目を整えるCSSなどは保存済みの静的ファイルとして配信できる。</p>
 <h2 id="16-サーバーをつなぎ、公開範囲を決めるもの">1.6 サーバーをつなぎ、公開範囲を決めるもの</h2>
 <h3 id="vpcとサブネット">VPCとサブネット</h3>
-<p><strong>VPC</strong>は、AWSの中に作る論理的に分離されたネットワークである。その中のIP範囲を分けたまとまりが<strong>サブネット</strong>である。図1-1の5台は、一つのVPC内の二つのサブネットに配置する。</p>
-<p>公開サブネットには踏み台とWebを置く。インターネットへの経路を持ち、それぞれに公開IPを割り当て、必要な入口へ接続できるようにする。非公開サブネットにはDNS、DB、配布サーバーを置き、学生PCから直接接続する公開IPは持たせない。</p>
-<p>非公開のサーバーも、VPC内部の通信は必要である。非公開とは、すべての相手との通信を禁止するという意味ではない。例えばWebはDBと通信し、Webと踏み台はDNSへ問い合わせる。<a href="https://docs.aws.amazon.com/vpc/latest/userguide/how-it-works.html">AWSのVPCとサブネット</a></p>
-<h3 id="ルートとinternet-gateway">ルートとInternet Gateway</h3>
-<p><strong>ルート</strong>は、ある宛先への通信をどこへ送るかという経路の情報である。<strong>Internet Gateway（IGW）</strong>は、AWSが提供するネットワーク機能であり、VPCに接続してインターネットとの通信に使う。図1-1ではAWSの枠内に置き、VPCの入口へつながる位置に示している。公開サブネットや非公開サブネットに置くEC2とは、種類が異なる。<a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html">AWSのInternet Gateway説明</a></p>
-<p>学生PCから公開WebへのHTTPも、踏み台へのリモートデスクトップもIGWを経由する。IGWはEC2ではなく、Webページを作ったり、管理用デスクトップを動かしたりするコンピューターではない。</p>
+<p><strong>VPC（Virtual Private Cloud）</strong>は、AWSの中に作る論理的に分離されたネットワークである。その中のIP範囲を分けたまとまりが<strong>サブネット</strong>である。図1-1の5台は、一つのVPC内の二つのサブネットに配置する。</p>
+<p><strong>公開サブネット</strong>は、インターネットと直接通信するために使うサブネットである。今回はWebと踏み台を置き、公開IPと必要な通信の許可を設定する。これにより、利用者PCからWebの公開画面や、踏み台の管理用デスクトップへ接続できるようにする。</p>
+<p><strong>非公開サブネット</strong>は、インターネットから直接アクセスさせないサーバーを置くためのサブネットである。今回はDNS、DB、配布サーバーを置き、公開IPを割り当てない。例えば、インターネット上のPCからDBへ直接接続することはできない。</p>
+<p>一方、VPC内のサーバー同士では、必要な通信を行う。公開サブネットのWebから非公開サブネットのDBへ接続したり、非公開サブネットのDNSから同じ非公開サブネットの配布サーバーへパッケージを取りに行ったりできる。このように、内部のサーバーはVPC内の公開・非公開サブネットにある相手から、許可された通信を受け付ける。<a href="https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html">AWSのVPCとサブネット</a></p>
+<h3 id="internet-gateway">Internet Gateway</h3>
+<p><strong>Internet Gateway（IGW）</strong>は、VPCとインターネットをつなぐAWSのネットワーク機能である。図1-1ではAWSの枠内に置き、VPCにつながる位置に示している。利用者PCから公開WebへのHTTPも、管理用の踏み台へのRDP接続も、IGWを経由する。<a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html">AWSのInternet Gateway説明</a></p>
 <h3 id="security-groupとポート">Security Groupとポート</h3>
 <p><strong>Security Group（SG）</strong>は、関連付けたAWS資源に対して、許可する通信を定める仕組みである。今回は各サーバーの役割に対応した別のSGを使う。相手、通信方式、ポートを用途ごとに制限する。</p>
 <p><strong>ポート番号</strong>は、一つのホスト内のどの通信窓口へ接続するかを指定する番号である。例えば一般Webの入口にはTCPの80番、DB接続にはTCPの5432番を使う。TCPやUDPは通信方式の名前であり、名前解決ではUDPとTCPの両方の53番を扱う。</p>
 <p>経路があること、SGが許可すること、目的のソフトウェアがその宛先で接続を待つことは別々の条件である。SGを開くだけでWebやDBが動くわけではない。具体的な設定は第2章以降で扱う。</p>
+<p>例えば、DBのSGではWebからのTCP5432を許可し、配布サーバーのSGでは必要な内部サーバーからのTCP80を許可する。VPC内の相手であっても、どのサーバーのどの機能を利用してよいかは、この許可条件で決める。</p>
+<figure><img src="../../assets/figures/fig05-network-boundaries.png" alt="Internet Gatewayを経由する公開Webへの接続、Webから内部DBへの許可された接続、非公開サーバー同士の資源取得、インターネットからDBへの直接接続不可を比較する。" width="1600" height="1150"></figure>
+<p><strong>図1-4 VPC、公開・非公開サブネット、IGW、SGの関係。</strong> 青い矢印は必要な機能への接続例、赤い線と×印はインターネットからDBへ直接接続できないことを示す。内部の接続は、各サーバーのSGが許可した相手・ポートで行う。</p>
 <h2 id="17-利用、管理、名前解決、配布の経路">1.7 利用、管理、名前解決、配布の経路</h2>
-<p>完成後の一般利用では、学生PCのブラウザからWebへ要求する。アプリがDBの値を必要とするときは、Web側からDBへ接続する。接続名の解決が必要なら、Web側が内部DNSへ問い合わせる。DNSはページ本文やSQLの通信を中継しない。</p>
-<p>管理者として設定を変えるときは、学生PCから踏み台のデスクトップへ入り、そこから対象サーバーへ接続する。<strong>SSH</strong>は離れたホストの端末を操作するための接続方式である。アプリ管理画面は、踏み台のブラウザからWebの内部向け入口を開く。</p>
-<div class="table-wrap"><table><thead><tr><th scope="col">用途</th><th scope="col">送信元から宛先</th><th scope="col">通信方式・ポート</th></tr></thead><tbody><tr><td>一般Web</td><td>学生PCからWebの公開IP</td><td>HTTP / TCP80</td></tr><tr><td>踏み台の画面操作</td><td>学生PCから踏み台の公開IP</td><td>RDP / TCP3389</td></tr><tr><td>内部サーバーの端末操作</td><td>踏み台からWeb・DNS・DB・配布サーバー</td><td>SSH / TCP22</td></tr><tr><td>内部の名前解決</td><td>踏み台・WebからDNS</td><td>DNS / UDP53・TCP53</td></tr><tr><td>DBの利用</td><td>Web上のアプリからDB</td><td>PostgreSQL接続 / TCP5432</td></tr><tr><td>アプリの管理画面</td><td>踏み台からWebの内部IP</td><td>HTTP / TCP8080</td></tr><tr><td>Web内の要求転送</td><td>Nginxから同じWeb内のアプリ</td><td>HTTP / TCP8000、同じホスト内のみ</td></tr><tr><td>パッケージ等の取得</td><td>踏み台・Web・DNS・DBから配布サーバー</td><td>HTTP / TCP80</td></tr></tbody></table></div>
+<p>完成後の一般利用では、利用者PCのブラウザからWebへ要求する。アプリがDBの値を必要とするときは、Web側からDBへ接続する。接続名の解決が必要なら、Web側が内部DNSへ問い合わせる。DNSはページ本文やSQLの通信を中継しない。</p>
+<p>管理者として設定を変えるときは、<strong>RDPで利用者PCから管理用の踏み台へ接続する</strong>。踏み台のデスクトップを開いたら、そこからSSHで対象サーバーの端末へ接続して設定する。アプリ管理画面も、踏み台のブラウザからWebの内部向け入口を開いて使う。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">用途</th><th scope="col">送信元から宛先</th><th scope="col">通信方式・ポート</th></tr></thead><tbody><tr><td>一般Web</td><td>利用者PCからWebの公開IP</td><td>HTTP / TCP80</td></tr><tr><td>踏み台の画面操作</td><td>利用者PCから管理用の踏み台の公開IP</td><td>RDP / TCP3389</td></tr><tr><td>内部サーバーの端末操作</td><td>踏み台からWeb・DNS・DB・配布サーバー</td><td>SSH / TCP22</td></tr><tr><td>内部の名前解決</td><td>踏み台・WebからDNS</td><td>DNS / UDP53・TCP53</td></tr><tr><td>DBの利用</td><td>Web上のアプリからDB</td><td>PostgreSQL接続 / TCP5432</td></tr><tr><td>アプリの管理画面</td><td>踏み台からWebの内部IP</td><td>HTTP / TCP8080</td></tr><tr><td>Web内の要求転送</td><td>Nginxから同じWeb内のアプリ</td><td>HTTP / TCP8000、同じホスト内のみ</td></tr><tr><td>パッケージ等の取得</td><td>踏み台・Web・DNS・DBから配布サーバー</td><td>HTTP / TCP80</td></tr></tbody></table></div>
 <p>この表の値は今回の演習の構成である。例えば8080番がどのWebシステムでも必ず管理画面になる、という意味ではない。ポートの用途はサービスの設定によって決まる。</p>
 <p>このほか、<strong>CloudShell</strong>と<strong>SSM（Session Manager）</strong>というAWSの管理機能を使う。CloudShellはAWS上でコマンドを実行する環境、Session Managerは対象EC2の端末へ入る管理手段である。今回の5台にはこの管理経路も用意される。CloudShellを操作することと、接続先Ubuntuで操作することは区別する。具体的な接続・終了は第3章で扱う。</p>
-<p>CloudShellとSSMは、利用者のページ要求が毎回通るサーバーではない。また、5台のEC2に加えて学生が構築する6台目・7台目のEC2として数えない。</p>
-<h2 id="18-学生が作る範囲と課題1の位置付け">1.8 学生が作る範囲と課題1の位置付け</h2>
-<p>個別の基盤として、VPC、サブネット、5台のEC2、所定の経路や管理接続、配布の仕組みを先に用意する。その土台を使って、学生がNginx、BIND、PostgreSQL、提供アプリの配置や接続設定を順に行う。</p>
-<p>サーバーが5台起動していることと、Webシステムが完成していることは違う。例えばWeb用EC2があっても、必要なソフトウェア、ファイル、設定が揃わなければ目的のページは返らない。学生が作業するのは、この土台を実際のサービスとして動かす部分である。</p>
-<figure><img src="../../assets/figures/fig03-first-mission.png" alt="課題1の要求がWebのNginxへ届き、保存済みのテキストファイルを返す。DNS、DB、アプリは後の課題で追加する。" width="1600" height="620"></figure>
-<p><strong>図1-3 最初の課題M1で作る範囲。</strong> 最初はIP指定でWebの静的ファイルを取得する。完成後の図1-2のうち、アプリやDBへ要求を渡す部分はまだ作らない。</p>
-<p>練習P1では、Nginxを導入し、配信するファイルと権限を整え、HTTPで本文を返して要求をログへ残す。自力課題M1では、P1とは別の指定ファイルを自分で配信し、P1のファイルも保持する。</p>
-<p>M1は、サービス、設定の構文、80番の待受、指定ファイル、Web自身からのHTTP、踏み台からのHTTP、公開IP経由のHTTP、アクセスログの8項目を採点する。公開経路の自動採点はCloudShellから行われる。学生PCのブラウザ表示と、どこから自動採点するかは区別する。</p>
-<p>学生は課題画面でM1の8/8を確認して、次のDNS単元へ進む。進行のために、別のサービス再確認や教師承認を追加することはない。NginxとHTTPの具体的な説明は第4〜5章、操作は既存の<a href="../../../labs/docs/ja/practice.md#p1-httpで静的ファイルを返す">練習P1</a>、完成要件は<a href="../../../labs/docs/ja/missions.md#m1-httpで静的ファイルを返す-8">自力課題M1</a>で扱う。</p>
+<h2 id="18-サービスを組み立てる">1.8 サービスを組み立てる</h2>
+<p>個別の基盤として、VPC、サブネット、5台のEC2、管理接続、配布の仕組みを先に用意する。その土台を使って、Nginx、BIND、PostgreSQL、提供アプリの配置や接続設定を順に行う。</p>
+<p>例えば、EC2 WebサーバーにNginxと配信するファイルを配置し、HTTPの要求に応じてファイルを返す構成を作る。これは、サーバーという土台をWebのサービスとして動かす一例である。</p>
+<figure><img src="../../assets/figures/fig03-first-mission.png" alt="EC2 WebサーバーのNginxがHTTP要求を受け、保存したテキストファイルを読み取って返す。" width="1600" height="620"></figure>
+<p><strong>図1-5 ファイルを配信するWebの構成。</strong> NginxがHTTP要求を受け、EC2 Webサーバーに保存されたファイルを読み取り、その内容を返す。</p>
+<p>最初の課題では、このようにNginxで保存したファイルをHTTP配信する構成を作る。</p>
 <h2 id="19-本章のまとめ">1.9 本章のまとめ</h2>
 <p>一般利用者はブラウザからWebへ接続する。Webは最初に静的ファイルを返し、後半では同じサーバー内のアプリを使ってDBの値を返す。DNSは接続名を解決し、DBはデータを管理する。踏み台は管理作業の端末、配布サーバーは必要資源の取得元である。</p>
-<p>それぞれの役割は、EC2、Ubuntu、EBSという実行と保存の土台の上で動く。VPC、サブネット、ルート、IGW、SGが配置・経路・通信の許可を支える。</p>
+<p>それぞれの役割は、EC2、Ubuntu、EBSという実行と保存の土台の上で動く。VPC、サブネット、IGW、SGがネットワークの配置と接続、通信の許可を支える。</p>
 <p>次の第2章では、全体図の配置と線を、ネットワークの設定へ結び付けて説明する。各章と課題の対応は<a href="../../README.md">教科書の入口</a>で参照できる。</p>
 <h2 id="章末問題">章末問題</h2>
 <h3 id="問1">問1</h3>
-<p>EC2、Ubuntu、Nginxは、それぞれ何を担当するか。Web用EC2を用意しただけで、目的のファイルを配信できるとは限らない理由も説明せよ。</p>
+<p>EC2、Ubuntu、Nginxは、それぞれ何を担当するか。</p>
 <h3 id="問2">問2</h3>
-<p>学生PCで一般一覧を見る場合と、管理者が内部サーバーを設定する場合は、どの経路を使うか。踏み台の役割を含めて説明せよ。</p>
+<p>踏み台サーバーの役割を説明せよ。</p>
 <h3 id="問3">問3</h3>
-<p>Web上のアプリが<code>db.lab.test</code>へ接続するとき、DNSとDBはそれぞれ何を返すか。DNSがDBの問い合わせを中継すると考えてよいか。</p>
+<p>今回のVPC内にある踏み台から、<code>web.lab.test</code>という名前でWebサーバーへ接続するとき、内部DNSが返す情報を答えよ。</p>
 <h3 id="問4">問4</h3>
-<p>一般Webの利用中に、配布サーバーが毎回ページの要求を中継するか。配布サーバーが必要になる場面を挙げよ。</p>
-<h3 id="問5">問5</h3>
-<p>Nginx、Gunicorn、Django、PostgreSQLを使うと、これらのためにEC2が4台必要になるか。今回の配置を答えよ。</p>
-<h3 id="問6">問6</h3>
-<p>最初の課題M1では、最終構成のどこを完成させるか。DNSやDBとの接続も同時に完成させる課題か。</p>
+<p>配布サーバーが必要になる場面を挙げよ。</p>
 <h2 id="章末解答">章末解答</h2>
 <h3 id="問1">問1</h3>
-<p>EC2は仮想サーバーという実行環境、Ubuntuはプログラム・ファイル・権限などを管理するOS、NginxはHTTP要求を受けてファイルを返すソフトウェアである。EC2だけでは目的のソフトウェア、ファイル、設定、通信条件が揃っているとは限らない。</p>
+<p>EC2は仮想サーバーという実行環境、Ubuntuはプログラム・ファイル・権限などを管理するOS、NginxはHTTP要求を受けてファイルを返したり、アプリへ要求を渡したりするWebサーバー用ソフトウェアである。</p>
 <h3 id="問2">問2</h3>
-<p>一般一覧は学生PCからIGWを経由して公開Webへ接続する。管理作業は学生PCからIGWを経由して踏み台へRDP接続し、踏み台から対象サーバーへSSH接続する。踏み台は管理用の作業端末であり、通常のWeb閲覧を中継する相手ではない。</p>
+<p>ほかのサーバーを管理するために経由するサーバーである。管理用の入口を集約し、各サーバーの管理用接続をインターネットへ直接公開する範囲を減らす。今回はRDPで開く管理用の作業端末としても使う。</p>
 <h3 id="問3">問3</h3>
-<p>DNSは名前に対応するIPなどのDNS情報を返す。WebはそのIPへ別の接続を行い、DBへデータを問い合わせる。DBは要求されたデータや処理結果を返す。DNSはSQLの問い合わせや結果を中継しない。</p>
+<p>内部名<code>web.lab.test</code>に対応するWebサーバーの内部IPv4アドレス、<code>10.20.1.20</code>を返す。</p>
 <h3 id="問4">問4</h3>
-<p>中継しない。配布サーバーはNginxなどのパッケージや指定アプリ資源を取得するときに使う。通常のページ要求はWebが受け、必要ならアプリとDBで処理する。</p>
-<h3 id="問5">問5</h3>
-<p>必要ではない。Nginx、Gunicorn、Djangoを使うアプリは同じWeb用EC2に置き、PostgreSQLは別のDB用EC2で動かす。ソフトウェアの数とEC2の数は同じとは限らない。</p>
-<h3 id="問6">問6</h3>
-<p>Nginxで指定された静的ファイルをHTTP配信し、指定本文、待受、各経路の応答、ログなどを揃える。DNS、DB、提供アプリとの連携は後の課題で追加する。M1は8/8で完了する。</p>
+<p>サーバーへソフトウェアを導入・更新するときに使う。外部の配布元に含まれる不正なプログラムをそのまま導入する危険を減らすため、入手元や署名・ハッシュを確認し、組織の方針に沿った検査と承認を経た資源を内部に保存して配布する。</p>
 <h2 id="参考資料">参考資料</h2>
 <p>外部資料の確認日：2026-10-30。今回の配置・IP・課題条件は本リポジトリの現行仕様による。</p>
 <p class="bullet">・ <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html">AWS What is Amazon EC2?</a></p>
 <p class="bullet">・ <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Environment_setup/Browsing_the_web">MDN Browsing the web</a></p>
 <p class="bullet">・ <a href="https://docs.aws.amazon.com/ebs/latest/userguide/what-is-ebs.html">AWS What is Amazon EBS?</a></p>
 <p class="bullet">・ <a href="https://docs.aws.amazon.com/vpc/latest/userguide/how-it-works.html">AWS How Amazon VPC works</a></p>
+<p class="bullet">・ <a href="https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html">AWS What is Amazon VPC?</a></p>
+<p class="bullet">・ <a href="https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html">AWS Subnets for your VPC</a></p>
+<p class="bullet">・ <a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html">AWS Security Groups</a></p>
+<p class="bullet">・ <a href="https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/overview">Microsoft Remote Desktop Services overview</a></p>
+<p class="bullet">・ <a href="https://ubuntu.com/server/docs/how-to/security/openssh-server/">Ubuntu OpenSSH server</a></p>
+<p class="bullet">・ <a href="https://manpages.debian.org/bookworm/apt/apt-secure.8.en.html">Debian apt-secure</a></p>
+<p class="bullet">・ <a href="https://csrc.nist.gov/pubs/sp/800/218/final">NIST SP 800-218 SSDF</a></p>
 <p class="bullet">・ <a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html">AWS Internet Gateway</a></p>
 <p class="bullet">・ <a href="https://aws.amazon.com/blogs/security/how-to-record-ssh-sessions-established-through-a-bastion-host/">AWS How to Record SSH Sessions Established Through a Bastion Host</a></p>
 <p class="bullet">・ <a href="https://nginx.org/en/docs/beginners_guide.html">Nginx Beginner’s Guide</a></p>
