@@ -1,0 +1,195 @@
+{
+  "date": "2026-10-30",
+  "scope": "browser-check-results-to-canonical-grades",
+  "status": "accepted",
+  "full_portal_goal_complete": false,
+  "source_commit": "ce896ad",
+  "portal_origin": "https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws",
+  "teacher_account": "170126527713",
+  "student_account": "965244652544",
+  "lab_id": "class193548-test1",
+  "deployment_id": "3ab82943-031d-4806-b4c0-c0b0e4554006",
+  "deployment": {
+    "verified_at": "2026-10-30T04:25:34.295626+00:00",
+    "teacher_checker_code_sha256": "e29ad4ec55b375a16534ed0c0c5a68e8482bc931419932f5f2f02a9de01dcdfa",
+    "web_code_sha256": "6c399ca8661e19ac9cdc91ba217edb280cce8559b42781f45dba3c45d52cf8bb",
+    "web_stack_status": "UPDATE_COMPLETE",
+    "web_template_and_parameters_match": true,
+    "web_versioned_artifact_bytes_verified": true,
+    "teacher_ec2_state": "stopped"
+  },
+  "canonical": {
+    "verified_at": "2026-10-30T04:22:15.028411+00:00",
+    "before_rows": 75,
+    "after_rows": 78,
+    "canonical_requests_added": 3,
+    "old_requests_and_unrelated_rows_preserved": true,
+    "original_registration_metadata_preserved": true,
+    "latest_and_selected_rules_verified": true,
+    "raw_earned": 62,
+    "raw_maximum": 62,
+    "requests": [
+      {
+        "job_id": "30a90bac-2950-4ed6-9322-1cf14a8416d5",
+        "task_id": "M1",
+        "request_id": "645e55ec-cc82-4082-af5d-ae3ea32b7c98",
+        "received_at": "2026-10-30T04:19:14.373437+00:00",
+        "report_sha256": "fb650bdeb003798bf26cec64445a997c4d2b844f6d15ee5dcc5a6d35eb72f4e0",
+        "raw_earned": 8,
+        "raw_maximum": 8,
+        "unresolved": 0,
+        "readiness_ok": true,
+        "evaluable": true,
+        "complete": true,
+        "counts_toward_assessment": true
+      },
+      {
+        "job_id": "ccc4771e-da90-424f-8b5c-44dcb542878b",
+        "task_id": "M1",
+        "request_id": "a24907ee-342a-4d76-9d71-795132447441",
+        "received_at": "2026-10-30T04:21:30.653149+00:00",
+        "report_sha256": "73c28bce5719dfd6ee446646589b280eab175a6ce350f04b227497d7dfe8bf8c",
+        "raw_earned": 8,
+        "raw_maximum": 8,
+        "unresolved": 0,
+        "readiness_ok": true,
+        "evaluable": true,
+        "complete": true,
+        "counts_toward_assessment": true
+      },
+      {
+        "job_id": "6d0da3ad-0e5b-4d34-9d54-17987e0be649",
+        "task_id": "M5",
+        "request_id": "f875295e-bf53-428f-8b9e-13b14aa31ab2",
+        "received_at": "2026-10-30T04:19:41.411706+00:00",
+        "report_sha256": "eae97720b2aa4c2649f9319e025a601ed281a69129a968cc77b7dd5863b09563",
+        "raw_earned": 9,
+        "raw_maximum": 13,
+        "unresolved": 4,
+        "readiness_ok": true,
+        "evaluable": false,
+        "complete": false,
+        "counts_toward_assessment": true
+      }
+    ]
+  },
+  "retries": {
+    "verified_at": "2026-10-30T04:23:48.416576+00:00",
+    "same_report_retry_returns_first_receipt": true,
+    "older_retry_does_not_reorder_newer_grade": true,
+    "entire_grade_partition_unchanged_by_retries": true,
+    "retried_receipts": [
+      {
+        "status": "saved",
+        "request_id": "645e55ec-cc82-4082-af5d-ae3ea32b7c98",
+        "received_at": "2026-10-30T04:19:14.373437+00:00",
+        "counts_toward_assessment": true,
+        "evaluable": true
+      },
+      {
+        "status": "saved",
+        "request_id": "f875295e-bf53-428f-8b9e-13b14aa31ab2",
+        "received_at": "2026-10-30T04:19:41.411706+00:00",
+        "counts_toward_assessment": true,
+        "evaluable": false
+      }
+    ]
+  },
+  "student": {
+    "verified_at": "2026-10-30T04:23:17.941252+00:00",
+    "original_five_ids_and_roots_matched": true,
+    "encrypted_root_gib": 96,
+    "jobs": [
+      {
+        "job_id": "30a90bac-2950-4ed6-9322-1cf14a8416d5",
+        "task_id": "M1",
+        "command_id": "67f9c508-84bd-4bfc-ad81-1a21cdd2d8db",
+        "command_count": 1,
+        "request_id": "645e55ec-cc82-4082-af5d-ae3ea32b7c98",
+        "report_sha256": "fb650bdeb003798bf26cec64445a997c4d2b844f6d15ee5dcc5a6d35eb72f4e0",
+        "raw_earned": 8,
+        "raw_maximum": 8,
+        "unresolved": 0,
+        "readiness_ok": true,
+        "evaluable": true,
+        "complete": true,
+        "counts_toward_assessment": true
+      },
+      {
+        "job_id": "5b15a547-45f2-484f-95bd-2a8ca287f313",
+        "task_id": "M2",
+        "command_id": "3a59822d-3391-4290-8b2b-192c45e3b439",
+        "command_count": 1,
+        "request_id": "16fe6b14-6c63-4845-ab30-949a89b79fce",
+        "report_sha256": "b5fba7b3b89b656ff1d1c66a3b3f99362b17459e65f584b9ad4730d253e5b149",
+        "raw_earned": 13,
+        "raw_maximum": 13,
+        "unresolved": 0,
+        "readiness_ok": true,
+        "evaluable": true,
+        "complete": true,
+        "counts_toward_assessment": true
+      },
+      {
+        "job_id": "6d0da3ad-0e5b-4d34-9d54-17987e0be649",
+        "task_id": "M5",
+        "command_id": "54abc0e0-6acd-4d7a-bdf0-3a35eb37c15a",
+        "command_count": 1,
+        "request_id": "f875295e-bf53-428f-8b9e-13b14aa31ab2",
+        "report_sha256": "eae97720b2aa4c2649f9319e025a601ed281a69129a968cc77b7dd5863b09563",
+        "raw_earned": 9,
+        "raw_maximum": 13,
+        "unresolved": 4,
+        "readiness_ok": true,
+        "evaluable": false,
+        "complete": false,
+        "counts_toward_assessment": true
+      },
+      {
+        "job_id": "ccc4771e-da90-424f-8b5c-44dcb542878b",
+        "task_id": "M1",
+        "command_id": "48a91e83-9f31-455a-9a34-61467341d2d6",
+        "command_count": 1,
+        "request_id": "a24907ee-342a-4d76-9d71-795132447441",
+        "report_sha256": "73c28bce5719dfd6ee446646589b280eab175a6ce350f04b227497d7dfe8bf8c",
+        "raw_earned": 8,
+        "raw_maximum": 8,
+        "unresolved": 0,
+        "readiness_ok": true,
+        "evaluable": true,
+        "complete": true,
+        "counts_toward_assessment": true
+      }
+    ],
+    "teacher_invoke_principal_unchanged": true,
+    "final_state": "all_five_stopped"
+  },
+  "browser_acceptance": {
+    "new_m1_finished_post_saved_automatically": true,
+    "extra_save_click_for_new_m1": false,
+    "old_m1_and_m5_saved_without_checker_rerun": true,
+    "m5_selected_grade_preserved": 13,
+    "selected_total": 62,
+    "selected_maximum": 62,
+    "languages": [
+      "ja",
+      "ru",
+      "uz"
+    ],
+    "same_receipt_after_ec2_stop": true,
+    "m5_save_response_temporarily_unavailable_recovered_by_get": true,
+    "no_second_m5_save_post_needed": true
+  },
+  "limits": [
+    "M3 stop/restart evidence and M5/M6 password-based functional checks remain unconfirmed in browser checks.",
+    "P/M0 exclusion was verified locally, not by a new real AWS P/M0 run in this acceptance.",
+    "Teacher Lab must be started; teacher EC2 can remain stopped.",
+    "New five-server browser provisioning, teacher progress list and general student release remain outside this completed scope."
+  ],
+  "previous_local_validation": {
+    "python_portal": 46,
+    "original_api": 14,
+    "node": 51
+  },
+  "new_runtime_verifier": "verify_canonical_submission.py passed on real AWS; 75 original rows -> 78 with exactly 3 new REQUEST rows"
+}

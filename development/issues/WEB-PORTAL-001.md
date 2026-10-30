@@ -1,11 +1,17 @@
 # WEB-PORTAL-001：学生の環境準備・採点確認をブラウザへ集約する
 
-- 状態: 本人指示で一時停止、原本への自動保存の適用・検証は翌日へ延期（10/29）。候補と計画は承認済み・未適用。ブラウザ確認/専用結果表示は前回受入済み。今回は既存採点処理へ接続し、原本保存/未確認時の点数保持/同report再送をAWSへ配備・受入する。全IssueのM3/M5M6特殊確認・新規5台準備・教師一覧・一般配布は別残件。教師Lab開始が必要。
+- 状態: ブラウザ課題確認結果の成績原本への自動保存までAWS実配備・受入完了（2026-10-30）。今回の範囲は完成。全IssueのM3/M5M6特殊確認・新規5台準備・教師一覧・一般配布は別残件としてOPENを維持する。教師Lab開始が必要。
 - 登録: 2026-10-23、本人依頼。
 - 着手順: D12の受入残件を保持し、2026-10-23の本人依頼で本Issueの構成検討を先行。Web演習の改善課題として実証・実装へ進める。
 - GitHub: [Issue #1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1)（非公開JDU-Web-Infrastructure）。
 
 10/29課題確認の内部基盤：固定task/jobとSSM実行番号を永続化し、切断時には同じcommandを回収する処理、元request ID付きreport outbox、既存checker/HTTP外部確認のadapterを追加した。Moto/架空SSM/HTTP29件と既存62点API14件合格。公開中Web/AWSは変更なし。HTTPの確認実行・本人認可・実AWS preflight・正規採点送信とM3/M5M6はまだ接続していない。[内部検証](../web_portal_poc/verification/2026-10-29-assessment-job-core.public.json)。
+
+## 2026-10-30 原本自動保存の実受入（最新）
+
+承認済み候補ce896adを学生/教師checkerと同じWebへ適用した。新M1は実SSMの8/8を完了POSTで自動保存し、追加の保存クリックは不要。既存M1/M5も元report/request IDのまま保存。M5 9/13＋未確認4で選択13点・合計62点を保持した。原本75→78行、REQUEST3件だけ追加、旧受付/無関係な行/登録情報を保持。旧report再送は原受付を返し新M1を巻き戻さず、全partition不変。元4件はSSM各1回、JA/RU/UZ、停止後の保存結果と62点表示を受入した。M5保存後の一時取得失敗はGET再読込みで回復し、2回目の保存POSTやSSM再送は不要だった。元5台/96GiB/認証/SSMを保持し、教師EC2とともに停止済み。新資源/IAM/鍵なし。
+
+[実受入記録](../web_portal_poc/verification/2026-10-30-canonical-submission-accepted.public.json)、[完成条件](../web_portal_poc/CANONICAL-SUBMISSION-ACCEPTANCE.md)、[全体の残件](../web_portal_poc/PORTAL-ACCEPTANCE.md)。P/M0成績外と不正要求/失効拒否の今回追加試験はローカルで確認し、新たな実AWS負例としては数えない。教師Lab終了中の成績閲覧は引き続き後続課題。今回の完成で区切り、次機能には自動着手しない。以下は各時点の履歴。
 
 ## 学生の到達体験
 
