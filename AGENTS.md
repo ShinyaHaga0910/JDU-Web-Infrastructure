@@ -20,7 +20,9 @@
 
 - 最新構成は公開subnetに踏み台・Web、private subnetにDNS・DB・専用repoの5台。各roleに別のSGを関連付ける。学生PC→HTTP80→公開Web→内部DBが利用経路、学生PC→RDP3389→踏み台→内部SSH22が管理経路。全5台のSSMを保持し、CloudShellからssm-userで管理できる。共有Windowsへ秘密鍵を出さない。CloudShell・踏み台を通常Web閲覧経路へ挟まない。詳細の受入と未試験はcourse/labs/VALIDATION.mdで区別する。
 
-- 現在の制作対象はcourse/labsのP0-P6/M0-M6教材。日本語原稿とロシア語・ウズベク語を同期し、Pは実行場所・目的・完全手順・期待結果・失敗時を省かない。Mは別対象の要件にする。採点は固定62素点、P/M0は成績外、本人実演・backup/restore・追加disk・アプリ開発は要求しない。既存署名版を教材編集で書き換えない。
+- 2026-10-23に先行制作したcourse/labsのP0-P6/M0-M6は現行演習。日本語原稿とロシア語・ウズベク語を同期し、Pは実行場所・目的・完全手順・期待結果・失敗時を省かない。Mは別対象の要件にする。採点は固定62素点、P/M0は成績外、本人実演・backup/restore・追加disk・アプリ開発は要求しない。既存署名版を教材編集で書き換えない。
+
+- 2026-10-30本人指示により、OS・Linux教科書を参考に後半教科書の設計へ進む。学習順序はcourse/textbook-plan.md、全14章の説明内容はcourse/textbook-outline.mdを参照する。学生が設定しないCookie等のアプリ内部機構は本編の独立説明にしない。本文制作では学生の配置・接続・起動・権限設定・観測に必要な理由と仕組みを優先する。
 
 - WEB-PORTAL-001は本人指示で構成検討を先行。Web FunctionsはEnd Lab後も利用できたという本人確認を採用し、演習EC2の利用停止と区別する。設計と未実証は`development/issues/WEB-PORTAL-001-feasibility.md`を参照。画面表示を根拠にEC2を自動起動/再作成したり、観測不能を0点へ変えたりしない。
 
