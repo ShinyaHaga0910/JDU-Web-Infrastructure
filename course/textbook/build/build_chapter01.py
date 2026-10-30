@@ -288,9 +288,14 @@ def blocks(text):
         yield ('paragraph',''.join(para))
 
 
-def build():
+def build(*, source=SOURCE, chapter=1, diagram_builder=figures, report_name='validation.public.json'):
+    source=Path(source)
+    source_text=source.read_text(encoding='utf-8')
+    book_title=next(value[1] for kind,value in blocks(source_text) if kind=='heading' and value[0]==1)
+    output_stem=f'web_textbook_ch{chapter:02d}_ja'
+    footer_label=f'Web Infrastructure / 第{chapter}章'
     for directory in (ASSETS,HTML_OUT,PDF_OUT): directory.mkdir(parents=True,exist_ok=True)
-    figures()
+    diagram_builder()
     pdfmetrics.registerFont(TTFont('JSans',str(SANS)))
     pdfmetrics.registerFont(TTFont('JSerif',str(SERIF)))
     pdfmetrics.registerFontFamily('JSans',normal='JSans',bold='JSans',italic='JSans',boldItalic='JSans')
@@ -302,7 +307,7 @@ def build():
     cell_style=ParagraphStyle('Cell',parent=body,fontName='JSans',fontSize=8.7,leading=14,spaceAfter=0)
     story=[]; web=[]; textual=[]; figure_count=0
     width=A4[0]-36*mm
-    for kind,value in blocks(SOURCE.read_text(encoding='utf-8')):
+    for kind,value in blocks(source_text):
         if kind=='heading':
             level,title=value
             if title=='章末解答': story.append(PageBreak())
@@ -311,7 +316,7 @@ def build():
             web.append(f'<h{level} id="{anchor}">{inline(title)}</h{level}>'); textual.append(title)
         elif kind=='image':
             figure_count+=1
-            alt,relative=value; path=(SOURCE.parent/relative).resolve()
+            alt,relative=value; path=(source.parent/relative).resolve()
             with PILImage.open(path) as im: w,h=im.size
             picture=Image(str(path),width=width,height=width*h/w)
             picture.keepWithNext=True
@@ -331,26 +336,26 @@ def build():
             web.append('<p'+(' class="bullet"' if kind=='bullet' else '')+'>'+prefix+inline(value)+'</p>')
             textual.append(value)
     css='''body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}'''
-    (HTML_OUT/'web_textbook_ch01_ja.html').write_text('<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第1章 Webシステムを構成するもの</title><style>'+css+'</style></head><body><a class="skip" href="#main">本文へ</a><main id="main">'+'\n'.join(web)+'</main></body></html>',encoding='utf-8')
-    pdfpath=PDF_OUT/'web_textbook_ch01_ja.pdf'
+    (HTML_OUT/(output_stem+'.html')).write_text('<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>'+html.escape(book_title)+'</title><style>'+css+'</style></head><body><a class="skip" href="#main">本文へ</a><main id="main">'+'\n'.join(web)+'</main></body></html>',encoding='utf-8')
+    pdfpath=PDF_OUT/(output_stem+'.pdf')
     def footer(canvas,doc):
         canvas.saveState(); canvas.setFont('JSans',8); canvas.setFillColor(colors.HexColor('#667c91'))
-        canvas.drawString(18*mm,12*mm,'Web Infrastructure / 第1章')
+        canvas.drawString(18*mm,12*mm,footer_label)
         canvas.drawRightString(A4[0]-18*mm,12*mm,str(doc.page)); canvas.restoreState()
-    SimpleDocTemplate(str(pdfpath),pagesize=A4,leftMargin=18*mm,rightMargin=18*mm,topMargin=17*mm,bottomMargin=20*mm,title='第1章 Webシステムを構成するもの',author='JDU',allowSplitting=1).build(story,onFirstPage=footer,onLaterPages=footer)
+    SimpleDocTemplate(str(pdfpath),pagesize=A4,leftMargin=18*mm,rightMargin=18*mm,topMargin=17*mm,bottomMargin=20*mm,title=book_title,author='JDU',allowSplitting=1).build(story,onFirstPage=footer,onLaterPages=footer)
     reader=PdfReader(pdfpath); normalized=lambda s:re.sub(r'\s+','',s)
-    page_contents=[re.sub(r'Web Infrastructure / 第1章\s*\d+\s*','',p.extract_text() or '',count=1) for p in reader.pages]
+    page_contents=[re.sub(re.escape(footer_label)+r'\s*\d+\s*','',p.extract_text() or '',count=1) for p in reader.pages]
     extracted=normalized(''.join(page_contents))
     plain=lambda s:re.sub(r'\[([^\]]+)\]\([^)]+\)',r'\1',s).replace('**','').replace('`','')
     missing=[plain(t)[:80] for t in textual if normalized(plain(t)) not in extracted]
     sizes_ok=all(abs(float(p.mediabox.width)-A4[0])<1 and abs(float(p.mediabox.height)-A4[1])<1 for p in reader.pages)
     answer_pages=[i+1 for i,p in enumerate(reader.pages) if '章末解答' in (p.extract_text() or '')]
-    report={'chapter':1,'language':'ja','draft':'editable prose skeleton','pages':len(reader.pages),'a4':sizes_ok,'text_blocks_checked':len(textual),'missing_text':missing,'figures':figure_count,'answer_starts_on_new_page':False,'teacher_visual_review':'not performed','student_trial':'not performed','aws_operations':'none','sha256':hashlib.sha256(pdfpath.read_bytes()).hexdigest()}
+    report={'chapter':chapter,'language':'ja','draft':'editable prose skeleton','pages':len(reader.pages),'a4':sizes_ok,'text_blocks_checked':len(textual),'missing_text':missing,'figures':figure_count,'answer_starts_on_new_page':False,'teacher_visual_review':'not performed','student_trial':'not performed','aws_operations':'none','sha256':hashlib.sha256(pdfpath.read_bytes()).hexdigest()}
     # Footer is painted first; inspect content text after that footer for the answer heading.
     if answer_pages:
         page_text=reader.pages[answer_pages[0]-1].extract_text() or ''
         report['answer_starts_on_new_page']='章末解答' in page_text[:120]
-    (ROOT/'validation.public.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+    (ROOT/report_name).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     if missing or not sizes_ok or not report['answer_starts_on_new_page']: raise RuntimeError(report)
     print(json.dumps(report,ensure_ascii=False))
 
