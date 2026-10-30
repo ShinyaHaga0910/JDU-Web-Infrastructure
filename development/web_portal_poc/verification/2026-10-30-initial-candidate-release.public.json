@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "scope": "r1_signed_initial_verification_candidate",
+  "r1_complete": false,
+  "deployed": false,
+  "formal_distribution_ready": false,
+  "class_ready": false,
+  "foundation_acceptance_pending": true,
+  "fingerprint": "65EC6784750CCFA703BA7179519284E45155EC2A",
+  "core_manifest_sha256": "567102d82c547d6ada6bfd6d3f9d4471545f7660dba6dfe2961ad00093fb9d38",
+  "candidate_manifest_sha256": "3565dcf9d578489b05321c9d31a58e093724b55da72cfd1b27d0edb3fd15b583",
+  "expires_at": "2026-11-06T08:52:07.545392+00:00",
+  "worker": {
+    "sha256": "e479ea2548565c832a63042a4f6799bfc4ed877f7d7674a8bb9b2175a0e75580",
+    "files": 67,
+    "bytes": 210289,
+    "individual_assignment_not_registered": true
+  },
+  "actual_local_checks": {
+    "signatures": "Actual pinned GPG core/envelope/assessment verification; WSL signing key stayed in WSL, Windows build used public key only",
+    "linux_import": {
+      "python": "3.12.3",
+      "actual_pwd_and_fcntl": true,
+      "runtime_file_hashes": 67,
+      "crypt_synthetic_fixture": true,
+      "aws_calls": false,
+      "lambda_python311_unverified": true
+    }
+  },
+  "tests": {
+    "related_candidate_publication_package_teaching": {
+      "passed": 21,
+      "skipped": 0,
+      "command": "python -B -m unittest -q test_initial_candidate_release test_initial_publication test_initial_package test_initial_teaching"
+    },
+    "existing_teacher_endpoint_binding": {
+      "passed": 5,
+      "skipped": 0
+    }
+  },
+  "fixtures": "New 5 candidate unit tests explicitly stub GPG; actual signed CLI builds and real verification above are separate observations.",
+  "source_refresh": {
+    "teacher_https_health_status": 200,
+    "teacher_ec2_running_observed": true,
+    "teacher_ec2_not_started_by_agent": true,
+    "payload_full_get_sha256": "60fbd303712672e34848c02f2d7d697ce21318eb7af91bf67665c88688f4deeb",
+    "payload_full_get_bytes": 741180532,
+    "same_previously_accepted_payload": true,
+    "price_catalog_sha256": "9aeec4265755cfd3985afc7c580142ef197a3d7003dc826346c894cb7a14b54a",
+    "official_price_csv_sha256": "cce748e4a6eaa35e349e2590ef36a957071b1e01b316369aaccaf51d270abe33",
+    "official_price_csv_bytes": 302903252
+  },
+  "next": "Prepare immutable worker publication in existing protected versioned bucket; do not apply new student read grant without concrete action-time confirmation. Settings, isolated assignment, actual helper and EC2 testing remain.",
+  "aws_changes": {
+    "new_resources": false,
+    "new_access_grants": false,
+    "credential_issuance": false,
+    "grade_writes": false,
+    "instance_lifecycle_operations": false,
+    "old_signed_archives_changed": false
+  }
+}

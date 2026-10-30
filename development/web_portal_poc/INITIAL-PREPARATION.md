@@ -82,3 +82,13 @@ AWS965のCloudShellでsyntax-only template（SHA256 `f7f0f9e8af66d5e414e45a78024
 その後の実読取りで元5台running/元root一致を確認し、同ClassのREADMEの同時9台/32vCPU・再開時全台起動を確認した。10台保持の併設案は採用しない。旧repo1台を整理する最小案と、既存bindingを保持した試験割当の検討は[既存環境再利用案](INITIAL-REUSE.md)へ記録。現12資源のValidateTemplateも成功したが、参照artifactは架空で新資源は作成していない。
 
 記録はverification/2026-10-30-initial-preparation-core.public.jsonとverification/2026-10-30-initial-preparation-ui-worker.public.json。既存成績の変更、新規AWS資源、権限追加、credential発行は行っていない。
+
+## 新しい署名付き検証候補（2026-10-30、AWS未配備）
+
+正式配布builderは「そのcoreそのものの実機合格」を要求するため、変更したcontrollerへ旧coreの合格証拠を流用しない。`initial_candidate_release.py`で初回検証用の署名envelopeを用意し、worker builderへ明示`--candidate-root`を追加した。通常の`--course-root`は従来どおり正式配布の検査を行う。候補はdistribution_ready=false / class_ready=false / foundation_acceptance_pending=trueとし、署名・期限・core hash・既存62点assessmentの署名と全hashを検査する。
+
+既存のWSL署名鍵は有効で、秘密鍵を持ち出さず新coreと候補を実署名した。期限は2026-11-06T08:52:07.545392+00:00。教師受付HTTPS200、同じ741,180,532 bytesの元payload全GET hash、公式料金CSVの更新を実確認した。コードは現repoから、旧記録rootは読取り専用の参照証拠として使う。旧toolsを編集正本に戻さず、旧署名archiveも変更しない。
+
+実GPGのcore/envelope/assessment検査から67 fileのworker ZIPを組立て、WSL Ubuntu Python3.12.3で実pwd/fcntl・全file照合・合成passwordのcryptを確認。Lambda Python3.11や実AWS作成の成功とは扱わない。関連21件と元endpoint検査5件も合格（skipなし）。[検査記録](verification/2026-10-30-initial-candidate-release.public.json)と[署名候補の保存先](../03_knowledge/aws_official/web_lab_packages_2026-10-15/portal-initial-class193548-20261030-r1/README.md)。
+
+workerの公開コードは既存の非公開・version管理済み配布bucketを再利用できるようにした。`prepare_initial_publication.py`は元policyを保ち、この学生向けの1 objectだけのread追加計画を作る。新bucket/公開URLを増やさず、権限追加の実行は具体計画への直前確認後とする。現段階はAWS未適用。

@@ -82,7 +82,9 @@ def template(assignment, origin, teacher_account, code):
             or any(not isinstance(v,str) or not v or len(v)>1024 for v in code.values())):
         raise ValueError('Immutable worker artifact and teacher account required')
     artifact = re.fullmatch(r'worker/([a-f0-9]{64})/initial-worker\.zip', code['S3Key'])
-    if (not artifact or code['S3Bucket'] != 'jdu-web-portal-initial-'+teacher_account+'-'+artifact[1][:12]
+    owner_bucket=(code['S3Bucket']=='jdu-web-portal-initial-'+teacher_account+'-'+artifact[1][:12]
+                  or re.fullmatch(r'jdu-web-portal-bootstrap-'+teacher_account+r'-[a-f0-9]{12}',code['S3Bucket'])) if artifact else False
+    if (not artifact or not owner_bucket
             or code['S3ObjectVersion'] == 'null' or not re.fullmatch(r'[A-Za-z0-9._~+/=-]{1,1024}',code['S3ObjectVersion'])):
         raise ValueError('Immutable same-owner worker artifact required')
     result = proof_template(origin, purpose='preparation')
@@ -130,14 +132,20 @@ def main():
     for name in ('manifest','signature','public-key','artifact-root','assignment-file','output'):
         parser.add_argument('--'+name, type=Path, required=True)
     parser.add_argument('--fingerprint', required=True, choices=[FINGERPRINT])
-    parser.add_argument('--course-root',type=Path,required=True)
+    kits=parser.add_mutually_exclusive_group(required=True)
+    kits.add_argument('--course-root',type=Path)
+    kits.add_argument('--candidate-root',type=Path)
     args = parser.parse_args()
     verified = verify_release(args.manifest,args.signature,args.public_key,args.fingerprint,args.artifact_root,include_bundle=False)
     assignment = json.loads(args.assignment_file.read_bytes())
-    import importlib.util
-    spec=importlib.util.spec_from_file_location('initial_trusted_course_tools',BOOTSTRAP.parent/'web_lab_release/release_tools.py')
-    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
-    course=module.verify(args.course_root,args.fingerprint)
+    if args.candidate_root:
+        from initial_candidate_release import verify
+        course=verify(args.candidate_root,verified,args.fingerprint)
+    else:
+        import importlib.util
+        spec=importlib.util.spec_from_file_location('initial_trusted_course_tools',BOOTSTRAP.parent/'web_lab_release/release_tools.py')
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        course=module.verify(args.course_root,args.fingerprint)
     print(build_verified(args.output,args.manifest,verified,assignment,course))
 
 

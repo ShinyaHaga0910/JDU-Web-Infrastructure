@@ -11,7 +11,7 @@
 
 [本人連携](../web_portal_poc/verification/2026-10-29-authenticated-student-portal.public.json)・[原本保存](../web_portal_poc/verification/2026-10-30-canonical-submission-accepted.public.json)・[教師画面](../web_portal_poc/verification/2026-10-30-teacher-progress-accepted.public.json)。元5台・暗号化root96GiB・認証・常設SSM・原本を保持。検証用1件の成功を一般学生への配布完了と数えない。
 
-R1の[画面・worker・作成後処理・採点登録](../web_portal_poc/INITIAL-PREPARATION.md)を接続。基盤検査/S3閉鎖/内部SSH/暗号化した個別登録/本人bindingに加え、公開教材配置と同じ5台専用status/checkerを候補接続した。関連Python97・Node73・Web package3とWSL Ubuntuの実filesystem4件が合格。新ready画面は架空Chromeで3言語を確認し、12資源候補もAWS構文検査に合格した。実課題実行/配備は未実施。有効新署名配布/設定/timeout更新/実受入は残る。[教材接続候補](../web_portal_poc/verification/2026-10-30-initial-teaching.public.json)。本人は別Labを用意できないため、実READMEの同時9台/再開時全台起動を確認したため10台併設は採用せず、[旧repoと登録先を含む再利用案](../web_portal_poc/INITIAL-REUSE.md)を具体化する。停止中も数える9台guardを実quotaと断定せず、削除/guard変更は未承認。独立学生identityの受入も未完。初期自動準備は基盤のみで、学生自身が各サーバーで行う導入・設定変更・反映を代行しない。
+R1の[画面・worker・作成後処理・採点登録](../web_portal_poc/INITIAL-PREPARATION.md)を接続。基盤検査/S3閉鎖/内部SSH/暗号化した個別登録/本人bindingに加え、公開教材配置と同じ5台専用status/checkerを候補接続した。関連Python97・Node73・Web package3とWSL Ubuntuの実filesystem4件が合格。新ready画面は架空Chromeで3言語を確認し、12資源候補もAWS構文検査に合格した。実課題実行/配備は未実施。有効な[署名付き検証候補](../web_portal_poc/verification/2026-10-30-initial-candidate-release.public.json)を制作し、実GPGと67 fileの実Linux読込みまで確認。正式配布へ昇格せず、publication/設定/timeout更新/試験用割当/実受入は残る。[教材接続候補](../web_portal_poc/verification/2026-10-30-initial-teaching.public.json)。本人は別Labを用意できないため、実READMEの同時9台/再開時全台起動を確認したため10台併設は採用せず、[旧repoと登録先を含む再利用案](../web_portal_poc/INITIAL-REUSE.md)を具体化する。停止中も数える9台guardを実quotaと断定せず、削除/guard変更は未承認。独立学生identityの受入も未完。初期自動準備は基盤のみで、学生自身が各サーバーで行う導入・設定変更・反映を代行しない。
 
 ## 残り6項目
 

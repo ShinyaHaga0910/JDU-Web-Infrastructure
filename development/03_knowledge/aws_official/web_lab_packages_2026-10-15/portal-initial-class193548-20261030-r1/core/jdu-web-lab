@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+exec python3 -B "$DIR/web_lab.py" student "$@" --deployment-manifest "$DIR/deployment-manifest.json" --signature "$DIR/deployment-manifest.json.asc" --public-key "$DIR/package-signing-public.asc" --trusted-fingerprint 65EC6784750CCFA703BA7179519284E45155EC2A --artifact-root "$DIR"

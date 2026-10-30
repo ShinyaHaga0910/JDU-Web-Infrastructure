@@ -69,7 +69,9 @@ def main():
     p.add_argument('--teacher-account',required=True)
     p.add_argument('--class-id',required=True,type=int)
     p.add_argument('--all-nodes-ssm',action='store_true')
-    a=p.parse_args();here=Path(__file__).resolve().parent;project=here.parents[3]
+    p.add_argument('--reference-root',type=Path,help='Read-only historical capture/evidence root; executable sources remain this repository')
+    p.add_argument('--price-catalog',type=Path,help='Fresh official price catalog; historical signed archives remain unchanged')
+    a=p.parse_args();here=Path(__file__).resolve().parent;project=a.reference_root or here.parents[3]
     now=datetime.now(timezone.utc)
     grading=teacher_endpoint(json.loads(a.teacher_facts.read_text()),a.teacher_account,a.class_id,now)
     evidence=project/'03_knowledge/aws_official/web_lab_packages_2026-10-15/candidate-c4'
@@ -81,7 +83,7 @@ def main():
         'public_key':project/'03_knowledge/aws_official/web_lab_packages_2026-10-15/package-signing-public.asc',
         'template':project/'03_knowledge/aws_official/web_lab_packages_2026-10-15/candidate-c3/web-lab-ssm-c3.template.json',
         'controller_validation':here/'controller_runtime.py',
-        'price_catalog':project/'03_knowledge/aws_official/web_lab_ami_2026-10-15/teacher-price-catalog.json'}
+        'price_catalog':a.price_catalog or project/'03_knowledge/aws_official/web_lab_ami_2026-10-15/teacher-price-catalog.json'}
     paths={}
     for role,source in sources.items():
         if role=='template' and a.all_nodes_ssm:

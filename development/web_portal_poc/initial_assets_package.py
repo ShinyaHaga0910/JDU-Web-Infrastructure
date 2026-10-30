@@ -19,12 +19,15 @@ def from_course(course,verified,assignment):
     root=Path(course['root']);release=course['release']
     raw=(root/'course-release.json').read_bytes()
     expiry=datetime.fromisoformat(release['expires_at'].replace('Z','+00:00'))
+    candidate=course.get('verification_candidate') is True
+    readiness=(release.get('distribution_ready') is False and release.get('foundation_acceptance_pending') is True
+               and release.get('scope')=='initial_foundation_verification_candidate') if candidate else release.get('distribution_ready') is True
     if (course.get('fingerprint')!=verified['trusted_fingerprint']
             or hashlib.sha256(raw).hexdigest()!=course['sha256'] or json.loads(raw)!=release
             or release.get('core_manifest_sha256')!=verified['manifest_sha256']
             or course['foundation']['core']['manifest_sha256']!=verified['manifest_sha256']
             or release.get('raw_maximum')!=62 or release.get('contract_sha256')!=CONTRACT
-            or release.get('distribution_ready') is not True or release.get('class_ready') is not False
+            or not readiness or release.get('class_ready') is not False
             or expiry.tzinfo is None or not datetime.now(timezone.utc)<expiry
             or assignment['release']['expires_at']>expiry.timestamp()):
         raise ValueError('Matching valid signed course kit required')

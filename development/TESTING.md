@@ -1,5 +1,9 @@
 # 移管ソースの検証
 
+## R1署名付き検証候補（2026-10-30）
+
+`test_initial_candidate_release test_initial_publication test_initial_package test_initial_teaching`の21件と元`test_teacher_endpoint_binding`5件が合格、skipなし。前者の候補検査ではGPGをstubする。別に実際のWSL署名とcore/envelope/assessmentのGPG検査、67 file workerの実Linux import/file照合・合成cryptを確認した。正式配布へ未受入coreを昇格せず、候補flagと期限を保持。AWS初回受入は未実施。[証拠](web_portal_poc/verification/2026-10-30-initial-candidate-release.public.json)。
+
 ## R1の公開教材・状態/課題確認接続候補（2026-10-30、AWS未適用）
 
 `web_portal_poc`で`python -B -m unittest -q test_initial_ssm test_initial_setup test_initial_stack test_initial_worker test_initial_package test_initial_registration test_initial_registration_guest test_initial_delivery test_initial_teaching test_portal_preparation test_browser_link test_portal_enrollment_handler test_portal_enrollment`の97件、`web`のNode73件とWeb package3件が合格。Moto/模擬AWSと署名済み旧assessment bytesを利用した架空の新course envelopeで、公開資源2台の配置、同じcommandの回収、元5台だけのcontext、status応答とchecker設定health、未準備/異なる宛先の拒否を確認した。実Google/新署名の発行/実AWS/実課題の実行ではない。
