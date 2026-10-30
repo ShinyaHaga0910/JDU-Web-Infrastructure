@@ -11,6 +11,8 @@
 
 [本人連携](../web_portal_poc/verification/2026-10-29-authenticated-student-portal.public.json)・[原本保存](../web_portal_poc/verification/2026-10-30-canonical-submission-accepted.public.json)・[教師画面](../web_portal_poc/verification/2026-10-30-teacher-progress-accepted.public.json)。元5台・暗号化root96GiB・認証・常設SSM・原本を保持。検証用1件の成功を一般学生への配布完了と数えない。
 
+R1の[内部入口・構築adapter](../web_portal_poc/INITIAL-PREPARATION.md)を実装・ローカル検査済み。学生画面/実行Lambda/作成後処理は未接続で、AWSには未適用。初期自動準備は基盤のみとし、学生自身が各サーバーに入り、導入・設定変更・反映を行う演習を代行しない。
+
 ## 残り6項目
 
 - [ ] **R1 ブラウザから初回5台を準備**：割当/本人AWS確認/資源確認→5台初期化/SSM/内部SSH/採点登録。学生にコマンド転記を要求せず、再読込みで重複作成しない。署名・期限の有効な資材を用いる。

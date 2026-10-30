@@ -26,16 +26,19 @@ def portal_origin(value):
     return value
 
 
-def post_proof(origin, pair_id, proof_url):
+def post_proof(origin, pair_id, proof_url, *, purpose='enrollment'):
+    if purpose not in ('enrollment', 'preparation'):
+        raise ValueError('Invalid confirmation purpose')
     target=urlsplit(portal_origin(origin))
     body=json.dumps({'pair_id':pair_id,'proof_url':proof_url},separators=(',',':')).encode()
     connection=http.client.HTTPSConnection(target.hostname,timeout=7)
     try:
-        connection.request('POST','/api/enrollment/complete',body=body,
+        connection.request('POST','/api/'+purpose+'/complete',body=body,
             headers={'Content-Type':'application/json','Content-Length':str(len(body))})
         response=connection.getresponse()
         result=response.read(4097)
-        if response.status!=200 or len(result)>4096 or json.loads(result)!={'registered':True}:
+        expected={'registered':True} if purpose=='enrollment' else {'aws_confirmed':True}
+        if response.status!=200 or len(result)>4096 or json.loads(result)!=expected:
             raise ValueError('Registration not confirmed')
     finally:
         connection.close()
@@ -102,13 +105,19 @@ def serve(event,env,session,*,sign=create_proof,post=post_proof,reply=send_respo
                     or not isinstance(props.get('PairId'),str) or not HEX.fullmatch(props['PairId'])):
                 raise ValueError('Invalid registration request')
             origin=portal_origin(env.get('PORTAL_ORIGIN'))
+            purpose=env.get('PORTAL_LINK_PURPOSE','enrollment')
+            if purpose not in ('enrollment','preparation'):
+                raise ValueError('Invalid confirmation purpose')
             from botocore.config import Config
             sts=session.client('sts',region_name='us-east-1',config=Config(
                 connect_timeout=3,read_timeout=5,retries={'max_attempts':0}))
             if sts.get_caller_identity()['Account']!=env['STUDENT_ACCOUNT']:
                 raise ValueError('Wrong student account')
             proof=sign(session,props['PairId'])
-            post(origin,props['PairId'],proof)
+            if purpose=='preparation':
+                post(origin,props['PairId'],proof,purpose='preparation')
+            else:
+                post(origin,props['PairId'],proof)
             proof=None
             body.update(Status='SUCCESS',Reason='Account registration confirmed. Return to the portal.')
         else:

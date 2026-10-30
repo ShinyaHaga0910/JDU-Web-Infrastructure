@@ -108,10 +108,12 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
     try { config=configFrom(env); } catch { return response('Unavailable',503); }
     if (url.origin !== config.origin) return response('Forbidden',403);
     const enrollmentEnabled=env.PORTAL_ENROLLMENT_ENABLED==='true' && typeof enroll==='function';
-    if (url.pathname==='/api/enrollment/complete') {
+    const preparationEnabled=env.PORTAL_PREPARATION_ENABLED==='true' && typeof enroll==='function';
+    if (url.pathname==='/api/enrollment/complete' || url.pathname==='/api/preparation/complete') {
       // Server-to-server signed proof only. The nonce was minted by an active,
       // approved Google session; no self-declared Google identity is accepted.
-      if (!enrollmentEnabled) return response('Not found',404);
+      const preparing=url.pathname==='/api/preparation/complete';
+      if (!(preparing?preparationEnabled:enrollmentEnabled)) return response('Not found',404);
       if (request.method!=='POST') return response('Method not allowed',405);
       if (url.search || request.headers.get('content-type')?.split(';')[0]!=='application/json') return response('Forbidden',403);
       try {
@@ -120,11 +122,12 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
         const value=JSON.parse(body);
         if (!value || Array.isArray(value) || Object.keys(value).sort().join(',')!=='pair_id,proof_url'
             || !/^[a-f0-9]{64}$/.test(value.pair_id||'') || typeof value.proof_url!=='string' || value.proof_url.length>8192) return response('Forbidden',403);
-        const result=await enroll({operation:'complete',pair_id:value.pair_id,proof_url:value.proof_url});
+        const result=await enroll({operation:preparing?'prepare_complete':'complete',pair_id:value.pair_id,proof_url:value.proof_url});
         if (result?.status==='unauthorized') return response('Forbidden',403);
-        if (result?.status!=='ok' || result.enrollment?.registered!==true
-            || !/^[a-z0-9][a-z0-9-]{2,31}$/.test(result.enrollment?.lab_id||'')) return response('Unavailable',503);
-        return new Response(JSON.stringify({registered:true}),{headers:{...security,'Content-Type':'application/json; charset=utf-8'}});
+        const outcome=preparing?result?.preparation:result?.enrollment;
+        if (result?.status!=='ok' || (preparing?outcome?.aws_confirmed!==true:outcome?.registered!==true)
+            || !/^[a-z0-9][a-z0-9-]{2,31}$/.test(outcome?.lab_id||'')) return response('Unavailable',503);
+        return new Response(JSON.stringify(preparing?{aws_confirmed:true}:{registered:true}),{headers:{...security,'Content-Type':'application/json; charset=utf-8'}});
       } catch {return response('Unavailable',503);}
     }
     if (url.pathname === '/auth/login' && request.method === 'GET') {

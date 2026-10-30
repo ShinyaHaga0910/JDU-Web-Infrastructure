@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "scope": "portal_initial_preparation_core",
+  "checked_at": "2026-10-30T05:37:52.019322+00:00",
+  "r1_complete": false,
+  "deployed": false,
+  "implemented": [
+    "teacher_preassignment_before_nodes",
+    "session_scoped_assigned_account_sts_confirmation",
+    "single_explicit_foundation_request",
+    "separate_cloudformation_proof_helper",
+    "legacy_five_node_create_adapter_with_retained_intent"
+  ],
+  "local_checks": {
+    "python": {
+      "passed": 50,
+      "skipped": 0,
+      "command": "python -B -m unittest -q test_initial_stack test_portal_preparation test_browser_link test_portal_enrollment_handler test_portal_enrollment",
+      "scope": "Moto DynamoDB, real legacy selector/template/parameter builder, fake STS/EC2/CloudFormation/TLS; Windows fcntl import compatibility only"
+    },
+    "node": {
+      "passed": 60,
+      "skipped": 0,
+      "command": "node --test",
+      "scope": "local API/mock authentication; no real new Web page or AWS deployment"
+    }
+  },
+  "live_student_read": {
+    "account": "965244652544",
+    "browser": "Edge",
+    "baseline_account_matches": true,
+    "nonterminated_count": 5,
+    "projected_with_five": 10,
+    "existing_pilot_ceiling": 9,
+    "within_existing_pilot_ceiling": false,
+    "roles": {
+      "bastion": {
+        "retained": true,
+        "root_ids_match": true,
+        "state": "stopped"
+      },
+      "web": {
+        "retained": true,
+        "root_ids_match": true,
+        "state": "stopped"
+      },
+      "dns": {
+        "retained": true,
+        "root_ids_match": true,
+        "state": "stopped"
+      },
+      "db": {
+        "retained": true,
+        "root_ids_match": true,
+        "state": "stopped"
+      },
+      "repo": {
+        "retained": true,
+        "root_ids_match": true,
+        "state": "stopped"
+      }
+    },
+    "is_claim_about_aws_service_quota": false
+  },
+  "aws_writes": {
+    "new_resources": false,
+    "access_grants": false,
+    "credentials_issued": false,
+    "original_grade_writes": false,
+    "instance_lifecycle_operations": false
+  },
+  "teaching_boundary": {
+    "automatic_preparation": "foundation_only",
+    "student_changes_server_configuration": true,
+    "automatic_mission_solution": false,
+    "current_completed_test_fixture_is_not_fresh_student_start": true
+  },
+  "r1_pending": [
+    "student_preparation_screen",
+    "signed_release_publication_and_teacher_assignment_operator",
+    "student_worker_package_template_and_live_read_plan",
+    "hidden_rdp_password_hashing",
+    "post_create_initial_state_closure_ssm_ssh_registration_resource_staging",
+    "fresh_aws_deployment_acceptance_preserving_original_five"
+  ]
+}

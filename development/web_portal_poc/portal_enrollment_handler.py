@@ -9,6 +9,7 @@ import re
 
 from identity_proof import ProofError
 from portal_enrollment import PortalEnrollment, EnrollmentDenied
+from portal_preparation import PortalPreparation
 
 HEX = re.compile(r'[a-f0-9]{64}\Z')
 IDENTITY = {'subject', 'email', 'session_id', 'token_hash'}
@@ -18,11 +19,16 @@ def valid(event):
     if type(event) is not dict:
         return False
     operation = event.get('operation')
+    if isinstance(operation, str) and operation.startswith('prepare_'):
+        # Explicit whitelist below still rejects approve/revoke/worker actions.
+        operation = operation.removeprefix('prepare_')
+        if operation not in ('begin', 'status', 'complete', 'confirm'):
+            return False
     if operation == 'complete':
         return (set(event) == {'operation', 'pair_id', 'proof_url'}
                 and isinstance(event['pair_id'], str) and HEX.fullmatch(event['pair_id'])
                 and isinstance(event['proof_url'], str) and len(event['proof_url']) <= 8192)
-    if operation not in ('begin', 'status') or set(event) != IDENTITY | {'operation'} | ({'request_id'} if operation == 'begin' else set()):
+    if operation not in ('begin', 'status', 'confirm') or (operation == 'confirm' and event['operation'] != 'prepare_confirm') or set(event) != IDENTITY | {'operation'} | ({'request_id'} if operation == 'begin' else set()):
         return False
     return (isinstance(event['subject'], str) and re.fullmatch(r'[0-9]{1,128}', event['subject'])
             and isinstance(event['email'], str) and event['email'].isascii()
@@ -31,12 +37,17 @@ def valid(event):
                     for k in ('session_id', 'token_hash') + (('request_id',) if operation == 'begin' else ())))
 
 
-def serve(event, service):
+def serve(event, service, preparation=None):
     if not valid(event):
         return {'status': 'unauthorized'}
     try:
         operation = event['operation']
         values = {k: v for k, v in event.items() if k != 'operation'}
+        if operation.startswith('prepare_'):
+            if preparation is None:
+                return {'status': 'unavailable'}
+            result = getattr(preparation, operation.removeprefix('prepare_'))(**values)
+            return {'status': 'ok', 'preparation': result}
         if operation == 'complete':
             result = service.complete(values['pair_id'], values['proof_url'])
         else:
@@ -65,6 +76,6 @@ def handler(event, context):
             return {'status': 'unavailable'}
         service = PortalEnrollment(boto3.client('dynamodb', region_name='us-east-1'),
             os.environ['PORTAL_BINDING_TABLE'], os.environ['GRADE_TABLE'], bytes.fromhex(value))
-        return serve(event, service)
+        return serve(event, service, PortalPreparation(service))
     except Exception:
         return {'status': 'unavailable'}

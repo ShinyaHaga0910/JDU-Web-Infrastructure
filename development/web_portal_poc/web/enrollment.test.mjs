@@ -127,6 +127,22 @@ test('fixed enrollment function is same-account and never selected by event',asy
   await assert.rejects(()=>enroll({operation:'approve'}));
 });
 
+test('initial AWS proof is explicitly gated and cannot register an existing Lab',async()=>{
+  const calls=[];
+  const enroll=async e=>{calls.push(e);return {status:'ok',preparation:{aws_confirmed:true,lab_id:'new-student',resources_created:false}};};
+  const proof={pair_id:'d'.repeat(64),proof_url:'https://sts.us-east-1.amazonaws.com/?signed-proof'};
+  const request=()=>req('/api/preparation/complete',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(proof)});
+  assert.equal((await createApp({env,enroll})(request())).status,404);
+  assert.equal(calls.length,0);
+  const app=createApp({env:{...env,PORTAL_PREPARATION_ENABLED:'true'},enroll});
+  const result=await app(request());
+  assert.equal(result.status,200);
+  assert.deepEqual(await result.json(),{aws_confirmed:true});
+  assert.deepEqual(calls,[{operation:'prepare_complete',...proof}]);
+  const failed=createApp({env:{...env,PORTAL_PREPARATION_ENABLED:'true'},enroll:async()=>({status:'ok',enrollment:{registered:true,lab_id:'existing'}})});
+  assert.equal((await failed(request())).status,503);
+});
+
 test('HTTP body reader bounds both declared and streamed content without destroying socket',async()=>{
   const stream=(chunks,length)=>{const r=Readable.from(chunks);r.method='POST';r.headers=length?{'content-length':length}:{};return r;};
   assert.equal((await readBody(stream([Buffer.from('hello')],'5'))).toString(),'hello');

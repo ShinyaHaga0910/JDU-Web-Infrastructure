@@ -23,8 +23,10 @@ def inline_source():
         'identity_proof=SimpleNamespace(NONCE=NONCE,HOST=HOST,validate=validate)',proof,handler])
 
 
-def template(origin):
+def template(origin, *, purpose='enrollment'):
     portal_origin(origin)
+    if purpose not in ('enrollment','preparation'):
+        raise ValueError('Invalid confirmation purpose')
     source=inline_source()
     return {
         'AWSTemplateFormatVersion':'2010-09-09',
@@ -41,17 +43,19 @@ def template(origin):
                 'Role':{'Fn::Sub':'arn:aws:iam::${ExpectedAccount}:role/LabRole'},
                 'Timeout':30,'MemorySize':128,'Code':{'ZipFile':source},
                 'Environment':{'Variables':{'STUDENT_ACCOUNT':{'Ref':'ExpectedAccount'},'LAB_ID':{'Ref':'LabId'},
-                    'BOOTSTRAP_STACK_ID':{'Ref':'AWS::StackId'},'PORTAL_ORIGIN':origin}}}},
+                    'BOOTSTRAP_STACK_ID':{'Ref':'AWS::StackId'},'PORTAL_ORIGIN':origin,
+                    'PORTAL_LINK_PURPOSE':purpose}}}},
             'LinkLogs':{'Type':'AWS::Logs::LogGroup','Properties':{
                 'LogGroupName':{'Fn::Sub':'/aws/lambda/${AccountLink}'},'RetentionInDays':3}},
             'LinkAccount':{'Type':'Custom::JduPortalAccountLink','DependsOn':'LinkLogs','Properties':{
                 'ServiceToken':{'Fn::GetAtt':['AccountLink','Arn']},'ServiceTimeout':'60',
                 'ExpectedAccount':{'Ref':'ExpectedAccount'},'LabId':{'Ref':'LabId'},'PairId':{'Ref':'PairId'}}}},
-        'Outputs':{'Portal':{'Value':origin+'/enroll','Description':'Return here to confirm registration; no credential copying'}}}
+        'Outputs':{'Portal':{'Value':origin+('/enroll' if purpose=='enrollment' else '/prepare'),
+                            'Description':'Return here to check confirmation; no credential copying'}}}
 
 
-def build(destination,origin):
-    data=(json.dumps(template(origin),ensure_ascii=False,sort_keys=True,indent=2)+'\n').encode()
+def build(destination,origin, *, purpose='enrollment'):
+    data=(json.dumps(template(origin,purpose=purpose),ensure_ascii=False,sort_keys=True,indent=2)+'\n').encode()
     with destination.open('xb') as target:target.write(data)
     return hashlib.sha256(data).hexdigest()
 
@@ -60,5 +64,6 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser()
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--origin',required=True)
+    parser.add_argument('--purpose',choices=('enrollment','preparation'),default='enrollment')
     args=parser.parse_args()
-    print(build(args.output,args.origin))
+    print(build(args.output,args.origin,purpose=args.purpose))

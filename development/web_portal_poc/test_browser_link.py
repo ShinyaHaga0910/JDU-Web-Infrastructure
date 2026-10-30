@@ -56,6 +56,26 @@ class BrowserLinkTest(unittest.TestCase):
         self.sign.assert_not_called()
         self.post.assert_not_called()
 
+    def test_preparation_proof_is_a_separate_operation_before_any_lab_exists(self):
+        self.env['PORTAL_LINK_PURPOSE']='preparation'
+        self.assertEqual(self.serve(),{'status':'ok'})
+        self.post.assert_called_once_with(self.origin,'a'*64,'private-sts-proof-canary',purpose='preparation')
+        template=builder.template(self.origin,purpose='preparation')
+        variables=template['Resources']['AccountLink']['Properties']['Environment']['Variables']
+        self.assertEqual(variables['PORTAL_LINK_PURPOSE'],'preparation')
+        self.assertEqual(template['Outputs']['Portal']['Value'],self.origin+'/prepare')
+        self.assertEqual(set(template['Parameters']),{'PairId','ExpectedAccount','LabId'})
+        with self.assertRaises(ValueError):builder.template(self.origin,purpose='create')
+
+    def test_preparation_transport_cannot_report_aws_confirmation_as_lab_registration(self):
+        connection=Mock()
+        response=connection.getresponse.return_value
+        response.status=200;response.read.return_value=b'{"aws_confirmed":true}'
+        with patch.object(link.http.client,'HTTPSConnection',return_value=connection):
+            link.post_proof(self.origin,'a'*64,'proof-canary',purpose='preparation')
+            self.assertEqual(connection.request.call_args.args,('POST','/api/preparation/complete'))
+            with self.assertRaises(ValueError):link.post_proof(self.origin,'a'*64,'proof-canary')
+
     def test_wrong_account_and_failed_transport_are_generic_failures_without_proof_replay(self):
         self.session.client.return_value.get_caller_identity.return_value={'Account':'987654321098'}
         self.assertEqual(self.serve(),{'status':'unavailable'})
