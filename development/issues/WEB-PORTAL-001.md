@@ -1,13 +1,17 @@
 # WEB-PORTAL-001：学生の環境準備・採点確認をブラウザへ集約する
 
-- 状態: 原本自動保存は10/30実受入済み。全体目標の継続指示を受けて、担当教師の進捗一覧/学生別画面と独立した閲覧許可を実装・検査中。新Python13件・Node8件（全59件）が合格、AWS実計画は検査済み・新しい教師許可の適用直前確認待ち。新規5台準備・特殊checker・一般配布も残り、全IssueはOPEN。
+- 状態: 原本自動保存と教師用進捗一覧をAWSへ実配備・受入済み（2026-10-30）。教師は担当verification Lab1件/62点/詳細/3言語を閲覧し、授業用から検証を除外、担当外とlogout後を拒否。元成績78行/元binding/元5台・認証を保持。全体目標の新規5台ブラウザ準備・特殊checker・一般配布は残り、全IssueはOPEN。
 - 登録: 2026-10-23、本人依頼。
 - 着手順: D12の受入残件を保持し、2026-10-23の本人依頼で本Issueの構成検討を先行。Web演習の改善課題として実証・実装へ進める。
 - GitHub: [Issue #1](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/issues/1)（非公開JDU-Web-Infrastructure）。
 
 10/29課題確認の内部基盤：固定task/jobとSSM実行番号を永続化し、切断時には同じcommandを回収する処理、元request ID付きreport outbox、既存checker/HTTP外部確認のadapterを追加した。Moto/架空SSM/HTTP29件と既存62点API14件合格。公開中Web/AWSは変更なし。HTTPの確認実行・本人認可・実AWS preflight・正規採点送信とM3/M5M6はまだ接続していない。[内部検証](../web_portal_poc/verification/2026-10-29-assessment-job-core.public.json)。
 
-## 2026-10-30 教師用進捗一覧（進行中）
+## 2026-10-30 教師用進捗一覧の実受入（最新）
+
+本人の適用直前承認後、既存非公開2 Codeと同じWebのUPDATE_COMPLETE、検証Lab1件だけの教師ACCESS行を確認。実Google→教師リンク→授業用0件/検証用1件→学生別62点/M5未確認、JA/RU/UZ、担当外拒否、実logout後拒否/通常reloginで同じscope再利用を受入した。元学生の5台停止表示/保存M1の元受付も保持し、元成績78行全体と元binding/承認は不変。新資源/IAM/認証情報なし、教師EC2停止。[実受入記録](../web_portal_poc/verification/2026-10-30-teacher-progress-accepted.public.json)。多実学生course/独立した別実teacher identityは未受入で、新規環境準備/特殊確認/一般配布を継続する。
+
+## 2026-10-30 教師用進捗一覧（適用前の履歴）
 
 全体目標の継続により、教師の担当Labだけを読む一覧/学生別画面を追加した。原本の62点方式を共用し、授業/検証を分離、未提出と取得不可を区別する。教師は学校domainだけで認めず、教師CloudShellで独立した閲覧許可を作る。新Python13件、Node新8件/全59件、package/計画検査を合格。架空データのChrome表示を確認し、実AWSの2 Code/2 Web Modifyと検証Lab1件だけの教師許可の下書きを検査し、双方の更新計画はCREATE_COMPLETE/AVAILABLE。まだ新しい教師許可や画面を有効にしていない。[計画記録](../web_portal_poc/verification/2026-10-30-teacher-progress-plan.public.json)。[完成条件](../web_portal_poc/TEACHER-PROGRESS-ACCEPTANCE.md)。
 

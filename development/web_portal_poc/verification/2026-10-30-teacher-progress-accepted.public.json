@@ -1,0 +1,67 @@
+{
+  "verified_at": "2026-10-30T05:04:37.782742+00:00",
+  "private_stack_status": "UPDATE_COMPLETE",
+  "private_functions": [
+    {
+      "service": "EnrollmentArn",
+      "state": "Active",
+      "code_sha256": "386f68fdbfa2d2e94af12d304131c60eab2f21a85a3d2e84d8ee4cf593b1ed3f"
+    },
+    {
+      "service": "GradeReaderArn",
+      "state": "Active",
+      "code_sha256": "386f68fdbfa2d2e94af12d304131c60eab2f21a85a3d2e84d8ee4cf593b1ed3f"
+    }
+  ],
+  "web_stack_status": "UPDATE_COMPLETE",
+  "web_code_sha256": "00a4cce72be52c9c2fe79d1b17805c73b477233451464dcf2f61c520a83cc40e",
+  "web_template_parameters_preserved": true,
+  "versioned_web_artifact_verified": true,
+  "teacher_scope_count": 1,
+  "teacher_class_id": "193548",
+  "teacher_scope_context": "verification",
+  "teacher_subject_pin_present": true,
+  "original_student_bindings_approvals_preserved": true,
+  "original_grade_partition_rows": 78,
+  "original_grade_partition_unchanged": true,
+  "raw_earned": 62,
+  "raw_maximum": 62,
+  "m5_selected": 13,
+  "current_unresolved": [
+    "M5"
+  ],
+  "teacher_ec2_state": "stopped",
+  "new_resources": 0,
+  "new_iam_policies": 0,
+  "new_credentials": 0,
+  "source_commit": "564f040",
+  "status": "accepted",
+  "full_portal_goal_complete": false,
+  "browser": {
+    "ru_list": true,
+    "uz_list": true,
+    "unassigned_lab_denied": true,
+    "student_status_five_stopped": true,
+    "saved_check_receipt_preserved": true,
+    "logged_out_teacher_denied": true,
+    "relogin_preserves_teacher_role": true,
+    "ja_list": true,
+    "course_excludes_verification": true,
+    "student_detail_preserves_62_and_m5_unknown": true
+  },
+  "limits": [
+    "Actual teacher scope is one existing verification Lab. Multi-student course records and independent real teacher/student school identities were not newly exercised.",
+    "Missing data, pagination, concurrent scope changes and revocation during reads were tested locally with synthetic/Moto records.",
+    "Teacher Lab must be started. Browser provisioning of a new five-server Lab and M3/M5/M6 special flows remain incomplete."
+  ],
+  "web_files": 4482,
+  "web_content_manifest_sha256": "9652976dd3ca5fe637533b05c487da780a66f3189d1f6ebb013e5bd4f8f038d2",
+  "previous_local_tests": {
+    "new_teacher_python": 13,
+    "new_teacher_node": 8,
+    "node_all": 59,
+    "web_package": 3,
+    "web_update_plan": 3,
+    "private_service_update_plan": 2
+  }
+}
