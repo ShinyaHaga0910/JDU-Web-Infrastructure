@@ -8,6 +8,7 @@ JDUのWebインフラストラクチャー構築教材です。今セミスタ�
 
 - [この単元だけで学ぶ目的と前提](course/learning-outcomes.md)
 - [教材の順序と到達状態](course/roadmap.md)
+- [後半教科書の学習順序と必要知識](course/textbook-plan.md)
 - [WEB-00 完成像](modules/WEB-00-overview/README.md)
 - [WEB-02 HTTPとNginx](modules/WEB-02-http/README.md)
 
