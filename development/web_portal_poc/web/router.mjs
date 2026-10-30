@@ -2,6 +2,8 @@ import { configFrom, cookies, cookie, login, callback, verifyGoogle, SESSION, FL
 import { ACCESS } from './sessions.mjs';
 import { formToken, checkForm, operationId, tokenHash } from './enrollment-client.mjs';
 import { enrollmentHtml, enrollmentText, checkedEnrollment } from './enrollment-page.mjs';
+import { preparationText, checkPreparationToken, checkedPreparation, preparationHtml,
+  preparationTemplate, createPreparationLink } from './preparation.mjs';
 import { bootstrapTemplate, createBootstrapLink } from './bootstrap-link.mjs';
 import { words as checkWords, validOperation, verifyCheckToken, checkHtml, progressScript } from './checks.mjs';
 import { teacherText, checkedTeacher, teacherListHtml } from './teacher-progress.mjs';
@@ -48,7 +50,7 @@ const redirect = (location, values=[]) => { const h=new Headers(security); h.set
 function page(lang, title, content, selection) {
   const tail=selection?.teacher ? Object.entries(selection.params).map(([k,v])=>`&amp;${k}=${encodeURIComponent(v)}`).join('') : selection?`&amp;task_id=${selection.task_id}&amp;job_id=${selection.job_id}`:'';
   const nav = ['ja','ru','uz'].map(k => `<a href="?lang=${k}${tail}"${k===lang?' aria-current="page"':''}>${k.toUpperCase()}</a>`).join(' ');
-  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)}</title><style>body{font:1rem/1.6 system-ui,sans-serif;margin:0;background:#f5f7fa;color:#182435}main{max-width:64rem;margin:auto;padding:1.5rem}nav{display:flex;gap:1rem}a,button{color:#064ca4}button{font:inherit;background:white;border:1px solid #64748b;border-radius:.35rem;padding:.65rem 1rem;cursor:pointer}a:focus-visible,button:focus-visible{outline:3px solid #d34800;outline-offset:3px}section{background:white;border:1px solid #d6dee8;border-radius:.5rem;padding:1rem;margin-block:1rem}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:44rem}th,td{padding:.6rem;text-align:left;border-bottom:1px solid #d6dee8}.num{font-size:1.6rem;font-weight:700}footer{margin-top:2rem}fieldset{border:1px solid #a9b6c7;border-radius:.35rem;padding:1rem;margin-block:1rem}.confirm{display:flex;align-items:flex-start;gap:.5rem;min-height:48px;padding-block:.5rem}input[type=checkbox]{width:1.25rem;height:1.25rem;margin:.2rem 0;flex-shrink:0}a.action{display:inline-flex;align-items:center;min-height:48px;padding:0 .75rem;border:1px solid #64748b;border-radius:.35rem}a.action:focus-visible,input:focus-visible{outline:3px solid #d34800;outline-offset:3px}.check-tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1rem}.check-tasks section{margin:0}.teacher-table{max-block-size:70vh;overflow:auto}.teacher-table table{border-collapse:separate;border-spacing:0;min-width:68rem}.teacher-table caption{text-align:left;font-weight:700;padding-block:.75rem}.teacher-table thead th{position:sticky;inset-block-start:0;background:#eaf0f7;z-index:2}.teacher-table tbody th{position:sticky;inset-inline-start:0;background:white;z-index:1}.teacher-table thead th:first-child{inset-inline-start:0;z-index:3}.teacher-table:focus-visible{outline:3px solid #d34800;outline-offset:3px}</style></head><body><main><nav aria-label="Languages">${nav}</nav><h1>${escape(title)}</h1>${content}</main></body></html>`;
+  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)}</title><style>body{font:1rem/1.6 system-ui,sans-serif;margin:0;background:#f5f7fa;color:#182435}main{max-width:64rem;margin:auto;padding:1.5rem}nav{display:flex;gap:1rem}a,button{color:#064ca4}button{font:inherit;background:white;border:1px solid #64748b;border-radius:.35rem;padding:.65rem 1rem;cursor:pointer}a:focus-visible,button:focus-visible{outline:3px solid #d34800;outline-offset:3px}section{background:white;border:1px solid #d6dee8;border-radius:.5rem;padding:1rem;margin-block:1rem}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:44rem}th,td{padding:.6rem;text-align:left;border-bottom:1px solid #d6dee8}.num{font-size:1.6rem;font-weight:700}footer{margin-top:2rem}li[aria-current=step]{font-weight:700}fieldset{border:1px solid #a9b6c7;border-radius:.35rem;padding:1rem;margin-block:1rem}.confirm{display:flex;align-items:flex-start;gap:.5rem;min-height:48px;padding-block:.5rem}input[type=password]{display:block;font:inherit;box-sizing:border-box;inline-size:min(100%,28rem);min-block-size:48px;padding:.6rem;margin-block:.4rem 1rem;border:1px solid #64748b;border-radius:.35rem}input[type=checkbox]{width:1.25rem;height:1.25rem;margin:.2rem 0;flex-shrink:0}a.action{display:inline-flex;align-items:center;min-height:48px;padding:0 .75rem;border:1px solid #64748b;border-radius:.35rem}a.action:focus-visible,input:focus-visible{outline:3px solid #d34800;outline-offset:3px}.check-tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1rem}.check-tasks section{margin:0}.teacher-table{max-block-size:70vh;overflow:auto}.teacher-table table{border-collapse:separate;border-spacing:0;min-width:68rem}.teacher-table caption{text-align:left;font-weight:700;padding-block:.75rem}.teacher-table thead th{position:sticky;inset-block-start:0;background:#eaf0f7;z-index:2}.teacher-table tbody th{position:sticky;inset-inline-start:0;background:white;z-index:1}.teacher-table thead th:first-child{inset-inline-start:0;z-index:3}.teacher-table:focus-visible{outline:3px solid #d34800;outline-offset:3px}</style></head><body><main><nav aria-label="Languages">${nav}</nav><h1>${escape(title)}</h1>${content}</main></body></html>`;
 }
 
 export function checkedGrade(grade) {
@@ -160,9 +162,10 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
       }
     }
     const enrollmentPost=url.pathname==='/enroll' && request.method==='POST' && enrollmentEnabled;
+    const preparationPost=url.pathname==='/prepare' && request.method==='POST' && preparationEnabled;
     const checkerEnabled=env.PORTAL_CHECKER_ENABLED==='true' && typeof checker==='function';
     const checkerPost=url.pathname==='/checks' && request.method==='POST' && checkerEnabled;
-    if (!['GET','HEAD'].includes(request.method) && !enrollmentPost && !checkerPost) return response('Method not allowed',405);
+    if (!['GET','HEAD'].includes(request.method) && !enrollmentPost && !preparationPost && !checkerPost) return response('Method not allowed',405);
     if (url.pathname === '/signed-out') return response(page(lang,t.title,`<p>${escape(t.signedout)}</p><p>${escape(t.shared)}</p><a href="/auth/login">${escape(t.login)}</a>`));
     let identity, jar, token;
     try {jar=cookies(request); token=jar.get(SESSION); identity=await verify(token,config);}
@@ -222,6 +225,48 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
         return response(page(lang,ct.title,checkHtml(lang,{config,session:jar.get(ACCESS),token,selected,result}),selected),result?.status==='unauthorized'?403:result && result.status!=='ok'?503:200,extras);
       } catch {return fail(ct.unavailable);}
     }
+    if (url.pathname==='/prepare') {
+      if (!preparationEnabled) return response('Not found',404);
+      const pt=preparationText[lang];
+      const fail=(message,status=503)=>response(page(lang,pt.title,`<p role="alert">${escape(message)}</p><a href="/prepare?lang=${lang}">${escape(pt.refresh)}</a>`),status);
+      try {
+        if (!teacherIdentity || [...url.searchParams.keys()].some(k=>k!=='lang') || url.searchParams.getAll('lang').length>1) return fail(pt.denied,403);
+        const session=jar.get(ACCESS);
+        const claims={subject:identity.sub,email:identity.email,session_id:session,token_hash:tokenHash(token)};
+        let fields,operation,requestId=operationId();
+        if (preparationPost) {
+          if (request.headers.get('origin')!==config.origin || request.headers.get('content-type')?.split(';')[0]!=='application/x-www-form-urlencoded') return fail(pt.denied,403);
+          const body=await request.text();
+          if (Buffer.byteLength(body)>4096) return fail(pt.denied,403);
+          fields=new URLSearchParams(body);operation=fields.get('operation');
+          const expected=['confirmed','csrf','deployment_id','operation','request_id',...(operation==='create'?['confirmation','password','plan_digest']:[])].sort().join(',');
+          if (!['begin','plan','create'].includes(operation) || [...fields.keys()].sort().join(',')!==expected || fields.get('confirmed')!=='yes') return fail(pt.denied,403);
+          requestId=fields.get('request_id');
+          const context={operation,requestId,deploymentId:fields.get('deployment_id'),planDigest:operation==='create'?fields.get('plan_digest'):''};
+          if (!checkPreparationToken(config,session,token,context,fields.get('csrf'))) return fail(pt.denied,403);
+          if (operation==='create' && (fields.get('password')!==fields.get('confirmation') || fields.get('password').length<12 || fields.get('password').length>128 || /[\r\n\u0000]/.test(fields.get('password')))) return fail(pt.passwordInvalid,400);
+        }
+        const observed=await enroll({operation:'prepare_status',...claims});
+        if (observed?.status==='unauthorized') return fail(pt.denied,403);
+        if (observed?.status!=='ok') return fail(pt.unavailable);
+        const value=checkedPreparation(observed.preparation);
+        if (preparationPost) {
+          if (value.deployment_id!==fields.get('deployment_id') || !value.can_continue) return fail(pt.denied,403);
+          const event={operation:`prepare_${operation}`,...claims};
+          if (operation==='begin')event.request_id=requestId;
+          if (operation==='create')Object.assign(event,{plan_digest:fields.get('plan_digest'),password:fields.get('password'),confirmation:fields.get('confirmation')});
+          const result=await enroll(event);
+          if (result?.status==='unauthorized')return fail(pt.denied,403);
+          if (result?.status!=='ok')return fail(pt.unavailable);
+          // Redirect clears a submitted password from the reload path. GET
+          // observes the durable original request and never resumes execution.
+          return redirect(`/prepare?lang=${lang}`);
+        }
+        if (value.stage==='APPROVED' && value.can_continue)preparationTemplate(env);
+        const bootstrapLink=value.pair_id?createPreparationLink(env,value):undefined;
+        return response(page(lang,pt.title,preparationHtml(lang,value,{config,session,token,requestId,bootstrapLink})),200,{'Referrer-Policy':'same-origin'});
+      } catch {return fail(pt.unavailable);}
+    }
     if (url.pathname==='/enroll') {
       if (!enrollmentEnabled) return response('Not found',404);
       const et=enrollmentText(lang);
@@ -263,7 +308,7 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
       if(teacherIdentity && typeof getTeacher==='function') {
         try {const result=await getTeacher({operation:'teacher_access',subject:identity.sub,email:identity.email});if(result?.status==='ok' && /^[0-9]{1,12}$/.test(result.teacher?.class_id||''))teacherLink=`<p><a href="/teacher?lang=${lang}">${escape(teacherText[lang].title)}</a></p>`;} catch {}
       }
-      return response(page(lang,t.title,`<section>${enrollmentEnabled?`<p><a href="/enroll?lang=${lang}">${escape(enrollmentText(lang).title)}</a></p>`:''}<p><a href="/grades?lang=${lang}">${escape(t.grades)}</a></p><p><a href="/status?lang=${lang}">${escape(t.status)}</a></p>${checkerEnabled?`<p><a href="/checks?lang=${lang}">${escape(checkWords[lang].title)}</a></p>`:''}${teacherLink}</section>${checkerEnabled?'':`<p>${escape(t.notice)}</p>`}<p>${escape(t.shared)}</p><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form>`));
+      return response(page(lang,t.title,`<section>${preparationEnabled?`<p><a href="/prepare?lang=${lang}">${escape(preparationText[lang].title)}</a></p>`:''}${enrollmentEnabled?`<p><a href="/enroll?lang=${lang}">${escape(enrollmentText(lang).title)}</a></p>`:''}<p><a href="/grades?lang=${lang}">${escape(t.grades)}</a></p><p><a href="/status?lang=${lang}">${escape(t.status)}</a></p>${checkerEnabled?`<p><a href="/checks?lang=${lang}">${escape(checkWords[lang].title)}</a></p>`:''}${teacherLink}</section>${checkerEnabled?'':`<p>${escape(t.notice)}</p>`}<p>${escape(t.shared)}</p><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form>`));
     }
     if (url.pathname !== '/grades' && url.pathname !== '/status') return response('Not found',404);
     if (url.pathname === '/status') {

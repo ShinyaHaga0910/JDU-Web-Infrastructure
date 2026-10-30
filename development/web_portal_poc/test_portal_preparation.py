@@ -1,7 +1,7 @@
 """R1 pre-provisioning transactions. Moto AWS; STS fetch is explicitly fake."""
 from datetime import datetime, timezone
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 from urllib.parse import urlencode
 
 import boto3
@@ -183,7 +183,7 @@ class PreparationTest(unittest.TestCase):
         self.assertEqual(self.row()['stage'], 'AWS_CONFIRMED')
         self.assertIsNone(self.prep.get('PREPARATION#' + self.approved['deployment_id'], 'REQUEST'))
 
-    def test_handler_has_exact_student_operations_no_approval_or_deployment_route(self):
+    def test_handler_has_exact_student_fields_and_no_approval_route(self):
         event = {'operation': 'prepare_begin', **self.claims(), 'request_id': 'e' * 64}
         response = serve(event, self.auth, self.prep)
         self.assertEqual(response['status'], 'ok')
@@ -198,6 +198,31 @@ class PreparationTest(unittest.TestCase):
         self.assertEqual(result['preparation']['stage'], 'AWS_CONFIRMED')
         result = serve({'operation': 'prepare_confirm', **self.claims()}, self.auth, self.prep)
         self.assertEqual(result['preparation']['stage'], 'CREATE_REQUESTED')
+
+    def test_pending_status_resumes_same_proof_without_writing(self):
+        pending = self.begin()
+        snapshot = self.snapshot()
+        view = self.prep.status(**self.claims())
+        self.assertEqual(view['pair_id'], pending['pair_id'])
+        self.assertEqual(view['expires_at'], pending['expires_at'])
+        self.assertEqual(self.snapshot(), snapshot)
+
+    def test_initial_gateway_only_receives_the_bound_assignment_after_confirmation(self):
+        initial = Mock(return_value={'stage':'PLAN_READY'})
+        self.prep.initial = initial
+        with self.assertRaises(EnrollmentDenied): self.prep.plan(**self.claims())
+        initial.assert_not_called()
+        self.confirmed()
+        self.prep.plan(**self.claims())
+        self.assertEqual(initial.call_args.args, (self.row()['grant'], 'plan'))
+        self.prep.status(**self.claims())
+        self.assertEqual(initial.call_args.args, (self.row()['grant'], 'observe'))
+        initial.return_value = {'stage':'CREATE_REQUESTED','resources_created':None}
+        result = self.prep.create(**self.claims(), plan_digest='f'*64,
+            password='DisposableFixtureOnly23', confirmation='DisposableFixtureOnly23')
+        self.assertIsNone(result['resources_created'])
+        self.assertEqual(initial.call_args.args, (self.row()['grant'], 'create'))
+        self.assertEqual(initial.call_args.kwargs['plan_digest'],'f'*64)
 
 
 if __name__ == '__main__': unittest.main()

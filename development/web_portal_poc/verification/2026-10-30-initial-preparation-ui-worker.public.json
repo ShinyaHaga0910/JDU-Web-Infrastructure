@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "scope": "portal_initial_preparation_ui_worker",
+  "checked_at": "2026-10-30T06:23:46.146542+00:00",
+  "r1_complete": false,
+  "deployed": false,
+  "implementation": [
+    "three_language_preparation_screen",
+    "action_bound_forms_and_password_post_redirect",
+    "sdk_discovery_using_original_selector",
+    "private_assigned_worker_gateway",
+    "fixed_assignment_lambda_handler",
+    "signature_verifying_operator_package_builder",
+    "five_resource_helper_template_candidate"
+  ],
+  "local_checks": {
+    "python_related": {
+      "passed": 62,
+      "skipped": 0,
+      "command": "python -B -m unittest -q test_initial_stack test_initial_worker test_initial_package test_portal_preparation test_browser_link test_portal_enrollment_handler test_portal_enrollment",
+      "scope": "Moto journal/transactions, real old selector/template/parameter builder, fake EC2/CFN/STS/TLS and password hashing"
+    },
+    "node": {
+      "passed": 65,
+      "skipped": 0,
+      "command": "node --test"
+    },
+    "web_package": {
+      "command": "python -B -m unittest -q test_web_package",
+      "scope": "deterministic source/dependency packaging; no AWS deployment",
+      "passed": 3,
+      "skipped": 0
+    }
+  },
+  "browser_preview": {
+    "browser": "Chrome",
+    "languages": [
+      "ja",
+      "ru",
+      "uz"
+    ],
+    "real_google": false,
+    "real_aws_calls": false,
+    "creation": "fictional only",
+    "password": "disposable mock value only; no real credential was entered",
+    "observed": [
+      "five_types_96gib_and_noncompute_cost_note",
+      "student_configuration_work_preserved",
+      "hidden_password_inputs",
+      "create_post_to_same_progress_get",
+      "no_completed_lab_claim_during_creation"
+    ]
+  },
+  "aws_syntax_validation": {
+    "account": "965244652544",
+    "browser": "Edge",
+    "api": "cloudformation.validate_template",
+    "template_sha256": "f7f0f9e8af66d5e414e45a78024ac4ef70ab9b9c16d148a116bf0a7113af3692",
+    "parameter_names": [
+      "ExpectedAccount",
+      "LabId",
+      "PairId"
+    ],
+    "capabilities": [],
+    "declared_resource_count": 5,
+    "fixture_code_uploaded": false,
+    "deployed": false,
+    "proves_role_runtime_or_code_access": false
+  },
+  "aws_changes": {
+    "new_resources": false,
+    "new_access_grants": false,
+    "grade_writes": false,
+    "credential_issuance": false,
+    "instance_lifecycle_operations": false
+  },
+  "r1_pending": [
+    "valid_signed_release_and_publication_assignment",
+    "explicit_control_plane_template_settings_and_timeouts_rollout",
+    "real_worker_role_hashing_and_create_acceptance",
+    "post_create_initial_state_closure_internal_ssh_grading_and_teaching_asset_staging",
+    "separate_fresh_account_test_preserving_original_five"
+  ]
+}

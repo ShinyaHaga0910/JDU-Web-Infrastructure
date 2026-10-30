@@ -8,7 +8,7 @@
 
 現行node_bootstrap.pyはWebのnginx、DNSのbind9、DBのpostgresql-16が未導入であることを初期状態として確認する。教材のstage_resources.pyも公開資源の配置だけで、package/service/DB/role/passwordを作らない。現在62点まで構築した検証5台と、新規学生の開始状態を区別し、前者を初期化して試験しない。
 
-## 今回追加した内部処理
+## 実装済みの内部処理（AWS未適用）
 
 | 部分 | 動作 | 検証範囲 |
 | --- | --- | --- |
@@ -16,20 +16,33 @@
 | 同上 begin/complete | 既存Google sessionに対応するnonce付きSTSで、割り当てた学生AWSを確認。期限切れは新しいform、再読込みは同じ有効な操作へ戻す | STS fetchはstub、署名の実認証は未試験 |
 | 同上 confirm | 明示POSTでfoundation_onlyの要求を1件だけ保存。GET/再送はEC2作成へ進めない | Motoで重複・失効・既存データとの競合を検査 |
 | browser_link_handler.py / template builder | preparation専用のAWS確認用CloudFormationを生成し、短期STS proofを固定HTTPS callbackへ送る。既存環境の登録とは別用途。鍵/パスワードのコピー不要 | SDK signer/HTTP stub/inline import。AWS未適用 |
-| 既存Webのcallback | 新しいpreparation callbackだけを明示フラグで開く。既定は閉鎖。既存enrollment登録と受領を混同しない | NodeのAPI試験。学生用の準備画面はまだない |
+| 既存Webのcallback | 新しいpreparation callbackだけを明示フラグで開く。既定は閉鎖。既存enrollment登録と受領を混同しない | NodeのAPI試験。新しい/prepare画面も実装・ローカルChromeで確認済み |
 | initial_stack.py | 既存controllerの本物の21パラメーター構築とAMI/予算判定を再利用し、割当と署名資材のhash/期限、96GiB/全5台SSMを確認してCreateStackへ渡す。意図を先に保存し、応答不明時や再送では同じStackを観測する | 元selector/template/parameter builder＋Moto journal＋模擬EC2/CFN。実作成なし |
 
 initial_stackは内部classであり、配備済みのLambda handlerではない。GPG署名を検証済みの資材と、本人が確定した割当を実行workerから渡す必要がある。自己申告JSONをverifiedとして受け付ける公開routeは作らない。RDP hashや署名URLを進捗表・ログへ保存しない。
 
 CloudFormationのClientRequestTokenも固定するが、それだけで二重作成防止を主張しない。元要求・Stack名/ID・タグ・templateを照合し、観測不能では保留する。[AWS CreateStackの定義](https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_CreateStack.html)。
 
+## 学生画面と実行workerの接続（追加実装）
+
+- `web/preparation.mjs`と`router.mjs`にJA/RU/UZの初回準備画面を追加。本人AWS確認→構成・種類/96GiB/料金の確認→非表示RDP入力→同じ構築要求の進捗表示を接続。GETは観測のみ、POSTは操作別CSRFを確認し、成功時はGETへ戻す。期限切れ・台数上限・確認不能を完成扱いにしない。
+- `initial_plan.py`はAWS CLIを使わずSDKでAMI/公開鍵/提供AZ・T系/価格catalog/S3 prefixを読む。既存selectorの最安同一family選定を再利用する。秘密鍵を取得しない。
+- `initial_worker.py`は固定割当のplan/observe/createを実行し、DDBへ元planと構築意図を保持する。RDP hashはPython3.11のSHA512-cryptで一時生成し、既存の21パラメーターを組む。原文password/hash/署名URLはjournalへ入れない。実AWSでのcrypt動作は未受入。
+- `initial_gateway.py`は割当から決まる学生Lambdaだけを呼ぶ。`portal_preparation.py`に本人確認後のplan/createを接続し、statusは同じ要求の観測だけにする。public bodyからAWS/identity/実行先を選ばせない。
+- `build_initial_worker.py`のCLIは既存の実GPG verifierを先に通し、署名controllerのbyteを保持したworker ZIPを作る。旧r2失効を回避しない。単体試験のZIPは架空の検証入力であり、新しい署名配布の実制作ではない。
+- 同builderは学生側の5資源（Lambda・DDB・ログ・本人確認処理・教師LabRole限定invoke許可）のtemplate候補を生成する。既存LabRoleを利用し、EC2/IAM role/公開URLをこのhelper自体へ追加しない。EC2の5台作成は後続の本人POSTで行う。
+
+ローカルPython62件、Web Node65件、Web package試験を確認。Chromeで架空データの構成/非表示入力/POST後の進捗とJA/RU/UZを確認した。実Google/実STS→新5台→初期状態の通し受入ではない。
+
+AWS965のCloudShellでsyntax-only template（SHA256 `f7f0f9e8af66d5e414e45a78024ac4ef70ab9b9c16d148a116bf0a7113af3692`）をValidateTemplateへ渡し受理。これは3parameter/5資源の構造検査のみ。参照codeは架空・未搬入で、S3実取得・Lambda実行・role間通信・resource作成の証拠ではない。
+
 ## R1内でまだ必要な接続
 
-- 学生用準備画面と教師の正式な事前割当・署名配布への接続。
-- 学生AWSでの実行Lambda/進捗保存先のpackage/template、価格/AMI等の読取り計画、非表示RDP入力からのhash生成とCreateStackへの接続。
+- 教師の正式な事前割当・有効な新署名配布/worker artifact publicationと学生画面を接続する。
+- 既存Web/private servicesへの初回準備用の設定追加・timeout調整を含む更新計画を作る。現行のcode-only更新toolはtemplate変更を拒否するため、そのまま適用しない。新しいhelper/入口をAWSへ配備し、実role・crypt・初回操作を確認する。
 - 作成後の初期状態検査、S3閉鎖、常設SSM/内部SSH/採点登録、公開教材資源配置、元checkへの接続。学生の解答設定は適用しない。
 - 有効な新署名版を使った実作成と、未完成の演習開始状態の確認。これはR1の受入、一般学生の通し受入はR6で確認する。
 
 2026-10-30にEdgeの学生AWS965244652544を確認。既存5台は全てstopped、保存済みroot ID一致、nonterminated=5。新5台で計10台となり旧controllerの保守的9台上限を超える。AWSのサービスquotaと断定せず、元5台削除/上限無断変更で通さない。別の初回配備用環境の確保は実作成前に必要。コード制作は継続できる。
 
-実機記録はverification/2026-10-30-initial-preparation-core.public.json。既存成績の変更、新規AWS資源、権限追加、credential発行は行っていない。
+記録はverification/2026-10-30-initial-preparation-core.public.jsonとverification/2026-10-30-initial-preparation-ui-worker.public.json。既存成績の変更、新規AWS資源、権限追加、credential発行は行っていない。

@@ -44,9 +44,10 @@ def checked_assignment(grant):
 
 
 class PortalPreparation:
-    def __init__(self, enrollment):
+    def __init__(self, enrollment, initial=None):
         self.auth = enrollment
         self.client, self.table = enrollment.client, enrollment.table
+        self.initial = initial
 
     def get(self, pk, sk):
         return self.auth.get(self.table, pk, sk)
@@ -123,13 +124,13 @@ class PortalPreparation:
             raise EnrollmentDenied('Existing Lab retained or assignment changed')
         return row, subject_pk, session_pk
 
-    @staticmethod
-    def view(row):
+    def view(self, row):
         grant = row['grant']
         return {'stage': row['stage'], 'account': grant['account'], 'lab_id': grant['lab_id'],
                 'deployment_id': grant['deployment_id'], 'release_id': grant['release']['release_id'],
                 'manifest_sha256': grant['release']['manifest_sha256'],
-                'deadline': int(row['deadline']), 'resources_created': False}
+                'deadline': int(row['deadline']), 'resources_created': False,
+                'can_continue': min(row['deadline'], grant['release']['expires_at']) > self.auth.clock()}
 
     def live(self, row):
         now = int(self.auth.clock())
@@ -137,10 +138,29 @@ class PortalPreparation:
             raise EnrollmentDenied('Assignment or release expired')
 
     def status(self, subject, email, session_id, token_hash):
-        row, _, _ = self.current(subject, email, session_id, token_hash)
+        row, person, session = self.current(subject, email, session_id, token_hash)
         result = self.view(row)
-        result['can_continue'] = min(row['deadline'], row['grant']['release']['expires_at']) > self.auth.clock()
+        if row['stage'] == 'APPROVED' and result['can_continue']:
+            pointer = self.get(session, 'PREPARATION_PAIR')
+            if pointer and pointer.get('expires_at', 0) > self.auth.clock():
+                if (pointer.get('grant_digest') != row['grant_digest'] or pointer.get('subject_pk') != person
+                        or pointer.get('session_token_hash') != token_hash):
+                    raise EnrollmentDenied('Preparation context changed')
+                nonce = self.nonce(row, person, session, pointer['request_hash'])
+                pair = self.get('PREPARE-PAIR#' + digest(nonce), 'IDENTITY')
+                if (not pair or pair.get('used') is not False or pair.get('expires_at') != pointer['expires_at']
+                        or pair.get('subject_pk') != person or pair.get('session_pk') != session
+                        or pair.get('grant_digest') != row['grant_digest']):
+                    raise EnrollmentDenied('Preparation confirmation unavailable')
+                result.update(pair_id=nonce, expires_at=int(pair['expires_at']))
+        if row['stage'] == 'CREATE_REQUESTED' and self.initial is not None:
+            result['initial'] = self.initial(row['grant'], 'observe')
+            result['resources_created'] = result['initial'].get('resources_created', False)
         return result
+
+    def nonce(self, row, person, session, request_hash):
+        context = '|'.join(('preparation-v1', row['grant_digest'], person, session, request_hash))
+        return hmac.new(self.auth.pepper, context.encode('ascii'), hashlib.sha256).hexdigest()
 
     def assignment_check(self, row):
         return {'ConditionCheck': {'TableName': self.table, 'Key': key(row['pk'], 'PREPARATION'),
@@ -168,8 +188,7 @@ class PortalPreparation:
             request_hash = pointer['request_hash']
         else:
             request_hash = digest(request_id)
-        context = '|'.join(('preparation-v1', row['grant_digest'], person, session, request_hash))
-        nonce = hmac.new(self.auth.pepper, context.encode('ascii'), hashlib.sha256).hexdigest()
+        nonce = self.nonce(row, person, session, request_hash)
         pk = 'PREPARE-PAIR#' + digest(nonce)
         old = self.get(pk, 'IDENTITY')
         if old:
@@ -278,3 +297,20 @@ class PortalPreparation:
                 return self.confirm(subject, email, session_id, token_hash)
             raise EnrollmentDenied('Preparation changed; reload its status') from None
         return self.view(dict(row, stage='CREATE_REQUESTED'))
+
+    def plan(self, subject, email, session_id, token_hash):
+        if self.initial is None:
+            raise RuntimeError('Initial worker unavailable')
+        self.confirm(subject, email, session_id, token_hash)
+        row, _, _ = self.current(subject, email, session_id, token_hash)
+        initial = self.initial(row['grant'], 'plan')
+        return {**self.view(row), 'initial': initial, 'resources_created': initial.get('resources_created', False)}
+
+    def create(self, subject, email, session_id, token_hash, plan_digest, password, confirmation):
+        row, person, _ = self.current(subject, email, session_id, token_hash)
+        self.live(row)
+        if (self.initial is None or row.get('bound_subject') != person or row['stage'] != 'CREATE_REQUESTED'
+                or not isinstance(plan_digest, str) or not HEX.fullmatch(plan_digest)):
+            raise EnrollmentDenied('Review your own initial plan first')
+        initial = self.initial(row['grant'], 'create', plan_digest=plan_digest, password=password, confirmation=confirmation)
+        return {**self.view(row), 'initial': initial, 'resources_created': initial.get('resources_created', False)}

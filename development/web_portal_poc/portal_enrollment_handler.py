@@ -22,13 +22,19 @@ def valid(event):
     if isinstance(operation, str) and operation.startswith('prepare_'):
         # Explicit whitelist below still rejects approve/revoke/worker actions.
         operation = operation.removeprefix('prepare_')
-        if operation not in ('begin', 'status', 'complete', 'confirm'):
+        if operation not in ('begin', 'status', 'complete', 'confirm', 'plan', 'create'):
             return False
     if operation == 'complete':
         return (set(event) == {'operation', 'pair_id', 'proof_url'}
                 and isinstance(event['pair_id'], str) and HEX.fullmatch(event['pair_id'])
                 and isinstance(event['proof_url'], str) and len(event['proof_url']) <= 8192)
-    if operation not in ('begin', 'status', 'confirm') or (operation == 'confirm' and event['operation'] != 'prepare_confirm') or set(event) != IDENTITY | {'operation'} | ({'request_id'} if operation == 'begin' else set()):
+    extra = {'request_id'} if operation == 'begin' else {'plan_digest', 'password', 'confirmation'} if operation == 'create' else set()
+    if (operation not in ('begin', 'status', 'confirm', 'plan', 'create')
+            or operation in ('confirm', 'plan', 'create') and event['operation'] != 'prepare_' + operation
+            or set(event) != IDENTITY | {'operation'} | extra):
+        return False
+    if operation == 'create' and (not isinstance(event['plan_digest'], str) or not HEX.fullmatch(event['plan_digest'])
+            or any(not isinstance(event[k], str) or not 12 <= len(event[k]) <= 128 for k in ('password', 'confirmation'))):
         return False
     return (isinstance(event['subject'], str) and re.fullmatch(r'[0-9]{1,128}', event['subject'])
             and isinstance(event['email'], str) and event['email'].isascii()
@@ -76,6 +82,10 @@ def handler(event, context):
             return {'status': 'unavailable'}
         service = PortalEnrollment(boto3.client('dynamodb', region_name='us-east-1'),
             os.environ['PORTAL_BINDING_TABLE'], os.environ['GRADE_TABLE'], bytes.fromhex(value))
-        return serve(event, service, PortalPreparation(service))
+        from initial_gateway import InitialGateway
+        from botocore.config import Config
+        initial = InitialGateway(boto3.client('lambda', region_name='us-east-1', config=Config(
+            connect_timeout=3, read_timeout=65, retries={'total_max_attempts':1})))
+        return serve(event, service, PortalPreparation(service, initial))
     except Exception:
         return {'status': 'unavailable'}

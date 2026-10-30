@@ -10,6 +10,7 @@ import { readBody } from './request-body.mjs';
 import { createBootstrapEnv } from './bootstrap-artifact.mjs';
 import { createCheckerClient } from './checks.mjs';
 import { createTeacherClient } from './teacher-progress.mjs';
+import { createPreparationEnv } from './preparation.mjs';
 
 // A missing backend fails closed at request time; the server can still start
 // in the closed deployment mode without credentials or an active Lab.
@@ -23,6 +24,7 @@ try { checker=createCheckerClient(); } catch { checker=undefined; }
 try { getTeacher=createTeacherClient(); } catch { getTeacher=undefined; }
 const getRuntimeEnv=createRuntimeEnv();
 const getBootstrapEnv=createBootstrapEnv();
+const getPreparationEnv=createPreparationEnv();
 const endpoint=process.env.AWS_LAMBDA_HTTP_ENDPOINT;
 const address=endpoint ? new URL(endpoint.includes('://') ? endpoint : `http://${endpoint}`) : new URL(`http://127.0.0.1:${process.env.PORT||8080}`);
 createServer(async (req,res) => {
@@ -37,6 +39,9 @@ createServer(async (req,res) => {
     if (path==='/enroll' && env.PORTAL_ENROLLMENT_ENABLED==='true') {
       const bootstrap=await getBootstrapEnv();
       env={...env,PORTAL_BOOTSTRAP_TEMPLATE_URL:bootstrap.PORTAL_BOOTSTRAP_TEMPLATE_URL};
+    }
+    if (path==='/prepare' && env.PORTAL_PREPARATION_ENABLED==='true') {
+      env={...env,PORTAL_PREPARATION_TEMPLATE_URL:(await getPreparationEnv()).PORTAL_PREPARATION_TEMPLATE_URL};
     }
     const app=createApp({env,getGrade,getStatus,sessions,getAcceptanceHealth,enroll,checker,getTeacher});
     const result=await app(request);
