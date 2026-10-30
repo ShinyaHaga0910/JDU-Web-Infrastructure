@@ -5,7 +5,7 @@ import { enrollmentHtml, enrollmentText, checkedEnrollment } from './enrollment-
 import { preparationText, checkPreparationToken, checkedPreparation, preparationHtml,
   preparationTemplate, createPreparationLink } from './preparation.mjs';
 import { bootstrapTemplate, createBootstrapLink } from './bootstrap-link.mjs';
-import { words as checkWords, validOperation, verifyCheckToken, checkHtml, progressScript } from './checks.mjs';
+import { words as checkWords, validOperation, verifyCheckToken, checkHtml, progressScript,sealApplicationPassword } from './checks.mjs';
 import { teacherText, checkedTeacher, teacherListHtml } from './teacher-progress.mjs';
 import { createInitialDelivery } from './initial-delivery.mjs';
 
@@ -49,7 +49,7 @@ const response = (body, status=200, extras={}) => new Response(body, {status, he
 const redirect = (location, values=[]) => { const h=new Headers(security); h.set('Location',location); for(const v of values) h.append('Set-Cookie',v); return new Response(null,{status:303,headers:h}); };
 
 function page(lang, title, content, selection) {
-  const tail=selection?.teacher ? Object.entries(selection.params).map(([k,v])=>`&amp;${k}=${encodeURIComponent(v)}`).join('') : selection?`&amp;task_id=${selection.task_id}&amp;job_id=${selection.job_id}`:'';
+  const tail=selection?.teacher ? Object.entries(selection.params).map(([k,v])=>`&amp;${k}=${encodeURIComponent(v)}`).join('') : selection?`&amp;task_id=${selection.task_id}&amp;job_id=${selection.job_id}${selection.check_mode?`&amp;check_mode=${selection.check_mode}`:''}`:'';
   const nav = ['ja','ru','uz'].map(k => `<a href="?lang=${k}${tail}"${k===lang?' aria-current="page"':''}>${k.toUpperCase()}</a>`).join(' ');
   return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)}</title><style>body{font:1rem/1.6 system-ui,sans-serif;margin:0;background:#f5f7fa;color:#182435}main{max-width:64rem;margin:auto;padding:1.5rem}nav{display:flex;gap:1rem}a,button{color:#064ca4}button{font:inherit;background:white;border:1px solid #64748b;border-radius:.35rem;padding:.65rem 1rem;cursor:pointer}a:focus-visible,button:focus-visible{outline:3px solid #d34800;outline-offset:3px}section{background:white;border:1px solid #d6dee8;border-radius:.5rem;padding:1rem;margin-block:1rem}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:44rem}th,td{padding:.6rem;text-align:left;border-bottom:1px solid #d6dee8}.num{font-size:1.6rem;font-weight:700}footer{margin-top:2rem}li[aria-current=step]{font-weight:700}fieldset{border:1px solid #a9b6c7;border-radius:.35rem;padding:1rem;margin-block:1rem}.confirm{display:flex;align-items:flex-start;gap:.5rem;min-height:48px;padding-block:.5rem}input[type=password]{display:block;font:inherit;box-sizing:border-box;inline-size:min(100%,28rem);min-block-size:48px;padding:.6rem;margin-block:.4rem 1rem;border:1px solid #64748b;border-radius:.35rem}input[type=checkbox]{width:1.25rem;height:1.25rem;margin:.2rem 0;flex-shrink:0}a.action{display:inline-flex;align-items:center;min-height:48px;padding:0 .75rem;border:1px solid #64748b;border-radius:.35rem}a.action:focus-visible,input:focus-visible{outline:3px solid #d34800;outline-offset:3px}.check-tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1rem}.check-tasks section{margin:0}.teacher-table{max-block-size:70vh;overflow:auto}.teacher-table table{border-collapse:separate;border-spacing:0;min-width:68rem}.teacher-table caption{text-align:left;font-weight:700;padding-block:.75rem}.teacher-table thead th{position:sticky;inset-block-start:0;background:#eaf0f7;z-index:2}.teacher-table tbody th{position:sticky;inset-inline-start:0;background:white;z-index:1}.teacher-table thead th:first-child{inset-inline-start:0;z-index:3}.teacher-table:focus-visible{outline:3px solid #d34800;outline-offset:3px}</style></head><body><main><nav aria-label="Languages">${nav}</nav><h1>${escape(title)}</h1>${content}</main></body></html>`;
 }
@@ -205,21 +205,31 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
       if (!checkerEnabled) return response('Not found',404);
       const ct=checkWords[lang],extras={'Referrer-Policy':'same-origin','Content-Security-Policy':security['Content-Security-Policy']+"; script-src 'self'"};
       let selected;
-      const fail=(message,status=503)=>response(page(lang,ct.title,`<p role="alert">${escape(message)}</p>${validOperation(selected)?`<p><a href="/checks?lang=${lang}&amp;task_id=${selected.task_id}&amp;job_id=${selected.job_id}">${escape(ct.refresh)}</a></p>`:''}<a href="/checks?lang=${lang}">${escape(ct.back)}</a>`),status,extras);
+      const fail=(message,status=503)=>response(page(lang,ct.title,`<p role="alert">${escape(message)}</p>${validOperation(selected)?`<p><a href="/checks?lang=${lang}&amp;task_id=${selected.task_id}&amp;job_id=${selected.job_id}${selected.check_mode?`&amp;check_mode=${selected.check_mode}`:''}">${escape(ct.refresh)}</a></p>`:''}<a href="/checks?lang=${lang}">${escape(ct.back)}</a>`),status,extras);
       try {
         let result;
         if (checkerPost) {
           if (request.headers.get('origin')!==config.origin || request.headers.get('content-type')?.split(';')[0]!=='application/x-www-form-urlencoded') return fail(ct.denied,403);
           const body=await request.text(); if(Buffer.byteLength(body)>4096)return fail(ct.denied,403);
           const fields=new URLSearchParams(body);
-          if ([...fields.keys()].sort().join(',')!=='csrf,job_id,operation,task_id') return fail(ct.denied,403);
+          const allowed=['csrf','job_id','operation','task_id',...(fields.has('check_mode')?['check_mode']:[]),...(fields.get('operation')==='functional_start'?['password']:[])];
+          if ([...fields.keys()].sort().join(',')!==allowed.sort().join(',')) return fail(ct.denied,403);
           selected=Object.fromEntries(['operation','task_id','job_id'].map(k=>[k,fields.get(k)]));
-          if (!validOperation(selected) || selected.operation==='result' || !verifyCheckToken(config,jar.get(ACCESS),token,selected,fields.get('csrf'))) return fail(ct.denied,403);
-          result=await checker({subject:identity.sub,...selected});
-          if(result?.status==='ok') return redirect(`/checks?lang=${lang}&task_id=${selected.task_id}&job_id=${selected.job_id}`);
+          if(fields.has('check_mode'))selected.check_mode=fields.get('check_mode');
+          if (!validOperation(selected) || ['result','functional_context'].includes(selected.operation) || !verifyCheckToken(config,jar.get(ACCESS),token,selected,fields.get('csrf'))) return fail(ct.denied,403);
+          let sealed;
+          if(selected.operation==='functional_start') {
+            const context=await checker({subject:identity.sub,...selected,operation:'functional_context'});
+            if(context?.status!=='ok' || context.job?.job_id!==selected.job_id || context.job?.task_id!==selected.task_id)throw Error('Own password recipient unavailable');
+            sealed=sealApplicationPassword(fields.get('password'),context.functional_recipient,selected.job_id);
+            fields.delete('password');
+          }
+          result=await checker({subject:identity.sub,...selected,...(sealed?{sealed_password:sealed}:{})});
+          if(result?.status==='ok') return redirect(`/checks?lang=${lang}&task_id=${selected.task_id}&job_id=${selected.job_id}${selected.check_mode?`&check_mode=${selected.check_mode}`:''}`);
           if(result?.status!=='ok') return fail(result?.status==='busy'?ct.busy:result?.status==='unauthorized'?ct.denied:ct.unavailable,result?.status==='unauthorized'?403:503);
         } else if (url.searchParams.has('task_id') || url.searchParams.has('job_id')) {
           selected={operation:'result',task_id:url.searchParams.get('task_id'),job_id:url.searchParams.get('job_id')};
+          if(url.searchParams.has('check_mode'))selected.check_mode=url.searchParams.get('check_mode');
           if(!validOperation(selected))return fail(ct.denied,403);
           result=await checker({subject:identity.sub,...selected});
         }

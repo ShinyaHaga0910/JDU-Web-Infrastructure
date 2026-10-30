@@ -62,6 +62,15 @@ class SubmissionTest(unittest.TestCase):
         spec.update(task_id=task, job_id=str(uuid.uuid4()), run_id=str(uuid.uuid4()))
         return spec
 
+    def test_browser_functional_report_uses_the_same_original_62_point_submission(self):
+        spec=self.new_spec('M5');spec['check_mode']='functional'
+        report=self.report('M5',functional=True);report['run_id']=spec['run_id']
+        first=self.save(report,spec);self.assertEqual(first['status'],'saved');self.assertTrue(first['evaluable'])
+        self.assertEqual(self.save(report,spec),first)
+        stored=self.grades.get(self.meta['pk'],'REQUEST#'+report['request_id'])
+        self.assertEqual(stored['report']['mode'],'functional')
+        self.assertEqual(stored['report'],report)
+
     def test_evaluable_report_updates_canonical_request_current_and_selected_grade(self):
         report = self.report()
         receipt = self.save(report)

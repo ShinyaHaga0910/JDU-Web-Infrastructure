@@ -11,8 +11,12 @@ from registry import CONTRACT_SHA256, TASKS
 
 
 def serve(event, pepper, bindings, grades, client, submissions=None):
-    if (type(event) is not dict or set(event) != {'subject', 'operation', 'task_id', 'job_id'}
-            or event['operation'] not in ('start', 'advance', 'result', 'submit')
+    base={'subject','operation','task_id','job_id'}
+    if (type(event) is not dict or not base<=set(event)
+            or set(event)-base-{'check_mode','sealed_password'}
+            or ('sealed_password' in event)!=(event.get('operation')=='functional_start')
+            or event.get('check_mode','read_only') not in ('read_only','storage','functional')
+            or event['operation'] not in ('start','advance','result','submit','functional_context','functional_start','storage_observe','storage_resume')
             or not isinstance(event['task_id'], str) or event['task_id'] not in TASKS):
         return {'status': 'unauthorized'}
     try:
@@ -22,15 +26,20 @@ def serve(event, pepper, bindings, grades, client, submissions=None):
         # execution just because the read-only viewer can resolve them.
         if not person or not person.get('approval_pk'):
             return {'status': 'unauthorized'}
+        mode=event.get('check_mode','read_only')
+        if event['operation'].startswith('functional_') and mode!='functional' or event['operation'].startswith('storage_') and mode!='storage':
+            return {'status':'unauthorized'}
         spec = checked_spec({'job_id': event['job_id'], 'run_id': event['job_id'],
             'owner_hash': subject_key(event['subject'], pepper).removeprefix('SUBJECT#'),
             'account': context['account'], 'lab_id': context['lab_id'],
             'deployment_id': meta['deployment_id'], 'release_id': meta['release_id'],
-            'instances': meta['instances'], 'task_id': event['task_id'], 'contract_sha256': CONTRACT_SHA256})
+            'instances': meta['instances'], 'task_id': event['task_id'], 'contract_sha256': CONTRACT_SHA256,
+            **({'check_mode':mode} if mode!='read_only' else {})})
         arn = f"arn:aws:lambda:us-east-1:{context['account']}:function:jdu-web-check-{context['lab_id']}"
         def invoke(operation):
             value = client.invoke(FunctionName=arn, InvocationType='RequestResponse',
-                Payload=json.dumps({'operation': operation, 'spec': spec}).encode())
+                Payload=json.dumps({'operation': operation, 'spec': spec,
+                    **({'sealed_password':event['sealed_password']} if operation=='functional_start' else {})}).encode())
             if value.get('FunctionError') or value.get('StatusCode') != 200:
                 raise RuntimeError('Student checker unavailable')
             raw = value['Payload'].read(65537)

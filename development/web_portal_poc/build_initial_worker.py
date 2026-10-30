@@ -24,7 +24,7 @@ from build_browser_link_template import template as proof_template
 
 EXTENSIONS = ('initial_worker.py', 'initial_stack.py', 'initial_plan.py', 'initial_setup.py', 'initial_ssm.py', 'initial_registration_guest.py',
               'initial_context.py','initial_teaching.py','initial_lesson_guest.py','initial_status_handler.py','initial_checker_handler.py',
-              'student_status_handler.py','status.py','student_checker_handler.py','assessment_command_jobs.py','assessment_observation.py','portal_enrollment.py',
+              'student_status_handler.py','status.py','student_checker_handler.py','assessment_command_jobs.py','assessment_observation.py','special_checks.py','browser_check_guest.py','portal_enrollment.py',
               'portal_preparation.py', 'identity_keys.py', 'identity_proof.py', 'student_proof.py', 'browser_link_handler.py')
 FINGERPRINT = '65EC6784750CCFA703BA7179519284E45155EC2A'
 

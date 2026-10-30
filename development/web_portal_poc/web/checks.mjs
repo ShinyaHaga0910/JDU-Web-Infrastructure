@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual, randomUUID } from 'node:crypto';
+import { createHmac, timingSafeEqual, randomUUID,createPublicKey,publicEncrypt,constants } from 'node:crypto';
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { readFileSync } from 'node:fs';
 const labels=JSON.parse(readFileSync(new URL('./check-labels.json',import.meta.url),'utf8'));
@@ -12,11 +12,28 @@ export const words={
   uz:{title:'Vazifani tekshirish',select:'Tekshiriladigan vazifa',start:'Ushbu vazifani tekshirish',refresh:'Natijani yangilash',pending:'Tekshiruv bajarilmoqda. Odatda 1–2 daqiqa davom etadi.',done:'Ushbu tekshiruv natijasi',fail:'Tekshiruv tugamadi. Lab va serverlar holatini tekshiring.',busy:'Boshqa tekshiruv bajarilmoqda. Avvalgi sahifaga qayting.',unavailable:'Hozir tekshirib bo‘lmaydi. O‘qituvchi va talaba Lab hamda besh server ulanishini tekshiring.',note:'Tekshiruvdan keyin natija asosiy jurnalga avtomatik saqlanadi. Tekshirilmagan bandlar bo‘lsa, avvalgi ball saqlanadi. P va M0 baholanmaydi. Serverlar avtomatik ishga tushmaydi.',limits:'M3 to‘xtatish dalili va M5/M6 parol bilan funksional tekshiruvlar bu sahifada tekshirilmagan bo‘lib qoladi.',points:'Ushbu tekshiruv bali',practice:'Mashq/tayyorgarlik (baholanmaydi)',unknown:'Tekshirilmagan bandlar mavjud. Ball yakuniy emas.',check:'Tekshiruv bandi',status:'Natija',PASS:'O‘tdi',FAIL:'O‘tmadi',UNKNOWN:'Tekshirilmagan',back:'Vazifani tanlash',grades:'Saqlangan baholar',home:'Bosh sahifa',denied:'Kirish va o‘z muhitingiz ro‘yxatini tekshiring.'},
 };
 export function validOperation(value) {
-  return value && tasks.includes(value.task_id) && uuid(value.job_id) && ['start','advance','result','submit'].includes(value.operation);
+  const mode=value?.check_mode||'read_only';
+  return value && tasks.includes(value.task_id) && uuid(value.job_id)
+    && ['read_only','storage','functional'].includes(mode)
+    && (mode!=='storage' || /^[PM]3$/.test(value.task_id))
+    && (mode!=='functional' || /^[PM][56]$/.test(value.task_id))
+    && (['start','advance','result','submit'].includes(value.operation)
+        || mode==='storage' && ['storage_observe','storage_resume'].includes(value.operation)
+        || mode==='functional' && ['functional_context','functional_start'].includes(value.operation));
 }
 export function checkToken(config,session,token,value) {
   if (!validOperation(value) || !/^[a-f0-9]{64}$/.test(session||'') || typeof token!=='string') throw Error('Invalid check');
-  return createHmac('sha256',config.secret).update(JSON.stringify(['jdu-portal/check/v1',config.origin,session,token,value.operation,value.task_id,value.job_id])).digest('hex');
+  return createHmac('sha256',config.secret).update(JSON.stringify(['jdu-portal/check/v1',config.origin,session,token,value.operation,value.task_id,value.job_id,...(value.check_mode?[value.check_mode]:[])])).digest('hex');
+}
+
+export function sealApplicationPassword(password,recipient,jobId) {
+  if(typeof password!=='string' || password.length<1 || password.length>128 || /[\x00-\x1f\x7f]/u.test(password)
+      || recipient?.job_id!==jobId || !uuid(jobId) || typeof recipient.public_key!=='string' || recipient.public_key.length>2048)throw Error('Invalid password recipient');
+  const key=createPublicKey(recipient.public_key);
+  if(key.asymmetricKeyType!=='rsa' || key.asymmetricKeyDetails?.modulusLength!==4096)throw Error('Invalid password recipient');
+  const raw=Buffer.from(JSON.stringify([jobId,password]));
+  if(raw.length>446)throw Error('Password delivery exceeds RSA4096 bound');
+  return publicEncrypt({key,padding:constants.RSA_PKCS1_OAEP_PADDING,oaepHash:'sha256'},raw).toString('base64');
 }
 export function verifyCheckToken(config,session,token,value,supplied) {
   return typeof supplied==='string' && /^[a-f0-9]{64}$/.test(supplied) && timingSafeEqual(Buffer.from(supplied,'hex'),Buffer.from(checkToken(config,session,token,value),'hex'));
@@ -34,7 +51,7 @@ export function createCheckerClient(env=process.env,client=new LambdaClient({reg
   };
 }
 function form(lang,value,csrf,content,label,auto=false) {
-  return `<form action="/checks?lang=${lang}" method="post"${auto?' data-check-progress="true"':''}><input type="hidden" name="operation" value="${value.operation}"><input type="hidden" name="job_id" value="${value.job_id}"><input type="hidden" name="csrf" value="${csrf}">${content}<button type="submit">${escape(label)}</button></form>`;
+  return `<form action="/checks?lang=${lang}" method="post"${auto?' data-check-progress="true"':''}><input type="hidden" name="operation" value="${value.operation}"><input type="hidden" name="job_id" value="${value.job_id}"><input type="hidden" name="csrf" value="${csrf}">${value.check_mode?`<input type="hidden" name="check_mode" value="${value.check_mode}">`:''}${content}<button type="submit">${escape(label)}</button></form>`;
 }
 const receiptWords={
   ja:{saved:'成績原本に保存しました。',unconfirmed:'未確認を含む結果を記録しました。確定済みの成績は維持しています。',practice:'練習・準備の記録を保存しました（成績外）。',pending:'確認は完了しましたが、成績原本への保存はまだ確認できません。',retry:'同じ結果の保存を再試行する',received:'原本への保存日時'},
@@ -57,18 +74,37 @@ function submissionHtml(lang,result,selected,{config,session,token}) {
 }
 export function checkHtml(lang,{config,session,token,selected,result}={}) {
   const t=words[lang],links=`<p><a href="/checks?lang=${lang}">${escape(t.back)}</a> · <a href="/grades?lang=${lang}">${escape(t.grades)}</a> · <a href="/?lang=${lang}">${escape(t.home)}</a></p>`;
-  const note=`<p>${escape(t.note)}</p><p>${escape(t.limits)}</p>`;
+  const st=specialWords[lang];
+  const note=`<p>${escape(t.note)}</p><p>${escape(st.overview)}</p>`;
   if (!selected) {
     const value={operation:'start',task_id:'P0',job_id:randomUUID()};
     // Each task has its own action-bound token. No client script is required.
-    const forms=tasks.map(task_id=>{const v={...value,task_id,job_id:randomUUID()};return `<section><h2>${task_id}</h2>${form(lang,v,checkToken(config,session,token,v),`<input type="hidden" name="task_id" value="${task_id}">`,t.start)}</section>`;}).join('');
+    const forms=tasks.map(task_id=>{
+      const mode=/^[PM]3$/.test(task_id)?'storage':/^[PM][56]$/.test(task_id)?'functional':null;
+      const v={...value,task_id,job_id:randomUUID(),...(mode?{check_mode:mode}:{})};
+      const normal={...value,task_id,job_id:randomUUID()};
+      return `<section><h2>${task_id}</h2>${form(lang,v,checkToken(config,session,token,v),`<input type="hidden" name="task_id" value="${task_id}">`,mode==='storage'?st.prepare:mode==='functional'?st.functional:t.start)}${mode?form(lang,normal,checkToken(config,session,token,normal),`<input type="hidden" name="task_id" value="${task_id}">`,st.readOnly):''}</section>`;
+    }).join('');
     return note+'<div class="check-tasks">'+forms+'</div>'+links;
   }
   if (!validOperation(selected)) throw Error('Invalid selection');
   if (result?.status!=='ok') return `<p role="alert">${escape(result?.status==='busy'?t.busy:result?.status==='unauthorized'?t.denied:t.unavailable)}</p>`+links;
   const job=result.job;
-  if (!job || job.job_id!==selected.job_id || job.task_id!==selected.task_id || !['queued','dispatching','observing','report_ready','failed'].includes(job.phase)) throw Error('Invalid job');
+  if (!job || job.job_id!==selected.job_id || job.task_id!==selected.task_id || !['queued','dispatching','observing','report_ready','failed','awaiting_password','awaiting_stop','awaiting_restart'].includes(job.phase)
+      || selected.check_mode && job.check_mode!==selected.check_mode) throw Error('Invalid job');
   let content=`<h2>${escape(selected.task_id)}</h2>`;
+  if(job.phase==='awaiting_password') {
+    if(selected.check_mode!=='functional')throw Error('Invalid functional step');
+    const v={...selected,operation:'functional_start'};
+    return content+`<p>${escape(st.passwordNote)}</p>`+form(lang,v,checkToken(config,session,token,v),
+      `<input type="hidden" name="task_id" value="${v.task_id}"><label for="application-password">${escape(st.password)}</label><input id="application-password" name="password" type="password" autocomplete="current-password" minlength="1" maxlength="128" required aria-describedby="application-password-note"><p id="application-password-note">${escape(st.privatePassword)}</p>`,st.runFunctional)+links;
+  }
+  if(job.phase==='awaiting_stop' || job.phase==='awaiting_restart') {
+    if(selected.check_mode!=='storage' || !/^i-[a-f0-9]{17}$/.test(job.web_instance_id||''))throw Error('Invalid storage step');
+    const stopped=job.phase==='awaiting_restart',v={...selected,operation:stopped?'storage_resume':'storage_observe'};
+    return content+`<p role="status">${escape(stopped?st.restartNote:st.stopNote)}</p><p>Web: ${escape(job.web_instance_id)}</p><p><a href="https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#InstanceDetails:instanceId=${job.web_instance_id}" target="_blank" rel="noopener noreferrer">${escape(st.openAws)}</a></p>`
+      +form(lang,v,checkToken(config,session,token,v),`<input type="hidden" name="task_id" value="${v.task_id}">`,stopped?st.resume:st.observe)+links;
+  }
   if (job.phase==='failed') return content+`<p role="alert">${escape(t.fail)}</p>`+links;
   if (job.phase!=='report_ready') {
     const v={...selected,operation:'advance'};
@@ -81,3 +117,9 @@ export function checkHtml(lang,{config,session,token,selected,result}={}) {
   return content+submissionHtml(lang,result,selected,{config,session,token})+note+links;
 }
 export const progressScript=`const form=document.querySelector('form[data-check-progress]'); if(form){const key='jdu-check-polls:'+new FormData(form).get('job_id');let n=Number(sessionStorage.getItem(key)||0);if(n<40){setTimeout(()=>{sessionStorage.setItem(key,String(n+1));form.requestSubmit();},4000);}}`;
+
+const specialWords={
+  ja:{overview:'P3/M3は停止前後の保持確認、P5/M5・P6/M6は既存パスワードを使う機能・権限確認まで進められます。',prepare:'停止前の状態を記録する',functional:'機能・権限を含めて確認する',readOnly:'現在の設定だけ確認する',password:'アプリ管理者の既存パスワード',passwordNote:'アプリへのログイン、確認専用の架空データの作成・編集・公開反映、ログアウトとアクセス拒否を確認します。',privatePassword:'パスワードはこの確認だけに使います。確認結果やコマンド履歴に平文で保存しません。',runFunctional:'このパスワードで確認する',stopNote:'停止前の状態を記録しました。AWSでこのWebだけを停止し、停止完了後に下のボタンを押してください。',restartNote:'同じWebの停止を確認しました。AWSでこのWebを開始し、起動後に下のボタンを押してください。',openAws:'AWSでこのWebを開く',observe:'停止完了を確認する',resume:'再開後の保持を確認する'},
+  ru:{overview:'P3/M3 проверяют сохранность после остановки, P5/M5 и P6/M6 — функции и права с существующим паролем.',prepare:'Записать состояние до остановки',functional:'Проверить функции и права',readOnly:'Проверить только текущие настройки',password:'Существующий пароль администратора приложения',passwordNote:'Проверяются вход, создание и изменение отдельной тестовой записи, публикация, выход и запреты доступа.',privatePassword:'Пароль используется только для этой проверки. В результаты и историю команд он не записывается открытым текстом.',runFunctional:'Проверить с этим паролем',stopNote:'Состояние до остановки записано. Остановите только этот Web в AWS, затем подтвердите остановку ниже.',restartNote:'Остановка того же Web подтверждена. Запустите его в AWS и после запуска выполните проверку ниже.',openAws:'Открыть этот Web в AWS',observe:'Подтвердить остановку',resume:'Проверить сохранность после запуска'},
+  uz:{overview:'P3/M3 to‘xtatishdan keyingi saqlanishni, P5/M5 va P6/M6 esa mavjud parol bilan funksiya va huquqlarni tekshiradi.',prepare:'To‘xtatishdan oldingi holatni yozish',functional:'Funksiya va huquqlarni tekshirish',readOnly:'Faqat joriy sozlamalarni tekshirish',password:'App administratorining mavjud paroli',passwordNote:'Kirish, alohida sinov yozuvini yaratish va o‘zgartirish, ommaviy aks etishi, chiqish va kirish rad etilishi tekshiriladi.',privatePassword:'Parol faqat shu tekshiruvda ishlatiladi. Natija yoki command tarixiga ochiq matnda saqlanmaydi.',runFunctional:'Shu parol bilan tekshirish',stopNote:'Oldingi holat yozildi. AWS orqali faqat shu Web serverni to‘xtating, keyin quyida tasdiqlang.',restartNote:'Aynan shu Web to‘xtagani tasdiqlandi. Uni AWS orqali ishga tushiring va keyin quyidagi tekshiruvni bajaring.',openAws:'Shu Web serverni AWSda ochish',observe:'To‘xtaganini tasdiqlash',resume:'Qayta ishga tushgandan keyin saqlanishni tekshirish'},
+};

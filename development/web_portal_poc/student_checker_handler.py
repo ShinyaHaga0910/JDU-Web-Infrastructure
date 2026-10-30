@@ -50,11 +50,20 @@ class StudentChecker:
             'public_web_ipv4': web.get('PublicIpAddress')}
 
     def serve(self, event):
-        if (type(event) is not dict or set(event) != {'operation', 'spec'}
-                or event['operation'] not in ('start', 'advance', 'result', 'report')):
+        if (type(event) is not dict or set(event) not in ({'operation','spec'},{'operation','spec','sealed_password'})
+                or event['operation'] not in ('start','advance','result','report','functional_context','functional_start','storage_observe','storage_resume')
+                or ('sealed_password' in event)!=(event['operation']=='functional_start')):
             return {'status': 'unauthorized'}
         try:
             spec = self.scope(event['spec'])
+            mode=spec.get('check_mode','read_only')
+            if mode in ('storage','functional'):
+                from special_checks import SpecialChecks
+                allowed={'start','advance','result','report'}|({'functional_context','functional_start'} if mode=='functional' else {'storage_observe','storage_resume'})
+                if event['operation'] not in allowed:return {'status':'unauthorized'}
+                return SpecialChecks(self,spec).serve(event)
+            if mode!='read_only' or event['operation'] not in ('start','advance','result','report'):
+                return {'status':'unauthorized'}
             item = self.db.get_item(TableName=self.table, Key=key('CHECK#' + spec['job_id'], 'SNAPSHOT'),
                 ConsistentRead=True).get('Item')
             saved = native({k: DE.deserialize(v) for k, v in item.items()}) if item else None

@@ -120,6 +120,26 @@ class BrowserChecksTest(unittest.TestCase):
         self.assertEqual(self.f.fixture.ssm.sends, [])
         self.assertNotIn('synthetic-private-value', json.dumps(self.call()))
 
+    def test_functional_gateway_preserves_owner_and_forwards_only_encrypted_delivery(self):
+        calls=[];job=self.spec['job_id'];sealed=__import__('base64').b64encode(b'x'*512).decode()
+        class Client:
+            def invoke(self,**kw):
+                calls.append(kw);value=json.loads(kw['Payload'])
+                return {'StatusCode':200,'Payload':io.BytesIO(json.dumps({'status':'ok','job':{
+                    'job_id':job,'task_id':'M5','check_mode':'functional','phase':'observing'}}).encode())}
+        self.client=Client()
+        result=self.call('functional_start',task_id='M5',check_mode='functional',sealed_password=sealed)
+        self.assertEqual(result['status'],'ok')
+        sent=json.loads(calls[0]['Payload'])
+        self.assertEqual(sent['sealed_password'],sealed)
+        self.assertEqual(sent['spec']['check_mode'],'functional')
+        self.assertEqual(sent['spec']['owner_hash'],self.spec['owner_hash'])
+        self.assertNotIn('password',sent);self.assertNotIn(self.subject,json.dumps(sent))
+        before=len(calls)
+        self.assertEqual(self.call('functional_start',task_id='M5',check_mode='functional',password='PlainCanary')['status'],'unauthorized')
+        self.assertEqual(self.call('start',task_id='M1',check_mode='functional')['status'],'unauthorized')
+        self.assertEqual(len(calls),before)
+
     def test_package_flat_imports_pinned_assets_and_contains_no_configuration(self):
         with tempfile.TemporaryDirectory() as directory:
             archive = Path(directory) / 'checks.zip'

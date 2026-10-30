@@ -1,3 +1,5 @@
+> 2026-10-30更新：初期設定はこのCloudFormation・登録手順を使います。登録後の課題確認と成績閲覧は[ブラウザの手順](../../../development/web_portal_poc/BROWSER-CHECKS.md)を使用します。下の課題確認コマンドとURLコピーは従来のCLI方式です。署名版の本体は変更していません。
+
 # 学生用：Web演習の配布物と採点コマンド
 
 自分のAWS Academyの指定ClassからLabを開始し、CloudShellを使います。Windowsの共有アカウントに秘密鍵・採点認証を保存する手順はありません。

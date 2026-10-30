@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { createApp } from './router.mjs';
 import { checkToken,verifyCheckToken } from './checks.mjs';
 import { configFrom } from './auth.mjs';
+import {generateKeyPairSync,privateDecrypt,constants} from 'node:crypto';
+import {sealApplicationPassword} from './checks.mjs';
 const env={PORTAL_MODE:'enabled',PORTAL_CHECKER_ENABLED:'true',PUBLIC_ORIGIN:'https://portal.example',GOOGLE_CLIENT_ID:'123-example.apps.googleusercontent.com',GOOGLE_CLIENT_SECRET:'synthetic-secret-only'};
 const session='a'.repeat(64),token='valid',cookie=`__Host-jdu-session=${token}; __Host-jdu-access=${session}`;
 const value={operation:'start',task_id:'M1',job_id:'11111111-1111-4111-8111-111111111111'};
@@ -76,4 +78,70 @@ test('pending result offers a same-report POST retry without automatic GET write
   const submit={...value,operation:'submit'};
   assert.equal((await app(request('/checks',{method:'POST',headers,body:body(submit)}))).status,303);
   assert.deepEqual(calls[1],{subject:'1234567890',...submit});
+});
+
+test('functional browser POST sends only an owned RSA ciphertext to the private checker',async()=>{
+  const keys=generateKeyPairSync('rsa',{modulusLength:4096});
+  const recipient={job_id:value.job_id,public_key:keys.publicKey.export({type:'spki',format:'pem'})};
+  const selected={...value,task_id:'M5',check_mode:'functional',operation:'functional_start'};
+  const password='SyntheticアプリPassword2026',calls=[];
+  const app=createApp({...credentials,checker:async event=>{
+    calls.push(event);
+    return {status:'ok',job:{...selected,phase:'awaiting_password'},functional_recipient:recipient};
+  }});
+  const payload=new URLSearchParams(body(selected));payload.set('password',password);
+  const response=await app(request('/checks?lang=ja',{method:'POST',headers,body:payload.toString()}));
+  assert.equal(response.status,303);assert.match(response.headers.get('location'),/check_mode=functional/);
+  assert.equal(calls.length,2);assert.equal(calls[0].operation,'functional_context');
+  assert.equal(calls[1].operation,'functional_start');
+  assert.ok(!JSON.stringify(calls).includes(password));assert.ok(!Object.hasOwn(calls[1],'password'));
+  const plain=privateDecrypt({key:keys.privateKey,padding:constants.RSA_PKCS1_OAEP_PADDING,oaepHash:'sha256'},Buffer.from(calls[1].sealed_password,'base64'));
+  assert.deepEqual(JSON.parse(plain),[selected.job_id,password]);
+  const get=await app(request(`/checks?task_id=M5&job_id=${value.job_id}&check_mode=functional`));
+  const html=await get.text();assert.equal(get.status,200);assert.match(html,/type="password"/);assert.match(html,/name="check_mode" value="functional"/);
+  assert.ok(!html.includes(password));assert.ok(!html.includes('BEGIN PUBLIC KEY'));assert.doesNotMatch(html,/data-check-progress/);
+  assert.ok(html.includes(`lang=ru&amp;task_id=M5&amp;job_id=${value.job_id}&amp;check_mode=functional`));
+});
+
+test('storage screen names the same Web and requires explicit stop and resume observations',async()=>{
+  const selected={...value,task_id:'M3',check_mode:'storage'},calls=[];
+  let phase='awaiting_stop';
+  const app=createApp({...credentials,checker:async event=>{calls.push(event);return {status:'ok',job:{...selected,phase,web_instance_id:'i-'+'1'.repeat(17)}};}});
+  for(const lang of ['ja','ru','uz']) {
+    const response=await app(request(`/checks?lang=${lang}&task_id=M3&job_id=${value.job_id}&check_mode=storage`));
+    assert.equal(response.status,200);const html=await response.text();
+    assert.match(html,/name="operation" value="storage_observe"/);assert.match(html,/InstanceDetails:instanceId=i-11111111111111111/);assert.doesNotMatch(html,/data-check-progress/);
+  }
+  phase='awaiting_restart';
+  const response=await app(request(`/checks?task_id=M3&job_id=${value.job_id}&check_mode=storage`));
+  assert.match(await response.text(),/name="operation" value="storage_resume"/);
+  const observe={...selected,operation:'storage_observe'};
+  assert.equal((await app(request('/checks',{method:'POST',headers,body:body(observe)}))).status,303);
+  assert.deepEqual(calls.at(-1),{subject:'1234567890',...observe});
+});
+
+test('mode changes and plaintext or ciphertext injection cannot bypass the form action',async()=>{
+  let calls=0;const app=createApp({...credentials,checker:async()=>{calls++;return {status:'ok'};}});
+  for(const selected of [
+    {...value,task_id:'M1',check_mode:'functional'},
+    {...value,task_id:'M5',check_mode:'storage'},
+  ]) {
+    const input=new URLSearchParams({...selected,csrf:'a'.repeat(64)});
+    assert.equal((await app(request('/checks',{method:'POST',headers,body:input.toString()}))).status,403);
+  }
+  assert.equal((await app(request('/checks',{method:'POST',headers,body:body()+'&password=SyntheticOnly'}))).status,403);
+  assert.equal((await app(request('/checks',{method:'POST',headers,body:body()+'&sealed_password=SyntheticOnly'}))).status,403);
+  const changed={...value,task_id:'M3',check_mode:'storage'};
+  const input=new URLSearchParams(body(changed));input.set('check_mode','read_only');
+  assert.equal((await app(request('/checks',{method:'POST',headers,body:input.toString()}))).status,403);
+  assert.equal(calls,0);
+});
+
+test('password seal rejects a different job or key and bounds Unicode without storing a password',()=>{
+  const keys=generateKeyPairSync('rsa',{modulusLength:4096});
+  const recipient={job_id:value.job_id,public_key:keys.publicKey.export({type:'spki',format:'pem'})};
+  assert.equal(Buffer.from(sealApplicationPassword('あ'.repeat(128),recipient,value.job_id),'base64').length,512);
+  assert.throws(()=>sealApplicationPassword('SyntheticOnly',recipient,'22222222-2222-4222-8222-222222222222'));
+  for(const password of ['', 'a'.repeat(129),'contains\ncontrol','contains\0control'])assert.throws(()=>sealApplicationPassword(password,recipient,value.job_id));
+  assert.throws(()=>sealApplicationPassword('SyntheticOnly',{...recipient,public_key:'invalid'},value.job_id));
 });

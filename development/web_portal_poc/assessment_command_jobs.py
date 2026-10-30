@@ -72,7 +72,10 @@ def key(pk, sk):
 
 
 def checked_spec(value):
-    if (type(value) is not dict or set(value) != SPEC_KEYS
+    if (type(value) is not dict or set(value) not in (SPEC_KEYS,SPEC_KEYS|{'check_mode'})
+            or value.get('check_mode','read_only') not in ('read_only','storage','functional','storage_prepare','functional_prepare')
+            or value.get('check_mode','read_only').startswith('storage') and value.get('task_id') not in ('P3','M3')
+            or value.get('check_mode','read_only').startswith('functional') and value.get('task_id') not in ('P5','M5','P6','M6')
             or any(not isinstance(value[k], str) or not UUID.fullmatch(value[k])
                    or uuid.UUID(value[k]).version != 4 for k in ('job_id', 'deployment_id', 'run_id'))
             or not isinstance(value['owner_hash'], str) or not HEX.fullmatch(value['owner_hash'])
@@ -86,6 +89,10 @@ def checked_spec(value):
             or len(set(value['instances'].values())) != 5):
         raise JobDenied('Invalid trusted assessment job')
     return json.loads(canonical(value))
+
+
+def report_mode(spec):
+    return 'functional' if spec.get('check_mode')=='functional' else 'read_only'
 
 
 def no_retry_ssm(session):
@@ -259,19 +266,20 @@ class CommandJobs:
             # The optional fixed controller adapter adds the external HTTP
             # observations used by the original CLI. Never a browser callback.
             observed = self.finish_observation(spec, output)
-            if type(observed) is not dict or not {'report'} <= set(observed) or set(observed) - {'report', 'storage_evidence'}:
+            if type(observed) is not dict or not {'report'} <= set(observed) or set(observed) - {'report', 'storage_evidence','functional_recipient'}:
                 raise ValueError('Invalid observer envelope')
             report = observed['report']
             validate_report(report, spec['instances'])
             if (any(report[k] != spec[k] for k in ('lab_id', 'deployment_id', 'release_id', 'run_id'))
-                    or report['mission_id'] != spec['task_id'] or report['mode'] != 'read_only'):
+                    or report['mission_id'] != spec['task_id'] or report['mode'] != report_mode(spec)):
                 raise ValueError('Observer belongs to another task or mode')
         except Exception:
             new = self.transition(spec, row, 'failed')
             return public_job(new) if new else self.current(spec)
         # Keep the first validated canonical report with its original request ID.
         # No browser may supply or replace this body; retries read this outbox.
-        new = self.transition(spec, row, 'report_ready', report=report, report_sha256=sha(report))
+        metadata={k:v for k,v in observed.items() if k!='report'}
+        new = self.transition(spec, row, 'report_ready', report=report, report_sha256=sha(report),observation_metadata=metadata)
         return public_job(new) if new else self.current(spec)
 
     def reconcile(self, spec, row, parameters):
@@ -317,6 +325,6 @@ class CommandJobs:
             raise JobDenied('Original report unavailable')
         validate_report(row['report'], spec['instances'])
         if (any(row['report'][k] != spec[k] for k in ('lab_id', 'deployment_id', 'release_id', 'run_id'))
-                or row['report']['mission_id'] != spec['task_id'] or row['report']['mode'] != 'read_only'):
+                or row['report']['mission_id'] != spec['task_id'] or row['report']['mode'] != report_mode(spec)):
             raise JobDenied('Original report context changed')
         return json.loads(canonical(row['report']))

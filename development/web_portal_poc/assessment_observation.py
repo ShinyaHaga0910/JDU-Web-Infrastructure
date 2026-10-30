@@ -4,7 +4,7 @@ No shell, expected body, score, network target or secret comes from HTTP input.
 The snapshot must be produced by the trusted controller from the retained AWS
 stack and existing public SSH enrollment. HTTP public-entry probes run outside
 the VPC just as in assessment_check.py; SSM observes through the same bastion.
-Functional password entry and the M3 stop-evidence workflow remain separate.
+SpecialChecks coordinates explicit functional entry and stop/retain/restart evidence.
 """
 import base64
 import copy
@@ -16,7 +16,7 @@ import re
 import shlex
 import zlib
 
-from assessment_command_jobs import JobDenied, ROLES, canonical, checked_spec, sha
+from assessment_command_jobs import JobDenied, ROLES, canonical, checked_spec, sha,report_mode
 from registry import build_report, canonical_checks, validate_report
 
 ROOT = Path(__file__).resolve().parents[1] / '01_roles/cyber_security/tools'
@@ -67,7 +67,7 @@ def checked_snapshot(spec, snapshot):
 
 
 class Observation:
-    def __init__(self, trusted_spec, trusted_snapshot, *, http_probe=None, http=None):
+    def __init__(self, trusted_spec, trusted_snapshot, *, http_probe=None, http=None,before=None,stopped=None,sealed_password=None):
         self.spec = checked_spec(trusted_spec)
         self.snapshot = checked_snapshot(self.spec, trusted_snapshot)
         if http_probe is None:
@@ -75,6 +75,7 @@ class Observation:
         if http is None:
             from network_checks import http
         self.http_probe, self.http = http_probe, http
+        self.before,self.stopped,self.sealed_password=before,stopped,sealed_password
 
     def scope(self, spec):
         if checked_spec(spec) != self.spec:
@@ -89,6 +90,12 @@ class Observation:
         request.update(role='bastion', instance_id=spec['instances']['bastion'], operation='collect',
             network_baseline=self.snapshot['network_baseline'], root_volumes=self.snapshot['root_volumes'],
             expected_public_key=self.snapshot['expected_public_key'], web_instance_id=spec['instances']['web'])
+        if spec.get('check_mode')=='storage':
+            if not self.before or not self.stopped:raise JobDenied('Same stopped Web evidence required')
+            request.update(before=self.before,stopped=self.stopped)
+        if spec.get('check_mode') in ('functional_prepare','functional'):
+            from browser_check_guest import command
+            return command(request,sealed_password=self.sealed_password,prepare=spec['check_mode']=='functional_prepare')
         # Same public source/registry transport as the installed CLI, not a shell
         # string or a task implementation selected by a browser parameter.
         return ssm_command(request)
@@ -122,18 +129,18 @@ class Observation:
             raise JobDenied('Invalid observer output')
         if spec['task_id'] in ('P1', 'M1'):
             return {'report': self.http_report(value)}
-        if not {'report'} <= set(value) or set(value) - {'report', 'storage_evidence'}:
+        if not {'report'} <= set(value) or set(value) - {'report', 'storage_evidence','functional_recipient'}:
             raise JobDenied('Invalid observer envelope')
         report = copy.deepcopy(value['report'])
         validate_report(report, spec['instances'])
         if (any(report[k] != spec[k] for k in ('lab_id', 'release_id', 'deployment_id', 'run_id'))
-                or report['mission_id'] != spec['task_id'] or report['mode'] != 'read_only'):
+                or report['mission_id'] != spec['task_id'] or report['mode'] != report_mode(spec)):
             raise JobDenied('Wrong observer context')
         if spec['task_id'] in ('P6', 'M6'):
             self.public_denials(report)
-        # Storage evidence is not yet exposed: its dedicated stop/retain/restart
-        # transaction must be connected before it can prove a retention check.
-        return {'report': report}
+        # Only the coordinator consumes preparation metadata; the original
+        # collector and registry determine the final scored report.
+        return {'report':report,**{k:value[k] for k in ('storage_evidence','functional_recipient') if k in value}}
 
     def http_report(self, observed):
         from http_task import contract

@@ -8,7 +8,7 @@ import re
 
 import progress_api as legacy
 from progress_api_v2 import assessment_attempt
-from assessment_command_jobs import checked_spec, native
+from assessment_command_jobs import checked_spec, native,report_mode
 from registry import validate_report, score
 
 
@@ -52,7 +52,7 @@ class PortalSubmissions:
         if (meta.get('active') is not True or meta.get('pk') != 'LAB#' + spec['lab_id']
                 or any(meta.get(k) != spec[k] for k in ('lab_id', 'release_id', 'deployment_id', 'instances'))
                 or any(report.get(k) != spec[k] for k in ('lab_id', 'deployment_id', 'release_id', 'run_id'))
-                or report['mission_id'] != spec['task_id'] or report['mode'] != 'read_only'):
+                or report['mission_id'] != spec['task_id'] or report['mode'] != report_mode(spec)):
             raise legacy.ApiError(401, 'unauthorized')
 
     def same_attempt(self, row, spec, report):

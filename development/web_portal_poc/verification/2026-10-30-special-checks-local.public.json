@@ -1,0 +1,13 @@
+{
+  "status": "local-accepted-aws-pending",
+  "scope": "existing-cloudformation-then-browser-checks",
+  "python_workflow_tests": 54,
+  "node_tests": 77,
+  "native_linux_openssl_tests": 4,
+  "web_package_tests": 3,
+  "real_ec2_special_checks": "pending",
+  "new_resources": 0,
+  "new_iam_grants": 0,
+  "grade_contract": "original-62-raw",
+  "independent_student_google_test": "not-performed"
+}
