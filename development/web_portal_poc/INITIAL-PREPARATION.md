@@ -30,7 +30,7 @@ CloudFormationのClientRequestTokenも固定するが、それだけで二重作
 - `initial_worker.py`は固定割当のplan/observe/create/advanceを実行し、DDBへ元planと構築意図を保持する。RDP hashはPython3.11のSHA512-cryptで一時生成し、既存の21パラメーターを組む。原文password/hash/署名URLはjournalへ入れない。実AWSでのcrypt動作は未受入。
 - `initial_gateway.py`は割当から決まる学生Lambdaだけを呼ぶ。`portal_preparation.py`に本人確認後のplan/createを接続し、statusは同じ要求の観測だけにする。public bodyからAWS/identity/実行先を選ばせない。
 - `build_initial_worker.py`のCLIは既存の実GPG verifierを先に通し、署名controllerのbyteを保持したworker ZIPを作る。旧r2失効を回避しない。単体試験のZIPは架空の検証入力であり、新しい署名配布の実制作ではない。
-- 同builderの現在の候補は学生側12資源（初回準備/status/checkerの3 Lambda、2 DDB、3ログ、本人確認処理、教師LabRole限定invoke許可3）を生成する。既存LabRoleを利用し、EC2/IAM role/公開URLをこのhelper自体へ追加しない。EC2の5台作成は後続の本人POSTで行う。下の5資源のAWS構文検査は旧候補の履歴で、現在の12資源はAWS未検査。
+- 同builderの現在の候補は学生側12資源（初回準備/status/checkerの3 Lambda、2 DDB、3ログ、本人確認処理、教師LabRole限定invoke許可3）を生成する。既存LabRoleを利用し、EC2/IAM role/公開URLをこのhelper自体へ追加しない。EC2の5台作成は後続の本人POSTで行う。下の5資源のAWS構文検査は旧候補の履歴。現在の12資源も後段の構文検査を実施したが、両方とも実配備の証拠ではない。
 
 ローカルPython62件、Web Node65件、Web package試験を確認。Chromeで架空データの構成/非表示入力/POST後の進捗とJA/RU/UZを確認した。実Google/実STS→新5台→初期状態の通し受入ではない。
 
@@ -68,7 +68,7 @@ AWS965のCloudShellでsyntax-only template（SHA256 `f7f0f9e8af66d5e414e45a78024
 
 同じjournalの元5台と登録receiptだけからstatus/checker用のcontextを構成し、既存の状態observerとStudentCheckerを呼ぶ。公開教材2台の配置、3関数の固定設定・同一コード、実status応答の5 IDとchecker設定healthが揃った時だけ初回基盤readyを保存する。healthは実課題の実行成功を意味しない。GETは配置・課題実行・EC2起動をしない。3言語画面は準備後の状態/課題/成績リンクを持つ。
 
-関連Python97件、Node73件が合格（skipなし、前回実行済み）。Moto/模擬AWSを使う接続検査と、WSL Ubuntuでのroot所有権・mode・symlink・途中配置再開の実filesystem検査4件を区別する。AWS上のLinux/SSM/実課題実行は未試験。新ready画面のChrome目視は未実施。証拠：[教材接続候補](verification/2026-10-30-initial-teaching.public.json)。
+関連Python97件、Node73件が合格（skipなし、前回実行済み）。Moto/模擬AWSを使う接続検査と、WSL Ubuntuでのroot所有権・mode・symlink・途中配置再開の実filesystem検査4件を区別する。AWS上のLinux/SSM/実課題実行は未試験。新ready画面も架空データのChromeでJA/RU/UZを確認済み。証拠：[教材接続候補](verification/2026-10-30-initial-teaching.public.json)。
 
 ## R1内でまだ必要な接続
 
@@ -78,5 +78,7 @@ AWS965のCloudShellでsyntax-only template（SHA256 `f7f0f9e8af66d5e414e45a78024
 - 有効な新署名版を使った実作成と、未完成の演習開始状態の確認。これはR1の受入、一般学生の通し受入はR6で確認する。
 
 2026-10-30の既存読取りでは学生AWS965244652544の元5台は全てstopped、保存済みroot ID一致、nonterminated=5。新5台で計10台となり旧controllerの保守的9台guardを超える。このguardは停止中も数え、AWS/Vocareumの実quotaの証拠ではない。本人は別の試験環境を用意できず、既存環境の整理・再利用を希望した。まず対象Classの実制限・Lab再開時の全台起動・予算を確認し、削除なしの併設可否を判断する。必要なら対象ID/保持disk/復旧手順の具体案を作る。台数guardを無断変更せず、元5台の削除・置換も未承認。独立した学校Google identityも未確保で、先生を学生役にする試験を独立学生の受入に読み替えない。
+
+その後の実読取りで元5台running/元root一致を確認し、同ClassのREADMEの同時9台/32vCPU・再開時全台起動を確認した。10台保持の併設案は採用しない。旧repo1台を整理する最小案と、既存bindingを保持した試験割当の検討は[既存環境再利用案](INITIAL-REUSE.md)へ記録。現12資源のValidateTemplateも成功したが、参照artifactは架空で新資源は作成していない。
 
 記録はverification/2026-10-30-initial-preparation-core.public.jsonとverification/2026-10-30-initial-preparation-ui-worker.public.json。既存成績の変更、新規AWS資源、権限追加、credential発行は行っていない。

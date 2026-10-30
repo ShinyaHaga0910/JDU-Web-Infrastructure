@@ -6,7 +6,7 @@
 
 WSL Ubuntuで`sudo python3 -B development/web_portal_poc/test_initial_lesson_guest_linux.py -q`の4件も合格。root専用の一時directory内で実際の所有権/mode/symlink/途中配置再開を検査し、終了時に削除する。EC2や実サービスを使わない。Windowsで新規生成したapp gzipは既存署名archiveとhashが一致せず、内部manifestは一致、gzip OS値10を観測した。全byte差分の原因は断定せず、試験には既存署名archiveの不変bytesを用いた。署名版や固定registryは変更していない。
 
-全件skipなし。新ready画面のChrome確認・現在の12資源helperのAWS構文検査/配備は未実施。[検査記録](web_portal_poc/verification/2026-10-30-initial-teaching.public.json)。
+全件skipなし。新ready画面は架空データでChromeのJA/RU/UZとPOST進捗/完了リンクを確認。現在の12資源helperは学生CloudShellのValidateTemplateに合格したが、架空artifactの構文検査だけで実配備は未実施。[検査記録](web_portal_poc/verification/2026-10-30-initial-teaching.public.json)。
 
 ## R1の個別採点登録候補（2026-10-30、AWS未適用）
 

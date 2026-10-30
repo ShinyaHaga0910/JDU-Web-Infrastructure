@@ -40,7 +40,7 @@
     "aws": "Moto and fake EC2/CFN/SSM/STS/Lambda replies",
     "signed_release": "accepted old assessment archive bytes inside synthetic new envelope; not a newly signed release",
     "checker_probe": "configuration health only, not an executed assignment",
-    "browser_ready_preview_performed": false
+    "browser_ready_preview_performed": true
   },
   "helper_template": {
     "candidate_resources": 12,
@@ -52,7 +52,7 @@
     "new_iam_roles": 0,
     "ec2_resources": 0,
     "public_urls": 0,
-    "aws_syntax_validation_current_candidate": false
+    "aws_syntax_validation_current_candidate": true
   },
   "limits": [
     "valid new signed release and immutable artifact publication required",
@@ -69,5 +69,61 @@
     "grade_writes": false,
     "instance_lifecycle_operations": false,
     "old_signed_archives_changed": false
+  },
+  "followup_checked_at": "2026-10-30T08:35:41Z",
+  "browser_preview": {
+    "browser": "Chrome",
+    "languages": [
+      "ja",
+      "ru",
+      "uz"
+    ],
+    "synthetic_data": true,
+    "aws_calls": false,
+    "observed": [
+      "explicit_POST_0_to_1_to_2_roles",
+      "two_roles_still_pending_until_connector_probe",
+      "INITIAL_READY_status_checks_grades_links",
+      "student_service_configuration_remains_required"
+    ],
+    "temporary_tab_closed": true,
+    "temporary_server_stopped": true
+  },
+  "aws_syntax_only": {
+    "account": "965244652544",
+    "api": "CloudFormation.ValidateTemplate",
+    "sha256": "7aee44bd72cc7a111431a3e03d60f18870d45e5b23e4739cce402ba46f9dac09",
+    "resource_count": 12,
+    "parameter_count": 3,
+    "capabilities": [],
+    "placeholder_artifact": true,
+    "resources_created": false
+  },
+  "retained_environment_read": {
+    "account": "965244652544",
+    "nonterminated": 5,
+    "running": 5,
+    "original_root_ids_match": true,
+    "quota_reads": {
+      "ec2": "AccessDeniedException",
+      "ebs": "AccessDeniedException"
+    },
+    "lab_readme": {
+      "class": "193548",
+      "instructions_last_updated": "2025-06-24",
+      "maximum_concurrently_running_instances_per_region": 9,
+      "maximum_concurrently_running_vcpu_per_region": 32,
+      "stopped_instances_started_next_lab_session": true,
+      "budget_display": "Used $7 of $50",
+      "budget_display_not_current_cost_measurement": true
+    },
+    "candidate_old_repo": {
+      "instance_id": "i-08f8a40fdaa5bb240",
+      "root_volume_id": "vol-07c3cc6ffdd36afb9",
+      "root_gib": 32,
+      "encrypted": true,
+      "root_delete_on_termination": true,
+      "modification_performed": false
+    }
   }
 }
