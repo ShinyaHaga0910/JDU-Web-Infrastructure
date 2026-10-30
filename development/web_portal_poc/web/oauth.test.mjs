@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { generateKeyPair, exportJWK, createLocalJWKSet, SignJWT } from 'jose';
-import { configFrom, login, readFlow, verifyGoogle, callback, FLOW, SESSION } from './auth.mjs';
+import { configFrom, login, loginTarget, readFlow, verifyGoogle, callback, FLOW, SESSION } from './auth.mjs';
 
 const env={PORTAL_MODE:'enabled',PUBLIC_ORIGIN:'https://portal.example',GOOGLE_CLIENT_ID:'1234-example.apps.googleusercontent.com',GOOGLE_CLIENT_SECRET:'example-test-secret-only'};
 const config=configFrom(env), pair=await generateKeyPair('RS256'), jwk=await exportJWK(pair.publicKey);
@@ -41,4 +41,20 @@ test('OAuth state, PKCE and nonce bind a callback to the browser flow',async()=>
   assert.ok(good.sessionCookie.startsWith(SESSION+'='));
   const wrongNonce=async()=>Response.json({id_token:await sign({nonce:'wrong'})});
   await assert.rejects(()=>callback(request(payload.state),config,{exchange:wrongNonce,verify}));
+});
+
+
+test('a same-portal task destination is sealed into OAuth and restored after login',async()=>{
+  const target='/checks?lang=ru&task_id=M3&job_id=12345678-1234-4234-8234-123456789abc&check_mode=storage';
+  const flow=await login(config,target), flowCookie=flow.flowCookie.split(';')[0];
+  const payload=await readFlow(flowCookie.slice(FLOW.length+1),config);
+  assert.equal(payload.returnTo,target);
+  const request=new Request(`https://portal.example/auth/callback?code=fake&state=${payload.state}`,{headers:{cookie:flowCookie}});
+  const result=await callback(request,config,{verify,exchange:async()=>Response.json({id_token:await sign({nonce:payload.nonce})})});
+  assert.equal(result.returnTo,target);
+});
+test('login return links cannot leave the portal or run authentication or POST routes',async()=>{
+  for(const target of ['https://evil.example','//evil.example','/\\evil.example','/auth/logout','/auth/callback?code=fake','/checks#fragment','/checks?password=private','/grades?lang=ja&lang=ru','/checks?lang='+'x'.repeat(1100)]){
+    assert.throws(()=>loginTarget(target,config));await assert.rejects(()=>login(config,target));
+  }
 });

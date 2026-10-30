@@ -36,9 +36,18 @@ const random = () => randomBytes(32).toString('base64url');
 export function equal(a, b) {
   return typeof a === 'string' && typeof b === 'string' && a.length <= 512 && a.length === b.length && timingSafeEqual(Buffer.from(a), Buffer.from(b));
 }
-export async function login(config) {
+export function loginTarget(value='/',config) {
+  if(typeof value!=='string' || value.length>1024 || !value.startsWith('/') || value.startsWith('//') || /[\\\x00-\x1f\x7f]/u.test(value))throw Error('Invalid login destination');
+  const target=new URL(value,config.origin);
+  const paths=new Set(['/','/checks','/grades','/status','/teacher','/teacher/student','/enroll','/prepare']);
+  const fields=new Set(['lang','task_id','job_id','check_mode','context','lab_id','after']);
+  if(target.origin!==config.origin || !paths.has(target.pathname) || target.hash || [...target.searchParams.keys()].some(k=>!fields.has(k)) || new Set(target.searchParams.keys()).size!==[...target.searchParams.keys()].length)throw Error('Invalid login destination');
+  return target.pathname+target.search;
+}
+export async function login(config,returnTo='/') {
+  returnTo=loginTarget(returnTo,config);
   const state = random(), nonce = random(), verifier = random();
-  const sealed = await new EncryptJWT({ state, nonce, verifier }).setProtectedHeader({ alg: 'dir', enc: 'A256GCM' }).setIssuer(config.origin).setAudience('oauth-flow').setIssuedAt().setExpirationTime('5m').encrypt(flowKey(config));
+  const sealed = await new EncryptJWT({ state, nonce, verifier, returnTo }).setProtectedHeader({ alg: 'dir', enc: 'A256GCM' }).setIssuer(config.origin).setAudience('oauth-flow').setIssuedAt().setExpirationTime('5m').encrypt(flowKey(config));
   const location = new URL('https://accounts.google.com/o/oauth2/v2/auth');
   location.search = new URLSearchParams({ client_id: config.clientId, redirect_uri: config.redirect, response_type: 'code', scope: 'openid email', state, nonce, code_challenge: createHash('sha256').update(verifier).digest('base64url'), code_challenge_method: 'S256', hd: config.domain, prompt: 'select_account' }).toString();
   return { location: location.toString(), flowCookie: cookie(FLOW, sealed, 300) };
@@ -64,5 +73,5 @@ export async function callback(request, config, { exchange = fetch, verify = ver
   const payload = await verify(result.id_token, config, { nonce: flow.nonce });
   const ttl = Math.min(3600, Math.floor(payload.exp - Date.now() / 1000));
   if (ttl <= 0) throw new Error('Expired');
-  return { sessionCookie: cookie(SESSION, result.id_token, ttl), clearFlow: cookie(FLOW, '', 0) };
+  return { sessionCookie: cookie(SESSION, result.id_token, ttl), clearFlow: cookie(FLOW, '', 0), returnTo:loginTarget(flow.returnTo,config) };
 }

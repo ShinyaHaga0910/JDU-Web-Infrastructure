@@ -130,3 +130,15 @@ test('malformed or unavailable status is shown as unavailable, not stopped',asyn
   assert.equal(result.status,503); const html=await result.text();
   assert.match(html,/状態を確認できません/); assert.doesNotMatch(html,/stopped/);
 });
+
+
+test('an expired check login offers a safe return link without executing or saving',async()=>{
+  let calls=0;
+  const app=createApp({env:{...env,PORTAL_CHECKER_ENABLED:'true'},verify:verified,sessions:{...sessions,check:async()=>false},checker:async()=>{calls++;}});
+  const path='/checks?lang=ja&task_id=M3&job_id=12345678-1234-4234-8234-123456789abc&check_mode=storage';
+  const result=await app(req(path,{headers:{cookie:credentials}}));
+  assert.equal(result.status,403);assert.equal(calls,0);
+  const html=await result.text();assert.match(html,/ログインし直す/);
+  assert.ok(html.includes('/auth/login?next='+encodeURIComponent(path)));
+  assert.doesNotMatch(html,/<input[^>]*name="password"|<form|type="submit"/);
+});

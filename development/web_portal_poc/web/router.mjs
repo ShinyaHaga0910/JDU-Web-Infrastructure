@@ -1,4 +1,4 @@
-import { configFrom, cookies, cookie, login, callback, verifyGoogle, SESSION, FLOW } from './auth.mjs';
+import { configFrom, cookies, cookie, login, loginTarget, callback, verifyGoogle, SESSION, FLOW } from './auth.mjs';
 import { ACCESS } from './sessions.mjs';
 import { formToken, checkForm, operationId, tokenHash } from './enrollment-client.mjs';
 import { enrollmentHtml, enrollmentText, checkedEnrollment } from './enrollment-page.mjs';
@@ -134,7 +134,7 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
       } catch {return response('Unavailable',503);}
     }
     if (url.pathname === '/auth/login' && request.method === 'GET') {
-      try {const flow=await login(config); return redirect(flow.location,[flow.flowCookie]);} catch {return response('Unavailable',503);}
+      try {const flow=await login(config,url.searchParams.get('next')||'/'); return redirect(flow.location,[flow.flowCookie]);} catch {return response('Unavailable',503);}
     }
     if (url.pathname === '/auth/callback' && request.method === 'GET') {
       if (!sessions) return response('Unavailable',503,{'Set-Cookie':cookie(FLOW,'',0)});
@@ -147,7 +147,7 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
         const token=result.sessionCookie.slice(prefix.length).split(';',1)[0];
         const identity=await verify(token,config);
         const access=await sessions.issue(token,identity.exp);
-        return redirect('/',[cookie(SESSION,token,access.ttl),cookie(ACCESS,access.id,access.ttl),result.clearFlow]);
+        return redirect(result.returnTo,[cookie(SESSION,token,access.ttl),cookie(ACCESS,access.id,access.ttl),result.clearFlow]);
       } catch {return response('Unavailable',503,{'Set-Cookie':cookie(FLOW,'',0)});}
     }
     if (url.pathname === '/auth/logout' && request.method === 'POST') {
@@ -168,11 +168,16 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
     const checkerPost=url.pathname==='/checks' && request.method==='POST' && checkerEnabled;
     if (!['GET','HEAD'].includes(request.method) && !enrollmentPost && !preparationPost && !checkerPost) return response('Method not allowed',405);
     if (url.pathname === '/signed-out') return response(page(lang,t.title,`<p>${escape(t.signedout)}</p><p>${escape(t.shared)}</p><a href="/auth/login">${escape(t.login)}</a>`));
+    const signInAgain=()=>{
+      const copy={ja:['ログインの有効期限が切れました。再ログインして確認を続けてください。','ログインし直す'],ru:['Срок входа истёк. Войдите снова, чтобы продолжить проверку.','Войти снова'],uz:['Kirish muddati tugadi. Tekshiruvni davom ettirish uchun qayta kiring.','Qayta kirish']}[lang];
+      let next='/';try {next=loginTarget(url.pathname+url.search,config);} catch {}
+      return response(page(lang,t.title,`<p role="alert">${copy[0]}</p><a href="/auth/login?next=${encodeURIComponent(next)}">${copy[1]}</a>`),403);
+    };
     let identity, jar, token;
     try {jar=cookies(request); token=jar.get(SESSION); identity=await verify(token,config);}
-    catch {return url.pathname==='/' ? redirect('/auth/login') : response('Forbidden',403);}
+    catch {return url.pathname==='/' ? redirect('/auth/login') : signInAgain();}
     if (!sessions) return response('Unavailable',503);
-    try {if (!await sessions.check(jar.get(ACCESS),token)) return url.pathname==='/' ? redirect('/auth/login') : response('Forbidden',403);}
+    try {if (!await sessions.check(jar.get(ACCESS),token)) return url.pathname==='/' ? redirect('/auth/login') : signInAgain();}
     catch {return response('Unavailable',503);}
     const teacherIdentity=typeof identity?.sub==='string' && typeof identity?.email==='string' && identity.email_verified===true && identity.hd==='jdu.uz';
     if (url.pathname==='/teacher' || url.pathname==='/teacher/student') {
