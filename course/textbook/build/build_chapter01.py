@@ -153,7 +153,7 @@ def figures():
     s.save('fig02-web-and-app')
 
     s = Scene(1600, 620, 'EC2 Webサーバーで静的ファイルを配信する構成')
-    s.text(40,18,'図1-5  ファイルを配信するWebの構成',36)
+    s.text(40,18,'図1-5  練習・課題1で構築するサービス',36)
     s.rect(40,165,330,155,'#f5f7fa')
     s.text(205,188,'HTTPクライアント',28,center=True)
     s.text(205,239,'IP指定でファイルを要求',25,center=True)

@@ -100,12 +100,12 @@
 <div class="table-wrap"><table><thead><tr><th scope="col">用途</th><th scope="col">送信元から宛先</th><th scope="col">通信方式・ポート</th></tr></thead><tbody><tr><td>一般Web</td><td>利用者PCからWebの公開IP</td><td>HTTP / TCP80</td></tr><tr><td>踏み台の画面操作</td><td>利用者PCから管理用の踏み台の公開IP</td><td>RDP / TCP3389</td></tr><tr><td>内部サーバーの端末操作</td><td>踏み台からWeb・DNS・DB・配布サーバー</td><td>SSH / TCP22</td></tr><tr><td>内部の名前解決</td><td>踏み台・WebからDNS</td><td>DNS / UDP53・TCP53</td></tr><tr><td>DBの利用</td><td>Web上のアプリからDB</td><td>PostgreSQL接続 / TCP5432</td></tr><tr><td>アプリの管理画面</td><td>踏み台からWebの内部IP</td><td>HTTP / TCP8080</td></tr><tr><td>Web内の要求転送</td><td>Nginxから同じWeb内のアプリ</td><td>HTTP / TCP8000、同じホスト内のみ</td></tr><tr><td>パッケージ等の取得</td><td>踏み台・Web・DNS・DBから配布サーバー</td><td>HTTP / TCP80</td></tr></tbody></table></div>
 <p>この表の値は今回の演習の構成である。例えば8080番がどのWebシステムでも必ず管理画面になる、という意味ではない。ポートの用途はサービスの設定によって決まる。</p>
 <p>このほか、<strong>CloudShell</strong>と<strong>SSM（Session Manager）</strong>というAWSの管理機能を使う。CloudShellはAWS上でコマンドを実行する環境、Session Managerは対象EC2の端末へ入る管理手段である。今回の5台にはこの管理経路も用意される。CloudShellを操作することと、接続先Ubuntuで操作することは区別する。具体的な接続・終了は第3章で扱う。</p>
-<h2 id="18-サービスを組み立てる">1.8 サービスを組み立てる</h2>
-<p>個別の基盤として、VPC、サブネット、5台のEC2、管理接続、配布の仕組みを先に用意する。その土台を使って、Nginx、BIND、PostgreSQL、提供アプリの配置や接続設定を順に行う。</p>
-<p>例えば、EC2 WebサーバーにNginxと配信するファイルを配置し、HTTPの要求に応じてファイルを返す構成を作る。これは、サーバーという土台をWebのサービスとして動かす一例である。</p>
+<h2 id="18-練習・課題1にて構築するサービス">1.8 練習・課題1にて構築するサービス</h2>
+<p>本章では、学校の備品管理システムを支える5台のサーバーと、それらが連携する全体像を説明した。練習・課題1では、そのうち<strong>EC2 Webサーバーで、保存したファイルをHTTPで配信する部分</strong>を構築する。図1-1の全体構成の中から、Webサーバーが要求を受けてファイルを返す部分を取り出したものが、図1-5である。</p>
+<p>用意されたEC2 WebサーバーにNginxを導入し、配信するファイルとその読み取り権限を整える。NginxがHTTPの要求を受け付けるように設定・起動し、要求されたファイルの内容を返すWebのサービスを作る。</p>
 <figure><img src="../../assets/figures/fig03-first-mission.png" alt="EC2 WebサーバーのNginxがHTTP要求を受け、保存したテキストファイルを読み取って返す。" width="1600" height="620"></figure>
-<p><strong>図1-5 ファイルを配信するWebの構成。</strong> NginxがHTTP要求を受け、EC2 Webサーバーに保存されたファイルを読み取り、その内容を返す。</p>
-<p>最初の課題では、このようにNginxで保存したファイルをHTTP配信する構成を作る。</p>
+<p><strong>図1-5 練習・課題1で構築するサービス。</strong> NginxがHTTP要求を受け、EC2 Webサーバーに保存されたファイルを読み取り、その内容を返す。</p>
+<p>このWeb配信の仕組みを土台にして、後の単元でDNSによる名前解決や、アプリとDBの連携を加えていく。</p>
 <h2 id="19-本章のまとめ">1.9 本章のまとめ</h2>
 <p>一般利用者はブラウザからWebへ接続する。Webは最初に静的ファイルを返し、後半では同じサーバー内のアプリを使ってDBの値を返す。DNSは接続名を解決し、DBはデータを管理する。踏み台は管理作業の端末、配布サーバーは必要資源の取得元である。</p>
 <p>それぞれの役割は、EC2、Ubuntu、EBSという実行と保存の土台の上で動く。VPC、サブネット、IGW、SGがネットワークの配置と接続、通信の許可を支える。</p>
