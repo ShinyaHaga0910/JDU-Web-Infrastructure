@@ -46,9 +46,10 @@ def hash_password(password, confirmation):
 
 
 class InitialWorker:
-    def __init__(self, stack, *, planner=make_plan, password_hasher=hash_password, setup=None):
+    def __init__(self, stack, *, planner=make_plan, password_hasher=hash_password, setup=None,teaching=None):
         self.stack, self.planner, self.password_hasher = stack, planner, password_hasher
         self.setup = setup
+        self.teaching = teaching
 
     def saved_plan(self):
         from boto3.dynamodb.types import TypeDeserializer
@@ -119,6 +120,8 @@ class InitialWorker:
                 raise EnrollmentDenied('Wrong student AWS account')
             if operation == 'observe':
                 initial = self.setup.current() if self.setup is not None else self.stack.current()
+                if self.teaching is not None and initial['stage']=='TEACHING_ASSETS_PENDING':
+                    initial=self.teaching.current()
                 saved = self.saved_plan()
                 if saved and initial['stage'] == 'NOT_REQUESTED':
                     initial = {'stage': 'PLAN_READY' if self.plan_current(saved) else 'PLAN_EXPIRED', **self.view_plan(saved)}
@@ -134,6 +137,8 @@ class InitialWorker:
                 if self.setup is None:
                     raise EnrollmentDenied('Setup adapter unavailable')
                 self.stack.checked_files()
+                if self.teaching is not None and self.setup.current()['stage']=='TEACHING_ASSETS_PENDING':
+                    return {'status':'ok','initial':self.teaching.advance()}
                 return {'status':'ok','initial':self.setup.advance()}
             if operation == 'plan':
                 return self.plan()
@@ -202,6 +207,9 @@ def handler(event, context):
             session.client('ssm',config=Config(connect_timeout=3,read_timeout=5,retries={'total_max_attempts':1})),
             session.client('ec2-instance-connect',config=Config(connect_timeout=3,read_timeout=5,retries={'total_max_attempts':1})),
             remaining=context.get_remaining_time_in_millis)
+        from initial_teaching import InitialTeaching
+        worker.teaching=InitialTeaching(worker.setup,Path(__file__).resolve().parent,os.environ,
+            session.client('lambda',config=Config(connect_timeout=3,read_timeout=30,retries={'total_max_attempts':1})))
         return worker.serve(event)
     except Exception:
         return {'status': 'unavailable'}

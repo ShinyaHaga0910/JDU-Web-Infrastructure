@@ -335,6 +335,8 @@ class PortalPreparation:
         self.live(row)
         if self.initial is None or row.get('bound_subject')!=person or row['stage']!='CREATE_REQUESTED':
             raise EnrollmentDenied('Own confirmed setup request required')
+        if row.get('registration') and row.get('registration_complete') is not True:
+            raise EnrollmentDenied('Complete own grading registration first')
         initial=self.initial(row['grant'],'advance')
         return {**self.view(row),'initial':initial,'resources_created':initial.get('resources_created',False)}
 

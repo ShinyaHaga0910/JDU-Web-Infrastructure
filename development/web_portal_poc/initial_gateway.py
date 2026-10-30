@@ -8,7 +8,7 @@ INITIAL_FIELDS = {'stage', 'stack_id', 'stack_status', 'stack_created', 'resourc
     'plan_digest', 'planned_at', 'account', 'lab_id', 'deployment_id', 'resource_budget', 'root_gib',
     'new_nodes', 'availability_zone', 'instance_types', 'compute_hourly_usd',
     'price_includes_disks_ipv4_endpoints', 'initial_state','setup_phase','setup_result','can_advance',
-    'available_after','ssh_completed_roles','foundation_ready'}
+    'available_after','ssh_completed_roles','foundation_ready','teaching_completed_roles','connectors_ready'}
 
 
 class InitialGateway:

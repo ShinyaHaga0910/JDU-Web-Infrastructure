@@ -149,3 +149,35 @@ test('busy and invalid setup states cannot display a new mutation button or a re
   for(const change of [{setup_phase:'arbitrary'},{lab_ready:true},{ssh_completed_roles:5},{can_advance:'yes'},{available_after:-1}])
     assert.throws(()=>checkedPreparation({...value,initial:{...value.initial,...change}}));
 });
+
+test('lesson preparation uses an explicit advance and ready links never run checks automatically',async()=>{
+  let value={...approved,stage:'CREATE_REQUESTED',registration_complete:true,initial:{stage:'TEACHING_ASSETS_PENDING',
+    setup_phase:'teaching_assets_pending',can_advance:true,lab_ready:false,ssh_completed_roles:4,teaching_completed_roles:1}};
+  const calls=[];
+  const app=createApp({env,verify,sessions,enroll:async e=>{
+    calls.push(e);
+    if(e.operation==='prepare_advance')value={...value,initial:{stage:'INITIAL_READY',setup_phase:'initial_ready',
+      can_advance:false,teaching_completed_roles:2,connectors_ready:true,lab_ready:true}};
+    return {status:'ok',preparation:value};
+  }});
+  let html=await (await app(request('/prepare',{headers:{cookie}}))).text();
+  assert.match(html,/教材配置済みサーバー: 1 \/ 2/);assert.match(html,/name="operation" value="advance"/);
+  assert.deepEqual(calls.map(e=>e.operation),['prepare_status']);
+  assert.equal((await app(request('/prepare',post('advance')))).status,303);
+  for(const lang of ['ja','ru','uz']){
+    html=await (await app(request(`/prepare?lang=${lang}`,{headers:{cookie}}))).text();
+    for(const path of ['status','checks','grades'])assert.match(html,new RegExp(`href="/${path}\\?lang=${lang}"`));
+    assert.doesNotMatch(html,/name="operation" value="advance"|type="password"|undefined/);
+  }
+  assert.equal(calls.filter(e=>e.operation==='prepare_advance').length,1);
+  assert.equal(calls.filter(e=>!['prepare_status','prepare_advance'].includes(e.operation)).length,0);
+});
+
+test('initial readiness requires own registration, both lesson targets and connectors',()=>{
+  const initial={stage:'INITIAL_READY',setup_phase:'initial_ready',lab_ready:true,connectors_ready:true,teaching_completed_roles:2,can_advance:false};
+  const value={...approved,stage:'CREATE_REQUESTED',registration_complete:true,initial};
+  assert.equal(checkedPreparation(value),value);
+  for(const change of [{lab_ready:false},{connectors_ready:false},{teaching_completed_roles:1},{can_advance:true}])
+    assert.throws(()=>checkedPreparation({...value,initial:{...initial,...change}}));
+  assert.throws(()=>checkedPreparation({...value,registration_complete:false}));
+});

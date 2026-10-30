@@ -4,6 +4,7 @@ This is an operator-side builder, not a web route. It never deploys or signs a
 new release and never changes the old signed artifacts or existing five nodes.
 """
 import argparse
+import copy
 import hashlib
 import json
 from pathlib import Path
@@ -21,12 +22,14 @@ from portal_enrollment import grant_digest
 from browser_link_handler import portal_origin
 from build_browser_link_template import template as proof_template
 
-EXTENSIONS = ('initial_worker.py', 'initial_stack.py', 'initial_plan.py', 'initial_setup.py', 'initial_ssm.py', 'initial_registration_guest.py', 'portal_enrollment.py',
+EXTENSIONS = ('initial_worker.py', 'initial_stack.py', 'initial_plan.py', 'initial_setup.py', 'initial_ssm.py', 'initial_registration_guest.py',
+              'initial_context.py','initial_teaching.py','initial_lesson_guest.py','initial_status_handler.py','initial_checker_handler.py',
+              'student_status_handler.py','status.py','student_checker_handler.py','assessment_command_jobs.py','assessment_observation.py','portal_enrollment.py',
               'portal_preparation.py', 'identity_keys.py', 'identity_proof.py', 'student_proof.py', 'browser_link_handler.py')
 FINGERPRINT = '65EC6784750CCFA703BA7179519284E45155EC2A'
 
 
-def build_verified(destination, manifest_path, verified, assignment):
+def build_verified(destination, manifest_path, verified, assignment, course=None):
     """Internal builder; CLI below must first run real OpenPGP verification."""
     assignment = checked_assignment(assignment)
     data = Path(manifest_path).read_bytes()
@@ -42,6 +45,10 @@ def build_verified(destination, manifest_path, verified, assignment):
         raise ValueError('Signed controller with SDK collector contract required')
     if not any(isinstance(n,ast.FunctionDef) and n.name=='decrypt_oaep' for n in ast.parse(files['progress_enrollment_guest.py']).body):
         raise ValueError('Signed controller with portal registration delivery required')
+    from initial_assets_package import from_course
+    for name,raw in from_course(course,verified,assignment).items():
+        if name in files and files[name]!=raw:raise ValueError('Signed controller and assessment sources differ')
+        files[name]=raw
     for name in EXTENSIONS:
         if name in files:
             raise ValueError('Extension conflicts with signed controller')
@@ -97,6 +104,22 @@ def template(assignment, origin, teacher_account, code):
     resources['TeacherInitialInvoke'] = {'Type':'AWS::Lambda::Permission','Properties':{
         'Action':'lambda:InvokeFunction','FunctionName':{'Ref':'AccountLink'},
         'Principal':'arn:aws:iam::'+teacher_account+':role/LabRole'}}
+    resources['CheckResults']={'Type':'AWS::DynamoDB::Table','DeletionPolicy':'Retain','UpdateReplacePolicy':'Retain',
+        'Properties':{'TableName':'jdu-web-check-'+assignment['lab_id']+'-results','BillingMode':'PAY_PER_REQUEST',
+            'SSESpecification':{'SSEEnabled':True},
+            'AttributeDefinitions':[{'AttributeName':v,'AttributeType':'S'} for v in ('pk','sk')],
+            'KeySchema':[{'AttributeName':'pk','KeyType':'HASH'},{'AttributeName':'sk','KeyType':'RANGE'}]}}
+    for label,kind,handler,timeout in [('StudentStatus','status','initial_status_handler.handler',25),
+                                      ('StudentChecker','check','initial_checker_handler.handler',120)]:
+        props=copy.deepcopy(function)
+        props.update(FunctionName='jdu-web-'+kind+'-'+assignment['lab_id'],Handler=handler,Timeout=timeout)
+        if kind=='check':props['Environment']['Variables']['INITIAL_CHECK_TABLE']={'Ref':'CheckResults'}
+        resources[label]={'Type':'AWS::Lambda::Function','Properties':props}
+        resources[label+'Logs']={'Type':'AWS::Logs::LogGroup','Properties':{
+            'LogGroupName':{'Fn::Sub':'/aws/lambda/${'+label+'}'},'RetentionInDays':3}}
+        resources[label+'Invoke']={'Type':'AWS::Lambda::Permission','Properties':{
+            'Action':'lambda:InvokeFunction','FunctionName':{'Ref':label},
+            'Principal':'arn:aws:iam::'+teacher_account+':role/LabRole'}}
     # Deleting/maintaining this helper never deletes or recreates the five-node
     # stack: browser_link_handler handles Update/Delete without resource calls.
     return result
@@ -107,10 +130,15 @@ def main():
     for name in ('manifest','signature','public-key','artifact-root','assignment-file','output'):
         parser.add_argument('--'+name, type=Path, required=True)
     parser.add_argument('--fingerprint', required=True, choices=[FINGERPRINT])
+    parser.add_argument('--course-root',type=Path,required=True)
     args = parser.parse_args()
     verified = verify_release(args.manifest,args.signature,args.public_key,args.fingerprint,args.artifact_root,include_bundle=False)
     assignment = json.loads(args.assignment_file.read_bytes())
-    print(build_verified(args.output,args.manifest,verified,assignment))
+    import importlib.util
+    spec=importlib.util.spec_from_file_location('initial_trusted_course_tools',BOOTSTRAP.parent/'web_lab_release/release_tools.py')
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    course=module.verify(args.course_root,args.fingerprint)
+    print(build_verified(args.output,args.manifest,verified,assignment,course))
 
 
 if __name__=='__main__': main()

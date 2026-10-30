@@ -40,7 +40,7 @@ class BoundedSsm:
 class JournaledSsm(BoundedSsm):
     def __init__(self,stack,client,phase,remaining=lambda:90000):
         super().__init__(client,remaining)
-        if not re.fullmatch(r'(ssh-init|ssh-(enroll|verify)-(web|dns|db|repo)|progress-(recipient|register))',phase):
+        if not re.fullmatch(r'(ssh-init|ssh-(enroll|verify)-(web|dns|db|repo)|progress-(recipient|register)|teaching-(web|db))',phase):
             raise EnrollmentDenied('Unknown setup phase')
         if (client.meta.config.retries or {}).get('total_max_attempts')!=1:
             raise EnrollmentDenied('Run Command retries must be disabled')

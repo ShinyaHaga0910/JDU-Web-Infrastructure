@@ -68,7 +68,7 @@ export function checkedPreparation(v) {
   if (v.initial!==undefined) {
     const i=v.initial;
     if (!i || !['NOT_REQUESTED','PLAN_READY','PLAN_EXPIRED','CREATE_REQUESTED','CREATE_OBSERVATION_REQUIRED','STACK_OBSERVED','RESOURCE_BUDGET',
-      'SETUP_REQUIRED','SETUP_PENDING','SETUP_OBSERVATION_REQUIRED','REGISTRATION_PENDING','TEACHING_ASSETS_PENDING'].includes(i.stage)) throw Error('Invalid initial state');
+      'SETUP_REQUIRED','SETUP_PENDING','SETUP_OBSERVATION_REQUIRED','REGISTRATION_PENDING','TEACHING_ASSETS_PENDING','INITIAL_READY'].includes(i.stage)) throw Error('Invalid initial state');
     if (['PLAN_READY','PLAN_EXPIRED'].includes(i.stage) && (!hex(i.plan_digest) || i.account!==v.account || i.lab_id!==v.lab_id || i.deployment_id!==v.deployment_id
         || i.root_gib!==96 || i.new_nodes!==5 || !/^us-east-1[a-z]$/.test(i.availability_zone||'')
         || !i.instance_types || Object.keys(i.instance_types).sort().join(',')!=='Bastion,Db,Dns,Package,Web'
@@ -76,6 +76,8 @@ export function checkedPreparation(v) {
         || typeof i.compute_hourly_usd!=='string' || !/^\d+(?:\.\d+)?$/.test(i.compute_hourly_usd)
         || !(Number(i.compute_hourly_usd)>0) || !Number.isFinite(Number(i.compute_hourly_usd)))) throw Error('Invalid initial plan');
     if (i.stack_status!==undefined && (typeof i.stack_status!=='string' || !/^[A-Z_]{1,64}$/.test(i.stack_status))) throw Error('Invalid stack state');
+    if (i.teaching_completed_roles!==undefined && (!Number.isSafeInteger(i.teaching_completed_roles) || i.teaching_completed_roles<0 || i.teaching_completed_roles>2)) throw Error('Invalid lesson state');
+    if (i.stage==='INITIAL_READY' && (v.registration_complete!==true || i.lab_ready!==true || i.connectors_ready!==true || i.teaching_completed_roles!==2 || i.can_advance!==false)) throw Error('Invalid readiness');
     if (['SETUP_REQUIRED','SETUP_PENDING','SETUP_OBSERVATION_REQUIRED','REGISTRATION_PENDING','TEACHING_ASSETS_PENDING'].includes(i.stage)) {
       if (!['check_foundation','close_prepare','close_plan_sent','close_apply_sent','ssh_discover','ssh_init','ssh_enroll','ssh_verify','registration_pending','teaching_assets_pending'].includes(i.setup_phase)
           || typeof i.can_advance!=='boolean'
@@ -124,13 +126,16 @@ export function preparationHtml(lang,v,{config,session,token,requestId,bootstrap
     content=`<h2>${escape(t.resources)}</h2><div class="table-wrap"><table><thead><tr><th scope="col">${escape(t.server)}</th><th scope="col">${escape(t.type)}</th></tr></thead><tbody>${rows}</tbody></table></div><dl><dt>${escape(t.disk)}</dt><dd>96 GiB</dd><dt>${escape(t.zone)}</dt><dd>${escape(initial.availability_zone)}</dd><dt>${escape(t.price)}</dt><dd>${escape(initial.compute_hourly_usd)}</dd></dl><p>${escape(t.otherCosts)}</p>`;
     const fields=`<input type="hidden" name="plan_digest" value="${initial.plan_digest}"><fieldset><legend>RDP</legend><p id="rdp-password-note">${escape(t.passwordNote)}</p><label for="rdp-password">${escape(t.password)}</label><input id="rdp-password" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" required aria-describedby="rdp-password-note"><label for="rdp-confirmation">${escape(t.confirmation)}</label><input id="rdp-confirmation" name="confirmation" type="password" autocomplete="new-password" minlength="12" maxlength="128" required></fieldset>`;
     content+=form('create',fields);
+  } else if(initial?.stage==='INITIAL_READY') {
+    const rt=readyText[lang];
+    content=`<h2>${escape(rt.title)}</h2><p role="status">${escape(rt.note)}</p><p><a href="/status?lang=${lang}">${escape(rt.status)}</a></p><p><a href="/checks?lang=${lang}">${escape(rt.checks)}</a></p><p><a href="/grades?lang=${lang}">${escape(rt.grades)}</a></p>`;
   } else if (initial?.setup_phase) {
     const st=setupText[lang];
     content=`<h2>${escape(st.title)}</h2><p role="status">${escape(st.phases[initial.setup_phase]||registrationText[lang].assetsStage)}</p>`;
     if (initial.ssh_completed_roles!==undefined)content+=`<p>${escape(st.peers)}: ${initial.ssh_completed_roles} / 4</p>`;
     if (initial.stage==='SETUP_OBSERVATION_REQUIRED')content+=`<p role="alert">${escape(st.observation)}</p>`;
     else if (['REGISTRATION_PENDING','TEACHING_ASSETS_PENDING'].includes(initial.stage))content+=v.registration_complete===true
-      ?`<p role="status">${escape(registrationText[lang].assetsPending)}</p>`
+      ?`<p role="status">${escape(registrationText[lang].assetsPending)}</p>${initial.teaching_completed_roles!==undefined?`<p>${escape(readyText[lang].placed)}: ${initial.teaching_completed_roles} / 2</p>`:''}${initial.can_advance?form('advance'):''}`
       :`<p role="status">${escape(st.registration)}</p><p>${escape(registrationText[lang].note)}</p>${form('register')}`;
     else if (initial.can_advance)content+=`${initial.setup_result==='unavailable'?`<p role="alert">${escape(t.unavailable)}</p>`:''}<p>${escape(st.continueNote)}</p>${form('advance')}`;
     else content+=`<p role="alert">${escape(t.unavailable)}</p>`;
@@ -144,6 +149,12 @@ const registrationText={
   ja:{button:'自分の環境を採点に登録する',note:'この環境専用の採点用認証を作り、暗号化して自分の踏み台へ設定します。入力やコピーは不要です。',assetsStage:'教材資源の準備待ち',assetsPending:'採点登録が完了しました。教材資源と課題確認の接続は準備中です。'},
   ru:{button:'Зарегистрировать свою среду для оценивания',note:'Учётные данные только для этой среды будут созданы и переданы в зашифрованном виде на ваш bastion. Вводить или копировать их не нужно.',assetsStage:'Ожидается подготовка учебных материалов',assetsPending:'Регистрация для оценивания завершена. Учебные материалы и подключение проверки заданий ещё подготавливаются.'},
   uz:{button:'O‘z muhitimni baholash uchun ro‘yxatdan o‘tkazish',note:'Faqat shu muhit uchun baholash credentiali yaratiladi va shifrlangan holda o‘z bastioningizga o‘rnatiladi. Uni kiritish yoki nusxalash shart emas.',assetsStage:'O‘quv resurslarini tayyorlash kutilmoqda',assetsPending:'Baholash uchun ro‘yxatdan o‘tish tugadi. O‘quv resurslari va vazifalarni tekshirish ulanishi hali tayyorlanmoqda.'},
+};
+
+const readyText={
+  ja:{title:'演習基盤の準備が完了しました',note:'教材の手順に沿ってサーバー内の設定を進めてください。設定後は「課題の確認」から結果を確認・提出できます。',status:'5台の状態を見る',checks:'課題の確認へ',grades:'保存した成績を見る',placed:'教材配置済みサーバー'},
+  ru:{title:'Основа учебной среды готова',note:'Настройте серверы по учебным инструкциям. После настройки проверьте и отправьте результат через проверку заданий.',status:'Состояние пяти серверов',checks:'К проверке заданий',grades:'Сохранённые результаты',placed:'Серверы с учебными материалами'},
+  uz:{title:'Amaliyot muhiti asosi tayyor',note:'O‘quv qo‘llanmasi bo‘yicha server ichidagi sozlamalarni bajaring. So‘ng vazifani tekshirish orqali natijani ko‘ring va yuboring.',status:'Besh server holatini ko‘rish',checks:'Vazifani tekshirishga o‘tish',grades:'Saqlangan natijalarni ko‘rish',placed:'O‘quv materiallari joylangan serverlar'},
 };
 
 const setupText={

@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-30T08:23:52.506220+00:00",
+  "scope": "r1_initial_public_lessons_and_connectors_candidate",
+  "r1_complete": false,
+  "deployed": false,
+  "implementation": [
+    "verified_core_and_signed_course_match_required",
+    "fixed_62_point_sources_unchanged",
+    "public_assets_only_web_and_db_no_service_solutions",
+    "journaled_same_ssm_command_and_fixed_targets",
+    "runtime_context_from_original_five_and_registration_receipt",
+    "original_status_observer_and_student_checker_reused",
+    "ready_after_two_staging_receipts_and_status_checker_configuration_probes"
+  ],
+  "local_checks": {
+    "python_related": {
+      "passed": 97,
+      "skipped": 0,
+      "includes": "test_initial_teaching"
+    },
+    "node": {
+      "passed": 73,
+      "skipped": 0
+    },
+    "web_package": {
+      "passed": 3,
+      "skipped": 0,
+      "command": "python -B -m unittest -q test_web_package"
+    },
+    "native_linux_filesystem": {
+      "passed": 4,
+      "skipped": 0,
+      "environment": "WSL Ubuntu root",
+      "command": "python3 -B development/web_portal_poc/test_initial_lesson_guest_linux.py -q",
+      "scope": "actual root-owned temporary filesystem; no EC2, package install, services or AWS"
+    }
+  },
+  "fixture_scope": {
+    "aws": "Moto and fake EC2/CFN/SSM/STS/Lambda replies",
+    "signed_release": "accepted old assessment archive bytes inside synthetic new envelope; not a newly signed release",
+    "checker_probe": "configuration health only, not an executed assignment",
+    "browser_ready_preview_performed": false
+  },
+  "helper_template": {
+    "candidate_resources": 12,
+    "functions": 3,
+    "tables": 2,
+    "logs": 3,
+    "custom_resources": 1,
+    "teacher_invoke_permissions": 3,
+    "new_iam_roles": 0,
+    "ec2_resources": 0,
+    "public_urls": 0,
+    "aws_syntax_validation_current_candidate": false
+  },
+  "limits": [
+    "valid new signed release and immutable artifact publication required",
+    "Web and private template flags/timeouts still require reviewed updates",
+    "actual initial create and registration and staging and checker acceptance pending",
+    "same-account retained coexistence or reviewed reuse under investigation; nine-instance guard is not proof of actual quota",
+    "independent student school identity unavailable; R6 incomplete",
+    "existing environment deletion and guard changes not authorized"
+  ],
+  "aws_changes": {
+    "new_resources": false,
+    "new_access_grants": false,
+    "credential_issuance": false,
+    "grade_writes": false,
+    "instance_lifecycle_operations": false,
+    "old_signed_archives_changed": false
+  }
+}

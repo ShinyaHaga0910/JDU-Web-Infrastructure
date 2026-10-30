@@ -1,5 +1,13 @@
 # 移管ソースの検証
 
+## R1の公開教材・状態/課題確認接続候補（2026-10-30、AWS未適用）
+
+`web_portal_poc`で`python -B -m unittest -q test_initial_ssm test_initial_setup test_initial_stack test_initial_worker test_initial_package test_initial_registration test_initial_registration_guest test_initial_delivery test_initial_teaching test_portal_preparation test_browser_link test_portal_enrollment_handler test_portal_enrollment`の97件、`web`のNode73件とWeb package3件が合格。Moto/模擬AWSと署名済み旧assessment bytesを利用した架空の新course envelopeで、公開資源2台の配置、同じcommandの回収、元5台だけのcontext、status応答とchecker設定health、未準備/異なる宛先の拒否を確認した。実Google/新署名の発行/実AWS/実課題の実行ではない。
+
+WSL Ubuntuで`sudo python3 -B development/web_portal_poc/test_initial_lesson_guest_linux.py -q`の4件も合格。root専用の一時directory内で実際の所有権/mode/symlink/途中配置再開を検査し、終了時に削除する。EC2や実サービスを使わない。Windowsで新規生成したapp gzipは既存署名archiveとhashが一致せず、内部manifestは一致、gzip OS値10を観測した。全byte差分の原因は断定せず、試験には既存署名archiveの不変bytesを用いた。署名版や固定registryは変更していない。
+
+全件skipなし。新ready画面のChrome確認・現在の12資源helperのAWS構文検査/配備は未実施。[検査記録](web_portal_poc/verification/2026-10-30-initial-teaching.public.json)。
+
 ## R1の個別採点登録候補（2026-10-30、AWS未適用）
 
 `web_portal_poc`で`python -B -m unittest -q test_initial_ssm test_initial_setup test_initial_stack test_initial_worker test_initial_package test_initial_registration test_initial_registration_guest test_initial_delivery test_portal_preparation test_browser_link test_portal_enrollment_handler test_portal_enrollment`の90件が合格、skipなし。新13件はMotoの発行/META/本人binding transaction、模擬SSMと元command compiler、Node→OpenSSLの実RSA-OAEP受渡し・改変拒否・旧CMS/GCM継続とCBC拒否を含む。test_initial_deliveryはOpenSSLが必要で、Windowsは既存Git同梱版、LinuxはPATH上の版を使う。Windowsのsafe-path fixtureは実Linux所有権の証拠にしない。

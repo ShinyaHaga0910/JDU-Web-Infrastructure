@@ -28,6 +28,9 @@ class InitialSetupTest(unittest.TestCase):
             compatibility.start();self.addCleanup(compatibility.stop)
         self.f=fixtures.InitialStackTest('test_double_click_and_status_only_observe_same_stack')
         self.f.setUp();self.addCleanup(self.f.doCleanups)
+        self.initialize_created()
+
+    def initialize_created(self):
         f=self.f
         f.worker.create(f.plan,f.password_hash)
         f.actual['StackStatus']='CREATE_COMPLETE'
