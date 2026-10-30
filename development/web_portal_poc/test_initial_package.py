@@ -61,7 +61,7 @@ class InitialPackageTest(unittest.TestCase):
         self.assertEqual(verified['files']['template'].read_bytes(),self.f.path.read_bytes())
         # The imported helpers need Linux fcntl, not an actual filesystem lock
         # in this import-only Windows check. No crypt/AWS call is made.
-        code="import sys,types;sys.modules['fcntl']=types.SimpleNamespace();import initial_worker,initial_stack,initial_setup,initial_ssm,student_controller,web_lab;print('INITIAL_PACKAGE_IMPORT_OK')"
+        code="import sys,types;sys.modules['fcntl']=types.SimpleNamespace();import initial_worker,initial_stack,initial_setup,initial_ssm,initial_registration_guest,student_controller,web_lab;print('INITIAL_PACKAGE_IMPORT_OK')"
         result=subprocess.run([sys.executable,'-B','-c',code],cwd=package,capture_output=True,text=True,check=True)
         self.assertEqual(result.stdout.strip(),'INITIAL_PACKAGE_IMPORT_OK')
 

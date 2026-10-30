@@ -11,7 +11,7 @@
 
 [本人連携](../web_portal_poc/verification/2026-10-29-authenticated-student-portal.public.json)・[原本保存](../web_portal_poc/verification/2026-10-30-canonical-submission-accepted.public.json)・[教師画面](../web_portal_poc/verification/2026-10-30-teacher-progress-accepted.public.json)。元5台・暗号化root96GiB・認証・常設SSM・原本を保持。検証用1件の成功を一般学生への配布完了と数えない。
 
-R1の[画面・実行workerと作成後処理](../web_portal_poc/INITIAL-PREPARATION.md)を接続し、初期状態確認・S3閉鎖・内部SSHの模擬検査と架空Chrome表示まで完了。新署名配布/実配備/採点登録と教材資源配置は未完で、AWSには未適用。初期自動準備は基盤のみとし、学生自身が各サーバーに入り、導入・設定変更・反映を行う演習を代行しない。
+R1の[画面・worker・作成後処理・採点登録](../web_portal_poc/INITIAL-PREPARATION.md)を接続。基盤検査/S3閉鎖/内部SSH/暗号化した個別登録/本人閲覧bindingまで候補実装し、模擬AWSとローカル実暗号化・架空Chromeで検査した。新署名配布/実配備/教材資源配置とstatus/checker接続は未完、AWS未適用。初期自動準備は基盤のみで、学生自身が各サーバーで行う導入・設定変更・反映を代行しない。
 
 ## 残り6項目
 

@@ -97,6 +97,28 @@ def decrypt(root, ciphertext):
     return json.loads(result.stdout)
 
 
+def decrypt_oaep(root, ciphertext, c):
+    """Portal delivery of one compact, context-bound token (not a CMS change)."""
+    safe(root / 'recipient.key', 0o600)
+    safe(root / 'recipient.crt', 0o600)
+    if len(ciphertext) != 384:
+        raise ValueError('RSA3072 envelope required')
+    result = subprocess.run(['openssl', 'pkeyutl', '-decrypt', '-inkey', str(root / 'recipient.key'),
+        '-pkeyopt', 'rsa_padding_mode:oaep', '-pkeyopt', 'rsa_oaep_md:sha256',
+        '-pkeyopt', 'rsa_mgf1_md:sha256'], input=ciphertext, capture_output=True)
+    if result.returncode != 0 or len(result.stdout) > 318:
+        raise ValueError('Envelope authentication failed')
+    value = json.loads(result.stdout)
+    if (type(value) is not list or len(value) != 6 or value[0] != 'jdu-progress-oaep-v1'
+            or value[1:5] != [c[k] for k in ('lab_id','release_id','deployment_id','instance_id')]
+            or not isinstance(value[5],str) or not re.fullmatch(r'[A-Za-z0-9_-]{43}',value[5])):
+        raise ValueError('Envelope belongs to another deployment or purpose')
+    return dict(schema_version=1, purpose='progress_registration',
+        **{k:c[k] for k in ('lab_id','release_id','deployment_id','instance_id')}, credentials={
+            'schema_version':1,'api_base_url':c['grading_api_url'],'fixed_ingress_ipv4':c['grading_ipv4'],
+            'lab_id':c['lab_id'],'release_id':c['release_id'],'lab_token':value[5]})
+
+
 def validate_envelope(value, c, probe=False):
     fields = {'schema_version', 'purpose', 'lab_id', 'release_id', 'deployment_id', 'instance_id',
               'probe' if probe else 'credentials'}
@@ -150,8 +172,15 @@ def run(request):
                 'transport_private_key_present': (root / 'recipient.key').exists()}
     if command == 'recipient':
         return recipient(root, c['deployment_id'])
-    if command in ('probe', 'register'):
-        value = decrypt(root, base64.b64decode(request['ciphertext_b64'], validate=True))
+    if command in ('probe', 'register', 'register_oaep'):
+        ciphertext = base64.b64decode(request['ciphertext_b64'], validate=True)
+        if command == 'register_oaep':
+            safe(root / 'recipient.crt', 0o600)
+            if hashlib.sha256((root / 'recipient.crt').read_bytes()).hexdigest() != request['certificate_sha256']:
+                raise ValueError('Recipient certificate differs')
+            value = decrypt_oaep(root, ciphertext, c)
+        else:
+            value = decrypt(root, ciphertext)
         validated = validate_envelope(value, c, probe=command == 'probe')
         if command == 'probe':
             return {'transport_probe': validated, 'plaintext_credential_written': False}
@@ -170,11 +199,14 @@ def run(request):
     receipt = client.register(config, c)
     write_once(Path('/var/lib/jdu-web/bootstrap/progress-registration.json'),
                (json.dumps(receipt, sort_keys=True) + '\n').encode())
-    if command in ('register', 'complete'):
+    if command in ('register', 'register_oaep', 'complete'):
         safe(root / 'recipient.key', 0o600)
         (root / 'recipient.key').unlink()  # Retire only this tool's one-use transport key.
-    return dict(receipt, private_credential_exported=False, instance_count=len(c['instances']),
-                transport_private_key_retired=not (root / 'recipient.key').exists())
+    answer = dict(receipt, private_credential_exported=False, instance_count=len(c['instances']),
+                  transport_private_key_retired=not (root / 'recipient.key').exists())
+    if command == 'register_oaep':
+        answer['token_hash'] = hashlib.sha256(config['lab_token'].encode('ascii')).hexdigest()
+    return answer
 
 
 if __name__ == '__main__':

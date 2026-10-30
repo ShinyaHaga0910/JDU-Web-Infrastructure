@@ -21,7 +21,7 @@ from portal_enrollment import grant_digest
 from browser_link_handler import portal_origin
 from build_browser_link_template import template as proof_template
 
-EXTENSIONS = ('initial_worker.py', 'initial_stack.py', 'initial_plan.py', 'initial_setup.py', 'initial_ssm.py', 'portal_enrollment.py',
+EXTENSIONS = ('initial_worker.py', 'initial_stack.py', 'initial_plan.py', 'initial_setup.py', 'initial_ssm.py', 'initial_registration_guest.py', 'portal_enrollment.py',
               'portal_preparation.py', 'identity_keys.py', 'identity_proof.py', 'student_proof.py', 'browser_link_handler.py')
 FINGERPRINT = '65EC6784750CCFA703BA7179519284E45155EC2A'
 
@@ -40,6 +40,8 @@ def build_verified(destination, manifest_path, verified, assignment):
     collector=next(n for n in ast.parse(files['inspect_teacher_probe.py']).body if isinstance(n,ast.FunctionDef) and n.name=='collect')
     if 'clients' not in {v.arg for v in collector.args.kwonlyargs}:
         raise ValueError('Signed controller with SDK collector contract required')
+    if not any(isinstance(n,ast.FunctionDef) and n.name=='decrypt_oaep' for n in ast.parse(files['progress_enrollment_guest.py']).body):
+        raise ValueError('Signed controller with portal registration delivery required')
     for name in EXTENSIONS:
         if name in files:
             raise ValueError('Extension conflicts with signed controller')

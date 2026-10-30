@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "checked_at": "2026-10-30T07:30:35Z",
+  "scope": "r1_initial_grading_registration_candidate",
+  "r1_complete": false,
+  "deployed": false,
+  "implementation": [
+    "same_origin_session_bound_explicit_registration_post",
+    "server_only_rsa3072_oaep_sha256_context_bound_token_delivery",
+    "old_authenticated_cms_route_preserved",
+    "fixed_bastion_recipient_and_register_ssm_command_journals",
+    "hash_ciphertext_and_new_grade_meta_atomic_issuance",
+    "same_delivery_recovery_after_unknown_reply",
+    "original_reader_schema_for_verified_school_and_aws_identity",
+    "atomic_reader_binding_after_guest_registration_ack",
+    "teaching_assets_pending_never_claims_lab_ready"
+  ],
+  "local_checks": {
+    "python_related": {
+      "passed": 90,
+      "skipped": 0,
+      "command": "python -B -m unittest -q test_initial_ssm test_initial_setup test_initial_stack test_initial_worker test_initial_package test_initial_registration test_initial_registration_guest test_initial_delivery test_portal_preparation test_browser_link test_portal_enrollment_handler test_portal_enrollment",
+      "scope": "Moto transactions, actual legacy command compiler and node identity validator; fake EC2/CFN/SSM/EIC/STS; real local Node/OpenSSL encryption and decryption with temporary synthetic keys"
+    },
+    "private_package_update_plan": {
+      "passed": 7,
+      "skipped": 0,
+      "command": "python -B -m unittest -q test_prepare_portal_services test_update_portal_services test_verify_portal_services"
+    },
+    "node": {"passed": 71, "skipped": 0, "command": "node --test"},
+    "web_package": {"passed": 3, "skipped": 0, "command": "python -B -m unittest -q test_web_package"}
+  },
+  "specific_assertions": [
+    "no_raw_token_returned_in_delivery_or_browser_fields",
+    "real_node_to_openssl_roundtrip_and_ciphertext_tampering_rejection",
+    "different_deployment_instance_lab_or_certificate_pin_rejected",
+    "expired_recipient_certificate_rejected",
+    "old_authenticated_cms_roundtrip_and_cbc_rejection",
+    "meta_and_retained_encrypted_delivery_created_atomically",
+    "session_revoked_at_issuance_rolls_back_meta_and_cipher",
+    "different_subject_or_existing_meta_cannot_issue",
+    "changed_release_at_final_transaction_rolls_back_all_bindings",
+    "wrong_guest_ack_does_not_authorize_reader",
+    "existing_reader_registration_schema_accepts_new_binding",
+    "no_invented_selected_score_in_new_meta",
+    "same_ssm_handles_and_saved_receipt_reused_after_registration",
+    "cached_receipt_serializes_after_real_dynamodb_decimal_roundtrip",
+    "original_unrelated_grade_meta_unchanged"
+  ],
+  "browser_preview": {
+    "browser": "Chrome",
+    "languages": ["ja", "ru", "uz"],
+    "real_google": false,
+    "real_aws_calls": false,
+    "new_credentials_issued": false,
+    "observed": ["registration_button_without_copy_or_input", "explicit_post_to_same_progress_get", "registered_but_assets_and_checker_still_pending"],
+    "temporary_tab_closed": true,
+    "temporary_server_stopped": true
+  },
+  "limits": [
+    "Windows safe-path checks patched only in local crypto tests; Linux ownership and actual bastion files unverified",
+    "guest enrollment acknowledgment and STS verification are mock responses",
+    "new status/checker deployment and public teaching resources remain unconnected",
+    "valid newly signed release and publication remain required",
+    "existing private and Web deployment timeouts still require reviewed template updates",
+    "real legacy grading registration needs teacher EC2 running",
+    "fresh account and independent student identity end-to-end acceptance remain required"
+  ],
+  "aws_changes": {"new_resources": false, "new_access_grants": false, "credential_issuance": false, "grade_writes": false, "instance_lifecycle_operations": false, "old_signed_archives_changed": false}
+}

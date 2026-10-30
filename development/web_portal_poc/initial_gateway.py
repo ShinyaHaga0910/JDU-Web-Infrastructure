@@ -17,8 +17,8 @@ class InitialGateway:
 
     def __call__(self, grant, operation, **fields):
         grant = checked_assignment(grant)
-        required = {'plan_digest', 'password', 'confirmation'} if operation == 'create' else set()
-        if operation not in ('plan', 'observe', 'create','advance') or set(fields) != required:
+        required = {'plan_digest', 'password', 'confirmation'} if operation == 'create' else {'delivery'} if operation=='register' else set()
+        if operation not in ('plan', 'observe', 'create','advance','recipient','register') or set(fields) != required:
             raise EnrollmentDenied('Invalid initial operation')
         arn = f'arn:aws:lambda:us-east-1:{grant["account"]}:function:jdu-web-initial-{grant["lab_id"]}'
         result = self.client.invoke(FunctionName=arn, InvocationType='RequestResponse', Payload=json.dumps({
@@ -32,6 +32,14 @@ class InitialGateway:
         if result.get('StatusCode') != 200 or result.get('FunctionError') or len(data) > 16384:
             raise RuntimeError('Initial worker unavailable')
         value = json.loads(data)
+        if operation in ('recipient','register'):
+            registration=value.get('registration')
+            if value.get('status')!='ok' or type(registration) is not dict:
+                raise RuntimeError('Registration worker unavailable')
+            allowed={'account','lab_id','deployment_id','release_id','instance_id','instances','certificate_pem','certificate_sha256'} if operation=='recipient' else {
+                'lab_id','release_id','deployment_id','registered','instance_count','private_credential_exported',
+                'transport_private_key_retired','token_hash'}
+            return {k:v for k,v in registration.items() if k in allowed}
         if value.get('status') == 'resource_budget':
             budget = value.get('resource_budget')
             allowed = {'existing_nonterminated', 'new_nodes', 'pilot_ceiling', 'projected', 'within_pilot_budget'}

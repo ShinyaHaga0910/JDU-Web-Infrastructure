@@ -51,7 +51,7 @@ export const preparationText={
 };
 
 export function preparationToken(config,session,token,{operation,requestId,deploymentId,planDigest=''}) {
-  if (!['begin','plan','create','advance'].includes(operation) || !hex(session) || !hex(requestId) || !uuid(deploymentId)
+  if (!['begin','plan','create','advance','register'].includes(operation) || !hex(session) || !hex(requestId) || !uuid(deploymentId)
       || (operation==='create' && !hex(planDigest))) throw Error('Invalid preparation form');
   return createHmac('sha256',config.secret).update(JSON.stringify(['jdu-portal/prepare/v1',config.origin,
     session,tokenHash(token),operation,requestId,deploymentId,planDigest])).digest('hex');
@@ -68,7 +68,7 @@ export function checkedPreparation(v) {
   if (v.initial!==undefined) {
     const i=v.initial;
     if (!i || !['NOT_REQUESTED','PLAN_READY','PLAN_EXPIRED','CREATE_REQUESTED','CREATE_OBSERVATION_REQUIRED','STACK_OBSERVED','RESOURCE_BUDGET',
-      'SETUP_REQUIRED','SETUP_PENDING','SETUP_OBSERVATION_REQUIRED','REGISTRATION_PENDING'].includes(i.stage)) throw Error('Invalid initial state');
+      'SETUP_REQUIRED','SETUP_PENDING','SETUP_OBSERVATION_REQUIRED','REGISTRATION_PENDING','TEACHING_ASSETS_PENDING'].includes(i.stage)) throw Error('Invalid initial state');
     if (['PLAN_READY','PLAN_EXPIRED'].includes(i.stage) && (!hex(i.plan_digest) || i.account!==v.account || i.lab_id!==v.lab_id || i.deployment_id!==v.deployment_id
         || i.root_gib!==96 || i.new_nodes!==5 || !/^us-east-1[a-z]$/.test(i.availability_zone||'')
         || !i.instance_types || Object.keys(i.instance_types).sort().join(',')!=='Bastion,Db,Dns,Package,Web'
@@ -76,8 +76,8 @@ export function checkedPreparation(v) {
         || typeof i.compute_hourly_usd!=='string' || !/^\d+(?:\.\d+)?$/.test(i.compute_hourly_usd)
         || !(Number(i.compute_hourly_usd)>0) || !Number.isFinite(Number(i.compute_hourly_usd)))) throw Error('Invalid initial plan');
     if (i.stack_status!==undefined && (typeof i.stack_status!=='string' || !/^[A-Z_]{1,64}$/.test(i.stack_status))) throw Error('Invalid stack state');
-    if (['SETUP_REQUIRED','SETUP_PENDING','SETUP_OBSERVATION_REQUIRED','REGISTRATION_PENDING'].includes(i.stage)) {
-      if (!['check_foundation','close_prepare','close_plan_sent','close_apply_sent','ssh_discover','ssh_init','ssh_enroll','ssh_verify','registration_pending'].includes(i.setup_phase)
+    if (['SETUP_REQUIRED','SETUP_PENDING','SETUP_OBSERVATION_REQUIRED','REGISTRATION_PENDING','TEACHING_ASSETS_PENDING'].includes(i.stage)) {
+      if (!['check_foundation','close_prepare','close_plan_sent','close_apply_sent','ssh_discover','ssh_init','ssh_enroll','ssh_verify','registration_pending','teaching_assets_pending'].includes(i.setup_phase)
           || typeof i.can_advance!=='boolean'
           || (i.available_after!==undefined && (!Number.isSafeInteger(i.available_after) || i.available_after<0))
           || (i.ssh_completed_roles!==undefined && (!Number.isSafeInteger(i.ssh_completed_roles) || i.ssh_completed_roles<0 || i.ssh_completed_roles>4))
@@ -105,8 +105,8 @@ export function preparationHtml(lang,v,{config,session,token,requestId,bootstrap
   const form=(operation,body='')=>{
     const context={operation,requestId,deploymentId:v.deployment_id,planDigest:operation==='create'?initial.plan_digest:''};
     const csrf=preparationToken(config,session,token,context);
-    const confirm=operation==='advance'?'<input type="hidden" name="confirmed" value="yes">':`<label class="confirm"><input type="checkbox" name="confirmed" value="yes" required> ${escape(operation==='begin'?t.confirmAccount:operation==='plan'?t.confirmPlan:t.review)}</label>`;
-    return `<form action="/prepare?lang=${lang}" method="post"><input type="hidden" name="operation" value="${operation}"><input type="hidden" name="deployment_id" value="${v.deployment_id}"><input type="hidden" name="request_id" value="${requestId}"><input type="hidden" name="csrf" value="${csrf}">${body}${confirm}<button type="submit">${escape(operation==='advance'?setupText[lang].advance:t[operation])}</button></form>`;
+    const confirm=['advance','register'].includes(operation)?'<input type="hidden" name="confirmed" value="yes">':`<label class="confirm"><input type="checkbox" name="confirmed" value="yes" required> ${escape(operation==='begin'?t.confirmAccount:operation==='plan'?t.confirmPlan:t.review)}</label>`;
+    return `<form action="/prepare?lang=${lang}" method="post"><input type="hidden" name="operation" value="${operation}"><input type="hidden" name="deployment_id" value="${v.deployment_id}"><input type="hidden" name="request_id" value="${requestId}"><input type="hidden" name="csrf" value="${csrf}">${body}${confirm}<button type="submit">${escape(operation==='advance'?setupText[lang].advance:operation==='register'?registrationText[lang].button:t[operation])}</button></form>`;
   };
   const context=`<dl><dt>${escape(t.account)}</dt><dd>${escape(v.account)}</dd><dt>${escape(t.lab)}</dt><dd>${escape(v.lab_id)}</dd></dl>`;
   let content;
@@ -126,10 +126,12 @@ export function preparationHtml(lang,v,{config,session,token,requestId,bootstrap
     content+=form('create',fields);
   } else if (initial?.setup_phase) {
     const st=setupText[lang];
-    content=`<h2>${escape(st.title)}</h2><p role="status">${escape(st.phases[initial.setup_phase])}</p>`;
+    content=`<h2>${escape(st.title)}</h2><p role="status">${escape(st.phases[initial.setup_phase]||registrationText[lang].assetsStage)}</p>`;
     if (initial.ssh_completed_roles!==undefined)content+=`<p>${escape(st.peers)}: ${initial.ssh_completed_roles} / 4</p>`;
     if (initial.stage==='SETUP_OBSERVATION_REQUIRED')content+=`<p role="alert">${escape(st.observation)}</p>`;
-    else if (initial.stage==='REGISTRATION_PENDING')content+=`<p role="status">${escape(st.registration)}</p>`;
+    else if (['REGISTRATION_PENDING','TEACHING_ASSETS_PENDING'].includes(initial.stage))content+=v.registration_complete===true
+      ?`<p role="status">${escape(registrationText[lang].assetsPending)}</p>`
+      :`<p role="status">${escape(st.registration)}</p><p>${escape(registrationText[lang].note)}</p>${form('register')}`;
     else if (initial.can_advance)content+=`${initial.setup_result==='unavailable'?`<p role="alert">${escape(t.unavailable)}</p>`:''}<p>${escape(st.continueNote)}</p>${form('advance')}`;
     else content+=`<p role="alert">${escape(t.unavailable)}</p>`;
   } else content=`<p role="status">${escape(initial?.stage==='CREATE_OBSERVATION_REQUIRED'?t.observationUnknown:initial?t.building:t.queued)}</p>${initial?.stack_status?.endsWith('_FAILED')?`<p role="alert">${escape(t.unavailable)}</p>`:''}`;
@@ -137,6 +139,12 @@ export function preparationHtml(lang,v,{config,session,token,requestId,bootstrap
   const progress=`<ol>${t.steps.map((s,k)=>`<li${k===step?' aria-current="step"':''}>${escape(s)}</li>`).join('')}</ol>`;
   return `${progress}<section>${context}<p>${escape(t.scope)}</p>${content}</section><p><a class="action" href="/prepare?lang=${lang}">${escape(t.refresh)}</a></p><a href="/?lang=${lang}">${escape(t.home)}</a>`;
 }
+
+const registrationText={
+  ja:{button:'自分の環境を採点に登録する',note:'この環境専用の採点用認証を作り、暗号化して自分の踏み台へ設定します。入力やコピーは不要です。',assetsStage:'教材資源の準備待ち',assetsPending:'採点登録が完了しました。教材資源と課題確認の接続は準備中です。'},
+  ru:{button:'Зарегистрировать свою среду для оценивания',note:'Учётные данные только для этой среды будут созданы и переданы в зашифрованном виде на ваш bastion. Вводить или копировать их не нужно.',assetsStage:'Ожидается подготовка учебных материалов',assetsPending:'Регистрация для оценивания завершена. Учебные материалы и подключение проверки заданий ещё подготавливаются.'},
+  uz:{button:'O‘z muhitimni baholash uchun ro‘yxatdan o‘tkazish',note:'Faqat shu muhit uchun baholash credentiali yaratiladi va shifrlangan holda o‘z bastioningizga o‘rnatiladi. Uni kiritish yoki nusxalash shart emas.',assetsStage:'O‘quv resurslarini tayyorlash kutilmoqda',assetsPending:'Baholash uchun ro‘yxatdan o‘tish tugadi. O‘quv resurslari va vazifalarni tekshirish ulanishi hali tayyorlanmoqda.'},
+};
 
 const setupText={
   ja:{title:'作成後の基盤準備',advance:'基盤準備を続ける',peers:'内部SSHの確認済みサーバー',

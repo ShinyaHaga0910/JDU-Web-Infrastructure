@@ -111,7 +111,8 @@ class InitialWorker:
             return {'status': 'unauthorized'}
         operation = event.get('operation')
         fields = {'operation', 'grant_digest'} | ({'plan_digest', 'password', 'confirmation'} if operation == 'create' else set())
-        if operation not in ('plan', 'observe', 'create', 'advance') or set(event) != fields:
+        if operation=='register':fields.add('delivery')
+        if operation not in ('plan', 'observe', 'create', 'advance','recipient','register') or set(event) != fields:
             return {'status': 'unauthorized'}
         try:
             if self.stack.sts.get_caller_identity()['Account'] != self.stack.grant['account']:
@@ -122,6 +123,13 @@ class InitialWorker:
                 if saved and initial['stage'] == 'NOT_REQUESTED':
                     initial = {'stage': 'PLAN_READY' if self.plan_current(saved) else 'PLAN_EXPIRED', **self.view_plan(saved)}
                 return {'status': 'ok', 'initial': initial}
+            if operation in ('recipient','register'):
+                self.stack.checked_files()
+                if self.setup is None:raise EnrollmentDenied('Setup adapter unavailable')
+                from initial_registration_guest import InitialRegistrationGuest
+                registration=InitialRegistrationGuest(self.setup)
+                value=registration.recipient() if operation=='recipient' else registration.register(event['delivery'])
+                return {'status':'ok','registration':value}
             if operation == 'advance':
                 if self.setup is None:
                     raise EnrollmentDenied('Setup adapter unavailable')

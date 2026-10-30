@@ -7,7 +7,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 from build_grade_package import FILES as GRADE_FILES, HERE
 
 FILES = {**GRADE_FILES, **{name: HERE / name for name in
-    ('portal_enrollment.py', 'portal_enrollment_handler.py', 'portal_preparation.py', 'initial_gateway.py', 'identity_proof.py')}}
+    ('portal_enrollment.py', 'portal_enrollment_handler.py', 'portal_preparation.py', 'initial_gateway.py', 'initial_registration.py', 'identity_proof.py')}}
 
 
 def build(destination):

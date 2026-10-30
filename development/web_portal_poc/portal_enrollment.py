@@ -291,17 +291,7 @@ class PortalEnrollment:
         now = int(self.clock())
         if pair.get('used') is not False or approval.get('bound_subject') is not None:
             raise EnrollmentDenied('Registration conflict')
-        connector = f'arn:aws:lambda:us-east-1:{grant["account"]}:function:jdu-web-status-{grant["lab_id"]}'
-        context = {k: grant[k] for k in ('account', 'lab_id', 'deployment_id')}
-        context['connector'] = digest(connector)
-        records = [
-            {'pk': 'LAB#' + grant['lab_id'], 'sk': 'BINDING', **context},
-            {'pk': 'ACCOUNT#' + grant['account'], 'sk': 'BINDING', **context},
-            {'pk': 'CONNECTOR#' + context['connector'], 'sk': 'META', 'arn': connector,
-             'active': True, **{k: grant[k] for k in ('account', 'lab_id', 'deployment_id')}},
-            {'pk': pair['subject_pk'], 'sk': 'BINDING', **context, 'token_hash': grant['token_hash'],
-             'active': True, 'approval_pk': pair['approval_pk']},
-            {'pk': 'LAB#' + grant['lab_id'], 'sk': 'SUBJECT', 'subject_pk': pair['subject_pk']}]
+        records = self.binding_records(pair['subject_pk'], grant, pair['approval_pk'])
         approval_update = {'Update': {'TableName': self.table, 'Key': key(pair['approval_pk'], 'LAB'),
             'UpdateExpression': 'SET #bound=:subject',
             'ConditionExpression': '#active=:yes AND #deadline>:now AND #digest=:digest AND attribute_not_exists(#bound)',
@@ -333,3 +323,19 @@ class PortalEnrollment:
                 return {'registered': True, 'lab_id': grant['lab_id'], 'reused': True}
             raise EnrollmentDenied('Registration conflict or original context changed') from None
         return {'registered': True, 'lab_id': grant['lab_id'], 'reused': False}
+
+    @staticmethod
+    def binding_records(subject_pk, grant, approval_pk):
+        """Shared exact reader binding schema; caller must authorize atomically."""
+        grant=checked_grant(grant)
+        connector = f'arn:aws:lambda:us-east-1:{grant["account"]}:function:jdu-web-status-{grant["lab_id"]}'
+        context = {k: grant[k] for k in ('account', 'lab_id', 'deployment_id')}
+        context['connector'] = digest(connector)
+        return [
+            {'pk': 'LAB#' + grant['lab_id'], 'sk': 'BINDING', **context},
+            {'pk': 'ACCOUNT#' + grant['account'], 'sk': 'BINDING', **context},
+            {'pk': 'CONNECTOR#' + context['connector'], 'sk': 'META', 'arn': connector,
+             'active': True, **{k: grant[k] for k in ('account', 'lab_id', 'deployment_id')}},
+            {'pk': subject_pk, 'sk': 'BINDING', **context, 'token_hash': grant['token_hash'],
+             'active': True, 'approval_pk': approval_pk},
+            {'pk': 'LAB#' + grant['lab_id'], 'sk': 'SUBJECT', 'subject_pk': subject_pk}]

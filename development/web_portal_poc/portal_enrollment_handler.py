@@ -22,17 +22,22 @@ def valid(event):
     if isinstance(operation, str) and operation.startswith('prepare_'):
         # Explicit whitelist below still rejects approve/revoke/worker actions.
         operation = operation.removeprefix('prepare_')
-        if operation not in ('begin', 'status', 'complete', 'confirm', 'plan', 'create','advance'):
+        if operation not in ('begin', 'status', 'complete', 'confirm', 'plan', 'create','advance','registration_context','register'):
             return False
     if operation == 'complete':
         return (set(event) == {'operation', 'pair_id', 'proof_url'}
                 and isinstance(event['pair_id'], str) and HEX.fullmatch(event['pair_id'])
                 and isinstance(event['proof_url'], str) and len(event['proof_url']) <= 8192)
-    extra = {'request_id'} if operation == 'begin' else {'plan_digest', 'password', 'confirmation'} if operation == 'create' else set()
-    if (operation not in ('begin', 'status', 'confirm', 'plan', 'create','advance')
-            or operation in ('confirm', 'plan', 'create','advance') and event['operation'] != 'prepare_' + operation
+    extra = {'request_id'} if operation == 'begin' else {'plan_digest', 'password', 'confirmation'} if operation == 'create' else {'delivery'} if operation=='register' else set()
+    if (operation not in ('begin', 'status', 'confirm', 'plan', 'create','advance','registration_context','register')
+            or operation in ('confirm', 'plan', 'create','advance','registration_context','register') and event['operation'] != 'prepare_' + operation
             or set(event) != IDENTITY | {'operation'} | extra):
         return False
+    if operation=='register' and event['delivery'] is not None:
+        try:
+            from initial_registration import checked_delivery
+            checked_delivery(event['delivery'])
+        except (EnrollmentDenied,ValueError):return False
     if operation == 'create' and (not isinstance(event['plan_digest'], str) or not HEX.fullmatch(event['plan_digest'])
             or any(not isinstance(event[k], str) or not 12 <= len(event[k]) <= 128 for k in ('password', 'confirmation'))):
         return False

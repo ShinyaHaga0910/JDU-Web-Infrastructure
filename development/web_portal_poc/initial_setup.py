@@ -56,6 +56,12 @@ class InitialSetup:
                 return observed
             return {**observed,'stage':'SETUP_REQUIRED','setup_phase':'check_foundation','can_advance':True}
         phase=row['phase']
+        enrolled=self.s.db.get_item(TableName=self.s.table,Key=key(self.s.pk,'ENROLLED'),ConsistentRead=True).get('Item')
+        if enrolled and enrolled.get('grant_digest')!={'S':grant_digest(self.s.grant)}:
+            raise EnrollmentDenied('Registration belongs to another assignment')
+        if enrolled and phase=='registration_pending':
+            return {**observed,'stage':'TEACHING_ASSETS_PENDING','setup_phase':'teaching_assets_pending',
+                'can_advance':False,'ssh_completed_roles':4,'foundation_ready':True,'lab_ready':False}
         available=observed.get('stack_status') in ('CREATE_COMPLETE','UPDATE_COMPLETE','UPDATE_IN_PROGRESS')
         return {**observed,'stage':'SETUP_OBSERVATION_REQUIRED' if row.get('busy') else
                 'REGISTRATION_PENDING' if phase=='registration_pending' else 'SETUP_PENDING',

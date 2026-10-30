@@ -38,7 +38,7 @@ AWS965のCloudShellでsyntax-only template（SHA256 `f7f0f9e8af66d5e414e45a78024
 
 ## 作成後の基盤確認・内部SSH（追加実装、AWS未適用）
 
-`initial_setup.py`をworker/private service/学生画面へ接続した。明示した「基盤準備を続ける」POSTで、初期状態の確認→取込み用S3通信の閉鎖→内部4台のホスト鍵確認→踏み台内の鍵準備→内部SSH設定→一時鍵の期限後の独立確認を進める。GETは状態表示だけで、SSM実行・鍵準備・変更適用を行わない。採点登録は未接続のため、最後は`REGISTRATION_PENDING`/`lab_ready=false`のまま表示する。
+`initial_setup.py`をworker/private service/学生画面へ接続した。明示した「基盤準備を続ける」POSTで、初期状態の確認→取込み用S3通信の閉鎖→内部4台のホスト鍵確認→踏み台内の鍵準備→内部SSH設定→一時鍵の期限後の独立確認を進める。GETは状態表示だけで、SSM実行・鍵準備・変更適用を行わない。内部SSH後は`REGISTRATION_PENDING`へ進み、下記の採点登録を行う。教材配置/checker接続が残るため`lab_ready=false`を維持する。
 
 - 元のcollector、2資源だけの閉鎖validator、同じinstance/root/SGの照合、内部SSH guest/command処理を再利用する。閉鎖では`BootstrapSg`と`S3Endpoint`の非置換変更だけを許し、他のparameterはUsePreviousValueで保持する。RDP hashを再取得・保存しない。
 - `initial_ssm.py`は変更するSSM要求の意図とdigestを先に保存し、AWSが返した同じcommand IDを再利用する。応答不明時はcomment/送信先/document/全parameterの一致で受付済み要求を探す。見つからないだけで再送しない。参照：[ListCommands](https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_ListCommands.html)、[CommandFilter](https://docs.aws.amazon.com/systems-manager/latest/APIReference/API_CommandFilter.html)。
@@ -48,11 +48,23 @@ AWS965のCloudShellでsyntax-only template（SHA256 `f7f0f9e8af66d5e414e45a78024
 
 新規13件＋本人限定advance1件＋旧controller拒否1件を含む関連Python77件、既存collector/closure/全台SSM21件、Web Node67件、Web package3件がローカルで合格（skipなし）。Motoと模擬AWSを使い、実SSHや実鍵発行ではない。Chromeの架空画面でJA/RU/UZとPOST→同じGET・採点登録未完の表示を確認。証拠は[作成後処理の検査記録](verification/2026-10-30-initial-setup.public.json)。
 
+## 採点登録・本人連携の接続（追加実装、AWS未適用）
+
+`initial_registration.py`と`initial_registration_guest.py`を、本人用の登録POSTへ接続した。初期5台/内部SSHの確認後だけ、踏み台の一回用受取鍵を既存guestで準備し、Webのserver内で生成した256bitのLab tokenをその公開鍵へ暗号化して渡す。画面・form・SSM履歴・DDBへ平文tokenを置かない。共有Windowsへ鍵や認証ファイルを保存する作業もない。
+
+- `web/initial-delivery.mjs`はNode標準のRSA3072/OAEP-SHA256を使う。用途/Lab/release/deployment/踏み台ID/tokenを含む短いJSON配列を1blockへ暗号化し、受取側は同じcontextを照合して元のcredential検査/保存/登録処理を使う。独自の暗号・padding・ASN.1実装は作らない。[Node publicEncrypt](https://nodejs.org/api/crypto.html#cryptopublicencryptkey-buffer)、[OpenSSL pkeyutl](https://docs.openssl.org/3.0/man1/openssl-pkeyutl/)。
+- 元guestへ`register_oaep`を追加した。従来の認証済みAES-GCM/CMS経路とCBC拒否を維持する。新しい関数を含まない旧controllerはbuilderが拒否し、署名済み旧archiveを編集して利用しない。
+- 発行時にはtoken hashと暗号文/元5台の対応を、成績METAの新規作成と同じtransactionで保持する。送信が中断しても元の暗号文を使い、別tokenで上書きしない。既存META/本人bindingがあるLabを取り込まない。
+- 踏み台からの登録応答と受取秘密鍵の廃棄を確認後、前段の学校Google/本人AWS確認に対応する本人だけへ、元readerと同じschemaの閲覧bindingを一括作成する。失効session・異なるMETA/release・競合bindingでは全bindingをrollbackし、無関係な成績は不変。新規Labに点数を創作しない。
+- 受付済みSSMは同command IDで回収し、登録後の再送は保存済みreceiptを読む。登録後は`TEACHING_ASSETS_PENDING`と表示し、教材配置/checker接続の完成に置き換えない。新しいstatus/checker関数の配備もこれから必要。
+
+関連Python90件（新規13件）、private serviceのpackage/更新計画7件、Node71件（新規4件）、Web package3件が合格、skipなし。Node→OpenSSLの実暗号化/復号と改変・異なるcontext・旧CMS/CBC拒否をローカルで検査。Motoの実transactionと模擬SSM/EC2/CFN/STSを使い、実AWSのcredential発行や登録ではない。Chromeの架空JA/RU/UZで登録POST→同じGET/教材準備待ちを確認した。[採点登録候補の検査記録](verification/2026-10-30-initial-registration.public.json)。
+
 ## R1内でまだ必要な接続
 
 - 教師の正式な事前割当・有効な新署名配布/worker artifact publicationと学生画面を接続する。
 - 既存Web/private servicesへの初回準備用の設定追加・timeout調整を含む更新計画を作る。現行のcode-only更新toolはtemplate変更を拒否するため、そのまま適用しない。新しいhelper/入口をAWSへ配備し、実role・crypt・初回操作を確認する。
-- 作成後の基盤検査・S3閉鎖・内部SSHの候補コードを実機検証し、採点登録、公開教材資源配置、元checkまで接続する。学生の解答設定は適用しない。
+- 作成後の基盤検査・S3閉鎖・内部SSH・採点登録候補を実機検証し、公開教材資源配置とstatus/checkerまで接続する。旧採点APIへの踏み台登録時は教師EC2の稼働が必要。表示で自動起動せず、学生の解答設定も適用しない。
 - 有効な新署名版を使った実作成と、未完成の演習開始状態の確認。これはR1の受入、一般学生の通し受入はR6で確認する。
 
 2026-10-30にEdgeの学生AWS965244652544を確認。既存5台は全てstopped、保存済みroot ID一致、nonterminated=5。新5台で計10台となり旧controllerの保守的9台上限を超える。AWSのサービスquotaと断定せず、元5台削除/上限無断変更で通さない。別の初回配備用環境の確保は実作成前に必要。コード制作は継続できる。

@@ -1,5 +1,11 @@
 # 移管ソースの検証
 
+## R1の個別採点登録候補（2026-10-30、AWS未適用）
+
+`web_portal_poc`で`python -B -m unittest -q test_initial_ssm test_initial_setup test_initial_stack test_initial_worker test_initial_package test_initial_registration test_initial_registration_guest test_initial_delivery test_portal_preparation test_browser_link test_portal_enrollment_handler test_portal_enrollment`の90件が合格、skipなし。新13件はMotoの発行/META/本人binding transaction、模擬SSMと元command compiler、Node→OpenSSLの実RSA-OAEP受渡し・改変拒否・旧CMS/GCM継続とCBC拒否を含む。test_initial_deliveryはOpenSSLが必要で、Windowsは既存Git同梱版、LinuxはPATH上の版を使う。Windowsのsafe-path fixtureは実Linux所有権の証拠にしない。
+
+private serviceのpackage/更新計画7件、Web Node71件、Web package3件も合格。Chromeは架空のJA/RU/UZ登録後表示だけを確認。実AWSでの新規認証・原本書込み・本人bindingは未適用。旧署名archiveを保持し、変更後controllerは新しい有効な署名配布へ収録する必要がある。[候補の証拠](web_portal_poc/verification/2026-10-30-initial-registration.public.json)。
+
 ## R1の作成後基盤準備候補（2026-10-30、AWS未適用）
 
 `web_portal_poc`でMoto/boto3等のtest依存を設定し、`python -B -m unittest -q test_initial_ssm test_initial_setup test_initial_stack test_initial_worker test_initial_package test_portal_preparation test_browser_link test_portal_enrollment_handler test_portal_enrollment`の77件が合格。元template/selector/closure validator/node照合/guest command compilerとMotoを使い、SSM/EIC/EC2/CFN/STS等は模擬応答。基盤検査→S3閉鎖→内部4台SSH→一時鍵期限後確認、元root保持、同command回収、GET非実行、本人限定advance、旧controller契約拒否を検査した。Windowsのpwd/fcntlはimport専用fixtureで、Linuxの実権限・鍵・SSHの受入ではない。

@@ -116,11 +116,25 @@ class PortalPreparation:
         self.auth.session(session_pk, token_hash)
         subject_pk = subject_key(subject, self.auth.pepper)
         row = self.assignment(email_key(email, self.auth.pepper))
-        if (row.get('bound_subject') not in (None, subject_pk) or self.get(subject_pk, 'BINDING')
-                or self.get('ACCOUNT#' + row['grant']['account'], 'BINDING')
-                or self.get('LAB#' + row['grant']['lab_id'], 'BINDING')
-                or self.auth.get(self.auth.grades, 'LAB#' + row['grant']['lab_id'], 'META')
-                or self.get(row['pk'], 'LAB')):
+        if row.get('bound_subject') not in (None, subject_pk):
+            raise EnrollmentDenied('Assignment belongs to another identity')
+        meta=self.auth.get(self.auth.grades,'LAB#'+row['grant']['lab_id'],'META')
+        bindings=[self.get(subject_pk,'BINDING'),self.get('ACCOUNT#'+row['grant']['account'],'BINDING'),
+                  self.get('LAB#'+row['grant']['lab_id'],'BINDING'),self.get(row['pk'],'LAB')]
+        if row.get('registration'):
+            from initial_registration import checked_registration
+            saved=checked_registration(row['registration'],row['grant']);grant=saved['grant']
+            if (row.get('bound_subject')!=subject_pk or not meta or meta.get('active') is not True
+                    or meta.get('release_id')!=saved['release_id']
+                    or any(meta.get(k)!=grant[k] for k in ('lab_id','deployment_id','token_hash','instances'))):
+                raise EnrollmentDenied('Original registration changed')
+            if row.get('registration_complete') is True:
+                if not self.auth.registered(subject_pk,grant,row['pk']):raise EnrollmentDenied('Original binding changed')
+                approval,approved_grant=self.auth.approval(row['pk'])
+                if approval.get('bound_subject')!=subject_pk or approved_grant!=grant:
+                    raise EnrollmentDenied('Original approval changed')
+            elif any(bindings):raise EnrollmentDenied('Existing binding retained')
+        elif meta or any(bindings):
             raise EnrollmentDenied('Existing Lab retained or assignment changed')
         return row, subject_pk, session_pk
 
@@ -130,6 +144,7 @@ class PortalPreparation:
                 'deployment_id': grant['deployment_id'], 'release_id': grant['release']['release_id'],
                 'manifest_sha256': grant['release']['manifest_sha256'],
                 'deadline': int(row['deadline']), 'resources_created': False,
+                'registration_complete': row.get('registration_complete') is True,
                 'can_continue': min(row['deadline'], grant['release']['expires_at']) > self.auth.clock()}
 
     def live(self, row):
@@ -322,3 +337,11 @@ class PortalPreparation:
             raise EnrollmentDenied('Own confirmed setup request required')
         initial=self.initial(row['grant'],'advance')
         return {**self.view(row),'initial':initial,'resources_created':initial.get('resources_created',False)}
+
+    def registration_context(self,**claims):
+        from initial_registration import InitialRegistration
+        return InitialRegistration(self).context(**claims)
+
+    def register(self,delivery=None,**claims):
+        from initial_registration import InitialRegistration
+        return InitialRegistration(self).register(delivery=delivery,**claims)
