@@ -1,0 +1,154 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第6章 DNSによる名前解決の仕組み</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第6章-dnsによる名前解決の仕組み">第6章 DNSによる名前解決の仕組み</h1>
+<h2 id="この章で分かること">この章で分かること</h2>
+<p>前章では、WebサーバーのIPアドレスを指定してファイルを取得した。例えば、踏み台サーバーのブラウザで<code>http://10.20.1.20/example.txt</code>を開くと、Webサーバーへ接続できる。しかし、サーバーが増えるたびにIPアドレスを覚えたり、接続先を変更するたびに利用者へ新しい番号を知らせたりするのは大変である。</p>
+<p>そこで、<code>web.lab.test</code>のような名前から、接続先のIPアドレスを調べる仕組みを使う。この仕組みを支えるのが<strong>DNS（Domain Name System）</strong>である。本章では、名前を入力してからIPアドレスを受け取り、Webサーバーへ接続するまでを順に説明する。今回構築するのは、学校の備品管理システムの内部で使うDNSである。</p>
+<h2 id="61-名前から接続先のipアドレスを調べる">6.1 名前から接続先のIPアドレスを調べる</h2>
+<h3 id="名前は人が接続先を指定する手掛かりになる">名前は人が接続先を指定する手掛かりになる</h3>
+<p>例えば、<code>web.lab.test</code>という名前と<code>10.20.1.20</code>というIPアドレスを対応付ける。利用者は名前を使ってWebサーバーを指定し、コンピューターは調べたIPアドレスを使って通信する。このように、名前に対応するIPアドレスなどの情報を調べることを<strong>名前解決</strong>という。</p>
+<p>DNSは、名前とIPアドレスだけでなく、さまざまな種類の情報を扱う。本章では、まず「この名前に対応するIPv4アドレスは何か」を調べる場合に注目する。</p>
+<h3 id="ブラウザに名前を入力した後の流れ">ブラウザに名前を入力した後の流れ</h3>
+<p>踏み台サーバーのブラウザで<code>http://web.lab.test/example.txt</code>を開く場面を考える。踏み台サーバーは、内部DNSを使えるように設定されているものとする。名前解決の結果がまだ保存されていない場合、次の順に処理が進む。</p>
+<p>1. ブラウザはURLを読み、接続先の名前が<code>web.lab.test</code>であると分かる。</p>
+<p>2. 踏み台サーバーの名前解決の仕組みが、設定されたDNSサーバーへ「web.lab.testのIPv4アドレスは何か」と問い合わせる。</p>
+<p>3. DNSサーバーは、自分が管理する情報から<code>10.20.1.20</code>と回答する。</p>
+<p>4. 踏み台サーバーは、そのIPアドレスを接続先として、Webサーバーの80番ポートへTCPで接続する。</p>
+<p>5. ブラウザは<code>/example.txt</code>へのHTTPリクエストを送り、WebサーバーからHTTPレスポンスを受け取る。</p>
+<figure><img src="../../assets/figures/ch06-fig01-dns-then-http.png" alt="踏み台サーバーが内部DNSからWebサーバーのIPを受け取り、その後WebサーバーへHTTP接続する。" width="1600" height="1250"></figure>
+<p><strong>図6-1 名前を調べる通信と、ページを取得する通信。</strong> 上から順に読む。緑の矢印ではDNSサーバーへ名前を尋ね、青の矢印ではWebサーバーへHTTPのリクエストを送る。HTTPの通信相手はWebサーバーであり、DNSサーバーを経由してページを取得するわけではない。</p>
+<p>このURLでDNSへ尋ねるのは<code>web.lab.test</code>の情報である。<code>http://</code>という通信方式、80番という接続先ポート、<code>/example.txt</code>というファイルのパスは、ブラウザがHTTPで接続・リクエストする際に使う。DNSへURL全体を渡してページを探してもらう仕組みではない。<a href="https://www.rfc-editor.org/rfc/rfc1034.html">DNSの名前と問い合わせ</a></p>
+<h2 id="62-今回使う名前の範囲を理解する">6.2 今回使う名前の範囲を理解する</h2>
+<h3 id="ドメイン名は階層を持つ">ドメイン名は階層を持つ</h3>
+<p><code>web.lab.test</code>のような名前を<strong>ドメイン名</strong>という。ドットで区切られた一つずつの部分は<strong>ラベル</strong>である。名前の階層は右側から読むと分かりやすい。<code>test</code>という範囲の中に<code>lab.test</code>があり、その中に<code>web.lab.test</code>という名前がある。</p>
+<p>DNSの名前の階層は、最上位の<strong>ルート</strong>から始まる。ルートは<code>.</code>で表される。ルートまで省略せずに書いた名前が<strong>FQDN（Fully Qualified Domain Name）</strong>であり、設定ファイルでは<code>web.lab.test.</code>のように末尾のドットまで書くことで、その名前が完結していると示せる。ブラウザのURLでは、通常は末尾のドットを省いて入力する。<a href="https://www.rfc-editor.org/rfc/rfc9499.html">DNSの名前とFQDN</a></p>
+<figure><img src="../../assets/figures/ch06-fig02-names-and-zone.png" alt="ルート、test、lab.test、web.lab.testの階層と、今回管理するlab.testゾーンの範囲を示す。" width="1600" height="1030"></figure>
+<p><strong>図6-2 名前の階層と、担当するゾーン。</strong> 図は名前の関係を示している。今回のDNSサーバーは、色の付いた<code>lab.test</code>の範囲を担当する。枠は名前の管理範囲を表し、コンピューターの配置を表すものではない。</p>
+<p>DNSサーバーが情報を管理するひとまとまりの範囲を<strong>ゾーン</strong>という。今回は<code>lab.test</code>ゾーンに、Webサーバーなどの名前とIPアドレスを登録する。名前の階層の一部を別のDNSへ任せる場合もあるが、今回の<code>lab.test</code>は一つのゾーンとして管理する。</p>
+<h3 id="今回の内部dnsと、スマートフォンが普段使うdns">今回の内部DNSと、スマートフォンが普段使うDNS</h3>
+<p><strong>今回構築するDNSは、備品管理システムの内部だけで使う内部DNSである。</strong> VPC内のDNSサーバーが<code>lab.test</code>の情報を持ち、踏み台サーバーとWebサーバーを、そのDNSへ問い合わせるように設定する。</p>
+<p>一方、普段スマートフォンでインターネットのホームページを開くときは、携帯電話回線やWi-Fiなどを通じて利用するDNSの仕組みが使われる。そこへ今回の<code>lab.test</code>の情報を公開登録する作業は行わない。<code>test</code>は試験用に予約された名前であり、今回の名前はインターネットに公開するドメインとして扱わない。<a href="https://www.rfc-editor.org/rfc/rfc2606.html">試験用の.test</a></p>
+<p>例えば、設定済みの踏み台サーバーのブラウザでは、<code>http://web.lab.test/example.txt</code>を開ける。同じURLを、普段のインターネット接続を使っているスマートフォンのブラウザに入力しても、今回のWebサーバーのIPアドレスは得られない。スマートフォンが問い合わせる先には、今回の内部DNSに登録した情報がないからである。また、スマートフォンからVPC内のDNSサーバーへ直接問い合わせる接続経路も用意していない。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">比べる点</th><th scope="col">今回構築する内部DNS</th><th scope="col">インターネットに公開するDNS情報</th></tr></thead><tbody><tr><td>名前を使う範囲</td><td>備品管理システムの内部</td><td>インターネット上の利用者に使ってもらう範囲</td></tr><tr><td>情報の置き場所</td><td>VPC内のDNSサーバーが管理するlab.testゾーン</td><td>対象ドメインを担当する公開のDNSサーバー</td></tr><tr><td>スマートフォンからの利用</td><td>普段の回線・DNS設定のままでは今回の内部名を解決できない</td><td>普段使うDNSの仕組みを通じて公開された情報を調べる</td></tr></tbody></table></div>
+<h3 id="「権威dns」は、名前の情報を答える役割を表す">「権威DNS」は、名前の情報を答える役割を表す</h3>
+<p>自分が担当するゾーンの情報を管理し、その情報に基づいて回答するDNSを<strong>権威DNS</strong>という。「内部・公開」は情報を使う範囲を分ける言い方であり、「権威DNS」は情報を管理して回答する役割を表す。今回の内部DNSも、<code>lab.test</code>ゾーンについては権威DNSである。インターネット向けのDNSにも、それぞれのドメインを担当する権威DNSがある。</p>
+<h2 id="63-名前を尋ねる側と、情報を持つ側を分ける">6.3 名前を尋ねる側と、情報を持つ側を分ける</h2>
+<h3 id="リゾルバーが問い合わせを担当する">リゾルバーが問い合わせを担当する</h3>
+<p>ブラウザなどのアプリから名前解決を頼まれ、必要な問い合わせを行う仕組みを<strong>リゾルバー</strong>という。端末やサーバーのOSには、名前解決を依頼するための仕組みがある。その依頼を受けて、他のDNSへ問い合わせながら答えを調べるDNSサーバーも、リゾルバーの役割を担う。</p>
+<p>例えば、踏み台サーバー上のブラウザは、Ubuntu OSの名前解決の仕組みへ接続先を尋ねる。OS側では、設定されたDNSサーバーへ問い合わせる。ブラウザで名前を使うには、名前を登録するDNSサーバー側の設定と、そのDNSを使う踏み台サーバー側の設定の両方が必要になる。</p>
+<h3 id="インターネットの名前は、複数のdnsが分担する">インターネットの名前は、複数のDNSが分担する</h3>
+<p>インターネット上のすべての名前を、一台のDNSサーバーが一覧として持つわけではない。名前の階層に応じて、担当するDNSが情報を分担する。例えば、リゾルバーが<code>www.example.com</code>を調べる際、使える情報が保存されていなければ、ルートDNS、<code>.com</code>のDNS、対象ドメインの権威DNSというように、問い合わせ先の案内をたどって情報を得る。</p>
+<p>ルートDNSは、すべてのWebサーバーのIPアドレスを返すのではなく、次にどの範囲のDNSへ尋ねればよいかを案内する。<code>.com</code>のDNSは、<code>example.com</code>を担当するDNSを案内する。その案内をたどって、リゾルバーが必要な情報を調べ、依頼した側へ結果を返す。</p>
+<figure><img src="../../assets/figures/ch06-fig03-public-resolution.png" alt="リゾルバーがルートDNSから対象ドメインの権威DNSまで問い合わせ先をたどる基本の流れ。" width="1600" height="1220"></figure>
+<p><strong>図6-3 インターネットのDNSが情報を分担する。</strong> 左は名前解決を取りまとめるリゾルバー、右は名前の階層を担当する各DNSである。必要な案内や回答が保存されていない場合の基本の流れを示す。ブラウザ自身が順にすべてのDNSへ直接尋ねる図ではない。</p>
+<p>問い合わせを取りまとめる役割を<strong>再帰リゾルバー</strong>という。次の問い合わせ先を自分でたどる方法に加え、他のリゾルバーへ調査を依頼する方法もある。後者の依頼先が<strong>フォワーダー（転送先DNS）</strong>である。<a href="https://www.rfc-editor.org/rfc/rfc1034.html#section-4.3.1">DNSの問い合わせ処理</a></p>
+<h3 id="今回は一台のbindが二つの役割を担う">今回は一台のBINDが二つの役割を担う</h3>
+<p>今回のDNSサーバーでは、<strong>BIND 9</strong>というDNSソフトウェアをUbuntu OS上で動かす。BINDは、<code>lab.test</code>については自分が持つゾーン情報から回答する。それ以外の名前については、許可された問い合わせ元からの依頼を受け、転送先DNSを使って名前解決を取りまとめる。</p>
+<p>つまり、権威DNSとリゾルバーという二つの役割を、今回の一台のDNSサーバーが担う。役割の名前が二つあっても、別々のEC2を追加するという意味ではない。具体的な転送先との関係は6.6で説明する。<a href="https://bind9.readthedocs.io/en/v9.18.39/chapter1.html">BINDによるDNSの構成</a></p>
+<h2 id="64-名前の情報をレコードとして記録する">6.4 名前の情報をレコードとして記録する</h2>
+<h3 id="レコードの種類で、情報の意味が変わる">レコードの種類で、情報の意味が変わる</h3>
+<p>DNSへ登録する一件ずつの情報を<strong>リソースレコード</strong>、または単に<strong>レコード</strong>という。レコードには種類があり、何の情報かを区別している。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">種類</th><th scope="col">表す情報</th><th scope="col">今回の構成での例</th></tr></thead><tbody><tr><td>A</td><td>名前に対応するIPv4アドレス</td><td>web.lab.testに対する10.20.1.20</td></tr><tr><td>NS</td><td>ゾーンを担当するDNSサーバーの名前</td><td>lab.testを担当するdns.lab.test</td></tr><tr><td>SOA</td><td>ゾーンの管理情報</td><td>更新番号や更新確認の間隔など</td></tr><tr><td>CNAME</td><td>別の名前を参照する別名</td><td>ある名前を別の名前へ対応させる</td></tr></tbody></table></div>
+<p>NSレコードに書くのは、担当するDNSサーバーの<strong>名前</strong>である。そのDNSサーバーへIPv4で接続するには、対応するAレコードなどでIPアドレスも分かる必要がある。CNAMEはIPアドレスを直接登録するものではなく、参照先の名前からさらに情報を調べる。<a href="https://www.rfc-editor.org/rfc/rfc1035.html#section-3.3">DNSレコードの種類</a></p>
+<h3 id="aレコードの一行を読む">Aレコードの一行を読む</h3>
+<p>次は、<code>web.lab.test</code>に対してIPv4アドレスを答える情報の例である。</p>
+<p><strong>レコードの説明例：コマンドとして実行するものではない。</strong></p>
+<pre><code>web.lab.test.  300  IN  A  10.20.1.20</code></pre>
+<div class="table-wrap"><table><thead><tr><th scope="col">部分</th><th scope="col">意味</th></tr></thead><tbody><tr><td>web.lab.test.</td><td>情報を登録する名前。末尾のドットまで書いた完全な名前</td></tr><tr><td>300</td><td>TTL。受け取った側が、この情報を通常のキャッシュとして使える時間の上限を秒で示す</td></tr><tr><td>IN</td><td>インターネットで一般的に使われるDNSのクラス。内部DNSでもこのクラスを使う</td></tr><tr><td>A</td><td>IPv4アドレスを表すレコードの種類</td></tr><tr><td>10.20.1.20</td><td>この名前に対応するIPv4アドレス</td></tr></tbody></table></div>
+<h3 id="ゾーンファイルでは、基準の名前を使って短く書ける">ゾーンファイルでは、基準の名前を使って短く書ける</h3>
+<p>BINDでは、ゾーンの情報を<strong>ゾーンファイル</strong>に記録できる。次は<code>lab.test</code>ゾーンを読むための説明例である。</p>
+<p><strong>ゾーンファイルの説明例：設定全体ではなく、レコードの読み方を示す例。</strong></p>
+<pre><code>$ORIGIN lab.test.
+$TTL 300
+@ IN SOA dns.lab.test. hostmaster.lab.test. (
+    2026110301 3600 600 604800 300 )
+@   IN NS dns.lab.test.
+dns IN A 10.20.2.10
+web IN A 10.20.1.20</code></pre>
+<p><code>$ORIGIN lab.test.</code>は、このファイルで使う名前の基準を指定する。<code>web</code>のように末尾のドットがない名前は、基準を補って<code>web.lab.test.</code>として読む。<code>@</code>は基準そのもの、ここでは<code>lab.test.</code>を表す。<code>$TTL 300</code>は、個別にTTLを指定していないレコードの既定値を300秒にする。<a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html#example-com-base-zone-file">BINDのゾーンファイル</a></p>
+<p>SOAの<code>dns.lab.test.</code>は主となるDNSサーバーの名前であり、<code>hostmaster.lab.test.</code>は管理者のメールアドレスを表す書式である。この例では<code>hostmaster@lab.test</code>を意味する。</p>
+<p>SOAの括弧の中の先頭にある<code>2026110301</code>は、ゾーンの更新番号である<strong>serial（シリアル）</strong>を表す。レコードを変更するときは、この番号も増やす。続く値は順に、別のDNSサーバーが更新を確かめる間隔、失敗したときの再試行間隔、更新できない状態で情報を保持する期限、名前が存在しないなどの否定回答をキャッシュするときに関わる時間である。ここでは、それぞれゾーン管理のための秒数と押さえておこう。</p>
+<p>serialは「ゾーン情報の版」を区別する番号であり、次節のTTLは「受け取った情報をキャッシュで使える時間」を表す。serialを増やすことと、すでに保存されたキャッシュの期限が切れることは、別の働きである。</p>
+<h2 id="65-キャッシュとttlで、同じ問い合わせを減らす">6.5 キャッシュとTTLで、同じ問い合わせを減らす</h2>
+<h3 id="毎回すべてのdnsへ問い合わせるわけではない">毎回すべてのDNSへ問い合わせるわけではない</h3>
+<p><strong>キャッシュ</strong>とは、取得した情報を一時的に保存して再利用する仕組みである。名前解決では、OSやリゾルバーなどが、以前に取得したDNS情報を保存することがある。使える情報がキャッシュにあれば、その情報を使うことで問い合わせの回数と待ち時間を減らせる。</p>
+<p>例えば、踏み台サーバー側で<code>web.lab.test</code>のIPアドレスを保存していれば、同じ名前をもう一度使ったときに、その情報を再利用できる場合がある。ページを開くたびに、必ず内部DNSへ新しい問い合わせが届くとは限らない。</p>
+<h3 id="ttlは、情報を使える時間を制限する">TTLは、情報を使える時間を制限する</h3>
+<p><strong>TTL（Time to Live）</strong>は、受け取ったDNS情報をキャッシュとして使える時間の上限である。例えばTTLが300秒なら、取得した時点から通常は最大300秒まで、その情報を再利用できる。120秒後なら残りは180秒であり、使うたびに300秒へ戻るわけではない。</p>
+<figure><img src="../../assets/figures/ch06-fig04-cache-ttl.png" alt="TTLが300秒の情報を取得し、120秒後には残り180秒となり、期限後の次の名前解決で新たに問い合わせる例。" width="1600" height="1090"></figure>
+<p><strong>図6-4 キャッシュの期限は、取得してからの経過時間で減る。</strong> 300秒のTTLを持つ情報をキャッシュする側の動きを示す。期限の後に同じ情報が必要になった場合は、通常、新たな問い合わせで取得する。図中の枠は保存した情報を表し、別のサーバーを表すものではない。</p>
+<p>DNSサーバーでIPアドレスの登録を変更しても、他の端末やリゾルバーが以前の情報をまだキャッシュしていれば、しばらく以前のIPアドレスを使うことがある。このため、DNSサーバー側の変更が、すべての端末へ同時に反映されるとは限らない。<a href="https://www.rfc-editor.org/rfc/rfc2181.html#section-8">DNSのTTLとキャッシュ</a></p>
+<p>また、「その名前は存在しない」という回答も、一定時間キャッシュされることがある。存在しなかった名前を後から追加したときも、以前の否定回答が残っている側では、すぐに新しい情報を使えない場合がある。<a href="https://www.rfc-editor.org/rfc/rfc2308.html">否定回答のキャッシュ</a></p>
+<h2 id="66-内部の名前と外部の名前で、答えを調べる場所が違う">6.6 内部の名前と外部の名前で、答えを調べる場所が違う</h2>
+<h3 id="labtestの情報は内部dnsが持つ">lab.testの情報は内部DNSが持つ</h3>
+<p>今回のDNSサーバーの内部IPは<code>10.20.2.10</code>である。踏み台サーバーから<code>web.lab.test</code>を尋ねると、DNSサーバー上のBINDが担当する<code>lab.test</code>ゾーンを調べ、登録したIPアドレスを回答する。</p>
+<p>担当するゾーンの中に名前が存在しなければ、BINDはその名前が存在しないと回答する。例えば<code>absent.lab.test</code>が未登録で、その下の名前も存在しない場合は、<strong>NXDOMAIN</strong>という結果になる。自分が担当するゾーンの名前を、見つからないからという理由で外部のDNSへ探しに行く処理にはしない。</p>
+<h3 id="外部の名前は、転送先dnsへ調査を依頼する">外部の名前は、転送先DNSへ調査を依頼する</h3>
+<p>一方、<code>aws.amazon.com</code>のような外部の名前は、今回の<code>lab.test</code>ゾーンの情報には入っていない。使えるキャッシュもなければ、BINDは設定されたフォワーダーへ問い合わせる。今回は、AWSが提供するDNSの機能を転送先に使い、そのアドレスを<code>10.20.0.2</code>とする。</p>
+<p>このAWSのDNSは、EC2上に自分で構築する内部DNSとは別の、AWSが提供する名前解決のサービスである。今回のVPCは<code>10.20.0.0/16</code>なので、VPCのネットワークアドレスに2を加えた<code>10.20.0.2</code>でも利用できる。<a href="https://docs.aws.amazon.com/vpc/latest/userguide/AmazonDNS-concepts.html">AWSが提供するDNS</a></p>
+<figure><img src="../../assets/figures/ch06-fig05-internal-and-forward.png" alt="BINDがlab.testは担当ゾーンから回答し、外部名はキャッシュを調べた後にAWSの転送先DNSへ依頼する。" width="1600" height="1160"></figure>
+<p><strong>図6-5 内部の情報と、外部の情報の調べ方。</strong> 左の踏み台サーバーが尋ねる相手は、どちらの場合もDNSサーバーの<code>10.20.2.10</code>である。DNSサーバーは、内部名を担当ゾーンから答え、外部名では使えるキャッシュを確認してから転送先を使う。右の丸はAWS提供のDNS機能を表し、追加するEC2ではない。</p>
+<p>今回使う<code>forward only</code>という設定では、外部名の解決を転送先DNSへ依頼する。BINDが転送先を使えなかったときに、自分でルートDNSから直接問い合わせ直す方法へ切り替えない。踏み台サーバーとWebサーバーが普段使うDNSは<code>10.20.2.10</code>とし、その内部DNSが必要に応じて<code>10.20.0.2</code>を使う、という順序である。<a href="https://bind9.readthedocs.io/en/v9.18.39/reference.html#namedconf-statement-forward">BINDのフォワーダー</a></p>
+<p>外部の名前からIPアドレスを取得できても、その外部WebサーバーへHTTPで接続できるかは別である。DNSで情報を得る通信と、そのIPアドレスへ実際に接続する通信を分けて考えよう。</p>
+<h2 id="67-名前解決の結果と、その後の接続を読む">6.7 名前解決の結果と、その後の接続を読む</h2>
+<h3 id="dnsへ尋ねた結果を文字で見る">DNSへ尋ねた結果を文字で見る</h3>
+<p><strong>dig</strong>は、DNSへ問い合わせて結果を表示するコマンドである。次の例では、踏み台サーバーから、問い合わせ先のDNSサーバーを明示してWebサーバーのIPv4アドレスを尋ねる。</p>
+<p><strong>実行場所：踏み台サーバーの端末。DNSサーバーに該当レコードを登録した後の説明例。</strong></p>
+<pre><code>dig @10.20.2.10 web.lab.test A</code></pre>
+<p><code>@10.20.2.10</code>は「今回の問い合わせ先DNSサーバー」、<code>web.lab.test</code>は「調べる名前」、<code>A</code>は「IPv4アドレスを調べる種類」を指定している。このコマンドではDNSの問い合わせだけを行い、Webページは取得しない。</p>
+<p><strong>表示例：digの出力から、問い合わせ結果に関わる行を抜粋したもの。</strong></p>
+<pre><code>;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 12001
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1
+;; ANSWER SECTION:
+web.lab.test.  300  IN  A  10.20.1.20
+;; SERVER: 10.20.2.10#53(10.20.2.10) (UDP)</code></pre>
+<p><code>status: NOERROR</code>はDNSの処理結果、<code>ANSWER SECTION</code>は回答の部分を示す。この例では、<code>web.lab.test.</code>に対して<code>10.20.1.20</code>が返っている。<code>aa</code>は、その回答が担当するゾーンの権威情報に基づくことを表す。<code>SERVER</code>の行では、実際に問い合わせた相手が<code>10.20.2.10</code>であると読み取れる。<a href="https://bind9.readthedocs.io/en/v9.18.39/manpages.html#dig-dns-lookup-utility">digによるDNS問い合わせ</a></p>
+<p>今回のDNSへの問い合わせは、通常はUDPでDNSサーバーの53番ポートへ届く。DNSはTCPでも53番ポートを使い、通常の名前解決にもTCPが必要になる場合がある。UDPで問い合わせが成功したことと、TCPでも利用できることは分けて扱う。<a href="https://www.rfc-editor.org/rfc/rfc7766.html">DNSでのTCP利用</a></p>
+<h3 id="存在しない名前と、返事を得られない状態を分ける">存在しない名前と、返事を得られない状態を分ける</h3>
+<div class="table-wrap"><table><thead><tr><th scope="col">結果</th><th scope="col">意味</th></tr></thead><tbody><tr><td>NOERRORと必要なAレコード</td><td>DNSの問い合わせが正常に処理され、この例では接続先のIPv4アドレスが回答されている</td></tr><tr><td>NXDOMAIN</td><td>問い合わせた名前が存在しないという回答。Webページの404とは異なる</td></tr><tr><td>REFUSED</td><td>DNSサーバーが方針や許可設定により、その問い合わせを拒否した</td></tr><tr><td>SERVFAIL</td><td>DNSサーバーが、必要な名前解決の処理を完了できなかった</td></tr><tr><td>タイムアウト</td><td>制限時間内にDNSの回答を受け取れなかった。回答としての不存在や拒否とは区別する</td></tr></tbody></table></div>
+<p>NXDOMAINは「その名前が存在しない」と伝えるDNSの結果であり、HTTPの404は「リクエストした対象が見つからない」などを伝えるWebサーバーの結果である。どの段階の、誰からの結果かを分けて読む。<a href="https://www.rfc-editor.org/rfc/rfc1035.html#section-4.1.1">DNSの処理結果</a></p>
+<p>なお、NOERRORでも、尋ねた種類のレコードが回答にない場合がある。名前が存在することと、その名前に必要なAレコードがあることは同じではない。IPv4の接続先を調べるときは、結果の文字と回答されたAレコードを対応させる。<a href="https://www.rfc-editor.org/rfc/rfc2308.html#section-2.2">名前とレコードの不存在</a></p>
+<h3 id="名前解決に成功した後、webサーバーへ接続する">名前解決に成功した後、Webサーバーへ接続する</h3>
+<p>DNSから<code>10.20.1.20</code>が返った後、ブラウザはそのIPアドレスのWebサーバーの80番ポートへ接続する。DNSの設定が正しくても、Webサーバーの停止、Nginxの待受設定、SG（AWSのSecurity Group）の通信許可などに問題があれば、ページは取得できない。</p>
+<p>例えば、IPアドレスを指定したURLでは開けるのに、名前を指定したURLでは開けない場合は、名前解決の段階を調べる手掛かりになる。名前から正しいIPアドレスが分かるのに接続できない場合は、その後のHTTP接続の範囲に注目する。</p>
+<p>練習・課題2では、今回のシステム内で使う名前を内部DNSへ登録し、踏み台サーバーとWebサーバーがそのDNSを使う構成を作る。第7章では、DNSサーバー側の設定と、問い合わせる側のUbuntu OSの設定を対応させて学ぶ。</p>
+<h2 id="章末問題">章末問題</h2>
+<h3 id="問1">問1</h3>
+<p>踏み台サーバーのブラウザで<code>http://web.lab.test/example.txt</code>を開く。DNSへ問い合わせる名前と、その回答を得た後のHTTP通信の接続先を答えなさい。</p>
+<h3 id="問2">問2</h3>
+<p>今回の内部DNSを設定すると、普段のインターネット接続を使うスマートフォンでも<code>web.lab.test</code>を名前解決できるようになるか。理由とともに説明しなさい。</p>
+<h3 id="問3">問3</h3>
+<p>権威DNSはどのような役割か。今回の内部DNSは、何のゾーンの権威DNSになるか。</p>
+<h3 id="問4">問4</h3>
+<p>TTLが300秒の情報をキャッシュへ保存した。120秒後にその情報を再利用すると、残りの時間は何秒か。また、その再利用でTTLは300秒へ戻るか。</p>
+<h3 id="問5">問5</h3>
+<p>今回の内部DNSへ、未登録の<code>absent.lab.test</code>を問い合わせた場合と、<code>aws.amazon.com</code>を問い合わせた場合では、情報の調べ方がどう違うか。前者の名前の下にも登録された名前はないものとする。</p>
+<h3 id="問6">問6</h3>
+<p>DNSのNXDOMAIN、DNSのタイムアウト、HTTPの404では、それぞれ何が分かるか。</p>
+<h2 id="章末解答">章末解答</h2>
+<h3 id="問1">問1</h3>
+<p>DNSへ問い合わせる名前は<code>web.lab.test</code>である。Aレコードから<code>10.20.1.20</code>を得た後、HTTPではそのWebサーバーの80番ポートへTCPで接続する。<code>/example.txt</code>は、その後に送るHTTPリクエストの対象のパスである。</p>
+<h3 id="問2">問2</h3>
+<p>そのままでは名前解決できない。今回の名前は、VPC内の内部DNSが持つlab.testゾーンへ登録する。スマートフォンが普段使うDNSの仕組みへは、その情報を公開登録していない。</p>
+<h3 id="問3">問3</h3>
+<p>担当するゾーンの情報を管理し、その情報に基づいて回答する役割である。今回の内部DNSはlab.testゾーンの権威DNSとなる。権威という語は役割を表しており、内部のDNSにも使う。</p>
+<h3 id="問4">問4</h3>
+<p>残りは180秒である。保存した情報を再利用するだけでは300秒へ戻らない。TTLは、その情報を取得してからの経過時間に応じて減る。</p>
+<h3 id="問5">問5</h3>
+<p>absent.lab.testは、自分が担当するlab.testゾーン内を調べ、名前が存在しないためNXDOMAINを回答する。外部へ転送して探し直さない。aws.amazon.comは担当ゾーンの外なので、使えるキャッシュがなければ転送先DNSへ問い合わせる。</p>
+<h3 id="問6">問6</h3>
+<p>NXDOMAINはDNSが名前の不存在を回答したこと、DNSのタイムアウトは時間内に回答を受け取れなかったことを示す。HTTPの404は、HTTPリクエストに対してWebサーバーなどが返した結果である。DNSの段階と、HTTPで対象を取得する段階を区別する。</p>
+<h2 id="参考資料">参考資料</h2>
+<p>確認日：2026-11-03。レコード、ゾーンファイル、digの出力は仕組みを説明するための例である。</p>
+<p class="bullet">・ <a href="https://www.rfc-editor.org/rfc/rfc1034.html">RFC 1034 Domain Names - Concepts and Facilities</a></p>
+<p class="bullet">・ <a href="https://www.rfc-editor.org/rfc/rfc1035.html">RFC 1035 Domain Names - Implementation and Specification</a></p>
+<p class="bullet">・ <a href="https://www.rfc-editor.org/rfc/rfc9499.html">RFC 9499 DNS Terminology</a></p>
+<p class="bullet">・ <a href="https://www.rfc-editor.org/rfc/rfc2181.html#section-8">RFC 2181 DNSのTTL</a></p>
+<p class="bullet">・ <a href="https://www.rfc-editor.org/rfc/rfc2308.html">RFC 2308 否定回答のキャッシュ</a></p>
+<p class="bullet">・ <a href="https://www.rfc-editor.org/rfc/rfc2606.html">RFC 2606 試験用のドメイン名</a></p>
+<p class="bullet">・ <a href="https://www.rfc-editor.org/rfc/rfc7766.html">RFC 7766 DNSでのTCP利用</a></p>
+<p class="bullet">・ <a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BIND 9 Configurations and Zone Files</a></p>
+<p class="bullet">・ <a href="https://bind9.readthedocs.io/en/v9.18.39/chapter1.html">BIND 9 Introduction to DNS and BIND 9</a></p>
+<p class="bullet">・ <a href="https://bind9.readthedocs.io/en/v9.18.39/reference.html#namedconf-statement-forward">BIND 9 forward / forwarders</a></p>
+<p class="bullet">・ <a href="https://bind9.readthedocs.io/en/v9.18.39/manpages.html#dig-dns-lookup-utility">BIND 9 dig</a></p>
+<p class="bullet">・ <a href="https://docs.aws.amazon.com/vpc/latest/userguide/AmazonDNS-concepts.html">AWS Understanding Amazon DNS</a></p>
+<p class="bullet">・ <a href="../../output/pdf/web_textbook_ch05_ja.pdf">第5章</a></p>
+<p class="bullet">・ <a href="../../../labs/docs/ja/p2.md">練習P2</a></p></main></body></html>

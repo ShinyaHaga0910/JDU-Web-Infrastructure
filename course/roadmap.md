@@ -38,3 +38,5 @@
 [第4章 HTTPでページをリクエストする仕組み](textbook/docs/ja/04-http-requests-and-responses.md)の本文と3図、HTML/PDFを作成しました。URLの部分、TCP接続後のリクエストとレスポンス、GET/POST、レスポンスの状態・ヘッダー・本文、HTTPレスポンスと接続失敗、curlとブラウザの見え方を説明します。Nginxの導入・設定手順は第5章とP1へ分け、本章で課題や採点条件を追加していません。
 
 [第5章 Nginxによる静的ファイルの配信](textbook/docs/ja/05-nginx-static-files.md)の本文と4図、HTML/PDFを作成しました。NginxとEC2の関係、URLと保存先、www-dataの読み取り権限、設定の検査と再読み込み、三つの接続元、アクセスログとエラーログを説明します。第4章はcurlのコマンド・表示例を見てからレスポンスの分解図へ進む順序に更新しました。
+
+[第6章 DNSによる名前解決の仕組み](textbook/docs/ja/06-dns-name-resolution.md)の本文と5図、HTML/PDFを作成しました。ブラウザへの名前入力からDNSの回答、そのIPへのHTTP接続までを説明します。内部DNSとスマートフォンが普段使うDNS、公開・内部という範囲と権威という役割、リゾルバーと転送先、レコード、キャッシュとTTL、DNSとHTTPの結果を分けて扱います。BINDとUbuntu OSの具体的な設定は第7章へつなげます。

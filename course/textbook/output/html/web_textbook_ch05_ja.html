@@ -13,12 +13,12 @@
 <p>後の章では、備品データをDBから読み、その値を使って一覧ページを作るアプリを接続する。まず本章では、保存済みの文章をそのまま届ける流れに注目する。</p>
 <h2 id="52-nginxをwebサーバー上で動かす">5.2 NginxをWebサーバー上で動かす</h2>
 <h3 id="ec2とnginxは何を担当するか">EC2とNginxは何を担当するか</h3>
-<p><strong>EC2 Webサーバー</strong>は、Ubuntuが動く仮想的なコンピューターである。<strong>Nginx</strong>は、そのUbuntuに導入して使うソフトウェアである。EC2が動いていても、Nginxが導入・起動されていなければ、NginxによるHTTPの受付は始まらない。</p>
+<p><strong>EC2 Webサーバー</strong>は、Ubuntu OSが動く仮想的なコンピューターである。<strong>Nginx</strong>は、そのUbuntu OSに導入して使うソフトウェアである。EC2が動いていても、Nginxが導入・起動されていなければ、NginxによるHTTPの受付は始まらない。</p>
 <p>今回の構成では、必要なパッケージを配布サーバーから取得する。Webサーバー上のAPTが内部の配布サーバーへ接続し、Nginxなどのパッケージを導入する。パッケージを取得する通信と、導入後のNginxがブラウザにファイルを配信する通信は、目的も相手も異なる。</p>
 <h3 id="導入、起動、自動起動を分けて考える">導入、起動、自動起動を分けて考える</h3>
-<p>パッケージを<strong>導入する</strong>と、Nginxのプログラムや初期設定などがWebサーバーへ配置される。サービスを<strong>起動する</strong>と、そのプログラムがプロセスとして動き、設定されたポートで接続を待ち受ける。<strong>自動起動を有効にする</strong>と、次回Ubuntuが起動したときにもサービスを起動するよう登録される。<a href="https://www.freedesktop.org/software/systemd/man/latest/systemctl.html">systemdのサービス管理</a></p>
-<p>Ubuntuでは、systemdが<code>nginx</code>という名前のサービスを管理する。Nginxには、設定を読み込んで全体を管理するマスタープロセスと、実際のリクエストを処理するワーカープロセスがある。ファイルを読み、ブラウザへ返す処理はワーカープロセスが担当する。<a href="https://nginx.org/en/docs/beginners_guide.html">Nginxのプロセス構成</a></p>
-<div class="table-wrap"><table><thead><tr><th scope="col">対象</th><th scope="col">確かめること</th></tr></thead><tbody><tr><td>導入したパッケージ</td><td>Nginxのプログラムや設定ファイルが配置されているか</td></tr><tr><td>サービスの現在の状態</td><td>今、Nginxが起動しているか</td></tr><tr><td>自動起動の設定</td><td>次にUbuntuが起動したときもNginxを起動するか</td></tr><tr><td>待受の状態</td><td>WebサーバーのどのIP・ポートで接続を受け付けているか</td></tr></tbody></table></div>
+<p>パッケージを<strong>導入する</strong>と、Nginxのプログラムや初期設定などがWebサーバーへ配置される。サービスを<strong>起動する</strong>と、そのプログラムがプロセスとして動き、設定されたポートで接続を待ち受ける。<strong>自動起動を有効にする</strong>と、次回Ubuntu OSが起動したときにもサービスを起動するよう登録される。<a href="https://www.freedesktop.org/software/systemd/man/latest/systemctl.html">systemdのサービス管理</a></p>
+<p>Ubuntu OSでは、systemdが<code>nginx</code>という名前のサービスを管理する。Nginxには、設定を読み込んで全体を管理するマスタープロセスと、実際のリクエストを処理するワーカープロセスがある。ファイルを読み、ブラウザへ返す処理はワーカープロセスが担当する。<a href="https://nginx.org/en/docs/beginners_guide.html">Nginxのプロセス構成</a></p>
+<div class="table-wrap"><table><thead><tr><th scope="col">対象</th><th scope="col">確かめること</th></tr></thead><tbody><tr><td>導入したパッケージ</td><td>Nginxのプログラムや設定ファイルが配置されているか</td></tr><tr><td>サービスの現在の状態</td><td>今、Nginxが起動しているか</td></tr><tr><td>自動起動の設定</td><td>次にUbuntu OSが起動したときもNginxを起動するか</td></tr><tr><td>待受の状態</td><td>WebサーバーのどのIP・ポートで接続を受け付けているか</td></tr></tbody></table></div>
 <h2 id="53-urlのパスとファイルの保存先を対応させる">5.3 URLのパスとファイルの保存先を対応させる</h2>
 <h3 id="設定ファイルは配信方法を決める">設定ファイルは配信方法を決める</h3>
 <p>ブラウザは、Webサーバーの保存領域から直接ファイルを探しているわけではない。例えば<code>http://10.20.1.20/example.txt</code>を開くと、HTTPのリクエストで伝わる対象のパスは<code>/example.txt</code>である。Nginxは設定に従って、このパスをWebサーバー内の保存先へ対応させる。</p>

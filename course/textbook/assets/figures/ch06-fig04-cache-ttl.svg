@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1090" viewBox="0 0 1600 1090" role="img">
+<title>300秒のTTLを持つ情報を保存した側で、時間の経過に応じてキャッシュの期限が減る例</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図6-4  キャッシュとTTLの残り時間</text>
+<text x="55" y="99" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">同じAレコードをキャッシュした側の動き</text>
+<polyline points="235,200 235,930" fill="none" stroke="#7991aa" stroke-width="5"/><polygon points="235,930 228.04055145422032,915.5928463623571 241.95944854577968,915.5928463623571" fill="#7991aa"/>
+<text x="85" y="217" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">取得時</text>
+<text x="285" y="223" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">0秒後</text>
+<rect x="550" y="200" width="990" height="185" rx="18" fill="#f7f9fc" stroke="#16745b" stroke-width="2"/>
+<text x="585" y="227" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">TTL 300秒の情報を保存する</text>
+<text x="585" y="306" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">web.lab.test → 10.20.1.20</text>
+<polyline points="435,273 550,273" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="550,273 535.5928463623571,279.9594485457797 535.5928463623571,266.0405514542203" fill="#16745b"/>
+<text x="85" y="477" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">再利用</text>
+<text x="285" y="483" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">120秒後</text>
+<rect x="550" y="460" width="990" height="185" rx="18" fill="#f7f9fc" stroke="#2165a7" stroke-width="2"/>
+<text x="585" y="487" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">残り180秒の情報を再利用できる</text>
+<text x="585" y="566" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">再利用だけでは300秒へ戻らない</text>
+<polyline points="435,533 550,533" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="550,533 535.5928463623571,539.9594485457797 535.5928463623571,526.0405514542203" fill="#2165a7"/>
+<text x="85" y="737" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">期限後</text>
+<text x="285" y="743" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">300秒後以降</text>
+<rect x="550" y="720" width="990" height="185" rx="18" fill="#f7f9fc" stroke="#9d651a" stroke-width="2"/>
+<text x="585" y="747" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">次に必要になったとき、新たに尋ねる</text>
+<text x="585" y="826" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">期限切れの情報を通常の回答に使わない</text>
+<polyline points="435,793 550,793" fill="none" stroke="#9d651a" stroke-width="4"/><polygon points="550,793 535.5928463623571,799.9594485457797 535.5928463623571,786.0405514542203" fill="#9d651a"/>
+<text x="55" y="967" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">TTLは取得した情報を通常のキャッシュとして使える時間の上限。単位は秒。</text>
+<text x="55" y="1030" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">ここに描いた枠は保存した情報であり、新しいサーバーを表していない。</text>
+</svg>

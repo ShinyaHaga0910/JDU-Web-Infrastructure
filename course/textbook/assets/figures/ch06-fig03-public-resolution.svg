@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1220" viewBox="0 0 1600 1220" role="img">
+<title>インターネット上の再帰リゾルバーがルート、com、対象ドメインの権威DNSへ案内をたどる</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図6-3  インターネットの名前を調べる基本の流れ</text>
+<text x="55" y="93" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">www.example.com の情報を調べる場合の例</text>
+<text x="55" y="144" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">各問い合わせ先の53番ポートへDNSで通信する（UDP/TCP）</text>
+<rect x="40" y="185" width="410" height="920" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
+<text x="245" y="215" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="34" dominant-baseline="text-before-edge" text-anchor="middle">再帰リゾルバー</text>
+<text x="245" y="286" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">名前解決を取りまとめる</text>
+<text x="245" y="856" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">集めた情報から</text>
+<text x="245" y="913" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">答えを調べる</text>
+<text x="245" y="1010" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">依頼した端末へ結果を返す</text>
+<rect x="1110" y="200" width="450" height="230" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
+<text x="1335" y="223" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">ルートDNSサーバー</text>
+<text x="1335" y="306" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">担当する範囲の情報を持つ</text>
+<text x="780" y="220" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">① .comを担当するDNSは？</text>
+<polyline points="450,292 1110,292" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1110,292 1095.5928463623572,298.9594485457797 1095.5928463623572,285.0405514542203" fill="#2165a7"/>
+<text x="780" y="329" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">② .comのDNSを案内する</text>
+<polyline points="1110,402 450,402" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="450,402 464.4071536376428,395.0405514542203 464.4071536376428,408.9594485457797" fill="#16745b"/>
+<rect x="1110" y="500" width="450" height="230" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
+<text x="1335" y="523" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">.comのDNSサーバー</text>
+<text x="1335" y="606" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">担当する範囲の情報を持つ</text>
+<text x="780" y="520" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">③ example.comの担当DNSは？</text>
+<polyline points="450,592 1110,592" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1110,592 1095.5928463623572,598.9594485457797 1095.5928463623572,585.0405514542203" fill="#2165a7"/>
+<text x="780" y="629" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">④ 対象ドメインのDNSを案内</text>
+<polyline points="1110,702 450,702" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="450,702 464.4071536376428,695.0405514542203 464.4071536376428,708.9594485457797" fill="#16745b"/>
+<rect x="1110" y="800" width="450" height="230" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
+<text x="1335" y="823" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">example.comの権威DNS</text>
+<text x="1335" y="906" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">担当する範囲の情報を持つ</text>
+<text x="780" y="820" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">⑤ 対象の名前の情報を尋ねる</text>
+<polyline points="450,892 1110,892" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1110,892 1095.5928463623572,898.9594485457797 1095.5928463623572,885.0405514542203" fill="#2165a7"/>
+<text x="780" y="929" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">⑥ 管理する情報に基づき回答</text>
+<polyline points="1110,1002 450,1002" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="450,1002 464.4071536376428,995.0405514542203 464.4071536376428,1008.9594485457797" fill="#16745b"/>
+<text x="55" y="1150" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">使えるキャッシュがない場合の基本例。ブラウザではなく、リゾルバーが案内をたどる。</text>
+</svg>

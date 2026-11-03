@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1030" viewBox="0 0 1600 1030" role="img">
+<title>DNSの名前の階層と、今回の内部DNSが担当するlab.testゾーンの範囲</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図6-2  名前の階層と、今回管理するゾーン</text>
+<text x="55" y="99" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">名前の関係を示す図（コンピューターの配置図ではない）</text>
+<rect x="600" y="175" width="400" height="110" rx="18" fill="#f7f9fc" stroke="#a9b8c7" stroke-width="2"/>
+<text x="800" y="207" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="middle">ルート： .</text>
+<polyline points="800,285 800,360" fill="none" stroke="#7991aa" stroke-width="4"/><polygon points="800,360 793.0405514542203,345.5928463623572 806.9594485457797,345.5928463623572" fill="#7991aa"/>
+<rect x="600" y="360" width="400" height="110" rx="18" fill="#f7f9fc" stroke="#a9b8c7" stroke-width="2"/>
+<text x="800" y="392" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="38" dominant-baseline="text-before-edge" text-anchor="middle">test</text>
+<rect x="60" y="550" width="1480" height="370" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
+<text x="85" y="570" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">担当範囲：lab.test ゾーン</text>
+<polyline points="800,470 800,630" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="800,630 793.0405514542203,615.5928463623571 806.9594485457797,615.5928463623571" fill="#16745b"/>
+<rect x="600" y="630" width="400" height="100" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
+<text x="800" y="654" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="37" dominant-baseline="text-before-edge" text-anchor="middle">lab.test</text>
+<polyline points="710,730 710,770 420,770 420,810" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="420,810 413.0405514542203,795.5928463623571 426.9594485457797,795.5928463623571" fill="#16745b"/>
+<polyline points="890,730 890,770 1180,770 1180,810" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="1180,810 1173.0405514542203,795.5928463623571 1186.9594485457797,795.5928463623571" fill="#16745b"/>
+<rect x="180" y="810" width="480" height="80" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
+<text x="420" y="830" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="34" dominant-baseline="text-before-edge" text-anchor="middle">web.lab.test</text>
+<rect x="940" y="810" width="480" height="80" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
+<text x="1180" y="830" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="34" dominant-baseline="text-before-edge" text-anchor="middle">dns.lab.test</text>
+<text x="55" y="963" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">完全な名前の表記例：web.lab.test.　末尾のドットはルートまでの名前を示す。</text>
+</svg>
