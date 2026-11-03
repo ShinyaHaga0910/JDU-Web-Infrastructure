@@ -10,18 +10,23 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">完成要件</a> · <a href="#section-3">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M0 自分の環境と実行場所 (0)</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">完成要件</a> · <a href="#section-3">今回の見取り図</a> · <a href="#section-4">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M0 自分の環境と実行場所 (0)</h1>
 <p><a href="start.html">はじめに：接続・操作の約束</a> · <a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a> · <a href="portal.html">ブラウザで確認する</a></p>
 <p><a href="../ja/m0.html">日本語</a> · <a href="../ru/m0.html">Русский</a> · <a href="../uz/m0.html">O‘zbekcha</a></p>
-<p>2026-11-03 · D12 P/M r1.3</p>
+<p>2026-11-03 · D12 P/M r1.4</p>
 <p>配布版の有効期限：2027年1月31日末（UZT）。</p>
 <h2 id="section-1">始める前に</h2>
 <p><a href="start.html">共通の接続・操作</a>を確認する。対応する詳しい練習は<a href="p0.html">P0</a>。課題の判定方法は<a href="portal.html">ブラウザ確認手順</a>を使う。</p>
 <h2 id="section-2">完成要件</h2>
 <p>自分の5役割・元instance・SSM/内部SSH・本人登録の対応を確認する。構築点は0。P0を参照し、提供済み基盤を再作成しない。</p>
-<h2 id="section-3">確認・提出</h2>
+<h2 id="section-3">今回の見取り図</h2>
+<p><img src="../../../assets/ja/m0.png" alt="M0: 5台は初期配備済み → 本人・接続先を確かめる → 正しい役割へSSMで入る。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。 図を参考に完成要件から設定値を自分で決めます。" width="1040" height="680" loading="lazy"></p>
+<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。 図を参考に完成要件から設定値を自分で決めます。</p>
+<p><a href="../../../assets/ja/m0.png">図を拡大する</a> · <a href="../../../assets/ja/m0.svg">SVG</a></p>
+<h2 id="section-4">確認・提出</h2>
 <ol>
 <li>PCの<a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a>へ学校Googleでログインし、本人のLabと <strong>M0</strong> を選ぶ。初回の連携・画面の説明は<a href="portal.html">ブラウザ確認手順</a>を参照する。</li>
 <li>「この課題を確認する」を押す。</li>

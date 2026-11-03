@@ -10,10 +10,11 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">使い方と共通の約束</a> · <a href="#section-2">対象・前提・準備</a> · <a href="#section-3">操作例の読み方</a> · <a href="#section-4">完成像と通信経路</a> · <a href="#section-5">自力課題に取り組む前に</a> · <a href="#section-6">M0 自分の環境と実行場所 (0)</a> · <a href="#section-7">M1 HTTPで静的ファイルを返す (8)</a> · <a href="#section-8">M2 内部DNSと通常の名前解決 (13)</a> · <a href="#section-9">M3 保存内容と停止・再開 (3)</a> · <a href="#section-10">M4 PostgreSQLへの認証接続 (9)</a> · <a href="#section-11">M5 教員アプリをWeb・DBへ接続する (13)</a> · <a href="#section-12">M6 最小権限と公開範囲 (16)</a> · <a href="#section-13">次回の再開・結果の確認</a> · <a href="#section-14">根拠と使用版</a></nav></header><main id="content" tabindex="-1"><h1>Web演習：自力課題M0〜M6</h1>
-<p>2026-11-03 | D12 P/M r1.3 | web-course-class193548-20261103-r3</p>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">使い方と共通の約束</a> · <a href="#section-2">対象・前提・準備</a> · <a href="#section-3">操作例の読み方</a> · <a href="#section-4">完成像と通信経路</a> · <a href="#section-5">自力課題に取り組む前に</a> · <a href="#section-6">M0 自分の環境と実行場所 (0)</a> · <a href="#section-7">M1 HTTPで静的ファイルを返す (8)</a> · <a href="#section-8">M2 内部DNSと通常の名前解決 (13)</a> · <a href="#section-9">M3 保存内容と停止・再開 (3)</a> · <a href="#section-10">M4 PostgreSQLへの認証接続 (9)</a> · <a href="#section-11">M5 教員アプリをWeb・DBへ接続する (13)</a> · <a href="#section-12">M6 最小権限と公開範囲 (16)</a> · <a href="#section-13">次回の再開・結果の確認</a> · <a href="#section-14">根拠と使用版</a></nav></header><main id="content" tabindex="-1"><h1>Web演習：自力課題M0〜M6</h1>
+<p>2026-11-03 | D12 P/M r1.4 | web-course-class193548-20261103-r3</p>
 <p>配布版の有効期限：2027年1月31日末（UZT）。</p>
 <p>教材初版・教師確認用。学生の最初からの通し試読は未実施。</p>
 <p>ロシア語・ウズベク語は日本語原稿と同じ手順・条件の翻訳初稿。母語話者校閲は未実施。</p>
@@ -65,6 +66,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 </table>
 <p>各Ubuntuへ入る操作：CloudShellで aws ssm start-session --target i-自分の対象ID。接続直後にid -unとbootstrap.jsonのroleを確認する。サーバーを替えるときはexitを1回でCloudShellへ戻り、次のIDでstart-sessionする。CloudShellの変数は接続先へ自動コピーされない。SSMのssm-userはsudo可能。RDPのlabuserはsudo管理者ではない。</p>
 <p>nanoの編集：file名を指定して開く→本文を入力→Ctrl+O→Enterで保存→Ctrl+Xで終了。設定fileの枠はshell commandではない。psqlに入るとpromptが変わる。SQL/\passwordはその中へ入力し、\qでUbuntuへ戻る。失敗したcommandの次へ進まず、期待結果を確認する。</p>
+<p>番号付きコメントは、その手順内の操作順と目的を示します。# はshell、-- はpsql内のコメントです。コメントは説明なので、書き換える必要はありません。接続・エディタ・パスワード入力の完了を待ち、一つずつ実行します。改行で続くコマンドは一つとして扱います。</p>
 <h2 id="section-3">操作例の読み方</h2>
 <p>各Pは「課題→仕組み→操作例→理解の確認」の順で使う。操作例は一つのまとまりを貼り付けず、1コマンドずつ実行して表示を読む。末尾のバックスラッシュは次の行へ続く記号なので、その行と次の行を一つのコマンドとして扱う。</p>
 <p>bash枠は表示された実行場所の端末へ入力する。text枠は設定ファイルの本文・psql内の入力・出力例などで、直前の説明に従う。行頭が#の説明行はコメント。自分の端末に出る$、#、postgres=#などのpromptをコマンドへ付け足さない。YOUR-から始まる値だけを自分の値へ置き換える。</p>
@@ -132,6 +134,10 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <h2 id="section-6">M0 自分の環境と実行場所 (0)</h2>
 <h3>完成要件</h3>
 <p>自分の5役割・元instance・SSM/内部SSH・本人登録の対応を確認する。構築点は0。P0を参照し、提供済み基盤を再作成しない。</p>
+<h3>今回の見取り図</h3>
+<p><img src="../../../assets/ja/m0.png" alt="M0: 5台は初期配備済み → 本人・接続先を確かめる → 正しい役割へSSMで入る。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。 図を参考に完成要件から設定値を自分で決めます。" width="1040" height="680" loading="lazy"></p>
+<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。 図を参考に完成要件から設定値を自分で決めます。</p>
+<p><a href="../../../assets/ja/m0.png">図を拡大する</a> · <a href="../../../assets/ja/m0.svg">SVG</a></p>
 <h3>確認・提出</h3>
 <ol>
 <li>PCの<a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a>へ学校Googleでログインし、本人のLabと <strong>M0</strong> を選ぶ。初回の連携・画面の説明は<a href="portal.html">ブラウザ確認手順</a>を参照する。</li>
@@ -141,6 +147,10 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <h2 id="section-7">M1 HTTPで静的ファイルを返す (8)</h2>
 <h3>完成要件</h3>
 <p>P1を参考に、指定された別fileと本文を独力でHTTP配信する。P1のpractice.txtを残す。file・service・listen・local/踏み台/public HTTP・今回要求のlogが対象。</p>
+<h3>今回の見取り図</h3>
+<p><img src="../../../assets/ja/m1.png" alt="M1: Webの練習配信は未完成 → Web内の配信を設定する → 本文とログを照合する。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 図を参考に完成要件から設定値を自分で決めます。" width="1040" height="680" loading="lazy"></p>
+<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 図を参考に完成要件から設定値を自分で決めます。</p>
+<p><a href="../../../assets/ja/m1.png">図を拡大する</a> · <a href="../../../assets/ja/m1.svg">SVG</a></p>
 <ul>
 <li>File: /var/www/html/mission.txt</li>
 <li>URL path: /mission.txt</li>
@@ -200,6 +210,10 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <h2 id="section-8">M2 内部DNSと通常の名前解決 (13)</h2>
 <h3>完成要件</h3>
 <p>同じlab.test zoneへ正式6名を設定する。P2のguide/practice-dbは保持してよい。踏み台/Webの通常resolver、名前によるM1 HTTP、DB名、UDP/TCP、外部forward、NXDOMAIN、ACL、AXFR拒否まで確認する。</p>
+<h3>今回の見取り図</h3>
+<p><img src="../../../assets/ja/m2.png" alt="M2: IP指定のHTTPが使える → DNSとresolverを設定する → 名前でも同じWebへ届く。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 図を参考に完成要件から設定値を自分で決めます。" width="1040" height="680" loading="lazy"></p>
+<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 図を参考に完成要件から設定値を自分で決めます。</p>
+<p><a href="../../../assets/ja/m2.png">図を拡大する</a> · <a href="../../../assets/ja/m2.svg">SVG</a></p>
 <table>
 <thead>
 <tr>
@@ -310,6 +324,10 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <h2 id="section-9">M3 保存内容と停止・再開 (3)</h2>
 <h3>完成要件</h3>
 <p>M専用markerを自分のLab IDで作る。P3とは別のブラウザで停止前記録→AWS Stop→ブラウザで停止完了確認→AWS Start→ブラウザで再開後確認を行う。対象は同じWebと元root volume。単なるrebootでは不可。backup/restoreとdisk追加は不要。</p>
+<h3>今回の見取り図</h3>
+<p><img src="../../../assets/ja/m3.png" alt="M3: 同じWebの元ディスク → 記録 → Stop → Start → 内容保持と新boot ID。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 Stop/StartはAWS APIによる管理操作で、Webの受信443番を開く操作ではありません。 図を参考に完成要件から設定値を自分で決めます。" width="1040" height="680" loading="lazy"></p>
+<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 Stop/StartはAWS APIによる管理操作で、Webの受信443番を開く操作ではありません。 図を参考に完成要件から設定値を自分で決めます。</p>
+<p><a href="../../../assets/ja/m3.png">図を拡大する</a> · <a href="../../../assets/ja/m3.svg">SVG</a></p>
 <ul>
 <li>File: /var/lib/jdu-web/mission/storage.txt</li>
 </ul>
@@ -351,6 +369,10 @@ payload=mission-storage-2026
 <h2 id="section-10">M4 PostgreSQLへの認証接続 (9)</h2>
 <h3>完成要件</h3>
 <p>本課題用DB/roleを自分で構築する。M2のdb.lab.testを通常解決し、Webのruntime roleで認証SELECTを成功させる。HBAはWeb/32・正しいDB/roleだけ。既存passwordをWeb内のmission用helperへ保存し、practiceと混ぜない。app tableはまだ不要。</p>
+<h3>今回の見取り図</h3>
+<p><img src="../../../assets/ja/m4.png" alt="M4: WebからDB接続を準備 → DB・role・認証を設定 → 許可したSELECTだけ成功。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。 図を参考に完成要件から設定値を自分で決めます。" width="1040" height="680" loading="lazy"></p>
+<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。 図を参考に完成要件から設定値を自分で決めます。</p>
+<p><a href="../../../assets/ja/m4.png">図を拡大する</a> · <a href="../../../assets/ja/m4.svg">SVG</a></p>
 <ul>
 <li>Profile: mission</li>
 <li>Database: jdu_catalog</li>
@@ -415,6 +437,10 @@ payload=mission-storage-2026
 <h2 id="section-11">M5 教員アプリをWeb・DBへ接続する (13)</h2>
 <h3>完成要件</h3>
 <p>同じ教員アプリをmission DBへ接続する。P5のpractice手順を参考にprofile=missionを選ぶ。既存app/venvを再配置しない。service停止後、mission runtime作成→明示activate→mission setup作成の順を守る（practiceのsetupはP6で終了済みにする）。固定migration/seed/管理者と権限をそのDBへ構築し指定2件を登録する。P1/M1を保持する。完成後はmissionをactiveにする。</p>
+<h3>今回の見取り図</h3>
+<p><img src="../../../assets/ja/m5.png" alt="M5: DNSとDBは準備済み → 提供アプリを接続・起動 → 操作結果がDBと画面へ。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 8000番はWeb内部だけ、8080番は踏み台からの管理用です。 図を参考に完成要件から設定値を自分で決めます。" width="1040" height="680" loading="lazy"></p>
+<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 8000番はWeb内部だけ、8080番は踏み台からの管理用です。 図を参考に完成要件から設定値を自分で決めます。</p>
+<p><a href="../../../assets/ja/m5.png">図を拡大する</a> · <a href="../../../assets/ja/m5.svg">SVG</a></p>
 <ul>
 <li>Profile: mission</li>
 <li>Database: jdu_catalog</li>
@@ -525,6 +551,10 @@ payload=mission-storage-2026
 <h2 id="section-12">M6 最小権限と公開範囲 (16)</h2>
 <h3>完成要件</h3>
 <p>mission側の最小権限を完成する。catalog_setupはNOLOGIN/password NULL、一時mission setup.envは残さない。root管理コード/venv、600秘密file、公開80からの管理拒否、private8080の正規成功、備品のview/add/changeだけの管理者、公開/非公開分離とSQL権限を確認する。ブラウザの機能確認は本人実演ではなく自動確認。</p>
+<h3>今回の見取り図</h3>
+<p><img src="../../../assets/ja/m6.png" alt="M6: アプリは動作済み → 不要な権限・公開を除く → 許可は成功、禁止は拒否。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 8000番はWeb内部だけ、8080番は踏み台からの管理用です。 図を参考に完成要件から設定値を自分で決めます。" width="1040" height="680" loading="lazy"></p>
+<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 8000番はWeb内部だけ、8080番は踏み台からの管理用です。 図を参考に完成要件から設定値を自分で決めます。</p>
+<p><a href="../../../assets/ja/m6.png">図を拡大する</a> · <a href="../../../assets/ja/m6.svg">SVG</a></p>
 <ul>
 <li>Profile: mission</li>
 <li>Database: jdu_catalog</li>

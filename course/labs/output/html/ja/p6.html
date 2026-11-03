@@ -10,12 +10,13 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">学ぶこと</a> · <a href="#section-3">課題</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">操作例：一つずつ実行する</a> · <a href="#section-6">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P6 最小権限と公開範囲</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">学ぶこと</a> · <a href="#section-3">課題</a> · <a href="#section-4">今回の見取り図</a> · <a href="#section-5">仕組みを理解する</a> · <a href="#section-6">操作例：一つずつ実行する</a> · <a href="#section-7">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P6 最小権限と公開範囲</h1>
 <p><a href="start.html">はじめに：接続・操作の約束</a> · <a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a> · <a href="portal.html">ブラウザで確認する</a></p>
 <p><a href="../ja/p6.html">日本語</a> · <a href="../ru/p6.html">Русский</a> · <a href="../uz/p6.html">O‘zbekcha</a></p>
-<p>2026-11-03 · D12 P/M r1.3</p>
+<p>2026-11-03 · D12 P/M r1.4</p>
 <p>配布版の有効期限：2027年1月31日末（UZT）。</p>
 <h2 id="section-1">始める前に</h2>
 <p><a href="start.html">共通の接続・操作</a>を確認する。対応する自力課題は<a href="m6.html">M6</a>。課題の判定方法は<a href="portal.html">ブラウザ確認手順</a>を使う。</p>
@@ -23,6 +24,10 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <p>正しい動作を保ち、不要な管理経路・DB権限・秘密fileの公開を拒否する。</p>
 <h2 id="section-3">課題</h2>
 <p>P5のpractice profileを使う。setup roleを無効化し、一時設定を片付け、正規loginを対照に拒否を自動確認する。SGやIAMの許可を広げない。</p>
+<h2 id="section-4">今回の見取り図</h2>
+<p><img src="../../../assets/ja/p6.png" alt="P6: アプリは動作済み → 不要な権限・公開を除く → 許可は成功、禁止は拒否。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 8000番はWeb内部だけ、8080番は踏み台からの管理用です。" width="1040" height="680" loading="lazy"></p>
+<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 8000番はWeb内部だけ、8080番は踏み台からの管理用です。</p>
+<p><a href="../../../assets/ja/p6.png">図を拡大する</a> · <a href="../../../assets/ja/p6.svg">SVG</a></p>
 <ul>
 <li>Profile: practice</li>
 <li>Database: jdu_catalog_practice</li>
@@ -57,21 +62,28 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 </tr>
 </tbody>
 </table>
-<h2 id="section-4">仕組みを理解する</h2>
+<h2 id="section-5">仕組みを理解する</h2>
 <p><strong>始める前の状態:</strong></p>
 <p>P5の練習アプリが動作し、初期構築用のsetup接続が残る。</p>
 <p><strong>このPで変えること:</strong></p>
 <p>setupを終了し、通常アプリの成功と不要なアクセスの拒否を同時に確かめる。</p>
 <p>作成時だけ必要なsetup権限と、運用中に必要なruntime権限を分ける。setup roleをNOLOGINにし、一時setup設定を削除しても、通常アプリはruntime接続で動くことが目標。公開80番・管理8080番・loopback8000番も別の境界である。どこか一つを閉じれば全体が安全と決めず、正規操作の成功と対象を限定した拒否を組にする。</p>
-<h2 id="section-5">操作例：一つずつ実行する</h2>
+<h2 id="section-6">操作例：一つずつ実行する</h2>
 <h3>P6.1 DB roleとtable権限を読む</h3>
 <p><strong>実行場所:</strong></p>
 <p>DBサーバーのpsql：OS postgres</p>
 <p><strong>目的と操作:</strong></p>
 <p>DBでpostgresのpsqlへ入る。\dpはtable権限、\duはrole属性。auth_user全体のUPDATEではなくlast_login/password列だけ、catalog_itemにDELETEなし、lookupは読取りだけ、django_migrationsは権限なしをSQL03と比べる。sequenceのnextval/setvalは確認目的で呼ばない。</p>
-<pre><code class="language-text">sudo -u postgres psql -X -d jdu_catalog_practice
+<p>入力するコマンド（番号はこの手順内の順番）</p>
+<pre><code class="language-bash"># 1. DBのOS端末からpostgresとしてpsqlを開く。以降はpsql内で操作する。
+sudo -u postgres psql -X -d jdu_catalog_practice
+</code></pre>
+<p>ここからはpsql内で入力する</p>
+<pre><code class="language-sql">-- 2. psql内で練習用DB roleの属性と権限を確認する。
 \du catalog_practice_*
+-- 3. psql内でpublic schemaのテーブル権限を読む。
 \dp public.*
+-- 4. psqlを終了し、同じDBサーバーのOS端末へ戻る。
 \q
 </code></pre>
 <p><strong>コマンド・設定値の意味:</strong></p>
@@ -85,8 +97,12 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>初期化に使ったsetup roleは完成後には不要。SQL04はNOLOGIN/password NULLにし、そのprofileの残存setup接続も閉じる。DB/tableの所有者はsetupのまま残す。削除やappへの所有権移転はしない。</p>
-<pre><code class="language-bash">cd /var/lib/jdu-web/lesson-resources-r1/app
+<p>入力するコマンド（番号はこの手順内の順番）</p>
+<pre><code class="language-bash"># 1. 作業場所を /var/lib/jdu-web/lesson-resources-r1/app へ移す。
+cd /var/lib/jdu-web/lesson-resources-r1/app
+# 2. 構築用roleのログインを無効にするSQLを表示する。まだ適用しない。
 python3 -B profile_sql.py --profile practice 04_disable_setup.sql
+# 3. 構築用roleのログインを無効にするSQLを生成し、postgres経由で指定DBへ適用する。
 python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u postgres \
   psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
 </code></pre>
@@ -101,11 +117,16 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>Webで対象のmetadataだけを確認する。rmの対象は練習setupの2fileに限定する。app.env、practice.app.env、DB runtime file、元command-state、SSH鍵、採点認証は残す。root専用fileの内容をcatする必要はない。</p>
-<pre><code class="language-bash">sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
+<p>入力するコマンド（番号はこの手順内の順番）</p>
+<pre><code class="language-bash"># 1. 指定ファイルの所有者・グループ・権限・名前を読む。
+sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
   /etc/jdu-catalog/profiles/practice.setup.env
+# 2. 表示して確認した2つの一時setup秘密ファイルだけを削除する。
 sudo rm -- /etc/jdu-catalog/setup.env /etc/jdu-catalog/profiles/practice.setup.env
+# 3. 指定ファイルの所有者・グループ・権限・名前を読む。
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env \
   /etc/jdu-catalog/profiles/practice.app.env /etc/jdu-web/db-practice.runtime.env
+# 4. 秘密の値を表示せずruntime設定の妥当性を検査する。
 sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
 </code></pre>
 <p><strong>コマンド・設定値の意味:</strong></p>
@@ -119,9 +140,14 @@ sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
 <p>踏み台のSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>踏み台のSSMで公開用port80を使い、通常一覧の成功を対照に/admin/やenvを要求する。8080の管理成功はRDP内Firefoxで別に確認する。404/403等の明示拒否と通常成功を組にして読み、timeoutだけで安全としない。</p>
-<pre><code class="language-bash">curl --noproxy '*' -i http://web.lab.test/
+<p>入力するコマンド（番号はこの手順内の順番）</p>
+<pre><code class="language-bash"># 1. http://web.lab.test/ へHTTP要求し、status・header・本文を表示する。
+curl --noproxy '*' -i http://web.lab.test/
+# 2. http://web.lab.test/admin/ へHTTP要求し、status・header・本文を表示する。
 curl --noproxy '*' -i http://web.lab.test/admin/
+# 3. http://web.lab.test/app.env へHTTP要求し、status・header・本文を表示する。
 curl --noproxy '*' -i http://web.lab.test/app.env
+# 4. http://web.lab.test/static/app.env へHTTP要求し、status・header・本文を表示する。
 curl --noproxy '*' -i http://web.lab.test/static/app.env
 </code></pre>
 <p><strong>コマンド・設定値の意味:</strong></p>
@@ -141,7 +167,7 @@ curl --noproxy '*' -i http://web.lab.test/static/app.env
 <p>練習16項目と保存状態を読む。Pは成績外で、M6はmission profileで別に確認する。「保存済み成績を見る」でMの成績原本を確認できる。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>処理中は結果を更新する。UNKNOWNは原因を直して再確認する。満点表示のためにgrade fileを編集しない。</p>
-<h2 id="section-6">理解の確認（採点外）</h2>
+<h2 id="section-7">理解の確認（採点外）</h2>
 <p>setupを閉じた後、アプリも停止した。setupを再び公開することが完成か？</p>
 <p><strong>考え方:</strong></p>
 <p>完成ではない。runtimeの接続設定・role・必要なtable権限を確認し、setupなしで正規機能が動く状態にする。</p>

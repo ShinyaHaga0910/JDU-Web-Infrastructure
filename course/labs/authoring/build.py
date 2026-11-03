@@ -17,6 +17,8 @@ PROJECT = Path(os.environ.get('JDU_WEB_PROJECT_ROOT', str(Path(__file__).resolve
 from markdown_it import MarkdownIt
 from portal_guide import write_guides
 from pages import write_pages, browser_check, expiry_text
+from command_notes import annotated_blocks
+from diagrams import diagram_markdown, write_diagrams
 from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE
 from checks import CHECKS
 from explanations import LABELS, READING, ROUTES, MISSION_PLAN, MODULE_NOTES, STEP_NOTES, OUTPUT_EXAMPLES
@@ -24,7 +26,7 @@ from explanations import LABELS, READING, ROUTES, MISSION_PLAN, MODULE_NOTES, ST
 KIT = PROJECT / '03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261103-r3'
 EXPECTED_REGISTRY = '3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33'
 DIST_ID = 'web-course-class193548-20261103-r3'
-MATERIAL_REVISION = 'r1.3'
+MATERIAL_REVISION = 'r1.4'
 L = {
  'practice': T('Web演習：練習P0〜P6と詳しい操作例', 'Web Infrastructure: практика P0–P6 с подробными шагами', 'Web Infrastructure: P0–P6 mashqlar va batafsil qadamlar'),
  'missions': T('Web演習：自力課題M0〜M6', 'Web Infrastructure: самостоятельные задания M0–M6', 'Web Infrastructure: M0–M6 mustaqil topshiriqlar'),
@@ -82,6 +84,9 @@ def emit_intro(lang, kind):
       T('nanoの編集：file名を指定して開く→本文を入力→Ctrl+O→Enterで保存→Ctrl+Xで終了。設定fileの枠はshell commandではない。psqlに入るとpromptが変わる。SQL/\\passwordはその中へ入力し、\\qでUbuntuへ戻る。失敗したcommandの次へ進まず、期待結果を確認する。',
         'Редактор nano: открыть файл → ввести текст → Ctrl+O → Enter сохранить → Ctrl+X выйти. Блок конфигурации не выполняется как shell-команда. В psql меняется prompt; SQL/\\password вводятся внутри, \\q возвращает в Ubuntu. Не продолжайте после ошибки без проверки результата.',
         'Nano: faylni ochish → matn yozish → Ctrl+O → Enter bilan saqlash → Ctrl+X bilan chiqish. Sozlama bloki shell buyrug‘i emas. Psql ichida prompt o‘zgaradi; SQL/\\password shu yerga yoziladi, \\q Ubuntu ga qaytaradi. Xatodan keyin natijani tekshirmay davom etmang.')[lang], '']
+    out += [T('番号付きコメントは、その手順内の操作順と目的を示します。# はshell、-- はpsql内のコメントです。コメントは説明なので、書き換える必要はありません。接続・エディタ・パスワード入力の完了を待ち、一つずつ実行します。改行で続くコマンドは一つとして扱います。',
+        'Нумерованные комментарии показывают порядок и цель внутри шага. # используется в shell, -- внутри psql. Комментарии менять не нужно. Выполняйте по одной команде, дожидаясь подключения, редактора и ввода пароля. Команда с продолжением строки остаётся одной командой.',
+        'Raqamli izohlar shu qadamdagi tartib va maqsadni bildiradi. # shell, -- psql ichidagi izohdir. Izohni o‘zgartirish shart emas. Ulanish, editor va parol kiritish tugashini kutib, bittadan bajaring. Qatorga bo‘lingan buyruq bitta buyruq bo‘lib qoladi.')[lang], '']
     return out
 
 
@@ -166,6 +171,7 @@ def make_markdown(reg, lang, kind):
     if kind == 'practice':
         for m in MODULES:
             out += ['## ' + m['id'] + ' ' + m['title'][lang], '', '### ' + L['goal'][lang], '', m['goals'][lang], '', '### ' + L['problem'][lang], '', m['problem'][lang], '']
+            out += diagram_markdown(m['id'],lang)
             out += task_spec(tasks[m['id']], reg, lang)
             notes=MODULE_NOTES[m['id']]
             out += ['### ' + LABELS['mechanism'][lang], '',
@@ -175,14 +181,10 @@ def make_markdown(reg, lang, kind):
             for i, s in enumerate(m['steps'], 1):
                 out += [f"#### {m['id']}.{i} {s['title'][lang]}", '', '**' + L['place'][lang] + ':** ' + PLACES[s['place']][lang], '', '**' + L['why'][lang] + ':** ' + s['why'][lang], '']
                 if s['code']:
-                    fence = 'bash'
-                    if s['place']=='pc':
-                        fence='powershell'
-                    if (m['id'], i) in {('P2', 2), ('P2', 3), ('P2', 6), ('P4', 2), ('P4', 3), ('P5', 9)}:
-                        fence = 'text'
-                    if (m['id'], i) in {('P4', 6), ('P6', 1)}:
-                        fence = 'text'
-                    out += ['```' + fence, shell_lines(s['code']) if fence=='bash' else s['code'], '```', '']
+                    for fence,source in annotated_blocks(m['id'],i,s['code'],lang):
+                        label=T('設定・入力データ（端末で実行するコマンドではない）','Конфигурация или данные: не выполнять как команды','Sozlama yoki ma’lumot: terminal buyrug‘i emas')[lang] if fence=='text' else T('入力するコマンド（番号はこの手順内の順番）','Команды: нумерация внутри этого шага','Buyruqlar: raqamlar shu qadam ichidagi tartib')[lang]
+                        if fence=='sql':label=T('ここからはpsql内で入力する','Далее вводить внутри psql','Bundan keyin psql ichida kiriting')[lang]
+                        out += [label, '', '```' + fence, shell_lines(source) if fence=='bash' else source, '```', '']
                 out += ['**' + LABELS['meaning'][lang] + ':** ' + STEP_NOTES[f"{m['id']}.{i}"][lang], '']
                 out += ['**' + L['expect'][lang] + ':** ' + s['expect'][lang], '', '**' + L['trouble'][lang] + ':** ' + s['trouble'][lang], '']
             if m['id'] in OUTPUT_EXAMPLES:
@@ -197,6 +199,7 @@ def make_markdown(reg, lang, kind):
             task = tasks['M' + str(number)]
             title = MODULES[number]['title'][lang]
             out += [f"## {task['id']} {title} ({task['raw_points_max']})", '', '### ' + L['requirements'][lang], '', MISSION_GUIDANCE[task['id']][lang], '']
+            out += diagram_markdown(task['id'],lang)
             out += task_spec(task, reg, lang)
             if task['requires_current']:
                 out += ['- ' + T('現在必要な前提', 'Текущие предпосылки', 'Joriy old shartlar')[lang] + ': ' + ', '.join(task['requires_current']), '']
@@ -226,6 +229,7 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
 '''
@@ -237,6 +241,8 @@ def render_html(md, lang, kind):
     # Generated output preserves the same folder hierarchy as Markdown.
     body = re.sub(r'href="([^"#]+)\.md(#[^"]*)?"', lambda m: 'href="' + m[1] + '.html' + (m[2] or '') + '"', body)
     body = body.replace('href="../../output/pdf/', 'href="../../pdf/')
+    body = body.replace('src="../../assets/', 'src="../../../assets/').replace('href="../../assets/', 'href="../../../assets/')
+    body = re.sub(r'<img src="([^"]+)" alt="([^"]*)"\s*/?>', r'<img src="\1" alt="\2" width="1040" height="680" loading="lazy">',body)
     toc = []
     def heading(m):
         slug = 'section-' + str(len(toc) + 1)
@@ -254,7 +260,7 @@ def make_pdf(md, lang, target):
     from reportlab.lib.styles import ParagraphStyle
     from reportlab.pdfbase import pdfmetrics
     from reportlab.pdfbase.ttfonts import TTFont
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Preformatted, Table, TableStyle, CondPageBreak
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, XPreformatted, Table, TableStyle, CondPageBreak, Image, KeepTogether
     for name, path in [('JP','msgothic.ttc'), ('Body','arial.ttf'), ('Mono','consola.ttf')]:
         if name not in pdfmetrics.getRegisteredFontNames():
             pdfmetrics.registerFont(TTFont(name, 'C:/Windows/Fonts/' + path, subfontIndex=0))
@@ -267,6 +273,7 @@ def make_pdf(md, lang, target):
             textColor=colors.HexColor('#134c61'), spaceBefore=14 if n>1 else 4, spaceAfter=9, keepWithNext=True)
     code_style = ParagraphStyle('code', fontName='Mono', fontSize=8.1, leading=11.3, leftIndent=7, rightIndent=3,
         spaceBefore=5, spaceAfter=9, backColor=colors.HexColor('#f0f4f7'), borderPadding=5)
+    pair_style = ParagraphStyle('commandpair',parent=code_style,spaceBefore=0,spaceAfter=0,borderPadding=0)
     small = ParagraphStyle('table', parent=styles[0], fontSize=8.5, leading=12.7, spaceAfter=0)
     parser = MarkdownIt('commonmark', {'html':False}).enable('table')
     tokens = parser.parse(md)
@@ -303,18 +310,33 @@ def make_pdf(md, lang, target):
                 flow.append(CondPageBreak(160))
             flow.append(Paragraph(html.escape(text),styles[level]));i+=3;continue
         if t.type=='paragraph_open':
+            images=[c for c in tokens[i+1].children or [] if c.type=='image']
+            if images:
+                for img in images:
+                    source=(ROOT/'docs'/lang/img.attrGet('src')).resolve()
+                    flow.extend([Image(str(source),width=width,height=width*680/1040),Spacer(1,8)])
+                i+=3;continue
             value=inline(tokens[i+1])
             if list_depth:value='• '+value
             flow.append(Paragraph(value,styles[0]));i+=3;continue
         if t.type in ('bullet_list_open','ordered_list_open'):list_depth+=1
         if t.type in ('bullet_list_close','ordered_list_close'):list_depth-=1
         if t.type=='fence':
-            lines=[]
-            for line in t.content.rstrip('\n').split('\n'):
-                # Printing wraps visually; source MD/HTML keeps exact commands.
-                lines.extend(textwrap.wrap(line, width=96, replace_whitespace=False, drop_whitespace=False,
-                    break_long_words=True, break_on_hyphens=False) or [''])
-            flow.append(Preformatted('\n'.join(lines),code_style))
+            chunks=re.split(r'(?m)(?=^(?:#|--) \d+\. )',t.content.rstrip('\n'))
+            chunks=[chunk for chunk in chunks if chunk]
+            paired=len(chunks)>1 or bool(re.match(r'^(?:#|--) \d+\. ',t.content))
+            if paired:flow.append(Spacer(1,5))
+            for chunk in chunks:
+                lines=[]
+                for line in chunk.rstrip('\n').split('\n'):
+                    # Printing wraps visually; source MD/HTML keeps exact commands.
+                    comment=bool(re.match(r'^(?:#|--) \d+\. ',line))
+                    limit=56 if comment and lang=='ja' else 96
+                    wrapped=textwrap.wrap(line,width=limit,replace_whitespace=False,drop_whitespace=False,break_long_words=True,break_on_hyphens=False) or ['']
+                    lines.extend('<font name="'+body_font+'" color="#285f45">'+html.escape(part)+'</font>' if comment else html.escape(part) for part in wrapped)
+                block=XPreformatted('\n'.join(lines),pair_style if paired else code_style)
+                flow.append(KeepTogether([block]) if paired else block)
+            if paired:flow.append(Spacer(1,9))
         if t.type=='table_open':
             rows=[];row=[];j=i+1
             while tokens[j].type!='table_close':
@@ -344,6 +366,7 @@ def main():
     reg_raw=(KIT/'assessment/assessment-registry.json').read_bytes()
     assert hashlib.sha256(reg_raw).hexdigest()==EXPECTED_REGISTRY
     reg=json.loads(reg_raw)
+    write_diagrams(ROOT)
     assert set(CHECKS)=={c for t in reg['tasks'] if t['category']=='automated_mission' for c in t['progress_scored_checks']}
     assert set(STEP_NOTES)=={f"{module['id']}.{i}" for module in MODULES for i in range(1,len(module['steps'])+1)}
     for m in MODULES:
@@ -395,7 +418,7 @@ def main():
         links.append(f'<article><h2>{label}</h2><p><a href="{lang}/portal.html">ブラウザ確認 / Проверка в браузере / Brauzerda tekshirish</a></p><p><a href="{lang}/practice.html">P0–P6</a> · <a href="{lang}/missions.html">M0–M6</a></p><p><a href="../pdf/web_lab_practice_{lang}.pdf">P PDF</a> · <a href="../pdf/web_lab_missions_{lang}.pdf">M PDF</a></p></article>')
     (ROOT/'output/html/index.html').write_text('<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JDU Web P/M 教材</title><style>'+CSS+'</style></head><body><main><h1>Web Infrastructure · P / M</h1><p>手順付き練習と自力課題 / Практика и задания / Mashqlar va topshiriqlar</p><p>2026-11-03 · D12 P/M '+MATERIAL_REVISION+'</p>'+''.join(links)+'<p>同梱署名版：2027-01-31末（UZT）まで有効。初回は教師の個別登録も必要です / Комплект действителен до 31.01.2027 (UZT); нужна личная регистрация / Tarqatma 31.01.2027 (UZT) gacha amal qiladi; shaxsiy ro‘yxat ham kerak.</p></main></body></html>',encoding='utf-8',newline='\n')
     package=ROOT/'output/web-lab-pm-r1.zip'
-    members=[p for folder in ('docs','resources','distribution','output/html','output/pdf') for p in (ROOT/folder).rglob('*') if p.is_file()]
+    members=[p for folder in ('docs','assets','resources','distribution','output/html','output/pdf') for p in (ROOT/folder).rglob('*') if p.is_file()]
     members += [ROOT/'README.md',ROOT/'TEACHER-NOTES.md',ROOT/'VALIDATION.md']
     if all(p.exists() for p in members):
         inventory={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in members}

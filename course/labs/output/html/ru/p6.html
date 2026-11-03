@@ -10,12 +10,13 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Что изучаем</a> · <a href="#section-3">Задание</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P6 Минимальные права и границы публикации</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Что изучаем</a> · <a href="#section-3">Задание</a> · <a href="#section-4">Схема задания</a> · <a href="#section-5">Как это работает</a> · <a href="#section-6">Пример решения: выполняйте по одному шагу</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P6 Минимальные права и границы публикации</h1>
 <p><a href="start.html">Сначала: подключение и правила</a> · <a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a> · <a href="portal.html">Проверка в браузере</a></p>
 <p><a href="../ja/p6.html">日本語</a> · <a href="../ru/p6.html">Русский</a> · <a href="../uz/p6.html">O‘zbekcha</a></p>
-<p>2026-11-03 · D12 P/M r1.3</p>
+<p>2026-11-03 · D12 P/M r1.4</p>
 <p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
 <h2 id="section-1">Перед началом</h2>
 <p>Проверьте <a href="start.html">подключение и правила</a>. Связанное задание: <a href="m6.html">M6</a>. Проверка описана в <a href="portal.html">инструкции браузера</a>.</p>
@@ -23,6 +24,10 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <p>Сохранить штатную работу, запретив лишние admin-маршруты, SQL-права и раскрытие секретов.</p>
 <h2 id="section-3">Задание</h2>
 <p>Используйте practice из P5. Отключите setup-role, уберите временную конфигурацию и проверьте отказы при наличии успешного контрольного login. Не расширяйте SG/IAM.</p>
+<h2 id="section-4">Схема задания</h2>
+<p><img src="../../../assets/ru/p6.png" alt="P6: Приложение уже работает → Убрать лишние права и доступ → Разрешённое работает, лишнее нет。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. 8000 доступен только внутри Web; 8080 используется для управления с бастиона." width="1040" height="680" loading="lazy"></p>
+<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. 8000 доступен только внутри Web; 8080 используется для управления с бастиона.</p>
+<p><a href="../../../assets/ru/p6.png">Открыть крупно</a> · <a href="../../../assets/ru/p6.svg">SVG</a></p>
 <ul>
 <li>Profile: practice</li>
 <li>Database: jdu_catalog_practice</li>
@@ -57,21 +62,28 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 </tr>
 </tbody>
 </table>
-<h2 id="section-4">Как это работает</h2>
+<h2 id="section-5">Как это работает</h2>
 <p><strong>Состояние перед началом:</strong></p>
 <p>Учебное приложение P5 работает; временный setup-доступ ещё существует.</p>
 <p><strong>Что изменится в этом P:</strong></p>
 <p>Setup завершён; нормальная работа и отказы ненужного доступа проверены вместе.</p>
 <p>Разделите временные права setup и рабочие права runtime. После NOLOGIN и удаления временной настройки приложение должно работать через runtime. Публичный 80, административный 8080 и локальный 8000 - разные границы. Проверяйте успешную разрешённую операцию вместе с отказом конкретного ненужного доступа.</p>
-<h2 id="section-5">Пример решения: выполняйте по одному шагу</h2>
+<h2 id="section-6">Пример решения: выполняйте по одному шагу</h2>
 <h3>P6.1 Прочитать роли и права таблиц</h3>
 <p><strong>Место выполнения:</strong></p>
 <p>psql на DB-сервере от имени системного postgres</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Откройте psql как postgres на DB. \dp показывает права таблиц, \du - атрибуты ролей. Сверьте с SQL03: UPDATE auth_user только last_login/password, без DELETE catalog_item; lookup только чтение, django_migrations без прав. Не вызывайте nextval/setval ради проверки.</p>
-<pre><code class="language-text">sudo -u postgres psql -X -d jdu_catalog_practice
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. В терминале DB открыть psql от postgres; следующие действия внутри psql.
+sudo -u postgres psql -X -d jdu_catalog_practice
+</code></pre>
+<p>Далее вводить внутри psql</p>
+<pre><code class="language-sql">-- 2. В psql проверить атрибуты и права учебных ролей.
 \du catalog_practice_*
+-- 3. В psql прочитать права таблиц схемы public.
 \dp public.*
+-- 4. Выйти из psql в терминал ОС того же DB-сервера.
 \q
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -85,8 +97,12 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>После инициализации вход setup не нужен. SQL04 задаёт NOLOGIN/password NULL и закрывает оставшиеся setup-подключения profile. Владельцем DB/table остаётся setup; роль не удаляется и владение app не передаётся.</p>
-<pre><code class="language-bash">cd /var/lib/jdu-web/lesson-resources-r1/app
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Перейти в рабочий каталог /var/lib/jdu-web/lesson-resources-r1/app.
+cd /var/lib/jdu-web/lesson-resources-r1/app
+# 2. Показать SQL отключения входа setup без выполнения.
 python3 -B profile_sql.py --profile practice 04_disable_setup.sql
+# 3. Сформировать SQL отключения входа setup и применить через postgres к нужной БД.
 python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u postgres \
   psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
 </code></pre>
@@ -101,11 +117,16 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>На Web проверьте только metadata. Удалите ровно два файла setup practice. app.env, practice.app.env, DB runtime, command-state, SSH-ключи и данные оценивания сохраняются. Содержимое секретных файлов через cat не выводится.</p>
-<pre><code class="language-bash">sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Прочитать владельца, группу, права и имя указанных файлов.
+sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
   /etc/jdu-catalog/profiles/practice.setup.env
+# 2. Удалить только два проверенных временных секретных файла setup.
 sudo rm -- /etc/jdu-catalog/setup.env /etc/jdu-catalog/profiles/practice.setup.env
+# 3. Прочитать владельца, группу, права и имя указанных файлов.
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env \
   /etc/jdu-catalog/profiles/practice.app.env /etc/jdu-web/db-practice.runtime.env
+# 4. Проверить runtime-конфигурацию без вывода секретов.
 sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -119,9 +140,14 @@ sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
 <p>SSM-терминал бастиона: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>В SSM бастиона запросите обычный список на 80, затем /admin/ и env. Отдельно подтвердите штатный admin на 8080 в Firefox через RDP. Нужны нормальный ответ и явный отказ 404/403; таймаута недостаточно.</p>
-<pre><code class="language-bash">curl --noproxy '*' -i http://web.lab.test/
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Отправить HTTP к http://web.lab.test/; показать статус, заголовки и тело.
+curl --noproxy '*' -i http://web.lab.test/
+# 2. Отправить HTTP к http://web.lab.test/admin/; показать статус, заголовки и тело.
 curl --noproxy '*' -i http://web.lab.test/admin/
+# 3. Отправить HTTP к http://web.lab.test/app.env; показать статус, заголовки и тело.
 curl --noproxy '*' -i http://web.lab.test/app.env
+# 4. Отправить HTTP к http://web.lab.test/static/app.env; показать статус, заголовки и тело.
 curl --noproxy '*' -i http://web.lab.test/static/app.env
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -141,7 +167,7 @@ curl --noproxy '*' -i http://web.lab.test/static/app.env
 <p>Прочитайте 16 учебных пунктов и статус сохранения. P не оценивается; M6 проверяется отдельно в mission. Сохранённые оценки M доступны в разделе оценок.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Во время обработки обновляйте результат. Устраните причину UNKNOWN и проверьте заново. Не редактируйте grade-файлы ради баллов.</p>
-<h2 id="section-6">Проверка понимания (без баллов)</h2>
+<h2 id="section-7">Проверка понимания (без баллов)</h2>
 <p>После закрытия setup приложение перестало работать. Нужно ли просто снова открыть setup?</p>
 <p><strong>Объяснение:</strong></p>
 <p>Нет. Проверьте runtime-настройку, роль и необходимые права таблиц; обычная работа должна обходиться без setup.</p>

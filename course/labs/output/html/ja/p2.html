@@ -10,12 +10,13 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">学ぶこと</a> · <a href="#section-3">課題</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">操作例：一つずつ実行する</a> · <a href="#section-6">出力の読み取り例（入力しない）</a> · <a href="#section-7">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P2 内部DNSと通常の名前解決</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">学ぶこと</a> · <a href="#section-3">課題</a> · <a href="#section-4">今回の見取り図</a> · <a href="#section-5">仕組みを理解する</a> · <a href="#section-6">操作例：一つずつ実行する</a> · <a href="#section-7">出力の読み取り例（入力しない）</a> · <a href="#section-8">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P2 内部DNSと通常の名前解決</h1>
 <p><a href="start.html">はじめに：接続・操作の約束</a> · <a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a> · <a href="portal.html">ブラウザで確認する</a></p>
 <p><a href="../ja/p2.html">日本語</a> · <a href="../ru/p2.html">Русский</a> · <a href="../uz/p2.html">O‘zbekcha</a></p>
-<p>2026-11-03 · D12 P/M r1.3</p>
+<p>2026-11-03 · D12 P/M r1.4</p>
 <p>配布版の有効期限：2027年1月31日末（UZT）。</p>
 <h2 id="section-1">始める前に</h2>
 <p><a href="start.html">共通の接続・操作</a>を確認する。対応する自力課題は<a href="m2.html">M2</a>。課題の判定方法は<a href="portal.html">ブラウザ確認手順</a>を使う。</p>
@@ -23,6 +24,10 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <p>BINDのzone・A record・問い合わせ制限と、client側resolverを順に構築する。</p>
 <h2 id="section-3">課題</h2>
 <p>guide.lab.test→10.20.1.20、practice-db.lab.test→10.20.2.20を設定する。P1のHTTPを名前で利用する。基盤の固定IPは変えない。</p>
+<h2 id="section-4">今回の見取り図</h2>
+<p><img src="../../../assets/ja/p2.png" alt="P2: IP指定のHTTPが使える → DNSとresolverを設定する → 名前でも同じWebへ届く。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。" width="1040" height="680" loading="lazy"></p>
+<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。</p>
+<p><a href="../../../assets/ja/p2.png">図を拡大する</a> · <a href="../../../assets/ja/p2.svg">SVG</a></p>
 <table>
 <thead>
 <tr>
@@ -41,21 +46,26 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 </tr>
 </tbody>
 </table>
-<h2 id="section-4">仕組みを理解する</h2>
+<h2 id="section-5">仕組みを理解する</h2>
 <p><strong>始める前の状態:</strong></p>
 <p>P1のHTTPがIP指定で使える。DNSはこれから設定する。</p>
 <p><strong>このPで変えること:</strong></p>
 <p>BINDの練習名を、踏み台とWebの通常resolverから使える。</p>
 <p>DNSの仕事は名前への回答で、HTTP本文の配信ではない。lab.testのzoneはBINDが管理し、A recordはIPv4を返す。digで問い合わせ先を明示した確認と、getentやbrowserがOSの設定を使う確認を分ける。名前解決後のHTTP接続は別の通信である。<a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BINDの一次資料</a>。</p>
-<h2 id="section-5">操作例：一つずつ実行する</h2>
+<h2 id="section-6">操作例：一つずつ実行する</h2>
 <h3>P2.1 BINDを導入し元設定を残す</h3>
 <p><strong>実行場所:</strong></p>
 <p>DNSサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>DNSへSSMで入りrole=dnsを確認。cp -aは元fileの属性を保って控えを作る。-nは既存の控えを上書きしない。これは編集失敗への控えであり、DB backup/restore課題ではない。</p>
-<pre><code class="language-bash">sudo apt-get update -o APT::Update::Error-Mode=any
+<p>入力するコマンド（番号はこの手順内の順番）</p>
+<pre><code class="language-bash"># 1. 内部repoのパッケージ一覧を更新する。取得エラーは失敗扱いにする。
+sudo apt-get update -o APT::Update::Error-Mode=any
+# 2. 内部repoから bind9 bind9-utils を推奨追加なしで導入する。
 sudo apt-get install --no-install-recommends bind9 bind9-utils
+# 3. 元ファイルを控えへコピーする。既存の控えは上書きしない。
 sudo cp -an /etc/bind/named.conf.options /etc/bind/named.conf.options.before-p2
+# 4. 元ファイルを控えへコピーする。既存の控えは上書きしない。
 sudo cp -an /etc/bind/named.conf.local /etc/bind/named.conf.local.before-p2
 </code></pre>
 <p><strong>コマンド・設定値の意味:</strong></p>
@@ -69,6 +79,7 @@ sudo cp -an /etc/bind/named.conf.local /etc/bind/named.conf.local.before-p2
 <p>DNSサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>sudo nano /etc/bind/named.conf.optionsで次の内容を設定し保存する。aclは許可するclient集合、listen-onはDNS自身の待受、forward onlyは外部名をAWS DNSへ渡す指定。recursionとqueryの両方を同じ3送信元へ限定する。dnssec-validation noは閉じた学習用forward構成に合わせた設定である。</p>
+<p>設定・入力データ（端末で実行するコマンドではない）</p>
 <pre><code class="language-text">acl &quot;jdu_clients&quot; { 127.0.0.1; 10.20.1.10; 10.20.1.20; };
 options {
     directory &quot;/var/cache/bind&quot;;
@@ -95,6 +106,7 @@ options {
 <p>DNSサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>sudo nano /etc/bind/named.conf.localで先頭のzoneブロックを記入。sudo install -d -m 0755 /etc/bind/zonesの後、sudo nano /etc/bind/zones/db.lab.testで残りを記入する。SOAは管理情報、NSは権威DNS、Aは名前とIPv4。末尾のドットは絶対名を示す。serialは編集のたびに増やす。</p>
+<p>設定・入力データ（端末で実行するコマンドではない）</p>
 <pre><code class="language-text">// /etc/bind/named.conf.local
 zone &quot;lab.test&quot; {
     type primary;
@@ -123,11 +135,18 @@ practice-db IN A 10.20.2.20
 <p>DNSサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>設定誤りのままclientを切り替えると名前解決が止まる。先にnamed-checkconfとnamed-checkzoneを成功させ、起動後にUDP/TCPの両方で応答を見る。</p>
-<pre><code class="language-bash">sudo named-checkconf -z
+<p>入力するコマンド（番号はこの手順内の順番）</p>
+<pre><code class="language-bash"># 1. BINDの設定と参照zoneを構文検査する。
+sudo named-checkconf -z
+# 2. lab.testのzoneファイルを検査する。
 sudo named-checkzone lab.test /etc/bind/zones/db.lab.test
+# 3. named を今すぐ起動し、次回起動時も自動起動させる。
 sudo systemctl enable --now named
+# 4. named を再起動して設定を読み直す。
 sudo systemctl restart named
+# 5. UDP 53で guide.lab.test を問い合わせ、応答を読む。
 dig @127.0.0.1 guide.lab.test A
+# 6. TCP 53で guide.lab.test を問い合わせ、応答を読む。
 dig @127.0.0.1 guide.lab.test A +tcp
 </code></pre>
 <p><strong>コマンド・設定値の意味:</strong></p>
@@ -141,10 +160,16 @@ dig @127.0.0.1 guide.lab.test A +tcp
 <p>踏み台のSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>踏み台とWebの両方で下を実行する。@10.20.2.10は今回だけ問い合わせ先を指定する。この成功だけでは、普通のbrowserやアプリが同じDNSを使うとは言えない。</p>
-<pre><code class="language-bash">dig @10.20.2.10 guide.lab.test A
+<p>入力するコマンド（番号はこの手順内の順番）</p>
+<pre><code class="language-bash"># 1. UDP 53で guide.lab.test を問い合わせ、応答を読む。
+dig @10.20.2.10 guide.lab.test A
+# 2. TCP 53で practice-db.lab.test を問い合わせ、応答を読む。
 dig @10.20.2.10 practice-db.lab.test A +tcp
+# 3. UDP 53で absent-p2.lab.test を問い合わせ、応答を読む。
 dig @10.20.2.10 absent-p2.lab.test A
+# 4. UDP 53で aws.amazon.com を問い合わせ、応答を読む。
 dig @10.20.2.10 aws.amazon.com A
+# 5. zone全件の転送を要求し、明示的に拒否されるか調べる。
 dig @10.20.2.10 lab.test AXFR
 </code></pre>
 <p><strong>コマンド・設定値の意味:</strong></p>
@@ -158,6 +183,7 @@ dig @10.20.2.10 lab.test AXFR
 <p>踏み台のSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>踏み台とWebで1台ずつ実施。ip -br linkでens5等の実interface名を調べ、networkctl status その名前でNetwork Fileを読む。対応するnetplan YAMLをls /etc/netplanで探し、sudo cp -anで控えを作る。sudo nanoで既存の同じinterfaceにdhcp4-overrides/use-dns:falseとnameserversを追加する。下はファイルの構造例であり、interface名と既存match/set-name/renderer等を自分のファイルに合わせて保持する。</p>
+<p>設定・入力データ（端末で実行するコマンドではない）</p>
 <pre><code class="language-text">network:
   version: 2
   ethernets:
@@ -179,12 +205,20 @@ dig @10.20.2.10 lab.test AXFR
 <p>踏み台のSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>踏み台とWebで構文生成→適用→確認の順に行う。SSH/RDPの別端末も開いておき、もし切断したらSSMで戻って控えとの差分を確認する。netplan tryの確認待ちは使わず、設定を読んでgenerate成功後にapplyする。</p>
-<pre><code class="language-bash">sudo netplan generate
+<p>入力するコマンド（番号はこの手順内の順番）</p>
+<pre><code class="language-bash"># 1. netplan YAMLから設定を生成し、適用前の構文を検査する。
+sudo netplan generate
+# 2. 保存したnetplan設定をネットワークへ適用する。
 sudo netplan apply
+# 3. systemd-resolved を再起動して設定を読み直す。
 sudo systemctl restart systemd-resolved
+# 4. 通常の名前解決に使うDNSサーバーを表示する。
 resolvectl dns
+# 5. 通常のresolverで guide.lab.test のIPv4を調べる。
 getent ahostsv4 guide.lab.test
+# 6. 通常のresolverで practice-db.lab.test のIPv4を調べる。
 getent ahostsv4 practice-db.lab.test
+# 7. http://guide.lab.test/practice.txt へHTTP要求し、status・header・本文を表示する。
 curl --noproxy '*' -i http://guide.lab.test/practice.txt
 </code></pre>
 <p><strong>コマンド・設定値の意味:</strong></p>
@@ -204,12 +238,12 @@ curl --noproxy '*' -i http://guide.lab.test/practice.txt
 <p>13項目の練習確認。P1の現在機能も必要。次のM2で正式名6件を追加してからDB/appへ進む。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>名前が開かない原因をHTTP停止と決めつけず、IP指定→dig→getent→HTTPの順で比べる。</p>
-<h2 id="section-6">出力の読み取り例（入力しない）</h2>
+<h2 id="section-7">出力の読み取り例（入力しない）</h2>
 <pre><code class="language-text">status: NOERROR
 guide.lab.test.  300  IN  A  10.20.1.20
 </code></pre>
 <p>dig出力の説明用抜粋。Aの右が回答IPv4、300がTTL。回答が出ても、問い合わせ先SERVERが10.20.2.10かを別に確認する。</p>
-<h2 id="section-7">理解の確認（採点外）</h2>
+<h2 id="section-8">理解の確認（採点外）</h2>
 <p>dig @10.20.2.10は成功し、getentは失敗する。DNSのzoneだけが原因と言えるか？</p>
 <p><strong>考え方:</strong></p>
 <p>言えない。明示したDNSへの回答と、OSが通常選ぶresolverは別なので、Netplanとresolvectlの実効設定を確認する。</p>

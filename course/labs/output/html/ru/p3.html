@@ -10,12 +10,13 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Что изучаем</a> · <a href="#section-3">Задание</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P3 Данные при остановке и запуске</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Что изучаем</a> · <a href="#section-3">Задание</a> · <a href="#section-4">Схема задания</a> · <a href="#section-5">Как это работает</a> · <a href="#section-6">Пример решения: выполняйте по одному шагу</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P3 Данные при остановке и запуске</h1>
 <p><a href="start.html">Сначала: подключение и правила</a> · <a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a> · <a href="portal.html">Проверка в браузере</a></p>
 <p><a href="../ja/p3.html">日本語</a> · <a href="../ru/p3.html">Русский</a> · <a href="../uz/p3.html">O‘zbekcha</a></p>
-<p>2026-11-03 · D12 P/M r1.3</p>
+<p>2026-11-03 · D12 P/M r1.4</p>
 <p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
 <h2 id="section-1">Перед началом</h2>
 <p>Проверьте <a href="start.html">подключение и правила</a>. Связанное задание: <a href="m3.html">M3</a>. Проверка описана в <a href="portal.html">инструкции браузера</a>.</p>
@@ -23,6 +24,10 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <p>Проверить файл и права на исходном EBS; доказать сохранение после stop/start того же Web.</p>
 <h2 id="section-3">Задание</h2>
 <p>Создайте marker P3 со своим анонимным Lab ID. Зафиксируйте состояние до остановки, stopped и после запуска. Дополнительный диск, mount и backup/restore не требуются.</p>
+<h2 id="section-4">Схема задания</h2>
+<p><img src="../../../assets/ru/p3.png" alt="P3: Исходный диск того же Web → Запись → Stop → Start → Данные сохранены, boot ID новый。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Stop/Start выполняется через AWS API, а не через входящий 443 Web." width="1040" height="680" loading="lazy"></p>
+<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Stop/Start выполняется через AWS API, а не через входящий 443 Web.</p>
+<p><a href="../../../assets/ru/p3.png">Открыть крупно</a> · <a href="../../../assets/ru/p3.svg">SVG</a></p>
 <ul>
 <li>File: /var/lib/jdu-web/practice/storage.txt</li>
 </ul>
@@ -30,21 +35,26 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 task=P3
 payload=practice-storage-2026
 </code></pre>
-<h2 id="section-4">Как это работает</h2>
+<h2 id="section-5">Как это работает</h2>
 <p><strong>Состояние перед началом:</strong></p>
 <p>Маркер можно сохранить на исходном корневом EBS того же Web.</p>
 <p><strong>Что изменится в этом P:</strong></p>
 <p>Сохранность после stop/start того же Web подтверждена данными до и после.</p>
 <p>Различайте оперативную память и сохранённый файл на EBS. Здесь выполняется Stop/Start того же Web с исходным EBS. Сравните хеш, instance/volume ID и изменение boot ID. Автоматический public IPv4 может измениться. <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Stop_Start.html">Остановка и запуск EC2</a>.</p>
-<h2 id="section-5">Пример решения: выполняйте по одному шагу</h2>
+<h2 id="section-6">Пример решения: выполняйте по одному шагу</h2>
 <h3>P3.1 Проверить исходный диск и свободное место</h3>
 <p><strong>Место выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>findmnt показывает файловую систему, lsblk - диски и разделы, df -h - свободное место. Используйте предоставленный root EBS; имя /dev/nvme не является причиной менять диск.</p>
-<pre><code class="language-bash">findmnt -T /var/lib
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Определить файловую систему для /var/lib.
+findmnt -T /var/lib
+# 2. Показать имена, типы, размеры, точки монтирования и ID дисков.
 lsblk -o NAME,TYPE,SIZE,MOUNTPOINTS,SERIAL
+# 3. Проверить занятое и свободное место /var/lib.
 df -h /var/lib
+# 4. Прочитать boot ID для сравнения загрузок до и после остановки.
 cat /proc/sys/kernel/random/boot_id
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -58,15 +68,26 @@ cat /proc/sys/kernel/random/boot_id
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Задайте LAB_ID и в этом терминале. printf завершает строки переводом строки. install задаёт directory 0755 и файл 0644/root:root. Сначала проверьте существующий файл; не заменяйте отличающееся содержимое без выяснения причины.</p>
-<pre><code class="language-bash">LAB_ID='YOUR-LAB-ID'
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Записать свой Lab ID от преподавателя в переменную.
+LAB_ID='YOUR-LAB-ID'
+# 2. Перейти в рабочий каталог ~.
 cd ~
+# 3. Создать рабочий каталог; существующий сохранить.
 mkdir -p jdu-web-practice/p3
+# 4. Перейти в рабочий каталог jdu-web-practice/p3.
 cd jdu-web-practice/p3
+# 5. Записать учебный marker со своим Lab ID в рабочий файл.
 printf 'lab_id=%s\ntask=P3\npayload=practice-storage-2026\n' &quot;$LAB_ID&quot; &gt; storage.txt
+# 6. Прочитать storage.txt без изменения.
 cat storage.txt
+# 7. Создать каталог с указанными владельцем, группой и правами.
 sudo install -d -o root -g root -m 0755 /var/lib/jdu-web/practice
+# 8. Установить файл с нужными владельцем, группой и правами.
 sudo install -o root -g root -m 0644 storage.txt /var/lib/jdu-web/practice/storage.txt
+# 9. Прочитать владельца, группу, права и имя указанных файлов.
 stat -c '%U:%G %a %n' /var/lib/jdu-web/practice /var/lib/jdu-web/practice/storage.txt
+# 10. Вычислить SHA256 marker для сравнения содержимого.
 sha256sum /var/lib/jdu-web/practice/storage.txt
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -108,7 +129,7 @@ sha256sum /var/lib/jdu-web/practice/storage.txt
 <p>Три учебные проверки PASS. Если public IPv4 изменился, используйте новый адрес для внешнего HTTP.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Новый instance не доказывает сохранение. Для P3/M3 нужны отдельные marker и доказательства.</p>
-<h2 id="section-6">Проверка понимания (без баллов)</h2>
+<h2 id="section-7">Проверка понимания (без баллов)</h2>
 <p>Достаточно ли одинакового текста на новом Web для выполнения задания?</p>
 <p><strong>Объяснение:</strong></p>
 <p>Нет: нужны исходные instance и volume, а также наблюдение остановленного состояния.</p>

@@ -1,6 +1,6 @@
 # Topshiriqlar M0–M6
 
-2026-11-03 · D12 P/M r1.3
+2026-11-03 · D12 P/M r1.4
 
 [Avval: ulanish va qoidalar](start.md) · [Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M6](missions.md) · [Brauzerda tekshirish](portal.md)
 

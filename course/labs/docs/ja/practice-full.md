@@ -1,6 +1,6 @@
 # Web演習：練習P0〜P6と詳しい操作例
 
-2026-11-03 | D12 P/M r1.3 | web-course-class193548-20261103-r3
+2026-11-03 | D12 P/M r1.4 | web-course-class193548-20261103-r3
 
 配布版の有効期限：2027年1月31日末（UZT）。
 
@@ -40,6 +40,8 @@ M1=8、M2=13、M3=3、M4=9、M5=13、M6=16、合計62素点。M0は0点。本人
 
 nanoの編集：file名を指定して開く→本文を入力→Ctrl+O→Enterで保存→Ctrl+Xで終了。設定fileの枠はshell commandではない。psqlに入るとpromptが変わる。SQL/\passwordはその中へ入力し、\qでUbuntuへ戻る。失敗したcommandの次へ進まず、期待結果を確認する。
 
+番号付きコメントは、その手順内の操作順と目的を示します。# はshell、-- はpsql内のコメントです。コメントは説明なので、書き換える必要はありません。接続・エディタ・パスワード入力の完了を待ち、一つずつ実行します。改行で続くコマンドは一つとして扱います。
+
 ## 操作例の読み方
 
 各Pは「課題→仕組み→操作例→理解の確認」の順で使う。操作例は一つのまとまりを貼り付けず、1コマンドずつ実行して表示を読む。末尾のバックスラッシュは次の行へ続く記号なので、その行と次の行を一つのコマンドとして扱う。
@@ -72,6 +74,14 @@ CloudShell、Windows、5台のUbuntuを区別し、正しいサーバーへSSM�
 
 自分のLab ID・配布ID・5役割のinstance IDを確認する。これは提供済み環境の確認で、0点。5台がまだない場合は先に初期配布手順を完了する。作成済みならcreate・鍵生成・採点再登録を繰り返さない。
 
+### 今回の見取り図
+
+![P0: 5台は初期配備済み → 本人・接続先を確かめる → 正しい役割へSSMで入る。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。](../../assets/ja/p0.png)
+
+図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。
+
+[図を拡大する](../../assets/ja/p0.png) · [SVG](../../assets/ja/p0.svg)
+
 ### 仕組みを理解する
 
 **始める前の状態:**
@@ -96,11 +106,18 @@ CloudShell（学生本人のAWS）
 
 AWS Academyの自分のClassからAWSを開き、CloudShellを起動する。LAB_IDを教師案内の値に置き換える。INSTALLは後の教材配置で使う保存先。初期導入済みのファイルとAWSアカウントを確認する。課題の判定は最後にブラウザで行う。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. 教師から案内された自分のLab IDを変数へ入れる。
 LAB_ID='YOUR-LAB-ID'
+# 2. 使用する署名配布版のIDを変数へ入れる。
 COURSE_ID='web-course-class193548-20261103-r3'
+# 3. 自分の配布版が導入されている保存先を変数へ入れる。
 INSTALL="$HOME/.local/share/jdu-web/courses/$COURSE_ID/$LAB_ID"
+# 4. 現在操作中のAWSアカウント番号を表示する。
 aws sts get-caller-identity --query Account --output text
+# 5. 初期導入のファイルがあればINSTALL_OKを表示する。
 test -f "$INSTALL/activate.sh" && printf 'INSTALL_OK\n'
 ```
 
@@ -148,12 +165,20 @@ CloudShell（学生本人のAWS）
 
 EC2で確認したWebのIDに置き換えて実行する。接続後はCloudShellではなくUbuntuの端末になる。id -unはSSM管理userを、bootstrap.jsonのroleはサーバー役割を示す。最後のexitを1回実行するとCloudShellへ戻る。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. CloudShellから指定EC2へSSM接続する。接続完了後に次へ進む。
 aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
+# 2. この端末で操作しているOSユーザー名を表示する。
 id -un
+# 3. 接続中のサーバーのホスト名を表示する。
 hostname
+# 4. bootstrap情報のroleだけを読み、接続先の役割を確認する。
 python3 -c 'import json;print(json.load(open("/etc/jdu-web/bootstrap.json"))["role"])'
+# 5. 現在の作業ディレクトリを表示する。
 pwd
+# 6. 現在のサーバーへの接続を閉じ、CloudShellへ戻る。
 exit
 ```
 
@@ -179,8 +204,12 @@ CloudShell（学生本人のAWS）
 
 本教材zipをCloudShellのActions→Upload fileでアップロードし、unzip web-lab-pm-r1.zipで展開する。resourcesへ移動し次を実行する。補助処理は本人の署名版と元5台を照合し、Web/DBへアプリ資源・SQL・秘密の非表示入力helperを置くだけ。サービスやDBは構築しない。秘密は送らない。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. 作業場所を $HOME/web-lab-pm-r1/resources へ移す。
 cd "$HOME/web-lab-pm-r1/resources"
+# 2. 署名版と本人の5台を照合し、公開教材をWeb/DBへ配置する。
 python3 -B stage_resources.py --installation "$INSTALL"
 ```
 
@@ -228,7 +257,10 @@ PUBLIC_LESSON_RESOURCES_READY=web と =db。各台の/var/lib/jdu-web/lesson-res
 
 EC2で確認した現在の踏み台の公開IPv4を使う。Windowsキー＋Rを押し、mstsc /promptを入力してEnter。ComputerへそのIPを指定し、userはlabuser、passwordは本人が初期配備で設定したRDP用を使う。Windowsアカウントのpasswordではない。「資格情報を記憶する」は選ばない。青いxrdp loginが出たらSession=Xorgを確認し、labuserで入る。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```powershell
+# 1. WindowsのRDP接続画面を開き、資格情報の入力を求める。
 mstsc /prompt
 ```
 
@@ -262,6 +294,14 @@ Nginx、保存先、待受、HTTP応答、access logを一組で確認する。
 
 Webの/var/www/html/practice.txtから指定本文をHTTP200で返す。Web自身・踏み台・外部の三経路で確認する。
 
+### 今回の見取り図
+
+![P1: Webの練習配信は未完成 → Web内の配信を設定する → 本文とログを照合する。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。](../../assets/ja/p1.png)
+
+図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。
+
+[図を拡大する](../../assets/ja/p1.png) · [SVG](../../assets/ja/p1.svg)
+
 - File: /var/www/html/practice.txt
 - URL path: /practice.txt
 
@@ -293,9 +333,14 @@ WebサーバーのSSM端末：ssm-user
 
 P0と同じ方法でWebへSSM接続し、role=webを確認する。APTのsourceを読み、10.20.2.30の署名済みrepoだけを使う。updateは一覧を取得し、installはpackageを導入する。Internet用sourceを追加しない。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. /etc/apt/sources.list.d/jdu-web.sources の内容を変更せずに読む。
 cat /etc/apt/sources.list.d/jdu-web.sources
+# 2. 内部repoのパッケージ一覧を更新する。取得エラーは失敗扱いにする。
 sudo apt-get update -o APT::Update::Error-Mode=any
+# 3. 内部repoから nginx を推奨追加なしで導入する。
 sudo apt-get install --no-install-recommends nginx
 ```
 
@@ -321,15 +366,25 @@ WebサーバーのSSM端末：ssm-user
 
 まずnanoで練習本文を編集する。表示する1行は下の指定どおりで、最後に改行を入れる。Ctrl+O→Enterで保存、Ctrl+Xで終了する。installはファイルを配置し、-o/-gは所有者、-mは権限を指定する。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. 作業場所を ~ へ移す。
 cd ~
+# 2. 練習の作業ディレクトリを作る。既存ならそのまま使う。
 mkdir -p jdu-web-practice/p1
+# 3. 作業場所を jdu-web-practice/p1 へ移す。
 cd jdu-web-practice/p1
+# 4. 現在の作業ディレクトリを表示する。
 pwd
+# 5. practice.txtを編集する。本文を入力し、保存して終了する。
 nano practice.txt
 # File content: JDU WEB-02 practice: HTTP response verified.
+# 6. 指定ファイルを配置し、所有者・グループ・権限を揃える。
 sudo install -o root -g root -m 0644 practice.txt /var/www/html/practice.txt
+# 7. 指定ファイルの所有者・グループ・権限・名前を読む。
 stat -c '%U:%G %a %n' /var/www/html/practice.txt
+# 8. /var/www/html/practice.txt の内容を変更せずに読む。
 cat /var/www/html/practice.txt
 ```
 
@@ -355,12 +410,20 @@ WebサーバーのSSM端末：ssm-user
 
 Ubuntuの初期siteは/var/www/htmlをrootにする。nginx -Tで実効設定を読み、/etc/nginx/sites-enabled/defaultが有効でrootとlisten 80があることを確認する。変更が必要ならsudo nanoで編集し、構文検査に成功してからreloadする。enable --nowは今起動し、次のOS起動時も起動させる。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. Nginxの設定全体を表示する（秘密の値は共有しない）。
 sudo nginx -T
+# 2. Nginx設定の構文と参照ファイルを検査する。
 sudo nginx -t
+# 3. nginx を今すぐ起動し、次回起動時も自動起動させる。
 sudo systemctl enable --now nginx
+# 4. nginx を止めずに設定を再読込する。
 sudo systemctl reload nginx
+# 5. nginx の現在の起動状態を読む。
 systemctl is-active nginx
+# 6. TCP待受のIP・port・対応プロセスを表示する。
 sudo ss -lntp
 ```
 
@@ -386,7 +449,10 @@ WebサーバーのSSM端末：ssm-user
 
 curlはHTTP client。-iはstatus/headerと本文を表示する。127.0.0.1は今のWeb自身で、public IPではない。表示を読み、端末のcommandが成功しただけで合格としない。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. http://127.0.0.1/practice.txt へHTTP要求し、status・header・本文を表示する。
 curl --noproxy '*' -i http://127.0.0.1/practice.txt
 ```
 
@@ -412,7 +478,10 @@ Welcome to nginxが出るなら/ではなく/practice.txtを要求したか確�
 
 Web端末をexitで閉じ、CloudShellから踏み台へSSM接続して下のURLを要求する。その後exitでCloudShellへ戻り、EC2に表示された現在のWeb公開IPv4を使って同じpathをcurl -iで要求する。内部の10.20.1.20と公開IPv4を混同しない。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. http://10.20.1.20/practice.txt へHTTP要求し、status・header・本文を表示する。
 curl --noproxy '*' -i http://10.20.1.20/practice.txt
 ```
 
@@ -438,8 +507,12 @@ WebサーバーのSSM端末：ssm-user
 
 Webへ戻り、access logの時刻・client IP・path・statusを見る。logは実際に要求を処理した証拠で、fileがある証拠とは別。exitでCloudShellへ戻ったら、PCのWeb PortalでP1を選び「この課題を確認する」を押す。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. access log末尾20行を読み、直前のHTTP要求を探す。
 sudo tail -n 20 /var/log/nginx/access.log
+# 2. 現在のサーバーへの接続を閉じ、CloudShellへ戻る。
 exit
 ```
 
@@ -483,6 +556,14 @@ BINDのzone・A record・問い合わせ制限と、client側resolverを順に�
 
 guide.lab.test→10.20.1.20、practice-db.lab.test→10.20.2.20を設定する。P1のHTTPを名前で利用する。基盤の固定IPは変えない。
 
+### 今回の見取り図
+
+![P2: IP指定のHTTPが使える → DNSとresolverを設定する → 名前でも同じWebへ届く。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。](../../assets/ja/p2.png)
+
+図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。
+
+[図を拡大する](../../assets/ja/p2.png) · [SVG](../../assets/ja/p2.svg)
+
 | DNS name | A / IPv4 |
 | --- | --- |
 | guide.lab.test | 10.20.1.20 |
@@ -512,10 +593,16 @@ DNSサーバーのSSM端末：ssm-user
 
 DNSへSSMで入りrole=dnsを確認。cp -aは元fileの属性を保って控えを作る。-nは既存の控えを上書きしない。これは編集失敗への控えであり、DB backup/restore課題ではない。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. 内部repoのパッケージ一覧を更新する。取得エラーは失敗扱いにする。
 sudo apt-get update -o APT::Update::Error-Mode=any
+# 2. 内部repoから bind9 bind9-utils を推奨追加なしで導入する。
 sudo apt-get install --no-install-recommends bind9 bind9-utils
+# 3. 元ファイルを控えへコピーする。既存の控えは上書きしない。
 sudo cp -an /etc/bind/named.conf.options /etc/bind/named.conf.options.before-p2
+# 4. 元ファイルを控えへコピーする。既存の控えは上書きしない。
 sudo cp -an /etc/bind/named.conf.local /etc/bind/named.conf.local.before-p2
 ```
 
@@ -540,6 +627,8 @@ DNSサーバーのSSM端末：ssm-user
 **目的と操作:**
 
 sudo nano /etc/bind/named.conf.optionsで次の内容を設定し保存する。aclは許可するclient集合、listen-onはDNS自身の待受、forward onlyは外部名をAWS DNSへ渡す指定。recursionとqueryの両方を同じ3送信元へ限定する。dnssec-validation noは閉じた学習用forward構成に合わせた設定である。
+
+設定・入力データ（端末で実行するコマンドではない）
 
 ```text
 acl "jdu_clients" { 127.0.0.1; 10.20.1.10; 10.20.1.20; };
@@ -579,6 +668,8 @@ DNSサーバーのSSM端末：ssm-user
 **目的と操作:**
 
 sudo nano /etc/bind/named.conf.localで先頭のzoneブロックを記入。sudo install -d -m 0755 /etc/bind/zonesの後、sudo nano /etc/bind/zones/db.lab.testで残りを記入する。SOAは管理情報、NSは権威DNS、Aは名前とIPv4。末尾のドットは絶対名を示す。serialは編集のたびに増やす。
+
+設定・入力データ（端末で実行するコマンドではない）
 
 ```text
 // /etc/bind/named.conf.local
@@ -621,12 +712,20 @@ DNSサーバーのSSM端末：ssm-user
 
 設定誤りのままclientを切り替えると名前解決が止まる。先にnamed-checkconfとnamed-checkzoneを成功させ、起動後にUDP/TCPの両方で応答を見る。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. BINDの設定と参照zoneを構文検査する。
 sudo named-checkconf -z
+# 2. lab.testのzoneファイルを検査する。
 sudo named-checkzone lab.test /etc/bind/zones/db.lab.test
+# 3. named を今すぐ起動し、次回起動時も自動起動させる。
 sudo systemctl enable --now named
+# 4. named を再起動して設定を読み直す。
 sudo systemctl restart named
+# 5. UDP 53で guide.lab.test を問い合わせ、応答を読む。
 dig @127.0.0.1 guide.lab.test A
+# 6. TCP 53で guide.lab.test を問い合わせ、応答を読む。
 dig @127.0.0.1 guide.lab.test A +tcp
 ```
 
@@ -652,11 +751,18 @@ zone loaded/OK、status NOERROR、flagsにaa、A=10.20.1.20。aaはこのzoneの
 
 踏み台とWebの両方で下を実行する。@10.20.2.10は今回だけ問い合わせ先を指定する。この成功だけでは、普通のbrowserやアプリが同じDNSを使うとは言えない。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. UDP 53で guide.lab.test を問い合わせ、応答を読む。
 dig @10.20.2.10 guide.lab.test A
+# 2. TCP 53で practice-db.lab.test を問い合わせ、応答を読む。
 dig @10.20.2.10 practice-db.lab.test A +tcp
+# 3. UDP 53で absent-p2.lab.test を問い合わせ、応答を読む。
 dig @10.20.2.10 absent-p2.lab.test A
+# 4. UDP 53で aws.amazon.com を問い合わせ、応答を読む。
 dig @10.20.2.10 aws.amazon.com A
+# 5. zone全件の転送を要求し、明示的に拒否されるか調べる。
 dig @10.20.2.10 lab.test AXFR
 ```
 
@@ -681,6 +787,8 @@ DNSへ届かない場合は送信元とport53のUDP/TCPを区別して調べる�
 **目的と操作:**
 
 踏み台とWebで1台ずつ実施。ip -br linkでens5等の実interface名を調べ、networkctl status その名前でNetwork Fileを読む。対応するnetplan YAMLをls /etc/netplanで探し、sudo cp -anで控えを作る。sudo nanoで既存の同じinterfaceにdhcp4-overrides/use-dns:falseとnameserversを追加する。下はファイルの構造例であり、interface名と既存match/set-name/renderer等を自分のファイルに合わせて保持する。
+
+設定・入力データ（端末で実行するコマンドではない）
 
 ```text
 network:
@@ -716,13 +824,22 @@ IP/gatewayを手書きせずDHCPを保持。別DNSをfallbackに加えない。/
 
 踏み台とWebで構文生成→適用→確認の順に行う。SSH/RDPの別端末も開いておき、もし切断したらSSMで戻って控えとの差分を確認する。netplan tryの確認待ちは使わず、設定を読んでgenerate成功後にapplyする。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. netplan YAMLから設定を生成し、適用前の構文を検査する。
 sudo netplan generate
+# 2. 保存したnetplan設定をネットワークへ適用する。
 sudo netplan apply
+# 3. systemd-resolved を再起動して設定を読み直す。
 sudo systemctl restart systemd-resolved
+# 4. 通常の名前解決に使うDNSサーバーを表示する。
 resolvectl dns
+# 5. 通常のresolverで guide.lab.test のIPv4を調べる。
 getent ahostsv4 guide.lab.test
+# 6. 通常のresolverで practice-db.lab.test のIPv4を調べる。
 getent ahostsv4 practice-db.lab.test
+# 7. http://guide.lab.test/practice.txt へHTTP要求し、status・header・本文を表示する。
 curl --noproxy '*' -i http://guide.lab.test/practice.txt
 ```
 
@@ -787,6 +904,14 @@ dig @10.20.2.10は成功し、getentは失敗する。DNSのzoneだけが原因�
 
 P3用markerを自分の匿名Lab IDで作る。停止前→stopped→再開後を観測する。ディスク追加・mount・backup/restoreは要求しない。
 
+### 今回の見取り図
+
+![P3: 同じWebの元ディスク → 記録 → Stop → Start → 内容保持と新boot ID。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 Stop/StartはAWS APIによる管理操作で、Webの受信443番を開く操作ではありません。](../../assets/ja/p3.png)
+
+図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 Stop/StartはAWS APIによる管理操作で、Webの受信443番を開く操作ではありません。
+
+[図を拡大する](../../assets/ja/p3.png) · [SVG](../../assets/ja/p3.svg)
+
 - File: /var/lib/jdu-web/practice/storage.txt
 
 ```text
@@ -819,10 +944,16 @@ WebサーバーのSSM端末：ssm-user
 
 findmntは対象pathのfile system、lsblkは接続されたdisk/partitionを示す。df -hは人が読みやすい単位。提供済みroot EBSを使い、名前が/dev/nvme等でも別diskへ付け替えない。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. /var/libが載っているファイルシステムを調べる。
 findmnt -T /var/lib
+# 2. ディスクの名前・種類・容量・マウント先・識別情報を読む。
 lsblk -o NAME,TYPE,SIZE,MOUNTPOINTS,SERIAL
+# 3. /var/libの使用量と空き容量を確認する。
 df -h /var/lib
+# 4. 今回の起動を識別するboot IDを読み、停止前後の比較に使う。
 cat /proc/sys/kernel/random/boot_id
 ```
 
@@ -848,16 +979,28 @@ WebサーバーのSSM端末：ssm-user
 
 この端末にも自分のLAB_IDを設定する。printfの各行は改行で終わる。sudo installでdirectoryを0755、fileを0644/root:rootにする。最初に既存内容を確認し、異なる内容がある場合は上書きせず理由を確認する。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. 教師から案内された自分のLab IDを変数へ入れる。
 LAB_ID='YOUR-LAB-ID'
+# 2. 作業場所を ~ へ移す。
 cd ~
+# 3. 練習の作業ディレクトリを作る。既存ならそのまま使う。
 mkdir -p jdu-web-practice/p3
+# 4. 作業場所を jdu-web-practice/p3 へ移す。
 cd jdu-web-practice/p3
+# 5. 自分のLab IDを含む練習用marker本文を作業ファイルへ書く。
 printf 'lab_id=%s\ntask=P3\npayload=practice-storage-2026\n' "$LAB_ID" > storage.txt
+# 6. storage.txt の内容を変更せずに読む。
 cat storage.txt
+# 7. 指定した所有者・グループ・権限でディレクトリを作る。
 sudo install -d -o root -g root -m 0755 /var/lib/jdu-web/practice
+# 8. 指定ファイルを配置し、所有者・グループ・権限を揃える。
 sudo install -o root -g root -m 0644 storage.txt /var/lib/jdu-web/practice/storage.txt
+# 9. 指定ファイルの所有者・グループ・権限・名前を読む。
 stat -c '%U:%G %a %n' /var/lib/jdu-web/practice /var/lib/jdu-web/practice/storage.txt
+# 10. markerの内容を比較するためのSHA256を表示する。
 sha256sum /var/lib/jdu-web/practice/storage.txt
 ```
 
@@ -957,6 +1100,14 @@ DB・role・schemaの違いを理解し、Webだけから既存パスワード�
 
 jdu_catalog_practice、catalog_practice_setup、catalog_practice_appを作る。Webの10.20.1.20/32だけからSCRAMで接続させる。P4時点ではappのtableは不要。
 
+### 今回の見取り図
+
+![P4: WebからDB接続を準備 → DB・role・認証を設定 → 許可したSELECTだけ成功。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。](../../assets/ja/p4.png)
+
+図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。
+
+[図を拡大する](../../assets/ja/p4.png) · [SVG](../../assets/ja/p4.svg)
+
 - Profile: practice
 - Database: jdu_catalog_practice
 - Setup role: catalog_practice_setup
@@ -985,11 +1136,18 @@ DBサーバーのSSM端末：ssm-user
 
 DBへSSM接続しrole=dbを確認する。PostgreSQL16のclusterはDBをまとめて動かす単位。公開資源の展開補助は署名版のappを検査し、SQLを取り出すだけでroleやDBを作らない。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. 内部repoのパッケージ一覧を更新する。取得エラーは失敗扱いにする。
 sudo apt-get update -o APT::Update::Error-Mode=any
+# 2. 内部repoから postgresql-16 postgresql-client-16 を推奨追加なしで導入する。
 sudo apt-get install --no-install-recommends postgresql-16 postgresql-client-16
+# 3. 固定hashを照合して教員提供アプリ・SQL資源を展開する。
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py
+# 4. PostgreSQLのversion・cluster・port・起動状態を読む。
 pg_lsclusters
+# 5. postgresとしてDB設定を読む：SHOW data_directory;
 sudo -u postgres psql -X -d postgres -c "SHOW data_directory;"
 ```
 
@@ -1014,6 +1172,8 @@ DBサーバーのSSM端末：ssm-user
 **目的と操作:**
 
 sudo cp -anでpostgresql.confの控えを作り、sudo nano /etc/postgresql/16/main/postgresql.confで次の3値を設定する。同じ項目が複数ある場合は有効値を後でSHOWで確認。listen_addressesはDBのprivate IPだけ、portは5432。password_encryptionはこの後設定するpasswordの保存方式。
+
+設定・入力データ（端末で実行するコマンドではない）
 
 ```text
 listen_addresses = '10.20.2.20'
@@ -1042,6 +1202,8 @@ DBサーバーのSSM端末：ssm-user
 **目的と操作:**
 
 sudo cp -anでpg_hba.confを控え、sudo nano /etc/postgresql/16/main/pg_hba.confで以下を保存。最初に一致する行が使われるため、既存の広い許可行は残さない。OS postgresだけはUnix socketのpeerで管理できる。M4で作る別profileも明示列挙し、練習roleが本課題DBへ入る組合せは許さない。
+
+設定・入力データ（端末で実行するコマンドではない）
 
 ```text
 local all postgres peer
@@ -1076,11 +1238,18 @@ DBサーバーのSSM端末：ssm-user
 
 restartは設定を読み直す。SQLのSHOWとpg_hba_file_rulesで、編集したつもりの値ではなく動作中の値を確認する。psqlの-Xは個人設定fileを読み込ませない指定。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. postgresql@16-main を再起動して設定を読み直す。
 sudo systemctl restart postgresql@16-main
+# 2. postgresql@16-main の現在の起動状態を読む。
 systemctl is-active postgresql@16-main
+# 3. TCP待受のIP・port・対応プロセスを表示する。
 sudo ss -lntp
+# 4. postgresとしてDB設定を読む：SHOW password_encryption;
 sudo -u postgres psql -X -d postgres -c "SHOW password_encryption;"
+# 5. HBAの読込エラー行を調べる。正常なら0行。
 sudo -u postgres psql -X -d postgres -c \
   "SELECT line_number,error FROM pg_hba_file_rules WHERE error IS NOT NULL;"
 ```
@@ -1107,11 +1276,17 @@ DBサーバーのSSM端末：ssm-user
 
 profile_sql.pyは固定SQLの練習名を出力するだけ。最初のcommandで内容を読み、その後同じ出力をpsqlへ渡す。setupはDB/schemaを所有し初期tableを作るrole、appは通常接続するrole。コードを作る授業ではないので配布SQLを使う。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. 作業場所を /var/lib/jdu-web/lesson-resources-r1/app へ移す。
 cd /var/lib/jdu-web/lesson-resources-r1/app
+# 2. 練習用DB roleを作るSQLを表示する。まだ適用しない。
 python3 -B profile_sql.py --profile practice 01_create_roles.sql
+# 3. 練習用DB roleを作るSQLを生成し、postgres経由で指定DBへ適用する。
 python3 -B profile_sql.py --profile practice 01_create_roles.sql | sudo -u postgres \
   psql -X -v ON_ERROR_STOP=1 -d postgres
+# 4. 練習用DBとschemaを作るSQLを生成し、postgres経由で指定DBへ適用する。
 python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u postgres \
   psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
 ```
@@ -1138,11 +1313,23 @@ DBサーバーのpsql：OS postgres
 
 DBのshellで最初の行を実行するとpostgres=#のpsqlに入る。\passwordはその中で入力する。16文字以上の異なるpasswordをsetup/appへそれぞれ2回入力。値は画面にも履歴にも書かない。最後の\qでDBのshellへ戻る。
 
-```text
+入力するコマンド（番号はこの手順内の順番）
+
+```bash
+# 1. DBのOS端末からpostgresとしてpsqlを開く。以降はpsql内で操作する。
 sudo -u postgres psql -X -d postgres
+```
+
+ここからはpsql内で入力する
+
+```sql
+-- 2. psql内で catalog_practice_setup のパスワードを非表示入力する。
 \password catalog_practice_setup
+-- 3. psql内で catalog_practice_app のパスワードを非表示入力する。
 \password catalog_practice_app
+-- 4. psql内で練習用DB roleの属性と権限を確認する。
 \du catalog_practice_*
+-- 5. psqlを終了し、同じDBサーバーのOS端末へ戻る。
 \q
 ```
 
@@ -1168,8 +1355,12 @@ WebサーバーのSSM端末：ssm-user
 
 DBのSSMをexitしCloudShellへ戻り、WebのSSMへ入る。psqlの-hは接続先、-UはDB role、-dはDB名、-Wはpassword入力を要求する。P4はDNS前提を増やさずprivate IPで接続する。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. 内部repoから postgresql-client-16 を推奨追加なしで導入する。
 sudo apt-get install --no-install-recommends postgresql-client-16
+# 2. Webから指定DBへ既存パスワードで接続し、SELECT結果を読む。
 psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
   'SELECT current_database(),current_user,1 AS value;'
 ```
@@ -1196,9 +1387,13 @@ WebサーバーのSSM端末：ssm-user
 
 helperは既存のcatalog_practice_app passwordを2回非表示入力し、Webのroot専用0600 fileへ保存する。DBのpasswordは変えない。envをcatしたりshellでsourceしない。exitでCloudShellへ戻ったら、PCのWeb PortalでP4を確認する。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. 既存の練習用DBパスワードを非表示入力し、Web内だけに保存する。
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/database_secret.py --profile \
   practice
+# 2. 現在のサーバーへの接続を閉じ、CloudShellへ戻る。
 exit
 ```
 
@@ -1241,6 +1436,14 @@ psqlがpasswordを受け付けたのにtable作成が拒否される。必ずpas
 
 practice profileで備品カタログを構築する。M2の正式DNSとP4が現在も使えることが前提。PのDB/管理者とMのDB/管理者を分け、同じWebのapp/portは共有する。
 
+### 今回の見取り図
+
+![P5: DNSとDBは準備済み → 提供アプリを接続・起動 → 操作結果がDBと画面へ。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 8000番はWeb内部だけ、8080番は踏み台からの管理用です。](../../assets/ja/p5.png)
+
+図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 8000番はWeb内部だけ、8080番は踏み台からの管理用です。
+
+[図を拡大する](../../assets/ja/p5.png) · [SVG](../../assets/ja/p5.svg)
+
 - Profile: practice
 - Database: jdu_catalog_practice
 - Setup role: catalog_practice_setup
@@ -1276,12 +1479,20 @@ WebサーバーのSSM端末：ssm-user
 
 Webで通常resolverのdb.lab.testが10.20.2.20、admin.lab.testが10.20.1.20になることを確認。offline_assetsは元署名にある7 wheelとlockを内部repoから取得しhashを検査する。pipの外部取得やDB/appの設定は行わない。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. 通常のresolverで db.lab.test のIPv4を調べる。
 getent ahostsv4 db.lab.test
+# 2. 通常のresolverで admin.lab.test のIPv4を調べる。
 getent ahostsv4 admin.lab.test
+# 3. 内部repoから python3-venv python3-pip を推奨追加なしで導入する。
 sudo apt-get install --no-install-recommends python3-venv python3-pip
+# 4. 署名・hashを確認してアプリと固定wheelを教材領域へ展開する。
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py --wheels
+# 5. /var/lib/jdu-web/lesson-resources-r1/app に配置された公開教材ファイルを一覧する。
 ls /var/lib/jdu-web/lesson-resources-r1/app
+# 6. /var/lib/jdu-web/lesson-resources-r1/wheels に配置された公開教材ファイルを一覧する。
 ls /var/lib/jdu-web/lesson-resources-r1/wheels
 ```
 
@@ -1307,14 +1518,21 @@ WebサーバーのSSM端末：ssm-user
 
 appとvenvはrootが管理し、実行user catalogには書換えさせない。/opt/jdu-catalog/appまたはvenvが既にある場合は新規配置を中止し、現在の版を確認する。cpは検査済み公開資源だけを配置する。venvはシステムPythonと依存を分離する。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. 指定した所有者・グループ・権限でディレクトリを作る。
 sudo install -d -o root -g root -m 0755 /opt/jdu-catalog/app
+# 2. 教員提供アプリを/optの運用先へ属性を保ってコピーする。
 sudo cp -a /var/lib/jdu-web/lesson-resources-r1/app/. /opt/jdu-catalog/app/
+# 3. アプリ専用のPython仮想環境を作る。
 sudo python3 -m venv /opt/jdu-catalog/venv
+# 4. 固定lock/hashと内部wheelだけでPython依存を導入する。
 sudo /opt/jdu-catalog/venv/bin/python -m pip --isolated --no-cache-dir install \
   --no-index --find-links=/var/lib/jdu-web/lesson-resources-r1/wheels \
   --only-binary=:all: --require-hashes -r \
   /var/lib/jdu-web/lesson-resources-r1/requirements.lock
+# 5. 導入済みPython依存パッケージの整合を検査する。
 sudo /opt/jdu-catalog/venv/bin/python -m pip check
 ```
 
@@ -1340,12 +1558,19 @@ WebサーバーのSSM端末：ssm-user
 
 catalogは人のlogin用ではなくGunicornの専用user。nologin、sudoなしで作る。staticの配置先だけはcollectstaticが書けるようcatalog所有にする。root管理のコード/venvとは役割が違う。既にcatalogがある場合はidとshellを確認し、useraddを繰り返さない。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. ログイン用homeやshellを持たないアプリ専用catalogユーザーを作る。
 sudo useradd --system --user-group --home-dir /nonexistent --no-create-home --shell \
   /usr/sbin/nologin catalog
+# 2. 指定した所有者・グループ・権限でディレクトリを作る。
 sudo install -d -o root -g root -m 0755 /var/lib/jdu-catalog
+# 3. 指定した所有者・グループ・権限でディレクトリを作る。
 sudo install -d -o catalog -g catalog -m 0755 /var/lib/jdu-catalog/static
+# 4. catalogユーザーのUID・GID・所属グループを確認する。
 id catalog
+# 5. catalogのホームとログインシェルを確認する。
 getent passwd catalog
 ```
 
@@ -1371,11 +1596,17 @@ WebサーバーのSSM端末：ssm-user
 
 PUBLIC_WEB_IPV4はEC2に表示された現在のWeb公開IPv4へ置き換える。runtime helperへP4で設定したcatalog_practice_appの既存passwordを2回入力する。Django secretは本人Labで生成される。root専用app.envとpractice profileが作られ、内容は表示しない。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. AWS画面で確認した現在のWeb公開IPv4を変数へ入れる。
 PUBLIC_WEB_IPV4='YOUR-CURRENT-WEB-PUBLIC-IP'
+# 2. 既存DBパスワードを非表示入力し、練習用runtime設定を作る。
 sudo python3 -B /opt/jdu-catalog/app/configuration.py create-runtime --profile \
   practice --public-web-ipv4 "$PUBLIC_WEB_IPV4"
+# 3. 秘密の値を表示せずruntime設定の妥当性を検査する。
 sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
+# 4. 指定ファイルの所有者・グループ・権限・名前を読む。
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
 ```
 
@@ -1401,14 +1632,21 @@ WebサーバーのSSM端末：ssm-user
 
 create-setupにはP4のcatalog_practice_setup passwordを入力する。migrateは配布済みDB構造を作り、seedは空DBへ架空サンプル3件を一度だけ入れる。create_lab_adminはpractice_adminを非表示password入力で作る。通常アプリはこのsetup roleでは動かさない。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. 既存構築用パスワードを非表示入力し、一時setup設定を作る。
 sudo python3 -B /opt/jdu-catalog/app/configuration.py create-setup --profile practice
+# 2. 構築用設定でアプリの設定エラーを検査する。
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase setup check
+# 3. 教員提供migrationを実行し、対象DBへ必要な表を作る。
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase setup migrate
+# 4. 提供済みの固定初期データを練習用DBへ登録する。
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase setup seed_catalog
+# 5. アプリ管理者を作り、そのパスワードを非表示入力する。
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase setup create_lab_admin
 ```
@@ -1435,9 +1673,14 @@ DBサーバーのSSM端末：ssm-user
 
 WebをexitしてCloudShellへ戻りDBへSSM接続する。SQL03を先に読み、11table/所有者を検査してからtable・列・sequence単位に必要権限を付ける。appに所有権やALL PRIVILEGESを与える方法ではない。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. 作業場所を /var/lib/jdu-web/lesson-resources-r1/app へ移す。
 cd /var/lib/jdu-web/lesson-resources-r1/app
+# 2. runtimeへ必要なSQL権限を与えるSQLを表示する。まだ適用しない。
 python3 -B profile_sql.py --profile practice 03_runtime_grants.sql
+# 3. runtimeへ必要なSQL権限を与えるSQLを生成し、postgres経由で指定DBへ適用する。
 python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u postgres \
   psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
 ```
@@ -1464,15 +1707,24 @@ WebサーバーのSSM端末：ssm-user
 
 Webへ戻る。collectstaticは配布CSS等をNginxが読むdirectoryへ集める。unitを/etc/systemd/systemへ置きdaemon-reloadでsystemdに認識させる。unit内容を読み、User=catalog、EnvironmentFile、127.0.0.1:8000を見つける。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. runtime設定でCSS等の静的ファイルを配信先へ集める。
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase runtime collectstatic
+# 2. /opt/jdu-catalog/app/config/jdu-catalog.service の内容を変更せずに読む。
 cat /opt/jdu-catalog/app/config/jdu-catalog.service
+# 3. 指定ファイルを配置し、所有者・グループ・権限を揃える。
 sudo install -o root -g root -m 0644 /opt/jdu-catalog/app/config/jdu-catalog.service \
   /etc/systemd/system/jdu-catalog.service
+# 4. 配置したsystemd unitファイルを管理機能へ読み込ませる。
 sudo systemctl daemon-reload
+# 5. jdu-catalog を今すぐ起動し、次回起動時も自動起動させる。
 sudo systemctl enable --now jdu-catalog
+# 6. jdu-catalog の現在の起動状態を読む。
 systemctl is-active jdu-catalog
+# 7. TCP待受のIP・port・対応プロセスを表示する。
 sudo ss -lntp
 ```
 
@@ -1498,15 +1750,24 @@ WebサーバーのSSM端末：ssm-user
 
 配布confをcatで読み、80→公開一覧、private8080→/admin/だけ、転送先8000を確認。初期default siteのsymlinkは別名で保存して無効化する。既にjdu-catalogが有効なら再移動せず現在設定を確認する。P1/M1の静的URLを保持したconfを使う。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf の内容を変更せずに読む。
 cat /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf
+# 2. 指定ファイルを配置し、所有者・グループ・権限を揃える。
 sudo install -o root -g root -m 0644 \
   /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf \
   /etc/nginx/sites-available/jdu-catalog
+# 3. 既定サイトのリンクを控えへ移す。既存の控えは上書きしない。
 sudo mv -n /etc/nginx/sites-enabled/default /etc/nginx/default-site.before-p5
+# 4. 配置したアプリ用サイト設定への有効化リンクを作る。
 sudo ln -s /etc/nginx/sites-available/jdu-catalog /etc/nginx/sites-enabled/jdu-catalog
+# 5. Nginx設定の構文と参照ファイルを検査する。
 sudo nginx -t
+# 6. nginx を止めずに設定を再読込する。
 sudo systemctl reload nginx
+# 7. http://127.0.0.1/practice.txt へHTTP要求し、status・header・本文を表示する。
 curl --noproxy '*' -i http://127.0.0.1/practice.txt
 ```
 
@@ -1531,6 +1792,8 @@ RDP内のFirefox（踏み台）
 **目的と操作:**
 
 踏み台のFirefoxでhttp://admin.lab.test:8080/admin/を開き、practice_adminと自分のアプリ管理者passwordでログイン。備品のAddから下の2行を登録する。code/name/quantity/locationを正確に入力し、公開行だけIs publicを有効にする。保存後にhttp://web.lab.test/で公開行だけ出るか見る。
+
+設定・入力データ（端末で実行するコマンドではない）
 
 ```text
 P5-PUBLIC-001 | Practice keyboard | 4 | Training shelf A | is_public=true
@@ -1559,11 +1822,15 @@ WebサーバーのSSM端末：ssm-user
 
 Webのpsqlで練習app roleを使って読取りSQLを実行する。管理画面の保存が本当にPostgreSQLへ届いたかを確認する。SELECTは読み取りで、UPDATE/DELETEはこの確認では使わない。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. 指定した2件を読むSQLを変数へ保存する。まだDBへ送らない。
 QUERY="SELECT code,name,quantity,location,is_public
 FROM catalog_item
 WHERE code IN ('P5-PUBLIC-001','P5-PRIVATE-001')
 ORDER BY code;"
+# 2. Webから指定DBへ既存パスワードで接続し、SELECT結果を読む。
 psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c "$QUERY"
 ```
 
@@ -1619,6 +1886,14 @@ WebをexitしてPCのWeb PortalでP5を選び、「機能・権限を含めて�
 
 P5のpractice profileを使う。setup roleを無効化し、一時設定を片付け、正規loginを対照に拒否を自動確認する。SGやIAMの許可を広げない。
 
+### 今回の見取り図
+
+![P6: アプリは動作済み → 不要な権限・公開を除く → 許可は成功、禁止は拒否。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 8000番はWeb内部だけ、8080番は踏み台からの管理用です。](../../assets/ja/p6.png)
+
+図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 8000番はWeb内部だけ、8080番は踏み台からの管理用です。
+
+[図を拡大する](../../assets/ja/p6.png) · [SVG](../../assets/ja/p6.svg)
+
 - Profile: practice
 - Database: jdu_catalog_practice
 - Setup role: catalog_practice_setup
@@ -1654,10 +1929,21 @@ DBサーバーのpsql：OS postgres
 
 DBでpostgresのpsqlへ入る。\dpはtable権限、\duはrole属性。auth_user全体のUPDATEではなくlast_login/password列だけ、catalog_itemにDELETEなし、lookupは読取りだけ、django_migrationsは権限なしをSQL03と比べる。sequenceのnextval/setvalは確認目的で呼ばない。
 
-```text
+入力するコマンド（番号はこの手順内の順番）
+
+```bash
+# 1. DBのOS端末からpostgresとしてpsqlを開く。以降はpsql内で操作する。
 sudo -u postgres psql -X -d jdu_catalog_practice
+```
+
+ここからはpsql内で入力する
+
+```sql
+-- 2. psql内で練習用DB roleの属性と権限を確認する。
 \du catalog_practice_*
+-- 3. psql内でpublic schemaのテーブル権限を読む。
 \dp public.*
+-- 4. psqlを終了し、同じDBサーバーのOS端末へ戻る。
 \q
 ```
 
@@ -1683,9 +1969,14 @@ DBサーバーのSSM端末：ssm-user
 
 初期化に使ったsetup roleは完成後には不要。SQL04はNOLOGIN/password NULLにし、そのprofileの残存setup接続も閉じる。DB/tableの所有者はsetupのまま残す。削除やappへの所有権移転はしない。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. 作業場所を /var/lib/jdu-web/lesson-resources-r1/app へ移す。
 cd /var/lib/jdu-web/lesson-resources-r1/app
+# 2. 構築用roleのログインを無効にするSQLを表示する。まだ適用しない。
 python3 -B profile_sql.py --profile practice 04_disable_setup.sql
+# 3. 構築用roleのログインを無効にするSQLを生成し、postgres経由で指定DBへ適用する。
 python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u postgres \
   psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
 ```
@@ -1712,12 +2003,18 @@ WebサーバーのSSM端末：ssm-user
 
 Webで対象のmetadataだけを確認する。rmの対象は練習setupの2fileに限定する。app.env、practice.app.env、DB runtime file、元command-state、SSH鍵、採点認証は残す。root専用fileの内容をcatする必要はない。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. 指定ファイルの所有者・グループ・権限・名前を読む。
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
   /etc/jdu-catalog/profiles/practice.setup.env
+# 2. 表示して確認した2つの一時setup秘密ファイルだけを削除する。
 sudo rm -- /etc/jdu-catalog/setup.env /etc/jdu-catalog/profiles/practice.setup.env
+# 3. 指定ファイルの所有者・グループ・権限・名前を読む。
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env \
   /etc/jdu-catalog/profiles/practice.app.env /etc/jdu-web/db-practice.runtime.env
+# 4. 秘密の値を表示せずruntime設定の妥当性を検査する。
 sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
 ```
 
@@ -1743,10 +2040,16 @@ setup.envとpractice.setup.envは一時構築用で、app.envとruntime用DB設�
 
 踏み台のSSMで公開用port80を使い、通常一覧の成功を対照に/admin/やenvを要求する。8080の管理成功はRDP内Firefoxで別に確認する。404/403等の明示拒否と通常成功を組にして読み、timeoutだけで安全としない。
 
+入力するコマンド（番号はこの手順内の順番）
+
 ```bash
+# 1. http://web.lab.test/ へHTTP要求し、status・header・本文を表示する。
 curl --noproxy '*' -i http://web.lab.test/
+# 2. http://web.lab.test/admin/ へHTTP要求し、status・header・本文を表示する。
 curl --noproxy '*' -i http://web.lab.test/admin/
+# 3. http://web.lab.test/app.env へHTTP要求し、status・header・本文を表示する。
 curl --noproxy '*' -i http://web.lab.test/app.env
+# 4. http://web.lab.test/static/app.env へHTTP要求し、status・header・本文を表示する。
 curl --noproxy '*' -i http://web.lab.test/static/app.env
 ```
 

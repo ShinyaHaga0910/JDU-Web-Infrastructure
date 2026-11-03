@@ -10,17 +10,22 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">完成要件</a> · <a href="#section-3">合格条件：採点check各1素点</a> · <a href="#section-4">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M5 教員アプリをWeb・DBへ接続する (13)</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">完成要件</a> · <a href="#section-3">今回の見取り図</a> · <a href="#section-4">合格条件：採点check各1素点</a> · <a href="#section-5">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M5 教員アプリをWeb・DBへ接続する (13)</h1>
 <p><a href="start.html">はじめに：接続・操作の約束</a> · <a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a> · <a href="portal.html">ブラウザで確認する</a></p>
 <p><a href="../ja/m5.html">日本語</a> · <a href="../ru/m5.html">Русский</a> · <a href="../uz/m5.html">O‘zbekcha</a></p>
-<p>2026-11-03 · D12 P/M r1.3</p>
+<p>2026-11-03 · D12 P/M r1.4</p>
 <p>配布版の有効期限：2027年1月31日末（UZT）。</p>
 <h2 id="section-1">始める前に</h2>
 <p><a href="start.html">共通の接続・操作</a>を確認する。対応する詳しい練習は<a href="p5.html">P5</a>。課題の判定方法は<a href="portal.html">ブラウザ確認手順</a>を使う。</p>
 <h2 id="section-2">完成要件</h2>
 <p>同じ教員アプリをmission DBへ接続する。P5のpractice手順を参考にprofile=missionを選ぶ。既存app/venvを再配置しない。service停止後、mission runtime作成→明示activate→mission setup作成の順を守る（practiceのsetupはP6で終了済みにする）。固定migration/seed/管理者と権限をそのDBへ構築し指定2件を登録する。P1/M1を保持する。完成後はmissionをactiveにする。</p>
+<h2 id="section-3">今回の見取り図</h2>
+<p><img src="../../../assets/ja/m5.png" alt="M5: DNSとDBは準備済み → 提供アプリを接続・起動 → 操作結果がDBと画面へ。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 8000番はWeb内部だけ、8080番は踏み台からの管理用です。 図を参考に完成要件から設定値を自分で決めます。" width="1040" height="680" loading="lazy"></p>
+<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 8000番はWeb内部だけ、8080番は踏み台からの管理用です。 図を参考に完成要件から設定値を自分で決めます。</p>
+<p><a href="../../../assets/ja/m5.png">図を拡大する</a> · <a href="../../../assets/ja/m5.svg">SVG</a></p>
 <ul>
 <li>Profile: mission</li>
 <li>Database: jdu_catalog</li>
@@ -58,7 +63,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <ul>
 <li>現在必要な前提: M2, M4</li>
 </ul>
-<h2 id="section-3">合格条件：採点check各1素点</h2>
+<h2 id="section-4">合格条件：採点check各1素点</h2>
 <table>
 <thead>
 <tr>
@@ -122,7 +127,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 </tbody>
 </table>
 <p>本人確認・管理・配布元・通信基盤・依存前提等の準備checkは上表の素点に加えない。必要前提が未完了なら、点が一部あっても次段階の準備完了ではない。</p>
-<h2 id="section-4">確認・提出</h2>
+<h2 id="section-5">確認・提出</h2>
 <ol>
 <li>PCの<a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a>へ学校Googleでログインし、本人のLabと <strong>M5</strong> を選ぶ。初回の連携・画面の説明は<a href="portal.html">ブラウザ確認手順</a>を参照する。</li>
 <li>「機能・権限を含めて確認する」を選び、lab_admin の既存パスワードを「アプリ管理者の既存パスワード」に非表示入力して「このパスワードで確認する」を押す。RDP用とは別。設定だけの確認では機能の合格を確定しない。</li>

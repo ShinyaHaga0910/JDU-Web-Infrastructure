@@ -10,12 +10,13 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">学ぶこと</a> · <a href="#section-3">課題</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">操作例：一つずつ実行する</a> · <a href="#section-6">出力の読み取り例（入力しない）</a> · <a href="#section-7">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P4 PostgreSQLへの認証接続</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">学ぶこと</a> · <a href="#section-3">課題</a> · <a href="#section-4">今回の見取り図</a> · <a href="#section-5">仕組みを理解する</a> · <a href="#section-6">操作例：一つずつ実行する</a> · <a href="#section-7">出力の読み取り例（入力しない）</a> · <a href="#section-8">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P4 PostgreSQLへの認証接続</h1>
 <p><a href="start.html">はじめに：接続・操作の約束</a> · <a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a> · <a href="portal.html">ブラウザで確認する</a></p>
 <p><a href="../ja/p4.html">日本語</a> · <a href="../ru/p4.html">Русский</a> · <a href="../uz/p4.html">O‘zbekcha</a></p>
-<p>2026-11-03 · D12 P/M r1.3</p>
+<p>2026-11-03 · D12 P/M r1.4</p>
 <p>配布版の有効期限：2027年1月31日末（UZT）。</p>
 <h2 id="section-1">始める前に</h2>
 <p><a href="start.html">共通の接続・操作</a>を確認する。対応する自力課題は<a href="m4.html">M4</a>。課題の判定方法は<a href="portal.html">ブラウザ確認手順</a>を使う。</p>
@@ -23,28 +24,38 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <p>DB・role・schemaの違いを理解し、Webだけから既存パスワードでSQLを実行する。</p>
 <h2 id="section-3">課題</h2>
 <p>jdu_catalog_practice、catalog_practice_setup、catalog_practice_appを作る。Webの10.20.1.20/32だけからSCRAMで接続させる。P4時点ではappのtableは不要。</p>
+<h2 id="section-4">今回の見取り図</h2>
+<p><img src="../../../assets/ja/p4.png" alt="P4: WebからDB接続を準備 → DB・role・認証を設定 → 許可したSELECTだけ成功。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。" width="1040" height="680" loading="lazy"></p>
+<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。</p>
+<p><a href="../../../assets/ja/p4.png">図を拡大する</a> · <a href="../../../assets/ja/p4.svg">SVG</a></p>
 <ul>
 <li>Profile: practice</li>
 <li>Database: jdu_catalog_practice</li>
 <li>Setup role: catalog_practice_setup</li>
 <li>Runtime role: catalog_practice_app</li>
 </ul>
-<h2 id="section-4">仕組みを理解する</h2>
+<h2 id="section-5">仕組みを理解する</h2>
 <p><strong>始める前の状態:</strong></p>
 <p>DBに教材資源があり、WebからDBへ許可された経路を使う。</p>
 <p><strong>このPで変えること:</strong></p>
 <p>練習DBとsetup/runtime roleを作り、Webから認証付きSQLを実行する。</p>
 <p>接続には、通信の到達、DBの待受、HBAの許可、password、SQL権限がそれぞれ必要。ssm-userはOS userで、catalog_practice_appはDB roleである。HBAは上から最初に一致した行を使う。SQLへ接続できることと、tableを作成できることも別の権限である。<a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBA</a>・<a href="https://www.postgresql.org/docs/16/sql-grant.html">SQL権限</a>。</p>
-<h2 id="section-5">操作例：一つずつ実行する</h2>
+<h2 id="section-6">操作例：一つずつ実行する</h2>
 <h3>P4.1 DBを導入し教材SQLを展開する</h3>
 <p><strong>実行場所:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>DBへSSM接続しrole=dbを確認する。PostgreSQL16のclusterはDBをまとめて動かす単位。公開資源の展開補助は署名版のappを検査し、SQLを取り出すだけでroleやDBを作らない。</p>
-<pre><code class="language-bash">sudo apt-get update -o APT::Update::Error-Mode=any
+<p>入力するコマンド（番号はこの手順内の順番）</p>
+<pre><code class="language-bash"># 1. 内部repoのパッケージ一覧を更新する。取得エラーは失敗扱いにする。
+sudo apt-get update -o APT::Update::Error-Mode=any
+# 2. 内部repoから postgresql-16 postgresql-client-16 を推奨追加なしで導入する。
 sudo apt-get install --no-install-recommends postgresql-16 postgresql-client-16
+# 3. 固定hashを照合して教員提供アプリ・SQL資源を展開する。
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py
+# 4. PostgreSQLのversion・cluster・port・起動状態を読む。
 pg_lsclusters
+# 5. postgresとしてDB設定を読む：SHOW data_directory;
 sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
 </code></pre>
 <p><strong>コマンド・設定値の意味:</strong></p>
@@ -58,6 +69,7 @@ sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>sudo cp -anでpostgresql.confの控えを作り、sudo nano /etc/postgresql/16/main/postgresql.confで次の3値を設定する。同じ項目が複数ある場合は有効値を後でSHOWで確認。listen_addressesはDBのprivate IPだけ、portは5432。password_encryptionはこの後設定するpasswordの保存方式。</p>
+<p>設定・入力データ（端末で実行するコマンドではない）</p>
 <pre><code class="language-text">listen_addresses = '10.20.2.20'
 port = 5432
 password_encryption = 'scram-sha-256'
@@ -73,6 +85,7 @@ password_encryption = 'scram-sha-256'
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>sudo cp -anでpg_hba.confを控え、sudo nano /etc/postgresql/16/main/pg_hba.confで以下を保存。最初に一致する行が使われるため、既存の広い許可行は残さない。OS postgresだけはUnix socketのpeerで管理できる。M4で作る別profileも明示列挙し、練習roleが本課題DBへ入る組合せは許さない。</p>
+<p>設定・入力データ（端末で実行するコマンドではない）</p>
 <pre><code class="language-text">local all postgres peer
 local all all reject
 host jdu_catalog_practice catalog_practice_setup 10.20.1.20/32 scram-sha-256
@@ -93,10 +106,16 @@ host all all ::/0 reject
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>restartは設定を読み直す。SQLのSHOWとpg_hba_file_rulesで、編集したつもりの値ではなく動作中の値を確認する。psqlの-Xは個人設定fileを読み込ませない指定。</p>
-<pre><code class="language-bash">sudo systemctl restart postgresql@16-main
+<p>入力するコマンド（番号はこの手順内の順番）</p>
+<pre><code class="language-bash"># 1. postgresql@16-main を再起動して設定を読み直す。
+sudo systemctl restart postgresql@16-main
+# 2. postgresql@16-main の現在の起動状態を読む。
 systemctl is-active postgresql@16-main
+# 3. TCP待受のIP・port・対応プロセスを表示する。
 sudo ss -lntp
+# 4. postgresとしてDB設定を読む：SHOW password_encryption;
 sudo -u postgres psql -X -d postgres -c &quot;SHOW password_encryption;&quot;
+# 5. HBAの読込エラー行を調べる。正常なら0行。
 sudo -u postgres psql -X -d postgres -c \
   &quot;SELECT line_number,error FROM pg_hba_file_rules WHERE error IS NOT NULL;&quot;
 </code></pre>
@@ -111,10 +130,15 @@ sudo -u postgres psql -X -d postgres -c \
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>profile_sql.pyは固定SQLの練習名を出力するだけ。最初のcommandで内容を読み、その後同じ出力をpsqlへ渡す。setupはDB/schemaを所有し初期tableを作るrole、appは通常接続するrole。コードを作る授業ではないので配布SQLを使う。</p>
-<pre><code class="language-bash">cd /var/lib/jdu-web/lesson-resources-r1/app
+<p>入力するコマンド（番号はこの手順内の順番）</p>
+<pre><code class="language-bash"># 1. 作業場所を /var/lib/jdu-web/lesson-resources-r1/app へ移す。
+cd /var/lib/jdu-web/lesson-resources-r1/app
+# 2. 練習用DB roleを作るSQLを表示する。まだ適用しない。
 python3 -B profile_sql.py --profile practice 01_create_roles.sql
+# 3. 練習用DB roleを作るSQLを生成し、postgres経由で指定DBへ適用する。
 python3 -B profile_sql.py --profile practice 01_create_roles.sql | sudo -u postgres \
   psql -X -v ON_ERROR_STOP=1 -d postgres
+# 4. 練習用DBとschemaを作るSQLを生成し、postgres経由で指定DBへ適用する。
 python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u postgres \
   psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
 </code></pre>
@@ -129,10 +153,18 @@ python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u pos
 <p>DBサーバーのpsql：OS postgres</p>
 <p><strong>目的と操作:</strong></p>
 <p>DBのshellで最初の行を実行するとpostgres=#のpsqlに入る。\passwordはその中で入力する。16文字以上の異なるpasswordをsetup/appへそれぞれ2回入力。値は画面にも履歴にも書かない。最後の\qでDBのshellへ戻る。</p>
-<pre><code class="language-text">sudo -u postgres psql -X -d postgres
+<p>入力するコマンド（番号はこの手順内の順番）</p>
+<pre><code class="language-bash"># 1. DBのOS端末からpostgresとしてpsqlを開く。以降はpsql内で操作する。
+sudo -u postgres psql -X -d postgres
+</code></pre>
+<p>ここからはpsql内で入力する</p>
+<pre><code class="language-sql">-- 2. psql内で catalog_practice_setup のパスワードを非表示入力する。
 \password catalog_practice_setup
+-- 3. psql内で catalog_practice_app のパスワードを非表示入力する。
 \password catalog_practice_app
+-- 4. psql内で練習用DB roleの属性と権限を確認する。
 \du catalog_practice_*
+-- 5. psqlを終了し、同じDBサーバーのOS端末へ戻る。
 \q
 </code></pre>
 <p><strong>コマンド・設定値の意味:</strong></p>
@@ -146,7 +178,10 @@ python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u pos
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>DBのSSMをexitしCloudShellへ戻り、WebのSSMへ入る。psqlの-hは接続先、-UはDB role、-dはDB名、-Wはpassword入力を要求する。P4はDNS前提を増やさずprivate IPで接続する。</p>
-<pre><code class="language-bash">sudo apt-get install --no-install-recommends postgresql-client-16
+<p>入力するコマンド（番号はこの手順内の順番）</p>
+<pre><code class="language-bash"># 1. 内部repoから postgresql-client-16 を推奨追加なしで導入する。
+sudo apt-get install --no-install-recommends postgresql-client-16
+# 2. Webから指定DBへ既存パスワードで接続し、SELECT結果を読む。
 psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
   'SELECT current_database(),current_user,1 AS value;'
 </code></pre>
@@ -161,8 +196,11 @@ psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>helperは既存のcatalog_practice_app passwordを2回非表示入力し、Webのroot専用0600 fileへ保存する。DBのpasswordは変えない。envをcatしたりshellでsourceしない。exitでCloudShellへ戻ったら、PCのWeb PortalでP4を確認する。</p>
-<pre><code class="language-bash">sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/database_secret.py --profile \
+<p>入力するコマンド（番号はこの手順内の順番）</p>
+<pre><code class="language-bash"># 1. 既存の練習用DBパスワードを非表示入力し、Web内だけに保存する。
+sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/database_secret.py --profile \
   practice
+# 2. 現在のサーバーへの接続を閉じ、CloudShellへ戻る。
 exit
 </code></pre>
 <p><strong>コマンド・設定値の意味:</strong></p>
@@ -171,12 +209,12 @@ exit
 <p>D11_EXISTING_DB_PASSWORD_STORED_LOCALLYと練習9項目。誤password・他DB/管理roleの拒否も正常接続との対照で確認される。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>既存fileありなら再生成しない。P5では同じDB passwordをapp設定にも入力する。M4はmission用の別DB/roleで構築する。</p>
-<h2 id="section-6">出力の読み取り例（入力しない）</h2>
+<h2 id="section-7">出力の読み取り例（入力しない）</h2>
 <pre><code class="language-text">current_database    | current_user         | value
 jdu_catalog_practice | catalog_practice_app | 1
 </code></pre>
 <p>SELECT結果の読み方の例。列の幅や罫線は実際と異なってよい。DB名・role名・value=1を確認する。table編集の許可を証明する結果ではない。</p>
-<h2 id="section-7">理解の確認（採点外）</h2>
+<h2 id="section-8">理解の確認（採点外）</h2>
 <p>psqlがpasswordを受け付けたのにtable作成が拒否される。必ずpasswordの誤りか？</p>
 <p><strong>考え方:</strong></p>
 <p>認証とSQL権限は別。runtime roleの役割に合った拒否なら正常で、setup用の操作をruntimeへ追加しない。</p>

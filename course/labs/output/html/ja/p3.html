@@ -10,12 +10,13 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">学ぶこと</a> · <a href="#section-3">課題</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">操作例：一つずつ実行する</a> · <a href="#section-6">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P3 保存内容と停止・再開</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">学ぶこと</a> · <a href="#section-3">課題</a> · <a href="#section-4">今回の見取り図</a> · <a href="#section-5">仕組みを理解する</a> · <a href="#section-6">操作例：一つずつ実行する</a> · <a href="#section-7">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P3 保存内容と停止・再開</h1>
 <p><a href="start.html">はじめに：接続・操作の約束</a> · <a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a> · <a href="portal.html">ブラウザで確認する</a></p>
 <p><a href="../ja/p3.html">日本語</a> · <a href="../ru/p3.html">Русский</a> · <a href="../uz/p3.html">O‘zbekcha</a></p>
-<p>2026-11-03 · D12 P/M r1.3</p>
+<p>2026-11-03 · D12 P/M r1.4</p>
 <p>配布版の有効期限：2027年1月31日末（UZT）。</p>
 <h2 id="section-1">始める前に</h2>
 <p><a href="start.html">共通の接続・操作</a>を確認する。対応する自力課題は<a href="m3.html">M3</a>。課題の判定方法は<a href="portal.html">ブラウザ確認手順</a>を使う。</p>
@@ -23,6 +24,10 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <p>元のEBS上のfile・権限を確認し、同じWebを停止して再開した保持を証拠で示す。</p>
 <h2 id="section-3">課題</h2>
 <p>P3用markerを自分の匿名Lab IDで作る。停止前→stopped→再開後を観測する。ディスク追加・mount・backup/restoreは要求しない。</p>
+<h2 id="section-4">今回の見取り図</h2>
+<p><img src="../../../assets/ja/p3.png" alt="P3: 同じWebの元ディスク → 記録 → Stop → Start → 内容保持と新boot ID。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 Stop/StartはAWS APIによる管理操作で、Webの受信443番を開く操作ではありません。" width="1040" height="680" loading="lazy"></p>
+<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 Stop/StartはAWS APIによる管理操作で、Webの受信443番を開く操作ではありません。</p>
+<p><a href="../../../assets/ja/p3.png">図を拡大する</a> · <a href="../../../assets/ja/p3.svg">SVG</a></p>
 <ul>
 <li>File: /var/lib/jdu-web/practice/storage.txt</li>
 </ul>
@@ -30,21 +35,26 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 task=P3
 payload=practice-storage-2026
 </code></pre>
-<h2 id="section-4">仕組みを理解する</h2>
+<h2 id="section-5">仕組みを理解する</h2>
 <p><strong>始める前の状態:</strong></p>
 <p>同じWebの元root EBS上にmarkerを保存できる。</p>
 <p><strong>このPで変えること:</strong></p>
 <p>Webを停止・起動しても同じ保存内容が残ることを、停止前後の証拠で示す。</p>
 <p>起動中のメモリーとEBS上へ保存したファイルを区別する。今回は元root EBSを保持した同じWebのStop/Startを扱う。ファイルのhashとinstance/volume IDを比べ、boot IDの変化で新しい起動も確認する。自動割当のpublic IPv4は変わることがある。<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Stop_Start.html">EC2の停止・起動</a>。</p>
-<h2 id="section-5">操作例：一つずつ実行する</h2>
+<h2 id="section-6">操作例：一つずつ実行する</h2>
 <h3>P3.1 元の保存先と空きを調べる</h3>
 <p><strong>実行場所:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>findmntは対象pathのfile system、lsblkは接続されたdisk/partitionを示す。df -hは人が読みやすい単位。提供済みroot EBSを使い、名前が/dev/nvme等でも別diskへ付け替えない。</p>
-<pre><code class="language-bash">findmnt -T /var/lib
+<p>入力するコマンド（番号はこの手順内の順番）</p>
+<pre><code class="language-bash"># 1. /var/libが載っているファイルシステムを調べる。
+findmnt -T /var/lib
+# 2. ディスクの名前・種類・容量・マウント先・識別情報を読む。
 lsblk -o NAME,TYPE,SIZE,MOUNTPOINTS,SERIAL
+# 3. /var/libの使用量と空き容量を確認する。
 df -h /var/lib
+# 4. 今回の起動を識別するboot IDを読み、停止前後の比較に使う。
 cat /proc/sys/kernel/random/boot_id
 </code></pre>
 <p><strong>コマンド・設定値の意味:</strong></p>
@@ -58,15 +68,26 @@ cat /proc/sys/kernel/random/boot_id
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>この端末にも自分のLAB_IDを設定する。printfの各行は改行で終わる。sudo installでdirectoryを0755、fileを0644/root:rootにする。最初に既存内容を確認し、異なる内容がある場合は上書きせず理由を確認する。</p>
-<pre><code class="language-bash">LAB_ID='YOUR-LAB-ID'
+<p>入力するコマンド（番号はこの手順内の順番）</p>
+<pre><code class="language-bash"># 1. 教師から案内された自分のLab IDを変数へ入れる。
+LAB_ID='YOUR-LAB-ID'
+# 2. 作業場所を ~ へ移す。
 cd ~
+# 3. 練習の作業ディレクトリを作る。既存ならそのまま使う。
 mkdir -p jdu-web-practice/p3
+# 4. 作業場所を jdu-web-practice/p3 へ移す。
 cd jdu-web-practice/p3
+# 5. 自分のLab IDを含む練習用marker本文を作業ファイルへ書く。
 printf 'lab_id=%s\ntask=P3\npayload=practice-storage-2026\n' &quot;$LAB_ID&quot; &gt; storage.txt
+# 6. storage.txt の内容を変更せずに読む。
 cat storage.txt
+# 7. 指定した所有者・グループ・権限でディレクトリを作る。
 sudo install -d -o root -g root -m 0755 /var/lib/jdu-web/practice
+# 8. 指定ファイルを配置し、所有者・グループ・権限を揃える。
 sudo install -o root -g root -m 0644 storage.txt /var/lib/jdu-web/practice/storage.txt
+# 9. 指定ファイルの所有者・グループ・権限・名前を読む。
 stat -c '%U:%G %a %n' /var/lib/jdu-web/practice /var/lib/jdu-web/practice/storage.txt
+# 10. markerの内容を比較するためのSHA256を表示する。
 sha256sum /var/lib/jdu-web/practice/storage.txt
 </code></pre>
 <p><strong>コマンド・設定値の意味:</strong></p>
@@ -108,7 +129,7 @@ sha256sum /var/lib/jdu-web/practice/storage.txt
 <p>練習3項目PASS。EC2のpublic IPv4が変われば外部HTTPの接続先も更新する。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>別instanceを作ると保持の証明にならない。P3/M3は別markerと別証拠を使う。</p>
-<h2 id="section-6">理解の確認（採点外）</h2>
+<h2 id="section-7">理解の確認（採点外）</h2>
 <p>起動後に同じ本文が読めれば、別のWebを作っても合格と言えるか？</p>
 <p><strong>考え方:</strong></p>
 <p>同じ元instanceとvolumeの保持も条件なので言えない。本文だけでなく、対象の連続性と停止状態の観測が必要。</p>

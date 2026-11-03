@@ -10,12 +10,13 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Boshlashdan oldin</a> · <a href="#section-2">Nimani o‘rganamiz</a> · <a href="#section-3">Topshiriq</a> · <a href="#section-4">Bu qanday ishlaydi</a> · <a href="#section-5">Yechim namunasi: bittadan bajaring</a> · <a href="#section-6">Natijani o‘qish namunasi (kiritmang)</a> · <a href="#section-7">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P1 HTTP orqali statik faylni qaytarish</h1>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">Boshlashdan oldin</a> · <a href="#section-2">Nimani o‘rganamiz</a> · <a href="#section-3">Topshiriq</a> · <a href="#section-4">Topshiriq diagrammasi</a> · <a href="#section-5">Bu qanday ishlaydi</a> · <a href="#section-6">Yechim namunasi: bittadan bajaring</a> · <a href="#section-7">Natijani o‘qish namunasi (kiritmang)</a> · <a href="#section-8">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P1 HTTP orqali statik faylni qaytarish</h1>
 <p><a href="start.html">Avval: ulanish va qoidalar</a> · <a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a> · <a href="portal.html">Brauzerda tekshirish</a></p>
 <p><a href="../ja/p1.html">日本語</a> · <a href="../ru/p1.html">Русский</a> · <a href="../uz/p1.html">O‘zbekcha</a></p>
-<p>2026-11-03 · D12 P/M r1.3</p>
+<p>2026-11-03 · D12 P/M r1.4</p>
 <p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
 <h2 id="section-1">Boshlashdan oldin</h2>
 <p><a href="start.html">Ulanish va qoidalar</a> bilan tanishing. Mos topshiriq: <a href="m1.html">M1</a>. Tekshiruv: <a href="portal.html">brauzer yo‘riqnomasi</a>.</p>
@@ -23,26 +24,34 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <p>Nginx, fayl joyi, tinglash porti, HTTP javobi va access log ni bog‘lash.</p>
 <h2 id="section-3">Topshiriq</h2>
 <p>Web dagi /var/www/html/practice.txt belgilangan matnni HTTP 200 bilan qaytarsin: Web ichidan, bastiondan va tashqaridan tekshiring.</p>
+<h2 id="section-4">Topshiriq diagrammasi</h2>
+<p><img src="../../../assets/uz/p1.png" alt="P1: HTTP topshirig‘i hali tayyor emas → Web ichida tarqatishni sozlash → Javob va log ni solishtirish。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz." width="1040" height="680" loading="lazy"></p>
+<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz.</p>
+<p><a href="../../../assets/uz/p1.png">Kattalashtirish</a> · <a href="../../../assets/uz/p1.svg">SVG</a></p>
 <ul>
 <li>File: /var/www/html/practice.txt</li>
 <li>URL path: /practice.txt</li>
 </ul>
 <pre><code class="language-text">JDU WEB-02 practice: HTTP response verified.
 </code></pre>
-<h2 id="section-4">Bu qanday ishlaydi</h2>
+<h2 id="section-5">Bu qanday ishlaydi</h2>
 <p><strong>Boshlashdan oldingi holat:</strong></p>
 <p>Web yaratilgan, ammo mashq fayli hali qaytarilmayapti.</p>
 <p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
 <p>Nginx 80 portda practice.txt qaytarib, request ni log ga yozadi.</p>
 <p>URL dagi /practice.txt Web ichidagi /var/www/html/practice.txt ga mos. 127.0.0.1 orqali muvaffaqiyat faqat Web ichini tekshiradi. Ayni matnni bastion va Windows dan o‘qish yo‘lning boshqa qismlarini tekshiradi. <a href="https://nginx.org/en/docs/beginners_guide.html">Nginx hujjati</a>.</p>
-<h2 id="section-5">Yechim namunasi: bittadan bajaring</h2>
+<h2 id="section-6">Yechim namunasi: bittadan bajaring</h2>
 <h3>P1.1 Ichki APT dan Nginx o‘rnatish</h3>
 <p><strong>Bajarish joyi:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>P0 dagidek Web ga SSM orqali kiring va role=web ni tekshiring. APT source faqat 10.20.2.30 dagi imzolangan repo ekanini ko‘ring. update indeksni oladi, install paketni o‘rnatadi. Internet source qo‘shmang.</p>
-<pre><code class="language-bash">cat /etc/apt/sources.list.d/jdu-web.sources
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. /etc/apt/sources.list.d/jdu-web.sources mazmunini o‘zgartirmay o‘qish.
+cat /etc/apt/sources.list.d/jdu-web.sources
+# 2. Ichki repo package ro‘yxatini yangilash; yuklash xatosini xato deb olish.
 sudo apt-get update -o APT::Update::Error-Mode=any
+# 3. Ichki repo dan nginx ni tavsiya etilgan qo‘shimchalarsiz o‘rnatish.
 sudo apt-get install --no-install-recommends nginx
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
@@ -56,14 +65,23 @@ sudo apt-get install --no-install-recommends nginx
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>nano da quyida ko‘rsatilgan bitta aniq qatorni yarating va oxiriga yangi qator qo‘ying. Ctrl+O → Enter saqlaydi, Ctrl+X yopadi. install faylni joylaydi; -o/-g egasi va guruhni, -m ruxsatni belgilaydi.</p>
-<pre><code class="language-bash">cd ~
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. Ish katalogini ~ ga o‘zgartirish.
+cd ~
+# 2. Mashq katalogini yaratish; mavjud bo‘lsa saqlash.
 mkdir -p jdu-web-practice/p1
+# 3. Ish katalogini jdu-web-practice/p1 ga o‘zgartirish.
 cd jdu-web-practice/p1
+# 4. Joriy ish katalogini ko‘rsatish.
 pwd
+# 5. Practice.txt ni ochish: matn yozish, saqlash va chiqish.
 nano practice.txt
 # File content: JDU WEB-02 practice: HTTP response verified.
+# 6. Faylni joylab owner, guruh va permission ni belgilash.
 sudo install -o root -g root -m 0644 practice.txt /var/www/html/practice.txt
+# 7. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
 stat -c '%U:%G %a %n' /var/www/html/practice.txt
+# 8. /var/www/html/practice.txt mazmunini o‘zgartirmay o‘qish.
 cat /var/www/html/practice.txt
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
@@ -77,11 +95,18 @@ cat /var/www/html/practice.txt
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Ubuntu boshlang‘ich sayti root sifatida /var/www/html dan foydalanadi. nginx -T da /etc/nginx/sites-enabled/default, root va listen 80 ni toping. Kerak bo‘lsa sudo nano bilan tahrirlang; tekshiruvdan keyin reload qiling. enable --now hozir ishga tushiradi va keyingi OS yuklanishiga yoqadi.</p>
-<pre><code class="language-bash">sudo nginx -T
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. Nginx to‘liq sozlamasini ko‘rsatish; maxfiy qiymatlarni ulashmaslik.
+sudo nginx -T
+# 2. Nginx config sintaksisi va fayllarini tekshirish.
 sudo nginx -t
+# 3. nginx ni hozir yoqish va avtomatik start ni yoqish.
 sudo systemctl enable --now nginx
+# 4. nginx ni to‘xtatmay sozlamani qayta o‘qish.
 sudo systemctl reload nginx
+# 5. nginx joriy ish holatini o‘qish.
 systemctl is-active nginx
+# 6. TCP listen IP, port va jarayonlarini ko‘rsatish.
 sudo ss -lntp
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
@@ -95,7 +120,9 @@ sudo ss -lntp
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>curl HTTP client; -i status, header va body ni ko‘rsatadi. 127.0.0.1 shu Web serverning o‘zi, public IP emas. Faqat buyruq tugaganini emas, javobni solishtiring.</p>
-<pre><code class="language-bash">curl --noproxy '*' -i http://127.0.0.1/practice.txt
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. http://127.0.0.1/practice.txt ga HTTP yuborib status, header va matnni ko‘rsatish.
+curl --noproxy '*' -i http://127.0.0.1/practice.txt
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
 <p>Curl -i body bilan HTTP header ni ham ko‘rsatadi. 127.0.0.1 ayni Web bo‘lib, request Internetdan o‘tmaydi. 200 kodi bilan belgilangan matnni birga tekshiring; boshqa sahifaning 200 javobi mos emas.</p>
@@ -108,7 +135,9 @@ sudo ss -lntp
 <p>Bastionning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web dan exit bilan chiqing, CloudShell dan bastion SSM terminalini ochib quyidagi URL ni so‘rang. Keyin exit bilan CloudShell ga qayting; EC2 dagi hozirgi Web public IPv4 orqali shu path ni curl -i bilan so‘rang. 10.20.1.20 private IP va public IPv4 ni adashtirmang.</p>
-<pre><code class="language-bash">curl --noproxy '*' -i http://10.20.1.20/practice.txt
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. http://10.20.1.20/practice.txt ga HTTP yuborib status, header va matnni ko‘rsatish.
+curl --noproxy '*' -i http://10.20.1.20/practice.txt
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
 <p>Ayni curl bastiondan bajarilsa ichki yo‘l tekshiriladi. Windows browser ida Web ning joriy public IP si kerak. Windows dan 10.20.1.20 ga yetib bo‘lmasligi Web to‘xtaganini anglatmaydi.</p>
@@ -121,7 +150,10 @@ sudo ss -lntp
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web ga qayting. Access log da vaqt, client IP, path va statusni ko‘ring. Bu fayl borligidan tashqari so‘rov ishlanganining dalilidir. Exit bilan CloudShell ga qaytgach, PC dagi Web Portal da P1 ni tekshiring.</p>
-<pre><code class="language-bash">sudo tail -n 20 /var/log/nginx/access.log
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. Access log oxirgi 20 qatoridan oldingi HTTP so‘rovini topish.
+sudo tail -n 20 /var/log/nginx/access.log
+# 2. Joriy server session ini yopib CloudShell ga qaytish.
 exit
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
@@ -130,13 +162,13 @@ exit
 <p>Sakkizta mashq va tayyorlik tekshiruvi natijalari ko‘rinib saqlanadi. P1 bahoga ball qo‘shmaydi; M1 boshqa fayl va matn bilan bajariladi.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Ishlov davom etsa natijani yangilang. Saqlash xatosida sababni o‘qing. Checker kutgan matnni o‘zgartirmang.</p>
-<h2 id="section-6">Natijani o‘qish namunasi (kiritmang)</h2>
+<h2 id="section-7">Natijani o‘qish namunasi (kiritmang)</h2>
 <pre><code class="language-text">HTTP/1.1 200 OK
 
 JDU WEB-02 practice: HTTP response verified.
 </code></pre>
 <p>Faqat kerakli qatorlar ko‘rsatilgan; haqiqiy javobda boshqa header lar ham bor. 200, matn va access log dagi path/status ni tekshiring.</p>
-<h2 id="section-7">Tushunishni tekshirish (ballsiz)</h2>
+<h2 id="section-8">Tushunishni tekshirish (ballsiz)</h2>
 <p>Web ichida 200, bastiondan ulanish ishlamaydi. Faylni qayta yozishdan oldin nimani tekshirasiz?</p>
 <p><strong>Izoh:</strong></p>
 <p>Manzil IP, listen address/port va bastion → Web ruxsatini tekshiring. Fayl mazmuni va yetib borish alohida tekshiruvdir.</p>

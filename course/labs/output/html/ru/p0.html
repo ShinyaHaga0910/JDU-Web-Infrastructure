@@ -10,12 +10,13 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Что изучаем</a> · <a href="#section-3">Задание</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P0 Своя среда и место выполнения команд</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Что изучаем</a> · <a href="#section-3">Задание</a> · <a href="#section-4">Схема задания</a> · <a href="#section-5">Как это работает</a> · <a href="#section-6">Пример решения: выполняйте по одному шагу</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P0 Своя среда и место выполнения команд</h1>
 <p><a href="start.html">Сначала: подключение и правила</a> · <a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a> · <a href="portal.html">Проверка в браузере</a></p>
 <p><a href="../ja/p0.html">日本語</a> · <a href="../ru/p0.html">Русский</a> · <a href="../uz/p0.html">O‘zbekcha</a></p>
-<p>2026-11-03 · D12 P/M r1.3</p>
+<p>2026-11-03 · D12 P/M r1.4</p>
 <p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
 <h2 id="section-1">Перед началом</h2>
 <p>Проверьте <a href="start.html">подключение и правила</a>. Связанное задание: <a href="m0.html">M0</a>. Проверка описана в <a href="portal.html">инструкции браузера</a>.</p>
@@ -23,22 +24,32 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <p>Различать CloudShell, Windows и пять Ubuntu-серверов; подключаться через SSM к нужному узлу и запускать самопроверку.</p>
 <h2 id="section-3">Задание</h2>
 <p>Проверьте свой Lab ID, ID комплекта и instance ID пяти ролей. Это проверка предоставленной среды, 0 баллов. Если пяти серверов ещё нет, сначала выполните начальную установку. Для готовой среды не повторяйте create, создание ключей и регистрацию.</p>
-<h2 id="section-4">Как это работает</h2>
+<h2 id="section-4">Схема задания</h2>
+<p><img src="../../../assets/ru/p0.png" alt="P0: Пять узлов уже созданы → Сверить аккаунт и сервер → Войти по SSM в нужную роль。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Стрелка SSM означает подключение через AWS, а не открытие входящего 443 на EC2." width="1040" height="680" loading="lazy"></p>
+<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Стрелка SSM означает подключение через AWS, а не открытие входящего 443 на EC2.</p>
+<p><a href="../../../assets/ru/p0.png">Открыть крупно</a> · <a href="../../../assets/ru/p0.svg">SVG</a></p>
+<h2 id="section-5">Как это работает</h2>
 <p><strong>Состояние перед началом:</strong></p>
 <p>Используются ваши пять узлов после начальной установки и регистрации.</p>
 <p><strong>Что изменится в этом P:</strong></p>
 <p>Вы различаете аккаунт, роль и место работы; учебные файлы подготовлены.</p>
 <p>AWS Console управляет ресурсами, CloudShell - ваш терминал с AWS CLI, SSM открывает сеанс внутри выбранного EC2. Пять серверов остаются разными ОС: путь /var/www на Web не является тем же каталогом на DB. Проверяйте отдельно роль сервера и пользователя ОС.</p>
-<h2 id="section-5">Пример решения: выполняйте по одному шагу</h2>
+<h2 id="section-6">Пример решения: выполняйте по одному шагу</h2>
 <h3>P0.1 Проверить свой CloudShell и комплект</h3>
 <p><strong>Место выполнения:</strong></p>
 <p>CloudShell в личном AWS-аккаунте студента</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Откройте AWS из своего класса Academy и запустите CloudShell. Замените LAB_ID значением преподавателя. INSTALL - каталог для последующего размещения материалов. Проверьте установленный файл и свой AWS account; проверку задания выполните в браузере в конце.</p>
-<pre><code class="language-bash">LAB_ID='YOUR-LAB-ID'
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Записать свой Lab ID от преподавателя в переменную.
+LAB_ID='YOUR-LAB-ID'
+# 2. Указать ID используемого подписанного комплекта.
 COURSE_ID='web-course-class193548-20261103-r3'
+# 3. Сохранить путь к своему установленному комплекту.
 INSTALL=&quot;$HOME/.local/share/jdu-web/courses/$COURSE_ID/$LAB_ID&quot;
+# 4. Показать номер текущего AWS account.
 aws sts get-caller-identity --query Account --output text
+# 5. Показать INSTALL_OK, если файл начальной установки существует.
 test -f &quot;$INSTALL/activate.sh&quot; &amp;&amp; printf 'INSTALL_OK\n'
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -63,11 +74,18 @@ test -f &quot;$INSTALL/activate.sh&quot; &amp;&amp; printf 'INSTALL_OK\n'
 <p>CloudShell в личном AWS-аккаунте студента</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Подставьте instance ID Web из EC2. После подключения вы работаете в Ubuntu, а не в CloudShell. id -un показывает управляющего пользователя SSM; role в bootstrap.json - роль сервера. Один exit возвращает в CloudShell.</p>
-<pre><code class="language-bash">aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Из CloudShell открыть SSM к выбранному EC2; дождаться подключения.
+aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
+# 2. Показать имя пользователя ОС в этом терминале.
 id -un
+# 3. Показать hostname подключённого сервера.
 hostname
+# 4. Прочитать только role из bootstrap, чтобы проверить выбранный сервер.
 python3 -c 'import json;print(json.load(open(&quot;/etc/jdu-web/bootstrap.json&quot;))[&quot;role&quot;])'
+# 5. Показать текущий рабочий каталог.
 pwd
+# 6. Закрыть сеанс текущего сервера и вернуться в CloudShell.
 exit
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -81,7 +99,10 @@ exit
 <p>CloudShell в личном AWS-аккаунте студента</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Загрузите zip этого пособия через CloudShell → Actions → Upload file; распакуйте командой unzip web-lab-pm-r1.zip. Перейдите в resources и выполните команду. Инструмент сверяет личный подписанный комплект и исходные пять узлов; переносит открытые файлы приложения, SQL и инструмент скрытого ввода на Web/DB. Сервисы и БД он не создаёт, секреты не передаёт.</p>
-<pre><code class="language-bash">cd &quot;$HOME/web-lab-pm-r1/resources&quot;
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Перейти в рабочий каталог $HOME/web-lab-pm-r1/resources.
+cd &quot;$HOME/web-lab-pm-r1/resources&quot;
+# 2. Сверить подписанный комплект и свои пять узлов, разместить материалы на Web/DB.
 python3 -B stage_resources.py --installation &quot;$INSTALL&quot;
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -106,7 +127,9 @@ python3 -B stage_resources.py --installation &quot;$INSTALL&quot;
 <p>Windows PC студента (общая учётная запись)</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Используйте текущий public IPv4 бастиона из EC2. Нажмите Windows+R, введите mstsc /prompt и Enter. В Computer укажите IP, пользователь labuser, пароль - свой RDP из начальной установки, не пароль Windows. Не выбирайте сохранение credentials. Если появится синий login xrdp, выберите Session=Xorg и labuser.</p>
-<pre><code class="language-powershell">mstsc /prompt
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-powershell"># 1. Открыть RDP Windows с запросом учётных данных.
+mstsc /prompt
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
 <p>RDP передаёт экран и ввод бастиона. Запрос Firefox внутри RDP идёт от бастиона, а не Windows. Раскладка клавиатуры влияет на символы пароля; язык интерфейса и раскладка - разные настройки.</p>
@@ -114,7 +137,7 @@ python3 -B stage_resources.py --installation &quot;$INSTALL&quot;
 <p>Открываются Xfce и Firefox внутри Ubuntu-бастиона. Это не браузер Windows. labuser не имеет sudo: настройку выполняйте через CloudShell → SSM/ssm-user.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>При Login failed проверьте имя и раскладку клавиатуры. Не отправляйте пароль в чат. При недоступности сверьте текущий IP и разрешённый CIDR с преподавателем; не открывайте 3389 для всех. Перед закрытием RDP сохраните работу.</p>
-<h2 id="section-6">Проверка понимания (без баллов)</h2>
+<h2 id="section-7">Проверка понимания (без баллов)</h2>
 <p>Какой узел изменится, если выполнить шаги DB в открытом SSM-сеансе Web?</p>
 <p><strong>Объяснение:</strong></p>
 <p>Изменится Web. Вернитесь через exit в CloudShell и подключитесь к instance ID DB.</p>

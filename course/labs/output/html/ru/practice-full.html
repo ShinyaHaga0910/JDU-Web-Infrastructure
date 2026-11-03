@@ -10,10 +10,11 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Как пользоваться пособием</a> · <a href="#section-2">Среда и подготовка</a> · <a href="#section-3">Как читать шаги</a> · <a href="#section-4">Система и пути соединений</a> · <a href="#section-5">P0 Своя среда и место выполнения команд</a> · <a href="#section-6">P1 Выдача статического файла по HTTP</a> · <a href="#section-7">P2 Внутренний DNS и системное разрешение имён</a> · <a href="#section-8">P3 Данные при остановке и запуске</a> · <a href="#section-9">P4 Подключение к PostgreSQL с аутентификацией</a> · <a href="#section-10">P5 Соединить предоставленное приложение с Web и DB</a> · <a href="#section-11">P6 Минимальные права и границы публикации</a> · <a href="#section-12">Продолжение и результаты</a> · <a href="#section-13">Источники и версия</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: практика P0-P6 с подробными шагами</h1>
-<p>2026-11-03 | D12 P/M r1.3 | web-course-class193548-20261103-r3</p>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">Как пользоваться пособием</a> · <a href="#section-2">Среда и подготовка</a> · <a href="#section-3">Как читать шаги</a> · <a href="#section-4">Система и пути соединений</a> · <a href="#section-5">P0 Своя среда и место выполнения команд</a> · <a href="#section-6">P1 Выдача статического файла по HTTP</a> · <a href="#section-7">P2 Внутренний DNS и системное разрешение имён</a> · <a href="#section-8">P3 Данные при остановке и запуске</a> · <a href="#section-9">P4 Подключение к PostgreSQL с аутентификацией</a> · <a href="#section-10">P5 Соединить предоставленное приложение с Web и DB</a> · <a href="#section-11">P6 Минимальные права и границы публикации</a> · <a href="#section-12">Продолжение и результаты</a> · <a href="#section-13">Источники и версия</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: практика P0-P6 с подробными шагами</h1>
+<p>2026-11-03 | D12 P/M r1.4 | web-course-class193548-20261103-r3</p>
 <p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
 <p>Первая редакция для проверки преподавателем. Полное прохождение по пособию студентом ещё не проверено.</p>
 <p>Русский и узбекский тексты синхронизированы с японским оригиналом. Редактура носителями языка ещё не выполнена.</p>
@@ -65,6 +66,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 </table>
 <p>Для входа в каждый Ubuntu выполните в CloudShell aws ssm start-session --target i-СВОЙ-ID. Сразу проверяйте id -un и role из bootstrap.json. Для смены сервера один exit возвращает в CloudShell; затем подключайтесь к следующему ID. Переменные CloudShell не копируются на узел. ssm-user может sudo; RDP-пользователь labuser не администратор sudo.</p>
 <p>Редактор nano: открыть файл → ввести текст → Ctrl+O → Enter сохранить → Ctrl+X выйти. Блок конфигурации не выполняется как shell-команда. В psql меняется prompt; SQL/\password вводятся внутри, \q возвращает в Ubuntu. Не продолжайте после ошибки без проверки результата.</p>
+<p>Нумерованные комментарии показывают порядок и цель внутри шага. # используется в shell, -- внутри psql. Комментарии менять не нужно. Выполняйте по одной команде, дожидаясь подключения, редактора и ввода пароля. Команда с продолжением строки остаётся одной командой.</p>
 <h2 id="section-3">Как читать шаги</h2>
 <p>В каждом P идут задание, объяснение, шаги и вопросы. Выполняйте команды по одной и читайте результат, не вставляйте весь раздел сразу. Обратная косая черта в конце строки означает продолжение: эта и следующая строки составляют одну команду.</p>
 <p>Блок bash вводится в терминале указанного узла. Блок text может содержать конфигурацию, ввод внутри psql или пример вывода: читайте пояснение перед ним. Строка с # - комментарий. Не добавляйте приглашение $ или postgres=# из своего терминала. Значения с YOUR- заменяйте своими.</p>
@@ -130,6 +132,10 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <p>Различать CloudShell, Windows и пять Ubuntu-серверов; подключаться через SSM к нужному узлу и запускать самопроверку.</p>
 <h3>Задание</h3>
 <p>Проверьте свой Lab ID, ID комплекта и instance ID пяти ролей. Это проверка предоставленной среды, 0 баллов. Если пяти серверов ещё нет, сначала выполните начальную установку. Для готовой среды не повторяйте create, создание ключей и регистрацию.</p>
+<h3>Схема задания</h3>
+<p><img src="../../../assets/ru/p0.png" alt="P0: Пять узлов уже созданы → Сверить аккаунт и сервер → Войти по SSM в нужную роль。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Стрелка SSM означает подключение через AWS, а не открытие входящего 443 на EC2." width="1040" height="680" loading="lazy"></p>
+<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Стрелка SSM означает подключение через AWS, а не открытие входящего 443 на EC2.</p>
+<p><a href="../../../assets/ru/p0.png">Открыть крупно</a> · <a href="../../../assets/ru/p0.svg">SVG</a></p>
 <h3>Как это работает</h3>
 <p><strong>Состояние перед началом:</strong></p>
 <p>Используются ваши пять узлов после начальной установки и регистрации.</p>
@@ -142,10 +148,16 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <p>CloudShell в личном AWS-аккаунте студента</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Откройте AWS из своего класса Academy и запустите CloudShell. Замените LAB_ID значением преподавателя. INSTALL - каталог для последующего размещения материалов. Проверьте установленный файл и свой AWS account; проверку задания выполните в браузере в конце.</p>
-<pre><code class="language-bash">LAB_ID='YOUR-LAB-ID'
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Записать свой Lab ID от преподавателя в переменную.
+LAB_ID='YOUR-LAB-ID'
+# 2. Указать ID используемого подписанного комплекта.
 COURSE_ID='web-course-class193548-20261103-r3'
+# 3. Сохранить путь к своему установленному комплекту.
 INSTALL=&quot;$HOME/.local/share/jdu-web/courses/$COURSE_ID/$LAB_ID&quot;
+# 4. Показать номер текущего AWS account.
 aws sts get-caller-identity --query Account --output text
+# 5. Показать INSTALL_OK, если файл начальной установки существует.
 test -f &quot;$INSTALL/activate.sh&quot; &amp;&amp; printf 'INSTALL_OK\n'
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -170,11 +182,18 @@ test -f &quot;$INSTALL/activate.sh&quot; &amp;&amp; printf 'INSTALL_OK\n'
 <p>CloudShell в личном AWS-аккаунте студента</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Подставьте instance ID Web из EC2. После подключения вы работаете в Ubuntu, а не в CloudShell. id -un показывает управляющего пользователя SSM; role в bootstrap.json - роль сервера. Один exit возвращает в CloudShell.</p>
-<pre><code class="language-bash">aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Из CloudShell открыть SSM к выбранному EC2; дождаться подключения.
+aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
+# 2. Показать имя пользователя ОС в этом терминале.
 id -un
+# 3. Показать hostname подключённого сервера.
 hostname
+# 4. Прочитать только role из bootstrap, чтобы проверить выбранный сервер.
 python3 -c 'import json;print(json.load(open(&quot;/etc/jdu-web/bootstrap.json&quot;))[&quot;role&quot;])'
+# 5. Показать текущий рабочий каталог.
 pwd
+# 6. Закрыть сеанс текущего сервера и вернуться в CloudShell.
 exit
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -188,7 +207,10 @@ exit
 <p>CloudShell в личном AWS-аккаунте студента</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Загрузите zip этого пособия через CloudShell → Actions → Upload file; распакуйте командой unzip web-lab-pm-r1.zip. Перейдите в resources и выполните команду. Инструмент сверяет личный подписанный комплект и исходные пять узлов; переносит открытые файлы приложения, SQL и инструмент скрытого ввода на Web/DB. Сервисы и БД он не создаёт, секреты не передаёт.</p>
-<pre><code class="language-bash">cd &quot;$HOME/web-lab-pm-r1/resources&quot;
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Перейти в рабочий каталог $HOME/web-lab-pm-r1/resources.
+cd &quot;$HOME/web-lab-pm-r1/resources&quot;
+# 2. Сверить подписанный комплект и свои пять узлов, разместить материалы на Web/DB.
 python3 -B stage_resources.py --installation &quot;$INSTALL&quot;
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -213,7 +235,9 @@ python3 -B stage_resources.py --installation &quot;$INSTALL&quot;
 <p>Windows PC студента (общая учётная запись)</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Используйте текущий public IPv4 бастиона из EC2. Нажмите Windows+R, введите mstsc /prompt и Enter. В Computer укажите IP, пользователь labuser, пароль - свой RDP из начальной установки, не пароль Windows. Не выбирайте сохранение credentials. Если появится синий login xrdp, выберите Session=Xorg и labuser.</p>
-<pre><code class="language-powershell">mstsc /prompt
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-powershell"># 1. Открыть RDP Windows с запросом учётных данных.
+mstsc /prompt
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
 <p>RDP передаёт экран и ввод бастиона. Запрос Firefox внутри RDP идёт от бастиона, а не Windows. Раскладка клавиатуры влияет на символы пароля; язык интерфейса и раскладка - разные настройки.</p>
@@ -230,6 +254,10 @@ python3 -B stage_resources.py --installation &quot;$INSTALL&quot;
 <p>Связать Nginx, файл, прослушивание порта, HTTP-ответ и access log.</p>
 <h3>Задание</h3>
 <p>Файл /var/www/html/practice.txt на Web должен возвращать заданный текст с HTTP 200: локально, с бастиона и извне.</p>
+<h3>Схема задания</h3>
+<p><img src="../../../assets/ru/p1.png" alt="P1: HTTP-задание ещё не готово → Настроить выдачу на Web → Сверить ответ и журнал。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер." width="1040" height="680" loading="lazy"></p>
+<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер.</p>
+<p><a href="../../../assets/ru/p1.png">Открыть крупно</a> · <a href="../../../assets/ru/p1.svg">SVG</a></p>
 <ul>
 <li>File: /var/www/html/practice.txt</li>
 <li>URL path: /practice.txt</li>
@@ -248,8 +276,12 @@ python3 -B stage_resources.py --installation &quot;$INSTALL&quot;
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Подключитесь по SSM к Web как в P0 и проверьте role=web. Проверьте APT source: используется только подписанный repo 10.20.2.30. update получает индекс, install устанавливает пакет. Не добавляйте внешние источники.</p>
-<pre><code class="language-bash">cat /etc/apt/sources.list.d/jdu-web.sources
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Прочитать /etc/apt/sources.list.d/jdu-web.sources без изменения.
+cat /etc/apt/sources.list.d/jdu-web.sources
+# 2. Обновить индекс пакетов внутреннего repo; считать ошибки загрузки сбоем.
 sudo apt-get update -o APT::Update::Error-Mode=any
+# 3. Установить nginx из внутреннего repo без рекомендуемых дополнений.
 sudo apt-get install --no-install-recommends nginx
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -263,14 +295,23 @@ sudo apt-get install --no-install-recommends nginx
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Создайте текст через nano: одна точная строка, указанная ниже, с переводом строки в конце. Ctrl+O → Enter сохраняет, Ctrl+X закрывает редактор. install копирует файл; -o/-g задают владельца и группу, -m - права.</p>
-<pre><code class="language-bash">cd ~
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Перейти в рабочий каталог ~.
+cd ~
+# 2. Создать рабочий каталог; существующий сохранить.
 mkdir -p jdu-web-practice/p1
+# 3. Перейти в рабочий каталог jdu-web-practice/p1.
 cd jdu-web-practice/p1
+# 4. Показать текущий рабочий каталог.
 pwd
+# 5. Открыть practice.txt: ввести текст, сохранить и выйти.
 nano practice.txt
 # File content: JDU WEB-02 practice: HTTP response verified.
+# 6. Установить файл с нужными владельцем, группой и правами.
 sudo install -o root -g root -m 0644 practice.txt /var/www/html/practice.txt
+# 7. Прочитать владельца, группу, права и имя указанных файлов.
 stat -c '%U:%G %a %n' /var/www/html/practice.txt
+# 8. Прочитать /var/www/html/practice.txt без изменения.
 cat /var/www/html/practice.txt
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -284,11 +325,18 @@ cat /var/www/html/practice.txt
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Начальный сайт Ubuntu использует root /var/www/html. Через nginx -T найдите включённый /etc/nginx/sites-enabled/default, root и listen 80. При необходимости редактируйте sudo nano; reload выполняйте после успешной проверки. enable --now запускает сейчас и включает автозапуск.</p>
-<pre><code class="language-bash">sudo nginx -T
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Показать полную конфигурацию Nginx; не передавать секреты.
+sudo nginx -T
+# 2. Проверить синтаксис и файлы конфигурации Nginx.
 sudo nginx -t
+# 3. Запустить nginx сейчас и включить автозапуск.
 sudo systemctl enable --now nginx
+# 4. Перечитать настройки nginx без остановки.
 sudo systemctl reload nginx
+# 5. Прочитать текущее состояние nginx.
 systemctl is-active nginx
+# 6. Показать IP, порты и процессы слушающих TCP-сокетов.
 sudo ss -lntp
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -302,7 +350,9 @@ sudo ss -lntp
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>curl - HTTP-клиент; -i показывает статус, заголовки и тело. 127.0.0.1 означает этот Web-сервер, не его public IP. Сравните ответ, а не только код завершения команды.</p>
-<pre><code class="language-bash">curl --noproxy '*' -i http://127.0.0.1/practice.txt
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Отправить HTTP к http://127.0.0.1/practice.txt; показать статус, заголовки и тело.
+curl --noproxy '*' -i http://127.0.0.1/practice.txt
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
 <p>Curl -i показывает HTTP-заголовки вместе с телом. Адрес 127.0.0.1 означает сам Web, запрос не идёт через Internet. Проверяйте и код 200, и заданный текст; ответ другой страницы не подходит.</p>
@@ -315,7 +365,9 @@ sudo ss -lntp
 <p>SSM-терминал бастиона: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Выйдите из Web через exit, откройте SSM бастиона из CloudShell и запросите URL ниже. Затем exit возвращает в CloudShell; там запросите тот же путь командой curl -i по текущему public IPv4 Web из EC2. Не путайте private 10.20.1.20 с public IPv4.</p>
-<pre><code class="language-bash">curl --noproxy '*' -i http://10.20.1.20/practice.txt
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Отправить HTTP к http://10.20.1.20/practice.txt; показать статус, заголовки и тело.
+curl --noproxy '*' -i http://10.20.1.20/practice.txt
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
 <p>Тот же curl с бастиона проверяет внутренний путь. В браузере Windows нужен текущий public IP Web. Недоступность 10.20.1.20 с Windows сама по себе не означает остановку Web.</p>
@@ -328,7 +380,10 @@ sudo ss -lntp
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Вернитесь на Web. В access log найдите время, IP клиента, путь и статус. Это доказательство обработки запроса, не только наличия файла. После exit в CloudShell выберите P1 в Web Portal на PC и запустите проверку.</p>
-<pre><code class="language-bash">sudo tail -n 20 /var/log/nginx/access.log
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Прочитать последние 20 строк access log и найти свой HTTP-запрос.
+sudo tail -n 20 /var/log/nginx/access.log
+# 2. Закрыть сеанс текущего сервера и вернуться в CloudShell.
 exit
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -352,6 +407,10 @@ JDU WEB-02 practice: HTTP response verified.
 <p>Последовательно настроить zone, A-записи, ACL BIND и resolver клиентов.</p>
 <h3>Задание</h3>
 <p>Настройте guide.lab.test → 10.20.1.20 и practice-db.lab.test → 10.20.2.20; откройте HTTP из P1 по имени. Фиксированные IP не меняются.</p>
+<h3>Схема задания</h3>
+<p><img src="../../../assets/ru/p2.png" alt="P2: HTTP по IP уже работает → Настроить DNS и resolver → Имя ведёт к тому же Web。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер." width="1040" height="680" loading="lazy"></p>
+<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер.</p>
+<p><a href="../../../assets/ru/p2.png">Открыть крупно</a> · <a href="../../../assets/ru/p2.svg">SVG</a></p>
 <table>
 <thead>
 <tr>
@@ -382,9 +441,14 @@ JDU WEB-02 practice: HTTP response verified.
 <p>SSM-терминал DNS-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Подключитесь к DNS, проверьте role=dns. cp -a сохраняет атрибуты исходного файла, -n не заменяет прежнюю копию. Это страховка при редактировании, не задание по backup/restore БД.</p>
-<pre><code class="language-bash">sudo apt-get update -o APT::Update::Error-Mode=any
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Обновить индекс пакетов внутреннего repo; считать ошибки загрузки сбоем.
+sudo apt-get update -o APT::Update::Error-Mode=any
+# 2. Установить bind9 bind9-utils из внутреннего repo без рекомендуемых дополнений.
 sudo apt-get install --no-install-recommends bind9 bind9-utils
+# 3. Скопировать исходный файл в резервную копию, не затирая существующую.
 sudo cp -an /etc/bind/named.conf.options /etc/bind/named.conf.options.before-p2
+# 4. Скопировать исходный файл в резервную копию, не затирая существующую.
 sudo cp -an /etc/bind/named.conf.local /etc/bind/named.conf.local.before-p2
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -398,6 +462,7 @@ sudo cp -an /etc/bind/named.conf.local /etc/bind/named.conf.local.before-p2
 <p>SSM-терминал DNS-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Откройте sudo nano /etc/bind/named.conf.options, введите и сохраните текст ниже. acl задаёт разрешённых клиентов; listen-on - адреса DNS; forward only передаёт внешние имена AWS DNS. И query, и recursion ограничены тремя источниками. dnssec-validation no соответствует изолированной учебной схеме forwarding.</p>
+<p>Конфигурация или данные: не выполнять как команды</p>
 <pre><code class="language-text">acl &quot;jdu_clients&quot; { 127.0.0.1; 10.20.1.10; 10.20.1.20; };
 options {
     directory &quot;/var/cache/bind&quot;;
@@ -424,6 +489,7 @@ options {
 <p>SSM-терминал DNS-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>В sudo nano /etc/bind/named.conf.local запишите первый блок zone. Создайте каталог командой sudo install -d -m 0755 /etc/bind/zones, затем откройте sudo nano /etc/bind/zones/db.lab.test и запишите остальной текст. SOA - служебные данные, NS - авторитетный DNS, A - имя/IPv4. Точка в конце обозначает полное имя; увеличивайте serial при изменениях.</p>
+<p>Конфигурация или данные: не выполнять как команды</p>
 <pre><code class="language-text">// /etc/bind/named.conf.local
 zone &quot;lab.test&quot; {
     type primary;
@@ -452,11 +518,18 @@ practice-db IN A 10.20.2.20
 <p>SSM-терминал DNS-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Переключение клиентов на неисправный DNS нарушит разрешение имён. Сначала добейтесь успешных named-checkconf и named-checkzone, затем проверьте UDP и TCP.</p>
-<pre><code class="language-bash">sudo named-checkconf -z
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Проверить конфигурацию BIND и подключённые zone.
+sudo named-checkconf -z
+# 2. Проверить zone-файл lab.test.
 sudo named-checkzone lab.test /etc/bind/zones/db.lab.test
+# 3. Запустить named сейчас и включить автозапуск.
 sudo systemctl enable --now named
+# 4. Перезапустить named с обновлённой настройкой.
 sudo systemctl restart named
+# 5. Запросить guide.lab.test по UDP 53 и прочитать ответ.
 dig @127.0.0.1 guide.lab.test A
+# 6. Запросить guide.lab.test по TCP 53 и прочитать ответ.
 dig @127.0.0.1 guide.lab.test A +tcp
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -470,10 +543,16 @@ dig @127.0.0.1 guide.lab.test A +tcp
 <p>SSM-терминал бастиона: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Выполните команды и на бастионе, и на Web. @10.20.2.10 задаёт DNS только для данного запроса. Это ещё не доказывает, что браузер и приложение используют его по умолчанию.</p>
-<pre><code class="language-bash">dig @10.20.2.10 guide.lab.test A
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Запросить guide.lab.test по UDP 53 и прочитать ответ.
+dig @10.20.2.10 guide.lab.test A
+# 2. Запросить practice-db.lab.test по TCP 53 и прочитать ответ.
 dig @10.20.2.10 practice-db.lab.test A +tcp
+# 3. Запросить absent-p2.lab.test по UDP 53 и прочитать ответ.
 dig @10.20.2.10 absent-p2.lab.test A
+# 4. Запросить aws.amazon.com по UDP 53 и прочитать ответ.
 dig @10.20.2.10 aws.amazon.com A
+# 5. Запросить AXFR всей zone и проверить явный отказ.
 dig @10.20.2.10 lab.test AXFR
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -487,6 +566,7 @@ dig @10.20.2.10 lab.test AXFR
 <p>SSM-терминал бастиона: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>На бастионе и Web по одному узлу выполните ip -br link, затем networkctl status ИМЯ для определения интерфейса и Network File. Найдите его YAML через ls /etc/netplan и сохраните копию sudo cp -an. Через sudo nano добавьте к тому же интерфейсу dhcp4-overrides/use-dns:false и nameservers. Ниже схема: имя интерфейса и имеющиеся match/set-name/renderer сохраняйте из своего файла.</p>
+<p>Конфигурация или данные: не выполнять как команды</p>
 <pre><code class="language-text">network:
   version: 2
   ethernets:
@@ -508,12 +588,20 @@ dig @10.20.2.10 lab.test AXFR
 <p>SSM-терминал бастиона: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>На бастионе и Web сначала создайте конфигурацию, затем примените и проверьте. Оставьте второе окно SSH/RDP; при разрыве вернитесь по SSM и сравните с сохранённой копией. Применяйте apply только после проверки файла и успешного generate.</p>
-<pre><code class="language-bash">sudo netplan generate
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Сгенерировать конфигурацию netplan и проверить YAML перед применением.
+sudo netplan generate
+# 2. Применить сохранённые настройки netplan к сети.
 sudo netplan apply
+# 3. Перезапустить systemd-resolved с обновлённой настройкой.
 sudo systemctl restart systemd-resolved
+# 4. Показать DNS-серверы системного resolver.
 resolvectl dns
+# 5. Получить IPv4 guide.lab.test через системный resolver.
 getent ahostsv4 guide.lab.test
+# 6. Получить IPv4 practice-db.lab.test через системный resolver.
 getent ahostsv4 practice-db.lab.test
+# 7. Отправить HTTP к http://guide.lab.test/practice.txt; показать статус, заголовки и тело.
 curl --noproxy '*' -i http://guide.lab.test/practice.txt
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -547,6 +635,10 @@ guide.lab.test.  300  IN  A  10.20.1.20
 <p>Проверить файл и права на исходном EBS; доказать сохранение после stop/start того же Web.</p>
 <h3>Задание</h3>
 <p>Создайте marker P3 со своим анонимным Lab ID. Зафиксируйте состояние до остановки, stopped и после запуска. Дополнительный диск, mount и backup/restore не требуются.</p>
+<h3>Схема задания</h3>
+<p><img src="../../../assets/ru/p3.png" alt="P3: Исходный диск того же Web → Запись → Stop → Start → Данные сохранены, boot ID новый。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Stop/Start выполняется через AWS API, а не через входящий 443 Web." width="1040" height="680" loading="lazy"></p>
+<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Stop/Start выполняется через AWS API, а не через входящий 443 Web.</p>
+<p><a href="../../../assets/ru/p3.png">Открыть крупно</a> · <a href="../../../assets/ru/p3.svg">SVG</a></p>
 <ul>
 <li>File: /var/lib/jdu-web/practice/storage.txt</li>
 </ul>
@@ -566,9 +658,14 @@ payload=practice-storage-2026
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>findmnt показывает файловую систему, lsblk - диски и разделы, df -h - свободное место. Используйте предоставленный root EBS; имя /dev/nvme не является причиной менять диск.</p>
-<pre><code class="language-bash">findmnt -T /var/lib
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Определить файловую систему для /var/lib.
+findmnt -T /var/lib
+# 2. Показать имена, типы, размеры, точки монтирования и ID дисков.
 lsblk -o NAME,TYPE,SIZE,MOUNTPOINTS,SERIAL
+# 3. Проверить занятое и свободное место /var/lib.
 df -h /var/lib
+# 4. Прочитать boot ID для сравнения загрузок до и после остановки.
 cat /proc/sys/kernel/random/boot_id
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -582,15 +679,26 @@ cat /proc/sys/kernel/random/boot_id
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Задайте LAB_ID и в этом терминале. printf завершает строки переводом строки. install задаёт directory 0755 и файл 0644/root:root. Сначала проверьте существующий файл; не заменяйте отличающееся содержимое без выяснения причины.</p>
-<pre><code class="language-bash">LAB_ID='YOUR-LAB-ID'
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Записать свой Lab ID от преподавателя в переменную.
+LAB_ID='YOUR-LAB-ID'
+# 2. Перейти в рабочий каталог ~.
 cd ~
+# 3. Создать рабочий каталог; существующий сохранить.
 mkdir -p jdu-web-practice/p3
+# 4. Перейти в рабочий каталог jdu-web-practice/p3.
 cd jdu-web-practice/p3
+# 5. Записать учебный marker со своим Lab ID в рабочий файл.
 printf 'lab_id=%s\ntask=P3\npayload=practice-storage-2026\n' &quot;$LAB_ID&quot; &gt; storage.txt
+# 6. Прочитать storage.txt без изменения.
 cat storage.txt
+# 7. Создать каталог с указанными владельцем, группой и правами.
 sudo install -d -o root -g root -m 0755 /var/lib/jdu-web/practice
+# 8. Установить файл с нужными владельцем, группой и правами.
 sudo install -o root -g root -m 0644 storage.txt /var/lib/jdu-web/practice/storage.txt
+# 9. Прочитать владельца, группу, права и имя указанных файлов.
 stat -c '%U:%G %a %n' /var/lib/jdu-web/practice /var/lib/jdu-web/practice/storage.txt
+# 10. Вычислить SHA256 marker для сравнения содержимого.
 sha256sum /var/lib/jdu-web/practice/storage.txt
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -641,6 +749,10 @@ sha256sum /var/lib/jdu-web/practice/storage.txt
 <p>Различать database, role и schema; выполнять SQL с Web по установленному паролю.</p>
 <h3>Задание</h3>
 <p>Создайте jdu_catalog_practice, catalog_practice_setup и catalog_practice_app. Разрешите SCRAM только с Web 10.20.1.20/32. Таблицы приложения на этапе P4 не нужны.</p>
+<h3>Схема задания</h3>
+<p><img src="../../../assets/ru/p4.png" alt="P4: Подготовить доступ Web к БД → Настроить БД, роли и вход → Разрешённый SELECT успешен。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Стрелка SSM означает подключение через AWS, а не открытие входящего 443 на EC2." width="1040" height="680" loading="lazy"></p>
+<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Стрелка SSM означает подключение через AWS, а не открытие входящего 443 на EC2.</p>
+<p><a href="../../../assets/ru/p4.png">Открыть крупно</a> · <a href="../../../assets/ru/p4.svg">SVG</a></p>
 <ul>
 <li>Profile: practice</li>
 <li>Database: jdu_catalog_practice</li>
@@ -659,10 +771,16 @@ sha256sum /var/lib/jdu-web/practice/storage.txt
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Подключитесь к DB по SSM, проверьте role=db. Cluster PostgreSQL 16 - единица работы сервера БД. Инструмент распаковки проверяет приложение и извлекает SQL; сам он не создаёт БД или роли.</p>
-<pre><code class="language-bash">sudo apt-get update -o APT::Update::Error-Mode=any
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Обновить индекс пакетов внутреннего repo; считать ошибки загрузки сбоем.
+sudo apt-get update -o APT::Update::Error-Mode=any
+# 2. Установить postgresql-16 postgresql-client-16 из внутреннего repo без рекомендуемых дополнений.
 sudo apt-get install --no-install-recommends postgresql-16 postgresql-client-16
+# 3. Сверить фиксированный hash и распаковать приложение/SQL преподавателя.
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py
+# 4. Показать версию, кластер, порт и состояние PostgreSQL.
 pg_lsclusters
+# 5. Прочитать настройку БД от postgres: SHOW data_directory;
 sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -676,6 +794,7 @@ sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Сохраните postgresql.conf через sudo cp -an. В sudo nano /etc/postgresql/16/main/postgresql.conf задайте три значения ниже. Если параметр встречается несколько раз, проверьте действующее значение через SHOW. Слушать нужно только private IP БД на 5432; password_encryption определяет хранение новых паролей.</p>
+<p>Конфигурация или данные: не выполнять как команды</p>
 <pre><code class="language-text">listen_addresses = '10.20.2.20'
 port = 5432
 password_encryption = 'scram-sha-256'
@@ -691,6 +810,7 @@ password_encryption = 'scram-sha-256'
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Сохраните pg_hba.conf, затем в sudo nano /etc/postgresql/16/main/pg_hba.conf запишите правила ниже. Действует первая совпавшая строка, поэтому прежние широкие разрешения не оставляйте. Системный postgres управляет через Unix socket/peer. Роли будущего M4 перечислены отдельно; учебной роли доступ к основной БД не даётся.</p>
+<p>Конфигурация или данные: не выполнять как команды</p>
 <pre><code class="language-text">local all postgres peer
 local all all reject
 host jdu_catalog_practice catalog_practice_setup 10.20.1.20/32 scram-sha-256
@@ -711,10 +831,16 @@ host all all ::/0 reject
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>restart перечитывает настройки. SHOW и pg_hba_file_rules проверяют действующие значения, а не только текст файла. Параметр psql -X отключает личные startup-файлы.</p>
-<pre><code class="language-bash">sudo systemctl restart postgresql@16-main
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Перезапустить postgresql@16-main с обновлённой настройкой.
+sudo systemctl restart postgresql@16-main
+# 2. Прочитать текущее состояние postgresql@16-main.
 systemctl is-active postgresql@16-main
+# 3. Показать IP, порты и процессы слушающих TCP-сокетов.
 sudo ss -lntp
+# 4. Прочитать настройку БД от postgres: SHOW password_encryption;
 sudo -u postgres psql -X -d postgres -c &quot;SHOW password_encryption;&quot;
+# 5. Найти ошибки HBA; в норме 0 строк.
 sudo -u postgres psql -X -d postgres -c \
   &quot;SELECT line_number,error FROM pg_hba_file_rules WHERE error IS NOT NULL;&quot;
 </code></pre>
@@ -729,10 +855,15 @@ sudo -u postgres psql -X -d postgres -c \
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>profile_sql.py только выводит фиксированный SQL с учебными именами. Сначала прочитайте вывод, затем передайте тот же текст psql. setup владеет БД/schema и создаёт таблицы; app используется приложением. Используйте предоставленный SQL: программировать приложение не требуется.</p>
-<pre><code class="language-bash">cd /var/lib/jdu-web/lesson-resources-r1/app
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Перейти в рабочий каталог /var/lib/jdu-web/lesson-resources-r1/app.
+cd /var/lib/jdu-web/lesson-resources-r1/app
+# 2. Показать SQL создания учебных ролей без выполнения.
 python3 -B profile_sql.py --profile practice 01_create_roles.sql
+# 3. Сформировать SQL создания учебных ролей и применить через postgres к нужной БД.
 python3 -B profile_sql.py --profile practice 01_create_roles.sql | sudo -u postgres \
   psql -X -v ON_ERROR_STOP=1 -d postgres
+# 4. Сформировать SQL создания учебной БД и схемы и применить через postgres к нужной БД.
 python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u postgres \
   psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
 </code></pre>
@@ -747,10 +878,18 @@ python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u pos
 <p>psql на DB-сервере от имени системного postgres</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Первая строка запускается в shell DB и открывает psql с postgres=#. Команды \password вводятся внутри psql. Для setup/app задайте разные пароли длиной от 16 символов, каждый дважды скрытым вводом. Не пишите значения в команду или отчёт. \q возвращает в shell DB.</p>
-<pre><code class="language-text">sudo -u postgres psql -X -d postgres
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. В терминале DB открыть psql от postgres; следующие действия внутри psql.
+sudo -u postgres psql -X -d postgres
+</code></pre>
+<p>Далее вводить внутри psql</p>
+<pre><code class="language-sql">-- 2. В psql скрыто задать пароль роли catalog_practice_setup.
 \password catalog_practice_setup
+-- 3. В psql скрыто задать пароль роли catalog_practice_app.
 \password catalog_practice_app
+-- 4. В psql проверить атрибуты и права учебных ролей.
 \du catalog_practice_*
+-- 5. Выйти из psql в терминал ОС того же DB-сервера.
 \q
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -764,7 +903,10 @@ python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u pos
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Закройте SSM DB через exit, вернитесь в CloudShell и откройте Web. У psql -h задаёт узел, -U - роль, -d - БД, -W запрашивает пароль. P4 использует private IP, чтобы не добавлять зависимость от DNS.</p>
-<pre><code class="language-bash">sudo apt-get install --no-install-recommends postgresql-client-16
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Установить postgresql-client-16 из внутреннего repo без рекомендуемых дополнений.
+sudo apt-get install --no-install-recommends postgresql-client-16
+# 2. Подключиться с Web к нужной БД с существующим паролем и выполнить SELECT.
 psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
   'SELECT current_database(),current_user,1 AS value;'
 </code></pre>
@@ -779,8 +921,11 @@ psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Инструмент дважды скрыто запрашивает существующий пароль catalog_practice_app и сохраняет его только на Web в root-файл 0600. Пароль БД не меняется. Не выводите env через cat и не выполняйте source. После exit проверьте P4 в Web Portal на PC.</p>
-<pre><code class="language-bash">sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/database_secret.py --profile \
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Скрыто ввести существующий пароль учебной БД и сохранить только на Web.
+sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/database_secret.py --profile \
   practice
+# 2. Закрыть сеанс текущего сервера и вернуться в CloudShell.
 exit
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -803,6 +948,10 @@ jdu_catalog_practice | catalog_practice_app | 1
 <p>Без программирования связать offline-зависимости, сервисного пользователя, инициализацию БД, Nginx/systemd и реальный HTTP.</p>
 <h3>Задание</h3>
 <p>Постройте каталог в profile practice. Нужны действующие DNS из M2 и P4. БД/администраторы P и M различны, но приложение и порты на том же Web общие.</p>
+<h3>Схема задания</h3>
+<p><img src="../../../assets/ru/p5.png" alt="P5: DNS и БД уже готовы → Подключить и запустить app → Изменения видны в БД и Web。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. 8000 доступен только внутри Web; 8080 используется для управления с бастиона." width="1040" height="680" loading="lazy"></p>
+<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. 8000 доступен только внутри Web; 8080 используется для управления с бастиона.</p>
+<p><a href="../../../assets/ru/p5.png">Открыть крупно</a> · <a href="../../../assets/ru/p5.svg">SVG</a></p>
 <ul>
 <li>Profile: practice</li>
 <li>Database: jdu_catalog_practice</li>
@@ -849,11 +998,18 @@ jdu_catalog_practice | catalog_practice_app | 1
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>На Web обычный resolver должен дать db.lab.test=10.20.2.20 и admin.lab.test=10.20.1.20. offline_assets получает семь wheel и lock из внутреннего repo, сверяя исходную подпись/hash. Он не запускает внешний pip и не настраивает DB/app.</p>
-<pre><code class="language-bash">getent ahostsv4 db.lab.test
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Получить IPv4 db.lab.test через системный resolver.
+getent ahostsv4 db.lab.test
+# 2. Получить IPv4 admin.lab.test через системный resolver.
 getent ahostsv4 admin.lab.test
+# 3. Установить python3-venv python3-pip из внутреннего repo без рекомендуемых дополнений.
 sudo apt-get install --no-install-recommends python3-venv python3-pip
+# 4. Проверить подпись/hash, подготовить приложение и фиксированные wheel.
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py --wheels
+# 5. Показать учебные файлы в /var/lib/jdu-web/lesson-resources-r1/app.
 ls /var/lib/jdu-web/lesson-resources-r1/app
+# 6. Показать учебные файлы в /var/lib/jdu-web/lesson-resources-r1/wheels.
 ls /var/lib/jdu-web/lesson-resources-r1/wheels
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -867,13 +1023,19 @@ ls /var/lib/jdu-web/lesson-resources-r1/wheels
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Код и venv контролирует root; пользователь catalog не должен их менять. Если app или venv уже существуют, не повторяйте создание - проверьте версию. cp переносит только проверенные открытые ресурсы. venv отделяет зависимости приложения от системного Python.</p>
-<pre><code class="language-bash">sudo install -d -o root -g root -m 0755 /opt/jdu-catalog/app
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Создать каталог с указанными владельцем, группой и правами.
+sudo install -d -o root -g root -m 0755 /opt/jdu-catalog/app
+# 2. Скопировать приложение преподавателя в /opt с сохранением атрибутов.
 sudo cp -a /var/lib/jdu-web/lesson-resources-r1/app/. /opt/jdu-catalog/app/
+# 3. Создать отдельное Python venv приложения.
 sudo python3 -m venv /opt/jdu-catalog/venv
+# 4. Установить зависимости только из локальных wheel с lock/hash.
 sudo /opt/jdu-catalog/venv/bin/python -m pip --isolated --no-cache-dir install \
   --no-index --find-links=/var/lib/jdu-web/lesson-resources-r1/wheels \
   --only-binary=:all: --require-hashes -r \
   /var/lib/jdu-web/lesson-resources-r1/requirements.lock
+# 5. Проверить совместимость установленных Python-зависимостей.
 sudo /opt/jdu-catalog/venv/bin/python -m pip check
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -887,11 +1049,17 @@ sudo /opt/jdu-catalog/venv/bin/python -m pip check
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>catalog предназначен для Gunicorn, не для входа человека. Создайте его с nologin и без sudo. Только каталог static принадлежит catalog для collectstatic; код/venv остаются root. Если catalog уже есть, проверьте id и shell вместо повторного useradd.</p>
-<pre><code class="language-bash">sudo useradd --system --user-group --home-dir /nonexistent --no-create-home --shell \
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Создать системного catalog для приложения без login shell и home.
+sudo useradd --system --user-group --home-dir /nonexistent --no-create-home --shell \
   /usr/sbin/nologin catalog
+# 2. Создать каталог с указанными владельцем, группой и правами.
 sudo install -d -o root -g root -m 0755 /var/lib/jdu-catalog
+# 3. Создать каталог с указанными владельцем, группой и правами.
 sudo install -d -o catalog -g catalog -m 0755 /var/lib/jdu-catalog/static
+# 4. Проверить UID, GID и группы пользователя catalog.
 id catalog
+# 5. Проверить home и login shell пользователя catalog.
 getent passwd catalog
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -905,10 +1073,15 @@ getent passwd catalog
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Подставьте текущий public IPv4 Web из EC2. Runtime-инструмент дважды запрашивает существующий пароль catalog_practice_app из P4. Django secret генерируется для вашего Lab. Создаются root-only app.env и profile practice; содержимое не выводится.</p>
-<pre><code class="language-bash">PUBLIC_WEB_IPV4='YOUR-CURRENT-WEB-PUBLIC-IP'
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Указать текущий public IPv4 Web из AWS Console.
+PUBLIC_WEB_IPV4='YOUR-CURRENT-WEB-PUBLIC-IP'
+# 2. Скрыто ввести существующий пароль БД и создать runtime practice.
 sudo python3 -B /opt/jdu-catalog/app/configuration.py create-runtime --profile \
   practice --public-web-ipv4 &quot;$PUBLIC_WEB_IPV4&quot;
+# 3. Проверить runtime-конфигурацию без вывода секретов.
 sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
+# 4. Прочитать владельца, группу, права и имя указанных файлов.
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -922,13 +1095,19 @@ sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>В create-setup введите пароль catalog_practice_setup из P4. migrate создаёт предоставленную структуру БД; seed однократно добавляет три вымышленных образца в пустой каталог. create_lab_admin создаёт practice_admin со скрытым вводом пароля. Обычное приложение не работает через setup.</p>
-<pre><code class="language-bash">sudo python3 -B /opt/jdu-catalog/app/configuration.py create-setup --profile practice
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Скрыто ввести существующий пароль setup и создать временную настройку.
+sudo python3 -B /opt/jdu-catalog/app/configuration.py create-setup --profile practice
+# 2. Проверить ошибки приложения в режиме setup.
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase setup check
+# 3. Применить migrations преподавателя и создать таблицы нужной БД.
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase setup migrate
+# 4. Загрузить фиксированные начальные данные в учебную БД.
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase setup seed_catalog
+# 5. Создать администратора приложения со скрытым вводом пароля.
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase setup create_lab_admin
 </code></pre>
@@ -943,8 +1122,12 @@ sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Выйдите из Web в CloudShell и откройте DB через SSM. Прочитайте SQL03: после проверки 11 таблиц и владельцев он выдаёт права по таблицам, столбцам и sequence. Владение и ALL PRIVILEGES роли app не даются.</p>
-<pre><code class="language-bash">cd /var/lib/jdu-web/lesson-resources-r1/app
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Перейти в рабочий каталог /var/lib/jdu-web/lesson-resources-r1/app.
+cd /var/lib/jdu-web/lesson-resources-r1/app
+# 2. Показать SQL необходимых прав runtime без выполнения.
 python3 -B profile_sql.py --profile practice 03_runtime_grants.sql
+# 3. Сформировать SQL необходимых прав runtime и применить через postgres к нужной БД.
 python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u postgres \
   psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
 </code></pre>
@@ -959,14 +1142,22 @@ python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u pos
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Вернитесь на Web. collectstatic собирает CSS и другие ресурсы для Nginx. Разместите unit и выполните daemon-reload. Прочитайте User=catalog, EnvironmentFile и bind 127.0.0.1:8000.</p>
-<pre><code class="language-bash">sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Собрать CSS и другую статику в каталог выдачи с runtime-настройкой.
+sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase runtime collectstatic
+# 2. Прочитать /opt/jdu-catalog/app/config/jdu-catalog.service без изменения.
 cat /opt/jdu-catalog/app/config/jdu-catalog.service
+# 3. Установить файл с нужными владельцем, группой и правами.
 sudo install -o root -g root -m 0644 /opt/jdu-catalog/app/config/jdu-catalog.service \
   /etc/systemd/system/jdu-catalog.service
+# 4. Перечитать установленные unit-файлы systemd.
 sudo systemctl daemon-reload
+# 5. Запустить jdu-catalog сейчас и включить автозапуск.
 sudo systemctl enable --now jdu-catalog
+# 6. Прочитать текущее состояние jdu-catalog.
 systemctl is-active jdu-catalog
+# 7. Показать IP, порты и процессы слушающих TCP-сокетов.
 sudo ss -lntp
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -980,14 +1171,22 @@ sudo ss -lntp
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Прочитайте conf: 80 - список, private8080 - только /admin/, upstream - 8000. Сохраните ссылку начального default site под другим именем и отключите её. Если jdu-catalog уже включён, проверьте состояние вместо повторных переносов. Статические URL P1/M1 сохраняются.</p>
-<pre><code class="language-bash">cat /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Прочитать /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf без изменения.
+cat /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf
+# 2. Установить файл с нужными владельцем, группой и правами.
 sudo install -o root -g root -m 0644 \
   /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf \
   /etc/nginx/sites-available/jdu-catalog
+# 3. Переместить ссылку стандартного сайта в копию без перезаписи.
 sudo mv -n /etc/nginx/sites-enabled/default /etc/nginx/default-site.before-p5
+# 4. Создать ссылку включения конфигурации сайта приложения.
 sudo ln -s /etc/nginx/sites-available/jdu-catalog /etc/nginx/sites-enabled/jdu-catalog
+# 5. Проверить синтаксис и файлы конфигурации Nginx.
 sudo nginx -t
+# 6. Перечитать настройки nginx без остановки.
 sudo systemctl reload nginx
+# 7. Отправить HTTP к http://127.0.0.1/practice.txt; показать статус, заголовки и тело.
 curl --noproxy '*' -i http://127.0.0.1/practice.txt
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -1001,6 +1200,7 @@ curl --noproxy '*' -i http://127.0.0.1/practice.txt
 <p>Firefox на рабочем столе бастиона через RDP</p>
 <p><strong>Цель и действия:</strong></p>
 <p>В Firefox бастиона откройте http://admin.lab.test:8080/admin/, войдите как practice_admin со своим паролем приложения. Через Add добавьте две строки ниже с точными code/name/quantity/location. Is public включите только у публичной записи. На http://web.lab.test/ должна быть только публичная строка.</p>
+<p>Конфигурация или данные: не выполнять как команды</p>
 <pre><code class="language-text">P5-PUBLIC-001 | Practice keyboard | 4 | Training shelf A | is_public=true
 P5-PRIVATE-001 | Practice mouse | 2 | Training shelf B | is_public=false
 </code></pre>
@@ -1015,10 +1215,13 @@ P5-PRIVATE-001 | Practice mouse | 2 | Training shelf B | is_public=false
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>На Web выполните SELECT учебной app-role. Так проверяется, что сохранение из admin действительно дошло до PostgreSQL. Для этой проверки не нужны UPDATE/DELETE.</p>
-<pre><code class="language-bash">QUERY=&quot;SELECT code,name,quantity,location,is_public
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Сохранить SELECT двух заданных записей; пока не отправлять в БД.
+QUERY=&quot;SELECT code,name,quantity,location,is_public
 FROM catalog_item
 WHERE code IN ('P5-PUBLIC-001','P5-PRIVATE-001')
 ORDER BY code;&quot;
+# 2. Подключиться с Web к нужной БД с существующим паролем и выполнить SELECT.
 psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &quot;$QUERY&quot;
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -1047,6 +1250,10 @@ psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &qu
 <p>Сохранить штатную работу, запретив лишние admin-маршруты, SQL-права и раскрытие секретов.</p>
 <h3>Задание</h3>
 <p>Используйте practice из P5. Отключите setup-role, уберите временную конфигурацию и проверьте отказы при наличии успешного контрольного login. Не расширяйте SG/IAM.</p>
+<h3>Схема задания</h3>
+<p><img src="../../../assets/ru/p6.png" alt="P6: Приложение уже работает → Убрать лишние права и доступ → Разрешённое работает, лишнее нет。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. 8000 доступен только внутри Web; 8080 используется для управления с бастиона." width="1040" height="680" loading="lazy"></p>
+<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. 8000 доступен только внутри Web; 8080 используется для управления с бастиона.</p>
+<p><a href="../../../assets/ru/p6.png">Открыть крупно</a> · <a href="../../../assets/ru/p6.svg">SVG</a></p>
 <ul>
 <li>Profile: practice</li>
 <li>Database: jdu_catalog_practice</li>
@@ -1093,9 +1300,16 @@ psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &qu
 <p>psql на DB-сервере от имени системного postgres</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Откройте psql как postgres на DB. \dp показывает права таблиц, \du - атрибуты ролей. Сверьте с SQL03: UPDATE auth_user только last_login/password, без DELETE catalog_item; lookup только чтение, django_migrations без прав. Не вызывайте nextval/setval ради проверки.</p>
-<pre><code class="language-text">sudo -u postgres psql -X -d jdu_catalog_practice
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. В терминале DB открыть psql от postgres; следующие действия внутри psql.
+sudo -u postgres psql -X -d jdu_catalog_practice
+</code></pre>
+<p>Далее вводить внутри psql</p>
+<pre><code class="language-sql">-- 2. В psql проверить атрибуты и права учебных ролей.
 \du catalog_practice_*
+-- 3. В psql прочитать права таблиц схемы public.
 \dp public.*
+-- 4. Выйти из psql в терминал ОС того же DB-сервера.
 \q
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -1109,8 +1323,12 @@ psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &qu
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>После инициализации вход setup не нужен. SQL04 задаёт NOLOGIN/password NULL и закрывает оставшиеся setup-подключения profile. Владельцем DB/table остаётся setup; роль не удаляется и владение app не передаётся.</p>
-<pre><code class="language-bash">cd /var/lib/jdu-web/lesson-resources-r1/app
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Перейти в рабочий каталог /var/lib/jdu-web/lesson-resources-r1/app.
+cd /var/lib/jdu-web/lesson-resources-r1/app
+# 2. Показать SQL отключения входа setup без выполнения.
 python3 -B profile_sql.py --profile practice 04_disable_setup.sql
+# 3. Сформировать SQL отключения входа setup и применить через postgres к нужной БД.
 python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u postgres \
   psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
 </code></pre>
@@ -1125,11 +1343,16 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>На Web проверьте только metadata. Удалите ровно два файла setup practice. app.env, practice.app.env, DB runtime, command-state, SSH-ключи и данные оценивания сохраняются. Содержимое секретных файлов через cat не выводится.</p>
-<pre><code class="language-bash">sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Прочитать владельца, группу, права и имя указанных файлов.
+sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
   /etc/jdu-catalog/profiles/practice.setup.env
+# 2. Удалить только два проверенных временных секретных файла setup.
 sudo rm -- /etc/jdu-catalog/setup.env /etc/jdu-catalog/profiles/practice.setup.env
+# 3. Прочитать владельца, группу, права и имя указанных файлов.
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env \
   /etc/jdu-catalog/profiles/practice.app.env /etc/jdu-web/db-practice.runtime.env
+# 4. Проверить runtime-конфигурацию без вывода секретов.
 sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -1143,9 +1366,14 @@ sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
 <p>SSM-терминал бастиона: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>В SSM бастиона запросите обычный список на 80, затем /admin/ и env. Отдельно подтвердите штатный admin на 8080 в Firefox через RDP. Нужны нормальный ответ и явный отказ 404/403; таймаута недостаточно.</p>
-<pre><code class="language-bash">curl --noproxy '*' -i http://web.lab.test/
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 1. Отправить HTTP к http://web.lab.test/; показать статус, заголовки и тело.
+curl --noproxy '*' -i http://web.lab.test/
+# 2. Отправить HTTP к http://web.lab.test/admin/; показать статус, заголовки и тело.
 curl --noproxy '*' -i http://web.lab.test/admin/
+# 3. Отправить HTTP к http://web.lab.test/app.env; показать статус, заголовки и тело.
 curl --noproxy '*' -i http://web.lab.test/app.env
+# 4. Отправить HTTP к http://web.lab.test/static/app.env; показать статус, заголовки и тело.
 curl --noproxy '*' -i http://web.lab.test/static/app.env
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>

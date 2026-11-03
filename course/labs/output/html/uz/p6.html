@@ -10,12 +10,13 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Boshlashdan oldin</a> · <a href="#section-2">Nimani o‘rganamiz</a> · <a href="#section-3">Topshiriq</a> · <a href="#section-4">Bu qanday ishlaydi</a> · <a href="#section-5">Yechim namunasi: bittadan bajaring</a> · <a href="#section-6">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P6 Eng kam huquq va ochiq kirish chegarasi</h1>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">Boshlashdan oldin</a> · <a href="#section-2">Nimani o‘rganamiz</a> · <a href="#section-3">Topshiriq</a> · <a href="#section-4">Topshiriq diagrammasi</a> · <a href="#section-5">Bu qanday ishlaydi</a> · <a href="#section-6">Yechim namunasi: bittadan bajaring</a> · <a href="#section-7">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P6 Eng kam huquq va ochiq kirish chegarasi</h1>
 <p><a href="start.html">Avval: ulanish va qoidalar</a> · <a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a> · <a href="portal.html">Brauzerda tekshirish</a></p>
 <p><a href="../ja/p6.html">日本語</a> · <a href="../ru/p6.html">Русский</a> · <a href="../uz/p6.html">O‘zbekcha</a></p>
-<p>2026-11-03 · D12 P/M r1.3</p>
+<p>2026-11-03 · D12 P/M r1.4</p>
 <p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
 <h2 id="section-1">Boshlashdan oldin</h2>
 <p><a href="start.html">Ulanish va qoidalar</a> bilan tanishing. Mos topshiriq: <a href="m6.html">M6</a>. Tekshiruv: <a href="portal.html">brauzer yo‘riqnomasi</a>.</p>
@@ -23,6 +24,10 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <p>To‘g‘ri ishlashni saqlab, ortiqcha admin yo‘li, SQL huquqi va maxfiy fayl ochilishini rad etish.</p>
 <h2 id="section-3">Topshiriq</h2>
 <p>P5 practice profile dan foydalaning. Setup role ni o‘chiring, vaqtinchalik sozlamani olib tashlang, muvaffaqiyatli login bilan solishtirib rad etishlarni tekshiring. SG/IAM ni kengaytirmang.</p>
+<h2 id="section-4">Topshiriq diagrammasi</h2>
+<p><img src="../../../assets/uz/p6.png" alt="P6: App allaqachon ishlaydi → Ortiqcha huquq va yo‘lni yopish → Ruxsat ishlaydi, taqiq rad etadi。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun." width="1040" height="680" loading="lazy"></p>
+<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun.</p>
+<p><a href="../../../assets/uz/p6.png">Kattalashtirish</a> · <a href="../../../assets/uz/p6.svg">SVG</a></p>
 <ul>
 <li>Profile: practice</li>
 <li>Database: jdu_catalog_practice</li>
@@ -57,21 +62,28 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 </tr>
 </tbody>
 </table>
-<h2 id="section-4">Bu qanday ishlaydi</h2>
+<h2 id="section-5">Bu qanday ishlaydi</h2>
 <p><strong>Boshlashdan oldingi holat:</strong></p>
 <p>P5 mashq app ishlaydi; vaqtinchalik setup ulanish hali mavjud.</p>
 <p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
 <p>Setup tugatiladi; odatiy app muvaffaqiyati va keraksiz kirish rad etilishi birga tekshiriladi.</p>
 <p>Vaqtinchalik setup privilege va ish paytidagi runtime privilege ni ajrating. NOLOGIN va vaqtinchalik sozlama o‘chirilgach app runtime bilan ishlashi kerak. Ochiq 80, admin 8080 va loopback 8000 alohida chegara. Ruxsatli amal muvaffaqiyati bilan aniq keraksiz kirish rad etilishini birga tekshiring.</p>
-<h2 id="section-5">Yechim namunasi: bittadan bajaring</h2>
+<h2 id="section-6">Yechim namunasi: bittadan bajaring</h2>
 <h3>P6.1 DB role va jadval huquqlarini o‘qish</h3>
 <p><strong>Bajarish joyi:</strong></p>
 <p>DB serverda OS postgres nomidan psql</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>DB da postgres psql ni oching. \dp jadval huquqini, \du role atributini ko‘rsatadi. SQL03 bilan solishtiring: auth_user UPDATE faqat last_login/password, catalog_item DELETE yo‘q; lookup faqat o‘qish, django_migrations huquqsiz. Tekshirish uchun nextval/setval chaqirmang.</p>
-<pre><code class="language-text">sudo -u postgres psql -X -d jdu_catalog_practice
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. DB OS terminalida postgres sifatida psql ochish; keyingi amallar psql ichida.
+sudo -u postgres psql -X -d jdu_catalog_practice
+</code></pre>
+<p>Bundan keyin psql ichida kiriting</p>
+<pre><code class="language-sql">-- 2. Psql ichida mashq DB role atribut va huquqlarini tekshirish.
 \du catalog_practice_*
+-- 3. Psql ichida public schema jadval huquqlarini o‘qish.
 \dp public.*
+-- 4. Psql dan chiqib ayni DB server OS terminaliga qaytish.
 \q
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
@@ -85,8 +97,12 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <p>DB serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Tayyorlashdan keyin setup login kerak emas. SQL04 NOLOGIN/password NULL qiladi va shu profile setup ulanishlarini yopadi. DB/table egasi setup bo‘lib qoladi; role o‘chirilmaydi, egalik app ga o‘tmaydi.</p>
-<pre><code class="language-bash">cd /var/lib/jdu-web/lesson-resources-r1/app
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. Ish katalogini /var/lib/jdu-web/lesson-resources-r1/app ga o‘zgartirish.
+cd /var/lib/jdu-web/lesson-resources-r1/app
+# 2. Setup role login ini o‘chirish SQL i ni ko‘rsatish; hali qo‘llamaslik.
 python3 -B profile_sql.py --profile practice 04_disable_setup.sql
+# 3. Setup role login ini o‘chirish SQL i ni yaratib postgres orqali kerakli DB ga qo‘llash.
 python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u postgres \
   psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
 </code></pre>
@@ -101,11 +117,16 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web da faqat metadata ni tekshiring. Faqat ikkita practice setup faylini o‘chiring. app.env, practice.app.env, DB runtime, command-state, SSH kalit va baholash ma’lumoti qoladi. Maxfiy fayl mazmunini cat qilish kerak emas.</p>
-<pre><code class="language-bash">sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
+sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
   /etc/jdu-catalog/profiles/practice.setup.env
+# 2. Tekshirilgan ikkita vaqtinchalik setup maxfiy faylini o‘chirish.
 sudo rm -- /etc/jdu-catalog/setup.env /etc/jdu-catalog/profiles/practice.setup.env
+# 3. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env \
   /etc/jdu-catalog/profiles/practice.app.env /etc/jdu-web/db-practice.runtime.env
+# 4. Maxfiy qiymatlarni chiqarmay runtime config ni tekshirish.
 sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
@@ -119,9 +140,14 @@ sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
 <p>Bastionning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Bastion SSM da 80 orqali avval oddiy ro‘yxatni, keyin /admin/ va env ni so‘rang. 8080 dagi to‘g‘ri admin kirishni RDP Firefox da alohida tekshiring. Oddiy muvaffaqiyat va aniq 404/403 rad etish kerak; timeout yetarli emas.</p>
-<pre><code class="language-bash">curl --noproxy '*' -i http://web.lab.test/
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. http://web.lab.test/ ga HTTP yuborib status, header va matnni ko‘rsatish.
+curl --noproxy '*' -i http://web.lab.test/
+# 2. http://web.lab.test/admin/ ga HTTP yuborib status, header va matnni ko‘rsatish.
 curl --noproxy '*' -i http://web.lab.test/admin/
+# 3. http://web.lab.test/app.env ga HTTP yuborib status, header va matnni ko‘rsatish.
 curl --noproxy '*' -i http://web.lab.test/app.env
+# 4. http://web.lab.test/static/app.env ga HTTP yuborib status, header va matnni ko‘rsatish.
 curl --noproxy '*' -i http://web.lab.test/static/app.env
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
@@ -141,7 +167,7 @@ curl --noproxy '*' -i http://web.lab.test/static/app.env
 <p>16 ta mashq bandi va saqlash holatini o‘qing. P bahoga qo‘shilmaydi; M6 mission profile da alohida tekshiriladi. Saqlangan baholar bo‘limida M asl bahosini ko‘rish mumkin.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Ishlov paytida natijani yangilang. UNKNOWN sababini tuzatib qayta tekshiring. Ball uchun grade faylini tahrirlamang.</p>
-<h2 id="section-6">Tushunishni tekshirish (ballsiz)</h2>
+<h2 id="section-7">Tushunishni tekshirish (ballsiz)</h2>
 <p>Setup yopilgach app ham to‘xtadi. Setup ni qayta ochish tayyor yechimmi?</p>
 <p><strong>Izoh:</strong></p>
 <p>Yo‘q. Runtime config, role va kerakli table privilege ni tekshiring; normal ish setup siz ishlashi kerak.</p>

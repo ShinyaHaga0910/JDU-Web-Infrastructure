@@ -1,0 +1,32 @@
+{
+  "checked_on": "2026-11-03",
+  "baseline_commit": "9abf53f",
+  "material_revision": "r1.4",
+  "source_content_checks_explanations_byte_identical": true,
+  "executable_source_preserved": true,
+  "numbered_comments_per_language": 153,
+  "languages": [
+    "ja",
+    "ru",
+    "uz"
+  ],
+  "diagrams": 42,
+  "editable_svg": 42,
+  "figure_text_bounds_and_overlap_checked": true,
+  "signed_distribution_files_unchanged": {
+    "distribution/foundation/STUDENT.md": "bc5dc361a4e4c9bbc265b8d7ac4f45e18b2ce3d2b123fa8cc576bfa6001334f1",
+    "distribution/foundation/TEACHER.md": "41a1913e4613fc675ff062ec0e108e705911f9dc0d35b444a82796dbde307741",
+    "distribution/jdu-web-course.tar.gz": "6672e1f7640e4cd73c7c9e724eef69ba4fe3c6176aa57d544b4ee942489b82d6",
+    "distribution/jdu-web-course.tar.gz.asc": "81846cede6084553e5ad9ef07ae6567b561c71540ce474f700bd7d90df305f87",
+    "distribution/package-signing-public.asc": "79c8d4f7041568d5f0fded709100e2d818f26353d216ae8661054bc49b775d61",
+    "distribution/STUDENT.md": "644e2f3801a7edf36b03be7a9d418cb035cbf8a75d100565bd3db4e91a26dbdc",
+    "distribution/TEACHER.md": "bc52a64c2b05c0284530cd763be0b42d9802977ee121abc581433f363eaf2121"
+  },
+  "registry_sha256": "3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33",
+  "raw_points": 62,
+  "sg_setup_is_preconfigured_not_a_scored_student_task": true,
+  "aws_resources_changed": false,
+  "native_language_review": false,
+  "teacher_visual_review": false,
+  "new_student_walkthrough": false
+}

@@ -10,24 +10,29 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Требуемый результат</a> · <a href="#section-3">Условия: 1 исходный балл за проверку</a> · <a href="#section-4">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M1 Выдача статического файла по HTTP (8)</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Требуемый результат</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Условия: 1 исходный балл за проверку</a> · <a href="#section-5">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M1 Выдача статического файла по HTTP (8)</h1>
 <p><a href="start.html">Сначала: подключение и правила</a> · <a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a> · <a href="portal.html">Проверка в браузере</a></p>
 <p><a href="../ja/m1.html">日本語</a> · <a href="../ru/m1.html">Русский</a> · <a href="../uz/m1.html">O‘zbekcha</a></p>
-<p>2026-11-03 · D12 P/M r1.3</p>
+<p>2026-11-03 · D12 P/M r1.4</p>
 <p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
 <h2 id="section-1">Перед началом</h2>
 <p>Проверьте <a href="start.html">подключение и правила</a>. Связанное задание: <a href="p1.html">P1</a>. Проверка описана в <a href="portal.html">инструкции браузера</a>.</p>
 <h2 id="section-2">Требуемый результат</h2>
 <p>По навыкам P1 самостоятельно выдайте другой заданный файл и текст. Сохраните practice.txt. Проверяются файл, сервис, слушатель, local/bastion/public HTTP и журнал текущего запроса.</p>
+<h2 id="section-3">Схема задания</h2>
+<p><img src="../../../assets/ru/m1.png" alt="M1: HTTP-задание ещё не готово → Настроить выдачу на Web → Сверить ответ и журнал。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. По схеме самостоятельно выберите настройки из требований." width="1040" height="680" loading="lazy"></p>
+<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. По схеме самостоятельно выберите настройки из требований.</p>
+<p><a href="../../../assets/ru/m1.png">Открыть крупно</a> · <a href="../../../assets/ru/m1.svg">SVG</a></p>
 <ul>
 <li>File: /var/www/html/mission.txt</li>
 <li>URL path: /mission.txt</li>
 </ul>
 <pre><code class="language-text">JDU WEB-02 mission: independent HTTP delivery.
 </code></pre>
-<h2 id="section-3">Условия: 1 исходный балл за проверку</h2>
+<h2 id="section-4">Условия: 1 исходный балл за проверку</h2>
 <table>
 <thead>
 <tr>
@@ -71,7 +76,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 </tbody>
 </table>
 <p>Проверки identity/управления/repo/сети/зависимостей не добавляют баллов. Частичные баллы не означают готовность следующего этапа при неисправных предпосылках.</p>
-<h2 id="section-4">Проверка и отправка</h2>
+<h2 id="section-5">Проверка и отправка</h2>
 <ol>
 <li>Войдите через школьный Google в <a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a> на PC, выберите свой Lab и <strong>M1</strong>. Привязка и экраны описаны в <a href="portal.html">инструкции браузера</a>.</li>
 <li>Запустите проверку выбранного задания.</li>

@@ -25,6 +25,9 @@ from pypdf import PdfReader
 from content import MODULES,LANGS
 from build import KIT,EXPECTED_REGISTRY,MATERIAL_REVISION
 from pages import expiry_text
+from command_notes import annotated_blocks,command_groups,executable_only,explanation,CONFIG_STEPS
+from PIL import Image
+import xml.etree.ElementTree as ET
 from explanations import LABELS,STEP_NOTES,MODULE_NOTES,READING,ROUTES,MISSION_PLAN,OUTPUT_EXAMPLES
 
 
@@ -35,6 +38,7 @@ class Page(HTMLParser):
         a=dict(attrs)
         if tag=='html':self.lang=a.get('lang')
         if tag=='a' and a.get('href'):self.links.append(a['href'])
+        if tag=='img' and a.get('src'):self.links.append(a['src'])
         if a.get('id'):self.ids.add(a['id'])
         if tag=='main':self.main+=1
         if tag=='table':self.tables+=1
@@ -80,8 +84,15 @@ def main():
             text='\n'.join(page.extract_text() or '' for page in pdf.pages)
             ok(f'{lang}_{kind}_pdf_A4',all(abs(float(p.mediabox.width)-595.276)<1 and abs(float(p.mediabox.height)-841.890)<1 for p in pdf.pages))
             ok(f'{lang}_{kind}_pdf_text',len(text)>5000 and all(prefix+str(n) in text for n in range(7) for prefix in [('P' if kind=='practice' else 'M')]) and '\ufffd' not in text and '\x00' not in text)
+            images=sum(sum(obj.get_object().get('/Subtype')=='/Image' for obj in p.get('/Resources',{}).get('/XObject',{}).values()) for p in pdf.pages)
+            ok(f'{lang}_{kind}_pdf_figures',images==7)
+            if kind=='practice':
+                expected=sum(sum(active for active,_ in command_groups(s['code'])) for m in MODULES for i,s in enumerate(m['steps'],1) if s['code'] and (m['id'],i) not in CONFIG_STEPS)
+                ok(f'{lang}_pdf_numbered_comments',len(re.findall(r'(?:#|--) \d+\.',text))==expected)
+                ok(f'{lang}_pdf_comment_text',re.sub(r'\s+','',explanation("LAB_ID='YOUR-LAB-ID'",lang)) in re.sub(r'\s+','',text))
     for kind in ('practice','missions'):
-        ok(kind+'_identical_code_in_3_languages',code['ja',kind]==code['ru',kind]==code['uz',kind])
+        normalized={lang:[(info,executable_only(source)) for info,source in code[lang,kind]] for lang in LANGS}
+        ok(kind+'_identical_executable_code_in_3_languages',normalized['ja']==normalized['ru']==normalized['uz'])
     for lang in LANGS:
         for kind,prefix in [('practice','P'),('missions','M')]:
             index=(ROOT/'docs'/lang/(kind+'.md')).read_text(encoding='utf-8')
@@ -100,15 +111,41 @@ def main():
     for path in [ROOT/'README.md',ROOT/'TEACHER-NOTES.md',*(ROOT/'docs').rglob('*.md')]:
         for token in parser.parse(path.read_text(encoding='utf-8')):
             for child in token.children or []:
-                if child.type!='link_open':continue
-                href=child.attrGet('href');uri=urlparse(href)
+                if child.type not in ('link_open','image'):continue
+                href=child.attrGet('src' if child.type=='image' else 'href');uri=urlparse(href)
                 if uri.scheme:continue
                 target=path.parent/unquote(uri.path) if uri.path else path
                 ok('markdown_link_'+str(len(checks)),target.exists())
+    annotations=0
+    for module in MODULES:
+        for number,step in enumerate(module['steps'],1):
+            if not step['code']:continue
+            for lang in LANGS:
+                blocks=annotated_blocks(module['id'],number,step['code'],lang)
+                joined='\n'.join(source for _,source in blocks)
+                ok(f'{lang}_{module["id"]}_{number}_executable_preserved',executable_only(joined)==step['code'])
+                if (module['id'],number) in CONFIG_STEPS:
+                    ok(f'{lang}_{module["id"]}_{number}_config_unchanged',blocks==[('text',step['code'])])
+                else:
+                    expected=sum(active for active,_ in command_groups(step['code']))
+                    comments=re.findall(r'^(?:#|--) (\d+)\. (.+)$',joined,re.M)
+                    ok(f'{lang}_{module["id"]}_{number}_every_command_annotated',[int(n) for n,_ in comments]==list(range(1,expected+1)) and all(len(text)>=8 for _,text in comments))
+                    if lang=='ja':annotations+=expected
+    for lang in LANGS:
+        for prefix in ('P','M'):
+            for number in range(7):
+                task=prefix+str(number)
+                md=(ROOT/'docs'/lang/(task.lower()+'.md')).read_text(encoding='utf-8')
+                images=[c for t in parser.parse(md) for c in t.children or [] if c.type=='image']
+                ok(f'{lang}_{task}_diagram_in_page',len(images)==1 and len(images[0].content)>60)
+                image_path=ROOT/'assets'/lang/(task.lower()+'.png')
+                with Image.open(image_path) as img:ok(f'{lang}_{task}_diagram_size',img.size==(2080,1360))
+                svg=ET.parse(image_path.with_suffix('.svg')).getroot()
+                ok(f'{lang}_{task}_editable_svg',svg.attrib['viewBox']=='0 0 1040 680' and len(list(svg.iter('{http://www.w3.org/2000/svg}text')))>15)
     ok('49_detailed_steps',sum(len(m['steps']) for m in MODULES)==49 and all(all(s[k].values()) for m in MODULES for s in m['steps'] for k in ('why','expect','trouble')))
     for info,source in code['ja','practice']+code['ja','missions']:
         if info=='bash':
-            result=subprocess.run(['wsl.exe','bash','-n'],input=source,text=True,capture_output=True)
+            result=subprocess.run(['wsl.exe','bash','-n'],input=source,text=True,encoding='utf-8',capture_output=True)
             ok('bash_fence_'+str(fences+1),result.returncode==0)
             fences+=1
     for path in (ROOT/'output/html').rglob('*.html'):
@@ -175,7 +212,8 @@ def main():
         ok('zip_all_hashes',all(hashlib.sha256(z.read('web-lab-pm-r1/'+p)).hexdigest()==v for p,v in hashes.items()))
     result=dict(scope='D12_P_M_materials_local_checks_not_AWS_walkthrough',checked_on=date.today().isoformat(),browser_guide_revision='2026-11-03',
         languages=list(LANGS),material_revision=MATERIAL_REVISION,practice_tasks=7,practice_steps=49,
-        task_pages=42,explained_steps=len(STEP_NOTES),module_understanding_questions=len(MODULE_NOTES),communication_routes=len(ROUTES),
+        task_pages=42,task_diagrams=42,numbered_command_comments_per_language=annotations,executable_source_preserved=True,
+        explained_steps=len(STEP_NOTES),module_understanding_questions=len(MODULE_NOTES),communication_routes=len(ROUTES),
         worked_output_examples=len(OUTPUT_EXAMPLES),mission_tasks=7,scored_checks=62,raw_points=62,
         checks_passed=len(checks),bash_blocks_syntax_checked=fences,
         pdfs={p.name:dict(pages=len(PdfReader(p).pages),bytes=p.stat().st_size) for p in (ROOT/'output/pdf').glob('*.pdf')},

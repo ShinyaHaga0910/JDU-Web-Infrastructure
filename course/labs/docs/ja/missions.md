@@ -1,6 +1,6 @@
 # 課題 M0〜M6
 
-2026-11-03 · D12 P/M r1.3
+2026-11-03 · D12 P/M r1.4
 
 [はじめに：接続・操作の約束](start.md) · [練習 P0〜P6](practice.md) · [課題 M0〜M6](missions.md) · [ブラウザで確認する](portal.md)
 

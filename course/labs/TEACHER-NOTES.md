@@ -1,5 +1,9 @@
 # 教師用：P/M教材の準備と制作
 
+教材r1.4では、各言語153コマンドに番号付きコメントを追加し、各P/Mに計42図（3言語×14課題）を用意しました。[command_notes.py](authoring/command_notes.py)が操作の説明、[diagrams.py](authoring/diagrams.py)が編集可能な図の生成元です。生成したSVG/PNGはassets以下に置き、Markdown・HTML・PDFへ同じ図を入れます。psqlの開始と内部操作はコード枠を分離し、コメントとコマンドはPDFでも対で保持します。
+
+SGは初期CloudFormationで設定済みの基盤であり、現行62点に学生のSG変更課題は含みません。この点を本人へ説明し、今回はコメントと図の仕上げを継続する指示を受けています。SGの変更課題や新たな採点条件は追加していません。
+
 [学生向けの入口へ戻る](README.md)
 
 

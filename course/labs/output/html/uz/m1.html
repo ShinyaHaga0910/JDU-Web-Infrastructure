@@ -10,24 +10,29 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Boshlashdan oldin</a> · <a href="#section-2">Tayyor holat talablari</a> · <a href="#section-3">Shartlar: har tekshiruvga 1 xom ball</a> · <a href="#section-4">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M1 HTTP orqali statik faylni qaytarish (8)</h1>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">Boshlashdan oldin</a> · <a href="#section-2">Tayyor holat talablari</a> · <a href="#section-3">Topshiriq diagrammasi</a> · <a href="#section-4">Shartlar: har tekshiruvga 1 xom ball</a> · <a href="#section-5">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M1 HTTP orqali statik faylni qaytarish (8)</h1>
 <p><a href="start.html">Avval: ulanish va qoidalar</a> · <a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a> · <a href="portal.html">Brauzerda tekshirish</a></p>
 <p><a href="../ja/m1.html">日本語</a> · <a href="../ru/m1.html">Русский</a> · <a href="../uz/m1.html">O‘zbekcha</a></p>
-<p>2026-11-03 · D12 P/M r1.3</p>
+<p>2026-11-03 · D12 P/M r1.4</p>
 <p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
 <h2 id="section-1">Boshlashdan oldin</h2>
 <p><a href="start.html">Ulanish va qoidalar</a> bilan tanishing. Mos topshiriq: <a href="p1.html">P1</a>. Tekshiruv: <a href="portal.html">brauzer yo‘riqnomasi</a>.</p>
 <h2 id="section-2">Tayyor holat talablari</h2>
 <p>P1 ko‘nikmasi bilan belgilangan boshqa fayl va matnni mustaqil tarqating. practice.txt ni saqlang. Fayl, service, listen, local/bastion/public HTTP va joriy so‘rov log i tekshiriladi.</p>
+<h2 id="section-3">Topshiriq diagrammasi</h2>
+<p><img src="../../../assets/uz/m1.png" alt="M1: HTTP topshirig‘i hali tayyor emas → Web ichida tarqatishni sozlash → Javob va log ni solishtirish。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
+<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
+<p><a href="../../../assets/uz/m1.png">Kattalashtirish</a> · <a href="../../../assets/uz/m1.svg">SVG</a></p>
 <ul>
 <li>File: /var/www/html/mission.txt</li>
 <li>URL path: /mission.txt</li>
 </ul>
 <pre><code class="language-text">JDU WEB-02 mission: independent HTTP delivery.
 </code></pre>
-<h2 id="section-3">Shartlar: har tekshiruvga 1 xom ball</h2>
+<h2 id="section-4">Shartlar: har tekshiruvga 1 xom ball</h2>
 <table>
 <thead>
 <tr>
@@ -71,7 +76,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 </tbody>
 </table>
 <p>Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.</p>
-<h2 id="section-4">Tekshirish va yuborish</h2>
+<h2 id="section-5">Tekshirish va yuborish</h2>
 <ol>
 <li>PC da maktab Google orqali <a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a> ga kiring, o‘z Lab va <strong>M1</strong> ni tanlang. Hisobni bog‘lash va ekranlar: <a href="portal.html">brauzer yo‘riqnomasi</a>.</li>
 <li>Tanlangan topshiriq tekshiruvini boshlang.</li>

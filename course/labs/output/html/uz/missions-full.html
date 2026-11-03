@@ -10,10 +10,11 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Qo‘llanmadan foydalanish</a> · <a href="#section-2">Muhit va tayyorgarlik</a> · <a href="#section-3">Qadamlarni qanday o‘qish kerak</a> · <a href="#section-4">Tayyor tizim va ulanish yo‘llari</a> · <a href="#section-5">Mustaqil topshiriqdan oldin</a> · <a href="#section-6">M0 Shaxsiy muhit va buyruqlarni bajarish joyi (0)</a> · <a href="#section-7">M1 HTTP orqali statik faylni qaytarish (8)</a> · <a href="#section-8">M2 Ichki DNS va odatiy nom yechimi (13)</a> · <a href="#section-9">M3 To‘xtatish va qayta ishga tushirishda ma’lumotlar (3)</a> · <a href="#section-10">M4 PostgreSQL ga autentifikatsiya bilan ulanish (9)</a> · <a href="#section-11">M5 Berilgan app ni Web va DB bilan bog‘lash (13)</a> · <a href="#section-12">M6 Eng kam huquq va ochiq kirish chegarasi (16)</a> · <a href="#section-13">Davom ettirish va natijalar</a> · <a href="#section-14">Manbalar va versiya</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: M0-M6 mustaqil topshiriqlar</h1>
-<p>2026-11-03 | D12 P/M r1.3 | web-course-class193548-20261103-r3</p>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">Qo‘llanmadan foydalanish</a> · <a href="#section-2">Muhit va tayyorgarlik</a> · <a href="#section-3">Qadamlarni qanday o‘qish kerak</a> · <a href="#section-4">Tayyor tizim va ulanish yo‘llari</a> · <a href="#section-5">Mustaqil topshiriqdan oldin</a> · <a href="#section-6">M0 Shaxsiy muhit va buyruqlarni bajarish joyi (0)</a> · <a href="#section-7">M1 HTTP orqali statik faylni qaytarish (8)</a> · <a href="#section-8">M2 Ichki DNS va odatiy nom yechimi (13)</a> · <a href="#section-9">M3 To‘xtatish va qayta ishga tushirishda ma’lumotlar (3)</a> · <a href="#section-10">M4 PostgreSQL ga autentifikatsiya bilan ulanish (9)</a> · <a href="#section-11">M5 Berilgan app ni Web va DB bilan bog‘lash (13)</a> · <a href="#section-12">M6 Eng kam huquq va ochiq kirish chegarasi (16)</a> · <a href="#section-13">Davom ettirish va natijalar</a> · <a href="#section-14">Manbalar va versiya</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: M0-M6 mustaqil topshiriqlar</h1>
+<p>2026-11-03 | D12 P/M r1.4 | web-course-class193548-20261103-r3</p>
 <p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
 <p>O‘qituvchi tekshiruvi uchun birinchi nashr. Talabaning qo‘llanma bo‘yicha boshidan oxirigacha o‘tishi hali tekshirilmagan.</p>
 <p>Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga ega. Ona tili mutaxassisi tahriri hali bajarilmagan.</p>
@@ -65,6 +66,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 </table>
 <p>Har Ubuntu ga kirish uchun CloudShell da aws ssm start-session --target i-OZ-ID bajaring. Darhol id -un va bootstrap.json dagi role ni tekshiring. Server almashtirishda bitta exit bilan CloudShell ga qaytib keyingi ID ga ulang. CloudShell o‘zgaruvchilari serverga avtomatik ko‘chmaydi. ssm-user sudo qila oladi; RDP labuser sudo admin emas.</p>
 <p>Nano: faylni ochish → matn yozish → Ctrl+O → Enter bilan saqlash → Ctrl+X bilan chiqish. Sozlama bloki shell buyrug‘i emas. Psql ichida prompt o‘zgaradi; SQL/\password shu yerga yoziladi, \q Ubuntu ga qaytaradi. Xatodan keyin natijani tekshirmay davom etmang.</p>
+<p>Raqamli izohlar shu qadamdagi tartib va maqsadni bildiradi. # shell, -- psql ichidagi izohdir. Izohni o‘zgartirish shart emas. Ulanish, editor va parol kiritish tugashini kutib, bittadan bajaring. Qatorga bo‘lingan buyruq bitta buyruq bo‘lib qoladi.</p>
 <h2 id="section-3">Qadamlarni qanday o‘qish kerak</h2>
 <p>Har P da topshiriq, tushuntirish, qadamlar va savollar bor. Butun bo‘limni birdan joylamang: har command ni alohida bajarib natijani o‘qing. Qator oxiridagi backslash davom etishni bildiradi: keyingi qator ham shu command ning qismidir.</p>
 <p>Bash blokini ko‘rsatilgan muhit terminaliga kiriting. Text bloki config matni, psql ichidagi kiritish yoki natija namunasi bo‘lishi mumkin; oldingi izohni o‘qing. # bilan boshlangan izoh comment hisoblanadi. Terminaldagi $ yoki postgres=# prompt ini command ga qo‘shmang. YOUR- qiymatlarini o‘zingiznikiga almashtiring.</p>
@@ -132,6 +134,10 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <h2 id="section-6">M0 Shaxsiy muhit va buyruqlarni bajarish joyi (0)</h2>
 <h3>Tayyor holat talablari</h3>
 <p>Beshta rol, asl instance, SSM/ichki SSH va shaxsiy ro‘yxat mosligini tekshiring. 0 ball. P0 ga qarang; asosni qayta yaratmang.</p>
+<h3>Topshiriq diagrammasi</h3>
+<p><img src="../../../assets/uz/m0.png" alt="M0: Besh server oldin yaratilgan → Hisob va serverni tekshirish → To‘g‘ri serverga SSM bilan kirish。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. SSM strelkasi AWS orqali ulanishdir; EC2 kiruvchi 443 portini ochish ko‘rsatmasi emas. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
+<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. SSM strelkasi AWS orqali ulanishdir; EC2 kiruvchi 443 portini ochish ko‘rsatmasi emas. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
+<p><a href="../../../assets/uz/m0.png">Kattalashtirish</a> · <a href="../../../assets/uz/m0.svg">SVG</a></p>
 <h3>Tekshirish va yuborish</h3>
 <ol>
 <li>PC da maktab Google orqali <a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a> ga kiring, o‘z Lab va <strong>M0</strong> ni tanlang. Hisobni bog‘lash va ekranlar: <a href="portal.html">brauzer yo‘riqnomasi</a>.</li>
@@ -141,6 +147,10 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <h2 id="section-7">M1 HTTP orqali statik faylni qaytarish (8)</h2>
 <h3>Tayyor holat talablari</h3>
 <p>P1 ko‘nikmasi bilan belgilangan boshqa fayl va matnni mustaqil tarqating. practice.txt ni saqlang. Fayl, service, listen, local/bastion/public HTTP va joriy so‘rov log i tekshiriladi.</p>
+<h3>Topshiriq diagrammasi</h3>
+<p><img src="../../../assets/uz/m1.png" alt="M1: HTTP topshirig‘i hali tayyor emas → Web ichida tarqatishni sozlash → Javob va log ni solishtirish。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
+<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
+<p><a href="../../../assets/uz/m1.png">Kattalashtirish</a> · <a href="../../../assets/uz/m1.svg">SVG</a></p>
 <ul>
 <li>File: /var/www/html/mission.txt</li>
 <li>URL path: /mission.txt</li>
@@ -200,6 +210,10 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <h2 id="section-8">M2 Ichki DNS va odatiy nom yechimi (13)</h2>
 <h3>Tayyor holat talablari</h3>
 <p>Ayni lab.test zone ga oltita asosiy nomni qo‘shing. guide/practice-db qolishi mumkin. Bastion/Web odatiy resolver, nom orqali M1 HTTP, DB nomi, UDP/TCP, forwarding, NXDOMAIN, ACL va AXFR rad etilishi kerak.</p>
+<h3>Topshiriq diagrammasi</h3>
+<p><img src="../../../assets/uz/m2.png" alt="M2: IP orqali HTTP ishlaydi → DNS va resolver ni sozlash → Nom ham ayni Web ga olib boradi。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
+<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
+<p><a href="../../../assets/uz/m2.png">Kattalashtirish</a> · <a href="../../../assets/uz/m2.svg">SVG</a></p>
 <table>
 <thead>
 <tr>
@@ -310,6 +324,10 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <h2 id="section-9">M3 To‘xtatish va qayta ishga tushirishda ma’lumotlar (3)</h2>
 <h3>Tayyor holat talablari</h3>
 <p>O‘z Lab ID bilan alohida M marker yarating. P3 dan alohida brauzerda oldingi holat → AWS Stop → brauzerda to‘xtashni tekshirish → AWS Start → brauzerda saqlanishni tekshirish ketma-ketligini bajaring. Ayni Web va asl root volume kerak; oddiy reboot yetmaydi. Backup/restore va yangi disk kerak emas.</p>
+<h3>Topshiriq diagrammasi</h3>
+<p><img src="../../../assets/uz/m3.png" alt="M3: Ayni Web ning asl diski → Qayd → Stop → Start → Mazmun saqlangan, boot ID yangi。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Stop/Start AWS API boshqaruvidir; Web kiruvchi 443 portini ochish emas. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
+<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Stop/Start AWS API boshqaruvidir; Web kiruvchi 443 portini ochish emas. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
+<p><a href="../../../assets/uz/m3.png">Kattalashtirish</a> · <a href="../../../assets/uz/m3.svg">SVG</a></p>
 <ul>
 <li>File: /var/lib/jdu-web/mission/storage.txt</li>
 </ul>
@@ -351,6 +369,10 @@ payload=mission-storage-2026
 <h2 id="section-10">M4 PostgreSQL ga autentifikatsiya bilan ulanish (9)</h2>
 <h3>Tayyor holat talablari</h3>
 <p>Asosiy DB va rollarni mustaqil quring. M2 db.lab.test ni odatiy resolver bilan yechib Web runtime role orqali SELECT bajaring. HBA faqat Web/32 va to‘g‘ri DB/role juftiga ruxsat beradi. Mavjud parolni Web mission helper orqali practice dan alohida saqlang. App jadvallari hali kerak emas.</p>
+<h3>Topshiriq diagrammasi</h3>
+<p><img src="../../../assets/uz/m4.png" alt="M4: Web dan DB ulanishini tayyorlash → DB, role va auth ni sozlash → Ruxsatli SELECT muvaffaqiyatli。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. SSM strelkasi AWS orqali ulanishdir; EC2 kiruvchi 443 portini ochish ko‘rsatmasi emas. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
+<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. SSM strelkasi AWS orqali ulanishdir; EC2 kiruvchi 443 portini ochish ko‘rsatmasi emas. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
+<p><a href="../../../assets/uz/m4.png">Kattalashtirish</a> · <a href="../../../assets/uz/m4.svg">SVG</a></p>
 <ul>
 <li>Profile: mission</li>
 <li>Database: jdu_catalog</li>
@@ -415,6 +437,10 @@ payload=mission-storage-2026
 <h2 id="section-11">M5 Berilgan app ni Web va DB bilan bog‘lash (13)</h2>
 <h3>Tayyor holat talablari</h3>
 <p>Ayni app ni mission DB ga ulang. P5 ko‘nikmasi bilan profile=mission tanlang, app/venv ni qayta joylamang. Service ni to‘xtatib: mission runtime yaratish → aniq activate → mission setup yaratish; practice setup P6 da tugatilgan bo‘lsin. Asosiy DB da migrations/seed/admin va grants ni bajaring, ikkita belgilangan yozuvni kiriting. P1/M1 ni saqlab mission ni active qoldiring.</p>
+<h3>Topshiriq diagrammasi</h3>
+<p><img src="../../../assets/uz/m5.png" alt="M5: DNS va DB tayyor → Tayyor app ni ulash va yoqish → Amal natijasi DB va Web da。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
+<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
+<p><a href="../../../assets/uz/m5.png">Kattalashtirish</a> · <a href="../../../assets/uz/m5.svg">SVG</a></p>
 <ul>
 <li>Profile: mission</li>
 <li>Database: jdu_catalog</li>
@@ -525,6 +551,10 @@ payload=mission-storage-2026
 <h2 id="section-12">M6 Eng kam huquq va ochiq kirish chegarasi (16)</h2>
 <h3>Tayyor holat talablari</h3>
 <p>Mission eng kam huquqini tugating: catalog_setup NOLOGIN/password NULL, vaqtinchalik setup fayllari qolmasin. Root kod/venv, 600 maxfiy fayl, 80 da admin rad etilishi, private8080 muvaffaqiyati, admin faqat view/add/change, ochiq/yopiq ma’lumot va SQL huquqlarini tekshiring. Brauzerdagi funksional tekshiruv avtomatik; shaxsiy namoyish kerak emas.</p>
+<h3>Topshiriq diagrammasi</h3>
+<p><img src="../../../assets/uz/m6.png" alt="M6: App allaqachon ishlaydi → Ortiqcha huquq va yo‘lni yopish → Ruxsat ishlaydi, taqiq rad etadi。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
+<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
+<p><a href="../../../assets/uz/m6.png">Kattalashtirish</a> · <a href="../../../assets/uz/m6.svg">SVG</a></p>
 <ul>
 <li>Profile: mission</li>
 <li>Database: jdu_catalog</li>

@@ -10,12 +10,13 @@ pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pr
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
 p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Boshlashdan oldin</a> · <a href="#section-2">Nimani o‘rganamiz</a> · <a href="#section-3">Topshiriq</a> · <a href="#section-4">Bu qanday ishlaydi</a> · <a href="#section-5">Yechim namunasi: bittadan bajaring</a> · <a href="#section-6">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P5 Berilgan app ni Web va DB bilan bog‘lash</h1>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">Boshlashdan oldin</a> · <a href="#section-2">Nimani o‘rganamiz</a> · <a href="#section-3">Topshiriq</a> · <a href="#section-4">Topshiriq diagrammasi</a> · <a href="#section-5">Bu qanday ishlaydi</a> · <a href="#section-6">Yechim namunasi: bittadan bajaring</a> · <a href="#section-7">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P5 Berilgan app ni Web va DB bilan bog‘lash</h1>
 <p><a href="start.html">Avval: ulanish va qoidalar</a> · <a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a> · <a href="portal.html">Brauzerda tekshirish</a></p>
 <p><a href="../ja/p5.html">日本語</a> · <a href="../ru/p5.html">Русский</a> · <a href="../uz/p5.html">O‘zbekcha</a></p>
-<p>2026-11-03 · D12 P/M r1.3</p>
+<p>2026-11-03 · D12 P/M r1.4</p>
 <p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
 <h2 id="section-1">Boshlashdan oldin</h2>
 <p><a href="start.html">Ulanish va qoidalar</a> bilan tanishing. Mos topshiriq: <a href="m5.html">M5</a>. Tekshiruv: <a href="portal.html">brauzer yo‘riqnomasi</a>.</p>
@@ -23,6 +24,10 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 <p>Dastur yozmasdan offline bog‘liqlik, service user, DB tayyorlash, Nginx/systemd va haqiqiy HTTP ni bog‘lash.</p>
 <h2 id="section-3">Topshiriq</h2>
 <p>practice profile da katalogni quring. M2 asosiy DNS va P4 hozir ham ishlashi kerak. P/M DB va admin lari alohida, ayni Web dagi app va port umumiy.</p>
+<h2 id="section-4">Topshiriq diagrammasi</h2>
+<p><img src="../../../assets/uz/p5.png" alt="P5: DNS va DB tayyor → Tayyor app ni ulash va yoqish → Amal natijasi DB va Web da。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun." width="1040" height="680" loading="lazy"></p>
+<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun.</p>
+<p><a href="../../../assets/uz/p5.png">Kattalashtirish</a> · <a href="../../../assets/uz/p5.svg">SVG</a></p>
 <ul>
 <li>Profile: practice</li>
 <li>Database: jdu_catalog_practice</li>
@@ -57,23 +62,30 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 </tr>
 </tbody>
 </table>
-<h2 id="section-4">Bu qanday ishlaydi</h2>
+<h2 id="section-5">Bu qanday ishlaydi</h2>
 <p><strong>Boshlashdan oldingi holat:</strong></p>
 <p>M2 DNS va P4 mashq DB hozir ishlaydi.</p>
 <p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
 <p>Tayyor app Web ichida ishlaydi; ochiq ro‘yxat va bastion admin oynasi DB ga ulanadi.</p>
 <p>Nginx HTTP ni qabul qiladi, Gunicorn Python app ni ishlatadi, PostgreSQL ma’lumot saqlaydi. Statik P1 dan farqli ravishda ro‘yxat mazmuni DB dan olinadi. Venv app Python muhitini ajratadi; systemd unit ishga tushishni belgilaydi. Tayyor kodni joylaysiz, dasturni qayta yozish shart emas.</p>
-<h2 id="section-5">Yechim namunasi: bittadan bajaring</h2>
+<h2 id="section-6">Yechim namunasi: bittadan bajaring</h2>
 <h3>P5.1 Kerakli DNS va ochiq resurslarni tekshirish</h3>
 <p><strong>Bajarish joyi:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web odatiy resolver db.lab.test=10.20.2.20 va admin.lab.test=10.20.1.20 qaytarsin. offline_assets ichki repo dan asl imzo/hash bo‘yicha yettita wheel va lock oladi. Tashqi pip ishlatmaydi, DB/app sozlamaydi.</p>
-<pre><code class="language-bash">getent ahostsv4 db.lab.test
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. Odatiy resolver orqali db.lab.test IPv4 sini olish.
+getent ahostsv4 db.lab.test
+# 2. Odatiy resolver orqali admin.lab.test IPv4 sini olish.
 getent ahostsv4 admin.lab.test
+# 3. Ichki repo dan python3-venv python3-pip ni tavsiya etilgan qo‘shimchalarsiz o‘rnatish.
 sudo apt-get install --no-install-recommends python3-venv python3-pip
+# 4. Imzo/hash ni tekshirib app va belgilangan wheel larni tayyorlash.
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py --wheels
+# 5. /var/lib/jdu-web/lesson-resources-r1/app dagi o‘quv fayllarini ro‘yxatlash.
 ls /var/lib/jdu-web/lesson-resources-r1/app
+# 6. /var/lib/jdu-web/lesson-resources-r1/wheels dagi o‘quv fayllarini ro‘yxatlash.
 ls /var/lib/jdu-web/lesson-resources-r1/wheels
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
@@ -87,13 +99,19 @@ ls /var/lib/jdu-web/lesson-resources-r1/wheels
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>App va venv ni root boshqaradi; catalog ularni o‘zgartira olmaydi. app yoki venv mavjud bo‘lsa, qayta yaratmay versiyani tekshiring. cp faqat tekshirilgan ochiq resursni joylaydi. venv app bog‘liqliklarini system Python dan ajratadi.</p>
-<pre><code class="language-bash">sudo install -d -o root -g root -m 0755 /opt/jdu-catalog/app
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. Belgilangan owner, guruh va permission bilan katalog yaratish.
+sudo install -d -o root -g root -m 0755 /opt/jdu-catalog/app
+# 2. O‘qituvchi app ini /opt ga atributlarini saqlab ko‘chirish.
 sudo cp -a /var/lib/jdu-web/lesson-resources-r1/app/. /opt/jdu-catalog/app/
+# 3. App uchun alohida Python venv yaratish.
 sudo python3 -m venv /opt/jdu-catalog/venv
+# 4. Python bog‘liqliklarini faqat ichki wheel va lock/hash bilan o‘rnatish.
 sudo /opt/jdu-catalog/venv/bin/python -m pip --isolated --no-cache-dir install \
   --no-index --find-links=/var/lib/jdu-web/lesson-resources-r1/wheels \
   --only-binary=:all: --require-hashes -r \
   /var/lib/jdu-web/lesson-resources-r1/requirements.lock
+# 5. O‘rnatilgan Python bog‘liqliklari mosligini tekshirish.
 sudo /opt/jdu-catalog/venv/bin/python -m pip check
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
@@ -107,11 +125,17 @@ sudo /opt/jdu-catalog/venv/bin/python -m pip check
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>catalog inson login i uchun emas, Gunicorn service user idir. nologin va sudo siz yarating. collectstatic yozishi uchun faqat static katalogini catalog egasi qiling; kod/venv root da qoladi. catalog mavjud bo‘lsa useradd ni takrorlamay id va shell ni tekshiring.</p>
-<pre><code class="language-bash">sudo useradd --system --user-group --home-dir /nonexistent --no-create-home --shell \
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. App uchun login shell va home siz catalog tizim user ini yaratish.
+sudo useradd --system --user-group --home-dir /nonexistent --no-create-home --shell \
   /usr/sbin/nologin catalog
+# 2. Belgilangan owner, guruh va permission bilan katalog yaratish.
 sudo install -d -o root -g root -m 0755 /var/lib/jdu-catalog
+# 3. Belgilangan owner, guruh va permission bilan katalog yaratish.
 sudo install -d -o catalog -g catalog -m 0755 /var/lib/jdu-catalog/static
+# 4. Catalog user UID, GID va guruhlarini tekshirish.
 id catalog
+# 5. Catalog user home va login shell ini tekshirish.
 getent passwd catalog
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
@@ -125,10 +149,15 @@ getent passwd catalog
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>EC2 dagi hozirgi Web public IPv4 ni kiriting. Runtime yordamchisiga P4 dagi mavjud catalog_practice_app parolini ikki marta kiriting. Django secret shaxsiy Lab uchun yaratiladi. Root-only app.env va practice profile yaratiladi; mazmun ko‘rsatilmaydi.</p>
-<pre><code class="language-bash">PUBLIC_WEB_IPV4='YOUR-CURRENT-WEB-PUBLIC-IP'
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. AWS Console dagi joriy Web public IPv4 ni belgilash.
+PUBLIC_WEB_IPV4='YOUR-CURRENT-WEB-PUBLIC-IP'
+# 2. Mavjud DB parolini yashirin kiritib, practice runtime config yaratish.
 sudo python3 -B /opt/jdu-catalog/app/configuration.py create-runtime --profile \
   practice --public-web-ipv4 &quot;$PUBLIC_WEB_IPV4&quot;
+# 3. Maxfiy qiymatlarni chiqarmay runtime config ni tekshirish.
 sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
+# 4. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
@@ -142,13 +171,19 @@ sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>create-setup ga P4 dagi catalog_practice_setup parolini kiriting. migrate berilgan DB tuzilmasini yaratadi; seed bo‘sh katalogga bir marta uchta xayoliy namuna kiritadi. create_lab_admin yashirin parol bilan practice_admin yaratadi. Oddiy app setup orqali ishlamaydi.</p>
-<pre><code class="language-bash">sudo python3 -B /opt/jdu-catalog/app/configuration.py create-setup --profile practice
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. Mavjud setup parolini yashirin kiritib, vaqtinchalik config yaratish.
+sudo python3 -B /opt/jdu-catalog/app/configuration.py create-setup --profile practice
+# 2. Setup rejimida app sozlama xatolarini tekshirish.
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase setup check
+# 3. O‘qituvchi migration larini bajarib, kerakli DB jadvallarini yaratish.
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase setup migrate
+# 4. Belgilangan boshlang‘ich ma’lumotni mashq DB ga yozish.
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase setup seed_catalog
+# 5. App administratorini yaratib parolini yashirin kiritish.
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase setup create_lab_admin
 </code></pre>
@@ -163,8 +198,12 @@ sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
 <p>DB serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web dan CloudShell ga chiqib DB SSM ni oching. Avval SQL03 ni o‘qing: u 11 jadval va egalarni tekshirib jadval, ustun va sequence bo‘yicha huquq beradi. App ga egalik yoki ALL PRIVILEGES berilmaydi.</p>
-<pre><code class="language-bash">cd /var/lib/jdu-web/lesson-resources-r1/app
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. Ish katalogini /var/lib/jdu-web/lesson-resources-r1/app ga o‘zgartirish.
+cd /var/lib/jdu-web/lesson-resources-r1/app
+# 2. Runtime uchun kerakli SQL huquqlari SQL i ni ko‘rsatish; hali qo‘llamaslik.
 python3 -B profile_sql.py --profile practice 03_runtime_grants.sql
+# 3. Runtime uchun kerakli SQL huquqlari SQL i ni yaratib postgres orqali kerakli DB ga qo‘llash.
 python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u postgres \
   psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
 </code></pre>
@@ -179,14 +218,22 @@ python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u pos
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web ga qayting. collectstatic CSS va boshqa fayllarni Nginx o‘qiydigan katalogga yig‘adi. Unit ni joylab daemon-reload bajaring. User=catalog, EnvironmentFile va 127.0.0.1:8000 ni toping.</p>
-<pre><code class="language-bash">sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. Runtime config bilan CSS va static fayllarni tarqatish katalogiga yig‘ish.
+sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase runtime collectstatic
+# 2. /opt/jdu-catalog/app/config/jdu-catalog.service mazmunini o‘zgartirmay o‘qish.
 cat /opt/jdu-catalog/app/config/jdu-catalog.service
+# 3. Faylni joylab owner, guruh va permission ni belgilash.
 sudo install -o root -g root -m 0644 /opt/jdu-catalog/app/config/jdu-catalog.service \
   /etc/systemd/system/jdu-catalog.service
+# 4. Joylangan systemd unit fayllarini qayta o‘qitish.
 sudo systemctl daemon-reload
+# 5. jdu-catalog ni hozir yoqish va avtomatik start ni yoqish.
 sudo systemctl enable --now jdu-catalog
+# 6. jdu-catalog joriy ish holatini o‘qish.
 systemctl is-active jdu-catalog
+# 7. TCP listen IP, port va jarayonlarini ko‘rsatish.
 sudo ss -lntp
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
@@ -200,14 +247,22 @@ sudo ss -lntp
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Conf ni o‘qing: 80 - ochiq ro‘yxat, private8080 - faqat /admin/, upstream - 8000. Boshlang‘ich default site symlink ini boshqa nom bilan saqlab o‘chiring. jdu-catalog allaqachon yoqilgan bo‘lsa qayta ko‘chirmay tekshiring. P1/M1 statik URL lari saqlanadi.</p>
-<pre><code class="language-bash">cat /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf mazmunini o‘zgartirmay o‘qish.
+cat /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf
+# 2. Faylni joylab owner, guruh va permission ni belgilash.
 sudo install -o root -g root -m 0644 \
   /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf \
   /etc/nginx/sites-available/jdu-catalog
+# 3. Default sayt linkini nusxaga ko‘chirish; mavjud nusxani ustidan yozmaslik.
 sudo mv -n /etc/nginx/sites-enabled/default /etc/nginx/default-site.before-p5
+# 4. App sayt sozlamasini yoqish uchun link yaratish.
 sudo ln -s /etc/nginx/sites-available/jdu-catalog /etc/nginx/sites-enabled/jdu-catalog
+# 5. Nginx config sintaksisi va fayllarini tekshirish.
 sudo nginx -t
+# 6. nginx ni to‘xtatmay sozlamani qayta o‘qish.
 sudo systemctl reload nginx
+# 7. http://127.0.0.1/practice.txt ga HTTP yuborib status, header va matnni ko‘rsatish.
 curl --noproxy '*' -i http://127.0.0.1/practice.txt
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
@@ -221,6 +276,7 @@ curl --noproxy '*' -i http://127.0.0.1/practice.txt
 <p>RDP orqali bastiondagi Firefox</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Bastion Firefox da http://admin.lab.test:8080/admin/ ni ochib practice_admin va o‘z app admin parolingiz bilan kiring. Add orqali quyidagi ikki qatorni code/name/quantity/location qiymatlari bilan aniq kiriting. Is public ni faqat ochiq yozuvda yoqing. http://web.lab.test/ da faqat ochiq qator ko‘rinsin.</p>
+<p>Sozlama yoki ma’lumot: terminal buyrug‘i emas</p>
 <pre><code class="language-text">P5-PUBLIC-001 | Practice keyboard | 4 | Training shelf A | is_public=true
 P5-PRIVATE-001 | Practice mouse | 2 | Training shelf B | is_public=false
 </code></pre>
@@ -235,10 +291,13 @@ P5-PRIVATE-001 | Practice mouse | 2 | Training shelf B | is_public=false
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web da mashq app role bilan SELECT bajaring. Bu admin dagi saqlash haqiqatan PostgreSQL ga yetganini tekshiradi. Ushbu tekshiruvda UPDATE/DELETE ishlatmang.</p>
-<pre><code class="language-bash">QUERY=&quot;SELECT code,name,quantity,location,is_public
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 1. Belgilangan ikki yozuv uchun SELECT ni saqlash; hali DB ga yubormaslik.
+QUERY=&quot;SELECT code,name,quantity,location,is_public
 FROM catalog_item
 WHERE code IN ('P5-PUBLIC-001','P5-PRIVATE-001')
 ORDER BY code;&quot;
+# 2. Web dan kerakli DB ga mavjud parol bilan ulanib SELECT natijasini o‘qish.
 psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &quot;$QUERY&quot;
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
@@ -258,7 +317,7 @@ psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &qu
 <p>13 ta mashq bandi va saqlash holati ko‘rinadi. Faqat sozlama tekshiruvi bilan funksional tekshiruvni farqlang. P bahoga qo‘shilmaydi.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Parol xato bo‘lsa to‘g‘ri mavjud qiymat bilan takrorlang. Joriy urinishni ko‘rish uchun natijani yangilang. Har yangi funksional tekshiruv bitta CK yozuv qo‘shadi.</p>
-<h2 id="section-6">Tushunishni tekshirish (ballsiz)</h2>
+<h2 id="section-7">Tushunishni tekshirish (ballsiz)</h2>
 <p>Ro‘yxatda private yozuv ham chiqsa, faqat HTTP 200 ni to‘g‘ri deb hisoblash mumkinmi?</p>
 <p><strong>Izoh:</strong></p>
 <p>Yo‘q. HTTP yetib borishi, DB qiymati va is_public bo‘yicha ajratishni alohida tekshiring.</p>
