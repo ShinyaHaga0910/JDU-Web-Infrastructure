@@ -1,12 +1,14 @@
 # ブラウザで課題を確認する
 
-2026-10-30
+2026-11-03
+
+[はじめに：接続・操作の約束](start.md) · [練習 P0〜P6](practice.md) · [課題 M0〜M6](missions.md) · [ブラウザで確認する](portal.md)
 
 [日本語](../ja/portal.md) · [Русский](../ru/portal.md) · [O‘zbekcha](../uz/portal.md)
 
 [Web Portal](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws)
 
-> 初期設定は教師から渡された有効なCloudFormation・登録手順を使います。P/M本文のサーバー設定手順はそのまま実行し、jdu-web-check / jdu-web-my-progressによる課題確認・点数閲覧をこの手順へ置き換えてください。配布版の期限が切れている場合は教師から更新版を受け取ります。
+> 初期設定は教師から渡された有効なCloudFormation・登録手順を使います。各P/Mでサーバーを自分で設定し、この画面で課題確認・成績閲覧を行います。配布版の期限切れは教師に相談します。
 
 教師Labは開始中で使います。学校Googleでログインし、本人AWSとの連携を一度完了します。共有Windowsへ秘密鍵を保存しません。
 

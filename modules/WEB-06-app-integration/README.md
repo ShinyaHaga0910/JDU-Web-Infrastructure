@@ -1,6 +1,6 @@
 # WEB-06 教員提供アプリとDBの接続
 
-2026-10-23：現在の学生用課題は[詳細練習P5/P6](../../course/labs/docs/ja/practice.md)と[自力課題M5/M6](../../course/labs/docs/ja/missions.md)。提供appと固定registryへ照合した三言語HTML/PDFを[教材入口](../../course/labs/README.md)へ作成。以下は実装前の構想記録で、現状は[確認範囲](../../course/labs/VALIDATION.md)を優先する。
+2026-11-03：現在の学生用課題は[詳細練習P5](../../course/labs/docs/ja/p5.md)・[P6](../../course/labs/docs/ja/p6.md)と[自力課題M5](../../course/labs/docs/ja/m5.md)・[M6](../../course/labs/docs/ja/m6.md)。3言語の一覧・PDFは[教材入口](../../course/labs/README.md)へ。以下は実装前の構想記録で、現状は[確認範囲](../../course/labs/VALIDATION.md)を優先する。
 
 状態: 構成方針のみ。教員提供アプリ、EC2配置、Security Group、DB権限、手順、確認用課題、学生権限の実機検証は未実施。
 

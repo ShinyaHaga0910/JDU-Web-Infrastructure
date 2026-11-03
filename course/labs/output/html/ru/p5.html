@@ -1,0 +1,267 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>P5 Соединить предоставленное приложение с Web и DB</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Что изучаем</a> · <a href="#section-3">Задание</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P5 Соединить предоставленное приложение с Web и DB</h1>
+<p><a href="start.html">Сначала: подключение и правила</a> · <a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a> · <a href="portal.html">Проверка в браузере</a></p>
+<p><a href="../ja/p5.html">日本語</a> · <a href="../ru/p5.html">Русский</a> · <a href="../uz/p5.html">O‘zbekcha</a></p>
+<p>2026-11-03 · D12 P/M r1.3</p>
+<p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
+<h2 id="section-1">Перед началом</h2>
+<p>Проверьте <a href="start.html">подключение и правила</a>. Связанное задание: <a href="m5.html">M5</a>. Проверка описана в <a href="portal.html">инструкции браузера</a>.</p>
+<h2 id="section-2">Что изучаем</h2>
+<p>Без программирования связать offline-зависимости, сервисного пользователя, инициализацию БД, Nginx/systemd и реальный HTTP.</p>
+<h2 id="section-3">Задание</h2>
+<p>Постройте каталог в profile practice. Нужны действующие DNS из M2 и P4. БД/администраторы P и M различны, но приложение и порты на том же Web общие.</p>
+<ul>
+<li>Profile: practice</li>
+<li>Database: jdu_catalog_practice</li>
+<li>Setup role: catalog_practice_setup</li>
+<li>Runtime role: catalog_practice_app</li>
+<li>Application administrator: practice_admin</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th scope="col">code</th>
+<th scope="col">name</th>
+<th scope="col">quantity</th>
+<th scope="col">location</th>
+<th scope="col">is_public</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P5-PUBLIC-001</td>
+<td>Practice keyboard</td>
+<td>4</td>
+<td>Training shelf A</td>
+<td>true</td>
+</tr>
+<tr>
+<td>P5-PRIVATE-001</td>
+<td>Practice mouse</td>
+<td>2</td>
+<td>Training shelf B</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<h2 id="section-4">Как это работает</h2>
+<p><strong>Состояние перед началом:</strong></p>
+<p>Сейчас работают DNS из M2 и учебная БД из P4.</p>
+<p><strong>Что изменится в этом P:</strong></p>
+<p>Предоставленное приложение на Web связывает каталог и управление с БД.</p>
+<p>Nginx принимает HTTP, Gunicorn исполняет Python-приложение, PostgreSQL хранит данные. В отличие от статического P1, каталог получает содержимое из БД. Venv отделяет Python-среду приложения, unit systemd описывает запуск. Размещайте предоставленный код, переписывать программу не требуется.</p>
+<h2 id="section-5">Пример решения: выполняйте по одному шагу</h2>
+<h3>P5.1 Проверить DNS и получить открытые ресурсы</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>На Web обычный resolver должен дать db.lab.test=10.20.2.20 и admin.lab.test=10.20.1.20. offline_assets получает семь wheel и lock из внутреннего repo, сверяя исходную подпись/hash. Он не запускает внешний pip и не настраивает DB/app.</p>
+<pre><code class="language-bash">getent ahostsv4 db.lab.test
+getent ahostsv4 admin.lab.test
+sudo apt-get install --no-install-recommends python3-venv python3-pip
+sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py --wheels
+ls /var/lib/jdu-web/lesson-resources-r1/app
+ls /var/lib/jdu-web/lesson-resources-r1/wheels
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>P5 использует обычный DNS из M2, не заменяйте имя DB вручную на IP. --wheels подготавливает пакеты Python фиксированных версий, но не запускает приложение. Открытые файлы и создаваемые далее секретные настройки различаются.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>PUBLIC_APP_RESOURCES_VERIFIED и SIGNED_OFFLINE_WHEELS_READY=7. Файлы приложения открытые и контролируются root.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Нужно и имя db.lab.test, не только practice-db. P5 зависит от M2, но не требует завершения основных заданий по каталогу.</p>
+<h3>P5.2 Разместить код и создать отдельный venv</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Код и venv контролирует root; пользователь catalog не должен их менять. Если app или venv уже существуют, не повторяйте создание - проверьте версию. cp переносит только проверенные открытые ресурсы. venv отделяет зависимости приложения от системного Python.</p>
+<pre><code class="language-bash">sudo install -d -o root -g root -m 0755 /opt/jdu-catalog/app
+sudo cp -a /var/lib/jdu-web/lesson-resources-r1/app/. /opt/jdu-catalog/app/
+sudo python3 -m venv /opt/jdu-catalog/venv
+sudo /opt/jdu-catalog/venv/bin/python -m pip --isolated --no-cache-dir install \
+  --no-index --find-links=/var/lib/jdu-web/lesson-resources-r1/wheels \
+  --only-binary=:all: --require-hashes -r \
+  /var/lib/jdu-web/lesson-resources-r1/requirements.lock
+sudo /opt/jdu-catalog/venv/bin/python -m pip check
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Код находится в /opt/jdu-catalog/app, Python-среда - в соседнем venv. --no-index отключает индекс пакетов, --find-links задаёт локальные wheel, --require-hashes требует совпадения хешей. Pip check проверяет зависимости после установки.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>--no-index запрещает внешний index; --require-hashes требует hash из lock. pip check не находит конфликтов.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Недостающую зависимость решают через комплект преподавателя. Не обновляйте до latest через pip и не меняйте код приложения.</p>
+<h3>P5.3 Создать сервисного пользователя и каталог static</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>catalog предназначен для Gunicorn, не для входа человека. Создайте его с nologin и без sudo. Только каталог static принадлежит catalog для collectstatic; код/venv остаются root. Если catalog уже есть, проверьте id и shell вместо повторного useradd.</p>
+<pre><code class="language-bash">sudo useradd --system --user-group --home-dir /nonexistent --no-create-home --shell \
+  /usr/sbin/nologin catalog
+sudo install -d -o root -g root -m 0755 /var/lib/jdu-catalog
+sudo install -d -o catalog -g catalog -m 0755 /var/lib/jdu-catalog/static
+id catalog
+getent passwd catalog
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Catalog - системный пользователь службы, не роль БД catalog_practice_app. Nologin запрещает интерактивную оболочку, но не запуск службы. Если id catalog уже найден, сначала проверьте, не выполнялся ли шаг ранее.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>catalog не входит в sudo, shell /usr/sbin/nologin. Это не labuser и не ssm-user.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Не исправляйте права через chmod -R 777 или добавление catalog в sudo. Проверьте конкретный каталог и владельца.</p>
+<h3>P5.4 Создать runtime-настройки скрытым вводом</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Подставьте текущий public IPv4 Web из EC2. Runtime-инструмент дважды запрашивает существующий пароль catalog_practice_app из P4. Django secret генерируется для вашего Lab. Создаются root-only app.env и profile practice; содержимое не выводится.</p>
+<pre><code class="language-bash">PUBLIC_WEB_IPV4='YOUR-CURRENT-WEB-PUBLIC-IP'
+sudo python3 -B /opt/jdu-catalog/app/configuration.py create-runtime --profile \
+  practice --public-web-ipv4 &quot;$PUBLIC_WEB_IPV4&quot;
+sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
+sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Runtime-настройка содержит обычное соединение с БД и разрешённый публичный host. Используйте текущий PUBLIC_WEB_IPV4 после stop/start. Check проверяет значения, stat - владельца и права. Не выводите весь app.env для проверки секретов.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>CATALOG_ENV_CREATED=practice, VALID, root:root 600. Выбраны учебная БД и учебная app-role.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Не вводите пароль RDP или администратора приложения. Не удаляйте существующий файл; для уже созданного используйте check.</p>
+<h3>P5.5 Создать таблицы и администратора через временный setup</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>В create-setup введите пароль catalog_practice_setup из P4. migrate создаёт предоставленную структуру БД; seed однократно добавляет три вымышленных образца в пустой каталог. create_lab_admin создаёт practice_admin со скрытым вводом пароля. Обычное приложение не работает через setup.</p>
+<pre><code class="language-bash">sudo python3 -B /opt/jdu-catalog/app/configuration.py create-setup --profile practice
+sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
+  --phase setup check
+sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
+  --phase setup migrate
+sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
+  --phase setup seed_catalog
+sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
+  --phase setup create_lab_admin
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Migrate создаёт структуру таблиц, seed_catalog - начальные записи, create_lab_admin - администратора приложения. Его пароль отличается от паролей DB и RDP. Setup используется для подготовки, а не обычного запуска.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Фиксированные 11 таблиц, три образца и staff-администратор без superuser. Операции выполняются с правами системного catalog.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>already exists при seed/admin защищает существующие данные. Не делайте reset; проверьте текущее состояние.</p>
+<h3>P5.6 Выдать runtime-роли необходимые SQL-права</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал DB-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Выйдите из Web в CloudShell и откройте DB через SSM. Прочитайте SQL03: после проверки 11 таблиц и владельцев он выдаёт права по таблицам, столбцам и sequence. Владение и ALL PRIVILEGES роли app не даются.</p>
+<pre><code class="language-bash">cd /var/lib/jdu-web/lesson-resources-r1/app
+python3 -B profile_sql.py --profile practice 03_runtime_grants.sql
+python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u postgres \
+  psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Вернитесь на DB и выдайте рабочей роли права на созданные таблицы. Подключение к БД и доступ к таблицам/sequence - разные права. Сначала прочитайте SQL practice; не решайте проблему превращением runtime в superuser.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Успех до COMMIT. catalog_item: SELECT/INSERT/UPDATE; auth_user: чтение и UPDATE только last_login/password; session и другие объекты - по назначению.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Ошибка guard требует проверить migrations/owner. Не удаляйте защиту ради продолжения.</p>
+<h3>P5.7 Разместить static и unit systemd</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Вернитесь на Web. collectstatic собирает CSS и другие ресурсы для Nginx. Разместите unit и выполните daemon-reload. Прочитайте User=catalog, EnvironmentFile и bind 127.0.0.1:8000.</p>
+<pre><code class="language-bash">sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
+  --phase runtime collectstatic
+cat /opt/jdu-catalog/app/config/jdu-catalog.service
+sudo install -o root -g root -m 0644 /opt/jdu-catalog/app/config/jdu-catalog.service \
+  /etc/systemd/system/jdu-catalog.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now jdu-catalog
+systemctl is-active jdu-catalog
+sudo ss -lntp
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Collectstatic собирает CSS и другие статические файлы. Daemon-reload после установки unit перечитывает определение systemd, а не настройки приложения. Порт 8000 должен слушать только 127.0.0.1 внутри Web.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>active; приложение слушает 8000 только на 127.0.0.1. Не публикуйте его через 0.0.0.0:8000.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>При ошибке смотрите journalctl -u jdu-catalog. Не копируйте env в журнал; формат проверяется configuration.py check.</p>
+<h3>P5.8 Разделить публичный и управляющий входы Nginx</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Прочитайте conf: 80 - список, private8080 - только /admin/, upstream - 8000. Сохраните ссылку начального default site под другим именем и отключите её. Если jdu-catalog уже включён, проверьте состояние вместо повторных переносов. Статические URL P1/M1 сохраняются.</p>
+<pre><code class="language-bash">cat /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf
+sudo install -o root -g root -m 0644 \
+  /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf \
+  /etc/nginx/sites-available/jdu-catalog
+sudo mv -n /etc/nginx/sites-enabled/default /etc/nginx/default-site.before-p5
+sudo ln -s /etc/nginx/sites-available/jdu-catalog /etc/nginx/sites-enabled/jdu-catalog
+sudo nginx -t
+sudo systemctl reload nginx
+curl --noproxy '*' -i http://127.0.0.1/practice.txt
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Sites-available хранит настройку, ссылка в sites-enabled включает её. Исходный default сохраняется отдельно. После nginx -t выполните reload и убедитесь, что статический файл P1 по-прежнему выдаётся.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Синтаксис успешен, practice.txt по-прежнему даёт 200. Публичный журнал теперь jdu-catalog-public.access.log.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>При duplicate default server проверьте старый site. До reload исправьте -t. Управляющий port не должен слушать public IP.</p>
+<h3>P5.9 Добавить две учебные записи через admin</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>Firefox на рабочем столе бастиона через RDP</p>
+<p><strong>Цель и действия:</strong></p>
+<p>В Firefox бастиона откройте http://admin.lab.test:8080/admin/, войдите как practice_admin со своим паролем приложения. Через Add добавьте две строки ниже с точными code/name/quantity/location. Is public включите только у публичной записи. На http://web.lab.test/ должна быть только публичная строка.</p>
+<pre><code class="language-text">P5-PUBLIC-001 | Practice keyboard | 4 | Training shelf A | is_public=true
+P5-PRIVATE-001 | Practice mouse | 2 | Training shelf B | is_public=false
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Две записи различаются полями code, name, quantity, location и is_public. Is_public управляет выдачей в каталоге, а не SG. Непубличная запись тоже должна храниться в БД, но отсутствовать в публичном списке.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Удалять три demo не нужно. Две заданные записи - обязательное подмножество; другие корректные публичные записи разрешены. Непубличная запись не видна в списке.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Открывайте admin.lab.test в Firefox внутри RDP, не на школьном PC. При CSRF проверьте host/port/proxy.</p>
+<h3>P5.10 Прочитать реальные строки БД и сравнить с экраном</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>На Web выполните SELECT учебной app-role. Так проверяется, что сохранение из admin действительно дошло до PostgreSQL. Для этой проверки не нужны UPDATE/DELETE.</p>
+<pre><code class="language-bash">QUERY=&quot;SELECT code,name,quantity,location,is_public
+FROM catalog_item
+WHERE code IN ('P5-PUBLIC-001','P5-PRIVATE-001')
+ORDER BY code;&quot;
+psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &quot;$QUERY&quot;
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>SELECT читает данные, WHERE выбирает две нужные записи, ORDER BY задаёт порядок. Другие корректные записи удалять не нужно. Сравнение браузера и SQL подтверждает реальные данные БД, а не только вид страницы.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Обе строки совпадают с заданием. Не подменяйте страницу фиксированным HTML при отказе БД.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>При permission denied проверьте profile и database SQL03. Не заменяйте обычную роль на superuser.</p>
+<h3>P5.11 Запустить функциональную проверку и отправить</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>Браузер на своём PC: Web Portal</p>
+<p><strong>Цель и действия:</strong></p>
+<p>После exit с Web выберите P5 в Web Portal на PC и функциональную проверку с правами. В скрытое поле введите существующий пароль practice_admin и запустите проверку с этим паролем. Это не пароль RDP. Автоматика выполняет HTTP login, создаёт одну запись CK-P-, меняет количество, сверяет DB/страницу и выполняет logout. Две заданные записи не меняются; проверочная остаётся. Личная демонстрация не нужна.</p>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Функциональная проверка проверяет HTTP-действия и обновление БД, а не только файл настройки. Поле предназначено для существующего пароля администратора приложения, не RDP. Читайте результат и статус сохранения.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Показаны 13 учебных пунктов и статус сохранения. Различайте проверку конфигурации и функций. P не влияет на оценку.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>При неверном пароле повторите с правильным существующим. Для просмотра текущего запуска обновите результат. Каждый новый функциональный запуск добавляет одну запись CK.</p>
+<h2 id="section-6">Проверка понимания (без баллов)</h2>
+<p>Можно ли считать ответ 200 правильным, если каталог показывает непубличную запись?</p>
+<p><strong>Объяснение:</strong></p>
+<p>Нет. Проверяйте доступность HTTP, значения БД и фильтрацию по is_public отдельно.</p>
+<hr />
+<p><a href="m4.html">Предыдущее: M4</a> · <a href="p6.html">Следующее: P6</a></p>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>

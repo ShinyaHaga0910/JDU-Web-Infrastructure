@@ -1,0 +1,64 @@
+<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M3 To‘xtatish va qayta ishga tushirishda ma’lumotlar (3)</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Boshlashdan oldin</a> · <a href="#section-2">Tayyor holat talablari</a> · <a href="#section-3">Shartlar: har tekshiruvga 1 xom ball</a> · <a href="#section-4">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M3 To‘xtatish va qayta ishga tushirishda ma’lumotlar (3)</h1>
+<p><a href="start.html">Avval: ulanish va qoidalar</a> · <a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a> · <a href="portal.html">Brauzerda tekshirish</a></p>
+<p><a href="../ja/m3.html">日本語</a> · <a href="../ru/m3.html">Русский</a> · <a href="../uz/m3.html">O‘zbekcha</a></p>
+<p>2026-11-03 · D12 P/M r1.3</p>
+<p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
+<h2 id="section-1">Boshlashdan oldin</h2>
+<p><a href="start.html">Ulanish va qoidalar</a> bilan tanishing. Mos topshiriq: <a href="p3.html">P3</a>. Tekshiruv: <a href="portal.html">brauzer yo‘riqnomasi</a>.</p>
+<h2 id="section-2">Tayyor holat talablari</h2>
+<p>O‘z Lab ID bilan alohida M marker yarating. P3 dan alohida brauzerda oldingi holat → AWS Stop → brauzerda to‘xtashni tekshirish → AWS Start → brauzerda saqlanishni tekshirish ketma-ketligini bajaring. Ayni Web va asl root volume kerak; oddiy reboot yetmaydi. Backup/restore va yangi disk kerak emas.</p>
+<ul>
+<li>File: /var/lib/jdu-web/mission/storage.txt</li>
+</ul>
+<pre><code class="language-text">lab_id={lab_id}
+task=M3
+payload=mission-storage-2026
+</code></pre>
+<p>{lab_id} ni o‘z anonim ID ga almashtiring. Fayl 0644/root:root, katalog 0755/root:root. Faqat ayni asl Web/volume ni to‘xtating.</p>
+<h2 id="section-3">Shartlar: har tekshiruvga 1 xom ball</h2>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID (o‘zgartirmang)</th>
+<th scope="col">Shart</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB04_MARKER_CONTENT</td>
+<td>Marker path, shaxsiy Lab ID, task va aniq matn topshiriqqa mos.</td>
+</tr>
+<tr>
+<td>WEB04_MARKER_PERMISSIONS</td>
+<td>Fayl root:root 0644, ota katalog root:root 0755.</td>
+</tr>
+<tr>
+<td>WEB04_STOP_START_RETENTION</td>
+<td>Stop/start uch bosqichi isbotlangan: ayni instance/volume/hash, yangi boot_id va alohida kuzatilgan stopped.</td>
+</tr>
+</tbody>
+</table>
+<p>Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.</p>
+<h2 id="section-4">Tekshirish va yuborish</h2>
+<ol>
+<li>PC da maktab Google orqali <a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a> ga kiring, o‘z Lab va <strong>M3</strong> ni tanlang. Hisobni bog‘lash va ekranlar: <a href="portal.html">brauzer yo‘riqnomasi</a>.</li>
+<li>To‘xtashdan oldingi holatni yozing → saqlanishini kuting → AWS da ayni Web ni Stop → stopped → to‘xtashni tasdiqlang → yozilishini kuting → ayni Web ni Start → running/SSM Online → qayta ishga tushgach saqlanishni tekshiring. M3 dalilini P3 dan alohida yozing.</li>
+<li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida. P va M0 bahoga qo‘shilmaydi.</li>
+</ol>
+<hr />
+<p><a href="p3.html">Oldingi: P3</a> · <a href="p4.html">Keyingi: P4</a></p>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>

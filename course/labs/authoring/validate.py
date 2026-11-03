@@ -24,6 +24,7 @@ from markdown_it import MarkdownIt
 from pypdf import PdfReader
 from content import MODULES,LANGS
 from build import KIT,EXPECTED_REGISTRY,MATERIAL_REVISION
+from pages import expiry_text
 from explanations import LABELS,STEP_NOTES,MODULE_NOTES,READING,ROUTES,MISSION_PLAN,OUTPUT_EXAMPLES
 
 
@@ -52,9 +53,12 @@ def main():
     docs={};code={};fences=0
     for lang in LANGS:
         for kind in ('practice','missions'):
-            path=ROOT/'docs'/lang/(kind+'.md');value=path.read_text(encoding='utf-8');docs[lang,kind]=value
+            path=ROOT/'docs'/lang/(kind+'-full.md');value=path.read_text(encoding='utf-8');docs[lang,kind]=value
             tokens=parser.parse(value)
             ok(f'{lang}_{kind}_current_revision','D12 P/M '+MATERIAL_REVISION in value)
+            ok(f'{lang}_{kind}_current_expiry',value.count(expiry_text(lang))==2 and '2026-10-27' not in value)
+            ok(f'{lang}_{kind}_browser_grading','portal.md' in value and not any(x in value for x in
+                ('jdu-web-check','jdu-web-my-progress','--functional','--no-submit','--retry','--prepare-stop','--observe-stopped')))
             ok(f'{lang}_{kind}_working_guide',all(p[lang] in value for p in READING))
             ok(f'{lang}_{kind}_routes',all(purpose[lang] in value for _,_,_,purpose in ROUTES))
             code[lang,kind]=[(t.info,t.content) for t in tokens if t.type=='fence']
@@ -78,6 +82,29 @@ def main():
             ok(f'{lang}_{kind}_pdf_text',len(text)>5000 and all(prefix+str(n) in text for n in range(7) for prefix in [('P' if kind=='practice' else 'M')]) and '\ufffd' not in text and '\x00' not in text)
     for kind in ('practice','missions'):
         ok(kind+'_identical_code_in_3_languages',code['ja',kind]==code['ru',kind]==code['uz',kind])
+    for lang in LANGS:
+        for kind,prefix in [('practice','P'),('missions','M')]:
+            index=(ROOT/'docs'/lang/(kind+'.md')).read_text(encoding='utf-8')
+            ok(f'{lang}_{kind}_index',all(f']({prefix.lower()}{n}.md)' in index for n in range(7)))
+            for number in range(7):
+                name=prefix+str(number)
+                value=(ROOT/'docs'/lang/(name.lower()+'.md')).read_text(encoding='utf-8')
+                ok(f'{lang}_{name}_page',value.startswith('# '+name+' ') and 'start.md' in value and 'portal.md' in value and expiry_text(lang) in value)
+                if prefix=='P':
+                    for step in range(1,len(MODULES[number]['steps'])+1):
+                        ok(f'{lang}_{name}_{step}_page_step',f'### {name}.{step} ' in value and STEP_NOTES[f'{name}.{step}'][lang] in value)
+                else:
+                    task=next(t for t in reg['tasks'] if t['id']==name)
+                    ok(f'{lang}_{name}_page_checks',all(value.count(cid)==1 for cid in task['progress_scored_checks']))
+    # Check Markdown paths too: GitHub is the primary reading entrance.
+    for path in [ROOT/'README.md',ROOT/'TEACHER-NOTES.md',*(ROOT/'docs').rglob('*.md')]:
+        for token in parser.parse(path.read_text(encoding='utf-8')):
+            for child in token.children or []:
+                if child.type!='link_open':continue
+                href=child.attrGet('href');uri=urlparse(href)
+                if uri.scheme:continue
+                target=path.parent/unquote(uri.path) if uri.path else path
+                ok('markdown_link_'+str(len(checks)),target.exists())
     ok('49_detailed_steps',sum(len(m['steps']) for m in MODULES)==49 and all(all(s[k].values()) for m in MODULES for s in m['steps'] for k in ('why','expect','trouble')))
     for info,source in code['ja','practice']+code['ja','missions']:
         if info=='bash':
@@ -91,7 +118,7 @@ def main():
             uri=urlparse(href)
             if uri.scheme:continue
             target=(path.parent/unquote(uri.path)) if uri.path else path
-            ok('html_link_'+str(len(checks)),target.exists())
+            ok('html_link_'+str(len(checks))+' '+str(path.relative_to(ROOT))+' -> '+href,target.exists())
             if uri.fragment:
                 dest=Page();dest.feed(target.read_text(encoding='utf-8'))
                 ok('html_anchor_'+str(len(checks)),uri.fragment in dest.ids)
@@ -146,9 +173,9 @@ def main():
         hashes=json.loads(z.read('web-lab-pm-r1/TEACHING-FILE-HASHES.json'))
         ok('zip_exact_inventory',set(z.namelist())=={'web-lab-pm-r1/'+p for p in hashes}|{'web-lab-pm-r1/TEACHING-FILE-HASHES.json'})
         ok('zip_all_hashes',all(hashlib.sha256(z.read('web-lab-pm-r1/'+p)).hexdigest()==v for p,v in hashes.items()))
-    result=dict(scope='D12_P_M_materials_local_checks_not_AWS_walkthrough',checked_on=date.today().isoformat(),browser_guide_revision='2026-10-30',
+    result=dict(scope='D12_P_M_materials_local_checks_not_AWS_walkthrough',checked_on=date.today().isoformat(),browser_guide_revision='2026-11-03',
         languages=list(LANGS),material_revision=MATERIAL_REVISION,practice_tasks=7,practice_steps=49,
-        explained_steps=len(STEP_NOTES),module_understanding_questions=len(MODULE_NOTES),communication_routes=len(ROUTES),
+        task_pages=42,explained_steps=len(STEP_NOTES),module_understanding_questions=len(MODULE_NOTES),communication_routes=len(ROUTES),
         worked_output_examples=len(OUTPUT_EXAMPLES),mission_tasks=7,scored_checks=62,raw_points=62,
         checks_passed=len(checks),bash_blocks_syntax_checked=fences,
         pdfs={p.name:dict(pages=len(PdfReader(p).pages),bytes=p.stat().st_size) for p in (ROOT/'output/pdf').glob('*.pdf')},

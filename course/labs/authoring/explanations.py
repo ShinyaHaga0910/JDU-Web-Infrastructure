@@ -50,9 +50,9 @@ MISSION_PLAN = [
  T('次に「どこから何を確認すれば、要件を満たしたと分かるか」を考える。ファイルを確認する場所と、接続を試す場所は同じとは限らない。許可経路の成功と、制限すべき経路の拒否を分けて記録する。',
    'Затем решите, откуда и чем подтвердить каждое требование. Проверка файла и проверка соединения могут выполняться на разных узлах. Отдельно фиксируйте успех разрешённого пути и отказ запрещённого.',
    'Keyin har talabni qayerdan va nima bilan tekshirishni belgilang. Faylni ko‘rish joyi bilan ulanishni sinash joyi bir xil bo‘lmasligi mumkin. Ruxsatli yo‘l muvaffaqiyati va taqiqlangan yo‘l rad etilishini alohida yozing.'),
- T('自己確認後は通常の提出でSTOREDまで確認する。M5/M6の機能確認は対話入力を含む。--no-submitの結果や自分のメモだけでは教師への提出は完了しない。理解の確認用メモやPの説明問題を、追加の成績要件にはしない。',
-   'После самопроверки отправьте результат и проверьте STORED. Функциональная проверка M5/M6 включает интерактивный ввод. --no-submit и личные заметки не являются отправкой. Вопросы на понимание и заметки не добавляют требований к оценке.',
-   'O‘zini tekshirgach natijani yuborib STORED ni tekshiring. M5/M6 functional tekshiruvi interaktiv kiritishni talab qiladi. --no-submit va shaxsiy qayd yuborish hisoblanmaydi. Tushunish savollari va qaydlar bahoga qo‘shimcha talab emas.'),
+ T('ブラウザで課題を選んで確認し、結果と保存状態を読む。M5/M6の機能確認では既存アプリ管理者パスワードを非表示入力する。成績は自動保存される。理解の確認用メモやPの説明問題を、追加の成績要件にはしない。',
+   'Выберите задание в браузере, проверьте результат и сохранение. Для функций M5/M6 скрыто введите существующий пароль администратора приложения. Оценки сохраняются автоматически. Вопросы на понимание и заметки не добавляют требований к оценке.',
+   'Brauzerda topshiriqni tanlab natija va saqlash holatini tekshiring. M5/M6 funksiyalari uchun app administratorining mavjud parolini yashirin kiriting. Baholar avtomatik saqlanadi. Tushunish savollari va qaydlar bahoga qo‘shimcha talab emas.'),
 ]
 
 MODULE_NOTES = {
@@ -120,9 +120,9 @@ def note(id, ja, ru, uz):
     STEP_NOTES[id] = T(ja, ru, uz)
 
 note('P0.1',
- 'LAB_IDとCOURSE_IDは端末内の変数。INSTALLはその値から作る保存先で、引用符は空白などを一つの値として扱うために付ける。sourceは現在のshellへ設定を読み込み、command -vは実行するコマンドの所在を調べる。',
- 'LAB_ID и COURSE_ID - переменные текущего терминала. INSTALL задаёт путь, кавычки сохраняют значение целиком. Source читает настройки в текущую оболочку; command -v показывает, какая команда будет запущена.',
- 'LAB_ID va COURSE_ID joriy terminal o‘zgaruvchilaridir. INSTALL ulardan path hosil qiladi; qo‘shtirnoq qiymatni bir butun saqlaydi. Source sozlamani joriy shell ga o‘qiydi; command -v qaysi command ishlashini ko‘rsatadi.')
+ 'INSTALLは初期導入済みの場所を表す変数。test -fはファイルの有無を調べるだけで、環境を作り直さない。AWS本人確認と課題の合格確認は別。',
+ 'INSTALL указывает на уже установленный комплект. test -f проверяет наличие файла, не пересоздавая среду. Проверка AWS account не является выполнением задания.',
+ 'INSTALL oldin o‘rnatilgan katalogni bildiradi. test -f fayl borligini tekshiradi, muhitni qayta yaratmaydi. AWS hisobini tekshirish topshiriqdan o‘tish degani emas.')
 note('P0.2',
  'instance IDはEC2を識別する値、roleは授業内の担当、公開IPは外から接続する宛先である。公開IPが変わっても同じinstance IDなら同じEC2として追跡できる。作業表には5役割とIDの組を記録する。',
  'Instance ID идентифицирует EC2, роль обозначает его задачу, public IP служит внешним адресом. Изменение public IP не означает замену instance ID. В рабочей таблице свяжите каждую из пяти ролей с её ID.',
@@ -136,9 +136,9 @@ note('P0.4',
  'Открытые учебные файлы - материалы приложения и SQL, а не готовая служба. Stage_resources.py запускается в CloudShell и переносит их на Web/DB. Сохранение zip в Windows само по себе не создаёт файлов в EC2.',
  'Ochiq resurslar app va SQL materiallaridir, tayyor service emas. Stage_resources.py CloudShell da ishga tushib ularni Web/DB ga joylaydi. Zip ni Windows ga saqlashning o‘zi EC2 da fayl yaratmaydi.')
 note('P0.5',
- '判定と送信は二つの結果である。自己確認でPASSでも、--no-submitならその回は教師へ保存されない。PENDINGは保存の確認がまだ取れていない状態なので、点数の増減と同一視しない。',
- 'Проверка и доставка дают два разных результата. PASS с --no-submit не сохраняет эту попытку у преподавателя. PENDING означает отсутствие подтверждения доставки, а не изменение баллов.',
- 'Tekshiruv va yuborish ikki xil natija. --no-submit bilan PASS bo‘lishi shu urinishni o‘qituvchiga saqlamaydi. PENDING yetkazilganini tasdiqlash yo‘qligini bildiradi, ball o‘zgarishini emas.')
+ 'ブラウザの確認結果は自動保存される。結果のPASS/FAIL/UNKNOWNと、処理・保存の状態を分けて読む。PとM0は保存されても成績に加算しない。',
+ 'Браузер сохраняет результат автоматически. Различайте PASS/FAIL/UNKNOWN и статус обработки/сохранения. P и M0 не добавляют баллов даже после сохранения.',
+ 'Brauzer natijani avtomatik saqlaydi. PASS/FAIL/UNKNOWN va ishlov/saqlash holatini farqlang. P va M0 saqlansa ham bahoga ball qo‘shmaydi.')
 note('P0.6',
  'RDPは踏み台の画面と入力を運ぶ。踏み台内Firefoxからの通信の送信元はWindowsではなく踏み台になる。日本語/英語などのキー配列はpasswordの記号入力にも影響するため、表示言語と配列を区別する。',
  'RDP передаёт экран и ввод бастиона. Запрос Firefox внутри RDP идёт от бастиона, а не Windows. Раскладка клавиатуры влияет на символы пароля; язык интерфейса и раскладка - разные настройки.',
@@ -165,9 +165,9 @@ note('P1.5',
  'Тот же curl с бастиона проверяет внутренний путь. В браузере Windows нужен текущий public IP Web. Недоступность 10.20.1.20 с Windows сама по себе не означает остановку Web.',
  'Ayni curl bastiondan bajarilsa ichki yo‘l tekshiriladi. Windows browser ida Web ning joriy public IP si kerak. Windows dan 10.20.1.20 ga yetib bo‘lmasligi Web to‘xtaganini anglatmaydi.')
 note('P1.6',
- 'access logでは時刻・要求path・statusを直前のcurlと対応させる。tailは末尾の行を読む操作で、logを書き換えない。exitで戻ってからCloudShell用checkerを使い、Web内へcheckerを移さない。',
- 'Сопоставьте время, путь запроса и статус в access log с недавним curl. Tail читает последние строки и не меняет журнал. После exit запускайте checker в CloudShell, не переносите его на Web.',
- 'Access log dagi vaqt, request path va status ni oldingi curl bilan solishtiring. Tail oxirgi qatorlarni o‘qiydi, log ni o‘zgartirmaydi. Exit dan keyin checker ni CloudShell da bajaring, Web ga ko‘chirmang.')
+ 'access logでは時刻・要求path・statusを直前のcurlと対応させる。tailは末尾を読む操作で、logを書き換えない。exitで接続を終えたら、PCのブラウザでP1を確認する。',
+ 'Сопоставьте время, путь и статус в access log с недавним curl. Tail читает последние строки и не меняет журнал. После exit проверьте P1 в браузере PC.',
+ 'Access log dagi vaqt, path va status ni oldingi curl bilan solishtiring. Tail oxirgi qatorlarni o‘qiydi, log ni o‘zgartirmaydi. Exit dan keyin PC brauzerida P1 ni tekshiring.')
 
 note('P2.1',
  'namedはBINDのservice名、named-checkconf等は設定を検査する道具である。cp -anの-nは同名の控えを上書きしない指定なので、再実行して最初の控えを失うことを防ぐ。',
@@ -211,13 +211,13 @@ note('P3.2',
  'Printf подставляет LAB_ID вместо %s, \\n означает перевод строки. Символ > записывает рабочий файл. Install -d создаёт каталог, следующий install задаёт владельца и права маркера. Хеш проверяет совпадение содержимого.',
  'Printf %s o‘rniga LAB_ID qo‘yadi; \\n yangi qatordir. > ish fayliga yozadi. Install -d katalog yaratadi, keyingi install marker owner va permission ini belgilaydi. Hash mazmun bir xilligini tekshiradi.')
 note('P3.3',
- '--prepare-stopは停止前の対象・起動・markerを保存する操作で、EC2を停止するコマンドではない。保存が成功してからStopへ進む。この順序を逆にすると、停止前の比較材料を取れない。',
- '--prepare-stop сохраняет исходное состояние узла, загрузки и маркера; сам EC2 он не останавливает. Сначала проверьте сохранение, затем выполняйте Stop. После остановки исходные данные уже не получить.',
- '--prepare-stop server, boot va marker ning oldingi holatini saqlaydi; EC2 ni o‘zi to‘xtatmaydi. Avval saqlanganini tekshirib, keyin Stop qiling. To‘xtatgach oldingi dalilni olib bo‘lmaydi.')
+ '停止前記録は比較用の対象・起動・markerを保存する操作。ボタン自体はEC2を止めない。保存後にAWS Stopを行い、ブラウザとコマンドの証拠を混ぜない。',
+ 'Запись до остановки сохраняет узел, загрузку и marker для сравнения. Кнопка сама не останавливает EC2. Затем выполните AWS Stop; не смешивайте браузерные и командные доказательства.',
+ 'Oldingi holat tugmasi server, boot va marker ni solishtirish uchun saqlaydi, EC2 ni to‘xtatmaydi. Keyin AWS Stop bajaring; brauzer va buyruq dalillarini aralashtirmang.')
 note('P3.4',
- 'AWSコンソールで対象WebをStopし、stoppedになった段階をCloudShellから--observe-stoppedで記録する。SSMが切れたことだけを停止完了の証拠にしない。再起動やTerminateとは違う操作を選ぶ。',
- 'В Console выполните Stop нужного Web; состояние stopped зафиксируйте из CloudShell через --observe-stopped. Разрыв SSM сам по себе не доказывает остановку. Stop отличается от reboot и Terminate.',
- 'Console da kerakli Web ni Stop qiling; stopped holatini CloudShell dan --observe-stopped bilan qayd eting. SSM uzilishi to‘xtashni o‘zi isbotlamaydi. Stop reboot va Terminate dan farq qiladi.')
+ 'AWSコンソールで対象WebをStopし、stoppedになった段階をWeb Portalで記録する。SSMが切れたことだけを停止完了の証拠にしない。再起動やTerminateとは違う操作を選ぶ。',
+ 'В Console выполните Stop нужного Web; состояние stopped зафиксируйте в Web Portal. Разрыв SSM сам по себе не доказывает остановку. Stop отличается от reboot и Terminate.',
+ 'Console da kerakli Web ni Stop qiling; stopped holatini Web Portal da qayd eting. SSM uzilishi to‘xtashni o‘zi isbotlamaydi. Stop reboot va Terminate dan farq qiladi.')
 note('P3.5',
  '同じWebをStartし、runningとSSM Onlineを待つ。checkerは保存済みの停止前証拠と現在を比べるので、起動後にmarkerを作り直して証拠を上書きしない。以降の外部閲覧には更新後のWeb公開IPを使う。',
  'Запустите тот же Web и дождитесь running/SSM Online. Checker сравнивает текущее состояние с сохранённым исходным; не пересоздавайте маркер после запуска. Для внешнего доступа далее используйте новый public IP Web.',
@@ -297,9 +297,9 @@ note('P5.10',
  'SELECT читает данные, WHERE выбирает две нужные записи, ORDER BY задаёт порядок. Другие корректные записи удалять не нужно. Сравнение браузера и SQL подтверждает реальные данные БД, а не только вид страницы.',
  'SELECT ma’lumot o‘qiydi; WHERE kerakli ikki yozuvni tanlaydi; ORDER BY tartib beradi. Boshqa to‘g‘ri yozuvlarni o‘chirmang. Browser va SQL ni solishtirish sahifa ko‘rinishini emas, haqiqiy DB qiymatini tasdiqlaydi.')
 note('P5.11',
- '--functionalは設定の有無だけでなく、指定された入力を使ってアプリの操作を確かめる。対話のpassword欄にはアプリ管理者の既存値を入力する。完了後は機能のPASS/FAIL/UNKNOWNと送信のSTORED/PENDINGを別々に読む。',
- '--functional проверяет действия приложения с заданным вводом, не только наличие конфигурации. В скрытое поле вводите существующий пароль администратора приложения. Различайте PASS/FAIL/UNKNOWN функций и STORED/PENDING доставки.',
- '--functional faqat config borligini emas, berilgan kiritish bilan app amallarini tekshiradi. Yashirin maydonga app administratorining mavjud parolini kiriting. Functional PASS/FAIL/UNKNOWN va yuborish STORED/PENDING ni alohida o‘qing.')
+ '機能確認は設定ファイルの存在だけでなく、実際のHTTP操作とDB更新を確かめる。パスワード欄はアプリ管理者の既存値用で、RDPの値ではない。確認結果と保存状態を両方読む。',
+ 'Функциональная проверка проверяет HTTP-действия и обновление БД, а не только файл настройки. Поле предназначено для существующего пароля администратора приложения, не RDP. Читайте результат и статус сохранения.',
+ 'Funksional tekshiruv faqat config faylini emas, HTTP amallari va DB yangilanishini tekshiradi. Maydon RDP emas, app administratorining mavjud paroli uchun. Natija va saqlash holatini o‘qing.')
 
 note('P6.1',
  '\\duはDB roleの属性、\\dpはtable等のアクセス権を読む。OSのls -lとは別の権限表である。setupとruntimeの役割を比較し、runtimeに構造変更の権限が不要な理由を考える。',

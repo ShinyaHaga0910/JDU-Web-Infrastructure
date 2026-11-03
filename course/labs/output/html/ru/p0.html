@@ -1,0 +1,123 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>P0 Своя среда и место выполнения команд</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Что изучаем</a> · <a href="#section-3">Задание</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P0 Своя среда и место выполнения команд</h1>
+<p><a href="start.html">Сначала: подключение и правила</a> · <a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a> · <a href="portal.html">Проверка в браузере</a></p>
+<p><a href="../ja/p0.html">日本語</a> · <a href="../ru/p0.html">Русский</a> · <a href="../uz/p0.html">O‘zbekcha</a></p>
+<p>2026-11-03 · D12 P/M r1.3</p>
+<p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
+<h2 id="section-1">Перед началом</h2>
+<p>Проверьте <a href="start.html">подключение и правила</a>. Связанное задание: <a href="m0.html">M0</a>. Проверка описана в <a href="portal.html">инструкции браузера</a>.</p>
+<h2 id="section-2">Что изучаем</h2>
+<p>Различать CloudShell, Windows и пять Ubuntu-серверов; подключаться через SSM к нужному узлу и запускать самопроверку.</p>
+<h2 id="section-3">Задание</h2>
+<p>Проверьте свой Lab ID, ID комплекта и instance ID пяти ролей. Это проверка предоставленной среды, 0 баллов. Если пяти серверов ещё нет, сначала выполните начальную установку. Для готовой среды не повторяйте create, создание ключей и регистрацию.</p>
+<h2 id="section-4">Как это работает</h2>
+<p><strong>Состояние перед началом:</strong></p>
+<p>Используются ваши пять узлов после начальной установки и регистрации.</p>
+<p><strong>Что изменится в этом P:</strong></p>
+<p>Вы различаете аккаунт, роль и место работы; учебные файлы подготовлены.</p>
+<p>AWS Console управляет ресурсами, CloudShell - ваш терминал с AWS CLI, SSM открывает сеанс внутри выбранного EC2. Пять серверов остаются разными ОС: путь /var/www на Web не является тем же каталогом на DB. Проверяйте отдельно роль сервера и пользователя ОС.</p>
+<h2 id="section-5">Пример решения: выполняйте по одному шагу</h2>
+<h3>P0.1 Проверить свой CloudShell и комплект</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>CloudShell в личном AWS-аккаунте студента</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Откройте AWS из своего класса Academy и запустите CloudShell. Замените LAB_ID значением преподавателя. INSTALL - каталог для последующего размещения материалов. Проверьте установленный файл и свой AWS account; проверку задания выполните в браузере в конце.</p>
+<pre><code class="language-bash">LAB_ID='YOUR-LAB-ID'
+COURSE_ID='web-course-class193548-20261103-r3'
+INSTALL=&quot;$HOME/.local/share/jdu-web/courses/$COURSE_ID/$LAB_ID&quot;
+aws sts get-caller-identity --query Account --output text
+test -f &quot;$INSTALL/activate.sh&quot; &amp;&amp; printf 'INSTALL_OK\n'
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>INSTALL указывает на уже установленный комплект. test -f проверяет наличие файла, не пересоздавая среду. Проверка AWS account не является выполнением задания.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Account должен совпадать с вашим. INSTALL_OK подтверждает наличие файла начальной установки. Это подготовка к работе, а не выполнение задания.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>При No such file проверьте начальную установку и install. Старая команда поддерживает не все задания. Просроченный комплект обновляет преподаватель.</p>
+<h3>P0.2 Записать instance ID пяти серверов</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>AWS Console своего студенческого аккаунта</p>
+<p><strong>Цель и действия:</strong></p>
+<p>В EC2 → Instances сверяйте теги LabId и DeploymentId. Запишите instance ID ролей bastion/web/dns/db/repo в рабочую таблицу. Не выбирайте только по имени. Public IPv4 есть у bastion и web. Для SSM нужен instance ID, а не публичный IP.</p>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Instance ID идентифицирует EC2, роль обозначает его задачу, public IP служит внешним адресом. Изменение public IP не означает замену instance ID. В рабочей таблице свяжите каждую из пяти ролей с её ID.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Все пять узлов running и SSM Online; private IP совпадают с общей таблицей. Public IPv4 может измениться после остановки и запуска.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Не трогайте другой Lab, аккаунт или неизвестные узлы. Для остановленных серверов используйте инструкцию запуска. Не применяйте Reset или Terminate.</p>
+<h3>P0.3 Подключиться по SSM и вернуться</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>CloudShell в личном AWS-аккаунте студента</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Подставьте instance ID Web из EC2. После подключения вы работаете в Ubuntu, а не в CloudShell. id -un показывает управляющего пользователя SSM; role в bootstrap.json - роль сервера. Один exit возвращает в CloudShell.</p>
+<pre><code class="language-bash">aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
+id -un
+hostname
+python3 -c 'import json;print(json.load(open(&quot;/etc/jdu-web/bootstrap.json&quot;))[&quot;role&quot;])'
+pwd
+exit
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Сначала выполните только start-session в CloudShell и дождитесь подключения. Затем вводите остальные строки по одной. Id -un показывает пользователя, hostname - имя ОС, role - учебную роль. Exit закрывает один уровень сеанса.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Ожидаются ssm-user и role web. Проверяйте их при каждом переходе. При SSH имя пользователя Ubuntu может быть ubuntu.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>При TargetNotConnected проверьте running, SSM Online и регион us-east-1. Не открывайте все порты SG и не скачивайте ключи в Windows.</p>
+<h3>P0.4 Подготовить только открытые учебные файлы</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>CloudShell в личном AWS-аккаунте студента</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Загрузите zip этого пособия через CloudShell → Actions → Upload file; распакуйте командой unzip web-lab-pm-r1.zip. Перейдите в resources и выполните команду. Инструмент сверяет личный подписанный комплект и исходные пять узлов; переносит открытые файлы приложения, SQL и инструмент скрытого ввода на Web/DB. Сервисы и БД он не создаёт, секреты не передаёт.</p>
+<pre><code class="language-bash">cd &quot;$HOME/web-lab-pm-r1/resources&quot;
+python3 -B stage_resources.py --installation &quot;$INSTALL&quot;
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Открытые учебные файлы - материалы приложения и SQL, а не готовая служба. Stage_resources.py запускается в CloudShell и переносит их на Web/DB. Сохранение zip в Windows само по себе не создаёт файлов в EC2.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Вывод содержит PUBLIC_LESSON_RESOURCES_READY=web и =db. Открытые файлы находятся в /var/lib/jdu-web/lesson-resources-r1; отличающиеся существующие файлы не заменяются.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>При незавершённой установке, другой версии или истечении срока остановитесь и сообщите преподавателю. Не используйте проверочные fixture, автоматически создающие готовое решение.</p>
+<h3>P0.5 Проверить готовность в браузере</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>Браузер на своём PC: Web Portal</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Откройте Web Portal по <a href="portal.html">инструкции браузера</a>. Войдите через школьный Google, завершите привязку своего AWS, выберите P0 и запустите проверку. Если обработка продолжается, обновите результат. Так же проверьте M0. P0/M0 проверяют готовность и не добавляют оценочных баллов.</p>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Браузер сохраняет результат автоматически. Различайте PASS/FAIL/UNKNOWN и статус обработки/сохранения. P и M0 не добавляют баллов даже после сохранения.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Проверьте свой Lab, ID задания и время. Прочитайте результаты check и статус сохранения; дождитесь завершения и сохранения. UNKNOWN означает невозможность измерения, а не успех.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Для обращения запишите check ID, время и роль узла. Не передавайте token, пароль и личный URL.</p>
+<h3>P0.6 Открыть рабочий стол бастиона по RDP</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>Windows PC студента (общая учётная запись)</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Используйте текущий public IPv4 бастиона из EC2. Нажмите Windows+R, введите mstsc /prompt и Enter. В Computer укажите IP, пользователь labuser, пароль - свой RDP из начальной установки, не пароль Windows. Не выбирайте сохранение credentials. Если появится синий login xrdp, выберите Session=Xorg и labuser.</p>
+<pre><code class="language-powershell">mstsc /prompt
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>RDP передаёт экран и ввод бастиона. Запрос Firefox внутри RDP идёт от бастиона, а не Windows. Раскладка клавиатуры влияет на символы пароля; язык интерфейса и раскладка - разные настройки.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Открываются Xfce и Firefox внутри Ubuntu-бастиона. Это не браузер Windows. labuser не имеет sudo: настройку выполняйте через CloudShell → SSM/ssm-user.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>При Login failed проверьте имя и раскладку клавиатуры. Не отправляйте пароль в чат. При недоступности сверьте текущий IP и разрешённый CIDR с преподавателем; не открывайте 3389 для всех. Перед закрытием RDP сохраните работу.</p>
+<h2 id="section-6">Проверка понимания (без баллов)</h2>
+<p>Какой узел изменится, если выполнить шаги DB в открытом SSM-сеансе Web?</p>
+<p><strong>Объяснение:</strong></p>
+<p>Изменится Web. Вернитесь через exit в CloudShell и подключитесь к instance ID DB.</p>
+<hr />
+<p><a href="m0.html">Следующее: M0</a></p>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>

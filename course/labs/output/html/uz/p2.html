@@ -1,0 +1,218 @@
+<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>P2 Ichki DNS va odatiy nom yechimi</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Boshlashdan oldin</a> · <a href="#section-2">Nimani o‘rganamiz</a> · <a href="#section-3">Topshiriq</a> · <a href="#section-4">Bu qanday ishlaydi</a> · <a href="#section-5">Yechim namunasi: bittadan bajaring</a> · <a href="#section-6">Natijani o‘qish namunasi (kiritmang)</a> · <a href="#section-7">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P2 Ichki DNS va odatiy nom yechimi</h1>
+<p><a href="start.html">Avval: ulanish va qoidalar</a> · <a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a> · <a href="portal.html">Brauzerda tekshirish</a></p>
+<p><a href="../ja/p2.html">日本語</a> · <a href="../ru/p2.html">Русский</a> · <a href="../uz/p2.html">O‘zbekcha</a></p>
+<p>2026-11-03 · D12 P/M r1.3</p>
+<p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
+<h2 id="section-1">Boshlashdan oldin</h2>
+<p><a href="start.html">Ulanish va qoidalar</a> bilan tanishing. Mos topshiriq: <a href="m2.html">M2</a>. Tekshiruv: <a href="portal.html">brauzer yo‘riqnomasi</a>.</p>
+<h2 id="section-2">Nimani o‘rganamiz</h2>
+<p>BIND zone, A record, ACL va client resolver ni ketma-ket sozlash.</p>
+<h2 id="section-3">Topshiriq</h2>
+<p>guide.lab.test → 10.20.1.20 va practice-db.lab.test → 10.20.2.20 ni sozlang; P1 HTTP ni nom orqali oching. Asosiy IP lar o‘zgarmaydi.</p>
+<table>
+<thead>
+<tr>
+<th scope="col">DNS name</th>
+<th scope="col">A / IPv4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>guide.lab.test</td>
+<td>10.20.1.20</td>
+</tr>
+<tr>
+<td>practice-db.lab.test</td>
+<td>10.20.2.20</td>
+</tr>
+</tbody>
+</table>
+<h2 id="section-4">Bu qanday ishlaydi</h2>
+<p><strong>Boshlashdan oldingi holat:</strong></p>
+<p>P1 HTTP IP orqali ishlaydi; DNS endi sozlanadi.</p>
+<p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
+<p>BIND mashq nomlari bastion va Web ning oddiy resolver idan ishlaydi.</p>
+<p>DNS nom so‘roviga javob beradi, Web sahifani qaytarmaydi. BIND lab.test zone ni boshqaradi; A record IPv4 qaytaradi. Aniq DNS server bilan dig va OS sozlamalaridan foydalanuvchi getent/browser ni farqlang. DNS dan keyin alohida HTTP ulanish bo‘ladi. <a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BIND hujjati</a>.</p>
+<h2 id="section-5">Yechim namunasi: bittadan bajaring</h2>
+<h3>P2.1 BIND o‘rnatish va asl sozlamani saqlash</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>DNS serverning SSM terminali: ssm-user</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>DNS ga kirib role=dns ni tekshiring. cp -a asl fayl atributlarini saqlaydi; -n eski nusxa ustiga yozmaydi. Bu tahrir xatosi uchun nusxa, DB backup/restore topshirig‘i emas.</p>
+<pre><code class="language-bash">sudo apt-get update -o APT::Update::Error-Mode=any
+sudo apt-get install --no-install-recommends bind9 bind9-utils
+sudo cp -an /etc/bind/named.conf.options /etc/bind/named.conf.options.before-p2
+sudo cp -an /etc/bind/named.conf.local /etc/bind/named.conf.local.before-p2
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Named - BIND service nomi; named-checkconf kabi vositalar config ni tekshiradi. Cp -an dagi -n takroriy bajarishda mavjud zaxira nusxa ustiga yozmaydi.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>Ichki repo dan o‘rnatiladi. M2 da shu DNS ga record qo‘shilib, P2 record lari saqlanadi.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>Boshqa Lab named.conf faylini to‘liq ko‘chirmang. O‘zingizning zone mavjud bo‘lsa, avval o‘qing.</p>
+<h3>P2.2 Client lar va forwarder ni sozlash</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>DNS serverning SSM terminali: ssm-user</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>sudo nano /etc/bind/named.conf.options ni ochib quyidagi matnni saqlang. acl ruxsatli client larni, listen-on DNS tinglashini belgilaydi; forward only tashqi nomlarni AWS DNS ga uzatadi. Query va recursion uchta manbaga cheklanadi. dnssec-validation no yopiq o‘quv forwarding tuzilmasiga mos.</p>
+<pre><code class="language-text">acl &quot;jdu_clients&quot; { 127.0.0.1; 10.20.1.10; 10.20.1.20; };
+options {
+    directory &quot;/var/cache/bind&quot;;
+    listen-on { 127.0.0.1; 10.20.2.10; };
+    listen-on-v6 { none; };
+    allow-query { jdu_clients; };
+    allow-recursion { jdu_clients; };
+    allow-query-cache { jdu_clients; };
+    recursion yes;
+    forward only;
+    forwarders { 10.20.0.2; };
+    dnssec-validation no;
+    allow-transfer { none; };
+};
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Allow-query so‘rov yuboruvchi client ni, allow-recursion tashqi nom uchun recursive qidiruv client ini belgilaydi. Lab.test o‘z zone idan, tashqi nom forwarder orqali olinadi. Client lar bastion, Web va localhost bilan cheklangan.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>Bu shell buyrug‘i emas, fayl mazmuni. 10.20.0.2 - AWS resolver, 10.20.2.10 - o‘z BIND serveringiz.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>Nuqtali vergul va qavslar sintaksis qismidir. ACL ni any yoki 0.0.0.0/0 gacha kengaytirmang.</p>
+<h3>P2.3 Zone ni e’lon qilish va A record yozish</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>DNS serverning SSM terminali: ssm-user</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>sudo nano /etc/bind/named.conf.local ga birinchi zone blokini yozing. sudo install -d -m 0755 /etc/bind/zones dan so‘ng sudo nano /etc/bind/zones/db.lab.test ga qolgan matnni yozing. SOA boshqaruv ma’lumoti, NS vakolatli DNS, A nom/IPv4 mosligi. Oxirgi nuqta to‘liq nomni bildiradi; har tahrirda serial ni oshiring.</p>
+<pre><code class="language-text">// /etc/bind/named.conf.local
+zone &quot;lab.test&quot; {
+    type primary;
+    file &quot;/etc/bind/zones/db.lab.test&quot;;
+    allow-transfer { none; };
+    allow-update { none; };
+};
+
+; /etc/bind/zones/db.lab.test
+$TTL 300
+@ IN SOA dns.lab.test. hostmaster.lab.test. (
+    2026102301 3600 600 604800 300 )
+@ IN NS dns.lab.test.
+dns IN A 10.20.2.10
+guide IN A 10.20.1.20
+practice-db IN A 10.20.2.20
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Zone e’loni va record lar alohida fayllarga saqlanadi. Guide nomi guide.lab.test gacha to‘ldiriladi; nuqtali dns.lab.test. to‘liq nomdir. TTL cache vaqtini, SOA serial esa zone versiyasini bildiradi, IP ni emas.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>Ikkita alohida faylga saqlang. dns A yozuvi NS nomining manzilidir. Client resolver ini hozircha o‘zgartirmang.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>M2 allaqachon mavjud bo‘lsa, zone ni almashtirmay ikkita mashq yozuvini qo‘shing. Zone ni ikki marta e’lon qilmang.</p>
+<h3>P2.4 Sintaksis va DNS ichki javobini tekshirish</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>DNS serverning SSM terminali: ssm-user</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>Client ni nosoz DNS ga o‘tkazish nom yechimini to‘xtatadi. Avval named-checkconf va named-checkzone muvaffaqiyatli bo‘lsin, keyin UDP hamda TCP ni tekshiring.</p>
+<pre><code class="language-bash">sudo named-checkconf -z
+sudo named-checkzone lab.test /etc/bind/zones/db.lab.test
+sudo systemctl enable --now named
+sudo systemctl restart named
+dig @127.0.0.1 guide.lab.test A
+dig @127.0.0.1 guide.lab.test A +tcp
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Sintaksis tekshiruvi o‘tgach sozlamani qo‘llang. Dig dagi @ DNS serverni, A IPv4 record turini bildiradi. +tcp bilan TCP53 tekshiriladi; uni UDP muvaffaqiyatidan alohida o‘qing.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>zone loaded/OK, NOERROR, aa va A=10.20.1.20. aa shu zone uchun vakolatli javobni bildiradi.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>Xatoda sudo journalctl -u named -n 30 --no-pager ni o‘qing, sozlamani tuzatib yana tekshiring.</p>
+<h3>P2.5 Bastion va Web dan DNS ga bevosita so‘rov yuborish</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>Bastionning SSM terminali: ssm-user</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>Buyruqlarni bastionda ham, Web da ham bajaring. @10.20.2.10 faqat shu so‘rov uchun DNS ni belgilaydi. Bu browser va app odatda shu DNS ni ishlatishini hali isbotlamaydi.</p>
+<pre><code class="language-bash">dig @10.20.2.10 guide.lab.test A
+dig @10.20.2.10 practice-db.lab.test A +tcp
+dig @10.20.2.10 absent-p2.lab.test A
+dig @10.20.2.10 aws.amazon.com A
+dig @10.20.2.10 lab.test AXFR
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Mavjud ichki nom, yo‘q nom, tashqi nom va zone transfer ni alohida sinang. NXDOMAIN to‘g‘ri manfiy javob, timeout emas. AXFR butun zone ni so‘raydi; bu Lab da rad etilishi kerak.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>Kerakli nomlar to‘g‘ri A qaytaradi; absent-p2 vakolatli NXDOMAIN, tashqi nom javob beradi; AXFR rad qilinadi. Timeout aniq rad etish isboti emas.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>Ulanmasa, manba hamda UDP/TCP 53 ni ajratib tekshiring. Boshqa private serverlarni client ACL ga qo‘shmang.</p>
+<h3>P2.6 Odatiy resolver ni faqat BIND ga yo‘naltirish</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>Bastionning SSM terminali: ssm-user</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>Bastion va Web da bittadan bajaring. ip -br link orqali interface nomini, networkctl status NOM orqali Network File ni aniqlang. ls /etc/netplan bilan YAML ni topib sudo cp -an orqali nusxa saqlang. sudo nano da ayni interface ga dhcp4-overrides/use-dns:false va nameservers qo‘shing. Quyida tuzilma namunasi: interface nomi hamda mavjud match/set-name/renderer qiymatlarini saqlang.</p>
+<pre><code class="language-text">network:
+  version: 2
+  ethernets:
+    ens5:
+      dhcp4: true
+      dhcp4-overrides:
+        use-dns: false
+      nameservers:
+        addresses: [10.20.2.10]
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Bu Netplan DNS serverga emas, client bo‘lgan bastion va Web ga yoziladi. Dhcp4 IP olishni davom ettiradi; use-dns: false DHCP DNS ni olishni to‘xtatadi. Addresses dagi DNS manzili EC2 ning o‘z IP si emas.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>IP va gateway DHCP da qoladi. Boshqa fallback DNS qo‘shmang, /etc/resolv.conf ni almashtirmang, topshiriq nomlarini /etc/hosts ga yozmang. SSM oynasini ochiq qoldiring.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>Bir interface bir necha YAML da bo‘lsa, qiymatlar birlashadi. resolvectl dns da AWS DNS qolsa, tegishli barcha YAML va amaldagi sozlamani tekshiring.</p>
+<h3>P2.7 Qo‘llagach odatiy resolver va HTTP ni tekshirish</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>Bastionning SSM terminali: ssm-user</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>Bastion va Web da avval sozlamani hosil qiling, keyin qo‘llang va tekshiring. Ikkinchi SSH/RDP oynasini ochiq tuting; uzilsa SSM orqali qaytib nusxa bilan solishtiring. Fayl tekshirilgach va generate muvaffaqiyatli tugagach apply qiling.</p>
+<pre><code class="language-bash">sudo netplan generate
+sudo netplan apply
+sudo systemctl restart systemd-resolved
+resolvectl dns
+getent ahostsv4 guide.lab.test
+getent ahostsv4 practice-db.lab.test
+curl --noproxy '*' -i http://guide.lab.test/practice.txt
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Netplan generate config hosil qiladi; apply qo‘llaydi. SSM uzilsa ayni instance ga qayta ulaning. Resolvectl tanlangan DNS ni ko‘rsatadi; getent OS ning oddiy yo‘lini ishlatadi; oxirida nom bilan HTTP tekshiriladi.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>Yagona upstream DNS 10.20.2.10. getent kerakli IP, HTTP esa 200 va P1 matnini beradi. 127.0.0.53 mahalliy stub; upstream ni resolvectl da ko‘ring.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>dig o‘tib getent o‘tmasa, client resolver ini tekshiring. Firefox dagi DoH o‘chirilgan sozlamani saqlang.</p>
+<h3>P2.8 Browser da IP va nomni solishtirib yuborish</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>RDP orqali bastiondagi Firefox</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>RDP orqali bastion Firefox ini oching. http://10.20.1.20/practice.txt va http://guide.lab.test/practice.txt bir xil matn berishini ko‘ring. lab.test maktab PC DNS ida emas, bastion ichki DNS ida ishlaydi. Keyin PC dagi Web Portal da P2 ni tekshiring.</p>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Bastion Firefox i ichki guide.lab.test nomini ishlatadi. Windows browser i ayni ichki DNS ga sozlanmagan. IP va nom orqali ko‘rinishni solishtirib, yuborishdan oldin ayni P1 fayl ekanini tekshiring.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>13 ta mashq tekshiruvi; P1 ning joriy ishlashi ham kerak. DB/app dan oldin M2 da oltita asosiy nomni qo‘shing.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>Nom ochilmasa darhol HTTP to‘xtagan demang: IP → dig → getent → HTTP tartibida solishtiring.</p>
+<h2 id="section-6">Natijani o‘qish namunasi (kiritmang)</h2>
+<pre><code class="language-text">status: NOERROR
+guide.lab.test.  300  IN  A  10.20.1.20
+</code></pre>
+<p>Dig ning qisqa namunasi: A dan keyin IPv4, 300 esa TTL. So‘rov SERVER i 10.20.2.10 ekanini alohida tekshiring.</p>
+<h2 id="section-7">Tushunishni tekshirish (ballsiz)</h2>
+<p>dig @10.20.2.10 ishlaydi, getent ishlamaydi. Muammo albatta zone dami?</p>
+<p><strong>Izoh:</strong></p>
+<p>Yo‘q. Aniq tanlangan DNS bilan OS ning oddiy resolver i farq qilishi mumkin. Netplan va resolvectl ning amaldagi sozlamalarini tekshiring.</p>
+<hr />
+<p><a href="m1.html">Oldingi: M1</a> · <a href="m2.html">Keyingi: M2</a></p>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>

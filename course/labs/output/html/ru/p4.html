@@ -1,0 +1,185 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>P4 Подключение к PostgreSQL с аутентификацией</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Что изучаем</a> · <a href="#section-3">Задание</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Пример чтения вывода (не вводить)</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P4 Подключение к PostgreSQL с аутентификацией</h1>
+<p><a href="start.html">Сначала: подключение и правила</a> · <a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a> · <a href="portal.html">Проверка в браузере</a></p>
+<p><a href="../ja/p4.html">日本語</a> · <a href="../ru/p4.html">Русский</a> · <a href="../uz/p4.html">O‘zbekcha</a></p>
+<p>2026-11-03 · D12 P/M r1.3</p>
+<p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
+<h2 id="section-1">Перед началом</h2>
+<p>Проверьте <a href="start.html">подключение и правила</a>. Связанное задание: <a href="m4.html">M4</a>. Проверка описана в <a href="portal.html">инструкции браузера</a>.</p>
+<h2 id="section-2">Что изучаем</h2>
+<p>Различать database, role и schema; выполнять SQL с Web по установленному паролю.</p>
+<h2 id="section-3">Задание</h2>
+<p>Создайте jdu_catalog_practice, catalog_practice_setup и catalog_practice_app. Разрешите SCRAM только с Web 10.20.1.20/32. Таблицы приложения на этапе P4 не нужны.</p>
+<ul>
+<li>Profile: practice</li>
+<li>Database: jdu_catalog_practice</li>
+<li>Setup role: catalog_practice_setup</li>
+<li>Runtime role: catalog_practice_app</li>
+</ul>
+<h2 id="section-4">Как это работает</h2>
+<p><strong>Состояние перед началом:</strong></p>
+<p>На DB есть учебные файлы; используется разрешённый путь Web → DB.</p>
+<p><strong>Что изменится в этом P:</strong></p>
+<p>Созданы учебная БД и роли setup/runtime; SQL с Web проходит с паролем.</p>
+<p>Нужны сетевой доступ, прослушивание DB, разрешение HBA, пароль и SQL-права. ssm-user - пользователь ОС, catalog_practice_app - роль БД. В HBA применяется первая совпавшая строка. Возможность подключиться не означает право создавать таблицы. <a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBA</a> и <a href="https://www.postgresql.org/docs/16/sql-grant.html">права SQL</a>.</p>
+<h2 id="section-5">Пример решения: выполняйте по одному шагу</h2>
+<h3>P4.1 Установить PostgreSQL и распаковать учебный SQL</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал DB-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Подключитесь к DB по SSM, проверьте role=db. Cluster PostgreSQL 16 - единица работы сервера БД. Инструмент распаковки проверяет приложение и извлекает SQL; сам он не создаёт БД или роли.</p>
+<pre><code class="language-bash">sudo apt-get update -o APT::Update::Error-Mode=any
+sudo apt-get install --no-install-recommends postgresql-16 postgresql-client-16
+sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py
+pg_lsclusters
+sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Установка пакета и создание учебных объектов в БД - разные этапы. Pg_lsclusters показывает версию, кластер, порт и состояние. Sudo -u postgres запускает команду от системного postgres; -X отключает личную настройку psql.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Cluster 16/main, data directory /var/lib/postgresql/16/main. Учебный SQL находится в /var/lib/jdu-web/lesson-resources-r1/app/sql.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Не удаляйте существующие БД и роли. Если уже настроено, изучите состояние и выполняйте только недостающие шаги.</p>
+<h3>P4.2 Настроить прослушивание и SCRAM</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал DB-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Сохраните postgresql.conf через sudo cp -an. В sudo nano /etc/postgresql/16/main/postgresql.conf задайте три значения ниже. Если параметр встречается несколько раз, проверьте действующее значение через SHOW. Слушать нужно только private IP БД на 5432; password_encryption определяет хранение новых паролей.</p>
+<pre><code class="language-text">listen_addresses = '10.20.2.20'
+port = 5432
+password_encryption = 'scram-sha-256'
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Listen_addresses задаёт локальный адрес прослушивания DB, а не список клиентов. Password_encryption задаёт формат для вновь устанавливаемых паролей. Сохранение файла не доказывает изменение работающего listener или прежних паролей.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Не используйте * для всех адресов. Пароли задаются после настройки HBA и restart.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Это текст postgresql.conf, не SQL. SG и адрес прослушивания ОС - разные средства контроля.</p>
+<h3>P4.3 Ограничить источник, database и role в HBA</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал DB-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Сохраните pg_hba.conf, затем в sudo nano /etc/postgresql/16/main/pg_hba.conf запишите правила ниже. Действует первая совпавшая строка, поэтому прежние широкие разрешения не оставляйте. Системный postgres управляет через Unix socket/peer. Роли будущего M4 перечислены отдельно; учебной роли доступ к основной БД не даётся.</p>
+<pre><code class="language-text">local all postgres peer
+local all all reject
+host jdu_catalog_practice catalog_practice_setup 10.20.1.20/32 scram-sha-256
+host jdu_catalog_practice catalog_practice_app 10.20.1.20/32 scram-sha-256
+host jdu_catalog catalog_setup 10.20.1.20/32 scram-sha-256
+host jdu_catalog catalog_app 10.20.1.20/32 scram-sha-256
+host all all 0.0.0.0/0 reject
+host all all ::/0 reject
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Строка host задаёт сочетание БД, роли, адреса клиента и метода аутентификации. /32 у 10.20.1.20 означает только Web. Разрешающие строки должны быть раньше завершающего reject. Local peer для системного postgres отличается от TCP-входа с паролем.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Разрешение зависит от сочетания database/role/источник. Строка 0.0.0.0/0 содержит reject, то есть запрет.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Не заменяйте метод на trust. Базовый SG также разрешает DB 5432 только с Web.</p>
+<h3>P4.4 Перезапустить и проверить действующие значения</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал DB-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>restart перечитывает настройки. SHOW и pg_hba_file_rules проверяют действующие значения, а не только текст файла. Параметр psql -X отключает личные startup-файлы.</p>
+<pre><code class="language-bash">sudo systemctl restart postgresql@16-main
+systemctl is-active postgresql@16-main
+sudo ss -lntp
+sudo -u postgres psql -X -d postgres -c &quot;SHOW password_encryption;&quot;
+sudo -u postgres psql -X -d postgres -c \
+  &quot;SELECT line_number,error FROM pg_hba_file_rules WHERE error IS NOT NULL;&quot;
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Postgresql@16-main - служба нужного кластера. После restart сопоставьте состояние службы, listener и действующее значение SHOW. Отсутствие error в pg_hba_file_rules ещё не заменяет реальное соединение клиента.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>active, 10.20.2.20:5432, scram-sha-256, ошибок HBA - 0 строк.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>active(exited) у postgresql.service не доказывает работу cluster. Изучайте journalctl -u postgresql@16-main.</p>
+<h3>P4.5 Создать учебную БД и две роли</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал DB-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>profile_sql.py только выводит фиксированный SQL с учебными именами. Сначала прочитайте вывод, затем передайте тот же текст psql. setup владеет БД/schema и создаёт таблицы; app используется приложением. Используйте предоставленный SQL: программировать приложение не требуется.</p>
+<pre><code class="language-bash">cd /var/lib/jdu-web/lesson-resources-r1/app
+python3 -B profile_sql.py --profile practice 01_create_roles.sql
+python3 -B profile_sql.py --profile practice 01_create_roles.sql | sudo -u postgres \
+  psql -X -v ON_ERROR_STOP=1 -d postgres
+python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u postgres \
+  psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Первый запуск profile_sql.py только показывает SQL. БД изменяется при передаче через | в psql. --profile practice выбирает учебные имена, ON_ERROR_STOP=1 останавливает обработку при SQL-ошибке. Не повторяйте создание в уже созданной БД.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Два CREATE ROLE, CREATE DATABASE, права schema/CONNECT/USAGE. app не получает superuser/CREATEDB.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>При already exists возможен повторный запуск. Не используйте DROP; проверьте роли и БД через \du и \l. Убедитесь, что psql справа от pipe не сообщил SQL error.</p>
+<h3>P4.6 Задать два пароля БД скрытым вводом</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>psql на DB-сервере от имени системного postgres</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Первая строка запускается в shell DB и открывает psql с postgres=#. Команды \password вводятся внутри psql. Для setup/app задайте разные пароли длиной от 16 символов, каждый дважды скрытым вводом. Не пишите значения в команду или отчёт. \q возвращает в shell DB.</p>
+<pre><code class="language-text">sudo -u postgres psql -X -d postgres
+\password catalog_practice_setup
+\password catalog_practice_app
+\du catalog_practice_*
+\q
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Строку sudo выполните в ОС, затем вводите \password, \du и \q по одной строке внутри psql. Setup и app - разные роли БД, различайте их пароли. Отсутствие символов на экране при вводе пароля нормально.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Нет Superuser/Create role/Create DB. Это отдельные секреты, не пароль RDP, не пароль администратора приложения и не token оценивания.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Учитывайте раскладку клавиатуры. Не записывайте пароль в чат или редактор для проверки. При потере используйте личную процедуру восстановления с преподавателем.</p>
+<h3>P4.7 Выполнить SELECT с Web по паролю</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Закройте SSM DB через exit, вернитесь в CloudShell и откройте Web. У psql -h задаёт узел, -U - роль, -d - БД, -W запрашивает пароль. P4 использует private IP, чтобы не добавлять зависимость от DNS.</p>
+<pre><code class="language-bash">sudo apt-get install --no-install-recommends postgresql-client-16
+psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
+  'SELECT current_database(),current_user,1 AS value;'
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>В psql -h задаёт сервер, -U - роль БД, -d - БД, -W запрашивает пароль, -c задаёт SQL. Выполняйте на Web. Имена БД и пользователя в результате подтверждают подключение к учебному профилю.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Результат jdu_catalog_practice / catalog_practice_app / 1. Открытый порт или успех pg_isready не заменяют этот SQL с аутентификацией.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>При отказе раздельно проверьте источник, БД, роль и пароль. Не публикуйте DB в Internet для диагностики.</p>
+<h3>P4.8 Сохранить существующий пароль для checker только на Web</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Инструмент дважды скрыто запрашивает существующий пароль catalog_practice_app и сохраняет его только на Web в root-файл 0600. Пароль БД не меняется. Не выводите env через cat и не выполняйте source. После exit проверьте P4 в Web Portal на PC.</p>
+<pre><code class="language-bash">sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/database_secret.py --profile \
+  practice
+exit
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Database_secret.py повторно принимает уже заданный runtime-пароль и сохраняет его в защищённой настройке Web. Это не создание и не смена пароля. Нужен пароль catalog_practice_app, не setup или RDP.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Вывод D11_EXISTING_DB_PASSWORD_STORED_LOCALLY и девять учебных проверок. Неверный пароль и запрещённые DB/admin-role проверяются вместе с успешным контрольным подключением.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Если файл уже есть, не создавайте заново. В P5 тот же пароль вводится в настройку приложения. M4 использует отдельные БД/роли mission.</p>
+<h2 id="section-6">Пример чтения вывода (не вводить)</h2>
+<pre><code class="language-text">current_database    | current_user         | value
+jdu_catalog_practice | catalog_practice_app | 1
+</code></pre>
+<p>Пример чтения SELECT; ширина столбцов может отличаться. Сверьте БД, роль и value=1. Это не доказательство права менять таблицы.</p>
+<h2 id="section-7">Проверка понимания (без баллов)</h2>
+<p>Пароль принят, но CREATE TABLE запрещён. Обязательно ли неверен пароль?</p>
+<p><strong>Объяснение:</strong></p>
+<p>Аутентификация и SQL-права различны. Для runtime отказ в setup-операции может быть правильным.</p>
+<hr />
+<p><a href="m3.html">Предыдущее: M3</a> · <a href="m4.html">Следующее: M4</a></p>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>

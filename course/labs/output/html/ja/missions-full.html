@@ -1,0 +1,662 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Web演習：自力課題M0〜M6</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">使い方と共通の約束</a> · <a href="#section-2">対象・前提・準備</a> · <a href="#section-3">操作例の読み方</a> · <a href="#section-4">完成像と通信経路</a> · <a href="#section-5">自力課題に取り組む前に</a> · <a href="#section-6">M0 自分の環境と実行場所 (0)</a> · <a href="#section-7">M1 HTTPで静的ファイルを返す (8)</a> · <a href="#section-8">M2 内部DNSと通常の名前解決 (13)</a> · <a href="#section-9">M3 保存内容と停止・再開 (3)</a> · <a href="#section-10">M4 PostgreSQLへの認証接続 (9)</a> · <a href="#section-11">M5 教員アプリをWeb・DBへ接続する (13)</a> · <a href="#section-12">M6 最小権限と公開範囲 (16)</a> · <a href="#section-13">次回の再開・結果の確認</a> · <a href="#section-14">根拠と使用版</a></nav></header><main id="content" tabindex="-1"><h1>Web演習：自力課題M0〜M6</h1>
+<p>2026-11-03 | D12 P/M r1.3 | web-course-class193548-20261103-r3</p>
+<p>配布版の有効期限：2027年1月31日末（UZT）。</p>
+<p>教材初版・教師確認用。学生の最初からの通し試読は未実施。</p>
+<p>ロシア語・ウズベク語は日本語原稿と同じ手順・条件の翻訳初稿。母語話者校閲は未実施。</p>
+<p><a href="../ja/missions-full.html">日本語</a> · <a href="../ru/missions-full.html">Русский</a> · <a href="../uz/missions-full.html">O‘zbekcha</a></p>
+<p><a href="start.html">はじめに：接続・操作の約束</a> · <a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a> · <a href="portal.html">ブラウザで確認する</a></p>
+<h2 id="section-1">使い方と共通の約束</h2>
+<p>まず各Pの課題文を読み、必要なら詳しい操作例を一段ずつ使う。Pは練習で成績に加算しない。Mは別の対象・値で自分で構築する。課題は授業回番号ではなく、自分の進度で進める。Pの完了はMの合格に置き換わらない。</p>
+<p>P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → M4 → P5 → P6 → M5 → M6</p>
+<p>P5にもM2のDNSが必要。P4はIP指定だが、アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。Pは任意の練習で、採点は各Mの現在の前提を検査する。</p>
+<p>M1=8、M2=13、M3=3、M4=9、M5=13、M6=16、合計62素点。M0は0点。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。</p>
+<h2 id="section-2">対象・前提・準備</h2>
+<p>初期配布の署名確認、新規5台または既存環境へのinstall、内部SSHと個別採点登録までを先に完了する。初期配布の手順は教材zipのdistribution/STUDENT.mdを読む。秘密鍵を共有Windowsへ置かず、CloudShellは本人Academy accountの中で使う。教師は本人用の匿名Lab ID・署名fingerprint・有効期限を案内する。</p>
+<p>共通IP表。public IPv4は固定しない。AWS regionはus-east-1、Ubuntu24.04/amd64。RDPはlabuser、SSMはssm-user、内部SSHはubuntu。user名とサーバー役割を混同しない。</p>
+<table>
+<thead>
+<tr>
+<th scope="col">Role</th>
+<th scope="col">Private IPv4</th>
+<th scope="col">用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bastion</td>
+<td>10.20.1.10</td>
+<td>RDP3389 / Firefox / SSH</td>
+</tr>
+<tr>
+<td>web</td>
+<td>10.20.1.20</td>
+<td>HTTP80 / private8080 / loopback8000</td>
+</tr>
+<tr>
+<td>dns</td>
+<td>10.20.2.10</td>
+<td>BIND UDP/TCP53</td>
+</tr>
+<tr>
+<td>db</td>
+<td>10.20.2.20</td>
+<td>PostgreSQL5432</td>
+</tr>
+<tr>
+<td>repo</td>
+<td>10.20.2.30</td>
+<td>事前保存した署名資源のHTTP80</td>
+</tr>
+</tbody>
+</table>
+<p>各Ubuntuへ入る操作：CloudShellで aws ssm start-session --target i-自分の対象ID。接続直後にid -unとbootstrap.jsonのroleを確認する。サーバーを替えるときはexitを1回でCloudShellへ戻り、次のIDでstart-sessionする。CloudShellの変数は接続先へ自動コピーされない。SSMのssm-userはsudo可能。RDPのlabuserはsudo管理者ではない。</p>
+<p>nanoの編集：file名を指定して開く→本文を入力→Ctrl+O→Enterで保存→Ctrl+Xで終了。設定fileの枠はshell commandではない。psqlに入るとpromptが変わる。SQL/\passwordはその中へ入力し、\qでUbuntuへ戻る。失敗したcommandの次へ進まず、期待結果を確認する。</p>
+<h2 id="section-3">操作例の読み方</h2>
+<p>各Pは「課題→仕組み→操作例→理解の確認」の順で使う。操作例は一つのまとまりを貼り付けず、1コマンドずつ実行して表示を読む。末尾のバックスラッシュは次の行へ続く記号なので、その行と次の行を一つのコマンドとして扱う。</p>
+<p>bash枠は表示された実行場所の端末へ入力する。text枠は設定ファイルの本文・psql内の入力・出力例などで、直前の説明に従う。行頭が#の説明行はコメント。自分の端末に出る$、#、postgres=#などのpromptをコマンドへ付け足さない。YOUR-から始まる値だけを自分の値へ置き換える。</p>
+<p>設定を作るときは「保存したファイル→構文検査→サービスへの反映→実際の通信」の順で確認する。ファイルの内容が正しくても、実行中のサービスが古い設定を使うことがある。画面表示だけでなく、HTTP応答・DNS回答・SQL結果とlogを対応させる。</p>
+<h2 id="section-4">完成像と通信経路</h2>
+<table>
+<thead>
+<tr>
+<th scope="col">送信元</th>
+<th scope="col">宛先</th>
+<th scope="col">Protocol / port</th>
+<th scope="col">目的</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Windows PC</td>
+<td>Web public IPv4</td>
+<td>TCP/80</td>
+<td>一般利用。Internet Gatewayを通り、公開一覧と静的ファイルを読む。</td>
+</tr>
+<tr>
+<td>Windows PC</td>
+<td>bastion public IPv4</td>
+<td>TCP/3389</td>
+<td>許可CIDRからRDPで入る。踏み台のデスクトップを操作する。</td>
+</tr>
+<tr>
+<td>bastion</td>
+<td>Web/DNS/DB/repo</td>
+<td>TCP/22</td>
+<td>内部SSHの管理経路。秘密鍵は踏み台内で保持する。</td>
+</tr>
+<tr>
+<td>bastion / Web</td>
+<td>DNS 10.20.2.10</td>
+<td>UDP+TCP/53</td>
+<td>lab.testの名前を解決する。DNSはWeb本文を返さない。</td>
+</tr>
+<tr>
+<td>Web app</td>
+<td>DB 10.20.2.20</td>
+<td>TCP/5432</td>
+<td>アプリのDB roleでSQLを実行する。WindowsからDBへ直接接続しない。</td>
+</tr>
+<tr>
+<td>bastion</td>
+<td>Web 10.20.1.20</td>
+<td>TCP/8080</td>
+<td>admin.lab.testの管理画面。公開80番の入口とは分ける。</td>
+</tr>
+<tr>
+<td>Nginx on Web</td>
+<td>127.0.0.1 on Web</td>
+<td>TCP/8000</td>
+<td>同じWeb内のアプリへ渡す。127.0.0.1は実行中のそのホスト自身。</td>
+</tr>
+</tbody>
+</table>
+<p>初期環境で提供されたSSMは、CloudShellから各EC2へ入る管理経路。上のWeb利用経路とは別に使う。表の内部IP/portはこのLabの仕様で、一般のWebシステム全てに同じ値を要求するものではない。</p>
+<h2 id="section-5">自力課題に取り組む前に</h2>
+<p>まず完成要件から「どのサーバーの、どのファイル・名前・DB・roleを変えるか」を自分の作業表へ整理する。練習と本課題の値を比較し、Mで必要な対象だけを選ぶ。採点表は完成状態の条件であり、実行順のコマンド一覧ではない。</p>
+<p>次に「どこから何を確認すれば、要件を満たしたと分かるか」を考える。ファイルを確認する場所と、接続を試す場所は同じとは限らない。許可経路の成功と、制限すべき経路の拒否を分けて記録する。</p>
+<p>ブラウザで課題を選んで確認し、結果と保存状態を読む。M5/M6の機能確認では既存アプリ管理者パスワードを非表示入力する。成績は自動保存される。理解の確認用メモやPの説明問題を、追加の成績要件にはしない。</p>
+<h2 id="section-6">M0 自分の環境と実行場所 (0)</h2>
+<h3>完成要件</h3>
+<p>自分の5役割・元instance・SSM/内部SSH・本人登録の対応を確認する。構築点は0。P0を参照し、提供済み基盤を再作成しない。</p>
+<h3>確認・提出</h3>
+<ol>
+<li>PCの<a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a>へ学校Googleでログインし、本人のLabと <strong>M0</strong> を選ぶ。初回の連携・画面の説明は<a href="portal.html">ブラウザ確認手順</a>を参照する。</li>
+<li>「この課題を確認する」を押す。</li>
+<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。</li>
+</ol>
+<h2 id="section-7">M1 HTTPで静的ファイルを返す (8)</h2>
+<h3>完成要件</h3>
+<p>P1を参考に、指定された別fileと本文を独力でHTTP配信する。P1のpractice.txtを残す。file・service・listen・local/踏み台/public HTTP・今回要求のlogが対象。</p>
+<ul>
+<li>File: /var/www/html/mission.txt</li>
+<li>URL path: /mission.txt</li>
+</ul>
+<pre><code class="language-text">JDU WEB-02 mission: independent HTTP delivery.
+</code></pre>
+<h3>合格条件：採点check各1素点</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID（変更しない）</th>
+<th scope="col">満たすこと</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB02_NGINX_ACTIVE</td>
+<td>既存checkerでnginxのactiveを確認。</td>
+</tr>
+<tr>
+<td>WEB02_CONFIG_VALID</td>
+<td>既存checkerでnginx -tが成功。</td>
+</tr>
+<tr>
+<td>WEB02_LISTEN_80</td>
+<td>既存checkerでprivate/all-interfaceの80番待受を確認。</td>
+</tr>
+<tr>
+<td>WEB02_FILE</td>
+<td>既存checkerどおり指定本文・通常file・root所有・0644を確認。</td>
+</tr>
+<tr>
+<td>WEB02_LOCAL_HTTP</td>
+<td>既存checkerでloopbackの200と本文完全一致。</td>
+</tr>
+<tr>
+<td>WEB02_BASTION_HTTP</td>
+<td>既存checkerでprivate IP経由の200と本文完全一致。</td>
+</tr>
+<tr>
+<td>WEB02_PUBLIC_HTTP</td>
+<td>既存checkerでCloudShellからpublic IP経由の200と本文完全一致。</td>
+</tr>
+<tr>
+<td>WEB02_ACCESS_LOG</td>
+<td>既存checkerで今回のnonce付き要求がaccess logに残る。</td>
+</tr>
+</tbody>
+</table>
+<p>本人確認・管理・配布元・通信基盤・依存前提等の準備checkは上表の素点に加えない。必要前提が未完了なら、点が一部あっても次段階の準備完了ではない。</p>
+<h3>確認・提出</h3>
+<ol>
+<li>PCの<a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a>へ学校Googleでログインし、本人のLabと <strong>M1</strong> を選ぶ。初回の連携・画面の説明は<a href="portal.html">ブラウザ確認手順</a>を参照する。</li>
+<li>「この課題を確認する」を押す。</li>
+<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。</li>
+</ol>
+<h2 id="section-8">M2 内部DNSと通常の名前解決 (13)</h2>
+<h3>完成要件</h3>
+<p>同じlab.test zoneへ正式6名を設定する。P2のguide/practice-dbは保持してよい。踏み台/Webの通常resolver、名前によるM1 HTTP、DB名、UDP/TCP、外部forward、NXDOMAIN、ACL、AXFR拒否まで確認する。</p>
+<table>
+<thead>
+<tr>
+<th scope="col">DNS name</th>
+<th scope="col">A / IPv4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>admin.lab.test</td>
+<td>10.20.1.20</td>
+</tr>
+<tr>
+<td>bastion.lab.test</td>
+<td>10.20.1.10</td>
+</tr>
+<tr>
+<td>db.lab.test</td>
+<td>10.20.2.20</td>
+</tr>
+<tr>
+<td>dns.lab.test</td>
+<td>10.20.2.10</td>
+</tr>
+<tr>
+<td>repo.lab.test</td>
+<td>10.20.2.30</td>
+</tr>
+<tr>
+<td>web.lab.test</td>
+<td>10.20.1.20</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>現在必要な前提: M1</li>
+</ul>
+<h3>合格条件：採点check各1素点</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID（変更しない）</th>
+<th scope="col">満たすこと</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB03_SERVICE</td>
+<td>BINDがactiveである。</td>
+</tr>
+<tr>
+<td>WEB03_CONFIG_VALID</td>
+<td>named設定とlab.test zoneの構文検査が成功する。</td>
+</tr>
+<tr>
+<td>WEB03_ZONE_AUTHORITY</td>
+<td>lab.testのSOA/NSと権威応答が設計と一致する。</td>
+</tr>
+<tr>
+<td>WEB03_REQUIRED_RECORDS</td>
+<td>P/M別の必須record全件が期待private IPを返す。6名を6点へ水増ししない。追加の正当な練習名を許す。</td>
+</tr>
+<tr>
+<td>WEB03_UDP_RESPONSE</td>
+<td>踏み台・Webの両方からUDP53で必要な回答が得られる。</td>
+</tr>
+<tr>
+<td>WEB03_TCP_RESPONSE</td>
+<td>踏み台・Webの両方からTCP53で必要な回答が得られる。</td>
+</tr>
+<tr>
+<td>WEB03_NORMAL_RESOLVER</td>
+<td>踏み台/Webの通常resolverがBINDだけを使い、対象名をhostsやbrowser DoHで代用しない。</td>
+</tr>
+<tr>
+<td>WEB03_NAMED_HTTP</td>
+<td>踏み台の通常resolverを使い、P/M別host名と既存HTTP fileで200/正しい本文を確認する。</td>
+</tr>
+<tr>
+<td>WEB03_DB_NAME</td>
+<td>Webの通常resolverでP/M別DB名が10.20.2.20になる。</td>
+</tr>
+<tr>
+<td>WEB03_FORWARD_ONLY</td>
+<td>forward only/転送先10.20.0.2の実効設定と外部名解決を確認する。外部Web接続成功は要求しない。</td>
+</tr>
+<tr>
+<td>WEB03_NXDOMAIN</td>
+<td>その回で作る未登録lab.test名に権威NXDOMAINが返る。</td>
+</tr>
+<tr>
+<td>WEB03_CLIENT_ACL</td>
+<td>BINDのquery/recursion/cache ACLがlocalhost・踏み台・Webのみを許す実効設定になっている。SGだけの遮断でBIND ACLの実証としない。</td>
+</tr>
+<tr>
+<td>WEB03_AXFR_DENIED</td>
+<td>通常問い合わせが同じ回に成功する踏み台/WebからAXFRが明示拒否される。timeoutだけではPASSにしない。</td>
+</tr>
+</tbody>
+</table>
+<p>本人確認・管理・配布元・通信基盤・依存前提等の準備checkは上表の素点に加えない。必要前提が未完了なら、点が一部あっても次段階の準備完了ではない。</p>
+<h3>確認・提出</h3>
+<ol>
+<li>PCの<a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a>へ学校Googleでログインし、本人のLabと <strong>M2</strong> を選ぶ。初回の連携・画面の説明は<a href="portal.html">ブラウザ確認手順</a>を参照する。</li>
+<li>「この課題を確認する」を押す。</li>
+<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。</li>
+</ol>
+<h2 id="section-9">M3 保存内容と停止・再開 (3)</h2>
+<h3>完成要件</h3>
+<p>M専用markerを自分のLab IDで作る。P3とは別のブラウザで停止前記録→AWS Stop→ブラウザで停止完了確認→AWS Start→ブラウザで再開後確認を行う。対象は同じWebと元root volume。単なるrebootでは不可。backup/restoreとdisk追加は不要。</p>
+<ul>
+<li>File: /var/lib/jdu-web/mission/storage.txt</li>
+</ul>
+<pre><code class="language-text">lab_id={lab_id}
+task=M3
+payload=mission-storage-2026
+</code></pre>
+<p>本文の{lab_id}は自分の匿名Lab IDに置き換える。file0644/root:root、親directory0755/root:root。停止はWebのみ、同じ元instance/volumeで行う。</p>
+<h3>合格条件：採点check各1素点</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID（変更しない）</th>
+<th scope="col">満たすこと</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB04_MARKER_CONTENT</td>
+<td>学生が作ったP/M別markerのpath・匿名Lab ID・task・本文が一致する。</td>
+</tr>
+<tr>
+<td>WEB04_MARKER_PERMISSIONS</td>
+<td>markerはroot:root/0644、親directoryは0755である。</td>
+</tr>
+<tr>
+<td>WEB04_STOP_START_RETENTION</td>
+<td>同じ配備の停止前/停止状態/再開後の証跡で、元instance/volumeとmarker hashが同じ、boot IDが変化したことを確認。単なるrebootや旧fixture記録では代用しない。</td>
+</tr>
+</tbody>
+</table>
+<p>本人確認・管理・配布元・通信基盤・依存前提等の準備checkは上表の素点に加えない。必要前提が未完了なら、点が一部あっても次段階の準備完了ではない。</p>
+<h3>確認・提出</h3>
+<ol>
+<li>PCの<a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a>へ学校Googleでログインし、本人のLabと <strong>M3</strong> を選ぶ。初回の連携・画面の説明は<a href="portal.html">ブラウザ確認手順</a>を参照する。</li>
+<li>「停止前の状態を記録する」→保存成功→AWSで同じWebをStop→stopped→「停止完了を確認する」→記録成功→AWSで同じWebをStart→running/SSM Online→「再開後の保持を確認する」の順で進める。P3とは別にM3を記録する。</li>
+<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。</li>
+</ol>
+<h2 id="section-10">M4 PostgreSQLへの認証接続 (9)</h2>
+<h3>完成要件</h3>
+<p>本課題用DB/roleを自分で構築する。M2のdb.lab.testを通常解決し、Webのruntime roleで認証SELECTを成功させる。HBAはWeb/32・正しいDB/roleだけ。既存passwordをWeb内のmission用helperへ保存し、practiceと混ぜない。app tableはまだ不要。</p>
+<ul>
+<li>Profile: mission</li>
+<li>Database: jdu_catalog</li>
+<li>Setup role: catalog_setup</li>
+<li>Runtime role: catalog_app</li>
+<li>現在必要な前提: M2</li>
+</ul>
+<h3>合格条件：採点check各1素点</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID（変更しない）</th>
+<th scope="col">満たすこと</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB05_CLUSTER_ACTIVE</td>
+<td>PostgreSQL16/mainがactiveである。</td>
+</tr>
+<tr>
+<td>WEB05_CLUSTER_CONFIG</td>
+<td>16/mainの設定・標準data directory・postgres/socket peer管理が妥当である。</td>
+</tr>
+<tr>
+<td>WEB05_LISTEN_5432</td>
+<td>10.20.2.20:5432で待ち受ける。</td>
+</tr>
+<tr>
+<td>WEB05_DATABASE_OWNER</td>
+<td>P/M別DBとpublic schemaのownerが対応するsetup roleである。</td>
+</tr>
+<tr>
+<td>WEB05_ROLE_ATTRIBUTES</td>
+<td>対応runtime roleはLOGIN。両roleにsuperuser/CREATEDB/CREATEROLE/REPLICATION/BYPASSRLSや昇格membershipがない。setupは構築中LOGIN/完成後NOLOGINの両段階を認める。</td>
+</tr>
+<tr>
+<td>WEB05_HBA_SCRAM</td>
+<td>pg_hbaはWeb /32・列挙したprofile DB/roleだけにSCRAMを許可し、それ以外の広い許可がない。</td>
+</tr>
+<tr>
+<td>WEB05_WEB_SQL</td>
+<td>Pはprivate IP、Mは通常DNS名からruntime roleで新規認証接続し、current_database/current_user/SELECT結果が一致する。</td>
+</tr>
+<tr>
+<td>WEB05_BAD_PASSWORD_DENIED</td>
+<td>同じ回の正規接続を対照に、1回の誤password接続が明示認証拒否される。秘密値やhashは返さない。</td>
+</tr>
+<tr>
+<td>WEB05_WRONG_TARGET_DENIED</td>
+<td>Webからpostgres role・許可外DB・他profileへの接続をHBA等で明示拒否する。未作成practice DB自体は必須にしない。</td>
+</tr>
+</tbody>
+</table>
+<p>本人確認・管理・配布元・通信基盤・依存前提等の準備checkは上表の素点に加えない。必要前提が未完了なら、点が一部あっても次段階の準備完了ではない。</p>
+<h3>確認・提出</h3>
+<ol>
+<li>PCの<a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a>へ学校Googleでログインし、本人のLabと <strong>M4</strong> を選ぶ。初回の連携・画面の説明は<a href="portal.html">ブラウザ確認手順</a>を参照する。</li>
+<li>「この課題を確認する」を押す。</li>
+<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。</li>
+</ol>
+<h2 id="section-11">M5 教員アプリをWeb・DBへ接続する (13)</h2>
+<h3>完成要件</h3>
+<p>同じ教員アプリをmission DBへ接続する。P5のpractice手順を参考にprofile=missionを選ぶ。既存app/venvを再配置しない。service停止後、mission runtime作成→明示activate→mission setup作成の順を守る（practiceのsetupはP6で終了済みにする）。固定migration/seed/管理者と権限をそのDBへ構築し指定2件を登録する。P1/M1を保持する。完成後はmissionをactiveにする。</p>
+<ul>
+<li>Profile: mission</li>
+<li>Database: jdu_catalog</li>
+<li>Setup role: catalog_setup</li>
+<li>Runtime role: catalog_app</li>
+<li>Application administrator: lab_admin</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th scope="col">code</th>
+<th scope="col">name</th>
+<th scope="col">quantity</th>
+<th scope="col">location</th>
+<th scope="col">is_public</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M5-PUBLIC-001</td>
+<td>Mission monitor</td>
+<td>6</td>
+<td>Lab cabinet C</td>
+<td>true</td>
+</tr>
+<tr>
+<td>M5-PRIVATE-001</td>
+<td>Mission router</td>
+<td>1</td>
+<td>Lab cabinet D</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>現在必要な前提: M2, M4</li>
+</ul>
+<h3>合格条件：採点check各1素点</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID（変更しない）</th>
+<th scope="col">満たすこと</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB06_ARTIFACTS</td>
+<td>教員配布コード・依存・固定版が一致する。学生はアプリコードを書かない。</td>
+</tr>
+<tr>
+<td>WEB06_SERVICE</td>
+<td>systemd serviceがactive/enabledで、設計の専用catalog userで起動する。</td>
+</tr>
+<tr>
+<td>WEB06_LOOPBACK</td>
+<td>Gunicornが127.0.0.1:8000のみで待ち受ける。</td>
+</tr>
+<tr>
+<td>WEB06_PROFILE_DATABASE</td>
+<td>app.envと実接続が選択profileのDB/runtime roleを通常DNSで使う。M4の単体SQL接続とは別にアプリ実接続を確認。</td>
+</tr>
+<tr>
+<td>WEB06_MIGRATIONS</td>
+<td>教員固定migrationと11table/必要sequenceが対象DBに揃う。</td>
+</tr>
+<tr>
+<td>WEB06_REQUIRED_RECORDS</td>
+<td>P/M別の指定2件が対象DBに期待値で保存される。必須部分集合として照合する。</td>
+</tr>
+<tr>
+<td>WEB06_PUBLIC_DATA</td>
+<td>一般80のHTTP200と公開対象の値がDBと一致する。固定HTMLのみではPASSにしない。</td>
+</tr>
+<tr>
+<td>WEB06_ADMIN_ENTRY</td>
+<td>通常DNSのadmin.lab.test:8080/admin/に踏み台から到達し、正しいログイン画面が返る。</td>
+</tr>
+<tr>
+<td>WEB06_STATIC</td>
+<td>一般/管理画面に必要なCSS等が正しい入口から取得でき、Content-Typeも妥当である。</td>
+</tr>
+<tr>
+<td>WEB06_PASSWORD_LOGIN</td>
+<td>対話型自動確認で実passwordと正しいCSRF/session処理によって対象staffとしてHTTPログインする。force_loginやsession直書きを使わない。</td>
+</tr>
+<tr>
+<td>WEB06_CREATE_REFLECT</td>
+<td>同じ自動確認回で専用nonceの架空備品1件を管理HTTPから登録し、PostgreSQLと一般画面の値が一致する。</td>
+</tr>
+<tr>
+<td>WEB06_EDIT_REFLECT</td>
+<td>その回にchecker自身が作った専用備品だけの数量を変更し、DBと一般画面の更新が一致する。</td>
+</tr>
+<tr>
+<td>WEB06_LOGOUT</td>
+<td>同じsessionをPOSTでログアウトし、そのcookieを再使用しても管理画面は再認証を要求する。</td>
+</tr>
+</tbody>
+</table>
+<p>本人確認・管理・配布元・通信基盤・依存前提等の準備checkは上表の素点に加えない。必要前提が未完了なら、点が一部あっても次段階の準備完了ではない。</p>
+<h3>確認・提出</h3>
+<ol>
+<li>PCの<a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a>へ学校Googleでログインし、本人のLabと <strong>M5</strong> を選ぶ。初回の連携・画面の説明は<a href="portal.html">ブラウザ確認手順</a>を参照する。</li>
+<li>「機能・権限を含めて確認する」を選び、lab_admin の既存パスワードを「アプリ管理者の既存パスワード」に非表示入力して「このパスワードで確認する」を押す。RDP用とは別。設定だけの確認では機能の合格を確定しない。</li>
+<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。</li>
+</ol>
+<h2 id="section-12">M6 最小権限と公開範囲 (16)</h2>
+<h3>完成要件</h3>
+<p>mission側の最小権限を完成する。catalog_setupはNOLOGIN/password NULL、一時mission setup.envは残さない。root管理コード/venv、600秘密file、公開80からの管理拒否、private8080の正規成功、備品のview/add/changeだけの管理者、公開/非公開分離とSQL権限を確認する。ブラウザの機能確認は本人実演ではなく自動確認。</p>
+<ul>
+<li>Profile: mission</li>
+<li>Database: jdu_catalog</li>
+<li>Setup role: catalog_setup</li>
+<li>Runtime role: catalog_app</li>
+<li>Application administrator: lab_admin</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th scope="col">code</th>
+<th scope="col">name</th>
+<th scope="col">quantity</th>
+<th scope="col">location</th>
+<th scope="col">is_public</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M5-PUBLIC-001</td>
+<td>Mission monitor</td>
+<td>6</td>
+<td>Lab cabinet C</td>
+<td>true</td>
+</tr>
+<tr>
+<td>M5-PRIVATE-001</td>
+<td>Mission router</td>
+<td>1</td>
+<td>Lab cabinet D</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>現在必要な前提: M5</li>
+</ul>
+<h3>合格条件：採点check各1素点</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID（変更しない）</th>
+<th scope="col">満たすこと</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB07_PUBLIC_ADMIN_DENIED</td>
+<td>公開80の/adminおよび配下・表記揺れがNginx/アプリで拒否され、偽装headerでも管理画面を返さない。</td>
+</tr>
+<tr>
+<td>WEB07_SECRET_PERMISSIONS</td>
+<td>app.env/有効runtime秘密fileはroot:root0600、linkではなく、catalog等から読取り不可。内容は送信しない。</td>
+</tr>
+<tr>
+<td>WEB07_CODE_PROTECTED</td>
+<td>実行catalog userはコード/venv/親directoryを改変できず、非login・非sudoである。</td>
+</tr>
+<tr>
+<td>WEB07_SECRET_HTTP_DENIED</td>
+<td>秘密をstatic/public配下へ置かず、固定した秘密path候補を一般HTTPで取得できない。</td>
+</tr>
+<tr>
+<td>WEB07_SETUP_RETIRED</td>
+<td>対応setup roleはNOLOGIN/password NULL/既存sessionなし。一時setup.envも終了している。</td>
+</tr>
+<tr>
+<td>WEB07_ITEM_PRIVILEGES</td>
+<td>catalog_itemはSELECT/INSERT/UPDATEのみ。DELETE・権限委譲を許さない。所有者/PUBLIC/membership経由も含める。</td>
+</tr>
+<tr>
+<td>WEB07_AUTH_USER_PRIVILEGES</td>
+<td>auth_userはSELECTとUPDATE(last_login,password)のみ。属性変更・table全体UPDATE/INSERT/DELETEを許さない。</td>
+</tr>
+<tr>
+<td>WEB07_AUTH_LOOKUP_PRIVILEGES</td>
+<td>auth_group/auth_permission/関連中間table/content_typeはSELECTのみ。</td>
+</tr>
+<tr>
+<td>WEB07_SESSION_PRIVILEGES</td>
+<td>django_sessionはSELECT/INSERT/UPDATE/DELETEのみを許す。必要なDELETEを一律禁止しない。</td>
+</tr>
+<tr>
+<td>WEB07_AUDIT_PRIVILEGES</td>
+<td>django_admin_logはSELECT/INSERTのみ。UPDATE/DELETEを許さない。</td>
+</tr>
+<tr>
+<td>WEB07_MIGRATION_PRIVILEGES</td>
+<td>runtimeはdjango_migrations権限・schema CREATE・アプリobject所有権を持たず、既定外の実効許可もない。</td>
+</tr>
+<tr>
+<td>WEB07_SEQUENCE_PRIVILEGES</td>
+<td>必要な備品/admin log ID sequenceはUSAGEだけ。他の過剰権限とsetvalを許すUPDATEがない。nextval/setvalを実行して試さない。</td>
+</tr>
+<tr>
+<td>WEB07_ADMIN_PERMISSIONS</td>
+<td>対象管理者はstaffかつ非superuser、備品view/add/changeのみ。削除・user/group管理権限やrouteがない。</td>
+</tr>
+<tr>
+<td>WEB07_ANONYMOUS_DENIED</td>
+<td>正規routeと妥当なCSRF条件で匿名の登録/編集を試し、認証を要求して対象DBを書き換えない。同じ回の正規ログイン/登録成功を対照にする。</td>
+</tr>
+<tr>
+<td>WEB07_BAD_PASSWORD_DENIED</td>
+<td>正規認証の成功を対照に、1回の誤passwordで認証sessionが成立しない。既存passwordの変更や総当たりはしない。</td>
+</tr>
+<tr>
+<td>WEB07_PRIVATE_DATA_HIDDEN</td>
+<td>対象DBの非公開備品が一般画面へ出ず、公開備品は同じ回に表示される。</td>
+</tr>
+</tbody>
+</table>
+<p>本人確認・管理・配布元・通信基盤・依存前提等の準備checkは上表の素点に加えない。必要前提が未完了なら、点が一部あっても次段階の準備完了ではない。</p>
+<h3>確認・提出</h3>
+<ol>
+<li>PCの<a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a>へ学校Googleでログインし、本人のLabと <strong>M6</strong> を選ぶ。初回の連携・画面の説明は<a href="portal.html">ブラウザ確認手順</a>を参照する。</li>
+<li>「機能・権限を含めて確認する」を選び、lab_admin の既存パスワードを「アプリ管理者の既存パスワード」に非表示入力して「このパスワードで確認する」を押す。RDP用とは別。設定だけの確認では機能の合格を確定しない。</li>
+<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。</li>
+</ol>
+<h2 id="section-13">次回の再開・結果の確認</h2>
+<p>次回は本人のLabと同じ5台を起動し、running/SSM Onlineと現在の公開IPを確認する。Web Portalへ学校Googleでログインし、まずM0で準備確認する。作成・鍵生成・登録を毎回繰り返す必要はない。期限切れは教師へ更新を依頼する。</p>
+<p>結果は自動保存される。処理中は「結果を更新する」、成績確認は「保存済み成績を見る」を使う。確認対象の課題・時刻と保存状態を読む。UNKNOWNは観測不能で、合格や0点を確定した意味ではない。未確認Mの確定済み点数は保持される。最新の評価可能な結果を使い、異なる回のPASSを合算したり自動で最高点を選んだりしない。</p>
+<p>詳しい画面操作は<a href="portal.html">ブラウザ確認手順</a>へ。password/token/cookie/秘密鍵/env本文を提出物や会話へ送らない。</p>
+<h2 id="section-14">根拠と使用版</h2>
+<p>採点条件は各Mの表と同梱の固定registryを参照する。</p>
+<p>web-course-class193548-20261103-r3; web-d11-2026-10-r1; registry SHA256 <code>3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33</code>.</p>
+<p>配布版の有効期限：2027年1月31日末（UZT）。</p>
+<p>取得URLの期限と配布版の期限は別。期限を書き換えず、教師から有効な版を受け取る。以下は一般機能の一次資料（2026-10-23確認）。</p>
+<ul>
+<li><a href="https://nginx.org/en/docs/beginners_guide.html">Nginx Beginner’s Guide</a></li>
+<li><a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BIND 9: configurations and zones</a></li>
+<li><a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">PostgreSQL 16: pg_hba.conf</a></li>
+<li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html">EC2 instance states</a></li>
+</ul>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>

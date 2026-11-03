@@ -1,0 +1,139 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Сначала: подключение и правила</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Как пользоваться пособием</a> · <a href="#section-2">Среда и подготовка</a> · <a href="#section-3">Как читать шаги</a> · <a href="#section-4">Система и пути соединений</a> · <a href="#section-5">Продолжение и результаты</a> · <a href="#section-6">Источники и версия</a></nav></header><main id="content" tabindex="-1"><h1>Сначала: подключение и правила</h1>
+<p><a href="start.html">Сначала: подключение и правила</a> · <a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a> · <a href="portal.html">Проверка в браузере</a></p>
+<p><a href="../ja/start.html">日本語</a> · <a href="../ru/start.html">Русский</a> · <a href="../uz/start.html">O‘zbekcha</a></p>
+<h2 id="section-1">Как пользоваться пособием</h2>
+<p>Сначала прочитайте задание P; при необходимости проходите подробный пример по шагам. P - тренировка без оценочных баллов. В M самостоятельно используйте другие объекты/значения. Номера заданий не являются номерами занятий; идите в своём темпе. Выполнение P не означает выполнение M.</p>
+<p>P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → M4 → P5 → P6 → M5 → M6</p>
+<p>P5 требует DNS из M2. P4 подключается по IP, а приложение - по db.lab.test. Перед переключением practice → mission завершите setup в P6. P - добровольная тренировка; checker оценивает текущие предпосылки M.</p>
+<p>M1=8, M2=13, M3=3, M4=9, M5=13, M6=16: всего 62 исходных балла. M0=0. Нет личной демонстрации, backup/restore, дополнительных дисков и разработки приложения. Пересчёт в 25 баллов делает преподаватель отдельно. Повторные отправки возможны до объявленного срока. PASS разных попыток не объединяются; максимум автоматически не выбирается.</p>
+<h2 id="section-2">Среда и подготовка</h2>
+<p>Сначала завершите проверку подписи начального комплекта, создание пяти узлов либо install в существующую среду, внутренний SSH и личную регистрацию. Инструкция - distribution/STUDENT.md в zip. Не храните приватные ключи в общем Windows; используйте CloudShell личного Academy account. Преподаватель выдаёт личный анонимный Lab ID, fingerprint и срок действия.</p>
+<p>Общие private IP ниже; public IPv4 не фиксируется. AWS region us-east-1, Ubuntu24.04/amd64. RDP: labuser; SSM: ssm-user; внутренний SSH: ubuntu. Не путайте пользователя и роль сервера.</p>
+<table>
+<thead>
+<tr>
+<th scope="col">Role</th>
+<th scope="col">Private IPv4</th>
+<th scope="col">Назначение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bastion</td>
+<td>10.20.1.10</td>
+<td>RDP3389 / Firefox / SSH</td>
+</tr>
+<tr>
+<td>web</td>
+<td>10.20.1.20</td>
+<td>HTTP80 / private8080 / loopback8000</td>
+</tr>
+<tr>
+<td>dns</td>
+<td>10.20.2.10</td>
+<td>BIND UDP/TCP53</td>
+</tr>
+<tr>
+<td>db</td>
+<td>10.20.2.20</td>
+<td>PostgreSQL5432</td>
+</tr>
+<tr>
+<td>repo</td>
+<td>10.20.2.30</td>
+<td>HTTP80 с заранее сохранёнными подписанными ресурсами</td>
+</tr>
+</tbody>
+</table>
+<p>Для входа в каждый Ubuntu выполните в CloudShell aws ssm start-session --target i-СВОЙ-ID. Сразу проверяйте id -un и role из bootstrap.json. Для смены сервера один exit возвращает в CloudShell; затем подключайтесь к следующему ID. Переменные CloudShell не копируются на узел. ssm-user может sudo; RDP-пользователь labuser не администратор sudo.</p>
+<p>Редактор nano: открыть файл → ввести текст → Ctrl+O → Enter сохранить → Ctrl+X выйти. Блок конфигурации не выполняется как shell-команда. В psql меняется prompt; SQL/\password вводятся внутри, \q возвращает в Ubuntu. Не продолжайте после ошибки без проверки результата.</p>
+<h2 id="section-3">Как читать шаги</h2>
+<p>В каждом P идут задание, объяснение, шаги и вопросы. Выполняйте команды по одной и читайте результат, не вставляйте весь раздел сразу. Обратная косая черта в конце строки означает продолжение: эта и следующая строки составляют одну команду.</p>
+<p>Блок bash вводится в терминале указанного узла. Блок text может содержать конфигурацию, ввод внутри psql или пример вывода: читайте пояснение перед ним. Строка с # - комментарий. Не добавляйте приглашение $ или postgres=# из своего терминала. Значения с YOUR- заменяйте своими.</p>
+<p>Проверяйте по порядку: сохранённый файл, синтаксис, применение к службе, реальное соединение. Правильный файл ещё не доказывает, что работающая служба уже использует его. Сопоставляйте HTTP-ответ, DNS-ответ или SQL-результат с журналом.</p>
+<h2 id="section-4">Система и пути соединений</h2>
+<table>
+<thead>
+<tr>
+<th scope="col">Источник</th>
+<th scope="col">Назначение</th>
+<th scope="col">Protocol / port</th>
+<th scope="col">Цель</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Windows PC</td>
+<td>Web public IPv4</td>
+<td>TCP/80</td>
+<td>Публичный доступ через Internet Gateway к каталогу и статическим файлам.</td>
+</tr>
+<tr>
+<td>Windows PC</td>
+<td>bastion public IPv4</td>
+<td>TCP/3389</td>
+<td>RDP из разрешённого CIDR к рабочему столу бастиона.</td>
+</tr>
+<tr>
+<td>bastion</td>
+<td>Web/DNS/DB/repo</td>
+<td>TCP/22</td>
+<td>Внутренний SSH для управления; приватный ключ остаётся на бастионе.</td>
+</tr>
+<tr>
+<td>bastion / Web</td>
+<td>DNS 10.20.2.10</td>
+<td>UDP+TCP/53</td>
+<td>Разрешение имён lab.test. DNS не выдаёт содержимое Web-страницы.</td>
+</tr>
+<tr>
+<td>Web app</td>
+<td>DB 10.20.2.20</td>
+<td>TCP/5432</td>
+<td>SQL от роли приложения. Прямое соединение Windows с DB не используется.</td>
+</tr>
+<tr>
+<td>bastion</td>
+<td>Web 10.20.1.20</td>
+<td>TCP/8080</td>
+<td>Администрирование через admin.lab.test отдельно от публичного порта 80.</td>
+</tr>
+<tr>
+<td>Nginx on Web</td>
+<td>127.0.0.1 on Web</td>
+<td>TCP/8000</td>
+<td>Передача приложению на том же Web; 127.0.0.1 - текущий локальный узел.</td>
+</tr>
+</tbody>
+</table>
+<p>SSM начальной среды - отдельный путь управления из CloudShell в EC2. Он не включён в путь обычного Web-запроса. Внутренние IP и порты таблицы заданы этим Lab, а не всеми Web-системами.</p>
+<h2 id="section-5">Продолжение и результаты</h2>
+<p>В следующий раз запустите свой Lab и те же пять узлов, проверьте running/SSM Online и текущие public IP. Войдите в Web Portal через школьный Google и начните с готовности M0. Не повторяйте создание, ключи и регистрацию каждый раз. При истечении срока запросите обновление у преподавателя.</p>
+<p>Результаты сохраняются автоматически. Во время обработки обновляйте результат; оценки смотрите в разделе сохранённых оценок. Сверяйте задание, время и сохранение. UNKNOWN означает невозможность измерения, а не успех или подтверждённый ноль. Подтверждённые баллы непроверенных M сохраняются. Используется последний оцениваемый результат, без объединения PASS разных запусков и автоматического выбора максимума.</p>
+<p>Подробные действия: <a href="portal.html">проверка в браузере</a>. Не отправляйте пароль/token/cookie/приватный ключ/env в отчёт или чат.</p>
+<h2 id="section-6">Источники и версия</h2>
+<p>Критерии: таблицы M и фиксированный registry комплекта.</p>
+<p>web-course-class193548-20261103-r3; web-d11-2026-10-r1; registry SHA256 <code>3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33</code>.</p>
+<p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
+<p>Срок URL загрузки отличается от срока комплекта. Не меняйте даты; получите актуальный комплект у преподавателя. Ниже первичные документы общих функций, проверенные 2026-10-23.</p>
+<ul>
+<li><a href="https://nginx.org/en/docs/beginners_guide.html">Nginx Beginner’s Guide</a></li>
+<li><a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BIND 9: configurations and zones</a></li>
+<li><a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">PostgreSQL 16: pg_hba.conf</a></li>
+<li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html">EC2 instance states</a></li>
+</ul>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>

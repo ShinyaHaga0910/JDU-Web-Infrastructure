@@ -1,12 +1,16 @@
 # Vazifalarni brauzerda tekshirish
 
-2026-10-30
+2026-11-03
+
+[Avval: ulanish va qoidalar](start.md) · [Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M6](missions.md) · [Brauzerda tekshirish](portal.md)
 
 [日本語](../ja/portal.md) · [Русский](../ru/portal.md) · [O‘zbekcha](../uz/portal.md)
 
 [Web Portal](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws)
 
-> Boshlang‘ich sozlash uchun o‘qituvchi bergan amaldagi CloudFormation va ro‘yxatdan o‘tish yo‘riqnomasidan foydalaning. P/M qo‘llanmasidagi server sozlamalarini bajaring; jdu-web-check / jdu-web-my-progress o‘rniga vazifa va ballarni ushbu yo‘riqnoma orqali tekshiring. Tarqatma muddati tugagan bo‘lsa, o‘qituvchidan yangisini oling.
+> Boshlang‘ich sozlash uchun o‘qituvchi bergan amaldagi CloudFormation va ro‘yxat yo‘riqnomasidan foydalaning. P/M bo‘yicha serverlarni o‘zingiz sozlab, shu ekranda topshiriq va baholarni tekshiring. Tarqatma muddati tugasa o‘qituvchiga murojaat qiling.
+
+Portalni o‘qituvchi Lab i ishlayotganda ishlating. Maktab Google orqali kirib o‘z AWS hisobingizni bir marta bog‘lang. Maxfiy kalitlarni umumiy Windows ga saqlamang.
 
 1. Dastlab CloudFormation va o‘qituvchi bergan boshlang‘ich ulanish hamda ro‘yxatdan o‘tkazish yo‘riqnomasini bajaring. Maktab Google hisobida kiring va o‘z AWS hisobingizni bir marta bog‘lang. Vazifaga ko‘ra o‘z serverlaringiz ichida sozlamalarni o‘zgartiring: tekshiruv sahifasi tayyor javobni o‘rnatmaydi.
 2. «Vazifani tekshirish» orqali P0–P6/M0–M6 ni tanlab tekshiruvni boshlang. Odatda 1–2 daqiqa kerak. Yangilanish to‘xtasa, shu sahifadagi yangilash tugmasini bosing.

@@ -1,0 +1,185 @@
+<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>P4 PostgreSQL ga autentifikatsiya bilan ulanish</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Boshlashdan oldin</a> · <a href="#section-2">Nimani o‘rganamiz</a> · <a href="#section-3">Topshiriq</a> · <a href="#section-4">Bu qanday ishlaydi</a> · <a href="#section-5">Yechim namunasi: bittadan bajaring</a> · <a href="#section-6">Natijani o‘qish namunasi (kiritmang)</a> · <a href="#section-7">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P4 PostgreSQL ga autentifikatsiya bilan ulanish</h1>
+<p><a href="start.html">Avval: ulanish va qoidalar</a> · <a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a> · <a href="portal.html">Brauzerda tekshirish</a></p>
+<p><a href="../ja/p4.html">日本語</a> · <a href="../ru/p4.html">Русский</a> · <a href="../uz/p4.html">O‘zbekcha</a></p>
+<p>2026-11-03 · D12 P/M r1.3</p>
+<p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
+<h2 id="section-1">Boshlashdan oldin</h2>
+<p><a href="start.html">Ulanish va qoidalar</a> bilan tanishing. Mos topshiriq: <a href="m4.html">M4</a>. Tekshiruv: <a href="portal.html">brauzer yo‘riqnomasi</a>.</p>
+<h2 id="section-2">Nimani o‘rganamiz</h2>
+<p>Database, role va schema ni farqlash; Web dan belgilangan parol bilan SQL bajarish.</p>
+<h2 id="section-3">Topshiriq</h2>
+<p>jdu_catalog_practice, catalog_practice_setup va catalog_practice_app ni yarating. Faqat Web 10.20.1.20/32 dan SCRAM ulanishiga ruxsat bering. P4 da app jadvallari hali kerak emas.</p>
+<ul>
+<li>Profile: practice</li>
+<li>Database: jdu_catalog_practice</li>
+<li>Setup role: catalog_practice_setup</li>
+<li>Runtime role: catalog_practice_app</li>
+</ul>
+<h2 id="section-4">Bu qanday ishlaydi</h2>
+<p><strong>Boshlashdan oldingi holat:</strong></p>
+<p>DB da o‘quv resurslari bor; Web → DB ruxsatli yo‘li ishlatiladi.</p>
+<p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
+<p>Mashq DB va setup/runtime role yaratiladi; Web dan parol bilan SQL bajariladi.</p>
+<p>Tarmoq yo‘li, DB listen, HBA ruxsati, parol va SQL privilege alohida kerak. ssm-user - OS user, catalog_practice_app - DB role. HBA birinchi mos qatorni ishlatadi. Ulanish huquqi table yaratish huquqini anglatmaydi. <a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBA</a> va <a href="https://www.postgresql.org/docs/16/sql-grant.html">SQL privilege</a>.</p>
+<h2 id="section-5">Yechim namunasi: bittadan bajaring</h2>
+<h3>P4.1 PostgreSQL o‘rnatish va o‘quv SQL ni ochish</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>DB serverning SSM terminali: ssm-user</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>DB ga SSM bilan kirib role=db ni tekshiring. PostgreSQL 16 cluster - DB serverni boshqarish birligi. Yordamchi app ni tekshirib SQL ni ochadi; DB yoki role yaratmaydi.</p>
+<pre><code class="language-bash">sudo apt-get update -o APT::Update::Error-Mode=any
+sudo apt-get install --no-install-recommends postgresql-16 postgresql-client-16
+sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py
+pg_lsclusters
+sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Package o‘rnatish va DB ichida o‘quv obyektlarini yaratish alohida bosqich. Pg_lsclusters version, cluster, port va holatni ko‘rsatadi. Sudo -u postgres command ni OS postgres bilan bajaradi; -X shaxsiy psql config ni o‘qimaydi.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>16/main, data directory /var/lib/postgresql/16/main. O‘quv SQL /var/lib/jdu-web/lesson-resources-r1/app/sql da.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>Mavjud DB yoki role ni o‘chirmang. Oldin qurilgan bo‘lsa, holatni o‘qib faqat yetishmagan qadamlarni bajaring.</p>
+<h3>P4.2 DB tinglashi va SCRAM ni sozlash</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>DB serverning SSM terminali: ssm-user</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>postgresql.conf nusxasini sudo cp -an bilan saqlang. sudo nano /etc/postgresql/16/main/postgresql.conf da uch qiymatni sozlang. Parametr takrorlansa, amaldagi qiymatni SHOW bilan tekshiring. Faqat DB private IP va 5432 tinglanadi; password_encryption keyingi parollar saqlanish turini belgilaydi.</p>
+<pre><code class="language-text">listen_addresses = '10.20.2.20'
+port = 5432
+password_encryption = 'scram-sha-256'
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Listen_addresses DB tinglaydigan o‘z IP sini bildiradi, client ruxsat ro‘yxatini emas. Password_encryption yangi o‘rnatiladigan parol formatini belgilaydi. Faylni saqlash listener yoki eski parollar o‘zgarganini isbotlamaydi.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>Barcha manzil uchun * ishlatmang. Parollar HBA va restart dan keyin belgilanadi.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>Bu SQL emas, postgresql.conf mazmuni. SG va OS tinglash manzili alohida nazoratdir.</p>
+<h3>P4.3 HBA da manba, database va role ni cheklash</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>DB serverning SSM terminali: ssm-user</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>pg_hba.conf nusxasini saqlab, sudo nano /etc/postgresql/16/main/pg_hba.conf ga quyidagi qoidalarni yozing. Birinchi mos qator ishlatiladi, shu sabab eski keng ruxsatlarni qoldirmang. OS postgres Unix socket/peer orqali boshqaradi. M4 rollari alohida ko‘rsatilgan; mashq roli asosiy DB ga kira olmaydi.</p>
+<pre><code class="language-text">local all postgres peer
+local all all reject
+host jdu_catalog_practice catalog_practice_setup 10.20.1.20/32 scram-sha-256
+host jdu_catalog_practice catalog_practice_app 10.20.1.20/32 scram-sha-256
+host jdu_catalog catalog_setup 10.20.1.20/32 scram-sha-256
+host jdu_catalog catalog_app 10.20.1.20/32 scram-sha-256
+host all all 0.0.0.0/0 reject
+host all all ::/0 reject
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Host qatori DB, role, client address va authentication usuli birikmasidir. 10.20.1.20/32 faqat Web ni bildiradi. Kerakli ruxsatlar oxirgi reject dan oldin turadi. OS postgres uchun local peer TCP parolli kirishdan alohida.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>Ruxsat database/role/manba birikmasiga bog‘liq. 0.0.0.0/0 qatori reject, ya’ni rad etishdir.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>Autentifikatsiyani trust bilan chetlab o‘tmang. Asosiy SG ham DB 5432 ni faqat Web dan ruxsat qiladi.</p>
+<h3>P4.4 Qayta ishga tushirish va amaldagi qiymatni tekshirish</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>DB serverning SSM terminali: ssm-user</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>restart sozlamani qayta o‘qiydi. SHOW va pg_hba_file_rules fayl matnini emas, ishlayotgan qiymatni tekshiradi. psql -X shaxsiy boshlang‘ich fayllarni o‘qimaydi.</p>
+<pre><code class="language-bash">sudo systemctl restart postgresql@16-main
+systemctl is-active postgresql@16-main
+sudo ss -lntp
+sudo -u postgres psql -X -d postgres -c &quot;SHOW password_encryption;&quot;
+sudo -u postgres psql -X -d postgres -c \
+  &quot;SELECT line_number,error FROM pg_hba_file_rules WHERE error IS NOT NULL;&quot;
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Postgresql@16-main kerakli cluster service idir. Restart dan keyin service, listener va SHOW amaldagi qiymatini birga tekshiring. Pg_hba_file_rules da error yo‘qligi haqiqiy client ulanishini almashtirmaydi.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>active, 10.20.2.20:5432, scram-sha-256, HBA xatosi - 0 qator.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>postgresql.service active(exited) bo‘lishi cluster ishlashini isbotlamaydi. journalctl -u postgresql@16-main ni o‘qing.</p>
+<h3>P4.5 Mashq DB va ikkita role yaratish</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>DB serverning SSM terminali: ssm-user</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>profile_sql.py faqat mashq nomlari bilan tayyor SQL ni chiqaradi. Avval matnni o‘qing, keyin ayni chiqishni psql ga uzating. setup DB/schema egasi va boshlang‘ich jadval yaratuvchi; app odatiy ulanish roli. App dasturlash talab qilinmagani uchun berilgan SQL dan foydalaning.</p>
+<pre><code class="language-bash">cd /var/lib/jdu-web/lesson-resources-r1/app
+python3 -B profile_sql.py --profile practice 01_create_roles.sql
+python3 -B profile_sql.py --profile practice 01_create_roles.sql | sudo -u postgres \
+  psql -X -v ON_ERROR_STOP=1 -d postgres
+python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u postgres \
+  psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Profile_sql.py ning birinchi ishga tushishi faqat SQL ni ko‘rsatadi. | orqali psql ga uzatilganda DB o‘zgaradi. --profile practice mashq nomlarini tanlaydi; ON_ERROR_STOP=1 SQL xatosida to‘xtatadi. Mavjud DB da yaratishni takrorlamang.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>Ikki CREATE ROLE, CREATE DATABASE va schema/CONNECT/USAGE sozlanadi. app ga superuser/CREATEDB berilmaydi.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>already exists oldin bajarilganini anglatishi mumkin. DROP qilmang; \du va \l orqali solishtiring. Pipe o‘ngidagi psql SQL error bermaganini tekshiring.</p>
+<h3>P4.6 Ikki DB parolini yashirin kiritish</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>DB serverda OS postgres nomidan psql</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>Birinchi qator DB shell ida bajarilib postgres=# psql ni ochadi. \password buyruqlarini psql ichida kiriting. setup/app uchun kamida 16 belgili turli parollarni har birini ikki marta yashirin kiriting. Qiymatni buyruq yoki hisobotga yozmang. \q DB shell iga qaytaradi.</p>
+<pre><code class="language-text">sudo -u postgres psql -X -d postgres
+\password catalog_practice_setup
+\password catalog_practice_app
+\du catalog_practice_*
+\q
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Sudo qatorini OS terminalida, keyingi \password, \du va \q ni psql ichida bittadan kiriting. Setup va app boshqa DB role bo‘lib, parollarini farqlang. Parol kiritishda belgilar ko‘rinmasligi normal.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>Superuser/Create role/Create DB yo‘q. Bular RDP paroli, app admin paroli yoki baholash tokenidan alohida maxfiy qiymatlardir.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>Klaviatura tartibiga e’tibor bering. Tekshirish uchun parolni chat yoki editorga yozmang. Unutilsa o‘qituvchi bilan shaxsiy tiklash tartibini bajaring.</p>
+<h3>P4.7 Web dan parol bilan SELECT bajarish</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>Web serverning SSM terminali: ssm-user</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>DB SSM dan exit qilib CloudShell ga qayting, Web SSM ni oching. psql da -h manzil, -U role, -d DB nomi, -W parol so‘rovi. P4 qo‘shimcha DNS bog‘liqligisiz private IP dan foydalanadi.</p>
+<pre><code class="language-bash">sudo apt-get install --no-install-recommends postgresql-client-16
+psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
+  'SELECT current_database(),current_user,1 AS value;'
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Psql da -h serverni, -U DB role ni, -d DB nomini, -W parol so‘rashni, -c SQL ni belgilaydi. Web da bajaring. Natijadagi DB va user nomlari mashq profile ga ulanganini tasdiqlaydi.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>jdu_catalog_practice / catalog_practice_app / 1. Port ochiqligi yoki pg_isready muvaffaqiyati bu autentifikatsiyali SQL o‘rnini bosmaydi.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>Rad etilsa manba, DB, role va parolni alohida tekshiring. Sinash uchun DB ni Internet ga ochmang.</p>
+<h3>P4.8 Checker uchun mavjud parolni faqat Web da saqlash</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>Web serverning SSM terminali: ssm-user</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>Yordamchi mavjud catalog_practice_app parolini ikki marta yashirin so‘rab, Web dagi root-only 0600 faylga saqlaydi. DB parolini o‘zgartirmaydi. Env ni cat bilan ko‘rsatmang va source qilmang. Exit dan keyin PC dagi Web Portal da P4 ni tekshiring.</p>
+<pre><code class="language-bash">sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/database_secret.py --profile \
+  practice
+exit
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Database_secret.py mavjud runtime parolini qayta olib Web dagi himoyalangan config ga saqlaydi. Bu yangi parol yaratish yoki almashtirish emas. Setup yoki RDP emas, catalog_practice_app ning mavjud parolini ishlating.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>D11_EXISTING_DB_PASSWORD_STORED_LOCALLY va to‘qqizta mashq tekshiruvi. Noto‘g‘ri parol hamda taqiqlangan DB/admin-role rad etilishi muvaffaqiyatli ulanish bilan solishtiriladi.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>Fayl mavjud bo‘lsa qayta yaratmang. P5 da ayni DB paroli app sozlamasiga kiritiladi. M4 alohida mission DB/rollaridan foydalanadi.</p>
+<h2 id="section-6">Natijani o‘qish namunasi (kiritmang)</h2>
+<pre><code class="language-text">current_database    | current_user         | value
+jdu_catalog_practice | catalog_practice_app | 1
+</code></pre>
+<p>SELECT natijasini o‘qish namunasi; ustun kengligi boshqacha bo‘lishi mumkin. DB, role va value=1 ni tekshiring. Bu table o‘zgartirish huquqini isbotlamaydi.</p>
+<h2 id="section-7">Tushunishni tekshirish (ballsiz)</h2>
+<p>Parol qabul qilinib CREATE TABLE rad etildi. Parol albatta xatomi?</p>
+<p><strong>Izoh:</strong></p>
+<p>Authentication va SQL privilege boshqa-boshqa. Runtime uchun setup amalining rad etilishi to‘g‘ri holat bo‘lishi mumkin.</p>
+<hr />
+<p><a href="m3.html">Oldingi: M3</a> · <a href="m4.html">Keyingi: M4</a></p>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>

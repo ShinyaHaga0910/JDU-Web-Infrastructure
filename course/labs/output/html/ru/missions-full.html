@@ -1,0 +1,662 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Web Infrastructure: самостоятельные задания M0-M6</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Как пользоваться пособием</a> · <a href="#section-2">Среда и подготовка</a> · <a href="#section-3">Как читать шаги</a> · <a href="#section-4">Система и пути соединений</a> · <a href="#section-5">Перед самостоятельной работой</a> · <a href="#section-6">M0 Своя среда и место выполнения команд (0)</a> · <a href="#section-7">M1 Выдача статического файла по HTTP (8)</a> · <a href="#section-8">M2 Внутренний DNS и системное разрешение имён (13)</a> · <a href="#section-9">M3 Данные при остановке и запуске (3)</a> · <a href="#section-10">M4 Подключение к PostgreSQL с аутентификацией (9)</a> · <a href="#section-11">M5 Соединить предоставленное приложение с Web и DB (13)</a> · <a href="#section-12">M6 Минимальные права и границы публикации (16)</a> · <a href="#section-13">Продолжение и результаты</a> · <a href="#section-14">Источники и версия</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: самостоятельные задания M0-M6</h1>
+<p>2026-11-03 | D12 P/M r1.3 | web-course-class193548-20261103-r3</p>
+<p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
+<p>Первая редакция для проверки преподавателем. Полное прохождение по пособию студентом ещё не проверено.</p>
+<p>Русский и узбекский тексты синхронизированы с японским оригиналом. Редактура носителями языка ещё не выполнена.</p>
+<p><a href="../ja/missions-full.html">日本語</a> · <a href="../ru/missions-full.html">Русский</a> · <a href="../uz/missions-full.html">O‘zbekcha</a></p>
+<p><a href="start.html">Сначала: подключение и правила</a> · <a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a> · <a href="portal.html">Проверка в браузере</a></p>
+<h2 id="section-1">Как пользоваться пособием</h2>
+<p>Сначала прочитайте задание P; при необходимости проходите подробный пример по шагам. P - тренировка без оценочных баллов. В M самостоятельно используйте другие объекты/значения. Номера заданий не являются номерами занятий; идите в своём темпе. Выполнение P не означает выполнение M.</p>
+<p>P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → M4 → P5 → P6 → M5 → M6</p>
+<p>P5 требует DNS из M2. P4 подключается по IP, а приложение - по db.lab.test. Перед переключением practice → mission завершите setup в P6. P - добровольная тренировка; checker оценивает текущие предпосылки M.</p>
+<p>M1=8, M2=13, M3=3, M4=9, M5=13, M6=16: всего 62 исходных балла. M0=0. Нет личной демонстрации, backup/restore, дополнительных дисков и разработки приложения. Пересчёт в 25 баллов делает преподаватель отдельно. Повторные отправки возможны до объявленного срока. PASS разных попыток не объединяются; максимум автоматически не выбирается.</p>
+<h2 id="section-2">Среда и подготовка</h2>
+<p>Сначала завершите проверку подписи начального комплекта, создание пяти узлов либо install в существующую среду, внутренний SSH и личную регистрацию. Инструкция - distribution/STUDENT.md в zip. Не храните приватные ключи в общем Windows; используйте CloudShell личного Academy account. Преподаватель выдаёт личный анонимный Lab ID, fingerprint и срок действия.</p>
+<p>Общие private IP ниже; public IPv4 не фиксируется. AWS region us-east-1, Ubuntu24.04/amd64. RDP: labuser; SSM: ssm-user; внутренний SSH: ubuntu. Не путайте пользователя и роль сервера.</p>
+<table>
+<thead>
+<tr>
+<th scope="col">Role</th>
+<th scope="col">Private IPv4</th>
+<th scope="col">Назначение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bastion</td>
+<td>10.20.1.10</td>
+<td>RDP3389 / Firefox / SSH</td>
+</tr>
+<tr>
+<td>web</td>
+<td>10.20.1.20</td>
+<td>HTTP80 / private8080 / loopback8000</td>
+</tr>
+<tr>
+<td>dns</td>
+<td>10.20.2.10</td>
+<td>BIND UDP/TCP53</td>
+</tr>
+<tr>
+<td>db</td>
+<td>10.20.2.20</td>
+<td>PostgreSQL5432</td>
+</tr>
+<tr>
+<td>repo</td>
+<td>10.20.2.30</td>
+<td>HTTP80 с заранее сохранёнными подписанными ресурсами</td>
+</tr>
+</tbody>
+</table>
+<p>Для входа в каждый Ubuntu выполните в CloudShell aws ssm start-session --target i-СВОЙ-ID. Сразу проверяйте id -un и role из bootstrap.json. Для смены сервера один exit возвращает в CloudShell; затем подключайтесь к следующему ID. Переменные CloudShell не копируются на узел. ssm-user может sudo; RDP-пользователь labuser не администратор sudo.</p>
+<p>Редактор nano: открыть файл → ввести текст → Ctrl+O → Enter сохранить → Ctrl+X выйти. Блок конфигурации не выполняется как shell-команда. В psql меняется prompt; SQL/\password вводятся внутри, \q возвращает в Ubuntu. Не продолжайте после ошибки без проверки результата.</p>
+<h2 id="section-3">Как читать шаги</h2>
+<p>В каждом P идут задание, объяснение, шаги и вопросы. Выполняйте команды по одной и читайте результат, не вставляйте весь раздел сразу. Обратная косая черта в конце строки означает продолжение: эта и следующая строки составляют одну команду.</p>
+<p>Блок bash вводится в терминале указанного узла. Блок text может содержать конфигурацию, ввод внутри psql или пример вывода: читайте пояснение перед ним. Строка с # - комментарий. Не добавляйте приглашение $ или postgres=# из своего терминала. Значения с YOUR- заменяйте своими.</p>
+<p>Проверяйте по порядку: сохранённый файл, синтаксис, применение к службе, реальное соединение. Правильный файл ещё не доказывает, что работающая служба уже использует его. Сопоставляйте HTTP-ответ, DNS-ответ или SQL-результат с журналом.</p>
+<h2 id="section-4">Система и пути соединений</h2>
+<table>
+<thead>
+<tr>
+<th scope="col">Источник</th>
+<th scope="col">Назначение</th>
+<th scope="col">Protocol / port</th>
+<th scope="col">Цель</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Windows PC</td>
+<td>Web public IPv4</td>
+<td>TCP/80</td>
+<td>Публичный доступ через Internet Gateway к каталогу и статическим файлам.</td>
+</tr>
+<tr>
+<td>Windows PC</td>
+<td>bastion public IPv4</td>
+<td>TCP/3389</td>
+<td>RDP из разрешённого CIDR к рабочему столу бастиона.</td>
+</tr>
+<tr>
+<td>bastion</td>
+<td>Web/DNS/DB/repo</td>
+<td>TCP/22</td>
+<td>Внутренний SSH для управления; приватный ключ остаётся на бастионе.</td>
+</tr>
+<tr>
+<td>bastion / Web</td>
+<td>DNS 10.20.2.10</td>
+<td>UDP+TCP/53</td>
+<td>Разрешение имён lab.test. DNS не выдаёт содержимое Web-страницы.</td>
+</tr>
+<tr>
+<td>Web app</td>
+<td>DB 10.20.2.20</td>
+<td>TCP/5432</td>
+<td>SQL от роли приложения. Прямое соединение Windows с DB не используется.</td>
+</tr>
+<tr>
+<td>bastion</td>
+<td>Web 10.20.1.20</td>
+<td>TCP/8080</td>
+<td>Администрирование через admin.lab.test отдельно от публичного порта 80.</td>
+</tr>
+<tr>
+<td>Nginx on Web</td>
+<td>127.0.0.1 on Web</td>
+<td>TCP/8000</td>
+<td>Передача приложению на том же Web; 127.0.0.1 - текущий локальный узел.</td>
+</tr>
+</tbody>
+</table>
+<p>SSM начальной среды - отдельный путь управления из CloudShell в EC2. Он не включён в путь обычного Web-запроса. Внутренние IP и порты таблицы заданы этим Lab, а не всеми Web-системами.</p>
+<h2 id="section-5">Перед самостоятельной работой</h2>
+<p>Из требований выпишите, на каком сервере меняется файл, имя, БД или роль. Сравните значения P и M и выберите объекты задания M. Таблица проверок описывает требуемое состояние, а не порядок команд.</p>
+<p>Затем решите, откуда и чем подтвердить каждое требование. Проверка файла и проверка соединения могут выполняться на разных узлах. Отдельно фиксируйте успех разрешённого пути и отказ запрещённого.</p>
+<p>Выберите задание в браузере, проверьте результат и сохранение. Для функций M5/M6 скрыто введите существующий пароль администратора приложения. Оценки сохраняются автоматически. Вопросы на понимание и заметки не добавляют требований к оценке.</p>
+<h2 id="section-6">M0 Своя среда и место выполнения команд (0)</h2>
+<h3>Требуемый результат</h3>
+<p>Проверьте пять ролей, исходные instance, SSM/внутренний SSH и личную регистрацию. 0 баллов. См. P0, не пересоздавайте основу.</p>
+<h3>Проверка и отправка</h3>
+<ol>
+<li>Войдите через школьный Google в <a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a> на PC, выберите свой Lab и <strong>M0</strong>. Привязка и экраны описаны в <a href="portal.html">инструкции браузера</a>.</li>
+<li>Запустите проверку выбранного задания.</li>
+<li>Во время обработки обновляйте результат. Сверьте ID задания, время, каждый check и сохранение. Результат сохраняется автоматически; оценки M доступны в разделе сохранённых оценок. P и M0 не оцениваются.</li>
+</ol>
+<h2 id="section-7">M1 Выдача статического файла по HTTP (8)</h2>
+<h3>Требуемый результат</h3>
+<p>По навыкам P1 самостоятельно выдайте другой заданный файл и текст. Сохраните practice.txt. Проверяются файл, сервис, слушатель, local/bastion/public HTTP и журнал текущего запроса.</p>
+<ul>
+<li>File: /var/www/html/mission.txt</li>
+<li>URL path: /mission.txt</li>
+</ul>
+<pre><code class="language-text">JDU WEB-02 mission: independent HTTP delivery.
+</code></pre>
+<h3>Условия: 1 исходный балл за проверку</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID (не менять)</th>
+<th scope="col">Условие</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB02_NGINX_ACTIVE</td>
+<td>Nginx работает (active).</td>
+</tr>
+<tr>
+<td>WEB02_CONFIG_VALID</td>
+<td>nginx -t успешно проверяет конфигурацию.</td>
+</tr>
+<tr>
+<td>WEB02_LISTEN_80</td>
+<td>Порт 80 слушает private IP/все интерфейсы, не только loopback.</td>
+</tr>
+<tr>
+<td>WEB02_FILE</td>
+<td>Обычный файл содержит точный текст, владелец root:root, права 0644.</td>
+</tr>
+<tr>
+<td>WEB02_LOCAL_HTTP</td>
+<td>Web получает HTTP 200 и точный текст через loopback.</td>
+</tr>
+<tr>
+<td>WEB02_BASTION_HTTP</td>
+<td>Бастион получает HTTP 200 и точный текст через private IP.</td>
+</tr>
+<tr>
+<td>WEB02_PUBLIC_HTTP</td>
+<td>CloudShell получает HTTP 200 и точный текст через public IP.</td>
+</tr>
+<tr>
+<td>WEB02_ACCESS_LOG</td>
+<td>Access log содержит запрос с nonce именно этой проверки.</td>
+</tr>
+</tbody>
+</table>
+<p>Проверки identity/управления/repo/сети/зависимостей не добавляют баллов. Частичные баллы не означают готовность следующего этапа при неисправных предпосылках.</p>
+<h3>Проверка и отправка</h3>
+<ol>
+<li>Войдите через школьный Google в <a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a> на PC, выберите свой Lab и <strong>M1</strong>. Привязка и экраны описаны в <a href="portal.html">инструкции браузера</a>.</li>
+<li>Запустите проверку выбранного задания.</li>
+<li>Во время обработки обновляйте результат. Сверьте ID задания, время, каждый check и сохранение. Результат сохраняется автоматически; оценки M доступны в разделе сохранённых оценок. P и M0 не оцениваются.</li>
+</ol>
+<h2 id="section-8">M2 Внутренний DNS и системное разрешение имён (13)</h2>
+<h3>Требуемый результат</h3>
+<p>Добавьте шесть основных имён в ту же zone lab.test. guide/practice-db можно сохранить. Нужны обычный resolver бастиона/Web, HTTP M1 по имени, имя DB, UDP/TCP, forwarding, NXDOMAIN, ACL и запрет AXFR.</p>
+<table>
+<thead>
+<tr>
+<th scope="col">DNS name</th>
+<th scope="col">A / IPv4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>admin.lab.test</td>
+<td>10.20.1.20</td>
+</tr>
+<tr>
+<td>bastion.lab.test</td>
+<td>10.20.1.10</td>
+</tr>
+<tr>
+<td>db.lab.test</td>
+<td>10.20.2.20</td>
+</tr>
+<tr>
+<td>dns.lab.test</td>
+<td>10.20.2.10</td>
+</tr>
+<tr>
+<td>repo.lab.test</td>
+<td>10.20.2.30</td>
+</tr>
+<tr>
+<td>web.lab.test</td>
+<td>10.20.1.20</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Текущие предпосылки: M1</li>
+</ul>
+<h3>Условия: 1 исходный балл за проверку</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID (не менять)</th>
+<th scope="col">Условие</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB03_SERVICE</td>
+<td>BIND/named работает (active).</td>
+</tr>
+<tr>
+<td>WEB03_CONFIG_VALID</td>
+<td>Проверки named и zone lab.test завершаются успешно.</td>
+</tr>
+<tr>
+<td>WEB03_ZONE_AUTHORITY</td>
+<td>SOA/NS zone lab.test и авторитетный ответ соответствуют схеме; NS - dns.lab.test.</td>
+</tr>
+<tr>
+<td>WEB03_REQUIRED_RECORDS</td>
+<td>Все заданные A-записи profile дают нужные private IP; это один пункт.</td>
+</tr>
+<tr>
+<td>WEB03_UDP_RESPONSE</td>
+<td>И бастион, и Web получают правильные ответы по UDP 53.</td>
+</tr>
+<tr>
+<td>WEB03_TCP_RESPONSE</td>
+<td>И бастион, и Web получают правильные ответы по TCP 53.</td>
+</tr>
+<tr>
+<td>WEB03_NORMAL_RESOLVER</td>
+<td>Обычный resolver бастиона/Web использует только BIND; нет подмены hosts или Firefox DoH.</td>
+</tr>
+<tr>
+<td>WEB03_NAMED_HTTP</td>
+<td>С бастиона HTTP по имени profile и заданному пути возвращает 200 и правильный текст.</td>
+</tr>
+<tr>
+<td>WEB03_DB_NAME</td>
+<td>Обычный resolver Web разрешает имя DB profile в 10.20.2.20.</td>
+</tr>
+<tr>
+<td>WEB03_FORWARD_ONLY</td>
+<td>Forward only направлен только на 10.20.0.2; внешнее DNS-имя разрешается. Внешний HTTP не нужен.</td>
+</tr>
+<tr>
+<td>WEB03_NXDOMAIN</td>
+<td>Новое отсутствующее имя этого запуска получает авторитетный NXDOMAIN.</td>
+</tr>
+<tr>
+<td>WEB03_CLIENT_ACL</td>
+<td>Query/recursion/cache разрешены только localhost, бастиону и Web в BIND; одного SG недостаточно.</td>
+</tr>
+<tr>
+<td>WEB03_AXFR_DENIED</td>
+<td>AXFR с бастиона/Web явно отклоняется при успешных обычных запросах того же запуска; таймаут не подходит.</td>
+</tr>
+</tbody>
+</table>
+<p>Проверки identity/управления/repo/сети/зависимостей не добавляют баллов. Частичные баллы не означают готовность следующего этапа при неисправных предпосылках.</p>
+<h3>Проверка и отправка</h3>
+<ol>
+<li>Войдите через школьный Google в <a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a> на PC, выберите свой Lab и <strong>M2</strong>. Привязка и экраны описаны в <a href="portal.html">инструкции браузера</a>.</li>
+<li>Запустите проверку выбранного задания.</li>
+<li>Во время обработки обновляйте результат. Сверьте ID задания, время, каждый check и сохранение. Результат сохраняется автоматически; оценки M доступны в разделе сохранённых оценок. P и M0 не оцениваются.</li>
+</ol>
+<h2 id="section-9">M3 Данные при остановке и запуске (3)</h2>
+<h3>Требуемый результат</h3>
+<p>Создайте отдельный marker M со своим Lab ID. Отдельно от P3 пройдите браузер: запись до остановки → AWS Stop → браузер: подтверждение остановки → AWS Start → браузер: проверка после запуска. Нужны тот же Web и исходный root volume; reboot не подходит. Backup/restore и новый диск не нужны.</p>
+<ul>
+<li>File: /var/lib/jdu-web/mission/storage.txt</li>
+</ul>
+<pre><code class="language-text">lab_id={lab_id}
+task=M3
+payload=mission-storage-2026
+</code></pre>
+<p>Замените {lab_id} своим анонимным ID. Файл 0644/root:root, каталог 0755/root:root. Останавливайте только тот же исходный Web/volume.</p>
+<h3>Условия: 1 исходный балл за проверку</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID (не менять)</th>
+<th scope="col">Условие</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB04_MARKER_CONTENT</td>
+<td>Путь, личный Lab ID, task и точный текст marker соответствуют заданию.</td>
+</tr>
+<tr>
+<td>WEB04_MARKER_PERMISSIONS</td>
+<td>Файл root:root 0644, его родительский каталог root:root 0755.</td>
+</tr>
+<tr>
+<td>WEB04_STOP_START_RETENTION</td>
+<td>Доказаны три стадии stop/start: те же instance/volume/hash, новый boot_id и отдельно наблюдённый stopped.</td>
+</tr>
+</tbody>
+</table>
+<p>Проверки identity/управления/repo/сети/зависимостей не добавляют баллов. Частичные баллы не означают готовность следующего этапа при неисправных предпосылках.</p>
+<h3>Проверка и отправка</h3>
+<ol>
+<li>Войдите через школьный Google в <a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a> на PC, выберите свой Lab и <strong>M3</strong>. Привязка и экраны описаны в <a href="portal.html">инструкции браузера</a>.</li>
+<li>Запишите состояние до остановки → дождитесь сохранения → Stop того же Web в AWS → stopped → подтвердите остановку → дождитесь записи → Start того же Web → running/SSM Online → проверьте сохранение после запуска. Доказательство M3 записывайте отдельно от P3.</li>
+<li>Во время обработки обновляйте результат. Сверьте ID задания, время, каждый check и сохранение. Результат сохраняется автоматически; оценки M доступны в разделе сохранённых оценок. P и M0 не оцениваются.</li>
+</ol>
+<h2 id="section-10">M4 Подключение к PostgreSQL с аутентификацией (9)</h2>
+<h3>Требуемый результат</h3>
+<p>Самостоятельно настройте основную БД и роли. Разрешите db.lab.test обычным resolver M2 и выполните SELECT с Web runtime-role. HBA разрешает только Web/32 и правильную пару DB/role. Существующий пароль сохраните через helper mission на Web, отдельно от practice. Таблицы приложения пока не нужны.</p>
+<ul>
+<li>Profile: mission</li>
+<li>Database: jdu_catalog</li>
+<li>Setup role: catalog_setup</li>
+<li>Runtime role: catalog_app</li>
+<li>Текущие предпосылки: M2</li>
+</ul>
+<h3>Условия: 1 исходный балл за проверку</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID (не менять)</th>
+<th scope="col">Условие</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB05_CLUSTER_ACTIVE</td>
+<td>PostgreSQL 16/main работает (active).</td>
+</tr>
+<tr>
+<td>WEB05_CLUSTER_CONFIG</td>
+<td>Настройки 16/main, стандартный data directory и socket/peer для OS postgres корректны.</td>
+</tr>
+<tr>
+<td>WEB05_LISTEN_5432</td>
+<td>PostgreSQL слушает 10.20.2.20:5432.</td>
+</tr>
+<tr>
+<td>WEB05_DATABASE_OWNER</td>
+<td>Владельцем БД и schema public является соответствующая setup-role.</td>
+</tr>
+<tr>
+<td>WEB05_ROLE_ATTRIBUTES</td>
+<td>Runtime LOGIN; нет superuser/CREATEDB/CREATEROLE/REPLICATION/BYPASSRLS и повышающих membership. Setup LOGIN при сборке или NOLOGIN после неё.</td>
+</tr>
+<tr>
+<td>WEB05_HBA_SCRAM</td>
+<td>HBA допускает SCRAM лишь для перечисленных DB/role с Web /32, без широких разрешений.</td>
+</tr>
+<tr>
+<td>WEB05_WEB_SQL</td>
+<td>Новый аутентифицированный SELECT с Web возвращает нужные DB/user/значение; P по IP, M через обычный DNS.</td>
+</tr>
+<tr>
+<td>WEB05_BAD_PASSWORD_DENIED</td>
+<td>Один неверный пароль явно отклонён в том же запуске, где правильный работает.</td>
+</tr>
+<tr>
+<td>WEB05_WRONG_TARGET_DENIED</td>
+<td>С Web запрещены postgres-role, посторонняя DB и чужой profile; ещё не созданная practice DB не обязательна.</td>
+</tr>
+</tbody>
+</table>
+<p>Проверки identity/управления/repo/сети/зависимостей не добавляют баллов. Частичные баллы не означают готовность следующего этапа при неисправных предпосылках.</p>
+<h3>Проверка и отправка</h3>
+<ol>
+<li>Войдите через школьный Google в <a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a> на PC, выберите свой Lab и <strong>M4</strong>. Привязка и экраны описаны в <a href="portal.html">инструкции браузера</a>.</li>
+<li>Запустите проверку выбранного задания.</li>
+<li>Во время обработки обновляйте результат. Сверьте ID задания, время, каждый check и сохранение. Результат сохраняется автоматически; оценки M доступны в разделе сохранённых оценок. P и M0 не оцениваются.</li>
+</ol>
+<h2 id="section-11">M5 Соединить предоставленное приложение с Web и DB (13)</h2>
+<h3>Требуемый результат</h3>
+<p>Подключите то же приложение к БД mission. Используйте навыки P5 с profile=mission, не копируйте заново app/venv. После остановки сервиса: создать runtime mission → явно activate → создать setup mission; setup practice должен быть завершён в P6. Выполните migrations/seed/admin и grants в основной БД, добавьте две заданные записи. Сохраните P1/M1, оставьте mission активным.</p>
+<ul>
+<li>Profile: mission</li>
+<li>Database: jdu_catalog</li>
+<li>Setup role: catalog_setup</li>
+<li>Runtime role: catalog_app</li>
+<li>Application administrator: lab_admin</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th scope="col">code</th>
+<th scope="col">name</th>
+<th scope="col">quantity</th>
+<th scope="col">location</th>
+<th scope="col">is_public</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M5-PUBLIC-001</td>
+<td>Mission monitor</td>
+<td>6</td>
+<td>Lab cabinet C</td>
+<td>true</td>
+</tr>
+<tr>
+<td>M5-PRIVATE-001</td>
+<td>Mission router</td>
+<td>1</td>
+<td>Lab cabinet D</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Текущие предпосылки: M2, M4</li>
+</ul>
+<h3>Условия: 1 исходный балл за проверку</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID (не менять)</th>
+<th scope="col">Условие</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB06_ARTIFACTS</td>
+<td>Код и зависимости точно соответствуют предоставленной фиксированной версии.</td>
+</tr>
+<tr>
+<td>WEB06_SERVICE</td>
+<td>jdu-catalog active и enabled, работает как catalog.</td>
+</tr>
+<tr>
+<td>WEB06_LOOPBACK</td>
+<td>Gunicorn слушает только 127.0.0.1:8000.</td>
+</tr>
+<tr>
+<td>WEB06_PROFILE_DATABASE</td>
+<td>Активный процесс использует DB и runtime-role нужного profile.</td>
+</tr>
+<tr>
+<td>WEB06_MIGRATIONS</td>
+<td>Фиксированные migrations, 11 таблиц и нужные sequence находятся в выбранной БД.</td>
+</tr>
+<tr>
+<td>WEB06_REQUIRED_RECORDS</td>
+<td>Обе обязательные записи совпадают с параметрами profile; дополнительные допустимые записи разрешены.</td>
+</tr>
+<tr>
+<td>WEB06_PUBLIC_DATA</td>
+<td>Обычный публичный URL получает правильные записи из действующей БД.</td>
+</tr>
+<tr>
+<td>WEB06_ADMIN_ENTRY</td>
+<td>С бастиона через обычный DNS доступна настоящая форма /admin/ на admin.lab.test:8080.</td>
+</tr>
+<tr>
+<td>WEB06_STATIC</td>
+<td>Static-ресурсы доступны по предусмотренному маршруту.</td>
+</tr>
+<tr>
+<td>WEB06_PASSWORD_LOGIN</td>
+<td>Функциональный режим проходит настоящий password/CSRF/cookie login, без обхода аутентификации.</td>
+</tr>
+<tr>
+<td>WEB06_CREATE_REFLECT</td>
+<td>В этом запуске через admin HTTP создана одна CK-запись; значения совпали в DB и публичной странице.</td>
+</tr>
+<tr>
+<td>WEB06_EDIT_REFLECT</td>
+<td>Количество именно этой CK-записи изменено; DB и публичная страница подтверждают изменение.</td>
+</tr>
+<tr>
+<td>WEB06_LOGOUT</td>
+<td>POST logout завершает сессию: прежний cookie снова требует входа.</td>
+</tr>
+</tbody>
+</table>
+<p>Проверки identity/управления/repo/сети/зависимостей не добавляют баллов. Частичные баллы не означают готовность следующего этапа при неисправных предпосылках.</p>
+<h3>Проверка и отправка</h3>
+<ol>
+<li>Войдите через школьный Google в <a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a> на PC, выберите свой Lab и <strong>M5</strong>. Привязка и экраны описаны в <a href="portal.html">инструкции браузера</a>.</li>
+<li>Выберите функциональную проверку с правами, скрыто введите существующий пароль lab_admin в поле администратора приложения и запустите с этим паролем. Это не пароль RDP. Проверка только настроек не подтверждает функции.</li>
+<li>Во время обработки обновляйте результат. Сверьте ID задания, время, каждый check и сохранение. Результат сохраняется автоматически; оценки M доступны в разделе сохранённых оценок. P и M0 не оцениваются.</li>
+</ol>
+<h2 id="section-12">M6 Минимальные права и границы публикации (16)</h2>
+<h3>Требуемый результат</h3>
+<p>Завершите минимальные права mission: catalog_setup NOLOGIN/password NULL, временные setup-файлы удалены. Проверьте root-код/venv, секреты 600, запрет admin на 80, успешный private8080, права admin только view/add/change, разделение публичных данных и SQL-права. Функциональная проверка в браузере автоматическая; личная демонстрация не нужна.</p>
+<ul>
+<li>Profile: mission</li>
+<li>Database: jdu_catalog</li>
+<li>Setup role: catalog_setup</li>
+<li>Runtime role: catalog_app</li>
+<li>Application administrator: lab_admin</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th scope="col">code</th>
+<th scope="col">name</th>
+<th scope="col">quantity</th>
+<th scope="col">location</th>
+<th scope="col">is_public</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M5-PUBLIC-001</td>
+<td>Mission monitor</td>
+<td>6</td>
+<td>Lab cabinet C</td>
+<td>true</td>
+</tr>
+<tr>
+<td>M5-PRIVATE-001</td>
+<td>Mission router</td>
+<td>1</td>
+<td>Lab cabinet D</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Текущие предпосылки: M5</li>
+</ul>
+<h3>Условия: 1 исходный балл за проверку</h3>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID (не менять)</th>
+<th scope="col">Условие</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB07_PUBLIC_ADMIN_DENIED</td>
+<td>Публичный порт 80 не открывает admin даже с поддельными Host/header; частный путь при этом работает.</td>
+</tr>
+<tr>
+<td>WEB07_SECRET_PERMISSIONS</td>
+<td>Секреты - обычные root:root 0600 файлы, без ссылок и раскрытия значений.</td>
+</tr>
+<tr>
+<td>WEB07_CODE_PROTECTED</td>
+<td>catalog без login/sudo не может менять код, venv и их управляющие каталоги.</td>
+</tr>
+<tr>
+<td>WEB07_SECRET_HTTP_DENIED</td>
+<td>Проверяемые env/секретные пути не доступны через HTTP или static.</td>
+</tr>
+<tr>
+<td>WEB07_SETUP_RETIRED</td>
+<td>Setup-role NOLOGIN/password NULL, её сессии закрыты, временные setup.env удалены.</td>
+</tr>
+<tr>
+<td>WEB07_ITEM_PRIVILEGES</td>
+<td>catalog_item: только SELECT/INSERT/UPDATE, без DELETE, TRUNCATE и передачи прав.</td>
+</tr>
+<tr>
+<td>WEB07_AUTH_USER_PRIVILEGES</td>
+<td>auth_user: SELECT и UPDATE только last_login/password, без создания/удаления пользователей.</td>
+</tr>
+<tr>
+<td>WEB07_AUTH_LOOKUP_PRIVILEGES</td>
+<td>Таблицы групп, permissions, связей и content type доступны только для SELECT.</td>
+</tr>
+<tr>
+<td>WEB07_SESSION_PRIVILEGES</td>
+<td>django_session: только необходимые SELECT/INSERT/UPDATE/DELETE, без лишних прав.</td>
+</tr>
+<tr>
+<td>WEB07_AUDIT_PRIVILEGES</td>
+<td>django_admin_log: только SELECT/INSERT.</td>
+</tr>
+<tr>
+<td>WEB07_MIGRATION_PRIVILEGES</td>
+<td>У runtime нет прав на django_migrations, schema CREATE, владения объектами и незаданных дополнительных прав.</td>
+</tr>
+<tr>
+<td>WEB07_SEQUENCE_PRIVILEGES</td>
+<td>USAGE только sequence оборудования и admin-log; без лишних SELECT/UPDATE/GRANT.</td>
+</tr>
+<tr>
+<td>WEB07_ADMIN_PERMISSIONS</td>
+<td>Активный staff, не superuser: только view/add/change оборудования, без delete/user management.</td>
+</tr>
+<tr>
+<td>WEB07_ANONYMOUS_DENIED</td>
+<td>Анонимные добавление/изменение отклонены без изменения БД при успешном контрольном login; одного CSRF-403 мало.</td>
+</tr>
+<tr>
+<td>WEB07_BAD_PASSWORD_DENIED</td>
+<td>Один неверный пароль приложения отклонён, при этом правильный login работает.</td>
+</tr>
+<tr>
+<td>WEB07_PRIVATE_DATA_HIDDEN</td>
+<td>Все найденные непубличные коды скрыты на публичной странице при доступной БД.</td>
+</tr>
+</tbody>
+</table>
+<p>Проверки identity/управления/repo/сети/зависимостей не добавляют баллов. Частичные баллы не означают готовность следующего этапа при неисправных предпосылках.</p>
+<h3>Проверка и отправка</h3>
+<ol>
+<li>Войдите через школьный Google в <a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a> на PC, выберите свой Lab и <strong>M6</strong>. Привязка и экраны описаны в <a href="portal.html">инструкции браузера</a>.</li>
+<li>Выберите функциональную проверку с правами, скрыто введите существующий пароль lab_admin в поле администратора приложения и запустите с этим паролем. Это не пароль RDP. Проверка только настроек не подтверждает функции.</li>
+<li>Во время обработки обновляйте результат. Сверьте ID задания, время, каждый check и сохранение. Результат сохраняется автоматически; оценки M доступны в разделе сохранённых оценок. P и M0 не оцениваются.</li>
+</ol>
+<h2 id="section-13">Продолжение и результаты</h2>
+<p>В следующий раз запустите свой Lab и те же пять узлов, проверьте running/SSM Online и текущие public IP. Войдите в Web Portal через школьный Google и начните с готовности M0. Не повторяйте создание, ключи и регистрацию каждый раз. При истечении срока запросите обновление у преподавателя.</p>
+<p>Результаты сохраняются автоматически. Во время обработки обновляйте результат; оценки смотрите в разделе сохранённых оценок. Сверяйте задание, время и сохранение. UNKNOWN означает невозможность измерения, а не успех или подтверждённый ноль. Подтверждённые баллы непроверенных M сохраняются. Используется последний оцениваемый результат, без объединения PASS разных запусков и автоматического выбора максимума.</p>
+<p>Подробные действия: <a href="portal.html">проверка в браузере</a>. Не отправляйте пароль/token/cookie/приватный ключ/env в отчёт или чат.</p>
+<h2 id="section-14">Источники и версия</h2>
+<p>Критерии: таблицы M и фиксированный registry комплекта.</p>
+<p>web-course-class193548-20261103-r3; web-d11-2026-10-r1; registry SHA256 <code>3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33</code>.</p>
+<p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
+<p>Срок URL загрузки отличается от срока комплекта. Не меняйте даты; получите актуальный комплект у преподавателя. Ниже первичные документы общих функций, проверенные 2026-10-23.</p>
+<ul>
+<li><a href="https://nginx.org/en/docs/beginners_guide.html">Nginx Beginner’s Guide</a></li>
+<li><a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BIND 9: configurations and zones</a></li>
+<li><a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">PostgreSQL 16: pg_hba.conf</a></li>
+<li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html">EC2 instance states</a></li>
+</ul>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>

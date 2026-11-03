@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PROJECT = Path(os.environ.get('JDU_WEB_PROJECT_ROOT', str(Path(__file__).resolve().parents[3] / 'development')))
 from markdown_it import MarkdownIt
 from portal_guide import write_guides
+from pages import write_pages, browser_check, expiry_text
 from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE
 from checks import CHECKS
 from explanations import LABELS, READING, ROUTES, MISSION_PLAN, MODULE_NOTES, STEP_NOTES, OUTPUT_EXAMPLES
@@ -23,7 +24,7 @@ from explanations import LABELS, READING, ROUTES, MISSION_PLAN, MODULE_NOTES, ST
 KIT = PROJECT / '03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261103-r3'
 EXPECTED_REGISTRY = '3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33'
 DIST_ID = 'web-course-class193548-20261103-r3'
-MATERIAL_REVISION = 'r1.2'
+MATERIAL_REVISION = 'r1.3'
 L = {
  'practice': T('Web演習：練習P0〜P6と詳しい操作例', 'Web Infrastructure: практика P0–P6 с подробными шагами', 'Web Infrastructure: P0–P6 mashqlar va batafsil qadamlar'),
  'missions': T('Web演習：自力課題M0〜M6', 'Web Infrastructure: самостоятельные задания M0–M6', 'Web Infrastructure: M0–M6 mustaqil topshiriqlar'),
@@ -41,7 +42,7 @@ L = {
  'checkid': T('check ID（変更しない）', 'check ID (не менять)', 'check ID (o‘zgartirmang)'),
  'condition': T('満たすこと', 'Условие', 'Shart'),
  'submit': T('確認・提出', 'Проверка и отправка', 'Tekshirish va yuborish'),
- 'resume': T('次回の再開・送信の再試行', 'Продолжение и повторная отправка', 'Davom ettirish va qayta yuborish'),
+ 'resume': T('次回の再開・結果の確認', 'Продолжение и результаты', 'Davom ettirish va natijalar'),
  'sources': T('根拠と使用版', 'Источники и версия', 'Manbalar va versiya'),
  'draft': T('教材初版・教師確認用。学生の最初からの通し試読は未実施。', 'Первая редакция для проверки преподавателем. Полное прохождение по пособию студентом ещё не проверено.', 'O‘qituvchi tekshiruvi uchun birinchi nashr. Talabaning qo‘llanma bo‘yicha boshidan oxirigacha o‘tishi hali tekshirilmagan.'),
  'translation': T('ロシア語・ウズベク語は日本語原稿と同じ手順・条件の翻訳初稿。母語話者校閲は未実施。', 'Русский и узбекский тексты синхронизированы с японским оригиналом. Редактура носителями языка ещё не выполнена.', 'Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga ega. Ona tili mutaxassisi tahriri hali bajarilmagan.'),
@@ -49,9 +50,7 @@ L = {
 
 def emit_intro(lang, kind):
     out = [f'# {L[kind][lang]}', '', f'2026-11-03 | D12 P/M {MATERIAL_REVISION} | {DIST_ID}', '',
-        T('配布版の有効期限：2027年1月31日末（UZT）。',
-          'Комплект действителен до конца 31 января 2027 года (UZT).',
-          'Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).')[lang], '',
+        expiry_text(lang), '',
         L['draft'][lang], '', L['translation'][lang], '']
     out += [T('[日本語](../ja/' + kind + '.md) · [Русский](../ru/' + kind + '.md) · [O‘zbekcha](../uz/' + kind + '.md)',
               '[日本語](../ja/' + kind + '.md) · [Русский](../ru/' + kind + '.md) · [O‘zbekcha](../uz/' + kind + '.md)',
@@ -85,26 +84,24 @@ def emit_intro(lang, kind):
         'Nano: faylni ochish → matn yozish → Ctrl+O → Enter bilan saqlash → Ctrl+X bilan chiqish. Sozlama bloki shell buyrug‘i emas. Psql ichida prompt o‘zgaradi; SQL/\\password shu yerga yoziladi, \\q Ubuntu ga qaytaradi. Xatodan keyin natijani tekshirmay davom etmang.')[lang], '']
     return out
 
+
 def emit_end(lang):
     return ['## ' + L['resume'][lang], '', T(
-      '次回は本人のLabと同じ5台を起動し、running/SSM Onlineと現在の公開IPを確認する。CloudShellでLAB_ID/COURSE_ID/INSTALLを再設定し、P0のactivate.shを読む。M0 --no-submitで準備確認する。作成・鍵生成・登録を繰り返さず、期限切れは教師へ更新を依頼する。',
-      'На следующем занятии запустите свой Lab и те же пять узлов, проверьте running/SSM Online и текущие public IP. В CloudShell заново задайте LAB_ID/COURSE_ID/INSTALL, прочитайте activate.sh как в P0 и выполните M0 --no-submit. Не повторяйте создание/ключи/регистрацию; при истечении срока запросите обновление.',
-      'Keyingi safar shaxsiy Lab va ayni besh serverni ishga tushirib running/SSM Online hamda joriy public IP ni tekshiring. CloudShell da LAB_ID/COURSE_ID/INSTALL ni qayta belgilang, P0 dagi activate.sh ni o‘qing va M0 --no-submit bajaring. Yaratish/kalit/ro‘yxatni takrorlamang; muddat o‘tsa yangilashni so‘rang.')[lang], '',
-      T('STOREDは教師受付済み。PENDINGなら表示された元request-idを元の課題と一緒に--retryへ渡す。--no-submitの自己確認は提出にならない。UNKNOWNは観測不能で、0点や合格を勝手に確定しない。現在のUNKNOWNで過去の評価可能な提出は消えないが、現在の前提が満たされる意味ではない。最新の評価可能な1回を参照し、最高点や回をまたぐPASSの寄せ集めを使わない。',
-        'STORED означает приём преподавателем. Для PENDING используйте исходный request-id и то же задание с --retry. --no-submit не является отправкой. UNKNOWN — измерение невозможно, а не автоматический ноль или успех. Оно не удаляет прежнюю оцениваемую попытку, но не доказывает текущую готовность. Используется последняя полностью оцениваемая попытка, не максимальная и не сумма PASS разных запусков.',
-        'STORED — o‘qituvchi qabul qilgan. PENDING bo‘lsa asl request-id va ayni topshiriq bilan --retry ishlating. --no-submit yuborish emas. UNKNOWN — o‘lchab bo‘lmagan, avtomatik nol yoki muvaffaqiyat emas. U oldingi baholanadigan urinishni o‘chirmaydi, lekin hozir tayyorlikni isbotlamaydi. Oxirgi to‘liq baholanadigan urinish olinadi; maksimum yoki turli urinish PASS yig‘indisi emas.')[lang], '',
-      '```bash', "jdu-web-check M2 --retry 'YOUR-ORIGINAL-REQUEST-ID'", 'jdu-web-my-progress', '```', '',
-      T('本人用URLは自分だけで開く。password/token/cookie/秘密鍵/env本文/教師URLを提出物や会話へ送らない。画面撮影は秘密欄を含めない。画面だけの操作が失敗した場合も、他人のLabで試さない。',
-        'Личный URL открывайте только сами. Не отправляйте в отчёт или чат пароль/token/cookie/ключ/env/URL преподавателя. Снимки не должны содержать секретов. Не проверяйте ошибки на чужом Lab.',
-        'Shaxsiy URL ni faqat o‘zingiz oching. Hisobot/chat ga parol/token/cookie/kalit/env/o‘qituvchi URL ini yubormang. Screenshot da maxfiy maydon bo‘lmasin. Xatoni boshqa talaba Lab ida sinamang.')[lang], '',
+      '次回は本人のLabと同じ5台を起動し、running/SSM Onlineと現在の公開IPを確認する。Web Portalへ学校Googleでログインし、まずM0で準備確認する。作成・鍵生成・登録を毎回繰り返す必要はない。期限切れは教師へ更新を依頼する。',
+      'В следующий раз запустите свой Lab и те же пять узлов, проверьте running/SSM Online и текущие public IP. Войдите в Web Portal через школьный Google и начните с готовности M0. Не повторяйте создание, ключи и регистрацию каждый раз. При истечении срока запросите обновление у преподавателя.',
+      'Keyingi safar o‘z Lab va ayni besh serverni ishga tushirib, running/SSM Online va joriy public IP ni tekshiring. Web Portal ga maktab Google orqali kirib, M0 tayyorligidan boshlang. Yaratish, kalit va ro‘yxatni har safar takrorlamang. Muddat tugasa o‘qituvchidan yangilashni so‘rang.')[lang], '', T(
+      '結果は自動保存される。処理中は「結果を更新する」、成績確認は「保存済み成績を見る」を使う。確認対象の課題・時刻と保存状態を読む。UNKNOWNは観測不能で、合格や0点を確定した意味ではない。未確認Mの確定済み点数は保持される。最新の評価可能な結果を使い、異なる回のPASSを合算したり自動で最高点を選んだりしない。',
+      'Результаты сохраняются автоматически. Во время обработки обновляйте результат; оценки смотрите в разделе сохранённых оценок. Сверяйте задание, время и сохранение. UNKNOWN означает невозможность измерения, а не успех или подтверждённый ноль. Подтверждённые баллы непроверенных M сохраняются. Используется последний оцениваемый результат, без объединения PASS разных запусков и автоматического выбора максимума.',
+      'Natijalar avtomatik saqlanadi. Ishlov paytida natijani yangilang; baholarni saqlangan baholar bo‘limidan ko‘ring. Topshiriq, vaqt va saqlash holatini solishtiring. UNKNOWN o‘lchab bo‘lmagan holat, muvaffaqiyat yoki tasdiqlangan nol emas. Tekshirilmagan M ning tasdiqlangan ballari saqlanadi. Oxirgi baholanadigan natija olinadi; turli urinish PASS lari qo‘shilmaydi, maksimum avtomatik tanlanmaydi.')[lang], '',
+      T('詳しい画面操作は[ブラウザ確認手順](portal.md)へ。password/token/cookie/秘密鍵/env本文を提出物や会話へ送らない。',
+        'Подробные действия: [проверка в браузере](portal.md). Не отправляйте пароль/token/cookie/приватный ключ/env в отчёт или чат.',
+        'Ekran amallari: [brauzer yo‘riqnomasi](portal.md). Parol/token/cookie/maxfiy kalit/env ni hisobot yoki chat ga yubormang.')[lang], '',
       '## ' + L['sources'][lang], '',
-      T('採点条件は同梱の固定registryと各Mの表を正本とする。原稿は受入済み実装・資源に照合したが、この詳細手順を新規学生が最初から辿る試験は未実施。成功passwordの本人手入力と、app導入後の全5台停止再開も追加受入が残る。教材編集だけで全授業のCLASS_READYをtrueにしない。',
-        'Критерии основаны на фиксированном registry и таблицах M. Текст сверен с принятой реализацией, но новый студент ещё не прошёл эти подробные шаги с нуля. Ещё нужны приёмка успешного ручного ввода пароля и stop/start всех пяти узлов после установки приложения. Редактирование пособия не делает CLASS_READY=true.',
-        'Shartlar belgilangan registry va M jadvallariga asoslangan. Matn qabul qilingan amalga oshirish bilan solishtirildi, ammo yangi talaba bu batafsil qadamlarni boshidan hali bajarmagan. To‘g‘ri parolni shaxsan kiritish va app o‘rnatilgach besh server stop/start qabul tekshiruvi qolgan. Qo‘llanma tahriri CLASS_READY=true degani emas.')[lang], '',
-      T('使用版', 'Версии', 'Versiyalar')[lang] + ': ' + DIST_ID + '; web-d11-2026-10-r1; registry SHA256 ' + EXPECTED_REGISTRY + '.', '',
-      T('署名期限：2026-10-27 14:24:57 UZT。取得URLの期限と署名の期限は別。期限を書き換えて続行しない。以下は一般機能の一次資料（2026-10-23確認）。Lab固有のIP・課題・点数は本教材の仕様。',
-        'Подпись действует до 2026-10-27 14:24:57 UZT. Срок URL загрузки отличается от срока подписи; не меняйте даты для обхода. Ниже первичные документы общих функций, проверенные 2026-10-23. IP, задания и баллы Lab определены этим курсом.',
-        'Imzo muddati: 2026-10-27 14:24:57 UZT. Yuklash URL muddati imzo muddatidan farq qiladi; chetlab o‘tish uchun sanani o‘zgartirmang. Quyida 2026-10-23 tekshirilgan umumiy funksiyalarning birlamchi hujjatlari. Lab IP, topshiriq va ballari ushbu kurs tomonidan belgilanadi.')[lang], '',
+      T('採点条件は各Mの表と同梱の固定registryを参照する。', 'Критерии: таблицы M и фиксированный registry комплекта.', 'Baholash shartlari: M jadvallari va tarqatmadagi belgilangan registry.')[lang], '',
+      DIST_ID + '; web-d11-2026-10-r1; registry SHA256 `' + EXPECTED_REGISTRY + '`.', '', expiry_text(lang), '',
+      T('取得URLの期限と配布版の期限は別。期限を書き換えず、教師から有効な版を受け取る。以下は一般機能の一次資料（2026-10-23確認）。',
+        'Срок URL загрузки отличается от срока комплекта. Не меняйте даты; получите актуальный комплект у преподавателя. Ниже первичные документы общих функций, проверенные 2026-10-23.',
+        'Yuklash URL muddati tarqatma muddatidan farq qiladi. Sanani o‘zgartirmang; o‘qituvchidan amaldagi nusxani oling. Quyida 2026-10-23 tekshirilgan birlamchi hujjatlar.')[lang], '',
       '- [Nginx Beginner’s Guide](https://nginx.org/en/docs/beginners_guide.html)',
       '- [BIND 9: configurations and zones](https://bind9.readthedocs.io/en/v9.18.39/chapter3.html)',
       '- [PostgreSQL 16: pg_hba.conf](https://www.postgresql.org/docs/16/auth-pg-hba-conf.html)',
@@ -211,22 +208,24 @@ def make_markdown(reg, lang, kind):
                     text = reg['check_definitions'][cid]['pass_condition'] if lang == 'ja' else CHECKS[cid][lang]
                     out += [f'| {cid} | {text} |']
                 out += ['', T('本人確認・管理・配布元・通信基盤・依存前提等の準備checkは上表の素点に加えない。必要前提が未完了なら、点が一部あっても次段階の準備完了ではない。', 'Проверки identity/управления/repo/сети/зависимостей не добавляют баллов. Частичные баллы не означают готовность следующего этапа при неисправных предпосылках.', 'Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.')[lang], '']
-            out += ['### ' + L['submit'][lang], '', '```bash', 'jdu-web-check ' + task['id'] + (' --functional' if number in (5,6) else ' --no-submit'), 'jdu-web-check ' + task['id'] if number not in (5,6) else '# STORED / PENDING: inspect delivery result', '```', '']
+            out += ['### ' + L['submit'][lang], '', browser_check(task['id'], lang), '']
     out += emit_end(lang)
-    return '\n'.join(out).replace('\u2013', '-').replace('\u2014', '-')
+    text = '\n'.join(out).replace('\u2013', '-').replace('\u2014', '-')
+    # Labels form their own paragraphs so commands, explanations and results scan separately.
+    return re.sub(r'^(\*\*[^\n]+?:\*\*) (.+)$', r'\1\n\n\2', text, flags=re.M)
 
 CSS = '''
-:root{color-scheme:light;font:17px/1.8 system-ui,sans-serif;color:#172637;background:#eef2f6}
-*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:1000px;margin:auto;padding:1.5rem 2rem;background:white}
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
 header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
 a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
 .skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
 h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
-h3{font-size:1.2rem;margin-top:2rem}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
 pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
 code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
 th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
-p,li{overflow-wrap:anywhere}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
 '''
@@ -237,6 +236,7 @@ def render_html(md, lang, kind):
     body = body.replace('<th>', '<th scope="col">')
     # Generated output preserves the same folder hierarchy as Markdown.
     body = re.sub(r'href="([^"#]+)\.md(#[^"]*)?"', lambda m: 'href="' + m[1] + '.html' + (m[2] or '') + '"', body)
+    body = body.replace('href="../../output/pdf/', 'href="../../pdf/')
     toc = []
     def heading(m):
         slug = 'section-' + str(len(toc) + 1)
@@ -244,8 +244,8 @@ def render_html(md, lang, kind):
         return f'<h2 id="{slug}">{m[1]}</h2>'
     body = re.sub(r'<h2>(.*?)</h2>', heading, body)
     links = ' · '.join(f'<a href="#{slug}">{text}</a>' for slug, text in toc)
-    title = html.escape(L[kind][lang])
-    return f'<!doctype html><html lang="{lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><style>{CSS}</style></head><body><a class="skip" href="#content">{html.escape(L["intro"][lang])}</a><header><p>JDU · Web Infrastructure · D12 P/M {MATERIAL_REVISION}</p><nav aria-label="Contents">{links}</nav></header><main id="content" tabindex="-1">{body}</main><footer>{DIST_ID} · 62 raw points · 2026-10-23</footer></body></html>'
+    title = html.escape(md.splitlines()[0].removeprefix('# '))
+    return f'<!doctype html><html lang="{lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><style>{CSS}</style></head><body><a class="skip" href="#content">{html.escape(L["intro"][lang])}</a><header><p>JDU · Web Infrastructure · D12 P/M {MATERIAL_REVISION}</p><nav aria-label="Contents">{links}</nav></header><main id="content" tabindex="-1">{body}</main><footer>{DIST_ID} · 62 raw points · 2026-11-03</footer></body></html>'
 
 def make_pdf(md, lang, target):
     from reportlab.lib import colors
@@ -271,7 +271,7 @@ def make_pdf(md, lang, target):
     parser = MarkdownIt('commonmark', {'html':False}).enable('table')
     tokens = parser.parse(md)
     def inline(token):
-        result=[]
+        result=[];active_links=[]
         for c in token.children or []:
             if c.type=='text':
                 value=html.escape(c.content)
@@ -286,12 +286,11 @@ def make_pdf(md, lang, target):
             elif c.type=='em_close': result.append('</i>')
             elif c.type=='link_open':
                 href=c.attrGet('href')
-                result.append('<a href="'+html.escape(href,quote=True)+'" color="#085e80">' if href.startswith('https://') else '')
+                active_links.append(href.startswith('https://'))
+                result.append('<a href="'+html.escape(href,quote=True)+'" color="#085e80">' if active_links[-1] else '')
             elif c.type=='link_close':
                 # Only external links are active in PDF; index/HTML keep local navigation.
-                j=(token.children or []).index(c)
-                opened=next((x for x in reversed(token.children[:j]) if x.type=='link_open'),None)
-                result.append('</a>' if opened and opened.attrGet('href').startswith('https://') else '')
+                result.append('</a>' if active_links.pop() else '')
         return ''.join(result)
     flow=[];i=0;list_depth=0
     while i<len(tokens):
@@ -364,13 +363,15 @@ def main():
         for kind in ('practice','missions'):
             folder=ROOT/'docs'/lang;folder.mkdir(parents=True,exist_ok=True)
             md=make_markdown(reg,lang,kind)
-            (folder/(kind+'.md')).write_text(md,encoding='utf-8',newline='\n')
+            (folder/(kind+'-full.md')).write_text(md,encoding='utf-8',newline='\n')
             out=ROOT/'output/html'/lang;out.mkdir(parents=True,exist_ok=True)
-            (out/(kind+'.html')).write_text(render_html(md,lang,kind),encoding='utf-8',newline='\n')
-            if not a.no_pdf:
+            (out/(kind+'-full.html')).write_text(render_html(md,lang,kind),encoding='utf-8',newline='\n')
+        write_pages(ROOT, lang, reg, MATERIAL_REVISION, DIST_ID, render_html, L, MODULES)
+        if not a.no_pdf:
+            for kind in ('practice','missions'):
                 out=ROOT/'output/pdf';out.mkdir(parents=True,exist_ok=True)
                 path=out/f'web_lab_{kind}_{lang}.pdf'
-                make_pdf(md,lang,path)
+                make_pdf((folder/(kind+'-full.md')).read_text(encoding='utf-8'),lang,path)
                 outputs.append(path.name)
     # Keep accepted initial distribution instructions as a byte-for-byte reference copy.
     for sub in ('', 'foundation'):
@@ -392,10 +393,10 @@ def main():
     for lang in LANGS:
         label={'ja':'日本語','ru':'Русский','uz':'O‘zbekcha'}[lang]
         links.append(f'<article><h2>{label}</h2><p><a href="{lang}/portal.html">ブラウザ確認 / Проверка в браузере / Brauzerda tekshirish</a></p><p><a href="{lang}/practice.html">P0–P6</a> · <a href="{lang}/missions.html">M0–M6</a></p><p><a href="../pdf/web_lab_practice_{lang}.pdf">P PDF</a> · <a href="../pdf/web_lab_missions_{lang}.pdf">M PDF</a></p></article>')
-    (ROOT/'output/html/index.html').write_text('<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JDU Web P/M 教材</title><style>'+CSS+'</style></head><body><main><h1>Web Infrastructure · P / M</h1><p>手順付き練習と自力課題 / Практика и задания / Mashqlar va topshiriqlar</p><p>2026-10-23 · 教師確認用初版 / Для проверки преподавателем / O‘qituvchi tekshiruvi uchun</p>'+''.join(links)+'<p>2026-10-30: 初期設定後はブラウザ確認の追補を使用 / После начальной настройки используйте инструкцию проверки в браузере / Boshlang‘ich sozlashdan keyin brauzer yo‘riqnomasidan foydalaning.</p><p>同梱署名版：2027-01-31末（UZT）まで有効。初回は教師の個別登録も必要です / Комплект действителен до 31.01.2027 (UZT); нужна личная регистрация / Tarqatma 31.01.2027 (UZT) gacha amal qiladi; shaxsiy ro‘yxat ham kerak.</p></main></body></html>',encoding='utf-8',newline='\n')
+    (ROOT/'output/html/index.html').write_text('<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JDU Web P/M 教材</title><style>'+CSS+'</style></head><body><main><h1>Web Infrastructure · P / M</h1><p>手順付き練習と自力課題 / Практика и задания / Mashqlar va topshiriqlar</p><p>2026-11-03 · D12 P/M '+MATERIAL_REVISION+'</p>'+''.join(links)+'<p>同梱署名版：2027-01-31末（UZT）まで有効。初回は教師の個別登録も必要です / Комплект действителен до 31.01.2027 (UZT); нужна личная регистрация / Tarqatma 31.01.2027 (UZT) gacha amal qiladi; shaxsiy ro‘yxat ham kerak.</p></main></body></html>',encoding='utf-8',newline='\n')
     package=ROOT/'output/web-lab-pm-r1.zip'
     members=[p for folder in ('docs','resources','distribution','output/html','output/pdf') for p in (ROOT/folder).rglob('*') if p.is_file()]
-    members += [ROOT/'README.md',ROOT/'VALIDATION.md']
+    members += [ROOT/'README.md',ROOT/'TEACHER-NOTES.md',ROOT/'VALIDATION.md']
     if all(p.exists() for p in members):
         inventory={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in members}
         with zipfile.ZipFile(package,'w',compression=zipfile.ZIP_DEFLATED) as z:

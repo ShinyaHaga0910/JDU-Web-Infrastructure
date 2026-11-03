@@ -4,55 +4,55 @@
   "pdfs": [
     {
       "file": "web_lab_missions_ja.pdf",
-      "sha256": "05fcfb5e7a404807bc2bb6680b9b5a24a893810ce3818059b057423eda556630",
-      "pages": 11,
-      "rendered_pages": 11,
+      "sha256": "268218b05dc0ee05a63968c151a783bfdcee9539d6235aff4e2a5d136ba73caf",
+      "pages": 12,
+      "rendered_pages": 12,
       "out_of_bounds_words": 0,
       "issues": []
     },
     {
       "file": "web_lab_missions_ru.pdf",
-      "sha256": "948d2027edff4cd462ace48b8a2dc7d4f560b6b47d2fec7ce7964eabd88b8182",
-      "pages": 11,
-      "rendered_pages": 11,
+      "sha256": "9cb0c29ce4f7f8e02d70e3b19c03cc80734a4c0cda064095469b7780e68f877f",
+      "pages": 12,
+      "rendered_pages": 12,
       "out_of_bounds_words": 0,
       "issues": []
     },
     {
       "file": "web_lab_missions_uz.pdf",
-      "sha256": "e185f0892f5b2073bbf473c069af6737d5b44b61fdba2c75fd5b27fbdf3fa829",
-      "pages": 11,
-      "rendered_pages": 11,
+      "sha256": "c95babbf4eec2f585fdf8fd298dab0aea60e3b9629a0941b9c059595e88001f6",
+      "pages": 12,
+      "rendered_pages": 12,
       "out_of_bounds_words": 0,
       "issues": []
     },
     {
       "file": "web_lab_practice_ja.pdf",
-      "sha256": "665796502f7de2d368f136df2cfaf28602387ea92b2c26abab83d705fcb5b695",
-      "pages": 30,
-      "rendered_pages": 30,
+      "sha256": "2fe07f7ef71c7004b5390be1804324cfa6efe6d48e4d327b6e61cd33064ba5e9",
+      "pages": 36,
+      "rendered_pages": 36,
       "out_of_bounds_words": 0,
       "issues": []
     },
     {
       "file": "web_lab_practice_ru.pdf",
-      "sha256": "811649e8e790882b8c816d33fbcb9d1391685c5eb8302a0e314f055b8e0427b9",
-      "pages": 32,
-      "rendered_pages": 32,
+      "sha256": "6120b60fff6927e1950e0720444ea77e5a44d68d731e652694519d6fcd4ebb51",
+      "pages": 38,
+      "rendered_pages": 38,
       "out_of_bounds_words": 0,
       "issues": []
     },
     {
       "file": "web_lab_practice_uz.pdf",
-      "sha256": "371004087498b655bc595d91cdf555dc15943585f2bb6e816635dacc24af5b21",
-      "pages": 30,
-      "rendered_pages": 30,
+      "sha256": "09b527c513761c6d2306cd337576dce3adeec99c52177d398264b3ca5da37e31",
+      "pages": 36,
+      "rendered_pages": 36,
       "out_of_bounds_words": 0,
       "issues": []
     }
   ],
-  "pdf_pages_checked": 125,
-  "rendered_pages": 125,
+  "pdf_pages_checked": 146,
+  "rendered_pages": 146,
   "out_of_bounds_words": 0,
   "teacher_visual_review": false,
   "native_language_review": false,

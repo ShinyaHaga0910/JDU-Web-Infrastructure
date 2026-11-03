@@ -1,0 +1,117 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>P3 Данные при остановке и запуске</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Что изучаем</a> · <a href="#section-3">Задание</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P3 Данные при остановке и запуске</h1>
+<p><a href="start.html">Сначала: подключение и правила</a> · <a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a> · <a href="portal.html">Проверка в браузере</a></p>
+<p><a href="../ja/p3.html">日本語</a> · <a href="../ru/p3.html">Русский</a> · <a href="../uz/p3.html">O‘zbekcha</a></p>
+<p>2026-11-03 · D12 P/M r1.3</p>
+<p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
+<h2 id="section-1">Перед началом</h2>
+<p>Проверьте <a href="start.html">подключение и правила</a>. Связанное задание: <a href="m3.html">M3</a>. Проверка описана в <a href="portal.html">инструкции браузера</a>.</p>
+<h2 id="section-2">Что изучаем</h2>
+<p>Проверить файл и права на исходном EBS; доказать сохранение после stop/start того же Web.</p>
+<h2 id="section-3">Задание</h2>
+<p>Создайте marker P3 со своим анонимным Lab ID. Зафиксируйте состояние до остановки, stopped и после запуска. Дополнительный диск, mount и backup/restore не требуются.</p>
+<ul>
+<li>File: /var/lib/jdu-web/practice/storage.txt</li>
+</ul>
+<pre><code class="language-text">lab_id={lab_id}
+task=P3
+payload=practice-storage-2026
+</code></pre>
+<h2 id="section-4">Как это работает</h2>
+<p><strong>Состояние перед началом:</strong></p>
+<p>Маркер можно сохранить на исходном корневом EBS того же Web.</p>
+<p><strong>Что изменится в этом P:</strong></p>
+<p>Сохранность после stop/start того же Web подтверждена данными до и после.</p>
+<p>Различайте оперативную память и сохранённый файл на EBS. Здесь выполняется Stop/Start того же Web с исходным EBS. Сравните хеш, instance/volume ID и изменение boot ID. Автоматический public IPv4 может измениться. <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Stop_Start.html">Остановка и запуск EC2</a>.</p>
+<h2 id="section-5">Пример решения: выполняйте по одному шагу</h2>
+<h3>P3.1 Проверить исходный диск и свободное место</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>findmnt показывает файловую систему, lsblk - диски и разделы, df -h - свободное место. Используйте предоставленный root EBS; имя /dev/nvme не является причиной менять диск.</p>
+<pre><code class="language-bash">findmnt -T /var/lib
+lsblk -o NAME,TYPE,SIZE,MOUNTPOINTS,SERIAL
+df -h /var/lib
+cat /proc/sys/kernel/random/boot_id
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Findmnt показывает файловую систему пути, lsblk - блочные устройства, df - свободное место. Это разные наблюдения. Boot_id идентифицирует текущую загрузку, а хеш - содержимое файла.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Соответствует исходному root volume; свободно не менее 20% и 2 GiB. Сохраните boot_id текущей загрузки.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Недостаток места - проблема готовности. Не удаляйте другие материалы или диски ради баллов.</p>
+<h3>P3.2 Создать и разместить marker</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Задайте LAB_ID и в этом терминале. printf завершает строки переводом строки. install задаёт directory 0755 и файл 0644/root:root. Сначала проверьте существующий файл; не заменяйте отличающееся содержимое без выяснения причины.</p>
+<pre><code class="language-bash">LAB_ID='YOUR-LAB-ID'
+cd ~
+mkdir -p jdu-web-practice/p3
+cd jdu-web-practice/p3
+printf 'lab_id=%s\ntask=P3\npayload=practice-storage-2026\n' &quot;$LAB_ID&quot; &gt; storage.txt
+cat storage.txt
+sudo install -d -o root -g root -m 0755 /var/lib/jdu-web/practice
+sudo install -o root -g root -m 0644 storage.txt /var/lib/jdu-web/practice/storage.txt
+stat -c '%U:%G %a %n' /var/lib/jdu-web/practice /var/lib/jdu-web/practice/storage.txt
+sha256sum /var/lib/jdu-web/practice/storage.txt
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Printf подставляет LAB_ID вместо %s, \n означает перевод строки. Символ &gt; записывает рабочий файл. Install -d создаёт каталог, следующий install задаёт владельца и права маркера. Хеш проверяет совпадение содержимого.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Три строки с конечным переводом строки, права 0755/0644. Запишите hash. Права 777 не подходят.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Не оставляйте YOUR-LAB-ID. Используйте анонимный Lab ID, не имя EC2 и не email.</p>
+<h3>P3.3 Сохранить доказательство до остановки</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>Браузер на своём PC: Web Portal</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Выйдите из Web через exit в CloudShell. В Web Portal выберите P3 и сохраните состояние до остановки. Сохраняются instance/volume/hash marker/boot_id; EC2 ещё не останавливается. Дождитесь успешного сохранения. Все этапы доказательства P3 выполняйте этим браузерным способом.</p>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Запись до остановки сохраняет узел, загрузку и marker для сравнения. Кнопка сама не останавливает EC2. Затем выполните AWS Stop; не смешивайте браузерные и командные доказательства.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Состояние до остановки сохранено. После этого marker не редактируйте.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Остановка после неуспешной подготовки не даст полной цепочки доказательств. Сначала исправьте файл/права/SSM.</p>
+<h3>P3.4 Остановить тот же Web и зафиксировать stopped</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>AWS Console своего студенческого аккаунта</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Сверьте instance ID своего Web в EC2. Выберите Instance state → Stop instance и дождитесь stopped. Не Reboot/Terminate. Не запуская Web, подтвердите остановку в P3 Web Portal. Остальные четыре сервера не останавливайте.</p>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>В Console выполните Stop нужного Web; состояние stopped зафиксируйте в Web Portal. Разрыв SSM сам по себе не доказывает остановку. Stop отличается от reboot и Terminate.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Записано stopped того же instance. Во время остановки недоступность HTTP/SSM ожидаема.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>При stopping подождите. Если запустили раньше наблюдения, цепочку из трёх этапов потребуется повторить.</p>
+<h3>P3.5 Запустить, сравнить данные и отправить</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>AWS Console своего студенческого аккаунта</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Запустите тот же Web и дождитесь running/SSM Online. Через SSM сравните текст/hash и boot_id: instance/volume/hash сохраняются, boot_id меняется. В P3 Web Portal проверьте сохранение после запуска и дождитесь результата и сохранения.</p>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Запустите тот же Web и дождитесь running/SSM Online. Checker сравнивает текущее состояние с сохранённым исходным; не пересоздавайте маркер после запуска. Для внешнего доступа далее используйте новый public IP Web.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Три учебные проверки PASS. Если public IPv4 изменился, используйте новый адрес для внешнего HTTP.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Новый instance не доказывает сохранение. Для P3/M3 нужны отдельные marker и доказательства.</p>
+<h2 id="section-6">Проверка понимания (без баллов)</h2>
+<p>Достаточно ли одинакового текста на новом Web для выполнения задания?</p>
+<p><strong>Объяснение:</strong></p>
+<p>Нет: нужны исходные instance и volume, а также наблюдение остановленного состояния.</p>
+<hr />
+<p><a href="m2.html">Предыдущее: M2</a> · <a href="m3.html">Следующее: M3</a></p>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>

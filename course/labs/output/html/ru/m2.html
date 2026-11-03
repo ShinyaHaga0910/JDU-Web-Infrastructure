@@ -1,0 +1,133 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M2 Внутренний DNS и системное разрешение имён (13)</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Требуемый результат</a> · <a href="#section-3">Условия: 1 исходный балл за проверку</a> · <a href="#section-4">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M2 Внутренний DNS и системное разрешение имён (13)</h1>
+<p><a href="start.html">Сначала: подключение и правила</a> · <a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a> · <a href="portal.html">Проверка в браузере</a></p>
+<p><a href="../ja/m2.html">日本語</a> · <a href="../ru/m2.html">Русский</a> · <a href="../uz/m2.html">O‘zbekcha</a></p>
+<p>2026-11-03 · D12 P/M r1.3</p>
+<p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
+<h2 id="section-1">Перед началом</h2>
+<p>Проверьте <a href="start.html">подключение и правила</a>. Связанное задание: <a href="p2.html">P2</a>. Проверка описана в <a href="portal.html">инструкции браузера</a>.</p>
+<h2 id="section-2">Требуемый результат</h2>
+<p>Добавьте шесть основных имён в ту же zone lab.test. guide/practice-db можно сохранить. Нужны обычный resolver бастиона/Web, HTTP M1 по имени, имя DB, UDP/TCP, forwarding, NXDOMAIN, ACL и запрет AXFR.</p>
+<table>
+<thead>
+<tr>
+<th scope="col">DNS name</th>
+<th scope="col">A / IPv4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>admin.lab.test</td>
+<td>10.20.1.20</td>
+</tr>
+<tr>
+<td>bastion.lab.test</td>
+<td>10.20.1.10</td>
+</tr>
+<tr>
+<td>db.lab.test</td>
+<td>10.20.2.20</td>
+</tr>
+<tr>
+<td>dns.lab.test</td>
+<td>10.20.2.10</td>
+</tr>
+<tr>
+<td>repo.lab.test</td>
+<td>10.20.2.30</td>
+</tr>
+<tr>
+<td>web.lab.test</td>
+<td>10.20.1.20</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Текущие предпосылки: M1</li>
+</ul>
+<h2 id="section-3">Условия: 1 исходный балл за проверку</h2>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID (не менять)</th>
+<th scope="col">Условие</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB03_SERVICE</td>
+<td>BIND/named работает (active).</td>
+</tr>
+<tr>
+<td>WEB03_CONFIG_VALID</td>
+<td>Проверки named и zone lab.test завершаются успешно.</td>
+</tr>
+<tr>
+<td>WEB03_ZONE_AUTHORITY</td>
+<td>SOA/NS zone lab.test и авторитетный ответ соответствуют схеме; NS - dns.lab.test.</td>
+</tr>
+<tr>
+<td>WEB03_REQUIRED_RECORDS</td>
+<td>Все заданные A-записи profile дают нужные private IP; это один пункт.</td>
+</tr>
+<tr>
+<td>WEB03_UDP_RESPONSE</td>
+<td>И бастион, и Web получают правильные ответы по UDP 53.</td>
+</tr>
+<tr>
+<td>WEB03_TCP_RESPONSE</td>
+<td>И бастион, и Web получают правильные ответы по TCP 53.</td>
+</tr>
+<tr>
+<td>WEB03_NORMAL_RESOLVER</td>
+<td>Обычный resolver бастиона/Web использует только BIND; нет подмены hosts или Firefox DoH.</td>
+</tr>
+<tr>
+<td>WEB03_NAMED_HTTP</td>
+<td>С бастиона HTTP по имени profile и заданному пути возвращает 200 и правильный текст.</td>
+</tr>
+<tr>
+<td>WEB03_DB_NAME</td>
+<td>Обычный resolver Web разрешает имя DB profile в 10.20.2.20.</td>
+</tr>
+<tr>
+<td>WEB03_FORWARD_ONLY</td>
+<td>Forward only направлен только на 10.20.0.2; внешнее DNS-имя разрешается. Внешний HTTP не нужен.</td>
+</tr>
+<tr>
+<td>WEB03_NXDOMAIN</td>
+<td>Новое отсутствующее имя этого запуска получает авторитетный NXDOMAIN.</td>
+</tr>
+<tr>
+<td>WEB03_CLIENT_ACL</td>
+<td>Query/recursion/cache разрешены только localhost, бастиону и Web в BIND; одного SG недостаточно.</td>
+</tr>
+<tr>
+<td>WEB03_AXFR_DENIED</td>
+<td>AXFR с бастиона/Web явно отклоняется при успешных обычных запросах того же запуска; таймаут не подходит.</td>
+</tr>
+</tbody>
+</table>
+<p>Проверки identity/управления/repo/сети/зависимостей не добавляют баллов. Частичные баллы не означают готовность следующего этапа при неисправных предпосылках.</p>
+<h2 id="section-4">Проверка и отправка</h2>
+<ol>
+<li>Войдите через школьный Google в <a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a> на PC, выберите свой Lab и <strong>M2</strong>. Привязка и экраны описаны в <a href="portal.html">инструкции браузера</a>.</li>
+<li>Запустите проверку выбранного задания.</li>
+<li>Во время обработки обновляйте результат. Сверьте ID задания, время, каждый check и сохранение. Результат сохраняется автоматически; оценки M доступны в разделе сохранённых оценок. P и M0 не оцениваются.</li>
+</ol>
+<hr />
+<p><a href="p2.html">Предыдущее: P2</a> · <a href="p3.html">Следующее: P3</a></p>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>

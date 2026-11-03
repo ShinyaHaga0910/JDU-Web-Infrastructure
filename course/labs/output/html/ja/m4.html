@@ -1,0 +1,87 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M4 PostgreSQLへの認証接続 (9)</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">完成要件</a> · <a href="#section-3">合格条件：採点check各1素点</a> · <a href="#section-4">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M4 PostgreSQLへの認証接続 (9)</h1>
+<p><a href="start.html">はじめに：接続・操作の約束</a> · <a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a> · <a href="portal.html">ブラウザで確認する</a></p>
+<p><a href="../ja/m4.html">日本語</a> · <a href="../ru/m4.html">Русский</a> · <a href="../uz/m4.html">O‘zbekcha</a></p>
+<p>2026-11-03 · D12 P/M r1.3</p>
+<p>配布版の有効期限：2027年1月31日末（UZT）。</p>
+<h2 id="section-1">始める前に</h2>
+<p><a href="start.html">共通の接続・操作</a>を確認する。対応する詳しい練習は<a href="p4.html">P4</a>。課題の判定方法は<a href="portal.html">ブラウザ確認手順</a>を使う。</p>
+<h2 id="section-2">完成要件</h2>
+<p>本課題用DB/roleを自分で構築する。M2のdb.lab.testを通常解決し、Webのruntime roleで認証SELECTを成功させる。HBAはWeb/32・正しいDB/roleだけ。既存passwordをWeb内のmission用helperへ保存し、practiceと混ぜない。app tableはまだ不要。</p>
+<ul>
+<li>Profile: mission</li>
+<li>Database: jdu_catalog</li>
+<li>Setup role: catalog_setup</li>
+<li>Runtime role: catalog_app</li>
+<li>現在必要な前提: M2</li>
+</ul>
+<h2 id="section-3">合格条件：採点check各1素点</h2>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID（変更しない）</th>
+<th scope="col">満たすこと</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB05_CLUSTER_ACTIVE</td>
+<td>PostgreSQL16/mainがactiveである。</td>
+</tr>
+<tr>
+<td>WEB05_CLUSTER_CONFIG</td>
+<td>16/mainの設定・標準data directory・postgres/socket peer管理が妥当である。</td>
+</tr>
+<tr>
+<td>WEB05_LISTEN_5432</td>
+<td>10.20.2.20:5432で待ち受ける。</td>
+</tr>
+<tr>
+<td>WEB05_DATABASE_OWNER</td>
+<td>P/M別DBとpublic schemaのownerが対応するsetup roleである。</td>
+</tr>
+<tr>
+<td>WEB05_ROLE_ATTRIBUTES</td>
+<td>対応runtime roleはLOGIN。両roleにsuperuser/CREATEDB/CREATEROLE/REPLICATION/BYPASSRLSや昇格membershipがない。setupは構築中LOGIN/完成後NOLOGINの両段階を認める。</td>
+</tr>
+<tr>
+<td>WEB05_HBA_SCRAM</td>
+<td>pg_hbaはWeb /32・列挙したprofile DB/roleだけにSCRAMを許可し、それ以外の広い許可がない。</td>
+</tr>
+<tr>
+<td>WEB05_WEB_SQL</td>
+<td>Pはprivate IP、Mは通常DNS名からruntime roleで新規認証接続し、current_database/current_user/SELECT結果が一致する。</td>
+</tr>
+<tr>
+<td>WEB05_BAD_PASSWORD_DENIED</td>
+<td>同じ回の正規接続を対照に、1回の誤password接続が明示認証拒否される。秘密値やhashは返さない。</td>
+</tr>
+<tr>
+<td>WEB05_WRONG_TARGET_DENIED</td>
+<td>Webからpostgres role・許可外DB・他profileへの接続をHBA等で明示拒否する。未作成practice DB自体は必須にしない。</td>
+</tr>
+</tbody>
+</table>
+<p>本人確認・管理・配布元・通信基盤・依存前提等の準備checkは上表の素点に加えない。必要前提が未完了なら、点が一部あっても次段階の準備完了ではない。</p>
+<h2 id="section-4">確認・提出</h2>
+<ol>
+<li>PCの<a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a>へ学校Googleでログインし、本人のLabと <strong>M4</strong> を選ぶ。初回の連携・画面の説明は<a href="portal.html">ブラウザ確認手順</a>を参照する。</li>
+<li>「この課題を確認する」を押す。</li>
+<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。</li>
+</ol>
+<hr />
+<p><a href="p4.html">前の課題: P4</a> · <a href="p5.html">次の課題: P5</a></p>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>

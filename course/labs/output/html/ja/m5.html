@@ -1,0 +1,133 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M5 教員アプリをWeb・DBへ接続する (13)</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">完成要件</a> · <a href="#section-3">合格条件：採点check各1素点</a> · <a href="#section-4">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M5 教員アプリをWeb・DBへ接続する (13)</h1>
+<p><a href="start.html">はじめに：接続・操作の約束</a> · <a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a> · <a href="portal.html">ブラウザで確認する</a></p>
+<p><a href="../ja/m5.html">日本語</a> · <a href="../ru/m5.html">Русский</a> · <a href="../uz/m5.html">O‘zbekcha</a></p>
+<p>2026-11-03 · D12 P/M r1.3</p>
+<p>配布版の有効期限：2027年1月31日末（UZT）。</p>
+<h2 id="section-1">始める前に</h2>
+<p><a href="start.html">共通の接続・操作</a>を確認する。対応する詳しい練習は<a href="p5.html">P5</a>。課題の判定方法は<a href="portal.html">ブラウザ確認手順</a>を使う。</p>
+<h2 id="section-2">完成要件</h2>
+<p>同じ教員アプリをmission DBへ接続する。P5のpractice手順を参考にprofile=missionを選ぶ。既存app/venvを再配置しない。service停止後、mission runtime作成→明示activate→mission setup作成の順を守る（practiceのsetupはP6で終了済みにする）。固定migration/seed/管理者と権限をそのDBへ構築し指定2件を登録する。P1/M1を保持する。完成後はmissionをactiveにする。</p>
+<ul>
+<li>Profile: mission</li>
+<li>Database: jdu_catalog</li>
+<li>Setup role: catalog_setup</li>
+<li>Runtime role: catalog_app</li>
+<li>Application administrator: lab_admin</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th scope="col">code</th>
+<th scope="col">name</th>
+<th scope="col">quantity</th>
+<th scope="col">location</th>
+<th scope="col">is_public</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M5-PUBLIC-001</td>
+<td>Mission monitor</td>
+<td>6</td>
+<td>Lab cabinet C</td>
+<td>true</td>
+</tr>
+<tr>
+<td>M5-PRIVATE-001</td>
+<td>Mission router</td>
+<td>1</td>
+<td>Lab cabinet D</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>現在必要な前提: M2, M4</li>
+</ul>
+<h2 id="section-3">合格条件：採点check各1素点</h2>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID（変更しない）</th>
+<th scope="col">満たすこと</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB06_ARTIFACTS</td>
+<td>教員配布コード・依存・固定版が一致する。学生はアプリコードを書かない。</td>
+</tr>
+<tr>
+<td>WEB06_SERVICE</td>
+<td>systemd serviceがactive/enabledで、設計の専用catalog userで起動する。</td>
+</tr>
+<tr>
+<td>WEB06_LOOPBACK</td>
+<td>Gunicornが127.0.0.1:8000のみで待ち受ける。</td>
+</tr>
+<tr>
+<td>WEB06_PROFILE_DATABASE</td>
+<td>app.envと実接続が選択profileのDB/runtime roleを通常DNSで使う。M4の単体SQL接続とは別にアプリ実接続を確認。</td>
+</tr>
+<tr>
+<td>WEB06_MIGRATIONS</td>
+<td>教員固定migrationと11table/必要sequenceが対象DBに揃う。</td>
+</tr>
+<tr>
+<td>WEB06_REQUIRED_RECORDS</td>
+<td>P/M別の指定2件が対象DBに期待値で保存される。必須部分集合として照合する。</td>
+</tr>
+<tr>
+<td>WEB06_PUBLIC_DATA</td>
+<td>一般80のHTTP200と公開対象の値がDBと一致する。固定HTMLのみではPASSにしない。</td>
+</tr>
+<tr>
+<td>WEB06_ADMIN_ENTRY</td>
+<td>通常DNSのadmin.lab.test:8080/admin/に踏み台から到達し、正しいログイン画面が返る。</td>
+</tr>
+<tr>
+<td>WEB06_STATIC</td>
+<td>一般/管理画面に必要なCSS等が正しい入口から取得でき、Content-Typeも妥当である。</td>
+</tr>
+<tr>
+<td>WEB06_PASSWORD_LOGIN</td>
+<td>対話型自動確認で実passwordと正しいCSRF/session処理によって対象staffとしてHTTPログインする。force_loginやsession直書きを使わない。</td>
+</tr>
+<tr>
+<td>WEB06_CREATE_REFLECT</td>
+<td>同じ自動確認回で専用nonceの架空備品1件を管理HTTPから登録し、PostgreSQLと一般画面の値が一致する。</td>
+</tr>
+<tr>
+<td>WEB06_EDIT_REFLECT</td>
+<td>その回にchecker自身が作った専用備品だけの数量を変更し、DBと一般画面の更新が一致する。</td>
+</tr>
+<tr>
+<td>WEB06_LOGOUT</td>
+<td>同じsessionをPOSTでログアウトし、そのcookieを再使用しても管理画面は再認証を要求する。</td>
+</tr>
+</tbody>
+</table>
+<p>本人確認・管理・配布元・通信基盤・依存前提等の準備checkは上表の素点に加えない。必要前提が未完了なら、点が一部あっても次段階の準備完了ではない。</p>
+<h2 id="section-4">確認・提出</h2>
+<ol>
+<li>PCの<a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a>へ学校Googleでログインし、本人のLabと <strong>M5</strong> を選ぶ。初回の連携・画面の説明は<a href="portal.html">ブラウザ確認手順</a>を参照する。</li>
+<li>「機能・権限を含めて確認する」を選び、lab_admin の既存パスワードを「アプリ管理者の既存パスワード」に非表示入力して「このパスワードで確認する」を押す。RDP用とは別。設定だけの確認では機能の合格を確定しない。</li>
+<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。</li>
+</ol>
+<hr />
+<p><a href="p6.html">前の課題: P6</a> · <a href="m6.html">次の課題: M6</a></p>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>

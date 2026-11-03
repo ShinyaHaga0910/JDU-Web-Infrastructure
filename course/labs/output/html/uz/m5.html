@@ -1,0 +1,133 @@
+<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M5 Berilgan app ni Web va DB bilan bog‘lash (13)</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Boshlashdan oldin</a> · <a href="#section-2">Tayyor holat talablari</a> · <a href="#section-3">Shartlar: har tekshiruvga 1 xom ball</a> · <a href="#section-4">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M5 Berilgan app ni Web va DB bilan bog‘lash (13)</h1>
+<p><a href="start.html">Avval: ulanish va qoidalar</a> · <a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a> · <a href="portal.html">Brauzerda tekshirish</a></p>
+<p><a href="../ja/m5.html">日本語</a> · <a href="../ru/m5.html">Русский</a> · <a href="../uz/m5.html">O‘zbekcha</a></p>
+<p>2026-11-03 · D12 P/M r1.3</p>
+<p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
+<h2 id="section-1">Boshlashdan oldin</h2>
+<p><a href="start.html">Ulanish va qoidalar</a> bilan tanishing. Mos topshiriq: <a href="p5.html">P5</a>. Tekshiruv: <a href="portal.html">brauzer yo‘riqnomasi</a>.</p>
+<h2 id="section-2">Tayyor holat talablari</h2>
+<p>Ayni app ni mission DB ga ulang. P5 ko‘nikmasi bilan profile=mission tanlang, app/venv ni qayta joylamang. Service ni to‘xtatib: mission runtime yaratish → aniq activate → mission setup yaratish; practice setup P6 da tugatilgan bo‘lsin. Asosiy DB da migrations/seed/admin va grants ni bajaring, ikkita belgilangan yozuvni kiriting. P1/M1 ni saqlab mission ni active qoldiring.</p>
+<ul>
+<li>Profile: mission</li>
+<li>Database: jdu_catalog</li>
+<li>Setup role: catalog_setup</li>
+<li>Runtime role: catalog_app</li>
+<li>Application administrator: lab_admin</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th scope="col">code</th>
+<th scope="col">name</th>
+<th scope="col">quantity</th>
+<th scope="col">location</th>
+<th scope="col">is_public</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>M5-PUBLIC-001</td>
+<td>Mission monitor</td>
+<td>6</td>
+<td>Lab cabinet C</td>
+<td>true</td>
+</tr>
+<tr>
+<td>M5-PRIVATE-001</td>
+<td>Mission router</td>
+<td>1</td>
+<td>Lab cabinet D</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Joriy old shartlar: M2, M4</li>
+</ul>
+<h2 id="section-3">Shartlar: har tekshiruvga 1 xom ball</h2>
+<table>
+<thead>
+<tr>
+<th scope="col">check ID (o‘zgartirmang)</th>
+<th scope="col">Shart</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WEB06_ARTIFACTS</td>
+<td>Kod va bog‘liqliklar berilgan aniq versiyaga mos.</td>
+</tr>
+<tr>
+<td>WEB06_SERVICE</td>
+<td>jdu-catalog active va enabled, catalog nomidan ishlaydi.</td>
+</tr>
+<tr>
+<td>WEB06_LOOPBACK</td>
+<td>Gunicorn faqat 127.0.0.1:8000 da tinglaydi.</td>
+</tr>
+<tr>
+<td>WEB06_PROFILE_DATABASE</td>
+<td>Faol process kerakli profile DB va runtime role dan foydalanadi.</td>
+</tr>
+<tr>
+<td>WEB06_MIGRATIONS</td>
+<td>Belgilangan migrations, 11 jadval va zarur sequence tanlangan DB da mavjud.</td>
+</tr>
+<tr>
+<td>WEB06_REQUIRED_RECORDS</td>
+<td>Ikkala majburiy yozuv profile qiymatlariga mos; boshqa to‘g‘ri yozuvlar mumkin.</td>
+</tr>
+<tr>
+<td>WEB06_PUBLIC_DATA</td>
+<td>Odatiy ochiq URL ishlayotgan DB dan to‘g‘ri yozuvlarni oladi.</td>
+</tr>
+<tr>
+<td>WEB06_ADMIN_ENTRY</td>
+<td>Bastiondan odatiy DNS orqali admin.lab.test:8080/admin/ haqiqiy login shakli ochiladi.</td>
+</tr>
+<tr>
+<td>WEB06_STATIC</td>
+<td>Static resurslar belgilangan yo‘l orqali ochiladi.</td>
+</tr>
+<tr>
+<td>WEB06_PASSWORD_LOGIN</td>
+<td>Funksional rejim haqiqiy password/CSRF/cookie login dan o‘tadi, autentifikatsiya chetlab o‘tilmaydi.</td>
+</tr>
+<tr>
+<td>WEB06_CREATE_REFLECT</td>
+<td>Shu tekshiruvda admin HTTP orqali bitta CK yozuv yaratilib, DB va ochiq sahifa qiymatlari mos keladi.</td>
+</tr>
+<tr>
+<td>WEB06_EDIT_REFLECT</td>
+<td>Aynan shu CK yozuv miqdori o‘zgartiriladi; DB va ochiq sahifa o‘zgarishni tasdiqlaydi.</td>
+</tr>
+<tr>
+<td>WEB06_LOGOUT</td>
+<td>POST logout session ni tugatadi: eski cookie bilan yana login talab etiladi.</td>
+</tr>
+</tbody>
+</table>
+<p>Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.</p>
+<h2 id="section-4">Tekshirish va yuborish</h2>
+<ol>
+<li>PC da maktab Google orqali <a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a> ga kiring, o‘z Lab va <strong>M5</strong> ni tanlang. Hisobni bog‘lash va ekranlar: <a href="portal.html">brauzer yo‘riqnomasi</a>.</li>
+<li>Funksiya/huquq tekshiruvini tanlang, lab_admin mavjud parolini app administratorining yashirin maydoniga kiritib, shu parol bilan tekshiring. Bu RDP paroli emas. Faqat sozlama tekshiruvi funksiyalarni tasdiqlamaydi.</li>
+<li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida. P va M0 bahoga qo‘shilmaydi.</li>
+</ol>
+<hr />
+<p><a href="p6.html">Oldingi: P6</a> · <a href="m6.html">Keyingi: M6</a></p>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>

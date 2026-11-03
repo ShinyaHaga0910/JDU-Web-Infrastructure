@@ -1,0 +1,185 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>P4 PostgreSQLへの認証接続</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">学ぶこと</a> · <a href="#section-3">課題</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">操作例：一つずつ実行する</a> · <a href="#section-6">出力の読み取り例（入力しない）</a> · <a href="#section-7">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P4 PostgreSQLへの認証接続</h1>
+<p><a href="start.html">はじめに：接続・操作の約束</a> · <a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a> · <a href="portal.html">ブラウザで確認する</a></p>
+<p><a href="../ja/p4.html">日本語</a> · <a href="../ru/p4.html">Русский</a> · <a href="../uz/p4.html">O‘zbekcha</a></p>
+<p>2026-11-03 · D12 P/M r1.3</p>
+<p>配布版の有効期限：2027年1月31日末（UZT）。</p>
+<h2 id="section-1">始める前に</h2>
+<p><a href="start.html">共通の接続・操作</a>を確認する。対応する自力課題は<a href="m4.html">M4</a>。課題の判定方法は<a href="portal.html">ブラウザ確認手順</a>を使う。</p>
+<h2 id="section-2">学ぶこと</h2>
+<p>DB・role・schemaの違いを理解し、Webだけから既存パスワードでSQLを実行する。</p>
+<h2 id="section-3">課題</h2>
+<p>jdu_catalog_practice、catalog_practice_setup、catalog_practice_appを作る。Webの10.20.1.20/32だけからSCRAMで接続させる。P4時点ではappのtableは不要。</p>
+<ul>
+<li>Profile: practice</li>
+<li>Database: jdu_catalog_practice</li>
+<li>Setup role: catalog_practice_setup</li>
+<li>Runtime role: catalog_practice_app</li>
+</ul>
+<h2 id="section-4">仕組みを理解する</h2>
+<p><strong>始める前の状態:</strong></p>
+<p>DBに教材資源があり、WebからDBへ許可された経路を使う。</p>
+<p><strong>このPで変えること:</strong></p>
+<p>練習DBとsetup/runtime roleを作り、Webから認証付きSQLを実行する。</p>
+<p>接続には、通信の到達、DBの待受、HBAの許可、password、SQL権限がそれぞれ必要。ssm-userはOS userで、catalog_practice_appはDB roleである。HBAは上から最初に一致した行を使う。SQLへ接続できることと、tableを作成できることも別の権限である。<a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBA</a>・<a href="https://www.postgresql.org/docs/16/sql-grant.html">SQL権限</a>。</p>
+<h2 id="section-5">操作例：一つずつ実行する</h2>
+<h3>P4.1 DBを導入し教材SQLを展開する</h3>
+<p><strong>実行場所:</strong></p>
+<p>DBサーバーのSSM端末：ssm-user</p>
+<p><strong>目的と操作:</strong></p>
+<p>DBへSSM接続しrole=dbを確認する。PostgreSQL16のclusterはDBをまとめて動かす単位。公開資源の展開補助は署名版のappを検査し、SQLを取り出すだけでroleやDBを作らない。</p>
+<pre><code class="language-bash">sudo apt-get update -o APT::Update::Error-Mode=any
+sudo apt-get install --no-install-recommends postgresql-16 postgresql-client-16
+sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py
+pg_lsclusters
+sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
+</code></pre>
+<p><strong>コマンド・設定値の意味:</strong></p>
+<p>packageの導入と、DB内の教材データ作成は別の段階。pg_lsclustersでversion・cluster・port・状態を読む。sudo -u postgresはOS userをpostgresへ切り替えて1コマンドを実行し、-Xは個人のpsql設定を読み込まない指定である。</p>
+<p><strong>期待する結果と読み方:</strong></p>
+<p>16/main、data directory=/var/lib/postgresql/16/main。教材SQLは/var/lib/jdu-web/lesson-resources-r1/app/sqlにある。</p>
+<p><strong>うまくいかないとき:</strong></p>
+<p>既存DBやroleは削除しない。すでに構築した場合は現在の状態を読み、未実施の手順だけ進める。</p>
+<h3>P4.2 DBの待受とSCRAMを設定する</h3>
+<p><strong>実行場所:</strong></p>
+<p>DBサーバーのSSM端末：ssm-user</p>
+<p><strong>目的と操作:</strong></p>
+<p>sudo cp -anでpostgresql.confの控えを作り、sudo nano /etc/postgresql/16/main/postgresql.confで次の3値を設定する。同じ項目が複数ある場合は有効値を後でSHOWで確認。listen_addressesはDBのprivate IPだけ、portは5432。password_encryptionはこの後設定するpasswordの保存方式。</p>
+<pre><code class="language-text">listen_addresses = '10.20.2.20'
+port = 5432
+password_encryption = 'scram-sha-256'
+</code></pre>
+<p><strong>コマンド・設定値の意味:</strong></p>
+<p>listen_addressesはDBが接続を受ける自分側のIPで、接続元の許可リストではない。password_encryptionは新しく設定するDB passwordの保存方式。設定を保存しただけでは、稼働中の待受や既存passwordが自動で変わった証拠にはならない。</p>
+<p><strong>期待する結果と読み方:</strong></p>
+<p>外部全addressを示す*は使わない。まだpasswordを設定せず、次のHBAを整えてからrestartする。</p>
+<p><strong>うまくいかないとき:</strong></p>
+<p>これは設定内容。psqlではなくpostgresql.confへ書く。SGとOSのlistenは別の制御である。</p>
+<h3>P4.3 接続元・DB・roleをHBAで限定する</h3>
+<p><strong>実行場所:</strong></p>
+<p>DBサーバーのSSM端末：ssm-user</p>
+<p><strong>目的と操作:</strong></p>
+<p>sudo cp -anでpg_hba.confを控え、sudo nano /etc/postgresql/16/main/pg_hba.confで以下を保存。最初に一致する行が使われるため、既存の広い許可行は残さない。OS postgresだけはUnix socketのpeerで管理できる。M4で作る別profileも明示列挙し、練習roleが本課題DBへ入る組合せは許さない。</p>
+<pre><code class="language-text">local all postgres peer
+local all all reject
+host jdu_catalog_practice catalog_practice_setup 10.20.1.20/32 scram-sha-256
+host jdu_catalog_practice catalog_practice_app 10.20.1.20/32 scram-sha-256
+host jdu_catalog catalog_setup 10.20.1.20/32 scram-sha-256
+host jdu_catalog catalog_app 10.20.1.20/32 scram-sha-256
+host all all 0.0.0.0/0 reject
+host all all ::/0 reject
+</code></pre>
+<p><strong>コマンド・設定値の意味:</strong></p>
+<p>HBAのhost行は「DB名・DB role・接続元・認証方式」の組で読む。10.20.1.20/32はWeb1台だけ。末尾のrejectより前へ必要な許可を置く。localのpeerはDB内のOS postgres用で、WebからのTCP password認証とは別の行である。</p>
+<p><strong>期待する結果と読み方:</strong></p>
+<p>接続許可はDB/role/送信元の組合せで判断する。0.0.0.0/0の行はrejectであり許可ではない。</p>
+<p><strong>うまくいかないとき:</strong></p>
+<p>trustへ変えて認証を省略しない。DB5432は基盤SGでもWebだけから許可される。</p>
+<h3>P4.4 起動して設定の実効値を読む</h3>
+<p><strong>実行場所:</strong></p>
+<p>DBサーバーのSSM端末：ssm-user</p>
+<p><strong>目的と操作:</strong></p>
+<p>restartは設定を読み直す。SQLのSHOWとpg_hba_file_rulesで、編集したつもりの値ではなく動作中の値を確認する。psqlの-Xは個人設定fileを読み込ませない指定。</p>
+<pre><code class="language-bash">sudo systemctl restart postgresql@16-main
+systemctl is-active postgresql@16-main
+sudo ss -lntp
+sudo -u postgres psql -X -d postgres -c &quot;SHOW password_encryption;&quot;
+sudo -u postgres psql -X -d postgres -c \
+  &quot;SELECT line_number,error FROM pg_hba_file_rules WHERE error IS NOT NULL;&quot;
+</code></pre>
+<p><strong>コマンド・設定値の意味:</strong></p>
+<p>postgresql@16-mainは実際のclusterのservice。再起動後はservice・待受・SHOWの実効値を組み合わせて確認する。pg_hba_file_rulesでerrorの行が0件でも、対象clientが接続できるかは次の実通信で確かめる。</p>
+<p><strong>期待する結果と読み方:</strong></p>
+<p>active、10.20.2.20:5432、scram-sha-256、HBA errorは0行。</p>
+<p><strong>うまくいかないとき:</strong></p>
+<p>postgresql.serviceのactive(exited)だけでcluster稼働を判断しない。journalctl -u postgresql@16-mainで調べる。</p>
+<h3>P4.5 練習DBと2種類のroleを作る</h3>
+<p><strong>実行場所:</strong></p>
+<p>DBサーバーのSSM端末：ssm-user</p>
+<p><strong>目的と操作:</strong></p>
+<p>profile_sql.pyは固定SQLの練習名を出力するだけ。最初のcommandで内容を読み、その後同じ出力をpsqlへ渡す。setupはDB/schemaを所有し初期tableを作るrole、appは通常接続するrole。コードを作る授業ではないので配布SQLを使う。</p>
+<pre><code class="language-bash">cd /var/lib/jdu-web/lesson-resources-r1/app
+python3 -B profile_sql.py --profile practice 01_create_roles.sql
+python3 -B profile_sql.py --profile practice 01_create_roles.sql | sudo -u postgres \
+  psql -X -v ON_ERROR_STOP=1 -d postgres
+python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u postgres \
+  psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
+</code></pre>
+<p><strong>コマンド・設定値の意味:</strong></p>
+<p>profile_sql.pyの最初の実行は生成SQLを読むだけ。|でpsqlへ渡した実行で初めてDBを変更する。--profile practiceは練習DB/roleを選び、ON_ERROR_STOP=1はSQLエラーの後へ処理が続くことを防ぐ。既存DBに同じ作成SQLを重ねない。</p>
+<p><strong>期待する結果と読み方:</strong></p>
+<p>CREATE ROLEが2回、CREATE DATABASE、schemaとCONNECT/USAGEの設定。appにsuperuser/CREATEDB等は付けない。</p>
+<p><strong>うまくいかないとき:</strong></p>
+<p>already existsなら成功済みの可能性。DROPで消さず\duと\lで対応を確認する。パイプ右側psqlにSQL errorがないことを確認する。</p>
+<h3>P4.6 2つのDBパスワードを非表示で設定する</h3>
+<p><strong>実行場所:</strong></p>
+<p>DBサーバーのpsql：OS postgres</p>
+<p><strong>目的と操作:</strong></p>
+<p>DBのshellで最初の行を実行するとpostgres=#のpsqlに入る。\passwordはその中で入力する。16文字以上の異なるpasswordをsetup/appへそれぞれ2回入力。値は画面にも履歴にも書かない。最後の\qでDBのshellへ戻る。</p>
+<pre><code class="language-text">sudo -u postgres psql -X -d postgres
+\password catalog_practice_setup
+\password catalog_practice_app
+\du catalog_practice_*
+\q
+</code></pre>
+<p><strong>コマンド・設定値の意味:</strong></p>
+<p>sudoから始まる行をOS端末へ入力し、その後の\password・\du・\qをpsql内へ1行ずつ入れる。setupとappは別のDB roleなので、それぞれのpasswordを区別する。入力が表示されなくてもキー入力は受け付けられている。</p>
+<p><strong>期待する結果と読み方:</strong></p>
+<p>roleの属性にSuperuser/Create role/Create DB等がない。RDP用password、アプリ管理者password、採点tokenとは別の秘密である。</p>
+<p><strong>うまくいかないとき:</strong></p>
+<p>keyboard配列に注意。値を確認するために会話やエディタへ書き出さない。忘れた場合は教師と本人用復旧を行う。</p>
+<h3>P4.7 Webからpassword付きSELECTを行う</h3>
+<p><strong>実行場所:</strong></p>
+<p>WebサーバーのSSM端末：ssm-user</p>
+<p><strong>目的と操作:</strong></p>
+<p>DBのSSMをexitしCloudShellへ戻り、WebのSSMへ入る。psqlの-hは接続先、-UはDB role、-dはDB名、-Wはpassword入力を要求する。P4はDNS前提を増やさずprivate IPで接続する。</p>
+<pre><code class="language-bash">sudo apt-get install --no-install-recommends postgresql-client-16
+psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
+  'SELECT current_database(),current_user,1 AS value;'
+</code></pre>
+<p><strong>コマンド・設定値の意味:</strong></p>
+<p>psqlの-hは接続先、-UはDB role、-dはDB名、-Wはpasswordの入力要求、-cは実行するSQL。これはWeb側から実行する。SELECT結果のDB名とuser名で、意図した練習環境へ入ったことを確認する。</p>
+<p><strong>期待する結果と読み方:</strong></p>
+<p>jdu_catalog_practice / catalog_practice_app / 1。portが開くだけ、pg_isreadyが成功するだけではこの認証SQLの代わりにならない。</p>
+<p><strong>うまくいかないとき:</strong></p>
+<p>拒否なら接続元/DB/role/passwordを分けて確認する。DBをInternetへ公開して試さない。</p>
+<h3>P4.8 checkerが使う既存passwordをWeb内だけに保存する</h3>
+<p><strong>実行場所:</strong></p>
+<p>WebサーバーのSSM端末：ssm-user</p>
+<p><strong>目的と操作:</strong></p>
+<p>helperは既存のcatalog_practice_app passwordを2回非表示入力し、Webのroot専用0600 fileへ保存する。DBのpasswordは変えない。envをcatしたりshellでsourceしない。exitでCloudShellへ戻ったら、PCのWeb PortalでP4を確認する。</p>
+<pre><code class="language-bash">sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/database_secret.py --profile \
+  practice
+exit
+</code></pre>
+<p><strong>コマンド・設定値の意味:</strong></p>
+<p>database_secret.pyは今設定したruntime passwordを再入力し、Web内の保護された設定へ保存する。新しいpasswordの生成や変更ではない。setup用やRDP用の値を入れず、catalog_practice_appの既存値を使う。</p>
+<p><strong>期待する結果と読み方:</strong></p>
+<p>D11_EXISTING_DB_PASSWORD_STORED_LOCALLYと練習9項目。誤password・他DB/管理roleの拒否も正常接続との対照で確認される。</p>
+<p><strong>うまくいかないとき:</strong></p>
+<p>既存fileありなら再生成しない。P5では同じDB passwordをapp設定にも入力する。M4はmission用の別DB/roleで構築する。</p>
+<h2 id="section-6">出力の読み取り例（入力しない）</h2>
+<pre><code class="language-text">current_database    | current_user         | value
+jdu_catalog_practice | catalog_practice_app | 1
+</code></pre>
+<p>SELECT結果の読み方の例。列の幅や罫線は実際と異なってよい。DB名・role名・value=1を確認する。table編集の許可を証明する結果ではない。</p>
+<h2 id="section-7">理解の確認（採点外）</h2>
+<p>psqlがpasswordを受け付けたのにtable作成が拒否される。必ずpasswordの誤りか？</p>
+<p><strong>考え方:</strong></p>
+<p>認証とSQL権限は別。runtime roleの役割に合った拒否なら正常で、setup用の操作をruntimeへ追加しない。</p>
+<hr />
+<p><a href="m3.html">前の課題: M3</a> · <a href="m4.html">次の課題: M4</a></p>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>

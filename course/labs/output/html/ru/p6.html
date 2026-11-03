@@ -1,0 +1,150 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>P6 Минимальные права и границы публикации</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Что изучаем</a> · <a href="#section-3">Задание</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P6 Минимальные права и границы публикации</h1>
+<p><a href="start.html">Сначала: подключение и правила</a> · <a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a> · <a href="portal.html">Проверка в браузере</a></p>
+<p><a href="../ja/p6.html">日本語</a> · <a href="../ru/p6.html">Русский</a> · <a href="../uz/p6.html">O‘zbekcha</a></p>
+<p>2026-11-03 · D12 P/M r1.3</p>
+<p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
+<h2 id="section-1">Перед началом</h2>
+<p>Проверьте <a href="start.html">подключение и правила</a>. Связанное задание: <a href="m6.html">M6</a>. Проверка описана в <a href="portal.html">инструкции браузера</a>.</p>
+<h2 id="section-2">Что изучаем</h2>
+<p>Сохранить штатную работу, запретив лишние admin-маршруты, SQL-права и раскрытие секретов.</p>
+<h2 id="section-3">Задание</h2>
+<p>Используйте practice из P5. Отключите setup-role, уберите временную конфигурацию и проверьте отказы при наличии успешного контрольного login. Не расширяйте SG/IAM.</p>
+<ul>
+<li>Profile: practice</li>
+<li>Database: jdu_catalog_practice</li>
+<li>Setup role: catalog_practice_setup</li>
+<li>Runtime role: catalog_practice_app</li>
+<li>Application administrator: practice_admin</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th scope="col">code</th>
+<th scope="col">name</th>
+<th scope="col">quantity</th>
+<th scope="col">location</th>
+<th scope="col">is_public</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P5-PUBLIC-001</td>
+<td>Practice keyboard</td>
+<td>4</td>
+<td>Training shelf A</td>
+<td>true</td>
+</tr>
+<tr>
+<td>P5-PRIVATE-001</td>
+<td>Practice mouse</td>
+<td>2</td>
+<td>Training shelf B</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<h2 id="section-4">Как это работает</h2>
+<p><strong>Состояние перед началом:</strong></p>
+<p>Учебное приложение P5 работает; временный setup-доступ ещё существует.</p>
+<p><strong>Что изменится в этом P:</strong></p>
+<p>Setup завершён; нормальная работа и отказы ненужного доступа проверены вместе.</p>
+<p>Разделите временные права setup и рабочие права runtime. После NOLOGIN и удаления временной настройки приложение должно работать через runtime. Публичный 80, административный 8080 и локальный 8000 - разные границы. Проверяйте успешную разрешённую операцию вместе с отказом конкретного ненужного доступа.</p>
+<h2 id="section-5">Пример решения: выполняйте по одному шагу</h2>
+<h3>P6.1 Прочитать роли и права таблиц</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>psql на DB-сервере от имени системного postgres</p>
+<p><strong>Цель и действия:</strong></p>
+<p>Откройте psql как postgres на DB. \dp показывает права таблиц, \du - атрибуты ролей. Сверьте с SQL03: UPDATE auth_user только last_login/password, без DELETE catalog_item; lookup только чтение, django_migrations без прав. Не вызывайте nextval/setval ради проверки.</p>
+<pre><code class="language-text">sudo -u postgres psql -X -d jdu_catalog_practice
+\du catalog_practice_*
+\dp public.*
+\q
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>\du показывает атрибуты ролей БД, \dp - права объектов. Это не файловые права ls -l. Сравните setup и runtime и объясните, почему рабочей роли не нужны права изменения структуры.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Runtime не владелец и не superuser. DELETE для Django session нужен, но не означает право удаления оборудования.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>При лишних правах пересмотрите SQL03 с сохранением guard. Не пробуйте отказ удалением реальных строк.</p>
+<h3>P6.2 Отключить вход setup-роли</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал DB-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>После инициализации вход setup не нужен. SQL04 задаёт NOLOGIN/password NULL и закрывает оставшиеся setup-подключения profile. Владельцем DB/table остаётся setup; роль не удаляется и владение app не передаётся.</p>
+<pre><code class="language-bash">cd /var/lib/jdu-web/lesson-resources-r1/app
+python3 -B profile_sql.py --profile practice 04_disable_setup.sql
+python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u postgres \
+  psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>NOLOGIN запрещает новые прямые входы setup-роли, но не удаляет БД и таблицы. Runtime остаётся. Перед применением проверьте SQL профиля practice, затем подтвердите работу обычного приложения.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>ALTER ROLE успешен, работа catalog_practice_app сохраняется.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Не включайте setup обратно для обычной работы. M5 инициализируется отдельной setup-role mission.</p>
+<h3>P6.3 Удалить только временную конфигурацию setup</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал Web-сервера: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>На Web проверьте только metadata. Удалите ровно два файла setup practice. app.env, practice.app.env, DB runtime, command-state, SSH-ключи и данные оценивания сохраняются. Содержимое секретных файлов через cat не выводится.</p>
+<pre><code class="language-bash">sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
+  /etc/jdu-catalog/profiles/practice.setup.env
+sudo rm -- /etc/jdu-catalog/setup.env /etc/jdu-catalog/profiles/practice.setup.env
+sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env \
+  /etc/jdu-catalog/profiles/practice.app.env /etc/jdu-web/db-practice.runtime.env
+sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Setup.env и practice.setup.env временные; app.env и runtime-настройка DB нужны для работы. Rm относится только к двум указанным файлам. После удаления проверьте права оставшихся файлов и runtime check без вывода секретного содержимого.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Runtime-файлы root:root 600, check успешен. Если setup-файлы уже удалены, пропустите удаление.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Если setup относится к другому profile, остановитесь. Не используйте wildcard или rm -r для всего каталога.</p>
+<h3>P6.4 Проверить запрет admin и секретов на публичном 80</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>SSM-терминал бастиона: ssm-user</p>
+<p><strong>Цель и действия:</strong></p>
+<p>В SSM бастиона запросите обычный список на 80, затем /admin/ и env. Отдельно подтвердите штатный admin на 8080 в Firefox через RDP. Нужны нормальный ответ и явный отказ 404/403; таймаута недостаточно.</p>
+<pre><code class="language-bash">curl --noproxy '*' -i http://web.lab.test/
+curl --noproxy '*' -i http://web.lab.test/admin/
+curl --noproxy '*' -i http://web.lab.test/app.env
+curl --noproxy '*' -i http://web.lab.test/static/app.env
+</code></pre>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Этот curl с бастиона проверяет поведение публичного порта 80. Путь / должен работать; /admin/ и секретные пути не должны раскрывать данные. Один сбой соединения не отличает правильный запрет от остановки службы.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Список - 200; admin/env отклоняются без секретов. Публичный Nginx перезаписывает X-JDU-Entry и не допускает подмену входа.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Если виден текст env, не распространяйте его: сообщите преподавателю и исправьте публикацию.</p>
+<h3>P6.5 Отправить успешный вход и отказы в одной проверке</h3>
+<p><strong>Место выполнения:</strong></p>
+<p>Браузер на своём PC: Web Portal</p>
+<p><strong>Цель и действия:</strong></p>
+<p>В Web Portal выберите P6, функциональную проверку с правами и скрыто введите существующий пароль practice_admin. Успешный login служит контролем: анонимные операции и неверный пароль должны отклоняться без изменения БД. Один CSRF-403 не доказывает авторизацию. Staff имеет только view/add/change оборудования, без delete и управления пользователями.</p>
+<p><strong>Смысл команд и настроек:</strong></p>
+<p>Проверьте разрешённое управление вместе с отказами неверного пароля, setup и ненужных путей. Одних отказов недостаточно. Переходите к mission после P6; checker сам профиль назад не переключает.</p>
+<p><strong>Ожидаемый результат и его смысл:</strong></p>
+<p>Прочитайте 16 учебных пунктов и статус сохранения. P не оценивается; M6 проверяется отдельно в mission. Сохранённые оценки M доступны в разделе оценок.</p>
+<p><strong>Если не получилось:</strong></p>
+<p>Во время обработки обновляйте результат. Устраните причину UNKNOWN и проверьте заново. Не редактируйте grade-файлы ради баллов.</p>
+<h2 id="section-6">Проверка понимания (без баллов)</h2>
+<p>После закрытия setup приложение перестало работать. Нужно ли просто снова открыть setup?</p>
+<p><strong>Объяснение:</strong></p>
+<p>Нет. Проверьте runtime-настройку, роль и необходимые права таблиц; обычная работа должна обходиться без setup.</p>
+<hr />
+<p><a href="p5.html">Предыдущее: P5</a> · <a href="m5.html">Следующее: M5</a></p>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>

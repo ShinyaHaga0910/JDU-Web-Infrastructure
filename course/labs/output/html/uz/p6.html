@@ -1,0 +1,150 @@
+<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>P6 Eng kam huquq va ochiq kirish chegarasi</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.3</p><nav aria-label="Contents"><a href="#section-1">Boshlashdan oldin</a> · <a href="#section-2">Nimani o‘rganamiz</a> · <a href="#section-3">Topshiriq</a> · <a href="#section-4">Bu qanday ishlaydi</a> · <a href="#section-5">Yechim namunasi: bittadan bajaring</a> · <a href="#section-6">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P6 Eng kam huquq va ochiq kirish chegarasi</h1>
+<p><a href="start.html">Avval: ulanish va qoidalar</a> · <a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a> · <a href="portal.html">Brauzerda tekshirish</a></p>
+<p><a href="../ja/p6.html">日本語</a> · <a href="../ru/p6.html">Русский</a> · <a href="../uz/p6.html">O‘zbekcha</a></p>
+<p>2026-11-03 · D12 P/M r1.3</p>
+<p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
+<h2 id="section-1">Boshlashdan oldin</h2>
+<p><a href="start.html">Ulanish va qoidalar</a> bilan tanishing. Mos topshiriq: <a href="m6.html">M6</a>. Tekshiruv: <a href="portal.html">brauzer yo‘riqnomasi</a>.</p>
+<h2 id="section-2">Nimani o‘rganamiz</h2>
+<p>To‘g‘ri ishlashni saqlab, ortiqcha admin yo‘li, SQL huquqi va maxfiy fayl ochilishini rad etish.</p>
+<h2 id="section-3">Topshiriq</h2>
+<p>P5 practice profile dan foydalaning. Setup role ni o‘chiring, vaqtinchalik sozlamani olib tashlang, muvaffaqiyatli login bilan solishtirib rad etishlarni tekshiring. SG/IAM ni kengaytirmang.</p>
+<ul>
+<li>Profile: practice</li>
+<li>Database: jdu_catalog_practice</li>
+<li>Setup role: catalog_practice_setup</li>
+<li>Runtime role: catalog_practice_app</li>
+<li>Application administrator: practice_admin</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th scope="col">code</th>
+<th scope="col">name</th>
+<th scope="col">quantity</th>
+<th scope="col">location</th>
+<th scope="col">is_public</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P5-PUBLIC-001</td>
+<td>Practice keyboard</td>
+<td>4</td>
+<td>Training shelf A</td>
+<td>true</td>
+</tr>
+<tr>
+<td>P5-PRIVATE-001</td>
+<td>Practice mouse</td>
+<td>2</td>
+<td>Training shelf B</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<h2 id="section-4">Bu qanday ishlaydi</h2>
+<p><strong>Boshlashdan oldingi holat:</strong></p>
+<p>P5 mashq app ishlaydi; vaqtinchalik setup ulanish hali mavjud.</p>
+<p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
+<p>Setup tugatiladi; odatiy app muvaffaqiyati va keraksiz kirish rad etilishi birga tekshiriladi.</p>
+<p>Vaqtinchalik setup privilege va ish paytidagi runtime privilege ni ajrating. NOLOGIN va vaqtinchalik sozlama o‘chirilgach app runtime bilan ishlashi kerak. Ochiq 80, admin 8080 va loopback 8000 alohida chegara. Ruxsatli amal muvaffaqiyati bilan aniq keraksiz kirish rad etilishini birga tekshiring.</p>
+<h2 id="section-5">Yechim namunasi: bittadan bajaring</h2>
+<h3>P6.1 DB role va jadval huquqlarini o‘qish</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>DB serverda OS postgres nomidan psql</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>DB da postgres psql ni oching. \dp jadval huquqini, \du role atributini ko‘rsatadi. SQL03 bilan solishtiring: auth_user UPDATE faqat last_login/password, catalog_item DELETE yo‘q; lookup faqat o‘qish, django_migrations huquqsiz. Tekshirish uchun nextval/setval chaqirmang.</p>
+<pre><code class="language-text">sudo -u postgres psql -X -d jdu_catalog_practice
+\du catalog_practice_*
+\dp public.*
+\q
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>\du DB role atributlarini, \dp obyekt privilege larini ko‘rsatadi. Bu ls -l dagi file permission emas. Setup va runtime ni solishtirib, runtime ga tuzilmani o‘zgartirish huquqi nega kerak emasligini tushuntiring.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>Runtime owner yoki superuser emas. Django session uchun DELETE zarur, lekin bu jihoz yozuvini o‘chirish huquqi emas.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>Ortiqcha huquqda SQL03 guard ini saqlab tekshiring. Haqiqiy qatorni o‘chirib rad etishni sinamang.</p>
+<h3>P6.2 Setup role login ini o‘chirish</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>DB serverning SSM terminali: ssm-user</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>Tayyorlashdan keyin setup login kerak emas. SQL04 NOLOGIN/password NULL qiladi va shu profile setup ulanishlarini yopadi. DB/table egasi setup bo‘lib qoladi; role o‘chirilmaydi, egalik app ga o‘tmaydi.</p>
+<pre><code class="language-bash">cd /var/lib/jdu-web/lesson-resources-r1/app
+python3 -B profile_sql.py --profile practice 04_disable_setup.sql
+python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u postgres \
+  psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>NOLOGIN setup role ning yangi bevosita login ini to‘xtatadi, DB yoki table ni o‘chirmaydi. Runtime qoladi. Qo‘llashdan oldin SQL practice uchunligini tekshiring, keyin normal app ishlashini tasdiqlang.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>ALTER ROLE muvaffaqiyatli; catalog_practice_app ishlashi saqlanadi.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>Keyin setup ni odatiy ish uchun LOGIN ga qaytarmang. M5 alohida mission setup role bilan tayyorlanadi.</p>
+<h3>P6.3 Faqat vaqtinchalik setup sozlamasini olib tashlash</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>Web serverning SSM terminali: ssm-user</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>Web da faqat metadata ni tekshiring. Faqat ikkita practice setup faylini o‘chiring. app.env, practice.app.env, DB runtime, command-state, SSH kalit va baholash ma’lumoti qoladi. Maxfiy fayl mazmunini cat qilish kerak emas.</p>
+<pre><code class="language-bash">sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
+  /etc/jdu-catalog/profiles/practice.setup.env
+sudo rm -- /etc/jdu-catalog/setup.env /etc/jdu-catalog/profiles/practice.setup.env
+sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env \
+  /etc/jdu-catalog/profiles/practice.app.env /etc/jdu-web/db-practice.runtime.env
+sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Setup.env va practice.setup.env vaqtinchalik; app.env va runtime DB config ishlash uchun kerak. Rm faqat ko‘rsatilgan ikki faylga tegishli. O‘chirgach maxfiy mazmunni chiqarmay, qolgan fayl permission i va runtime check ni tekshiring.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>Runtime fayllari root:root 600, check muvaffaqiyatli. Setup fayllari oldin o‘chirilgan bo‘lsa, o‘chirishni takrorlamang.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>Setup boshqa profile ga tegishli bo‘lsa to‘xtang. Wildcard yoki rm -r bilan butun katalogni o‘chirmang.</p>
+<h3>P6.4 Ochiq 80 da admin va maxfiy fayl ko‘rinmasligini tekshirish</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>Bastionning SSM terminali: ssm-user</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>Bastion SSM da 80 orqali avval oddiy ro‘yxatni, keyin /admin/ va env ni so‘rang. 8080 dagi to‘g‘ri admin kirishni RDP Firefox da alohida tekshiring. Oddiy muvaffaqiyat va aniq 404/403 rad etish kerak; timeout yetarli emas.</p>
+<pre><code class="language-bash">curl --noproxy '*' -i http://web.lab.test/
+curl --noproxy '*' -i http://web.lab.test/admin/
+curl --noproxy '*' -i http://web.lab.test/app.env
+curl --noproxy '*' -i http://web.lab.test/static/app.env
+</code></pre>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>Bu curl bastiondan ochiq 80 port xatti-harakatini tekshiradi. / ishlashi, /admin/ va maxfiy path lar ma’lumot bermasligi kerak. Bitta ulanish xatosi to‘g‘ri taqiq bilan service to‘xtashini farqlamaydi.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>Ro‘yxat 200; admin/env maxfiy ma’lumotsiz rad etiladi. Ochiq Nginx X-JDU-Entry ni qayta yozib kirishni soxtalashtirishga yo‘l qo‘ymaydi.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>Env matni ko‘rinsa uni ulashmang; o‘qituvchiga aytib ochiq sozlamani tuzating.</p>
+<h3>P6.5 Bir tekshiruvda to‘g‘ri kirish va rad etishlarni yuborish</h3>
+<p><strong>Bajarish joyi:</strong></p>
+<p>Shaxsiy PC brauzeri: Web Portal</p>
+<p><strong>Maqsad va amallar:</strong></p>
+<p>Web Portal da P6 va funksiya/huquq tekshiruvini tanlab, practice_admin mavjud parolini yashirin kiriting. To‘g‘ri login nazorat bo‘lib, anonim amallar va xato parol DB ni o‘zgartirmasdan rad etilishini tekshiradi. Faqat CSRF-403 avtorizatsiya isboti emas. Staff faqat jihoz view/add/change huquqiga ega, delete va user boshqaruvi yo‘q.</p>
+<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
+<p>To‘g‘ri admin amalini xato parol, setup va keraksiz yo‘l rad etilishi bilan birga tekshiring. Faqat rad etish yetarli emas. P6 dan keyin mission profile ga o‘ting; checker profile ni o‘zi qaytarmaydi.</p>
+<p><strong>Kutilgan natija va ma’nosi:</strong></p>
+<p>16 ta mashq bandi va saqlash holatini o‘qing. P bahoga qo‘shilmaydi; M6 mission profile da alohida tekshiriladi. Saqlangan baholar bo‘limida M asl bahosini ko‘rish mumkin.</p>
+<p><strong>Ishlamasa:</strong></p>
+<p>Ishlov paytida natijani yangilang. UNKNOWN sababini tuzatib qayta tekshiring. Ball uchun grade faylini tahrirlamang.</p>
+<h2 id="section-6">Tushunishni tekshirish (ballsiz)</h2>
+<p>Setup yopilgach app ham to‘xtadi. Setup ni qayta ochish tayyor yechimmi?</p>
+<p><strong>Izoh:</strong></p>
+<p>Yo‘q. Runtime config, role va kerakli table privilege ni tekshiring; normal ish setup siz ishlashi kerak.</p>
+<hr />
+<p><a href="p5.html">Oldingi: P5</a> · <a href="m5.html">Keyingi: M5</a></p>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>
