@@ -289,7 +289,7 @@ def blocks(text):
 
 
 def build(*, source=SOURCE, chapter=1, diagram_builder=figures, report_name='validation.public.json',
-          new_page_headings=('章末解答',)):
+          new_page_headings=('章末解答',), extra_css=''):
     source=Path(source)
     source_text=source.read_text(encoding='utf-8')
     book_title=next(value[1] for kind,value in blocks(source_text) if kind=='heading' and value[0]==1)
@@ -350,6 +350,7 @@ def build(*, source=SOURCE, chapter=1, diagram_builder=figures, report_name='val
     css='''body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}'''
     if code_count:
         css+='pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}'
+    css+=extra_css
     (HTML_OUT/(output_stem+'.html')).write_text('<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>'+html.escape(book_title)+'</title><style>'+css+'</style></head><body><a class="skip" href="#main">本文へ</a><main id="main">'+'\n'.join(web)+'</main></body></html>',encoding='utf-8')
     pdfpath=PDF_OUT/(output_stem+'.pdf')
     def footer(canvas,doc):

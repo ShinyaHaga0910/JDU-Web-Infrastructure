@@ -1,0 +1,16 @@
+{
+  "chapter": 12,
+  "language": "ja",
+  "draft": "editable prose skeleton",
+  "pages": 9,
+  "a4": true,
+  "text_blocks_checked": 104,
+  "missing_text": [],
+  "figures": 3,
+  "answer_starts_on_new_page": true,
+  "teacher_visual_review": "not performed",
+  "student_trial": "not performed",
+  "aws_operations": "none",
+  "sha256": "672668918479109b09675b10a7f3b02d32fc803943507f2902542b06571f3f11",
+  "code_blocks": 1
+}

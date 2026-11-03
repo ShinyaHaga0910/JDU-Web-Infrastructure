@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1120" viewBox="0 0 1600 1120" role="img">
+<title>権限を判定する場所を分ける</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図13-1  権限を判定する場所を分ける</text>
+<rect x="160" y="130" width="1280" height="155" rx="18" fill="#f7f9fc" stroke="#2165a7" stroke-width="2"/>
+<text x="800" y="148" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">通信：接続元と入口</text>
+<text x="800" y="212" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">一般80番・踏み台からの管理8080番・WebからDB5432番</text>
+<polyline points="800,285 800,335" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="800,335 793.0405514542203,320.5928463623572 806.9594485457797,320.5928463623572" fill="#2165a7"/>
+<rect x="160" y="335" width="1280" height="155" rx="18" fill="#f7f9fc" stroke="#16745b" stroke-width="2"/>
+<text x="800" y="353" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">OS：ユーザーとファイル</text>
+<text x="800" y="417" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">catalogで実行、コードや秘密は管理側で保護</text>
+<polyline points="800,490 800,540" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="800,540 793.0405514542203,525.5928463623571 806.9594485457797,525.5928463623571" fill="#16745b"/>
+<rect x="160" y="540" width="1280" height="155" rx="18" fill="#f7f9fc" stroke="#9d651a" stroke-width="2"/>
+<text x="800" y="558" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">DB：ロールとSQL操作</text>
+<text x="800" y="622" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">対象の表・列・シーケンスへ必要な権限</text>
+<polyline points="800,695 800,745" fill="none" stroke="#9d651a" stroke-width="4"/><polygon points="800,745 793.0405514542203,730.5928463623571 806.9594485457797,730.5928463623571" fill="#9d651a"/>
+<rect x="160" y="745" width="1280" height="155" rx="18" fill="#f7f9fc" stroke="#2165a7" stroke-width="2"/>
+<text x="800" y="763" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">アプリ：認証と操作権限</text>
+<text x="800" y="827" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">備品の閲覧・追加・変更を許された担当者</text>
+<text x="55" y="1010" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">図は判定対象の整理。上から下へ同じ認証情報を流す図ではない。</text>
+</svg>

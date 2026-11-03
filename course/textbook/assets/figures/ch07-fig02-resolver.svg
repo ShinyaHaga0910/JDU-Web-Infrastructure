@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1100" viewBox="0 0 1600 1100" role="img">
+<title>問い合わせる側のOS内の名前解決と、上流の内部DNSを分ける</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図7-2  OS内の名前解決と、別のEC2の内部DNS</text>
+<rect x="40" y="130" width="940" height="750" rx="18" fill="#f7f9fc" stroke="#2165a7" stroke-width="2"/>
+<text x="510" y="148" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
+<text x="510" y="191" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="middle">踏み台サーバー</text>
+<rect x="100" y="285" width="820" height="115" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
+<text x="510" y="315" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">ブラウザ・getentなどの名前解決の依頼</text>
+<text x="200" y="500" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">OSの機能を利用する方法</text>
+<polyline points="150,400 150,620" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="150,620 143.04055145422032,605.5928463623571 156.95944854577968,605.5928463623571" fill="#2165a7"/>
+<text x="535" y="445" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">ローカルスタブを使う方法</text>
+<text x="535" y="510" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">127.0.0.53の53番ポート</text>
+<polyline points="900,400 900,620" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="900,620 893.0405514542203,605.5928463623571 906.9594485457797,605.5928463623571" fill="#16745b"/>
+<rect x="100" y="620" width="820" height="160" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
+<text x="510" y="638" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="34" dominant-baseline="text-before-edge" text-anchor="middle">systemd-resolved</text>
+<text x="510" y="704" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">上流DNSの設定：10.20.2.10</text>
+<rect x="1160" y="590" width="400" height="225" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
+<text x="1360" y="608" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
+<text x="1360" y="652" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">DNSサーバー</text>
+<text x="1360" y="714" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">10.20.2.10</text>
+<text x="1360" y="767" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">53番ポート</text>
+<polyline points="920,705 1160,705" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="1160,705 1145.5928463623572,711.9594485457797 1145.5928463623572,698.0405514542203" fill="#16745b"/>
+<text x="995" y="588" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">DNS</text>
+<text x="980" y="638" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">UDP/TCP</text>
+<text x="55" y="943" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">127.0.0.53は同じ踏み台サーバー内。10.20.2.10は別のDNSサーバー。</text>
+<text x="55" y="1006" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">すべての名前解決がローカルスタブへのDNS通信を通るとは限らない。</text>
+</svg>

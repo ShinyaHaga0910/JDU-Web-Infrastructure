@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="910" viewBox="0 0 1600 910" role="img">
+<title>管理画面の保存と、表示の対応</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図11-3  管理画面の保存と、表示の対応</text>
+<text x="55" y="100" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">左から順に、情報や処理の対応を読む</text>
+<rect x="40" y="210" width="490" height="420" rx="18" fill="#f7f9fc" stroke="#2165a7" stroke-width="2"/>
+<text x="285" y="240" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">踏み台のブラウザ</text>
+<text x="285" y="330" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">管理用8080番ポート</text>
+<text x="285" y="398" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">認証して備品を入力</text>
+<text x="285" y="466" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">POSTで保存を依頼</text>
+<polyline points="530,465 575,465" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="575,465 560.5928463623571,471.9594485457797 560.5928463623571,458.0405514542203" fill="#2165a7"/>
+<rect x="575" y="210" width="490" height="420" rx="18" fill="#f7f9fc" stroke="#16745b" stroke-width="2"/>
+<text x="820" y="240" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">Webの提供アプリ</text>
+<text x="820" y="330" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">入力と権限を確認</text>
+<text x="820" y="398" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">DBへ追加・変更</text>
+<text x="820" y="466" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">DB接続：TCP・5432番</text>
+<polyline points="1065,465 1110,465" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="1110,465 1095.5928463623572,471.9594485457797 1095.5928463623572,458.0405514542203" fill="#16745b"/>
+<rect x="1110" y="210" width="490" height="420" rx="18" fill="#f7f9fc" stroke="#9d651a" stroke-width="2"/>
+<text x="1355" y="240" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">DBと再取得した画面</text>
+<text x="1355" y="330" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">対象行が保存される</text>
+<text x="1355" y="398" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">管理画面で読める</text>
+<text x="1355" y="466" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">公開対象だけ一般一覧へ</text>
+<text x="55" y="725" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">HTTPリクエストの入力値、DBの対象行、再表示した値を対応させる。</text>
+</svg>

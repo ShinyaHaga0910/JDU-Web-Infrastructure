@@ -1,6 +1,6 @@
 # Webインフラストラクチャー教科書
 
-後半授業の教科書。現在は日本語第1〜6章の本文を作成し、第7章以降は[章・節の設計](../textbook-outline.md)に説明内容を定めている。文章は教員が編集しやすい章別Markdownを正本とする。OS・Linux教材の説明形式をそのまま踏襲することを優先せず、全体像・各部の役割・実作業とのつながりを分かりやすく示す。
+後半授業の教科書。日本語第1〜14章の本文・図・HTML・PDFを作成済み。[章・節の設計](../textbook-outline.md)と既存P/Mの構成に対応させている。文章は教員が編集しやすい章別Markdownを正本とする。OS・Linux教材の説明形式をそのまま踏襲することを優先せず、全体像・各部の役割・実作業とのつながりを分かりやすく示す。
 
 ## 章と練習と課題の対応
 
@@ -43,6 +43,30 @@ Pは手順付きの練習、Mは別の対象を自分で設定する課題であ
 - [第6章 DNSによる名前解決の仕組み](docs/ja/06-dns-name-resolution.md)
 - [第6章 閲覧用HTML](output/html/web_textbook_ch06_ja.html)
 - [第6章 A4縦PDF](output/pdf/web_textbook_ch06_ja.pdf)
+- [第7章 内部DNSの設定と動作確認](docs/ja/07-internal-dns-configuration.md)
+- [第7章 閲覧用HTML](output/html/web_textbook_ch07_ja.html)
+- [第7章 A4縦PDF](output/pdf/web_textbook_ch07_ja.pdf)
+- [第8章 保存領域と停止後のデータ](docs/ja/08-storage-and-restart.md)
+- [第8章 閲覧用HTML](output/html/web_textbook_ch08_ja.html)
+- [第8章 A4縦PDF](output/pdf/web_textbook_ch08_ja.pdf)
+- [第9章 リレーショナルDBとSQLの基本](docs/ja/09-databases-and-sql.md)
+- [第9章 閲覧用HTML](output/html/web_textbook_ch09_ja.html)
+- [第9章 A4縦PDF](output/pdf/web_textbook_ch09_ja.pdf)
+- [第10章 PostgreSQLの接続と認証](docs/ja/10-postgresql-connections.md)
+- [第10章 閲覧用HTML](output/html/web_textbook_ch10_ja.html)
+- [第10章 A4縦PDF](output/pdf/web_textbook_ch10_ja.pdf)
+- [第11章 WebサーバーとアプリとDBの連携](docs/ja/11-web-app-and-database.md)
+- [第11章 閲覧用HTML](output/html/web_textbook_ch11_ja.html)
+- [第11章 A4縦PDF](output/pdf/web_textbook_ch11_ja.pdf)
+- [第12章 提供アプリの配置と初期設定](docs/ja/12-application-deployment.md)
+- [第12章 閲覧用HTML](output/html/web_textbook_ch12_ja.html)
+- [第12章 A4縦PDF](output/pdf/web_textbook_ch12_ja.pdf)
+- [第13章 公開範囲と最小権限](docs/ja/13-access-and-least-privilege.md)
+- [第13章 閲覧用HTML](output/html/web_textbook_ch13_ja.html)
+- [第13章 A4縦PDF](output/pdf/web_textbook_ch13_ja.pdf)
+- [第14章 観測による障害の切り分けと復旧](docs/ja/14-observation-and-recovery.md)
+- [第14章 閲覧用HTML](output/html/web_textbook_ch14_ja.html)
+- [第14章 A4縦PDF](output/pdf/web_textbook_ch14_ja.pdf)
 - [全体構成図 PNG](assets/figures/fig01-system-overview.png) / [SVG](assets/figures/fig01-system-overview.svg)
 - [SSHとRDPの比較図](assets/figures/fig04-ssh-rdp.png)
 - [VPC・公開範囲・SGの関係図](assets/figures/fig05-network-boundaries.png)
@@ -52,12 +76,22 @@ Pは手順付きの練習、Mは別の対象を自分で設定する課題であ
 - [第4章の制作・確認の記録](CHAPTER04_VALIDATION.md)
 - [第5章の制作・確認の記録](CHAPTER05_VALIDATION.md)
 - [第6章の制作・確認の記録](CHAPTER06_VALIDATION.md)
+- [第7章の制作・確認の記録](CHAPTER07_VALIDATION.md)
+- [第8章の制作・確認の記録](CHAPTER08_VALIDATION.md)
+- [第9章の制作・確認の記録](CHAPTER09_VALIDATION.md)
+- [第10章の制作・確認の記録](CHAPTER10_VALIDATION.md)
+- [第11章の制作・確認の記録](CHAPTER11_VALIDATION.md)
+- [第12章の制作・確認の記録](CHAPTER12_VALIDATION.md)
+- [第13章の制作・確認の記録](CHAPTER13_VALIDATION.md)
+- [第14章の制作・確認の記録](CHAPTER14_VALIDATION.md)
 
 第1章はP0/M0のための共通導入であり、第1章だけを読んでM1へ直行する構成ではない。M1に必要なHTTPとNginxの説明は第4〜5章で扱う。
 
+第7〜14章の集計は[制作と自動確認](CHAPTER07_14_VALIDATION.md)を参照する。
+
 ## 更新方法
 
-本文は`docs/ja/`の章別Markdown、図とHTML/PDFの生成元は`build/build_chapter01.py`〜`build/build_chapter06.py`。表示用の共通処理は第1章の生成元に置き、各章は自分の原稿・図・出力を指定して生成する。コマンド例は実行場所を本文で示し、改行を保った独立した枠へ出力する。Python 3とPillow・ReportLab・pypdf、および日本語フォントを使う。フォントは同梱しない。
+本文は`docs/ja/`の章別Markdown、図とHTML/PDFの生成元は`build/build_chapter01.py`〜`build/build_chapter14.py`。第7〜14章の図は`build/chapter_figures_07_14.py`で管理する。表示用の共通処理は第1章の生成元に置き、各章は自分の原稿・図・出力を指定して生成する。コマンド例は実行場所を本文で示し、改行を保った独立した枠へ出力する。Python 3とPillow・ReportLab・pypdf、および日本語フォントを使う。フォントは同梱しない。
 
 ```powershell
 python course/textbook/build/build_chapter01.py
@@ -66,6 +100,14 @@ python course/textbook/build/build_chapter03.py
 python course/textbook/build/build_chapter04.py
 python course/textbook/build/build_chapter05.py
 python course/textbook/build/build_chapter06.py
+python course/textbook/build/build_chapter07.py
+python course/textbook/build/build_chapter08.py
+python course/textbook/build/build_chapter09.py
+python course/textbook/build/build_chapter10.py
+python course/textbook/build/build_chapter11.py
+python course/textbook/build/build_chapter12.py
+python course/textbook/build/build_chapter13.py
+python course/textbook/build/build_chapter14.py
 ```
 
 `JDU_FONT_SANS`と`JDU_FONT_SERIF`で日本語TrueTypeフォントを指定できる。既定はWindowsのNoto Sans JP / Noto Serif JP。出力は同じ最新版ファイルを更新する。

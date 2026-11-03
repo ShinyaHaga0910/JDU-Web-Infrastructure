@@ -1,0 +1,82 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第10章 PostgreSQLの接続と認証</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}h1,h2,h3{overflow-wrap:anywhere}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第10章-postgresqlの接続と認証">第10章 PostgreSQLの接続と認証</h1>
+<h2 id="この章で分かること">この章で分かること</h2>
+<p>Webサーバーのアプリが備品を読むには、DBサーバーへ接続し、適切なデータベースを選び、許可された操作を実行する必要がある。正しいパスワードだけを用意しても、このすべてが成立するわけではない。</p>
+<p>本章では、PostgreSQLの中のまとまり、OSユーザーとDBのロール、接続を受け付ける設定と認証、個々のSQL操作の権限を順に結び付ける。</p>
+<h2 id="101-postgresqlの中のまとまりを知る">10.1 PostgreSQLの中のまとまりを知る</h2>
+<p>今回のDBサーバーにはPostgreSQL 16を導入する。Ubuntu OSでは、<code>16/main</code>という<strong>クラスター</strong>を管理する。ここでのクラスターは、一つのPostgreSQLの管理単位であり、複数台のサーバーによる冗長化を意味していない。</p>
+<p>その管理単位の中に複数の<strong>データベース</strong>を置ける。さらに、データベース内の<strong>スキーマ</strong>は、表などの名前を整理するまとまりである。例えば<code>public.catalog_item</code>は、publicスキーマ内のcatalog_item表を表す。</p>
+<figure><img src="../../assets/figures/ch10-fig01-structure.png" alt="DBサーバー、PostgreSQLクラスター、データベース、スキーマ、表の関係。" width="1600" height="1120"></figure>
+<p><strong>図10-1 接続先と、その中のデータのまとまり。</strong> 同じDBサーバーでも、選んだデータベースが違えば、同じ表名であっても別の対象になる。</p>
+<p><code>pg_lsclusters</code>ではバージョン、クラスター名、ポート、稼働状態、保存先などを読む。今回、実際の処理を行うサービスは<code>postgresql@16-main</code>であり、まとめ役のサービスの表示だけで個別クラスターの状態を判断しない。</p>
+<h2 id="102-osユーザーとdbロールを区別する">10.2 OSユーザーとDBロールを区別する</h2>
+<p><strong>ロール（role）</strong>は、PostgreSQL内で権限を管理する単位である。ログインできるロール、他のロールへ権限をまとめて与えるロールなどとして利用できる。ロールはクラスター内で管理され、個別のデータベースだけに属するOSユーザーではない。<a href="https://www.postgresql.org/docs/16/database-roles.html">DBロール</a></p>
+<p>今回のDBサーバーには、OSユーザーとしての<code>postgres</code>と、DBの管理ロールとしての<code>postgres</code>がある。同じ名前でも管理する場所が違う。OSのroot権限やsudoが、そのまま別サーバーのDBへの接続資格になるわけではない。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">種類</th><th scope="col">主な仕事</th></tr></thead><tbody><tr><td>OSの管理用ユーザー</td><td>PostgreSQLの設定ファイル、サービス、ログなどを管理する</td></tr><tr><td>DBの管理ロール</td><td>データベースやロールを作成し、権限を管理する</td></tr><tr><td>構築用ロール</td><td>アプリ用の表や初期データなどを準備する</td></tr><tr><td>通常アプリ用ロール</td><td>一覧の取得や管理画面の保存に必要なSQLを実行する</td></tr></tbody></table></div>
+<p><strong>LOGIN</strong>は、そのロールとして直接接続できる属性である。<strong>SUPERUSER</strong>はDB内の広い管理権限を持つ属性であり、LOGINと同じ意味ではない。通常アプリのために管理ロールの権限を使い続けず、用途を分ける。</p>
+<h2 id="103-所有者と、許された操作を分ける">10.3 所有者と、許された操作を分ける</h2>
+<p>DBや表などには<strong>所有者</strong>がいる。所有者はその対象の管理を行えるため、通常アプリを表の所有者にすると、必要以上の操作が可能になる。今回の構成では、構築用と通常用を分け、通常用へ必要な権限を与える。</p>
+<p><strong>GRANT</strong>は権限を与え、<strong>REVOKE</strong>は与えられている権限を取り除くSQLである。例えば、DBへのCONNECT、スキーマへのUSAGE、表へのSELECTは対象が異なる権限である。<a href="https://www.postgresql.org/docs/16/ddl-priv.html">権限</a></p>
+<p><strong>説明用SQL：lesson_appへ表を読む権限を与える例。</strong></p>
+<pre><code>GRANT SELECT ON public.lesson_item TO lesson_app;</code></pre>
+<p>これは特定の表の読取りを許す例であり、表の作成、変更、削除をすべて許す指定ではない。INSERTやUPDATEを必要とする機能には、それぞれに対応する権限を検討する。番号を採番する場合には、シーケンス側の権限も別に読む。<a href="https://www.postgresql.org/docs/16/sql-grant.html">GRANT</a></p>
+<h2 id="104-webサーバーからdbへ届く条件をつなげる">10.4 WebサーバーからDBへ届く条件をつなげる</h2>
+<p>接続の前には、Webサーバーが<code>db.lab.test</code>からDBサーバーの内部IP<code>10.20.2.20</code>を得る。その後、TCPでDBサーバーの5432番ポートへ接続する。</p>
+<figure><img src="../../assets/figures/ch10-fig02-connection.png" alt="名前解決、通信許可、待受、認証、SQL権限という接続条件を分ける。" width="1600" height="1120"></figure>
+<p><strong>図10-2 接続してSQLを使うまでの条件。</strong> 左から順に関係する範囲を読む。パスワードが正しいことは、この中の認証に関わる一つの条件である。</p>
+<p>SG（AWSのSecurity Group）がWebサーバーからDBサーバーへの通信を許し、PostgreSQLが正しいIP・ポートで待ち受けている必要がある。<code>listen_addresses</code>は、PostgreSQL自身のどのアドレスで受け付けるかを決める。接続元の許可リストではない。<a href="https://www.postgresql.org/docs/16/runtime-config-connection.html">待受設定</a></p>
+<p>今回の待受はDBサーバーの内部IPを使う。サービスの起動、待受IP、SG、名前解決をそれぞれ対応させる。DBサーバーはインターネットから直接使う入口として公開しない。</p>
+<h2 id="105-pg_hbaconfで接続条件と認証方式を読む">10.5 pg_hba.confで接続条件と認証方式を読む</h2>
+<p>PostgreSQLは、<code>pg_hba.conf</code>で接続する方法、対象DB、ロール、送信元、認証方式を定める。HBAは<strong>Host-Based Authentication</strong>の略である。</p>
+<p><strong>設定の説明例：説明用DB・ロールへの接続を、Webサーバー一台から許す一行。</strong></p>
+<pre><code>host lesson_catalog lesson_app 10.20.1.20/32 scram-sha-256</code></pre>
+<p><code>host</code>はTCP/IPによる接続、<code>lesson_catalog</code>はDB名、<code>lesson_app</code>は接続するロール、<code>10.20.1.20/32</code>は送信元のWebサーバー一台、<code>scram-sha-256</code>はパスワード認証に使う方式である。</p>
+<figure><img src="../../assets/figures/ch10-fig03-hba.png" alt="HBAの各列を、Webサーバーからの接続情報へ対応させる。" width="1600" height="1100"></figure>
+<p><strong>図10-3 一つの接続を、HBAの一行と照合する。</strong> 10.20.1.20は接続元であり、DBサーバー自身の待受アドレス10.20.2.20とは用途が異なる。</p>
+<p>HBAは上から読み、<strong>最初に接続条件が一致した行</strong>を使う。その行で認証が失敗しても、下の別の行へ移って試し直すわけではない。広すぎる許可行が先にあれば、後に置いた制限より先に使われる。<a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBAの照合</a></p>
+<p><code>local</code>は同じDBサーバー内のUnixソケット接続を扱う。今回、OSのpostgresから管理する接続では<code>peer</code>によりOSユーザーを照合する。WebサーバーからのTCP接続では、対応するhost行とパスワード認証を使う。<code>password_encryption</code>を変えても、以前のパスワードの保存形式が自動ですべて更新されるわけではない。</p>
+<h2 id="106-接続した相手と実行者をsqlで読む">10.6 接続した相手と実行者をSQLで読む</h2>
+<p>接続するときは、接続先ホスト、ポート、DB名、ロールをそろえる。パスワードは端末の非表示入力で渡し、共有資料やコマンドの引数へ書かない。</p>
+<p><strong>実行場所：Webサーバーの端末。説明用DB・ロールへ接続する例。</strong></p>
+<pre><code>psql -h db.lab.test -p 5432 \
+  -U lesson_app -d lesson_catalog -W</code></pre>
+<p><code>-h</code>はホスト、<code>-p</code>はポート、<code>-U</code>はDBロール、<code>-d</code>はデータベースを指定する。<code>-W</code>はパスワード入力を求めるオプションである。実際には、自分の構成で作成した対象を指定する。</p>
+<p><strong>実行場所：接続後のpsql内。</strong></p>
+<pre><code>SELECT current_database(), current_user;</code></pre>
+<p><strong>表示例：説明用DBとロールの場合。</strong></p>
+<pre><code> current_database | current_user
+------------------+--------------
+ lesson_catalog   | lesson_app
+(1 row)</code></pre>
+<p>この結果は、SQLを処理しているDBと実行者を示す。WebサーバーのOSユーザー名や、アプリ管理画面のログイン名ではない。</p>
+<h2 id="107-成功と拒否を、原因の範囲ごとに読む">10.7 成功と拒否を、原因の範囲ごとに読む</h2>
+<div class="table-wrap"><table><thead><tr><th scope="col">見えた結果</th><th scope="col">主に調べる範囲</th></tr></thead><tbody><tr><td>名前解決できない</td><td>Webサーバーの通常のDNS設定とDB名の登録</td></tr><tr><td>接続拒否・タイムアウト</td><td>指定IP・ポート、サービス、待受、通信許可など</td></tr><tr><td>HBAで接続対象外</td><td>DB名、ロール、送信元とHBAの行</td></tr><tr><td>パスワード認証失敗</td><td>接続したロール、入力値、認証方式など</td></tr><tr><td>permission denied for table</td><td>認証後に使おうとした表や操作の権限</td></tr></tbody></table></div>
+<p>例えば、表の権限不足という結果を受けたなら、DBまでの接続と認証を経て、SQLの操作を判定する段階に達している。反対に、タイムアウトだけでパスワードが誤っていると判断することはできない。</p>
+<p>正しい接続の成功を基準に、許可しないDB・ロールの組合せや誤った認証が拒否されることを比べる。拒否を試すために既存データを削除する必要はない。</p>
+<p>練習・課題4では、Webサーバーだけから、必要なDB・ロールで認証付きSQLを実行する構成を作る。アプリ用の表と、通常動作に必要な細かなSQL権限は、提供アプリの準備と合わせて後の章で扱う。</p>
+<h2 id="章末問題">章末問題</h2>
+<h3 id="問1">問1</h3>
+<p>OSユーザーpostgresと、DBロールpostgresは同じ管理対象か。</p>
+<h3 id="問2">問2</h3>
+<p>listen_addressesとHBAの送信元IPは、それぞれどちら側のアドレスを指定するか。</p>
+<h3 id="問3">問3</h3>
+<p>HBAで最初に一致した行のパスワード認証が失敗したら、下の行で認証をやり直すか。</p>
+<h3 id="問4">問4</h3>
+<p>ログインに成功すれば、すべての表をUPDATEできるか。</p>
+<h2 id="章末解答">章末解答</h2>
+<h3 id="問1">問1</h3>
+<p>異なる。OSユーザーはUbuntu OSが管理し、DBロールはPostgreSQLが管理する。同名でも権限と照合する場所を区別する。</p>
+<h3 id="問2">問2</h3>
+<p>listen_addressesはDBサーバー自身が待ち受けるIP、HBAの送信元は接続してくるWebサーバーなどのIPである。</p>
+<h3 id="問3">問3</h3>
+<p>やり直さない。最初に条件が一致した行で認証する。その認証の失敗は、後続の行へ移る理由にならない。</p>
+<h3 id="問4">問4</h3>
+<p>できない。接続の認証と、各表で許可する操作は別であり、必要なSQL権限が要る。</p>
+<h2 id="参考資料">参考資料</h2>
+<p>確認日：2026-11-03。lesson_catalog、lesson_appは接続条件を読むための説明用の名前である。</p>
+<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/database-roles.html">DBロール</a></p>
+<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/ddl-priv.html">権限</a></p>
+<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/sql-grant.html">GRANT</a></p>
+<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/runtime-config-connection.html">待受設定</a></p>
+<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBA</a></p>
+<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/app-psql.html">psql</a></p>
+<p class="bullet">・ <a href="../../../labs/docs/ja/p4.md">練習P4</a></p></main></body></html>
