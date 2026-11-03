@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="910" viewBox="0 0 1600 910" role="img">
+<title>rootのディレクトリとリクエストのパスを組み合わせて、Webサーバー内の保存先へ対応させる</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図5-2  リクエストのパスと保存先の対応</text>
+<text x="55" y="98" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="start">URL：http://10.20.1.20/example.txt</text>
+<rect x="50" y="200" width="660" height="200" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
+<text x="380" y="225" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">Nginxのroot設定</text>
+<text x="380" y="306" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="44" dominant-baseline="text-before-edge" text-anchor="middle">/var/www/html</text>
+<text x="800" y="277" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="48" dominant-baseline="text-before-edge" text-anchor="middle">＋</text>
+<rect x="890" y="200" width="660" height="200" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
+<text x="1220" y="225" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">リクエストのパス</text>
+<text x="1220" y="306" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="44" dominant-baseline="text-before-edge" text-anchor="middle">/example.txt</text>
+<polyline points="380,400 380,472 800,472 800,560" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="800,560 793.0405514542203,545.5928463623571 806.9594485457797,545.5928463623571" fill="#16745b"/>
+<polyline points="1220,400 1220,472 870,472 870,560" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="870,560 863.0405514542203,545.5928463623571 876.9594485457797,545.5928463623571" fill="#2165a7"/>
+<rect x="155" y="560" width="1290" height="200" rx="18" fill="#fff3df" stroke="#9d651a" stroke-width="2"/>
+<text x="800" y="583" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="middle">Webサーバー内で読むファイル</text>
+<text x="800" y="666" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="44" dominant-baseline="text-before-edge" text-anchor="middle">/var/www/html/example.txt</text>
+<text x="55" y="825" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">URLへ保存先全体を入力するのではなく、Nginxが設定に従って対応させる。</text>
+</svg>

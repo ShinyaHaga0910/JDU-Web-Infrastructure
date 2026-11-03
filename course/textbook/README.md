@@ -1,6 +1,6 @@
 # Webインフラストラクチャー教科書
 
-後半授業の教科書。現在は日本語第1〜4章の本文を作成し、第5章以降は[章・節の設計](../textbook-outline.md)に説明内容を定めている。文章は教員が編集しやすい章別Markdownを正本とする。OS・Linux教材の説明形式をそのまま踏襲することを優先せず、全体像・各部の役割・実作業とのつながりを分かりやすく示す。
+後半授業の教科書。現在は日本語第1〜5章の本文を作成し、第6章以降は[章・節の設計](../textbook-outline.md)に説明内容を定めている。文章は教員が編集しやすい章別Markdownを正本とする。OS・Linux教材の説明形式をそのまま踏襲することを優先せず、全体像・各部の役割・実作業とのつながりを分かりやすく示す。
 
 ## 章と練習と課題の対応
 
@@ -37,6 +37,9 @@ Pは手順付きの練習、Mは別の対象を自分で設定する課題であ
 - [第4章 HTTPでページをリクエストする仕組み](docs/ja/04-http-requests-and-responses.md)
 - [第4章 閲覧用HTML](output/html/web_textbook_ch04_ja.html)
 - [第4章 A4縦PDF](output/pdf/web_textbook_ch04_ja.pdf)
+- [第5章 Nginxによる静的ファイルの配信](docs/ja/05-nginx-static-files.md)
+- [第5章 閲覧用HTML](output/html/web_textbook_ch05_ja.html)
+- [第5章 A4縦PDF](output/pdf/web_textbook_ch05_ja.pdf)
 - [全体構成図 PNG](assets/figures/fig01-system-overview.png) / [SVG](assets/figures/fig01-system-overview.svg)
 - [SSHとRDPの比較図](assets/figures/fig04-ssh-rdp.png)
 - [VPC・公開範囲・SGの関係図](assets/figures/fig05-network-boundaries.png)
@@ -44,18 +47,20 @@ Pは手順付きの練習、Mは別の対象を自分で設定する課題であ
 - [第2章の制作・確認の記録](CHAPTER02_VALIDATION.md)
 - [第3章の制作・確認の記録](CHAPTER03_VALIDATION.md)
 - [第4章の制作・確認の記録](CHAPTER04_VALIDATION.md)
+- [第5章の制作・確認の記録](CHAPTER05_VALIDATION.md)
 
 第1章はP0/M0のための共通導入であり、第1章だけを読んでM1へ直行する構成ではない。M1に必要なHTTPとNginxの説明は第4〜5章で扱う。
 
 ## 更新方法
 
-本文は`docs/ja/`の章別Markdown、図とHTML/PDFの生成元は`build/build_chapter01.py`〜`build/build_chapter04.py`。表示用の共通処理は第1章の生成元に置き、各章は自分の原稿・図・出力を指定して生成する。コマンド例は実行場所を本文で示し、改行を保った独立した枠へ出力する。Python 3とPillow・ReportLab・pypdf、および日本語フォントを使う。フォントは同梱しない。
+本文は`docs/ja/`の章別Markdown、図とHTML/PDFの生成元は`build/build_chapter01.py`〜`build/build_chapter05.py`。表示用の共通処理は第1章の生成元に置き、各章は自分の原稿・図・出力を指定して生成する。コマンド例は実行場所を本文で示し、改行を保った独立した枠へ出力する。Python 3とPillow・ReportLab・pypdf、および日本語フォントを使う。フォントは同梱しない。
 
 ```powershell
 python course/textbook/build/build_chapter01.py
 python course/textbook/build/build_chapter02.py
 python course/textbook/build/build_chapter03.py
 python course/textbook/build/build_chapter04.py
+python course/textbook/build/build_chapter05.py
 ```
 
 `JDU_FONT_SANS`と`JDU_FONT_SERIF`で日本語TrueTypeフォントを指定できる。既定はWindowsのNoto Sans JP / Noto Serif JP。出力は同じ最新版ファイルを更新する。

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1080" viewBox="0 0 1600 1080" role="img">
+<title>管理者による配置と、Nginxのwww-dataによるディレクトリ通過およびファイル読み取りを分ける</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図5-3  配置する権限と、配信のために読む権限</text>
+<text x="55" y="96" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">EC2 Webサーバー内の権限</text>
+<rect x="50" y="190" width="400" height="180" rx="18" fill="#fff3df" stroke="#9d651a" stroke-width="2"/>
+<text x="250" y="216" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="34" dominant-baseline="text-before-edge" text-anchor="middle">管理者</text>
+<text x="250" y="287" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">rootの権限で配置する</text>
+<rect x="940" y="170" width="610" height="240" rx="18" fill="#f5f7fa" stroke="#7991aa" stroke-width="2"/>
+<text x="1245" y="194" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">配信用ファイル</text>
+<text x="1245" y="253" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">/var/www/html/example.txt</text>
+<text x="1245" y="314" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">所有者 root:root ／ 権限 0644</text>
+<text x="1245" y="365" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">所有者は読み書き、その他は読み取り</text>
+<polyline points="450,280 940,280" fill="none" stroke="#9d651a" stroke-width="4"/><polygon points="940,280 925.5928463623571,286.9594485457797 925.5928463623571,273.0405514542203" fill="#9d651a"/>
+<text x="690" y="210" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">本文・所有者・権限を整える</text>
+<rect x="50" y="570" width="400" height="170" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
+<text x="250" y="596" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">Nginxワーカー</text>
+<text x="250" y="661" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">実行ユーザー：www-data</text>
+<rect x="590" y="540" width="960" height="240" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
+<text x="1070" y="566" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">① 途中のディレクトリを通過する</text>
+<text x="1070" y="631" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">/ → /var → /var/www → /var/www/html</text>
+<text x="1070" y="702" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">各ディレクトリに x が必要（例：0755）</text>
+<polyline points="450,650 590,650" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="590,650 575.5928463623571,656.9594485457797 575.5928463623571,643.0405514542203" fill="#16745b"/>
+<polyline points="1460,540 1460,410" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="1460,410 1466.9594485457797,424.4071536376428 1453.0405514542203,424.4071536376428" fill="#16745b"/>
+<text x="620" y="454" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">② 配信するファイルには r が必要</text>
+<text x="55" y="868" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">www-dataは、ファイルを読み取ってレスポンスを返す。</text>
+<text x="55" y="932" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">本文の書き換えを許可する権限は、静的配信には必要ない。</text>
+<text x="55" y="998" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">管理者が読めるかだけでなく、Nginxを動かすユーザーの権限を見る。</text>
+</svg>
