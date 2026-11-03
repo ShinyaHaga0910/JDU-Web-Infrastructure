@@ -1,0 +1,78 @@
+{
+  "scope": "read_only_review_of_published_github_pm_pages",
+  "reviewed_at": "2026-11-03T07:33:27.657154+00:00",
+  "github_commit": "d8d11267f1d96bbb577134058028ec58d57f5314",
+  "repository": "ShinyaHaga0910/JDU-Web-Infrastructure",
+  "source_acquisition": "Authenticated git fetch origin main; browser login independently confirmed private repository readable",
+  "markdown_pages": 10,
+  "task_sections_per_language": {
+    "practice": 7,
+    "missions": 7
+  },
+  "practice_steps": 49,
+  "mission_points": {
+    "M0": 0,
+    "M1": 8,
+    "M2": 13,
+    "M3": 3,
+    "M4": 9,
+    "M5": 13,
+    "M6": 16
+  },
+  "total_graded_points": 62,
+  "scored_check_ids_match_registry_in_all_languages": true,
+  "command_and_configuration_blocks_match_in_all_languages": true,
+  "bash_blocks_syntax_checked": 48,
+  "relative_links_checked": 48,
+  "broken_relative_file_links": [],
+  "stale_expiry_occurrences": [
+    {
+      "path": "course/labs/docs/ja/practice.md",
+      "line": 1319
+    },
+    {
+      "path": "course/labs/docs/ja/missions.md",
+      "line": 345
+    },
+    {
+      "path": "course/labs/docs/ru/practice.md",
+      "line": 1319
+    },
+    {
+      "path": "course/labs/docs/ru/missions.md",
+      "line": 345
+    },
+    {
+      "path": "course/labs/docs/uz/practice.md",
+      "line": 1319
+    },
+    {
+      "path": "course/labs/docs/uz/missions.md",
+      "line": 345
+    }
+  ],
+  "pm_pages_without_direct_browser_guide_link": [
+    "course/labs/docs/ja/practice.md",
+    "course/labs/docs/ja/missions.md",
+    "course/labs/docs/ru/practice.md",
+    "course/labs/docs/ru/missions.md",
+    "course/labs/docs/uz/practice.md",
+    "course/labs/docs/uz/missions.md"
+  ],
+  "git_blob_sha256": {
+    "course/labs/README.md": "17f6ba01d0f6c1f6135d8cb7c2c392a88df9d4f098a1e673834cd5d0fbb05ff2",
+    "course/labs/docs/ja/practice.md": "b659bbe1c05c685586af6a6edf8e33a4c81a780ab8abfc5b697d344eb4dc12eb",
+    "course/labs/docs/ja/missions.md": "4d13b95213847787189c23b63621aa4a26aa0ee6ddabb726ad046b04c206daf7",
+    "course/labs/docs/ja/portal.md": "b5af29887bd5c973e8b5879882397741e85d74bc89b29294228b75cc06077345",
+    "course/labs/docs/ru/practice.md": "4caaaa58cbc4fb93959eec6a490cf3f03833ca51be9f55bcd597c83863d400c0",
+    "course/labs/docs/ru/missions.md": "9a88c692c748d9b691101b065cba1b7635820d8a41339df1058126d37d2ade3e",
+    "course/labs/docs/ru/portal.md": "8d2cce16d386a6de940e77bc5d9265f3ba699978097d34f5ae2ce86e80263783",
+    "course/labs/docs/uz/practice.md": "854f8cd778939009cfa436d9d03740c1057a3394790a34a531f83d7bda8f581b",
+    "course/labs/docs/uz/missions.md": "e28a3c0790a17c735e36f24c2b85732501d271c13a9c0c5006cc4984b9173fe2",
+    "course/labs/docs/uz/portal.md": "2ce68dd967340040f3a205bc0fe9d8e4d0027c11435df46565b125601834b8f6"
+  },
+  "all_14_tasks_reexecuted_in_AWS": false,
+  "native_language_proofreading": false,
+  "student_github_access_checked": false,
+  "student_materials_changed": false
+}
