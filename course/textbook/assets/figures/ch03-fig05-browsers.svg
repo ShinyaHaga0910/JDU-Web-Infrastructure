@@ -20,7 +20,7 @@
 <text x="1275" y="452" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
 <text x="1275" y="497" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="middle">Webサーバー</text>
 <text x="1275" y="554" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">内部IP  10.20.1.20</text>
-<text x="1275" y="613" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">80番：一般 / 8080番：管理</text>
+<text x="1275" y="613" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="21" dominant-baseline="text-before-edge" text-anchor="middle">80番ポート：一般 / 8080番ポート：管理</text>
 <rect x="480" y="655" width="440" height="225" rx="18" fill="#f1f7f3" stroke="#16745b" stroke-width="2"/>
 <text x="700" y="666" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
 <text x="700" y="709" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">踏み台サーバー</text>
