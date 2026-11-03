@@ -1,0 +1,196 @@
+{
+  "checked_on": "2026-11-03",
+  "scope": "initial_workflow_audit_not_fresh_student_acceptance",
+  "aws_calls_from_local": false,
+  "signed_artifacts_modified": false,
+  "bash_syntax_blocks_passed": 13,
+  "existing_cli_help": [
+    {
+      "program": "student.py",
+      "exit_code": 0,
+      "usage_present": true
+    },
+    {
+      "program": "teacher.py",
+      "exit_code": 0,
+      "usage_present": true
+    },
+    {
+      "program": "distribution.py",
+      "exit_code": 0,
+      "usage_present": true
+    },
+    {
+      "program": "jdu-web-lab",
+      "exit_code": 0,
+      "usage_present": true
+    }
+  ],
+  "formal_release_verification": {
+    "accepted": false,
+    "error_type": "ValueError",
+    "reason": "Expired or future dated distribution; keep existing state"
+  },
+  "formal_release": {
+    "distribution_id": "web-course-class193548-20261023-r2",
+    "expires_at": "2026-10-27T14:24:57.194372+05:00"
+  },
+  "teaching_stage_pinned_distribution": "web-course-class193548-20261023-r2",
+  "new_student_end_to_end_verified_this_turn": false,
+  "prior_browser_runtime_acceptance": "2026-10-30-browser-special-checks-accepted.public.json",
+  "status": "not_ready_for_new_student_initial_workflow",
+  "live_existing_environment": {
+    "student": {
+      "scope": "existing_student_initial_workflow_readonly",
+      "account": "965244652544",
+      "nodes": [
+        {
+          "id": "i-0c43b73c9a75c41eb",
+          "state": "running",
+          "private_ip": "10.20.1.20",
+          "public_ip": "3.230.1.107"
+        },
+        {
+          "id": "i-0488d26e69614e096",
+          "state": "running",
+          "private_ip": "10.20.1.10",
+          "public_ip": "100.48.90.243"
+        },
+        {
+          "id": "i-0f4cfc066e59488a6",
+          "state": "running",
+          "private_ip": "10.20.2.10",
+          "public_ip": null
+        },
+        {
+          "id": "i-0ccc3e9206d30867b",
+          "state": "running",
+          "private_ip": "10.20.2.20",
+          "public_ip": null
+        },
+        {
+          "id": "i-08f8a40fdaa5bb240",
+          "state": "running",
+          "private_ip": "10.20.2.30",
+          "public_ip": null
+        }
+      ],
+      "ssm_online": 5,
+      "root_volume_ids": [
+        "vol-031fe29759bd1d27d",
+        "vol-05586863b8491a998",
+        "vol-07c3cc6ffdd36afb9",
+        "vol-08dce34a5376e7d58",
+        "vol-0dd3097fd722b6bb5"
+      ],
+      "root_total_gib": 96,
+      "all_roots_encrypted": true,
+      "checker_state": "Active",
+      "checker_sha256": "9c245021d6857304ac0f51ab202e439648cac1ebb4dc1b1e248b2b10d0f456e1",
+      "checker_same_five": true,
+      "lab_id": "class193548-test1",
+      "command_state_paths": [
+        "/home/cloudshell-user/.jdu-web-student/class193548-test1/command-state.json"
+      ]
+    },
+    "teacher_before": {
+      "scope": "existing_teacher_initial_workflow_readonly",
+      "account": "170126527713",
+      "teacher_stack_status": "UPDATE_COMPLETE",
+      "teacher_ec2_state": "running",
+      "original_rows": 82,
+      "raw_earned": 62,
+      "raw_maximum": 62,
+      "lab_active": true,
+      "assessment_context": "verification",
+      "existing_instances": 5,
+      "private_backup_retained": true
+    },
+    "web_guest": {
+      "nginx": "active",
+      "lesson_resources_directory": false,
+      "public_resources_present": {
+        "catalog-app.tar.gz": false,
+        "registry.py": false,
+        "assessment-registry.json": false,
+        "database_secret.py": false,
+        "offline_assets.py": false
+      },
+      "web_files": [
+        {
+          "name": "practice.txt",
+          "exists": true,
+          "sha256": "5e53589d70463f31a1da2b532b3cd58fbc9f84013315165edcbfa059e987e978"
+        },
+        {
+          "name": "mission.txt",
+          "exists": true,
+          "sha256": "da05a9e03196ab00eb1df730eeeb10df42215bebc8ab4f884701f32dc5e3e8b4"
+        }
+      ]
+    },
+    "browser": {
+      "m0": {
+        "job_id": "e2768c38-b82d-412c-b75d-3f1a8dce56b9",
+        "passed": 3,
+        "graded": false,
+        "stored_at": "2026-11-03T04:43:00.176Z"
+      },
+      "m1": {
+        "job_id": "832f0004-5fa4-42ea-973d-a44aeee671ac",
+        "earned": 8,
+        "maximum": 8,
+        "stored_at": "2026-11-03T04:44:46.376Z"
+      },
+      "student_grade_total": 62,
+      "teacher_total": 62,
+      "teacher_latest_submission": "2026-11-03T04:44:46.376Z"
+    },
+    "canonical_after": {
+      "scope": "initial_workflow_canonical_readonly",
+      "rows_before": 82,
+      "rows_after": 84,
+      "new_keys": [
+        "REQUEST#b125aa27-7c13-4111-8b29-2cb3339fc33b",
+        "REQUEST#d9439d2c-f601-465f-8bf5-d48486f1c379"
+      ],
+      "new_requests": [
+        {
+          "job_id": "832f0004-5fa4-42ea-973d-a44aeee671ac",
+          "task_id": "M1",
+          "request_id": "d9439d2c-f601-465f-8bf5-d48486f1c379",
+          "received_at": "2026-11-03T09:44:46.376232+05:00",
+          "receipt_stored": true,
+          "body_sha256_matches": true
+        },
+        {
+          "job_id": "e2768c38-b82d-412c-b75d-3f1a8dce56b9",
+          "task_id": "M0",
+          "request_id": "b125aa27-7c13-4111-8b29-2cb3339fc33b",
+          "received_at": "2026-11-03T09:43:00.176599+05:00",
+          "receipt_stored": true,
+          "body_sha256_matches": true
+        }
+      ],
+      "old_requests_unchanged": true,
+      "registration_metadata_unchanged": true,
+      "unrelated_rows_unchanged": true,
+      "raw_earned": 62,
+      "raw_maximum": 62
+    }
+  },
+  "blockers": [
+    "Formal signed course release expired; real verifier refuses it.",
+    "Public teaching resource staging pins the expired distribution; expected lesson-resources-r1 is absent on the existing Web.",
+    "Per-student browser setup and first-command-to-P1/M1 walkthrough remain unverified; preparation helpers contain test-account constants."
+  ],
+  "new_aws_resources": 0,
+  "iam_changes": 0,
+  "new_credentials": 0,
+  "existing_servers_or_settings_reset": false,
+  "screenshots": [
+    "images/2026-11-03-workflow-m1.png",
+    "images/2026-11-03-workflow-grades.png",
+    "images/2026-11-03-workflow-teacher.png"
+  ]
+}
