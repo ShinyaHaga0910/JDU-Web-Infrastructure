@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "scope": "fresh_initial_workflow_replacement_plan_not_approval",
+  "scope": "fresh_initial_workflow_replacement_approved_partial_execution",
   "prepared_on": "2026-11-03",
-  "approved": false,
+  "approved": true,
   "executed": false,
   "class_id": 193548,
   "teacher_account": "170126527713",
@@ -109,5 +109,8 @@
     "full browser automation of initial five-node creation",
     "teacher End Lab availability",
     "additional nonfunctional requirements"
-  ]
+  ],
+  "execution_status": "Original five retired; encrypted 96GiB roots retained. New delivery issued and transferred encrypted. Fresh creation awaits human RDP entry; browser acceptance remains pending.",
+  "credential_issuance_verified": true,
+  "fresh_initial_workflow_passed": false
 }

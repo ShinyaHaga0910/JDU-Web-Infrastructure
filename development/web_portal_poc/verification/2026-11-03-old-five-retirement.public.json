@@ -1,0 +1,47 @@
+{
+  "account": "965244652544",
+  "lab_id": "class193548-test1",
+  "deployment_id": "3ab82943-031d-4806-b4c0-c0b0e4554006",
+  "terminated_instance_ids": [
+    "i-0488d26e69614e096",
+    "i-08f8a40fdaa5bb240",
+    "i-0c43b73c9a75c41eb",
+    "i-0ccc3e9206d30867b",
+    "i-0f4cfc066e59488a6"
+  ],
+  "retained_volumes": [
+    {
+      "id": "vol-07c3cc6ffdd36afb9",
+      "state": "available",
+      "size_gib": 32,
+      "encrypted": true
+    },
+    {
+      "id": "vol-08dce34a5376e7d58",
+      "state": "available",
+      "size_gib": 16,
+      "encrypted": true
+    },
+    {
+      "id": "vol-05586863b8491a998",
+      "state": "available",
+      "size_gib": 16,
+      "encrypted": true
+    },
+    {
+      "id": "vol-0dd3097fd722b6bb5",
+      "state": "available",
+      "size_gib": 24,
+      "encrypted": true
+    },
+    {
+      "id": "vol-031fe29759bd1d27d",
+      "state": "available",
+      "size_gib": 8,
+      "encrypted": true
+    }
+  ],
+  "retained_gib": 96,
+  "private_state_or_credentials_changed": false,
+  "new_resources": 0
+}
