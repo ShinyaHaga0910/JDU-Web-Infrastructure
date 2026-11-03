@@ -31,4 +31,6 @@ P3/M3の停止前・停止中・再開後は同じブラウザ画面で記録し
 
 [教材検査](../validation.public.json) / [PDF生成検査](../rendering.public.json) / [修正前との照合](2026-11-03-readability-r13.public.json)。再照合はrepo rootで `python -B course/labs/authoring/review_r13.py` を実行します。
 
+GitHub main `bc75a33` へのpush後、Chromeの所有者ログインで、[教材入口](2026-11-03-readability-entry.png)がMarkdownのPreviewとして表示され、そこから[P1の個別ページ](2026-11-03-readability-p1.png)へ移動できることを確認しました。実行場所・目的・コード・設定の意味・期待結果・困ったときが別の段落として表示されています。
+
 AWS資源・採点機能は今回変更していません。全49手順の新規学生試読、母語校閲、教師の教材承認は未実施です。非公開GitHubへの学生閲覧権限も、この編集で追加していません。
