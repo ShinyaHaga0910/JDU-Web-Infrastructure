@@ -1,115 +1,115 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第4章 HTTPでページを要求する仕組み</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第4章-httpでページを要求する仕組み">第4章 HTTPでページを要求する仕組み</h1>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第4章 HTTPでページをリクエストする仕組み</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第4章-httpでページをリクエストする仕組み">第4章 HTTPでページをリクエストする仕組み</h1>
 <h2 id="この章で分かること">この章で分かること</h2>
-<p>学校の備品管理システムで備品一覧を開くと、ブラウザには備品名や数量が表示される。このときブラウザは、自分だけで一覧を作っているのではない。Webサーバーへ「このページを送ってほしい」と要求し、返ってきたデータを画面に表示している。</p>
-<p>ブラウザとWebサーバーの間で、要求や返答をどのような形式でやり取りするかを定めるのが<strong>HTTP（Hypertext Transfer Protocol）</strong>である。ブラウザから送るものを<strong>要求（リクエスト）</strong>、Webサーバーから返すものを<strong>応答（レスポンス）</strong>という。</p>
-<p>本章では、仕組みを読み取りやすくするために、Webサーバーへ置いた説明用の<code>example.txt</code>から短い文章を取得する場面を使う。HTTPの書き方はHTTP/1.1を例にする。備品管理アプリの画面でも、ブラウザから要求し、Webサーバーから応答を受け取るという関係は同じである。</p>
-<p class="bullet">・ URLは、接続先と要求するものをどのように指定するのか。</p>
-<p class="bullet">・ 接続することと、HTTPで要求することはどう違うのか。</p>
-<p class="bullet">・ 要求と応答の中には、何が書かれているのか。</p>
-<p class="bullet">・ 404という返答と、応答がない状態では何が違うのか。</p>
+<p>学校の備品管理システムで備品一覧を開くと、ブラウザには備品名や数量が表示される。このときブラウザは、自分だけで一覧を作っているのではない。Webサーバーへ「このページを送ってほしい」とリクエストし、返ってきたデータを画面に表示している。</p>
+<p>ブラウザとWebサーバーの間で、リクエストやレスポンスをどのような形式でやり取りするかを定めるのが<strong>HTTP（Hypertext Transfer Protocol）</strong>である。ブラウザから送るものを<strong>リクエスト</strong>、Webサーバーから返すものを<strong>レスポンス</strong>という。</p>
+<p>本章では、仕組みを読み取りやすくするために、Webサーバーへ置いた説明用の<code>example.txt</code>から短い文章を取得する場面を使う。HTTPの書き方はHTTP/1.1を例にする。備品管理アプリの画面でも、ブラウザからリクエストし、Webサーバーからレスポンスを受け取るという関係は同じである。</p>
+<p class="bullet">・ URLは、接続先とリクエストするものをどのように指定するのか。</p>
+<p class="bullet">・ 接続することと、HTTPでリクエストすることはどう違うのか。</p>
+<p class="bullet">・ リクエストとレスポンスの中には、何が書かれているのか。</p>
+<p class="bullet">・ 404というレスポンスと、レスポンスがない状態では何が違うのか。</p>
 <p class="bullet">・ ブラウザの画面とcurlの出力は、それぞれ何を見せているのか。</p>
-<h2 id="41-urlで接続先と要求するものを指定する">4.1 URLで接続先と要求するものを指定する</h2>
-<p>ブラウザのアドレス欄へ入力する<code>http://...</code>という文字列を<strong>URL（Uniform Resource Locator）</strong>という。URLには、使う通信方式、接続先、ポート番号、要求する対象などを指定する。</p>
-<p>例えば、利用者PCからWebサーバーの公開IPを指定して、説明用のファイルを要求するURLを考える。</p>
+<h2 id="41-urlで接続先とリクエストするものを指定する">4.1 URLで接続先とリクエストするものを指定する</h2>
+<p>ブラウザのアドレス欄へ入力する<code>http://...</code>という文字列を<strong>URL（Uniform Resource Locator）</strong>という。URLには、使う通信方式、接続先、ポート番号、リクエストする対象などを指定する。</p>
+<p>例えば、利用者PCからWebサーバーの公開IPを指定して、説明用のファイルをリクエストするURLを考える。</p>
 <p><strong>URLの例：公開IPは説明用の値である。</strong></p>
 <pre><code>http://203.0.113.20:80/example.txt</code></pre>
 <figure><img src="../../assets/figures/ch04-fig01-url.png" alt="URLのhttp、Webサーバーの公開IP、80番ポート、example.txtのパスを分けて示す。" width="1600" height="850"></figure>
-<p><strong>図4-1 URLの四つの部分。</strong> <code>http</code>は通信方式、<code>203.0.113.20</code>は接続先のWebサーバー、<code>80</code>は接続先のポート番号、<code>/example.txt</code>は要求する対象のパスを表す。この公開IPは文書で説明するための例であり、実際の接続には割り当てられた公開IPを使う。</p>
+<p><strong>図4-1 URLの四つの部分。</strong> <code>http</code>は通信方式、<code>203.0.113.20</code>は接続先のWebサーバー、<code>80</code>は接続先のポート番号、<code>/example.txt</code>はリクエストする対象のパスを表す。この公開IPは文書で説明するための例であり、実際の接続には割り当てられた公開IPを使う。</p>
 <h3 id="ipアドレスとパスでは指定するものが違う">IPアドレスとパスでは指定するものが違う</h3>
-<p>IPアドレスは、どのWebサーバーへ接続するかを指定する。一方、<strong>パス</strong>は、そのWebサーバーに何を要求するかを指定する。例えば同じWebサーバーに対して、<code>/example.txt</code>は説明用の文章、<code>/</code>はサイトの入口となるページを求める指定として使える。</p>
-<p>URLのパスが、サーバーのストレージ上の絶対パスと同じになるとは限らない。Webサーバーの設定によって、<code>/example.txt</code>を配信するファイルへ対応付けたり、アプリに処理させたりする。ブラウザはURLで対象を求め、Webサーバー側がその要求をどのように処理するかを決める。</p>
+<p>IPアドレスは、どのWebサーバーへ接続するかを指定する。一方、<strong>パス</strong>は、そのWebサーバーに何をリクエストするかを指定する。例えば同じWebサーバーに対して、<code>/example.txt</code>は説明用の文章、<code>/</code>はサイトの入口となるページを求める指定として使える。</p>
+<p>URLのパスが、サーバーのストレージ上の絶対パスと同じになるとは限らない。Webサーバーの設定によって、<code>/example.txt</code>を配信するファイルへ対応付けたり、アプリに処理させたりする。ブラウザはURLで対象を求め、Webサーバー側がそのリクエストをどのように処理するかを決める。</p>
 <h3 id="省略されたポート番号を読む">省略されたポート番号を読む</h3>
 <p>HTTPのURLでポート番号を省略すると、通常は80番ポートを使う。このため、次の二つは同じWebサーバーの同じ入口とパスを指定している。</p>
 <pre><code>http://203.0.113.20:80/example.txt
 http://203.0.113.20/example.txt</code></pre>
 <p>今回のアプリ管理のように8080番ポートを使う場合は、URLにも<code>:8080</code>を付ける。接続先のポート番号を省略したHTTPのURLでは、Webサーバーの80番ポートへ向かう。<a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-4.2.1">HTTPのURLと既定ポート</a></p>
-<h2 id="42-接続した後にhttpの要求を送る">4.2 接続した後にHTTPの要求を送る</h2>
-<p>利用者PCのブラウザでHTTPのURLを開くとき、まずブラウザは指定されたWebサーバーの80番ポートへTCPで接続する。接続が確立すると、その通信を使ってHTTPの要求を送る。TCPはデータを届けるための通信方式、HTTPはその上でページなどを要求するための取り決めとして働く。</p>
-<p>例えば、80番ポートへ接続できただけでは、どのページを返してほしいかはWebサーバーへ伝わっていない。ブラウザがHTTPで<code>/example.txt</code>を要求することで、Webサーバーは何を求められたのかを読み取れる。</p>
-<figure><img src="../../assets/figures/ch04-fig02-roundtrip.png" alt="TCPでWebサーバーの80番ポートへ接続し、ブラウザからHTTP要求を送り、WebサーバーからHTTP応答を受け取る順番。" width="1600" height="1030"></figure>
-<p><strong>図4-2 接続、要求、応答の順番。</strong> 上から下へ順に読む。接続した後にブラウザが対象を要求し、Webサーバーが処理結果とデータを返す。図は初めて接続して一つの対象を取得する場面を示している。</p>
-<p>Webサーバーは要求を読み、指定されたファイルを返すなどの処理を行う。対象を返せる場合も、見つからない場合も、その結果をHTTPの応答としてブラウザへ知らせる。ブラウザは応答を受け取り、その内容に応じてページやエラーの画面を表示する。</p>
-<p>実際のブラウザは、一度確立した接続を続けて使うこともある。一つの接続でやり取りできる要求が、必ず一回だけというわけではない。本章では、一回の要求とそれに対する応答を取り出して考える。<a href="https://www.rfc-editor.org/rfc/rfc9112.html">HTTP/1.1のメッセージ</a></p>
-<h2 id="43-httpの要求には何が書かれているか">4.3 HTTPの要求には何が書かれているか</h2>
+<h2 id="42-接続した後にhttpのリクエストを送る">4.2 接続した後にHTTPのリクエストを送る</h2>
+<p>利用者PCのブラウザでHTTPのURLを開くとき、まずブラウザは指定されたWebサーバーの80番ポートへTCPで接続する。接続が確立すると、その通信を使ってHTTPのリクエストを送る。TCPはデータを届けるための通信方式、HTTPはその上でページなどをリクエストするための取り決めとして働く。</p>
+<p>例えば、80番ポートへ接続できただけでは、どのページを返してほしいかはWebサーバーへ伝わっていない。ブラウザがHTTPで<code>/example.txt</code>をリクエストすることで、Webサーバーは何を求められたのかを読み取れる。</p>
+<figure><img src="../../assets/figures/ch04-fig02-roundtrip.png" alt="TCPでWebサーバーの80番ポートへ接続し、ブラウザからHTTPリクエストを送り、WebサーバーからHTTPレスポンスを受け取る順番。" width="1600" height="1030"></figure>
+<p><strong>図4-2 接続、リクエスト、レスポンスの順番。</strong> 上から下へ順に読む。接続した後にブラウザが対象をリクエストし、Webサーバーが処理結果とデータを返す。図は初めて接続して一つの対象を取得する場面を示している。</p>
+<p>Webサーバーはリクエストを読み、指定されたファイルを返すなどの処理を行う。対象を返せる場合も、見つからない場合も、その結果をHTTPのレスポンスとしてブラウザへ知らせる。ブラウザはレスポンスを受け取り、その内容に応じてページやエラーの画面を表示する。</p>
+<p>実際のブラウザは、一度確立した接続を続けて使うこともある。一つの接続でやり取りできるリクエストが、必ず一回だけというわけではない。本章では、一回のリクエストとそれに対するレスポンスを取り出して考える。<a href="https://www.rfc-editor.org/rfc/rfc9112.html">HTTP/1.1のメッセージ</a></p>
+<h2 id="43-httpのリクエストには何が書かれているか">4.3 HTTPのリクエストには何が書かれているか</h2>
 <h3 id="getで対象を取得する">GETで対象を取得する</h3>
-<p>ブラウザが説明用の文章を求めるHTTP/1.1の要求を、必要な行に絞って示す。</p>
-<p><strong>要求の表示例：端末へ入力するコマンドではない。</strong></p>
+<p>ブラウザが説明用の文章を求めるHTTP/1.1のリクエストを、必要な行に絞って示す。</p>
+<p><strong>リクエストの表示例：端末へ入力するコマンドではない。</strong></p>
 <pre><code>GET /example.txt HTTP/1.1
 Host: 203.0.113.20</code></pre>
-<p>先頭の行には、<code>GET</code>、<code>/example.txt</code>、<code>HTTP/1.1</code>の三つが並ぶ。<code>GET</code>は「対象の内容を取得したい」という要求の種類、<code>/example.txt</code>は取得したい対象、<code>HTTP/1.1</code>は使っているHTTPのバージョンである。</p>
-<p><code>GET</code>のように、何をしてほしいかを表す要求の種類を<strong>メソッド</strong>という。備品一覧や詳細を開くときのように、内容を取得する場面では主にGETを使う。ブラウザのアドレス欄にURLを入力する操作も、通常はGETによる取得につながる。<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/GET">GETメソッド</a></p>
-<h3 id="ヘッダーで要求に関する情報を付ける">ヘッダーで要求に関する情報を付ける</h3>
-<p><code>Host: 203.0.113.20</code>は、<strong>ヘッダー</strong>の一つである。ヘッダーは<code>項目名: 値</code>という形式で、要求に関する補足情報を伝える。</p>
-<p><code>Host</code>には、URLで指定した宛先の名前やIPアドレスが入る。名前でアクセスしたときは、その名前が入る。Webサーバーはこの情報を使って、どのサイトに対する要求かを判断できる。一台のWebサーバーが複数のサイトを扱う場合にも使われる。<a href="https://nginx.org/en/docs/http/request_processing.html">Webサーバーが要求を処理する仕組み</a></p>
-<p>要求でも、ヘッダーの終わりには空行が入る。本文を送る場合は、その空行の後にデータが続く。</p>
-<p>名前から接続先のIPアドレスを調べるDNSと、接続後にHTTPの要求の中で宛先を伝えるHostヘッダーは、役割が異なる。今回の例はIPアドレスで直接接続するため、HostヘッダーにもそのIPアドレスを使っている。</p>
+<p>先頭の行には、<code>GET</code>、<code>/example.txt</code>、<code>HTTP/1.1</code>の三つが並ぶ。<code>GET</code>は「対象の内容を取得したい」というリクエストの種類、<code>/example.txt</code>は取得したい対象、<code>HTTP/1.1</code>は使っているHTTPのバージョンである。</p>
+<p><code>GET</code>のように、何をしてほしいかを表すリクエストの種類を<strong>メソッド</strong>という。備品一覧や詳細を開くときのように、内容を取得する場面では主にGETを使う。ブラウザのアドレス欄にURLを入力する操作も、通常はGETによる取得につながる。<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/GET">GETメソッド</a></p>
+<h3 id="ヘッダーでリクエストに関する情報を付ける">ヘッダーでリクエストに関する情報を付ける</h3>
+<p><code>Host: 203.0.113.20</code>は、<strong>ヘッダー</strong>の一つである。ヘッダーは<code>項目名: 値</code>という形式で、リクエストに関する補足情報を伝える。</p>
+<p><code>Host</code>には、URLで指定した宛先の名前やIPアドレスが入る。名前でアクセスしたときは、その名前が入る。Webサーバーはこの情報を使って、どのサイトに対するリクエストかを判断できる。一台のWebサーバーが複数のサイトを扱う場合にも使われる。<a href="https://nginx.org/en/docs/http/request_processing.html">Webサーバーがリクエストを処理する仕組み</a></p>
+<p>リクエストでも、ヘッダーの終わりには空行が入る。本文を送る場合は、その空行の後にデータが続く。</p>
+<p>名前から接続先のIPアドレスを調べるDNSと、接続後にHTTPのリクエストの中で宛先を伝えるHostヘッダーは、役割が異なる。今回の例はIPアドレスで直接接続するため、HostヘッダーにもそのIPアドレスを使っている。</p>
 <h3 id="postで入力内容を送る">POSTで入力内容を送る</h3>
-<p>Webアプリの管理画面で備品の名前や数量を入力して保存するときは、入力した内容をWebサーバーへ送る必要がある。このような場面では<strong>POST</strong>というメソッドが使われる。入力値などのデータは、要求の<strong>本文</strong>に入れて送る。</p>
+<p>Webアプリの管理画面で備品の名前や数量を入力して保存するときは、入力した内容をWebサーバーへ送る必要がある。このような場面では<strong>POST</strong>というメソッドが使われる。入力値などのデータは、リクエストの<strong>本文</strong>に入れて送る。</p>
 <p>GETは対象の取得、POSTは送ったデータの処理を求める、という違いを押さえておこう。今回の一般向けの備品一覧は閲覧用であり、登録・変更は踏み台サーバーのブラウザから開く管理画面で行う。<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/POST">POSTメソッド</a></p>
-<h2 id="44-httpの応答には結果とデータが入る">4.4 HTTPの応答には結果とデータが入る</h2>
+<h2 id="44-httpのレスポンスには結果とデータが入る">4.4 HTTPのレスポンスには結果とデータが入る</h2>
 <h3 id="状態、ヘッダー、本文を分けて読む">状態、ヘッダー、本文を分けて読む</h3>
-<p>説明用のファイルを返す応答を示す。本文は<code>School inventory server</code>という一行の文章とし、末尾の改行を含めて24バイトである。</p>
-<p><strong>応答の表示例：入力するコマンドではない。</strong></p>
+<p>説明用のファイルを返すレスポンスを示す。本文は<code>School inventory server</code>という一行の文章とし、末尾の改行を含めて24バイトである。</p>
+<p><strong>レスポンスの表示例：入力するコマンドではない。</strong></p>
 <pre><code>HTTP/1.1 200 OK
 Content-Type: text/plain
 Content-Length: 24
 
 School inventory server</code></pre>
-<p>先頭の<code>HTTP/1.1 200 OK</code>は、要求を処理した結果を示す行である。<code>200</code>は成功を示す番号であり、<strong>ステータスコード</strong>という。<code>OK</code>はその状態を説明する語である。</p>
-<p>続く<code>Content-Type</code>と<code>Content-Length</code>は、応答のヘッダーである。<code>Content-Type: text/plain</code>は、本文が通常のテキストであることを示す。<code>Content-Length: 24</code>は本文の長さをバイト数で示している。</p>
+<p>先頭の<code>HTTP/1.1 200 OK</code>は、リクエストを処理した結果を示す行である。<code>200</code>は成功を示す番号であり、<strong>ステータスコード</strong>という。<code>OK</code>はその状態を説明する語である。</p>
+<p>続く<code>Content-Type</code>と<code>Content-Length</code>は、レスポンスのヘッダーである。<code>Content-Type: text/plain</code>は、本文が通常のテキストであることを示す。<code>Content-Length: 24</code>は本文の長さをバイト数で示している。</p>
 <p>ヘッダーの後には空行があり、その後に<strong>本文</strong>が続く。上の例では<code>School inventory server</code>が取得したデータである。ヘッダーはデータの種類などを説明する情報、本文は実際に受け取るデータとして分けて読む。</p>
-<figure><img src="../../assets/figures/ch04-fig03-response.png" alt="HTTP応答のステータス、ヘッダー、本文をそれぞれの説明に対応付ける。" width="1600" height="920"></figure>
-<p><strong>図4-3 応答の結果とデータを読み分ける。</strong> 先頭の行で処理結果を読み、ヘッダーで本文の種類などを読み、空行の後でデータそのものを読む。</p>
+<figure><img src="../../assets/figures/ch04-fig03-response.png" alt="HTTPレスポンスのステータス、ヘッダー、本文をそれぞれの説明に対応付ける。" width="1600" height="920"></figure>
+<p><strong>図4-3 レスポンスの結果とデータを読み分ける。</strong> 先頭の行で処理結果を読み、ヘッダーで本文の種類などを読み、空行の後でデータそのものを読む。</p>
 <h3 id="ブラウザは本文の種類に応じて表示する">ブラウザは本文の種類に応じて表示する</h3>
-<p>ブラウザでこの応答を受け取ると、通常は本文の文章が表示される。<code>200 OK</code>や<code>Content-Type</code>などのヘッダーは、普段のページ表示では前面に出てこない。ブラウザがその情報を使って、受け取ったデータをどう扱うか判断する。</p>
-<p>HTMLのページを返す場合は、例えば<code>Content-Type: text/html</code>を使う。ブラウザはHTMLを読み、文字やリンクなどを配置して画面を作る。ページの中で画像やCSSという表示用のファイルが指定されていれば、ブラウザはそれらを取得するために追加の要求を送ることもある。<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Messages">HTTPの要求と応答</a></p>
+<p>ブラウザでこのレスポンスを受け取ると、通常は本文の文章が表示される。<code>200 OK</code>や<code>Content-Type</code>などのヘッダーは、普段のページ表示では前面に出てこない。ブラウザがその情報を使って、受け取ったデータをどう扱うか判断する。</p>
+<p>HTMLのページを返す場合は、例えば<code>Content-Type: text/html</code>を使う。ブラウザはHTMLを読み、文字やリンクなどを配置して画面を作る。ページの中で画像やCSSという表示用のファイルが指定されていれば、ブラウザはそれらを取得するために追加のリクエストを送ることもある。<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Messages">HTTPのリクエストとレスポンス</a></p>
 <h2 id="45-ステータスコードと通信できない状態を区別する">4.5 ステータスコードと通信できない状態を区別する</h2>
-<h3 id="応答が返ってきたときの結果を読む">応答が返ってきたときの結果を読む</h3>
-<p>HTTPのステータスコードは、要求に対してWebサーバーがどのような結果を返したかを表す。以後の構築で出会う主な例を示す。</p>
-<div class="table-wrap"><table><thead><tr><th scope="col">ステータス</th><th scope="col">何を知らせているか</th></tr></thead><tbody><tr><td><code>200 OK</code></td><td>要求を正常に処理した。GETなら、通常は取得した対象が本文に入る</td></tr><tr><td><code>302 Found</code></td><td>別のURLへ移動するよう知らせている。移動先はLocationヘッダーで示す</td></tr><tr><td><code>403 Forbidden</code></td><td>要求を理解したが、利用を拒否している</td></tr><tr><td><code>404 Not Found</code></td><td>要求した対象が見つからない。存在を知らせないためにこの状態を返す場合もある</td></tr><tr><td><code>500 Internal Server Error</code></td><td>要求を処理するサーバー側で、処理を完了できない問題が起きた</td></tr><tr><td><code>502 Bad Gateway</code></td><td>中継するWebサーバーが、転送先のサーバーやアプリから正常な応答を得られなかった</td></tr></tbody></table></div>
-<p>例えば、ブラウザで間違ったパスを指定し、404という返答があったとする。この場合、HTTPの要求を受け取り、応答を返した相手がいる。ただし、その相手が意図したWebサーバーかどうかは、URLの接続先などと合わせて考える必要がある。</p>
-<p>302では、ブラウザがLocationヘッダーのURLを自動で開き直すことがある。そのため、最初の返答は302でも、画面には移動先のページが表示される場合がある。ステータスの番号と、最終的に表示されたページを分けて読む。<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status">HTTPステータスコード</a></p>
-<h3 id="httpの返答を受け取れない場合">HTTPの返答を受け取れない場合</h3>
-<p>一方、<strong>接続拒否</strong>や<strong>タイムアウト</strong>は、HTTPのステータスコードとは異なる。接続拒否はTCP接続を受け付けてもらえなかった状態、タイムアウトは接続や応答を待っても一定時間内に完了しなかった状態を表す。HTTPの応答を受け取れていない場合には、200や404といったステータスコードを読むこともできない。</p>
-<p>例えば、SGで通信が許可されていないために届かない場合と、Webサーバー上のソフトウェアが要求を受け取って403を返した場合では、調べる対象が異なる。403が見えたという理由で、SGが403という応答を作ったと考えてはいけない。</p>
-<p>タイムアウトだけでは、接続経路の問題、サーバーの停止、処理の遅れなどのどこに原因があるかを一つに決められない。まず「HTTPの応答が返ったのか」「返ったなら何というステータスと本文だったのか」を分けて読む。</p>
+<h3 id="レスポンスが返ってきたときの結果を読む">レスポンスが返ってきたときの結果を読む</h3>
+<p>HTTPのステータスコードは、リクエストに対してWebサーバーがどのような結果を返したかを表す。以後の構築で出会う主な例を示す。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">ステータス</th><th scope="col">何を知らせているか</th></tr></thead><tbody><tr><td><code>200 OK</code></td><td>リクエストを正常に処理した。GETなら、通常は取得した対象が本文に入る</td></tr><tr><td><code>302 Found</code></td><td>別のURLへ移動するよう知らせている。移動先はLocationヘッダーで示す</td></tr><tr><td><code>403 Forbidden</code></td><td>リクエストを理解したが、利用を拒否している</td></tr><tr><td><code>404 Not Found</code></td><td>リクエストした対象が見つからない。存在を知らせないためにこの状態を返す場合もある</td></tr><tr><td><code>500 Internal Server Error</code></td><td>リクエストを処理するサーバー側で、処理を完了できない問題が起きた</td></tr><tr><td><code>502 Bad Gateway</code></td><td>中継するWebサーバーが、転送先のサーバーやアプリから正常なレスポンスを得られなかった</td></tr></tbody></table></div>
+<p>例えば、ブラウザで間違ったパスを指定し、404というレスポンスがあったとする。この場合、HTTPのリクエストを受け取り、レスポンスを返した相手がいる。ただし、その相手が意図したWebサーバーかどうかは、URLの接続先などと合わせて考える必要がある。</p>
+<p>302では、ブラウザがLocationヘッダーのURLを自動で開き直すことがある。そのため、最初のレスポンスは302でも、画面には移動先のページが表示される場合がある。ステータスの番号と、最終的に表示されたページを分けて読む。<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status">HTTPステータスコード</a></p>
+<h3 id="httpのレスポンスを受け取れない場合">HTTPのレスポンスを受け取れない場合</h3>
+<p>一方、<strong>接続拒否</strong>や<strong>タイムアウト</strong>は、HTTPのステータスコードとは異なる。接続拒否はTCP接続を受け付けてもらえなかった状態、タイムアウトは接続やレスポンスを待っても一定時間内に完了しなかった状態を表す。HTTPのレスポンスを受け取れていない場合には、200や404といったステータスコードを読むこともできない。</p>
+<p>例えば、SGで通信が許可されていないために届かない場合と、Webサーバー上のソフトウェアがリクエストを受け取って403を返した場合では、調べる対象が異なる。403が見えたという理由で、SGが403というレスポンスを作ったと考えてはいけない。</p>
+<p>タイムアウトだけでは、接続経路の問題、サーバーの停止、処理の遅れなどのどこに原因があるかを一つに決められない。まず「HTTPのレスポンスが返ったのか」「返ったなら何というステータスと本文だったのか」を分けて読む。</p>
 <h2 id="46-ブラウザとcurlで見える結果を比べる">4.6 ブラウザとcurlで見える結果を比べる</h2>
-<h3 id="curlは応答を文字で読むためにも使える">curlは応答を文字で読むためにも使える</h3>
-<p>ブラウザが受け取ったデータをページとして表示するのに対し、<strong>curl</strong>はURLを指定してデータを取得するコマンドである。HTTPの応答を文字で読みたいときにも使える。</p>
+<h3 id="curlはレスポンスを文字で読むためにも使える">curlはレスポンスを文字で読むためにも使える</h3>
+<p>ブラウザが受け取ったデータをページとして表示するのに対し、<strong>curl</strong>はURLを指定してデータを取得するコマンドである。HTTPのレスポンスを文字で読みたいときにも使える。</p>
 <p>例えば、説明用の<code>example.txt</code>を配信する設定ができたWebサーバーを、踏み台サーバーから調べる場合を考える。</p>
 <p><strong>実行場所：踏み台サーバーの端末。接続先はWebサーバーの内部IPである。</strong></p>
 <pre><code>curl -i http://10.20.1.20/example.txt</code></pre>
-<p><code>-i</code>は、取得した本文と一緒に応答のヘッダーも表示する指定である。4.4のような出力から、先頭のステータス、Content-Type、本文を読み取れる。この出力はWebサーバーから返ってきた応答であり、ブラウザが送った要求を表示しているわけではない。<a href="https://curl.se/docs/manpage.html#-i">curlの応答ヘッダー表示</a></p>
-<p>この例のURLではポート番号を省略しているため、Webサーバーの80番ポートへ接続する。最初の<code>curl</code>は踏み台サーバー上で動き、要求を受けるソフトウェアはWebサーバー上で動く。</p>
-<p><code>curl -i</code>は、通常は302で指定された移動先を自動で取得せず、最初の応答を表示する。ブラウザでは移動先のページが見えていても、curlでは302とLocationヘッダーが見える場合がある。どちらも、同じやり取りの異なる部分を見ていることがある。</p>
+<p><code>-i</code>は、取得した本文と一緒にレスポンスのヘッダーも表示する指定である。4.4のような出力から、先頭のステータス、Content-Type、本文を読み取れる。この出力はWebサーバーから返ってきたレスポンスであり、ブラウザが送ったリクエストを表示しているわけではない。<a href="https://curl.se/docs/manpage.html#-i">curlのレスポンスヘッダー表示</a></p>
+<p>この例のURLではポート番号を省略しているため、Webサーバーの80番ポートへ接続する。最初の<code>curl</code>は踏み台サーバー上で動き、リクエストを受けるソフトウェアはWebサーバー上で動く。</p>
+<p><code>curl -i</code>は、通常は302で指定された移動先を自動で取得せず、最初のレスポンスを表示する。ブラウザでは移動先のページが見えていても、curlでは302とLocationヘッダーが見える場合がある。どちらも、同じやり取りの異なる部分を見ていることがある。</p>
 <h3 id="同じ対象でも、どこから取得したかで分かることが違う">同じ対象でも、どこから取得したかで分かることが違う</h3>
 <div class="table-wrap"><table><thead><tr><th scope="col">取得する場所</th><th scope="col">指定するURLと使う入口</th></tr></thead><tbody><tr><td>利用者PCのブラウザ</td><td><code>http://203.0.113.20/example.txt</code>のようにWebサーバーの公開IPを指定し、80番ポートへ接続する</td></tr><tr><td>踏み台サーバーのブラウザやcurl</td><td><code>http://10.20.1.20/example.txt</code>でWebサーバーの内部IPを指定し、80番ポートへ接続する</td></tr><tr><td>Webサーバー自身のcurl</td><td><code>http://127.0.0.1/example.txt</code>で、そのWebサーバー自身の80番ポートへ接続する</td></tr></tbody></table></div>
 <p>公開IPの行は説明用の値である。同じパスの文章を取得する場合も、利用者PCから取得した結果はインターネット側からの閲覧、踏み台サーバーから取得した結果はVPC内からの閲覧を示す。Webサーバー自身からの成功だけでは、利用者PCからも取得できるとまでは分からない。</p>
-<p>また、200が返っていても、本文がWebサーバーの初期ページや、別の文章であれば、求めていた対象を取得できたことにはならない。URL、ステータス、本文を対応させて読む。curlは通常、404などのHTTP応答もそのまま表示するため、コマンドが終了したことだけで成功と判断しない。</p>
+<p>また、200が返っていても、本文がWebサーバーの初期ページや、別の文章であれば、求めていた対象を取得できたことにはならない。URL、ステータス、本文を対応させて読む。curlは通常、404などのHTTPレスポンスもそのまま表示するため、コマンドが終了したことだけで成功と判断しない。</p>
 <h2 id="47-httpで届くことと暗号化は別の性質である">4.7 HTTPで届くことと暗号化は別の性質である</h2>
-<p>今回の説明と構築の基本では、<code>http://</code>のURLを使ってHTTPの要求と応答を学ぶ。HTTPのやり取りが成立したことは、必要なページやデータを要求して返してもらえることを示す。一方、<code>http://</code>での通信そのものは、通信内容を暗号化する仕組みを備えていない。</p>
-<p>インターネットのWebサービスでは、<strong>HTTPS</strong>によりTLSという仕組みで通信を保護することが広く行われている。HTTPSのURLは<code>https://</code>で始まり、ポート番号を省略すると通常は443番ポートを使う。Webサーバー側にはTLSや証明書などの設定が必要になる。HTTPの要求・応答の役割と、それを保護する通信の仕組みを分けて理解しておこう。<a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-4.2.2">HTTPとHTTPS</a></p>
-<p>次の第5章では、本章で説明したHTTPの要求に対して、Webサーバー上のNginxがファイルを返す仕組みと設定を扱う。</p>
+<p>今回の説明と構築の基本では、<code>http://</code>のURLを使ってHTTPのリクエストとレスポンスを学ぶ。HTTPのやり取りが成立したことは、必要なページやデータをリクエストして返してもらえることを示す。一方、<code>http://</code>での通信そのものは、通信内容を暗号化する仕組みを備えていない。</p>
+<p>インターネットのWebサービスでは、<strong>HTTPS</strong>によりTLSという仕組みで通信を保護することが広く行われている。HTTPSのURLは<code>https://</code>で始まり、ポート番号を省略すると通常は443番ポートを使う。Webサーバー側にはTLSや証明書などの設定が必要になる。HTTPのリクエスト・レスポンスの役割と、それを保護する通信の仕組みを分けて理解しておこう。<a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-4.2.2">HTTPとHTTPS</a></p>
+<p>次の第5章では、本章で説明したHTTPのリクエストに対して、Webサーバー上のNginxがファイルを返す仕組みと設定を扱う。</p>
 <h2 id="章末問題">章末問題</h2>
 <h3 id="問1">問1</h3>
 <p><code>http://203.0.113.20:80/example.txt</code>のIPアドレス、ポート番号、<code>/example.txt</code>は、それぞれ何を指定しているか。</p>
 <h3 id="問2">問2</h3>
-<p>HTTP応答のステータス、ヘッダー、本文は、それぞれ何を伝えるためのものか。</p>
+<p>HTTPレスポンスのステータス、ヘッダー、本文は、それぞれ何を伝えるためのものか。</p>
 <h3 id="問3">問3</h3>
-<p>404という応答を受け取った場合と、タイムアウトしてHTTPの応答を受け取れなかった場合では、分かることがどう違うか。</p>
+<p>404というレスポンスを受け取った場合と、タイムアウトしてHTTPのレスポンスを受け取れなかった場合では、分かることがどう違うか。</p>
 <h3 id="問4">問4</h3>
 <p>curlで200が表示されたが、本文は求めていた説明用の文章ではなくWebサーバーの初期ページだった。この結果から、目的の文章を取得できたと判断してよいか。</p>
 <h2 id="章末解答">章末解答</h2>
 <h3 id="問1">問1</h3>
-<p>IPアドレスは接続するWebサーバー、80はそのWebサーバーの80番ポート、<code>/example.txt</code>はWebサーバーへ要求する対象のパスを指定する。</p>
+<p>IPアドレスは接続するWebサーバー、80はそのWebサーバーの80番ポート、<code>/example.txt</code>はWebサーバーへリクエストする対象のパスを指定する。</p>
 <h3 id="問2">問2</h3>
-<p>ステータスは要求を処理した結果、ヘッダーは本文の種類などの補足情報、本文は取得した文章やHTMLなどのデータを伝える。ヘッダーと本文の間には空行がある。</p>
+<p>ステータスはリクエストを処理した結果、ヘッダーは本文の種類などの補足情報、本文は取得した文章やHTMLなどのデータを伝える。ヘッダーと本文の間には空行がある。</p>
 <h3 id="問3">問3</h3>
-<p>404では、HTTPの要求に対して応答を返した相手がいることと、その要求に404という結果を返したことが分かる。タイムアウトだけでは、HTTPの処理まで届いたかや、どこで待っていたかを一つに決められない。</p>
+<p>404では、HTTPのリクエストに対してレスポンスを返した相手がいることと、そのリクエストに404という結果を返したことが分かる。タイムアウトだけでは、HTTPの処理まで届いたかや、どこで待っていたかを一つに決められない。</p>
 <h3 id="問4">問4</h3>
-<p>判断してはいけない。200は要求を正常に処理したことを示すが、求めていた文章かどうかは本文も読んで判断する。接続先、パス、Webサーバーの配信設定などを、表示された内容と合わせて考える。</p>
+<p>判断してはいけない。200はリクエストを正常に処理したことを示すが、求めていた文章かどうかは本文も読んで判断する。接続先、パス、Webサーバーの配信設定などを、表示された内容と合わせて考える。</p>
 <h2 id="参考資料">参考資料</h2>
-<p>確認日：2026-11-03。URL、要求・応答、本文は仕組みを説明するための例である。</p>
+<p>確認日：2026-11-03。URL、リクエスト・レスポンス、本文は仕組みを説明するための例である。</p>
 <p class="bullet">・ <a href="https://www.rfc-editor.org/rfc/rfc9110.html">RFC 9110 HTTP Semantics</a></p>
 <p class="bullet">・ <a href="https://www.rfc-editor.org/rfc/rfc9112.html">RFC 9112 HTTP/1.1</a></p>
 <p class="bullet">・ <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Messages">MDN HTTP messages</a></p>

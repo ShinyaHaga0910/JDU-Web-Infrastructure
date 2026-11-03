@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="920" viewBox="0 0 1600 920" role="img">
-<title>HTTP応答のステータス行、ヘッダー、空行、本文を読み分ける</title>
+<title>HTTPレスポンスのステータス行、ヘッダー、空行、本文を読み分ける</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図4-3  HTTP応答の結果、補足情報、データ</text>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図4-3  HTTPレスポンスの結果、補足情報、データ</text>
 <rect x="40" y="120" width="910" height="650" rx="18" fill="#f5f7fa" stroke="#7991aa" stroke-width="2"/>
-<text x="75" y="138" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">HTTP/1.1の応答例</text>
+<text x="75" y="138" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">HTTP/1.1のレスポンス例</text>
 <text x="85" y="215" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">HTTP/1.1 200 OK</text>
 <text x="85" y="325" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">Content-Type: text/plain</text>
 <text x="85" y="385" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">Content-Length: 24</text>
@@ -11,7 +11,7 @@
 <text x="85" y="678" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">本文は末尾の改行を含む24バイト</text>
 <rect x="1030" y="180" width="520" height="140" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
 <text x="1050" y="194" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="start">① ステータス</text>
-<text x="1050" y="258" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">要求を処理した結果</text>
+<text x="1050" y="258" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">リクエストを処理した結果</text>
 <polyline points="1030,270 950,270" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="950,270 964.4071536376429,263.0405514542203 964.4071536376429,276.9594485457797" fill="#2165a7"/>
 <rect x="1030" y="350" width="520" height="140" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
 <text x="1050" y="364" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="start">② ヘッダー</text>
@@ -23,5 +23,5 @@
 <polyline points="1030,650 950,650" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="950,650 964.4071536376429,643.0405514542203 964.4071536376429,656.9594485457797" fill="#2165a7"/>
 <text x="1045" y="504" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">空行を挟んで本文が続く</text>
 <text x="55" y="816" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">普段のブラウザ表示では、主に本文が画面に出る。ヘッダーも通信では届いている。</text>
-<text x="55" y="868" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">curlの-iは、応答のヘッダーと本文を一緒に表示する。</text>
+<text x="55" y="868" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">curlの-iは、レスポンスのヘッダーと本文を一緒に表示する。</text>
 </svg>

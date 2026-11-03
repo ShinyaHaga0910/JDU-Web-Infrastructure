@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1030" viewBox="0 0 1600 1030" role="img">
-<title>ブラウザからWebサーバーへTCP接続し、HTTP要求を送り、HTTP応答を受け取る順番</title>
+<title>ブラウザからWebサーバーへTCP接続し、HTTPリクエストを送り、HTTPレスポンスを受け取る順番</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図4-2  接続、HTTPの要求、HTTPの応答</text>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図4-2  接続、HTTPのリクエスト、HTTPのレスポンス</text>
 <rect x="45" y="120" width="370" height="155" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
 <text x="230" y="141" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">利用者PC</text>
 <text x="230" y="199" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">ブラウザ</text>
@@ -13,12 +13,12 @@
 <polyline points="1325,275 1325,870" fill="none" stroke="#91a1b2" stroke-width="2" stroke-dasharray="13 9"/><polygon points="1325,870 1318.0405514542203,855.5928463623571 1331.9594485457797,855.5928463623571" fill="#91a1b2"/>
 <text x="778" y="315" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">① TCPで80番ポートへの接続を確立する</text>
 <polyline points="230,385 1325,385" fill="none" stroke="#9d651a" stroke-width="4"/><polygon points="1325,385 1310.5928463623572,391.9594485457797 1310.5928463623572,378.0405514542203" fill="#9d651a"/>
-<text x="778" y="464" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">② ブラウザがHTTPの要求を送る</text>
+<text x="778" y="464" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">② ブラウザがHTTPのリクエストを送る</text>
 <text x="778" y="515" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">GET /example.txt HTTP/1.1</text>
 <polyline points="230,580 1325,580" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1325,580 1310.5928463623572,586.9594485457797 1310.5928463623572,573.0405514542203" fill="#2165a7"/>
-<text x="778" y="664" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">③ WebサーバーがHTTPの応答を返す</text>
+<text x="778" y="664" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">③ WebサーバーがHTTPのレスポンスを返す</text>
 <text x="778" y="716" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">HTTP/1.1 200 OK ＋ ヘッダーと本文</text>
 <polyline points="1325,785 230,785" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="230,785 244.40715363764284,778.0405514542203 244.40715363764284,791.9594485457797" fill="#2165a7"/>
-<text x="55" y="920" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">上から下へ順に読む。接続しただけでは、要求するページはまだ伝わっていない。</text>
-<text x="55" y="975" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">ブラウザは、要求に対する結果とデータを応答から読み取って表示する。</text>
+<text x="55" y="920" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">上から下へ順に読む。接続しただけでは、リクエストするページはまだ伝わっていない。</text>
+<text x="55" y="975" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">ブラウザは、リクエストに対する結果とデータをレスポンスから読み取って表示する。</text>
 </svg>

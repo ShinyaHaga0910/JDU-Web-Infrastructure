@@ -34,7 +34,7 @@ Pは手順付きの練習、Mは別の対象を自分で設定する課題であ
 - [第3章 A4縦PDF](output/pdf/web_textbook_ch03_ja.pdf)
 - [第3章：手元のPC・RDP・SSH端末の入れ子の図](assets/figures/ch03-fig01-nested-screen.png)
 - [第3章：RDP実画面例の出典とライセンス](assets/third-party/rdp-desktop-example.md)
-- [第4章 HTTPでページを要求する仕組み](docs/ja/04-http-requests-and-responses.md)
+- [第4章 HTTPでページをリクエストする仕組み](docs/ja/04-http-requests-and-responses.md)
 - [第4章 閲覧用HTML](output/html/web_textbook_ch04_ja.html)
 - [第4章 A4縦PDF](output/pdf/web_textbook_ch04_ja.pdf)
 - [全体構成図 PNG](assets/figures/fig01-system-overview.png) / [SVG](assets/figures/fig01-system-overview.svg)

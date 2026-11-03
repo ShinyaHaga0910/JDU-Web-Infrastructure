@@ -35,4 +35,4 @@
 
 [第3章 サーバーへの接続と作業場所](textbook/docs/ja/03-connecting-and-working.md)の本文とHTML/PDFを作成しました。2026-11-03のレビューを反映し、RDPウィンドウとSSH端末の入れ子の図、Microsoft公式のRDP画面例を加え、図は計5点です。手元のPC・踏み台・対象サーバーの具体的な操作を結び付けて説明し、3.3の補助コマンド手順と小見出しを削除しました。OSコマンドの詳しい読み方やexitで戻る先の説明は省き、接続元・接続先・操作対象を中心にしています。
 
-[第4章 HTTPでページを要求する仕組み](textbook/docs/ja/04-http-requests-and-responses.md)の本文と3図、HTML/PDFを作成しました。URLの部分、TCP接続後の要求と応答、GET/POST、応答の状態・ヘッダー・本文、HTTP応答と接続失敗、curlとブラウザの見え方を説明します。Nginxの導入・設定手順は第5章とP1へ分け、本章で課題や採点条件を追加していません。
+[第4章 HTTPでページをリクエストする仕組み](textbook/docs/ja/04-http-requests-and-responses.md)の本文と3図、HTML/PDFを作成しました。URLの部分、TCP接続後のリクエストとレスポンス、GET/POST、レスポンスの状態・ヘッダー・本文、HTTPレスポンスと接続失敗、curlとブラウザの見え方を説明します。Nginxの導入・設定手順は第5章とP1へ分け、本章で課題や採点条件を追加していません。
