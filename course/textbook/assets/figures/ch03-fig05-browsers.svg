@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1050" viewBox="0 0 1600 1050" role="img">
 <title>利用者PCと踏み台のブラウザではHTTPの送信元とWebの入口が異なる</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図3-3  ブラウザを動かす場所とWebの入口</text>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図3-5  ブラウザを動かす場所とWebの入口</text>
 <rect x="25" y="160" width="350" height="220" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
 <text x="200" y="185" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">利用者PC</text>
 <text x="200" y="250" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">ブラウザ</text>
@@ -13,7 +13,7 @@
 <text x="655" y="248" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">AWSのIGW</text>
 <polyline points="375,265 480,265" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="480,265 465.5928463623572,271.9594485457797 465.5928463623572,258.0405514542203" fill="#2165a7"/>
 <polyline points="830,255 1275,255 1275,440" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1275,440 1268.0405514542203,425.5928463623572 1281.9594485457797,425.5928463623572" fill="#2165a7"/>
-<text x="1055" y="319" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">Webの公開IP / TCP80</text>
+<text x="1055" y="319" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">Webの公開IP / TCP・ポート80</text>
 <rect x="445" y="395" width="1070" height="525" rx="18" fill="#ffffff" stroke="#7991aa" stroke-width="2"/>
 <text x="470" y="411" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">VPC</text>
 <rect x="1050" y="440" width="450" height="230" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
@@ -27,6 +27,6 @@
 <text x="700" y="764" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">この中のブラウザ</text>
 <text x="700" y="822" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">アプリの管理画面を使う</text>
 <polyline points="920,780 1275,780 1275,670" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="1275,670 1281.9594485457797,684.4071536376429 1268.0405514542203,684.4071536376429" fill="#16745b"/>
-<text x="945" y="827" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">Webの内部IP / TCP8080</text>
+<text x="945" y="827" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">Webの内部IP / TCP・ポート8080</text>
 <text x="45" y="985" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">青：利用者PCから一般閲覧　　緑：踏み台からアプリ管理（いずれもHTTP）</text>
 </svg>

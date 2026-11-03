@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1150" viewBox="0 0 1600 1150" role="img">
+<title>手元のPCの画面内にRDPのデスクトップとSSH端末が入れ子で表示される</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図3-1  手元のPCの中に見える、接続先の操作画面</text>
+<rect x="25" y="120" width="975" height="735" rx="18" fill="#dce3eb" stroke="#60748a" stroke-width="2"/>
+<rect x="55" y="150" width="915" height="670" rx="18" fill="#f5f7fa" stroke="#7991aa" stroke-width="2"/>
+<text x="75" y="169" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="start">① 利用者PC：手元のWindowsの画面</text>
+<rect x="120" y="245" width="820" height="490" rx="18" fill="#e7f4ed" stroke="#16745b" stroke-width="2"/>
+<text x="140" y="264" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">② RDPのウィンドウ：踏み台の画面</text>
+<rect x="155" y="350" width="285" height="265" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
+<text x="297" y="368" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">ブラウザ</text>
+<text x="297" y="447" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">備品一覧</text>
+<text x="297" y="503" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">ページを表示</text>
+<rect x="470" y="350" width="435" height="265" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
+<text x="687" y="368" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">③ SSH接続した端末</text>
+<text x="490" y="447" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">Webにコマンドを送る</text>
+<text x="490" y="503" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">Webの結果を表示する</text>
+<text x="140" y="665" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">ブラウザも端末も、踏み台のデスクトップの中にある。</text>
+<text x="140" y="705" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">SSH接続した端末では、その先のWebを操作する。</text>
+<rect x="420" y="855" width="180" height="40" rx="4" fill="#60748a" stroke="#60748a" stroke-width="2"/>
+<rect x="330" y="895" width="360" height="20" rx="4" fill="#60748a" stroke="#60748a" stroke-width="2"/>
+<rect x="60" y="950" width="920" height="80" rx="10" fill="#dce3eb" stroke="#60748a" stroke-width="2"/>
+<rect x="80" y="966" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="134" y="966" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="188" y="966" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="242" y="966" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="296" y="966" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="350" y="966" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="404" y="966" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="458" y="966" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="512" y="966" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="566" y="966" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="620" y="966" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="674" y="966" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="728" y="966" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="782" y="966" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="836" y="966" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="890" y="966" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="80" y="991" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="134" y="991" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="188" y="991" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="242" y="991" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="296" y="991" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="350" y="991" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="404" y="991" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="458" y="991" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="512" y="991" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="566" y="991" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="620" y="991" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="674" y="991" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="728" y="991" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="782" y="991" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="836" y="991" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<rect x="890" y="991" width="44" height="18" rx="3" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
+<text x="75" y="1045" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">机の上にあるディスプレイとキーボード</text>
+<rect x="1050" y="120" width="510" height="750" rx="18" fill="#f8fafc" stroke="#7991aa" stroke-width="2"/>
+<text x="1075" y="144" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">AWS上の別々のコンピューター</text>
+<rect x="1090" y="210" width="430" height="220" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
+<text x="1305" y="224" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
+<text x="1305" y="269" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">踏み台サーバー</text>
+<text x="1305" y="337" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">デスクトップが動く</text>
+<rect x="1090" y="555" width="430" height="220" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
+<text x="1305" y="569" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
+<text x="1305" y="614" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">Webサーバー</text>
+<text x="1305" y="682" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">コマンドを実行する</text>
+<polyline points="1090,280 940,280" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="940,280 954.4071536376429,273.0405514542203 954.4071536376429,286.9594485457797" fill="#16745b"/>
+<text x="1015" y="236" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">画面</text>
+<polyline points="940,340 1090,340" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="1090,340 1075.5928463623572,346.9594485457797 1075.5928463623572,333.0405514542203" fill="#16745b"/>
+<text x="1015" y="366" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">入力</text>
+<polyline points="905,560 990,560 990,680 1090,680" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1090,680 1075.5928463623572,686.9594485457797 1075.5928463623572,673.0405514542203" fill="#2165a7"/>
+<text x="1015" y="721" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">SSH</text>
+<text x="45" y="1100" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">入れ子になっているのは画面。踏み台とWebは、手元のPCの中で動いているのではない。</text>
+</svg>

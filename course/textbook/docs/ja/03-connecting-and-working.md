@@ -13,9 +13,17 @@
 
 ## 3.1 手元のPCと操作するサーバーを分けて考える
 
-キーボードやマウスを操作している手元のコンピューターを、本書では**利用者PC**と呼ぶ。備品管理システムのWeb、DNS、DBなどは、AWS上にある別のコンピューターである。サーバーを設定するには、利用者PCから必要な方法で接続する。
+まず、机の上にあるPCと、そのディスプレイ、キーボード、マウスを思い浮かべてほしい。実際に手で操作している、このコンピューターを本書では**利用者PC**と呼ぶ。今回の利用者PCではWindowsを使う。一方、踏み台やWeb、DNS、DBは、AWS上に用意した別々のコンピューターである。
 
-例えば、利用者PCに踏み台のデスクトップを表示した場合、画面を表示するのは利用者PC、デスクトップやその中のソフトウェアを動かすのは踏み台である。さらに、そのデスクトップの端末からWebへ接続すれば、その端末に入力するコマンドはWebで実行される。手元のPCが変わらなくても、操作する相手は切り替わる。
+利用者PCで「リモートデスクトップ接続」というソフトウェアを開き、踏み台へRDP接続したとする。すると、Windowsの画面上に開いたウィンドウの内側に、踏み台のUbuntuのデスクトップが表示される。これは、離れた場所にある踏み台を、手元のPCから画面越しに操作するためのウィンドウである。
+
+例えば、そのウィンドウ内のブラウザのアイコンをダブルクリックしてみる。マウスを動かしているのは手元の利用者PCだが、クリックした情報はRDPを通して踏み台へ送られる。その情報を受け取った踏み台がブラウザを起動し、起動したブラウザの画面を利用者PCへ送り返す。操作に合わせて画面が更新されるため、踏み台の前に座っているような感覚で操作できる。[リモートデスクトップの基本](https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/remotepc/understanding-security-warnings)
+
+さらに、表示されている踏み台のデスクトップで端末を開き、その端末からWebへSSH接続する。接続後は、端末に入力したコマンドが踏み台からWebへ送られ、Webで処理される。処理結果は踏み台の端末に表示され、その端末を含むデスクトップの画面がRDPを通して手元のPCに届く。
+
+![実物の利用者PCの画面内にRDPウィンドウがあり、その中の踏み台デスクトップにブラウザとSSH接続した端末が並ぶ。右側に、実際に処理するAWS上の踏み台とWebを示す。](../../assets/figures/ch03-fig01-nested-screen.png)
+
+**図3-1 手元のPC、RDPのウィンドウ、その中のSSH端末。** 大きな外枠は手元のPCのディスプレイ、緑の内枠はRDPで表示した踏み台のデスクトップ、さらに内側の端末はWebへSSH接続した状態を表す。入れ子になっているのは画面であり、踏み台とWebはAWS上の別々のコンピューターである。
 
 今回使う環境を、最初に次のように整理しておこう。
 
@@ -30,35 +38,27 @@
 
 ## 3.2 RDPで踏み台のデスクトップを開く
 
-**RDP（Remote Desktop Protocol）**は、離れたコンピューターのデスクトップを画面越しに操作するための通信方式である。今回は利用者PCから踏み台の公開IPへTCP3389で接続する。インターネットからの接続は、AWSのInternet Gateway（IGW）を通って踏み台へ届く。
+**RDP（Remote Desktop Protocol）**は、離れたコンピューターのデスクトップを画面越しに操作するための通信方式である。今回は利用者PCから踏み台の公開IPへ接続し、TCPという通信方式で、踏み台のポート番号3389へ操作に必要な情報を届ける。インターネットからの接続は、AWSのInternet Gateway（IGW）を通って踏み台へ届く。
 
-Windowsでは「リモートデスクトップ接続」を開き、接続先に現在の踏み台の公開IPを指定する。今回のRDP用ユーザーは`labuser`であり、パスワードには初期設定で用意した本人用の値を使う。これは利用者PCのWindowsへログインするアカウントとは別である。具体的な接続操作は、練習の共通準備で扱う。
+Windowsでは「リモートデスクトップ接続」を開き、接続先に現在の踏み台の公開IPを指定する。今回のRDP用ユーザーは`labuser`であり、パスワードには初期設定で用意した本人用の値を使う。これは利用者PCのWindowsへログインするアカウントとは別である。
 
-接続すると、利用者PCの画面の中に踏み台のUbuntuデスクトップが表示される。その中でブラウザを開けば、ブラウザは踏み台上で動く。端末を開いた時点では、その端末も踏み台上で動く。踏み台へのRDP接続だけで、WebやDBのOSまで同時に操作できるようになるわけではない。
+例えば、RDPのウィンドウ内にある「Webブラウザ」のアイコンをクリックして備品一覧を開く。このときブラウザを起動しているのは、接続先の踏み台のUbuntuである。踏み台がWebへページを要求し、受け取ったページをブラウザに表示する。手元のPCでは、そのブラウザを含む踏み台のデスクトップの様子を見ている。
+
+同じデスクトップで「端末」のアイコンをクリックすると、まず踏み台をコマンドで操作するためのウィンドウが開く。例えばそこで踏み台の設定を表示すれば、踏み台の情報が表示される。Webの設定を調べたい場合は、さらにこの端末からWebへSSH接続して、コマンドを送る相手をWebにする。この一段先への接続を、次の3.3で説明する。
+
+![Windowsのリモートデスクトップ接続ウィンドウの内側に、接続先LinuxのXfceデスクトップとアイコンが表示されているMicrosoft公式資料の画面例。](../../assets/figures/ch03-fig02-rdp-desktop-example.png)
+
+**図3-2 WindowsからLinuxへRDP接続した画面例。** 外側のタイトルバーはWindowsの「リモートデスクトップ接続」のウィンドウを表し、その内側には接続先のLinuxのデスクトップが表示されている。本演習でもXfceという種類のデスクトップを使うが、背景やアイコン、接続先のアドレスはこの例と異なる。出典：Microsoft Learn「[Use xrdp with Linux](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/use-remote-desktop)」、© Microsoft、[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。画像は改変せず掲載。
 
 ## 3.3 踏み台からSSHで対象サーバーを操作する
 
-### デスクトップの先にあるサーバーへ接続する
-
 Webのサービス設定やDBの設定を操作するには、そのサーバーへ接続する必要がある。踏み台を使う経路では、RDPで開いた踏み台のデスクトップ内に端末を開き、そこから対象サーバーへSSH接続する。
 
-**SSH（Secure Shell）**は、別のコンピューターへ安全に接続し、コマンドで操作するための仕組みである。今回は踏み台からWeb、DNS、DB、配布の各サーバーの内部IPへTCP22で接続する。端末の操作方法やLinuxコマンドの基本は、OS・Linux教材のSSHの説明を参照する。
+**SSH（Secure Shell）**は、別のコンピューターへ安全に接続し、コマンドで操作するための仕組みである。今回は踏み台から対象サーバーの内部IPを指定し、TCPという通信方式で、そのサーバーのポート番号22へ接続する。例えばWebへ接続するときは、内部IP`10.20.1.20`のポート番号22を接続先にする。
 
-初期準備済みの踏み台には、接続先や鍵の設定を使う`lab-ssh`という補助コマンドが用意される。例えば、Webへ接続する場合は次のように指定する。
+![利用者PCからAWSのIGWを通ってRDPで踏み台へ接続し、踏み台の端末からSSHでWebの内部IPへ接続する。](../../assets/figures/ch03-fig03-rdp-ssh.png)
 
-**実行場所：RDPで開いた踏み台のデスクトップ内の端末。**
-
-```bash
-lab-ssh web
-```
-
-`web`はWebサーバーを選ぶ指定である。補助コマンドは準備済みの設定を使い、Webの内部IP`10.20.1.20`へSSH接続する。ほかの役割には`dns`、`db`、`repo`を指定する。内部SSH用の秘密鍵は踏み台内で保持する。
-
-![利用者PCからAWSのIGWを通ってRDPで踏み台へ接続し、踏み台の端末からSSHでWebの内部IPへ接続する。](../../assets/figures/ch03-fig01-rdp-ssh.png)
-
-**図3-1 利用者PCから踏み台を経由してWebを操作する。** RDPでは踏み台のデスクトップを開く。その中の端末からSSH接続すると、以後その端末に入力するコマンドはWebで実行される。緑の矢印は管理接続を表す。
-
-### 接続後も踏み台のデスクトップは残る
+**図3-3 利用者PCから踏み台を経由してWebを操作する。** RDPでは踏み台のデスクトップを開く。その中の端末からSSH接続すると、以後その端末に入力するコマンドはWebで実行される。緑の矢印は管理接続を表す。
 
 SSH接続によって操作先が変わるのは、接続に使った端末である。踏み台のデスクトップ全体がWebへ切り替わるのではない。例えば、端末でWebの設定を調べながら、別のウィンドウにある踏み台のブラウザでWebの表示を確認できる。
 
@@ -84,11 +84,11 @@ aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
 
 `aws`はAWSをコマンドで操作するプログラム、`ssm start-session`は接続の開始、`--target`は接続対象の指定である。接続が完了するまではCloudShellの操作、接続後は選んだWebのOS上での操作になる。
 
-![利用者PCのブラウザでCloudShellを開き、AWSのSession Managerを使ってWebのOSへ接続する。](../../assets/figures/ch03-fig02-ssm.png)
+![利用者PCのブラウザでCloudShellを開き、AWSのSession Managerを使ってWebのOSへ接続する。](../../assets/figures/ch03-fig04-ssm.png)
 
-**図3-2 CloudShellからSSM接続するときの操作先。** 図は接続を開始する操作の流れを示す。CloudShellでWebのインスタンスIDを指定し、接続後のコマンドはWebで実行する。CloudShell自体がWebサーバーになるわけではない。
+**図3-4 CloudShellからSSM接続するときの操作先。** 図は接続を開始する操作の流れを示す。CloudShellでWebのインスタンスIDを指定し、接続後のコマンドはWebで実行する。CloudShell自体がWebサーバーになるわけではない。
 
-SSMはAWS側の管理機能とEC2内のSSM Agentを通じて接続する。今回使うSSMのシェル接続のために、CloudShellからEC2のSSH22へ直接接続するわけではない。Webだけでなく、踏み台・DNS・DB・配布にも、それぞれのインスタンスIDを選んで接続する。[AWS Session Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html)、[セッションの開始](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-sessions-start.html)
+SSMはAWS側の管理機能とEC2内のSSM Agentを通じて接続する。今回使うSSMのシェル接続のために、CloudShellからEC2のSSH用のポート番号22へ直接接続するわけではない。Webだけでなく、踏み台・DNS・DB・配布にも、それぞれのインスタンスIDを選んで接続する。[AWS Session Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html)、[セッションの開始](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-sessions-start.html)
 
 ### 今回の設定作業では主にSSMを使う
 
@@ -108,9 +108,9 @@ SSMはAWS側の管理機能とEC2内のSSM Agentを通じて接続する。今�
 
 後半で構築するアプリの管理画面は、この踏み台上のブラウザから`http://admin.lab.test:8080/admin/`を開く。内部DNSが名前をWebの内部IPへ解決し、ブラウザがWebの8080番へ接続する。
 
-![利用者PCのブラウザはIGW経由でWebの公開IPの80番へ接続する。踏み台のブラウザはWebの内部IPの8080番へ接続する。](../../assets/figures/ch03-fig03-browsers.png)
+![利用者PCのブラウザはIGW経由でWebの公開IPの80番へ接続する。踏み台のブラウザはWebの内部IPの8080番へ接続する。](../../assets/figures/ch03-fig05-browsers.png)
 
-**図3-3 ブラウザを動かす場所と接続する入口。** 青は利用者PCからの一般閲覧、緑は踏み台からのアプリ管理を示す。RDPで踏み台を操作していても、その中のブラウザが送るHTTP要求の送信元は踏み台になる。
+**図3-5 ブラウザを動かす場所と接続する入口。** 青は利用者PCからの一般閲覧、緑は踏み台からのアプリ管理を示す。RDPで踏み台を操作していても、その中のブラウザが送るHTTP要求の送信元は踏み台になる。
 
 利用者PCのブラウザと、RDPのウィンドウ内に見える踏み台のブラウザは、別のコンピューター上で動いている。同じ人が同じ画面を見て操作していても、ネットワーク上での接続元は同じにはならない。管理用の8080番は、踏み台からの接続だけを許可する。
 
@@ -147,7 +147,7 @@ RDPは踏み台のデスクトップを開く接続であり、それだけで�
 
 ### 問2
 
-踏み台の端末で`lab-ssh web`を実行してWebへ接続した。その端末へ入力する設定用のコマンドは、どのサーバーで実行されるか。
+踏み台のデスクトップ内の端末から、WebへSSH接続した。その端末へ入力する設定用のコマンドは、どのサーバーで実行されるか。
 
 ### 問3
 
@@ -177,13 +177,15 @@ Webサーバーで実行される。踏み台の端末からSSH接続すると�
 
 ## 参考資料
 
-確認日：2026-10-30。接続先、OSユーザー、補助コマンドは今回の演習環境の設定による。
+確認日：2026-10-30。RDPの仕組み・ポート・画面例は2026-11-03に追加確認。接続先、OSユーザーは今回の演習環境の設定による。
 
 - [AWS CloudShell](https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html)
 - [AWS Session Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html)
 - [AWS セッションの開始](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-sessions-start.html)
+- [Microsoft リモートデスクトップの基本](https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/remotepc/understanding-security-warnings)
+- [Microsoft RDPとXfceの画面例](https://learn.microsoft.com/en-us/azure/virtual-machines/linux/use-remote-desktop)
+- [RDP画面例の出典・ライセンス](../../assets/third-party/rdp-desktop-example.md)
 - [OpenSSH ssh(1)](https://man.openbsd.org/ssh)
 - [既存の練習・共通準備](../../../labs/docs/ja/practice.md)
-- [内部SSHの設定と補助コマンド](../../../../development/01_roles/cyber_security/tools/web_lab_bootstrap/internal_ssh_guest.py)
 - [OS・Linux教材](https://github.com/ShinyaHaga0910/OS-Linux-Control)
 - [第2章](../../output/pdf/web_textbook_ch02_ja.pdf)
