@@ -9,11 +9,14 @@
 - psqlを開くshellコマンドと、psql内部のメタコマンドを別コード枠へ分離。後者は`-- 2.`等のコメントを使い、同じ手順の番号を継続する。
 - BIND/netplan/PostgreSQLの設定本文とアプリ入力データは「端末コマンドではない」と明記。既存の設定例は変更しない。
 - 3言語×P/M各7課題に、42の図を追加。開始時点・今回の操作・確認結果、主対象の太枠、接続先とポート、次の課題を示す。詳細は図の説明と拡大リンクから読める。
+- 本人の追加指示で、IGWを描くP1/M1/P5/M5/P6/M6の計18図にインターネット側とAWSのVPCの枠を追加。IGWをVPC境界に置き、踏み台を含む全EC2がAWS側に入る配置へ統一。
 - 編集元は[command_notes.py](../authoring/command_notes.py)・[diagrams.py](../authoring/diagrams.py)。SVG/PNG、Markdown、HTML、PDF、配布zipを同期する。
 
 ## 確認
 
 [検査結果](../validation.public.json)で、全コマンドの番号・説明、コメントを除いた実行内容の一致、3言語同期、Bash構文、設定例の保持、図42点の参照とSVG/PNG、PDF内の図と153コメント、62点の固定条件、zip全内容を確認しています。
+
+最終検査は4,093件合格、Bash34枠、6 PDF全189ページの画像化・文字枠外0です。IGWのある18図では、IGWがVPC境界上にあり、全EC2がAWS側に置かれていることも検査しています。
 
 [元版との照合](2026-11-03-command-comments-diagrams.public.json)では、`9abf53f`のcontent.py/checks.py/explanations.pyと署名配布7ファイルのbyte一致を確認しました。図の文字枠と重なりは生成時に全42図を検査します。全PDFのページ画像化・文字枠外は[PDF検査](../rendering.public.json)に記録します。
 

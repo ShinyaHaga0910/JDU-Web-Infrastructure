@@ -37,7 +37,7 @@ def main():
     assert validation['task_diagrams']==42
     result=dict(checked_on='2026-11-03',baseline_commit=BASELINE,material_revision=MATERIAL_REVISION,
         source_content_checks_explanations_byte_identical=True,executable_source_preserved=True,
-        numbered_comments_per_language=count,languages=list(LANGS),diagrams=42,editable_svg=42,
+        numbered_comments_per_language=count,languages=list(LANGS),diagrams=42,editable_svg=42,internet_aws_boundary_diagrams=18,
         figure_text_bounds_and_overlap_checked=True,signed_distribution_files_unchanged=signed,
         registry_sha256=EXPECTED_REGISTRY,raw_points=62,sg_setup_is_preconfigured_not_a_scored_student_task=True,
         aws_resources_changed=False,native_language_review=False,teacher_visual_review=False,new_student_walkthrough=False)

@@ -82,6 +82,12 @@ class Scene:
     def simple(self,x,y,label,w=190,ellipse=False):
         self.rect(x,y,w,65,fill='#f4f7fa',ellipse=ellipse)
         self.text(x+w/2,y+18,label,19,center=True,max_width=w-12)
+    def internet_boundary(self,x):
+        """The IGW sits on the VPC edge; all EC2 nodes stay on the AWS side."""
+        self.rect(40,233,x-40,367,fill='#fcf8f1',stroke='#b8b0a0')
+        self.rect(x,233,998-x,367,fill='#f1f7fc',stroke='#7e9cb3',width=2)
+        self.text(56,236,T('インターネット側','Интернет','Internet tomoni')[self.lang],17,color=MUTED)
+        self.text(x+14,236,'AWS / VPC 10.20.0.0/16',17,color=MUTED)
     def finish(self,target,alt):
         # Detect text-label collisions, not just text extending outside the canvas.
         for i,a in enumerate(self.text_bounds):
@@ -103,6 +109,8 @@ def diagram_text(task,lang):
         caption+=' '+T('Stop/StartはAWS APIによる管理操作で、Webの受信443番を開く操作ではありません。','Stop/Start выполняется через AWS API, а не через входящий 443 Web.','Stop/Start AWS API boshqaruvidir; Web kiruvchi 443 portini ochish emas.')[lang]
     if n in (5,6):
         caption+=' '+T('8000番はWeb内部だけ、8080番は踏み台からの管理用です。','8000 доступен только внутри Web; 8080 используется для управления с бастиона.','8000 faqat Web ichida; 8080 bastiondan boshqarish uchun.')[lang]
+    if n in (1,5,6):
+        caption+=' '+T('左はインターネット側、右の枠はAWSのVPCです。IGWはVPCの境界に置き、踏み台を含む全EC2はAWS側にあります。','Слева Интернет, справа VPC в AWS. IGW стоит на границе VPC; все EC2, включая бастион, находятся в AWS.','Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida.')[lang]
     if task.startswith('M'):
         caption+=' '+T('図を参考に完成要件から設定値を自分で決めます。','По схеме самостоятельно выберите настройки из требований.','Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.')[lang]
     alt=f'{task}: {before[lang]} → {action[lang]} → {result[lang]}。 '+caption
@@ -132,13 +140,14 @@ def write_diagrams(root):
                         s.node(role,x,480,True,w=164)
                     s.text(525,589,'ssm-user',20,color=TEAL,center=True)
                 elif n==1:
-                    s.simple(56,270,LABELS['pc'][lang]);s.simple(410,270,'IGW',w=120)
-                    s.node('web',770,270,True);s.node('bastion',56,472);s.node('repo',770,482)
-                    s.path([(246,303),(410,303)],'HTTP / TCP 80',(327,269))
-                    s.path([(530,303),(770,303)],'HTTP / TCP 80',(650,269))
-                    s.path([(246,512),(624,512),(624,338),(770,338)],'HTTP / TCP 80',(440,480))
+                    s.internet_boundary(440)
+                    s.simple(56,270,LABELS['pc'][lang]);s.simple(380,270,'IGW',w=120)
+                    s.node('web',770,270,True);s.node('bastion',500,472);s.node('repo',770,482)
+                    s.path([(246,303),(380,303)],'HTTP / TCP 80',(313,269))
+                    s.path([(500,303),(770,303)],'HTTP / TCP 80',(635,269))
+                    s.path([(595,472),(595,338),(770,338)],'HTTP / TCP 80',(595,414))
                     s.path([(865,356),(865,482)],'HTTP / TCP 80',(865,414))
-                    s.text(328,570,T('Web内でも127.0.0.1へ確認','Проверка 127.0.0.1 также внутри Web','Web ichida 127.0.0.1 ham tekshiriladi')[lang],18)
+                    s.text(720,575,T('Web内でも127.0.0.1へ確認','Также 127.0.0.1 внутри Web','Web ichida 127.0.0.1 ham')[lang],16,center=True)
                 elif n==2:
                     s.node('bastion',56,270,True);s.node('web',56,480,True);s.node('dns',770,270,True)
                     s.simple(770,490,'VPC DNS',w=190)
@@ -164,6 +173,7 @@ def write_diagrams(root):
                     s.path([(256,520),(660,520),(660,348),(770,348)],'SSM / HTTPS 443',(507,488))
                     s.text(520,570,T('Web /32・正しいDB・正しいroleだけ許可','Разрешить только Web /32 и нужные DB/role','Faqat Web /32 va to‘g‘ri DB/role ga ruxsat')[lang],18,center=True)
                 else:
+                    s.internet_boundary(325)
                     s.simple(42,272,LABELS['pc'][lang],w=155);s.simple(280,272,'IGW',w=90)
                     s.node('web',484,260,True,w=170);s.node('db',810,260,n==6,w=170)
                     s.node('bastion',484,480,w=170);s.node('dns',810,480,w=170)

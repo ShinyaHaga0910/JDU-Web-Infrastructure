@@ -4,7 +4,7 @@
   "pdfs": [
     {
       "file": "web_lab_missions_ja.pdf",
-      "sha256": "8b07df00b5d6c8111a8e42d6b7085218c528a81aa4eb557a69b5809dde2656c4",
+      "sha256": "e5ba0f4068d7d47e50d7af3a2074ec7794980b1396731b4e6b0dd8af17a90a53",
       "pages": 16,
       "rendered_pages": 16,
       "out_of_bounds_words": 0,
@@ -12,7 +12,7 @@
     },
     {
       "file": "web_lab_missions_ru.pdf",
-      "sha256": "f0aef54da185b9dc0031b9fa0828ec6e5423c8d9a0831045eee085cf542f22f1",
+      "sha256": "2eeb8b8c834373c202dceb7b54a6b754798072f8ed5385acaba86c27c8387cf0",
       "pages": 17,
       "rendered_pages": 17,
       "out_of_bounds_words": 0,
@@ -20,7 +20,7 @@
     },
     {
       "file": "web_lab_missions_uz.pdf",
-      "sha256": "6e7172375a073c2325adc4e8bae1d17e15172df5aed70aa0566ad0f378230341",
+      "sha256": "41da0184992d011ac2e627b4c0fc853c32fc792a969905d8ed68a731210fce29",
       "pages": 17,
       "rendered_pages": 17,
       "out_of_bounds_words": 0,
@@ -28,7 +28,7 @@
     },
     {
       "file": "web_lab_practice_ja.pdf",
-      "sha256": "2840c35a0d99fb24fa8cd6cf47102af0a1ac8dfa7f99c1b6a09dd973adf91461",
+      "sha256": "3ad8295c187dfa8f87c57522a86d32607293737b3cd14e77b0dc76d507bb88f4",
       "pages": 45,
       "rendered_pages": 45,
       "out_of_bounds_words": 0,
@@ -36,7 +36,7 @@
     },
     {
       "file": "web_lab_practice_ru.pdf",
-      "sha256": "eb8098f0ef51af9df091021f05d8aebc75e4e3af7bb0e999958e9084b439d85e",
+      "sha256": "839cb80fc8aa5d3d3c02587a2ce1d8f06f8fa33a631c60709835f7c96817f481",
       "pages": 47,
       "rendered_pages": 47,
       "out_of_bounds_words": 0,
@@ -44,15 +44,15 @@
     },
     {
       "file": "web_lab_practice_uz.pdf",
-      "sha256": "f4e735b035e14e60e42ef9623d6804b604c838ca627141650df99af7e48732c2",
-      "pages": 46,
-      "rendered_pages": 46,
+      "sha256": "7eb6859274d30a2401f3d1eb5cfe1c7420904fb15d6a649ecfeb1cceb4bda1f2",
+      "pages": 47,
+      "rendered_pages": 47,
       "out_of_bounds_words": 0,
       "issues": []
     }
   ],
-  "pdf_pages_checked": 188,
-  "rendered_pages": 188,
+  "pdf_pages_checked": 189,
+  "rendered_pages": 189,
   "out_of_bounds_words": 0,
   "teacher_visual_review": false,
   "native_language_review": false,

@@ -142,6 +142,12 @@ def main():
                 with Image.open(image_path) as img:ok(f'{lang}_{task}_diagram_size',img.size==(2080,1360))
                 svg=ET.parse(image_path.with_suffix('.svg')).getroot()
                 ok(f'{lang}_{task}_editable_svg',svg.attrib['viewBox']=='0 0 1040 680' and len(list(svg.iter('{http://www.w3.org/2000/svg}text')))>15)
+                if number in (1,5,6):
+                    texts=list(svg.iter('{http://www.w3.org/2000/svg}text'))
+                    boundary=440 if number==1 else 325
+                    ok(f'{lang}_{task}_internet_aws_boundary',any(t.text=='AWS / VPC 10.20.0.0/16' for t in texts)
+                        and any(t.text=='IGW' and float(t.attrib['x'])==boundary for t in texts)
+                        and all(float(t.attrib['x'])>boundary for t in texts if t.text=='EC2'))
     ok('49_detailed_steps',sum(len(m['steps']) for m in MODULES)==49 and all(all(s[k].values()) for m in MODULES for s in m['steps'] for k in ('why','expect','trouble')))
     for info,source in code['ja','practice']+code['ja','missions']:
         if info=='bash':

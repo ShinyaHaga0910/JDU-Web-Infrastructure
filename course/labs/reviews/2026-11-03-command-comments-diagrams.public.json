@@ -12,6 +12,7 @@
   ],
   "diagrams": 42,
   "editable_svg": 42,
+  "internet_aws_boundary_diagrams": 18,
   "figure_text_bounds_and_overlap_checked": true,
   "signed_distribution_files_unchanged": {
     "distribution/foundation/STUDENT.md": "bc5dc361a4e4c9bbc265b8d7ac4f45e18b2ce3d2b123fa8cc576bfa6001334f1",
