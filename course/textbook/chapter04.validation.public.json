@@ -2,15 +2,15 @@
   "chapter": 4,
   "language": "ja",
   "draft": "editable prose skeleton",
-  "pages": 11,
+  "pages": 12,
   "a4": true,
-  "text_blocks_checked": 133,
+  "text_blocks_checked": 142,
   "missing_text": [],
   "figures": 3,
   "answer_starts_on_new_page": true,
   "teacher_visual_review": "not performed",
   "student_trial": "not performed",
   "aws_operations": "none",
-  "sha256": "302718ea7e423385e43521b901d291dd2b2d01f0f604d062d37bd96e58646c36",
+  "sha256": "9d973a927b17e9b49db06d8eed5abafad2e69c48eafa2019ddf34171c0e6744e",
   "code_blocks": 5
 }

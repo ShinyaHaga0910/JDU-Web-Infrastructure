@@ -45,25 +45,30 @@ def figures():
     s.text(55,975,'ブラウザは、リクエストに対する結果とデータをレスポンスから読み取って表示する。',28)
     s.save('ch04-fig02-roundtrip')
 
-    s=Scene(1600,920,'HTTPレスポンスのステータス行、ヘッダー、空行、本文を読み分ける')
-    s.text(40,18,'図4-3  HTTPレスポンスの結果、補足情報、データ',36)
-    s.rect(40,120,910,650,'#f5f7fa','#7991aa')
-    s.text(75,138,'HTTP/1.1のレスポンス例',28)
-    s.text(85,215,'HTTP/1.1 200 OK',36,BLUE)
-    s.text(85,325,'Content-Type: text/plain',32,GREEN)
-    s.text(85,385,'Content-Length: 24',32,GREEN)
-    s.text(85,550,'School inventory server',34,BLUE)
-    s.text(85,678,'本文は末尾の改行を含む24バイト',25)
-    for y,title,detail,color in [(180,'① ステータス','リクエストを処理した結果',BLUE),
-                                 (350,'② ヘッダー','本文の種類や長さなど',GREEN),
-                                 (560,'③ 本文','取得したデータそのもの',BLUE)]:
-        s.rect(1030,y,520,140,'#ffffff',color)
-        s.text(1050,y+14,title,31,color)
-        s.text(1050,y+78,detail,29)
-        s.arrow([(1030,y+90),(950,y+90)],color)
-    s.text(1045,504,'空行を挟んで本文が続く',27,AMBER)
-    s.text(55,816,'普段のブラウザ表示では、主に本文が画面に出る。ヘッダーも通信では届いている。',27)
-    s.text(55,868,'curlの-iは、レスポンスのヘッダーと本文を一緒に表示する。',28)
+    s=Scene(1600,1040,'HTTPレスポンスを三つの枠に分け、各部分と意味を同じ番号・高さ・背景色・矢印で対応付ける')
+    s.text(40,18,'図4-3  レスポンスの各部分と、その意味',36)
+    s.text(75,111,'HTTP/1.1で届いた内容',30)
+    s.text(1055,111,'各部分の意味',30)
+    rows=[(200,160,'① ステータス行','① 処理の結果',BLUE,'#edf5fc'),
+          (400,230,'② ヘッダー','② 本文に関する補足情報',GREEN,'#edf7f0'),
+          (730,150,'③ 本文','③ 取得したデータ',AMBER,'#fff3df')]
+    for y,h,left,right,color,fill in rows:
+        s.rect(40,y,910,h,fill,color)
+        s.rect(1050,y,500,h,fill,color)
+        s.text(65,y+17,left,29,color)
+        s.text(1075,y+17,right,29,color)
+        s.arrow([(950,y+h/2),(1050,y+h/2)],color)
+    s.text(75,278,'HTTP/1.1 200 OK',34,BLUE)
+    s.text(1075,278,'正常に処理した（200）',27,BLUE)
+    s.text(75,477,'Content-Type: text/plain',31,GREEN)
+    s.text(75,535,'Content-Length: 24',31,GREEN)
+    s.text(1075,477,'種類：通常のテキスト',27,GREEN)
+    s.text(1075,535,'長さ：24バイト',27,GREEN)
+    s.text(75,664,'空行（ヘッダーと本文の区切り）',27)
+    s.text(75,805,'School inventory server',32,AMBER)
+    s.text(1075,805,'画面に表示する文章',27,AMBER)
+    s.text(55,930,'同じ番号の枠が一組。矢印に沿って、届いた内容と右の説明を読み比べる。',28)
+    s.text(55,987,'三つの枠は、実際には一つに続いて届くHTTPレスポンスの一部分を表す。',27)
     s.save('ch04-fig03-response')
 
 

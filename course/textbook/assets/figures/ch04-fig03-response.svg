@@ -1,27 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="920" viewBox="0 0 1600 920" role="img">
-<title>HTTPレスポンスのステータス行、ヘッダー、空行、本文を読み分ける</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1040" viewBox="0 0 1600 1040" role="img">
+<title>HTTPレスポンスを三つの枠に分け、各部分と意味を同じ番号・高さ・背景色・矢印で対応付ける</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図4-3  HTTPレスポンスの結果、補足情報、データ</text>
-<rect x="40" y="120" width="910" height="650" rx="18" fill="#f5f7fa" stroke="#7991aa" stroke-width="2"/>
-<text x="75" y="138" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">HTTP/1.1のレスポンス例</text>
-<text x="85" y="215" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">HTTP/1.1 200 OK</text>
-<text x="85" y="325" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">Content-Type: text/plain</text>
-<text x="85" y="385" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">Content-Length: 24</text>
-<text x="85" y="550" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="34" dominant-baseline="text-before-edge" text-anchor="start">School inventory server</text>
-<text x="85" y="678" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">本文は末尾の改行を含む24バイト</text>
-<rect x="1030" y="180" width="520" height="140" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
-<text x="1050" y="194" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="start">① ステータス</text>
-<text x="1050" y="258" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">リクエストを処理した結果</text>
-<polyline points="1030,270 950,270" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="950,270 964.4071536376429,263.0405514542203 964.4071536376429,276.9594485457797" fill="#2165a7"/>
-<rect x="1030" y="350" width="520" height="140" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
-<text x="1050" y="364" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="start">② ヘッダー</text>
-<text x="1050" y="428" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">本文の種類や長さなど</text>
-<polyline points="1030,440 950,440" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="950,440 964.4071536376429,433.0405514542203 964.4071536376429,446.9594485457797" fill="#16745b"/>
-<rect x="1030" y="560" width="520" height="140" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
-<text x="1050" y="574" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="start">③ 本文</text>
-<text x="1050" y="638" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">取得したデータそのもの</text>
-<polyline points="1030,650 950,650" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="950,650 964.4071536376429,643.0405514542203 964.4071536376429,656.9594485457797" fill="#2165a7"/>
-<text x="1045" y="504" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">空行を挟んで本文が続く</text>
-<text x="55" y="816" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">普段のブラウザ表示では、主に本文が画面に出る。ヘッダーも通信では届いている。</text>
-<text x="55" y="868" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">curlの-iは、レスポンスのヘッダーと本文を一緒に表示する。</text>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図4-3  レスポンスの各部分と、その意味</text>
+<text x="75" y="111" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">HTTP/1.1で届いた内容</text>
+<text x="1055" y="111" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">各部分の意味</text>
+<rect x="40" y="200" width="910" height="160" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
+<rect x="1050" y="200" width="500" height="160" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
+<text x="65" y="217" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">① ステータス行</text>
+<text x="1075" y="217" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">① 処理の結果</text>
+<polyline points="950,280.0 1050,280.0" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1050,280.0 1035.5928463623572,286.9594485457797 1035.5928463623572,273.0405514542203" fill="#2165a7"/>
+<rect x="40" y="400" width="910" height="230" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
+<rect x="1050" y="400" width="500" height="230" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
+<text x="65" y="417" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">② ヘッダー</text>
+<text x="1075" y="417" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">② 本文に関する補足情報</text>
+<polyline points="950,515.0 1050,515.0" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="1050,515.0 1035.5928463623572,521.9594485457797 1035.5928463623572,508.0405514542203" fill="#16745b"/>
+<rect x="40" y="730" width="910" height="150" rx="18" fill="#fff3df" stroke="#9d651a" stroke-width="2"/>
+<rect x="1050" y="730" width="500" height="150" rx="18" fill="#fff3df" stroke="#9d651a" stroke-width="2"/>
+<text x="65" y="747" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">③ 本文</text>
+<text x="1075" y="747" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">③ 取得したデータ</text>
+<polyline points="950,805.0 1050,805.0" fill="none" stroke="#9d651a" stroke-width="4"/><polygon points="1050,805.0 1035.5928463623572,811.9594485457797 1035.5928463623572,798.0405514542203" fill="#9d651a"/>
+<text x="75" y="278" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="34" dominant-baseline="text-before-edge" text-anchor="start">HTTP/1.1 200 OK</text>
+<text x="1075" y="278" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">正常に処理した（200）</text>
+<text x="75" y="477" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="start">Content-Type: text/plain</text>
+<text x="75" y="535" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="start">Content-Length: 24</text>
+<text x="1075" y="477" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">種類：通常のテキスト</text>
+<text x="1075" y="535" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">長さ：24バイト</text>
+<text x="75" y="664" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">空行（ヘッダーと本文の区切り）</text>
+<text x="75" y="805" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">School inventory server</text>
+<text x="1075" y="805" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">画面に表示する文章</text>
+<text x="55" y="930" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">同じ番号の枠が一組。矢印に沿って、届いた内容と右の説明を読み比べる。</text>
+<text x="55" y="987" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">三つの枠は、実際には一つに続いて届くHTTPレスポンスの一部分を表す。</text>
 </svg>
