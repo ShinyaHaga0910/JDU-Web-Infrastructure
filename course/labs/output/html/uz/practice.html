@@ -12,8 +12,9 @@ th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:an
 p,li{overflow-wrap:anywhere}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.1</p><nav aria-label="Contents"><a href="#section-1">Qo‘llanmadan foydalanish</a> · <a href="#section-2">Muhit va tayyorgarlik</a> · <a href="#section-3">Qadamlarni qanday o‘qish kerak</a> · <a href="#section-4">Tayyor tizim va ulanish yo‘llari</a> · <a href="#section-5">P0 Shaxsiy muhit va buyruqlarni bajarish joyi</a> · <a href="#section-6">P1 HTTP orqali statik faylni qaytarish</a> · <a href="#section-7">P2 Ichki DNS va odatiy nom yechimi</a> · <a href="#section-8">P3 To‘xtatish va qayta ishga tushirishda ma’lumotlar</a> · <a href="#section-9">P4 PostgreSQL ga autentifikatsiya bilan ulanish</a> · <a href="#section-10">P5 Berilgan app ni Web va DB bilan bog‘lash</a> · <a href="#section-11">P6 Eng kam huquq va ochiq kirish chegarasi</a> · <a href="#section-12">Davom ettirish va qayta yuborish</a> · <a href="#section-13">Manbalar va versiya</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: P0-P6 mashqlar va batafsil qadamlar</h1>
-<p>2026-10-23 | D12 P/M r1.1 | web-course-class193548-20261023-r2</p>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.2</p><nav aria-label="Contents"><a href="#section-1">Qo‘llanmadan foydalanish</a> · <a href="#section-2">Muhit va tayyorgarlik</a> · <a href="#section-3">Qadamlarni qanday o‘qish kerak</a> · <a href="#section-4">Tayyor tizim va ulanish yo‘llari</a> · <a href="#section-5">P0 Shaxsiy muhit va buyruqlarni bajarish joyi</a> · <a href="#section-6">P1 HTTP orqali statik faylni qaytarish</a> · <a href="#section-7">P2 Ichki DNS va odatiy nom yechimi</a> · <a href="#section-8">P3 To‘xtatish va qayta ishga tushirishda ma’lumotlar</a> · <a href="#section-9">P4 PostgreSQL ga autentifikatsiya bilan ulanish</a> · <a href="#section-10">P5 Berilgan app ni Web va DB bilan bog‘lash</a> · <a href="#section-11">P6 Eng kam huquq va ochiq kirish chegarasi</a> · <a href="#section-12">Davom ettirish va qayta yuborish</a> · <a href="#section-13">Manbalar va versiya</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: P0-P6 mashqlar va batafsil qadamlar</h1>
+<p>2026-11-03 | D12 P/M r1.2 | web-course-class193548-20261103-r3</p>
+<p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
 <p>O‘qituvchi tekshiruvi uchun birinchi nashr. Talabaning qo‘llanma bo‘yicha boshidan oxirigacha o‘tishi hali tekshirilmagan.</p>
 <p>Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga ega. Ona tili mutaxassisi tahriri hali bajarilmagan.</p>
 <p><a href="../ja/practice.html">日本語</a> · <a href="../ru/practice.html">Русский</a> · <a href="../uz/practice.html">O‘zbekcha</a></p>
@@ -137,7 +138,7 @@ p,li{overflow-wrap:anywhere}footer{font-size:.85rem;color:#415569;border-top:1px
 <p><strong>Bajarish joyi:</strong> Talabaning shaxsiy AWS hisobidagi CloudShell</p>
 <p><strong>Maqsad va amallar:</strong> Academy dagi o‘z Class’ingizdan AWS ni, keyin CloudShell ni oching. Dastlabki ikki qatordagi qiymatlarni o‘qituvchi bergan qiymatlarga almashtiring. Dollar belgisi o‘zgaruvchiga murojaat bo‘lib, buyruqning bir qismidir. activate.sh yangi tekshiruvchi katalogini PATH ga qo‘shadi.</p>
 <pre><code class="language-bash">LAB_ID='YOUR-LAB-ID'
-COURSE_ID='web-course-class193548-20261023-r2'
+COURSE_ID='web-course-class193548-20261103-r3'
 INSTALL=&quot;$HOME/.local/share/jdu-web/courses/$COURSE_ID/$LAB_ID&quot;
 source &quot;$INSTALL/activate.sh&quot;
 aws sts get-caller-identity --query Account --output text
@@ -935,7 +936,7 @@ jdu-web-my-progress
 <p>Shaxsiy URL ni faqat o‘zingiz oching. Hisobot/chat ga parol/token/cookie/kalit/env/o‘qituvchi URL ini yubormang. Screenshot da maxfiy maydon bo‘lmasin. Xatoni boshqa talaba Lab ida sinamang.</p>
 <h2 id="section-13">Manbalar va versiya</h2>
 <p>Shartlar belgilangan registry va M jadvallariga asoslangan. Matn qabul qilingan amalga oshirish bilan solishtirildi, ammo yangi talaba bu batafsil qadamlarni boshidan hali bajarmagan. To‘g‘ri parolni shaxsan kiritish va app o‘rnatilgach besh server stop/start qabul tekshiruvi qolgan. Qo‘llanma tahriri CLASS_READY=true degani emas.</p>
-<p>Versiyalar: web-course-class193548-20261023-r2; web-d11-2026-10-r1; registry SHA256 3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33.</p>
+<p>Versiyalar: web-course-class193548-20261103-r3; web-d11-2026-10-r1; registry SHA256 3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33.</p>
 <p>Imzo muddati: 2026-10-27 14:24:57 UZT. Yuklash URL muddati imzo muddatidan farq qiladi; chetlab o‘tish uchun sanani o‘zgartirmang. Quyida 2026-10-23 tekshirilgan umumiy funksiyalarning birlamchi hujjatlari. Lab IP, topshiriq va ballari ushbu kurs tomonidan belgilanadi.</p>
 <ul>
 <li><a href="https://nginx.org/en/docs/beginners_guide.html">Nginx Beginner’s Guide</a></li>
@@ -943,4 +944,4 @@ jdu-web-my-progress
 <li><a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">PostgreSQL 16: pg_hba.conf</a></li>
 <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html">EC2 instance states</a></li>
 </ul>
-</main><footer>web-course-class193548-20261023-r2 · 62 raw points · 2026-10-23</footer></body></html>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-10-23</footer></body></html>

@@ -1,0 +1,16 @@
+{
+  "accepted_at": "2026-10-22T10:28:43.715Z",
+  "aws_checks": 29,
+  "class_ready": false,
+  "core_manifest_sha256": "a00239fa1cb8efc09d8cad214c6e97f5c99f1436c9549c3f66bf09ea9ee4a3d2",
+  "evidence_index_sha256": "feb71176c38872c14af8090aa84c31a9590f69fa9a358b06bd802b7e5d34fc55",
+  "foundation_checks": 47,
+  "fresh_cross_account_create": true,
+  "initial_environment_distribution_only": true,
+  "payload_sha256": "60fbd303712672e34848c02f2d7d697ce21318eb7af91bf67665c88688f4deeb",
+  "post_restart_gui": true,
+  "scope": "d08_immutable_core_acceptance_reference",
+  "source_acceptance_sha256": "e7bce37853e154c6fc97c0e34e6346299689da16b4ed8147dfb2b1a5886f26ee",
+  "teacher_exact_reports": 17,
+  "web02_assessments": 13
+}

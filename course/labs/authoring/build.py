@@ -20,10 +20,10 @@ from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE
 from checks import CHECKS
 from explanations import LABELS, READING, ROUTES, MISSION_PLAN, MODULE_NOTES, STEP_NOTES, OUTPUT_EXAMPLES
 
-KIT = PROJECT / '03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261023-r2'
+KIT = PROJECT / '03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261103-r3'
 EXPECTED_REGISTRY = '3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33'
-DIST_ID = 'web-course-class193548-20261023-r2'
-MATERIAL_REVISION = 'r1.1'
+DIST_ID = 'web-course-class193548-20261103-r3'
+MATERIAL_REVISION = 'r1.2'
 L = {
  'practice': T('Web演習：練習P0〜P6と詳しい操作例', 'Web Infrastructure: практика P0–P6 с подробными шагами', 'Web Infrastructure: P0–P6 mashqlar va batafsil qadamlar'),
  'missions': T('Web演習：自力課題M0〜M6', 'Web Infrastructure: самостоятельные задания M0–M6', 'Web Infrastructure: M0–M6 mustaqil topshiriqlar'),
@@ -48,7 +48,11 @@ L = {
 }
 
 def emit_intro(lang, kind):
-    out = [f'# {L[kind][lang]}', '', f'2026-10-23 | D12 P/M {MATERIAL_REVISION} | {DIST_ID}', '', L['draft'][lang], '', L['translation'][lang], '']
+    out = [f'# {L[kind][lang]}', '', f'2026-11-03 | D12 P/M {MATERIAL_REVISION} | {DIST_ID}', '',
+        T('配布版の有効期限：2027年1月31日末（UZT）。',
+          'Комплект действителен до конца 31 января 2027 года (UZT).',
+          'Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).')[lang], '',
+        L['draft'][lang], '', L['translation'][lang], '']
     out += [T('[日本語](../ja/' + kind + '.md) · [Русский](../ru/' + kind + '.md) · [O‘zbekcha](../uz/' + kind + '.md)',
               '[日本語](../ja/' + kind + '.md) · [Русский](../ru/' + kind + '.md) · [O‘zbekcha](../uz/' + kind + '.md)',
               '[日本語](../ja/' + kind + '.md) · [Русский](../ru/' + kind + '.md) · [O‘zbekcha](../uz/' + kind + '.md)')[lang], '']
@@ -388,7 +392,7 @@ def main():
     for lang in LANGS:
         label={'ja':'日本語','ru':'Русский','uz':'O‘zbekcha'}[lang]
         links.append(f'<article><h2>{label}</h2><p><a href="{lang}/portal.html">ブラウザ確認 / Проверка в браузере / Brauzerda tekshirish</a></p><p><a href="{lang}/practice.html">P0–P6</a> · <a href="{lang}/missions.html">M0–M6</a></p><p><a href="../pdf/web_lab_practice_{lang}.pdf">P PDF</a> · <a href="../pdf/web_lab_missions_{lang}.pdf">M PDF</a></p></article>')
-    (ROOT/'output/html/index.html').write_text('<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JDU Web P/M 教材</title><style>'+CSS+'</style></head><body><main><h1>Web Infrastructure · P / M</h1><p>手順付き練習と自力課題 / Практика и задания / Mashqlar va topshiriqlar</p><p>2026-10-23 · 教師確認用初版 / Для проверки преподавателем / O‘qituvchi tekshiruvi uchun</p>'+''.join(links)+'<p>2026-10-30: 初期設定後はブラウザ確認の追補を使用 / После начальной настройки используйте инструкцию проверки в браузере / Boshlang‘ich sozlashdan keyin brauzer yo‘riqnomasidan foydalaning.</p><p>同梱の旧署名版は2026-10-27で期限切れです。初期設定には教師が個別発行する有効版を使用 / Получите актуальный комплект у преподавателя / O‘qituvchidan amaldagi tarqatmani oling.</p></main></body></html>',encoding='utf-8',newline='\n')
+    (ROOT/'output/html/index.html').write_text('<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JDU Web P/M 教材</title><style>'+CSS+'</style></head><body><main><h1>Web Infrastructure · P / M</h1><p>手順付き練習と自力課題 / Практика и задания / Mashqlar va topshiriqlar</p><p>2026-10-23 · 教師確認用初版 / Для проверки преподавателем / O‘qituvchi tekshiruvi uchun</p>'+''.join(links)+'<p>2026-10-30: 初期設定後はブラウザ確認の追補を使用 / После начальной настройки используйте инструкцию проверки в браузере / Boshlang‘ich sozlashdan keyin brauzer yo‘riqnomasidan foydalaning.</p><p>同梱署名版：2027-01-31末（UZT）まで有効。初回は教師の個別登録も必要です / Комплект действителен до 31.01.2027 (UZT); нужна личная регистрация / Tarqatma 31.01.2027 (UZT) gacha amal qiladi; shaxsiy ro‘yxat ham kerak.</p></main></body></html>',encoding='utf-8',newline='\n')
     package=ROOT/'output/web-lab-pm-r1.zip'
     members=[p for folder in ('docs','resources','distribution','output/html','output/pdf') for p in (ROOT/folder).rglob('*') if p.is_file()]
     members += [ROOT/'README.md',ROOT/'VALIDATION.md']

@@ -35,7 +35,7 @@ step(m, T('本人のCloudShellで版を有効にする', 'Активироват
    'Откройте AWS из своего класса Academy, затем CloudShell. Замените значения в первых двух строках данными преподавателя. Знак доллара означает обращение к переменной и вводится как часть команды. activate.sh добавляет каталог нового проверяющего инструмента в PATH.',
    'Academy dagi o‘z Class’ingizdan AWS ni, keyin CloudShell ni oching. Dastlabki ikki qatordagi qiymatlarni o‘qituvchi bergan qiymatlarga almashtiring. Dollar belgisi o‘zgaruvchiga murojaat bo‘lib, buyruqning bir qismidir. activate.sh yangi tekshiruvchi katalogini PATH ga qo‘shadi.'),
  """LAB_ID='YOUR-LAB-ID'
-COURSE_ID='web-course-class193548-20261023-r2'
+COURSE_ID='web-course-class193548-20261103-r3'
 INSTALL="$HOME/.local/share/jdu-web/courses/$COURSE_ID/$LAB_ID"
 source "$INSTALL/activate.sh"
 aws sts get-caller-identity --query Account --output text

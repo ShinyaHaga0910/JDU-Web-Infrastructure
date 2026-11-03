@@ -1,0 +1,9 @@
+{
+  "assessment_archive_unchanged": true,
+  "class_ready": false,
+  "fresh_student_create_tested": false,
+  "retained_state_compatibility": "explicit signed RENEWAL.json; no state writes",
+  "runtime_artifacts_unchanged": true,
+  "scope": "renewal_of_previously_accepted_runtime",
+  "source_release_sha256": "ab5e1f9edbd10c20f81b1cdd8bfb7deac1a42a60e9314849b775b32f98b18a99"
+}

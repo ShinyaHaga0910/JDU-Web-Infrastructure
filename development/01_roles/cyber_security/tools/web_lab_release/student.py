@@ -10,7 +10,7 @@ import subprocess
 import sys
 
 sys.dont_write_bytecode = True
-from release_tools import digest, encoded, parse, read, save, tree, verify
+from release_tools import compatible_core, digest, encoded, parse, read, save, tree, verify
 
 ROOT = Path(__file__).resolve().parent
 ROLES = {'bastion', 'web', 'dns', 'db', 'repo'}
@@ -58,7 +58,7 @@ def identity(context, config_path, actual_account):
             or state['account'] != actual_account or actual_account == release['teacher_account']
             or not re.fullmatch('[0-9]{12}', actual_account)
             or not re.fullmatch('[a-z0-9][a-z0-9-]{2,31}', state['lab_id'])
-            or state['region'] != release['region'] or state['manifest_sha256'] != release['core_manifest_sha256']
+            or state['region'] != release['region'] or not compatible_core(context, state['manifest_sha256'])
             or state['release_id'] != foundation['core']['manifest']['release_id']
             or state['stack_name'] != 'jdu-web-' + state['lab_id']
             or any(state[k] != baseline[k] for k in ('account', 'stack_id', 'deployment_id'))

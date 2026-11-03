@@ -1,0 +1,12 @@
+{
+  "assessment_archive_sha256": "2b3159bee267b1408abf94fe5c8929718264b0ab710f5d3428bce57ac67dbe68",
+  "created_at": "2026-11-03T05:02:50.797269+00:00",
+  "expires_at": "2027-01-31T19:00:00+00:00",
+  "fresh_initial_walkthrough_verified": false,
+  "original_core_manifest_sha256": "a00239fa1cb8efc09d8cad214c6e97f5c99f1436c9549c3f66bf09ea9ee4a3d2",
+  "original_distribution_id": "web-course-class193548-20261023-r2",
+  "original_release_sha256": "ab5e1f9edbd10c20f81b1cdd8bfb7deac1a42a60e9314849b775b32f98b18a99",
+  "renewed_core_manifest_sha256": "cdeaace960c8cae0328cbc360be542baeeb3889366989481f7bc9d3623a683dc",
+  "runtime_artifacts_unchanged": true,
+  "scope": "same_runtime_validity_renewal"
+}

@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "scope": "fresh_initial_workflow_replacement_plan_not_approval",
+  "prepared_on": "2026-11-03",
+  "approved": false,
+  "executed": false,
+  "class_id": 193548,
+  "teacher_account": "170126527713",
+  "student_account": "965244652544",
+  "reason": "Five retained instances plus five fresh instances would exceed the existing conservative nine-instance tool guard; this is not an assertion about an AWS quota.",
+  "retire_only": [
+    {
+      "instance_id": "i-0c43b73c9a75c41eb",
+      "root_device": "/dev/sda1",
+      "root_volume": "vol-08dce34a5376e7d58",
+      "delete_on_termination": true
+    },
+    {
+      "instance_id": "i-0488d26e69614e096",
+      "root_device": "/dev/sda1",
+      "root_volume": "vol-0dd3097fd722b6bb5",
+      "delete_on_termination": true
+    },
+    {
+      "instance_id": "i-0f4cfc066e59488a6",
+      "root_device": "/dev/sda1",
+      "root_volume": "vol-031fe29759bd1d27d",
+      "delete_on_termination": true
+    },
+    {
+      "instance_id": "i-0ccc3e9206d30867b",
+      "root_device": "/dev/sda1",
+      "root_volume": "vol-05586863b8491a998",
+      "delete_on_termination": true
+    },
+    {
+      "instance_id": "i-08f8a40fdaa5bb240",
+      "root_device": "/dev/sda1",
+      "root_volume": "vol-07c3cc6ffdd36afb9",
+      "delete_on_termination": true
+    }
+  ],
+  "original_lab_id": "class193548-test1",
+  "original_deployment_id": "3ab82943-031d-4806-b4c0-c0b0e4554006",
+  "before_retirement": [
+    "Verify current account/Lab/deployment/instance/root IDs again.",
+    "Set DeleteOnTermination=false for each original root and verify all five before any terminate.",
+    "Keep original 96GiB root volumes, original grade partition, original private state and credential files.",
+    "Back up the test-only Google/AWS binding inside the teacher AWS account before reassignment."
+  ],
+  "original_instance_ids_cannot_be_restored": true,
+  "root_volumes_retained_gib": 96,
+  "new_create_plan": {
+    "account": "965244652544",
+    "lab_id": "class193548-retest1",
+    "deployment_id": "1e757ad7-b719-49d6-be80-209c24df052f",
+    "region": "us-east-1",
+    "stack_name": "jdu-web-class193548-retest1",
+    "manifest_sha256": "cdeaace960c8cae0328cbc360be542baeeb3889366989481f7bc9d3623a683dc",
+    "template_sha256": "b91e53ec887d4988ae4df531536a1e265fc7551e5bebef7312a6dd776f180c06",
+    "planned_at": "2026-11-03T05:26:36.208220+00:00",
+    "resource_budget": {
+      "existing_nonterminated": 5,
+      "new_nodes": 5,
+      "pilot_ceiling": 9,
+      "projected": 10,
+      "within_pilot_budget": false
+    },
+    "types": {
+      "Bastion": "t3a.medium",
+      "Web": "t3a.small",
+      "Dns": "t3a.micro",
+      "Db": "t3a.small",
+      "Package": "t3a.small"
+    },
+    "created": false
+  },
+  "new_root_volumes_gib": 96,
+  "total_retained_plus_new_storage_gib": 192,
+  "fresh_instance_security": {
+    "public_web_tcp": 80,
+    "rdp_tcp": 3389,
+    "rdp_source_cidrs": 50,
+    "rdp_password": "human hidden entry",
+    "all_five_ssm": true,
+    "instance_profile": "existing LabInstanceProfile / LabRole; role has broad Lab permissions"
+  },
+  "browser_connection": {
+    "student_role_google": "same already-approved test identity, no email recorded here",
+    "assignment_target": "class193548-retest1",
+    "new_student_status_resources": 2,
+    "new_student_checker_resources": 4,
+    "new_account_confirmation_resources": 3,
+    "existing_student_artifact_bucket_reused": true,
+    "teacher_invoke_permission": "existing teacher LabRole to the new status/checker Lambda only",
+    "teacher_new_resources": 0,
+    "original_62_point_lab_history_retained": true
+  },
+  "charged_resources": "new EC2/EBS, two new SSM interface endpoints and student Lambda/DDB/log resources; original retained disks/network can continue to incur charges",
+  "acceptance": [
+    "Fresh CloudFormation five-node creation and initialization.",
+    "Initial closure, SSM, internal SSH and individual grading registration.",
+    "r3 course install and public teaching resource staging.",
+    "Fresh school Google/AWS Lab registration using the same test identity.",
+    "P1/M1 actual server configuration, browser results, canonical save and teacher view."
+  ],
+  "not_in_scope": [
+    "new independent Google or AWS account",
+    "full browser automation of initial five-node creation",
+    "teacher End Lab availability",
+    "additional nonfunctional requirements"
+  ]
+}

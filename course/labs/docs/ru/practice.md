@@ -1,6 +1,8 @@
 # Web Infrastructure: практика P0-P6 с подробными шагами
 
-2026-10-23 | D12 P/M r1.1 | web-course-class193548-20261023-r2
+2026-11-03 | D12 P/M r1.2 | web-course-class193548-20261103-r3
+
+Комплект действителен до конца 31 января 2027 года (UZT).
 
 Первая редакция для проверки преподавателем. Полное прохождение по пособию студентом ещё не проверено.
 
@@ -86,7 +88,7 @@ AWS Console управляет ресурсами, CloudShell - ваш терм�
 
 ```bash
 LAB_ID='YOUR-LAB-ID'
-COURSE_ID='web-course-class193548-20261023-r2'
+COURSE_ID='web-course-class193548-20261103-r3'
 INSTALL="$HOME/.local/share/jdu-web/courses/$COURSE_ID/$LAB_ID"
 source "$INSTALL/activate.sh"
 aws sts get-caller-identity --query Account --output text
@@ -1312,7 +1314,7 @@ jdu-web-my-progress
 
 Критерии основаны на фиксированном registry и таблицах M. Текст сверен с принятой реализацией, но новый студент ещё не прошёл эти подробные шаги с нуля. Ещё нужны приёмка успешного ручного ввода пароля и stop/start всех пяти узлов после установки приложения. Редактирование пособия не делает CLASS_READY=true.
 
-Версии: web-course-class193548-20261023-r2; web-d11-2026-10-r1; registry SHA256 3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33.
+Версии: web-course-class193548-20261103-r3; web-d11-2026-10-r1; registry SHA256 3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33.
 
 Подпись действует до 2026-10-27 14:24:57 UZT. Срок URL загрузки отличается от срока подписи; не меняйте даты для обхода. Ниже первичные документы общих функций, проверенные 2026-10-23. IP, задания и баллы Lab определены этим курсом.
 

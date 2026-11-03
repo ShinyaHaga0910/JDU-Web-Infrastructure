@@ -1,5 +1,7 @@
 # Web演習の構築・採点・配布コード
 
+2026-11-03：有効な正式配布は`web-course-class193548-20261103-r3`（2027-01-31末 UZTまで）。[期限更新の制作コード](01_roles/cyber_security/tools/web_lab_release/renew_release.py)は独立に固定した旧r2の全署名・全byteを認証し、同じcore実行物/template/payload/assessmentを新しい有効期限で署名する。既存stateの新course導入・教材配置は署名済みRENEWAL.jsonで対応し、元stateを変更しない。署名鍵はWSLの元保管先から出さず、GitHubには公開ソフトウェアと検証資料だけを保持する。[実機受入](web_portal_poc/verification/2026-11-03-renewal-and-material-assets.public.json)。新規構築の通し試験はこの受入に含めない。
+
 2026-10-23、本人の「CloudFormationなどのコードもこのGitHubへ登録して管理する」という指示に基づき、従来のJUD project作業領域からWeb演習の開発ソースを移管した。**今後の開発正本はこのdevelopment以下**とし、学生教材は引き続き[course/labs](../course/labs/README.md)で管理する。
 
 ## 構成を確認する入口

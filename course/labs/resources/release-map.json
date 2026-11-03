@@ -1,10 +1,10 @@
 {
-  "distribution_id": "web-course-class193548-20261023-r2",
+  "distribution_id": "web-course-class193548-20261103-r3",
   "registry_sha256": "3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33",
   "fingerprint": "65EC6784750CCFA703BA7179519284E45155EC2A",
   "import_pins": {
-    "student.py": "d238af47cad741e192831c9b61bebbb0f27cf94e26f278ec403cbc53fd8d5ab1",
-    "release_tools.py": "f921c0f8e1bd860c1cc0c9dd27b67d9383941140099cc96b2fbe7975635a8fb6"
+    "student.py": "10d1aab4f8167e25ebe9c6e1ab6edbc1b874bf6332d3d8f182caa2d20acf2a1f",
+    "release_tools.py": "0f4cb6d2c64f0db459dce30e8a2c8ca2de7a51e6b118b100cc54c142b6e73908"
   },
   "resource_pins": {
     "offline_assets.py": "3fbb818afde02a1a695e476668d07adefd3788a12ed5e4f23c692a5983644fc2"

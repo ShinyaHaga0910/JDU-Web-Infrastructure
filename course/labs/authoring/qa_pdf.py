@@ -1,5 +1,6 @@
 """Render every handbook page and check text bounds. This is not teacher visual approval."""
 import argparse
+from datetime import date
 from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
@@ -51,7 +52,7 @@ def main():
 
     paths=sorted((ROOT/'output/pdf').glob('*.pdf'))
     with ThreadPoolExecutor(max_workers=3) as pool:results=list(pool.map(check,paths))
-    result=dict(scope='D12_P_M_all_page_render_and_bounds_not_visual_approval',checked_on='2026-10-23',
+    result=dict(scope='D12_P_M_all_page_render_and_bounds_not_visual_approval',checked_on=date.today().isoformat(),
         pdfs=results,pdf_pages_checked=sum(r['pages'] for r in results),
         rendered_pages=sum(r['rendered_pages'] for r in results),
         out_of_bounds_words=sum(r['out_of_bounds_words'] for r in results),

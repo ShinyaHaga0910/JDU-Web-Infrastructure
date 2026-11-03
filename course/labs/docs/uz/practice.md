@@ -1,6 +1,8 @@
 # Web Infrastructure: P0-P6 mashqlar va batafsil qadamlar
 
-2026-10-23 | D12 P/M r1.1 | web-course-class193548-20261023-r2
+2026-11-03 | D12 P/M r1.2 | web-course-class193548-20261103-r3
+
+Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).
 
 O‘qituvchi tekshiruvi uchun birinchi nashr. Talabaning qo‘llanma bo‘yicha boshidan oxirigacha o‘tishi hali tekshirilmagan.
 
@@ -86,7 +88,7 @@ AWS Console resurslarni boshqaradi; CloudShell - AWS CLI bor shaxsiy terminal; S
 
 ```bash
 LAB_ID='YOUR-LAB-ID'
-COURSE_ID='web-course-class193548-20261023-r2'
+COURSE_ID='web-course-class193548-20261103-r3'
 INSTALL="$HOME/.local/share/jdu-web/courses/$COURSE_ID/$LAB_ID"
 source "$INSTALL/activate.sh"
 aws sts get-caller-identity --query Account --output text
@@ -1312,7 +1314,7 @@ Shaxsiy URL ni faqat o‘zingiz oching. Hisobot/chat ga parol/token/cookie/kalit
 
 Shartlar belgilangan registry va M jadvallariga asoslangan. Matn qabul qilingan amalga oshirish bilan solishtirildi, ammo yangi talaba bu batafsil qadamlarni boshidan hali bajarmagan. To‘g‘ri parolni shaxsan kiritish va app o‘rnatilgach besh server stop/start qabul tekshiruvi qolgan. Qo‘llanma tahriri CLASS_READY=true degani emas.
 
-Versiyalar: web-course-class193548-20261023-r2; web-d11-2026-10-r1; registry SHA256 3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33.
+Versiyalar: web-course-class193548-20261103-r3; web-d11-2026-10-r1; registry SHA256 3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33.
 
 Imzo muddati: 2026-10-27 14:24:57 UZT. Yuklash URL muddati imzo muddatidan farq qiladi; chetlab o‘tish uchun sanani o‘zgartirmang. Quyida 2026-10-23 tekshirilgan umumiy funksiyalarning birlamchi hujjatlari. Lab IP, topshiriq va ballari ushbu kurs tomonidan belgilanadi.
 

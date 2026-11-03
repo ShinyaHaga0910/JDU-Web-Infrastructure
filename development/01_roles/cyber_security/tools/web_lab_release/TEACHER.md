@@ -1,5 +1,7 @@
 # 教師用：Web演習の正式配布
 
+2026-11-03更新：構築・初回登録後の課題確認と成績閲覧は学校Googleのブラウザ入口を使います。配布物の更新は`renew_release.py`で署名を正規更新し、同じruntimeである署名済みRENEWAL.jsonによって既存stateをそのまま使います。元5台・鍵・採点認証の再作成は不要です。最新の実行順は教材repoのcourse/labs/INITIAL-WORKFLOW.mdを参照します。
+
 教師の採点受付と非公開教材を先に起動し、学生は本人の別AWS accountで5台を使います。教師adminは教師CloudShellにだけ保持します。現在の配布は初期環境と62素点checkerの正式入口で、授業本文のD12は次工程です。
 
 ## 配布前に確認する
@@ -57,7 +59,7 @@ python3 -B teacher.py export --trusted-fingerprint "$FINGERPRINT" --csv \
 
 ## 期限と次版
 
-配布版は初期環境と署名鍵の期限を超えません。今回の期限は**2026-10-27 14:24:57 UZT**です。授業前に署名と価格台帳の期限を点検します。期限切れを無視する設定はありません。
+配布版は初期環境と署名鍵の期限を超えません。期限はcourse-release.jsonのexpires_atで確認します。2026-11-03の更新指定は2027-01-31末（UZT）までです。価格台帳は起動計画時に7日以内のものを使います。期限切れを無視する設定はありません。
 
 次版は元の受入済みfoundationと承認済みassessmentのbyteを検査して別の配布IDで制作します。実装差分・teacherのAPI/registry整合・既存stateでの移行を受入してから案内します。今の版は元5台/state/root/SSH/RDP/採点認証を保持した更新を対象とし、別Classへprivate設定を流用しません。
 

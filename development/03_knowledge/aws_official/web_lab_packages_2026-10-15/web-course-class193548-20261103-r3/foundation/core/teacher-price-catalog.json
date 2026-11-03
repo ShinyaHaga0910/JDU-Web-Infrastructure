@@ -1,0 +1,24 @@
+{
+  "region": "us-east-1",
+  "currency": "USD",
+  "source": "AWS Price List",
+  "collected_at": "2026-10-15T07:20:57.377754+00:00",
+  "prices": {
+    "t2.medium": "0.0464000000",
+    "t2.micro": "0.0116000000",
+    "t2.small": "0.0230000000",
+    "t3.medium": "0.0416000000",
+    "t3.micro": "0.0104000000",
+    "t3.small": "0.0208000000",
+    "t3a.medium": "0.0376000000",
+    "t3a.micro": "0.0094000000",
+    "t3a.small": "0.0188000000",
+    "t8i.medium": "0.0499200000",
+    "t8i.micro": "0.0124800000",
+    "t8i.small": "0.0249600000"
+  },
+  "source_url": "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/us-east-1/index.csv",
+  "source_last_modified": "Mon, 12 Oct 2026 20:38:22 GMT",
+  "source_sha256": "0fdf3af7ef1e8198dfd96eff15f4de81c9a448d72fb02a945a570006b8f7d994",
+  "source_size_bytes": 302869403
+}

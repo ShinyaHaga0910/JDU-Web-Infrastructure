@@ -1,6 +1,8 @@
 # Web演習：練習P0〜P6と詳しい操作例
 
-2026-10-23 | D12 P/M r1.1 | web-course-class193548-20261023-r2
+2026-11-03 | D12 P/M r1.2 | web-course-class193548-20261103-r3
+
+配布版の有効期限：2027年1月31日末（UZT）。
 
 教材初版・教師確認用。学生の最初からの通し試読は未実施。
 
@@ -86,7 +88,7 @@ AWSコンソールはAWS資源を管理する画面、CloudShellはAWS CLIを使
 
 ```bash
 LAB_ID='YOUR-LAB-ID'
-COURSE_ID='web-course-class193548-20261023-r2'
+COURSE_ID='web-course-class193548-20261103-r3'
 INSTALL="$HOME/.local/share/jdu-web/courses/$COURSE_ID/$LAB_ID"
 source "$INSTALL/activate.sh"
 aws sts get-caller-identity --query Account --output text
@@ -1312,7 +1314,7 @@ jdu-web-my-progress
 
 採点条件は同梱の固定registryと各Mの表を正本とする。原稿は受入済み実装・資源に照合したが、この詳細手順を新規学生が最初から辿る試験は未実施。成功passwordの本人手入力と、app導入後の全5台停止再開も追加受入が残る。教材編集だけで全授業のCLASS_READYをtrueにしない。
 
-使用版: web-course-class193548-20261023-r2; web-d11-2026-10-r1; registry SHA256 3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33.
+使用版: web-course-class193548-20261103-r3; web-d11-2026-10-r1; registry SHA256 3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33.
 
 署名期限：2026-10-27 14:24:57 UZT。取得URLの期限と署名の期限は別。期限を書き換えて続行しない。以下は一般機能の一次資料（2026-10-23確認）。Lab固有のIP・課題・点数は本教材の仕様。
 

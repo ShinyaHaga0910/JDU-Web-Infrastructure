@@ -98,7 +98,7 @@ def verify(root, fingerprint):
             or release['region'] != 'us-east-1'
             or not re.fullmatch(r'[a-zA-Z][a-zA-Z0-9-]{0,127}', release['teacher_stack'])):
         raise ValueError('Unexpected distribution scope')
-    window(release, datetime.now(timezone.utc), timedelta(days=7))
+    window(release, datetime.now(timezone.utc), timedelta(days=120))
     entries = release['files']
     names = set()
     for entry in entries:

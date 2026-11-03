@@ -98,7 +98,7 @@ def verify(root, fingerprint):
             or value['raw_maximum'] != 62 or value['distribution_ready'] is not True or value['class_ready'] is not False):
         raise ValueError('Unexpected course distribution scope')
     created, expiry = map(time_value, (value['created_at'], value['expires_at']))
-    if (not created <= datetime.now(timezone.utc) < expiry or not timedelta(0) < expiry - created <= timedelta(days=7)
+    if (not created <= datetime.now(timezone.utc) < expiry or not timedelta(0) < expiry - created <= timedelta(days=120)
             or expiry.timestamp() > key_expiry):
         raise ValueError('Expired or future dated distribution; keep existing state')
     names = set()
@@ -141,6 +141,27 @@ def verify(root, fingerprint):
     if registry['raw_points_by_mission'] != POINTS:
         raise ValueError('Fixed 62-point registry required')
     return dict(root=root, release=value, sha256=digest(raw), fingerprint=fingerprint, foundation=foundation)
+
+
+def compatible_core(context, manifest_sha256):
+    """Accept only an explicitly signed renewal of the same executable runtime.
+
+    `context` must come from verify(), which authenticates RENEWAL.json as part
+    of the entire release before this function reads it. No old expiry is
+    ignored by the original runtime; the new signed release authorizes using
+    its unchanged controller with retained state, without editing that state.
+    """
+    if manifest_sha256 == context['release']['core_manifest_sha256']:
+        return True
+    path = context['root'] / 'RENEWAL.json'
+    if not path.is_file():
+        return False
+    row = parse(read(path))
+    return (row.get('scope') == 'same_runtime_validity_renewal'
+            and row.get('original_core_manifest_sha256') == manifest_sha256
+            and row.get('renewed_core_manifest_sha256') == context['release']['core_manifest_sha256']
+            and row.get('runtime_artifacts_unchanged') is True
+            and row.get('assessment_archive_sha256') == context['release']['assessment_archive_sha256'])
 
 
 def tree(root):

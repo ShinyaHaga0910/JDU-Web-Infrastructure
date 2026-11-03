@@ -1,6 +1,6 @@
 # Web演習 D12：P/M課題教材
 
-2026-11-03：教師・学生の実行順を[初回ワークフローとコマンド](INITIAL-WORKFLOW.md)へ集約。ブラウザ機能の指定環境での完了と、新規学生への配布開始を区別します。正式署名r2は期限切れで、教材P0の配置処理もその旧版へ固定されています。有効な配布・教材対応・初回連携を含む通し確認が済むまで、新規学生がこのまま開始できるとは案内しません。
+2026-11-03更新：正式配布r3 `web-course-class193548-20261103-r3` は**2027年1月31日末（UZT）まで有効**です。同梱の署名版・P0の教材配置設定・3言語のP/M教材を揃え、教師/学生の実CloudShellで全署名を検証しました。元5台/state/鍵/認証を変更せず更新版を導入し、Web/DBの公開教材資源の配置・同一再実行を確認済みです。教師向けの[初回ワークフローとコマンド](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/blob/main/course/labs/INITIAL-WORKFLOW.md)を参照します。**新規構築からの初回通し確認は残っており、全授業CLASS_READYはfalseです。**
 
 2026-10-30追加：初期設定は既存CloudFormation、その後の課題確認・成績閲覧はブラウザを使います。まず[日本語の確認手順](output/html/ja/portal.html)・[Русский](output/html/ru/portal.html)・[O‘zbekcha](output/html/uz/portal.html)を読みます。本文/PDFのサーバー設定コマンドは維持し、課題確認用CLIとURLコピーをこの追補へ置き換えます。期限切れの署名版は使わず、教師が有効な版を個別発行します。
 
@@ -26,7 +26,7 @@ r1.1では全49段階へコマンド・設定値の説明を加え、各Pに開�
 2. 共通zipの公開ファイルは共有Windowsへ置いてよい。秘密鍵、token、env、本人進捗URL、教師adminは含めない。学生はzipを本人のCloudShellへアップロードし、ホームで展開する。
 3. P0のstage_resources.pyは署名版/本人binding/元5台/SG/SSMを照合後、WebとDBの固定directoryへ公開アプリ/SQL/helperだけを配置する。package・service・DB・role・password・鍵・採点認証を作らない。異なる既存資源は上書きしない。
 4. Web/DB内のoffline_assets.pyは受入済みapp hashと全fileを照合して公開教材directoryへ展開する。Webの--wheelsだけが既存署名manifestから7 wheel/lockを取得する。pip/サービス設定は学生が各Pの手順で行う。
-5. 初期配布参照はdistribution/STUDENT.md、foundation/STUDENT.md。これらの実行場所は展開した署名版jdu-web-course/以下であり、この教材folderではない。署名version本体とhelperの履歴を分ける。期限は**2026-10-27 14:24:57 UZT**。教材資源helperもこの版へ固定しているので、次版では照合と再受入が必要。
+5. 初期配布参照はdistribution/STUDENT.md、foundation/STUDENT.md。実行場所は展開した署名版jdu-web-course/以下。今回のr3と教材配置helperは対応済みで、期限は**2027-01-31末（UZT）**。旧r2は書き換えず保存した。起動計画に指定する教師の価格台帳は7日以内のものを使う。
 6. RDPは確認済み50 CIDRと既存password、内部SSHは踏み台、各台管理はCloudShellからSSM。初回password/権限と各段階の失敗を教師が確認する。学生全員に同じ到達時刻を要求しない。P5の前にM2、profile切替前にP6を扱う。
 
 ## 正本と生成

@@ -12,8 +12,9 @@ th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:an
 p,li{overflow-wrap:anywhere}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.1</p><nav aria-label="Contents"><a href="#section-1">Как пользоваться пособием</a> · <a href="#section-2">Среда и подготовка</a> · <a href="#section-3">Как читать шаги</a> · <a href="#section-4">Система и пути соединений</a> · <a href="#section-5">P0 Своя среда и место выполнения команд</a> · <a href="#section-6">P1 Выдача статического файла по HTTP</a> · <a href="#section-7">P2 Внутренний DNS и системное разрешение имён</a> · <a href="#section-8">P3 Данные при остановке и запуске</a> · <a href="#section-9">P4 Подключение к PostgreSQL с аутентификацией</a> · <a href="#section-10">P5 Соединить предоставленное приложение с Web и DB</a> · <a href="#section-11">P6 Минимальные права и границы публикации</a> · <a href="#section-12">Продолжение и повторная отправка</a> · <a href="#section-13">Источники и версия</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: практика P0-P6 с подробными шагами</h1>
-<p>2026-10-23 | D12 P/M r1.1 | web-course-class193548-20261023-r2</p>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.2</p><nav aria-label="Contents"><a href="#section-1">Как пользоваться пособием</a> · <a href="#section-2">Среда и подготовка</a> · <a href="#section-3">Как читать шаги</a> · <a href="#section-4">Система и пути соединений</a> · <a href="#section-5">P0 Своя среда и место выполнения команд</a> · <a href="#section-6">P1 Выдача статического файла по HTTP</a> · <a href="#section-7">P2 Внутренний DNS и системное разрешение имён</a> · <a href="#section-8">P3 Данные при остановке и запуске</a> · <a href="#section-9">P4 Подключение к PostgreSQL с аутентификацией</a> · <a href="#section-10">P5 Соединить предоставленное приложение с Web и DB</a> · <a href="#section-11">P6 Минимальные права и границы публикации</a> · <a href="#section-12">Продолжение и повторная отправка</a> · <a href="#section-13">Источники и версия</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: практика P0-P6 с подробными шагами</h1>
+<p>2026-11-03 | D12 P/M r1.2 | web-course-class193548-20261103-r3</p>
+<p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
 <p>Первая редакция для проверки преподавателем. Полное прохождение по пособию студентом ещё не проверено.</p>
 <p>Русский и узбекский тексты синхронизированы с японским оригиналом. Редактура носителями языка ещё не выполнена.</p>
 <p><a href="../ja/practice.html">日本語</a> · <a href="../ru/practice.html">Русский</a> · <a href="../uz/practice.html">O‘zbekcha</a></p>
@@ -137,7 +138,7 @@ p,li{overflow-wrap:anywhere}footer{font-size:.85rem;color:#415569;border-top:1px
 <p><strong>Место выполнения:</strong> CloudShell в личном AWS-аккаунте студента</p>
 <p><strong>Цель и действия:</strong> Откройте AWS из своего класса Academy, затем CloudShell. Замените значения в первых двух строках данными преподавателя. Знак доллара означает обращение к переменной и вводится как часть команды. activate.sh добавляет каталог нового проверяющего инструмента в PATH.</p>
 <pre><code class="language-bash">LAB_ID='YOUR-LAB-ID'
-COURSE_ID='web-course-class193548-20261023-r2'
+COURSE_ID='web-course-class193548-20261103-r3'
 INSTALL=&quot;$HOME/.local/share/jdu-web/courses/$COURSE_ID/$LAB_ID&quot;
 source &quot;$INSTALL/activate.sh&quot;
 aws sts get-caller-identity --query Account --output text
@@ -935,7 +936,7 @@ jdu-web-my-progress
 <p>Личный URL открывайте только сами. Не отправляйте в отчёт или чат пароль/token/cookie/ключ/env/URL преподавателя. Снимки не должны содержать секретов. Не проверяйте ошибки на чужом Lab.</p>
 <h2 id="section-13">Источники и версия</h2>
 <p>Критерии основаны на фиксированном registry и таблицах M. Текст сверен с принятой реализацией, но новый студент ещё не прошёл эти подробные шаги с нуля. Ещё нужны приёмка успешного ручного ввода пароля и stop/start всех пяти узлов после установки приложения. Редактирование пособия не делает CLASS_READY=true.</p>
-<p>Версии: web-course-class193548-20261023-r2; web-d11-2026-10-r1; registry SHA256 3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33.</p>
+<p>Версии: web-course-class193548-20261103-r3; web-d11-2026-10-r1; registry SHA256 3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33.</p>
 <p>Подпись действует до 2026-10-27 14:24:57 UZT. Срок URL загрузки отличается от срока подписи; не меняйте даты для обхода. Ниже первичные документы общих функций, проверенные 2026-10-23. IP, задания и баллы Lab определены этим курсом.</p>
 <ul>
 <li><a href="https://nginx.org/en/docs/beginners_guide.html">Nginx Beginner’s Guide</a></li>
@@ -943,4 +944,4 @@ jdu-web-my-progress
 <li><a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">PostgreSQL 16: pg_hba.conf</a></li>
 <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html">EC2 instance states</a></li>
 </ul>
-</main><footer>web-course-class193548-20261023-r2 · 62 raw points · 2026-10-23</footer></body></html>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-10-23</footer></body></html>

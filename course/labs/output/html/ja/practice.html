@@ -12,8 +12,9 @@ th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:an
 p,li{overflow-wrap:anywhere}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.1</p><nav aria-label="Contents"><a href="#section-1">使い方と共通の約束</a> · <a href="#section-2">対象・前提・準備</a> · <a href="#section-3">操作例の読み方</a> · <a href="#section-4">完成像と通信経路</a> · <a href="#section-5">P0 自分の環境と実行場所</a> · <a href="#section-6">P1 HTTPで静的ファイルを返す</a> · <a href="#section-7">P2 内部DNSと通常の名前解決</a> · <a href="#section-8">P3 保存内容と停止・再開</a> · <a href="#section-9">P4 PostgreSQLへの認証接続</a> · <a href="#section-10">P5 教員アプリをWeb・DBへ接続する</a> · <a href="#section-11">P6 最小権限と公開範囲</a> · <a href="#section-12">次回の再開・送信の再試行</a> · <a href="#section-13">根拠と使用版</a></nav></header><main id="content" tabindex="-1"><h1>Web演習：練習P0〜P6と詳しい操作例</h1>
-<p>2026-10-23 | D12 P/M r1.1 | web-course-class193548-20261023-r2</p>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.2</p><nav aria-label="Contents"><a href="#section-1">使い方と共通の約束</a> · <a href="#section-2">対象・前提・準備</a> · <a href="#section-3">操作例の読み方</a> · <a href="#section-4">完成像と通信経路</a> · <a href="#section-5">P0 自分の環境と実行場所</a> · <a href="#section-6">P1 HTTPで静的ファイルを返す</a> · <a href="#section-7">P2 内部DNSと通常の名前解決</a> · <a href="#section-8">P3 保存内容と停止・再開</a> · <a href="#section-9">P4 PostgreSQLへの認証接続</a> · <a href="#section-10">P5 教員アプリをWeb・DBへ接続する</a> · <a href="#section-11">P6 最小権限と公開範囲</a> · <a href="#section-12">次回の再開・送信の再試行</a> · <a href="#section-13">根拠と使用版</a></nav></header><main id="content" tabindex="-1"><h1>Web演習：練習P0〜P6と詳しい操作例</h1>
+<p>2026-11-03 | D12 P/M r1.2 | web-course-class193548-20261103-r3</p>
+<p>配布版の有効期限：2027年1月31日末（UZT）。</p>
 <p>教材初版・教師確認用。学生の最初からの通し試読は未実施。</p>
 <p>ロシア語・ウズベク語は日本語原稿と同じ手順・条件の翻訳初稿。母語話者校閲は未実施。</p>
 <p><a href="../ja/practice.html">日本語</a> · <a href="../ru/practice.html">Русский</a> · <a href="../uz/practice.html">O‘zbekcha</a></p>
@@ -137,7 +138,7 @@ p,li{overflow-wrap:anywhere}footer{font-size:.85rem;color:#415569;border-top:1px
 <p><strong>実行場所:</strong> CloudShell（学生本人のAWS）</p>
 <p><strong>目的と操作:</strong> AWS Academyの自分のClassからAWSを開き、CloudShellを起動する。下の2行は教師案内の値に置き換える。先頭のドル記号は変数の参照であり、実際に入力する。activate.shは新しい採点コマンドの保存場所をPATHへ加える。</p>
 <pre><code class="language-bash">LAB_ID='YOUR-LAB-ID'
-COURSE_ID='web-course-class193548-20261023-r2'
+COURSE_ID='web-course-class193548-20261103-r3'
 INSTALL=&quot;$HOME/.local/share/jdu-web/courses/$COURSE_ID/$LAB_ID&quot;
 source &quot;$INSTALL/activate.sh&quot;
 aws sts get-caller-identity --query Account --output text
@@ -935,7 +936,7 @@ jdu-web-my-progress
 <p>本人用URLは自分だけで開く。password/token/cookie/秘密鍵/env本文/教師URLを提出物や会話へ送らない。画面撮影は秘密欄を含めない。画面だけの操作が失敗した場合も、他人のLabで試さない。</p>
 <h2 id="section-13">根拠と使用版</h2>
 <p>採点条件は同梱の固定registryと各Mの表を正本とする。原稿は受入済み実装・資源に照合したが、この詳細手順を新規学生が最初から辿る試験は未実施。成功passwordの本人手入力と、app導入後の全5台停止再開も追加受入が残る。教材編集だけで全授業のCLASS_READYをtrueにしない。</p>
-<p>使用版: web-course-class193548-20261023-r2; web-d11-2026-10-r1; registry SHA256 3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33.</p>
+<p>使用版: web-course-class193548-20261103-r3; web-d11-2026-10-r1; registry SHA256 3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33.</p>
 <p>署名期限：2026-10-27 14:24:57 UZT。取得URLの期限と署名の期限は別。期限を書き換えて続行しない。以下は一般機能の一次資料（2026-10-23確認）。Lab固有のIP・課題・点数は本教材の仕様。</p>
 <ul>
 <li><a href="https://nginx.org/en/docs/beginners_guide.html">Nginx Beginner’s Guide</a></li>
@@ -943,4 +944,4 @@ jdu-web-my-progress
 <li><a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">PostgreSQL 16: pg_hba.conf</a></li>
 <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html">EC2 instance states</a></li>
 </ul>
-</main><footer>web-course-class193548-20261023-r2 · 62 raw points · 2026-10-23</footer></body></html>
+</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-10-23</footer></body></html>

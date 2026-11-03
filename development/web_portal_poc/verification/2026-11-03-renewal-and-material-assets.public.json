@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-11-03",
+  "scope": "validity_renewal_and_public_teaching_assets_not_fresh_initial_walkthrough",
+  "completed_steps": [
+    1,
+    2
+  ],
+  "fresh_initial_walkthrough_complete": false,
+  "release": {
+    "all_signature_layers_verified": true,
+    "archive_sha256": "6672e1f7640e4cd73c7c9e724eef69ba4fe3c6176aa57d544b4ee942489b82d6",
+    "archive_size_bytes": 345992,
+    "assessment_archive_sha256": "2b3159bee267b1408abf94fe5c8929718264b0ab710f5d3428bce57ac67dbe68",
+    "course_release_sha256": "3a0cdfa7aec13a2bfe089d8252b12b69ceeb8a9bba3593f54b4ffcf807e68591",
+    "created_at": "2026-11-03T05:02:50.797269+00:00",
+    "distribution_id": "web-course-class193548-20261103-r3",
+    "expires_at": "2027-01-31T19:00:00+00:00",
+    "expires_at_uzt": "2027-02-01T00:00:00+05:00",
+    "fresh_initial_walkthrough_verified": false,
+    "old_distribution_modified": false,
+    "original_core_manifest_sha256": "a00239fa1cb8efc09d8cad214c6e97f5c99f1436c9549c3f66bf09ea9ee4a3d2",
+    "original_distribution_id": "web-course-class193548-20261023-r2",
+    "original_release_sha256": "ab5e1f9edbd10c20f81b1cdd8bfb7deac1a42a60e9314849b775b32f98b18a99",
+    "renewed_core_manifest_sha256": "cdeaace960c8cae0328cbc360be542baeeb3889366989481f7bc9d3623a683dc",
+    "runtime_artifacts_unchanged": true,
+    "scope": "same_runtime_validity_renewal",
+    "servers_or_credentials_modified": false
+  },
+  "actual_aws": {
+    "publication": {
+      "archive_sha256": "6672e1f7640e4cd73c7c9e724eef69ba4fe3c6176aa57d544b4ee942489b82d6",
+      "archive_size_bytes": 345992,
+      "aws_resources_created": false,
+      "bucket": "jdu-web-class193548-170126527713",
+      "class_id": 193548,
+      "class_ready": false,
+      "credentials_included": false,
+      "distribution_id": "web-course-class193548-20261103-r3",
+      "distribution_ready": true,
+      "expires_at": "2027-01-31T19:00:00+00:00",
+      "objects": [
+        {
+          "key": "distributions/web-course-class193548-20261103-r3/jdu-web-course.tar.gz",
+          "sha256": "6672e1f7640e4cd73c7c9e724eef69ba4fe3c6176aa57d544b4ee942489b82d6",
+          "size_bytes": 345992
+        },
+        {
+          "key": "distributions/web-course-class193548-20261103-r3/jdu-web-course.tar.gz.asc",
+          "sha256": "81846cede6084553e5ad9ef07ae6567b561c71540ce474f700bd7d90df305f87",
+          "size_bytes": 659
+        },
+        {
+          "key": "distributions/web-course-class193548-20261103-r3/package-signing-public.asc",
+          "sha256": "79c8d4f7041568d5f0fded709100e2d818f26353d216ae8661054bc49b775d61",
+          "size_bytes": 1302
+        }
+      ],
+      "public_access_enabled": false,
+      "raw_maximum": 62,
+      "release_sha256": "3a0cdfa7aec13a2bfe089d8252b12b69ceeb8a9bba3593f54b4ffcf807e68591",
+      "scope": "web_course_private_publication",
+      "teacher_account": "170126527713"
+    },
+    "student": {
+      "scope": "renewed_course_existing_state_installation",
+      "distribution_id": "web-course-class193548-20261103-r3",
+      "retained_input_files_unchanged": 4,
+      "existing_nodes_total": 5,
+      "existing_running": 5,
+      "new_five_projected_total": 10,
+      "pilot_ceiling": 9,
+      "fresh_five_with_originals_retained_allowed_by_current_guard": false,
+      "state_manifest_unchanged": true,
+      "lab_id": "class193548-test1",
+      "deployment_id": "3ab82943-031d-4806-b4c0-c0b0e4554006",
+      "public_lesson_staging_both_roles_succeeded": true,
+      "identical_retry_succeeded": true,
+      "no_credentials_or_services_changed": true
+    },
+    "public_assets": [
+      {
+        "role": "web",
+        "status": "Success",
+        "output": "PUBLIC_APP_RESOURCES_VERIFIED; no application installed\nSIGNED_OFFLINE_WHEELS_READY=7; pip has not been run",
+        "command_id": "c4a0a91d-828d-4607-954a-02372421db89"
+      },
+      {
+        "role": "db",
+        "status": "Success",
+        "output": "PUBLIC_APP_RESOURCES_VERIFIED; no application installed",
+        "command_id": "0a1af610-9b43-443e-ad50-63d898503906"
+      }
+    ],
+    "grade_retained": {
+      "scope": "initial_workflow_canonical_readonly",
+      "rows_before": 82,
+      "rows_after": 84,
+      "new_keys": [
+        "REQUEST#b125aa27-7c13-4111-8b29-2cb3339fc33b",
+        "REQUEST#d9439d2c-f601-465f-8bf5-d48486f1c379"
+      ],
+      "new_requests": [
+        {
+          "job_id": "e2768c38-b82d-412c-b75d-3f1a8dce56b9",
+          "task_id": "M0",
+          "request_id": "b125aa27-7c13-4111-8b29-2cb3339fc33b",
+          "received_at": "2026-11-03T04:43:00.176599+00:00",
+          "receipt_stored": true,
+          "body_sha256_matches": true
+        },
+        {
+          "job_id": "832f0004-5fa4-42ea-973d-a44aeee671ac",
+          "task_id": "M1",
+          "request_id": "d9439d2c-f601-465f-8bf5-d48486f1c379",
+          "received_at": "2026-11-03T04:44:46.376232+00:00",
+          "receipt_stored": true,
+          "body_sha256_matches": true
+        }
+      ],
+      "old_requests_unchanged": true,
+      "registration_metadata_unchanged": true,
+      "unrelated_rows_unchanged": true,
+      "raw_earned": 62,
+      "raw_maximum": 62
+    }
+  },
+  "tests": {
+    "renewal_and_real_signed_release": 16,
+    "material_checks": 510,
+    "bash_blocks": 48,
+    "pdf_pages_rendered": 125,
+    "out_of_bounds_words": 0
+  },
+  "new_aws_resources": 0,
+  "iam_changes": 0,
+  "credential_issuance": false,
+  "original_state_modified": false,
+  "old_signed_distribution_modified": false,
+  "services_or_database_configured_by_staging": false,
+  "image": "images/2026-11-03-renewal-student.png"
+}

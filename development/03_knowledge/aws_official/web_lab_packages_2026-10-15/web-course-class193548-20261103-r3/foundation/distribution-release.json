@@ -1,0 +1,117 @@
+{
+  "class_id": 193548,
+  "class_ready": false,
+  "core_manifest_sha256": "cdeaace960c8cae0328cbc360be542baeeb3889366989481f7bc9d3623a683dc",
+  "course_points_assigned": false,
+  "created_at": "2026-11-03T05:02:50.797269+00:00",
+  "distribution_id": "web-course-class193548-20261103-r3-foundation",
+  "distribution_ready": true,
+  "expires_at": "2027-01-31T19:00:00+00:00",
+  "files": [
+    {
+      "path": "ACCEPTANCE.json",
+      "sha256": "21903c966fcece21c782b1b28055eaae4f80f7873655357ee078a9dededdcf80",
+      "size_bytes": 721
+    },
+    {
+      "path": "RELEASE.md",
+      "sha256": "7f9d4c1ecab645ccb4612b5363acf635298d89c47f4221acee10d4761a0a6e79",
+      "size_bytes": 1696
+    },
+    {
+      "path": "STUDENT.md",
+      "sha256": "bc5dc361a4e4c9bbc265b8d7ac4f45e18b2ce3d2b123fa8cc576bfa6001334f1",
+      "size_bytes": 6716
+    },
+    {
+      "path": "TEACHER.md",
+      "sha256": "41a1913e4613fc675ff062ec0e108e705911f9dc0d35b444a82796dbde307741",
+      "size_bytes": 6188
+    },
+    {
+      "path": "core/README.txt",
+      "sha256": "f4f24e2b3f7ec7a3c12d40a424fb4e0083ebcec097d07e27e4d12ab2fae36bbe",
+      "size_bytes": 1976
+    },
+    {
+      "path": "core/controller_runtime.py",
+      "sha256": "3c4e1ef0e3413637b31b9ead6e32893b9e7b9ed11640c6b7ea34601285ac6489",
+      "size_bytes": 2422
+    },
+    {
+      "path": "core/deployment-manifest.json",
+      "sha256": "cdeaace960c8cae0328cbc360be542baeeb3889366989481f7bc9d3623a683dc",
+      "size_bytes": 4075
+    },
+    {
+      "path": "core/deployment-manifest.json.asc",
+      "sha256": "9da5f6e422b93a040ca1b69a4be8e1e78863adcbd8d6d213d08601da5db8f257",
+      "size_bytes": 659
+    },
+    {
+      "path": "core/deployment-manifest.schema.json",
+      "sha256": "99ab9d6d02e6497834b11c295a9f8b088e9312a3ed27a83151bd039e27870df9",
+      "size_bytes": 4354
+    },
+    {
+      "path": "core/jdu-web-lab",
+      "sha256": "5a9069bd3bd7cfacbff3a64792d4f80da19b53fee8b7fd47425d4d765f27d3a8",
+      "size_bytes": 378
+    },
+    {
+      "path": "core/package-signing-public.asc",
+      "sha256": "79c8d4f7041568d5f0fded709100e2d818f26353d216ae8661054bc49b775d61",
+      "size_bytes": 1302
+    },
+    {
+      "path": "core/release_validation.py",
+      "sha256": "e9aebc2f1ed3d54df70e862e5a9aabe8e08970004106c8a89a6260da9e34096c",
+      "size_bytes": 15606
+    },
+    {
+      "path": "core/select_instances.py",
+      "sha256": "f92ac3d7e0d4bb4f4b4ec625757c30507dc087babdda79431bd65131517a4710",
+      "size_bytes": 12322
+    },
+    {
+      "path": "core/student-controller.tar.gz",
+      "sha256": "90a152c012f2e3a862f158e70629a578d68fa2c5f6535db8e976c87f6a723837",
+      "size_bytes": 51294
+    },
+    {
+      "path": "core/teacher-price-catalog.json",
+      "sha256": "24ae3a662d422f09985c3d2bbddd29db73965ddce035e5316f09eeafa9f3bb44",
+      "size_bytes": 862
+    },
+    {
+      "path": "core/web-lab-ssm-all-nodes-c5.template.json",
+      "sha256": "b91e53ec887d4988ae4df531536a1e265fc7551e5bebef7312a6dd776f180c06",
+      "size_bytes": 51146
+    },
+    {
+      "path": "core/web_lab.py",
+      "sha256": "c6f181a0f6ae82ed49cf9f63b2f5199068fd31592b49dbeb4e23f19c00b85916",
+      "size_bytes": 16264
+    },
+    {
+      "path": "distribution.py",
+      "sha256": "6c6442a3aa58b8b45cc0b52be3e132e068c38f0afa570646b56bad186f6cfe36",
+      "size_bytes": 22360
+    },
+    {
+      "path": "package-signing-public.asc",
+      "sha256": "79c8d4f7041568d5f0fded709100e2d818f26353d216ae8661054bc49b775d61",
+      "size_bytes": 1302
+    },
+    {
+      "path": "publish_release.py",
+      "sha256": "24852090988981de2a76e2a8c9e9e60928e25562f912e859e2db4a87365c8031",
+      "size_bytes": 5213
+    }
+  ],
+  "region": "us-east-1",
+  "schema_version": 1,
+  "scope": "d08_initial_environment_distribution",
+  "teacher_account": "170126527713",
+  "teacher_stack": "jdu-web-progress-2026"
+}

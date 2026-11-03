@@ -1,0 +1,366 @@
+{
+  "assessment_archive_sha256": "2b3159bee267b1408abf94fe5c8929718264b0ab710f5d3428bce57ac67dbe68",
+  "assessment_manifest_sha256": "11afe7e838b7d6f1b397022afa117a92e99bcf74b237b2c628e06eb429b07414",
+  "class_id": 193548,
+  "class_ready": false,
+  "contract_id": "web-d11-2026-10-r1",
+  "contract_sha256": "3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33",
+  "core_manifest_sha256": "cdeaace960c8cae0328cbc360be542baeeb3889366989481f7bc9d3623a683dc",
+  "created_at": "2026-11-03T05:02:50.797269+00:00",
+  "distribution_id": "web-course-class193548-20261103-r3",
+  "distribution_ready": true,
+  "expires_at": "2027-01-31T19:00:00+00:00",
+  "files": [
+    {
+      "path": "ACCEPTANCE.json",
+      "sha256": "0bc3d238251546729329b678817bd26746666a64eb6cd5dcd47c7c0899d89dc9",
+      "size_bytes": 377
+    },
+    {
+      "path": "RELEASE.md",
+      "sha256": "be2ba378f655312fffd1478ebf216e5d5992b4dd535ac776e9439a9bed8be9d0",
+      "size_bytes": 1993
+    },
+    {
+      "path": "RENEWAL.json",
+      "sha256": "114a8520a12b3b18caa3d72cfd11cda0819a2779d0c09186fc7fb2775fb8f3a7",
+      "size_bytes": 699
+    },
+    {
+      "path": "STUDENT.md",
+      "sha256": "644e2f3801a7edf36b03be7a9d418cb035cbf8a75d100565bd3db4e91a26dbdc",
+      "size_bytes": 7209
+    },
+    {
+      "path": "TEACHER.md",
+      "sha256": "bc52a64c2b05c0284530cd763be0b42d9802977ee121abc581433f363eaf2121",
+      "size_bytes": 5584
+    },
+    {
+      "path": "assessment.tar.gz",
+      "sha256": "2b3159bee267b1408abf94fe5c8929718264b0ab710f5d3428bce57ac67dbe68",
+      "size_bytes": 114424
+    },
+    {
+      "path": "assessment.tar.gz.asc",
+      "sha256": "74fd167a985c7e096cc51494bc9d2cefa9fb4f3ac36774d18ee1adc5b324eadb",
+      "size_bytes": 659
+    },
+    {
+      "path": "assessment/D11-MANIFEST.json",
+      "sha256": "11afe7e838b7d6f1b397022afa117a92e99bcf74b237b2c628e06eb429b07414",
+      "size_bytes": 5927
+    },
+    {
+      "path": "assessment/README.md",
+      "sha256": "f5cf7c06ae17b4ceb27bd6cc5fb891e91a5b936cec64223f638c97d53adcda9f",
+      "size_bytes": 5881
+    },
+    {
+      "path": "assessment/app_probe.py",
+      "sha256": "90dd0ab14bb9b7217533c18d4967766368ef7dfca6cf06f2259c43978c83c373",
+      "size_bytes": 7678
+    },
+    {
+      "path": "assessment/assessment-registry.json",
+      "sha256": "3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33",
+      "size_bytes": 34605
+    },
+    {
+      "path": "assessment/assessment_check.py",
+      "sha256": "80e35aeec9ca91d9d18021cf28f4bcf3beccf558819b2c7a275f0fa1a5c3c3a1",
+      "size_bytes": 16151
+    },
+    {
+      "path": "assessment/aws_readiness.py",
+      "sha256": "659a15294915c4c8681f932e2a365d5f4d66c7de8fdde4a8d66219466772eb2b",
+      "size_bytes": 3482
+    },
+    {
+      "path": "assessment/build_teacher.py",
+      "sha256": "00c3cf191109efb1b9a1c54a974f1b7052d053e4e073c083cd706a089c5e96c3",
+      "size_bytes": 3176
+    },
+    {
+      "path": "assessment/candidate_install.py",
+      "sha256": "6c052918a2d9e722a3c35ea6370b79db6e89237f45bc711cc242aa91230c5abe",
+      "size_bytes": 2980
+    },
+    {
+      "path": "assessment/catalog-app.tar.gz",
+      "sha256": "212cc8faf7a37bf0b3227de69993f5e2c5fa4e403b9b815ce280bf408dd53d24",
+      "size_bytes": 19486
+    },
+    {
+      "path": "assessment/dashboard.py",
+      "sha256": "fb1bb5f4a9879f3296532de85aba30bfafae8537526ba6db9a7b1686b2b99e99",
+      "size_bytes": 9642
+    },
+    {
+      "path": "assessment/database_secret.py",
+      "sha256": "0b3cab3c1b4a49902e908620a6f06c9b225bbadc88162bd1e70f37365ca4c36b",
+      "size_bytes": 2020
+    },
+    {
+      "path": "assessment/db_observer.py",
+      "sha256": "dd68a042398edd3ecd45dfc463fca39bb0a33fa75e400d0272343f4aa25b97a9",
+      "size_bytes": 15591
+    },
+    {
+      "path": "assessment/grading.py",
+      "sha256": "eadb82a8f7a0ab365a2e0d39e10bc833d5fd2a34a5a02f72c5210a328f285b24",
+      "size_bytes": 3117
+    },
+    {
+      "path": "assessment/http_guest_v2.py",
+      "sha256": "d88b67e03a9b7b12bc9bd154c1e28f13fe3f7cf4c3f0b542643e67edd51efa1b",
+      "size_bytes": 2601
+    },
+    {
+      "path": "assessment/legacy/bootstrap_inspection.py",
+      "sha256": "bb4d9dfa7b6dc8ab13d308b571565fe0e9b7cc3f5fd6dc1115e438982f3c0f74",
+      "size_bytes": 16720
+    },
+    {
+      "path": "assessment/legacy/bootstrap_submission_guest.py",
+      "sha256": "a272e00352be15e2c64082661edb0aee03df68a194ab0b3a4dbe619058d71683",
+      "size_bytes": 4515
+    },
+    {
+      "path": "assessment/legacy/build_template.py",
+      "sha256": "b749a1293b39c10a59b58ef3566656455a0281ce0b737653011f28803c999053",
+      "size_bytes": 6627
+    },
+    {
+      "path": "assessment/legacy/check_bootstrap.py",
+      "sha256": "3503b96ed464d1a0122aecb24e4537f60b27812ab82ea030636db51250f6811e",
+      "size_bytes": 6261
+    },
+    {
+      "path": "assessment/legacy/check_http.py",
+      "sha256": "c13c23b0bd4097bbacbe068c9c343c4faa33d13b0c059e31621c740bb7b60353",
+      "size_bytes": 5088
+    },
+    {
+      "path": "assessment/legacy/http_task.py",
+      "sha256": "5f50d4b586630c93b0c4c3274dc8ac0bc05a4d6bba9d35f1145ecf2c24cb2462",
+      "size_bytes": 2999
+    },
+    {
+      "path": "assessment/legacy/http_task_guest.py",
+      "sha256": "d0f7e10575f2db17047df3b8fc22fbfb545e7bb4aa3d240d49f915135e326ac0",
+      "size_bytes": 5903
+    },
+    {
+      "path": "assessment/legacy/internal_ssh_guest.py",
+      "sha256": "d2e23f58e6bf1191906ddacf27615b56596c56860995efbf18c27437a8323101",
+      "size_bytes": 10114
+    },
+    {
+      "path": "assessment/legacy/payload_runtime.py",
+      "sha256": "fcaeacb1060e1f3b93811d4d9f2ca69d0c6004b78b77b0cd46aaabef84fc150e",
+      "size_bytes": 11149
+    },
+    {
+      "path": "assessment/legacy/progress_api.py",
+      "sha256": "3ccd2e1915c417b853d182d236be706e8fdcfa4bbd34f03452c3d221728de663",
+      "size_bytes": 27321
+    },
+    {
+      "path": "assessment/legacy/release_validation.py",
+      "sha256": "e9aebc2f1ed3d54df70e862e5a9aabe8e08970004106c8a89a6260da9e34096c",
+      "size_bytes": 15606
+    },
+    {
+      "path": "assessment/legacy/setup_internal_ssh.py",
+      "sha256": "1d66bb79bdfb8fae8f56249bdd82c8d578ea9b2d05657195faee2edf1bfb4498",
+      "size_bytes": 10700
+    },
+    {
+      "path": "assessment/legacy/submit_five_node_bootstrap.py",
+      "sha256": "ca345c7e2779239a39b22384437bde49d407177dfd9bfd503b39bf4a6b4f3d8f",
+      "size_bytes": 5442
+    },
+    {
+      "path": "assessment/legacy/web_progress.py",
+      "sha256": "a966bbe49eefdb4fc6f9ca1dc39d930532992490923fde155caf3ed5a5aed6a4",
+      "size_bytes": 7600
+    },
+    {
+      "path": "assessment/network_checks.py",
+      "sha256": "e88ae871adb070987696aea17366dd2fc7516f554b68093cb2b082f516187626",
+      "size_bytes": 11734
+    },
+    {
+      "path": "assessment/progress_api_v2.py",
+      "sha256": "4a71af667b883aed2d016abc5e52b115a0d72aa5296779ce0fd6ffb3dcdc7cb5",
+      "size_bytes": 8788
+    },
+    {
+      "path": "assessment/registry.py",
+      "sha256": "15f0624c07aff3f9cc2f931419ff1f2f2056400d470d08ca142b0f84a2bc1642",
+      "size_bytes": 5050
+    },
+    {
+      "path": "assessment/remote_guest.py",
+      "sha256": "ac9a2b144008992e6445649cb033cc6d4cd6f18b4f7666d5b4afd29663e0c91d",
+      "size_bytes": 14226
+    },
+    {
+      "path": "assessment/system_observer.py",
+      "sha256": "4896cb45d547a59151e65432e98d8120ccc3ecf581b411c3877211b92d69a4b7",
+      "size_bytes": 10584
+    },
+    {
+      "path": "assessment/teacher_cli.py",
+      "sha256": "9e6ec0d5c2326a72b3f4b474616d68510c745acd83ce408329a0a0c1f56f64b6",
+      "size_bytes": 3471
+    },
+    {
+      "path": "assessment/transport.py",
+      "sha256": "8056da7741dc773bc4ade3ed3bc38d141b5067bcd58e9bcd2a3a422233768c1c",
+      "size_bytes": 1724
+    },
+    {
+      "path": "assessment/upgrade_teacher.py",
+      "sha256": "45414aea1bb999126c8fec42cab0b04d61ab3dfec15c067a2fc22de09e559b4f",
+      "size_bytes": 5805
+    },
+    {
+      "path": "foundation/ACCEPTANCE.json",
+      "sha256": "21903c966fcece21c782b1b28055eaae4f80f7873655357ee078a9dededdcf80",
+      "size_bytes": 721
+    },
+    {
+      "path": "foundation/RELEASE.md",
+      "sha256": "7f9d4c1ecab645ccb4612b5363acf635298d89c47f4221acee10d4761a0a6e79",
+      "size_bytes": 1696
+    },
+    {
+      "path": "foundation/STUDENT.md",
+      "sha256": "bc5dc361a4e4c9bbc265b8d7ac4f45e18b2ce3d2b123fa8cc576bfa6001334f1",
+      "size_bytes": 6716
+    },
+    {
+      "path": "foundation/TEACHER.md",
+      "sha256": "41a1913e4613fc675ff062ec0e108e705911f9dc0d35b444a82796dbde307741",
+      "size_bytes": 6188
+    },
+    {
+      "path": "foundation/core/README.txt",
+      "sha256": "f4f24e2b3f7ec7a3c12d40a424fb4e0083ebcec097d07e27e4d12ab2fae36bbe",
+      "size_bytes": 1976
+    },
+    {
+      "path": "foundation/core/controller_runtime.py",
+      "sha256": "3c4e1ef0e3413637b31b9ead6e32893b9e7b9ed11640c6b7ea34601285ac6489",
+      "size_bytes": 2422
+    },
+    {
+      "path": "foundation/core/deployment-manifest.json",
+      "sha256": "cdeaace960c8cae0328cbc360be542baeeb3889366989481f7bc9d3623a683dc",
+      "size_bytes": 4075
+    },
+    {
+      "path": "foundation/core/deployment-manifest.json.asc",
+      "sha256": "9da5f6e422b93a040ca1b69a4be8e1e78863adcbd8d6d213d08601da5db8f257",
+      "size_bytes": 659
+    },
+    {
+      "path": "foundation/core/deployment-manifest.schema.json",
+      "sha256": "99ab9d6d02e6497834b11c295a9f8b088e9312a3ed27a83151bd039e27870df9",
+      "size_bytes": 4354
+    },
+    {
+      "path": "foundation/core/jdu-web-lab",
+      "sha256": "5a9069bd3bd7cfacbff3a64792d4f80da19b53fee8b7fd47425d4d765f27d3a8",
+      "size_bytes": 378
+    },
+    {
+      "path": "foundation/core/package-signing-public.asc",
+      "sha256": "79c8d4f7041568d5f0fded709100e2d818f26353d216ae8661054bc49b775d61",
+      "size_bytes": 1302
+    },
+    {
+      "path": "foundation/core/release_validation.py",
+      "sha256": "e9aebc2f1ed3d54df70e862e5a9aabe8e08970004106c8a89a6260da9e34096c",
+      "size_bytes": 15606
+    },
+    {
+      "path": "foundation/core/select_instances.py",
+      "sha256": "f92ac3d7e0d4bb4f4b4ec625757c30507dc087babdda79431bd65131517a4710",
+      "size_bytes": 12322
+    },
+    {
+      "path": "foundation/core/student-controller.tar.gz",
+      "sha256": "90a152c012f2e3a862f158e70629a578d68fa2c5f6535db8e976c87f6a723837",
+      "size_bytes": 51294
+    },
+    {
+      "path": "foundation/core/teacher-price-catalog.json",
+      "sha256": "24ae3a662d422f09985c3d2bbddd29db73965ddce035e5316f09eeafa9f3bb44",
+      "size_bytes": 862
+    },
+    {
+      "path": "foundation/core/web-lab-ssm-all-nodes-c5.template.json",
+      "sha256": "b91e53ec887d4988ae4df531536a1e265fc7551e5bebef7312a6dd776f180c06",
+      "size_bytes": 51146
+    },
+    {
+      "path": "foundation/core/web_lab.py",
+      "sha256": "c6f181a0f6ae82ed49cf9f63b2f5199068fd31592b49dbeb4e23f19c00b85916",
+      "size_bytes": 16264
+    },
+    {
+      "path": "foundation/distribution-release.json",
+      "sha256": "ac544dc9000ef29f7652afd0a4cbf4baf236943c5f5c508b0ccdfd5e03eeb155",
+      "size_bytes": 3833
+    },
+    {
+      "path": "foundation/distribution-release.json.asc",
+      "sha256": "8e935f6520159318c2adf104d093f053dd0171ff3c82d25e71a276703b21e959",
+      "size_bytes": 659
+    },
+    {
+      "path": "foundation/distribution.py",
+      "sha256": "6c6442a3aa58b8b45cc0b52be3e132e068c38f0afa570646b56bad186f6cfe36",
+      "size_bytes": 22360
+    },
+    {
+      "path": "foundation/package-signing-public.asc",
+      "sha256": "79c8d4f7041568d5f0fded709100e2d818f26353d216ae8661054bc49b775d61",
+      "size_bytes": 1302
+    },
+    {
+      "path": "foundation/publish_release.py",
+      "sha256": "24852090988981de2a76e2a8c9e9e60928e25562f912e859e2db4a87365c8031",
+      "size_bytes": 5213
+    },
+    {
+      "path": "package-signing-public.asc",
+      "sha256": "79c8d4f7041568d5f0fded709100e2d818f26353d216ae8661054bc49b775d61",
+      "size_bytes": 1302
+    },
+    {
+      "path": "release_tools.py",
+      "sha256": "0f4cb6d2c64f0db459dce30e8a2c8ca2de7a51e6b118b100cc54c142b6e73908",
+      "size_bytes": 8938
+    },
+    {
+      "path": "student.py",
+      "sha256": "10d1aab4f8167e25ebe9c6e1ab6edbc1b874bf6332d3d8f182caa2d20acf2a1f",
+      "size_bytes": 10199
+    },
+    {
+      "path": "teacher.py",
+      "sha256": "83aceaeab94ca20f51323f66ac7932f50a90c78a626ce08b8a35ae9399d94b58",
+      "size_bytes": 7815
+    }
+  ],
+  "foundation_distribution_sha256": "ac544dc9000ef29f7652afd0a4cbf4baf236943c5f5c508b0ccdfd5e03eeb155",
+  "raw_maximum": 62,
+  "region": "us-east-1",
+  "schema_version": 1,
+  "scope": "web_course_distribution",
+  "teacher_account": "170126527713"
+}
