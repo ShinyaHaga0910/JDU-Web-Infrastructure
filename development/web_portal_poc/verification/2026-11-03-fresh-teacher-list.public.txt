@@ -1,0 +1,61 @@
+- main:
+  - navigation "Languages":
+    - link "JA":
+      - /url: "?lang=ja&context=verification&after="
+    - link "RU":
+      - /url: "?lang=ru&context=verification&after="
+    - link "UZ":
+      - /url: "?lang=uz&context=verification&after="
+  - heading "教師用の進捗" [level=1]
+  - paragraph:
+    - link "授業用":
+      - /url: /teacher?lang=ja&context=course
+    - text: ·
+    - link "検証用（授業成績から除外）":
+      - /url: /teacher?lang=ja&context=verification
+  - paragraph: 保存済み点数を表示します。未確認の結果で確定済み点数を下げず、未提出と取得失敗を区別します。サーバーは操作しません。
+  - region "Class 193548 — 検証用（授業成績から除外）":
+    - table "Class 193548 — 検証用（授業成績から除外）":
+      - caption: Class 193548 — 検証用（授業成績から除外）
+      - rowgroup:
+        - row "学生Lab M1 M2 M3 M4 M5 M6 保存済み素点 未確認の課題 最終提出":
+          - columnheader "学生Lab"
+          - columnheader "M1"
+          - columnheader "M2"
+          - columnheader "M3"
+          - columnheader "M4"
+          - columnheader "M5"
+          - columnheader "M6"
+          - columnheader "保存済み素点"
+          - columnheader "未確認の課題"
+          - columnheader "最終提出"
+      - rowgroup:
+        - row "class193548-retest1 8 / 8 記録なし 記録なし 記録なし 記録なし 記録なし 8 / 62 なし 2026-11-03 06:59 UTC":
+          - rowheader "class193548-retest1":
+            - link "class193548-retest1":
+              - /url: /teacher/student?lang=ja&lab_id=class193548-retest1
+          - cell "8 / 8"
+          - cell "記録なし"
+          - cell "記録なし"
+          - cell "記録なし"
+          - cell "記録なし"
+          - cell "記録なし"
+          - cell "8 / 62"
+          - cell "なし"
+          - cell "2026-11-03 06:59 UTC"
+        - row "class193548-test1 8 / 8 13 / 13 3 / 3 9 / 9 13 / 13 16 / 16 62 / 62 なし 2026-11-03 04:44 UTC":
+          - rowheader "class193548-test1":
+            - link "class193548-test1":
+              - /url: /teacher/student?lang=ja&lab_id=class193548-test1
+          - cell "8 / 8"
+          - cell "13 / 13"
+          - cell "3 / 3"
+          - cell "9 / 9"
+          - cell "13 / 13"
+          - cell "16 / 16"
+          - cell "62 / 62"
+          - cell "なし"
+          - cell "2026-11-03 04:44 UTC"
+  - paragraph:
+    - link "トップへ":
+      - /url: /?lang=ja

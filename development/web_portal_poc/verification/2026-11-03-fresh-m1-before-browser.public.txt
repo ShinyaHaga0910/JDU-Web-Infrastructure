@@ -1,0 +1,78 @@
+- main:
+  - navigation "Languages":
+    - link "JA":
+      - /url: "?lang=ja&task_id=M1&job_id=388a2569-9cce-47c7-b5c3-09d32fc4a24d"
+    - link "RU":
+      - /url: "?lang=ru&task_id=M1&job_id=388a2569-9cce-47c7-b5c3-09d32fc4a24d"
+    - link "UZ":
+      - /url: "?lang=uz&task_id=M1&job_id=388a2569-9cce-47c7-b5c3-09d32fc4a24d"
+  - heading "課題の確認" [level=1]
+  - heading "M1" [level=2]
+  - heading "今回の確認結果" [level=3]
+  - paragraph: 2026-11-03T06:54:22.520Z
+  - paragraph: "今回の素点: 3 / 8"
+  - table:
+    - rowgroup:
+      - row "確認項目 結果":
+        - columnheader "確認項目"
+        - columnheader "結果"
+    - rowgroup:
+      - row "WEB02_IDENTITY 合格":
+        - rowheader "WEB02_IDENTITY"
+        - cell "合格"
+      - row "WEB02_NGINX_ACTIVE 既存checkerでnginxのactiveを確認。 合格":
+        - rowheader "WEB02_NGINX_ACTIVE 既存checkerでnginxのactiveを確認。":
+          - text: WEB02_NGINX_ACTIVE
+          - text: 既存checkerでnginxのactiveを確認。
+        - cell "合格"
+      - row "WEB02_CONFIG_VALID 既存checkerでnginx -tが成功。 合格":
+        - rowheader "WEB02_CONFIG_VALID 既存checkerでnginx -tが成功。":
+          - text: WEB02_CONFIG_VALID
+          - text: 既存checkerでnginx -tが成功。
+        - cell "合格"
+      - row "WEB02_LISTEN_80 既存checkerでprivate/all-interfaceの80番待受を確認。 合格":
+        - rowheader "WEB02_LISTEN_80 既存checkerでprivate/all-interfaceの80番待受を確認。":
+          - text: WEB02_LISTEN_80
+          - text: 既存checkerでprivate/all-interfaceの80番待受を確認。
+        - cell "合格"
+      - row "WEB02_FILE 既存checkerどおり指定本文・通常file・root所有・0644を確認。 不合格":
+        - rowheader "WEB02_FILE 既存checkerどおり指定本文・通常file・root所有・0644を確認。":
+          - text: WEB02_FILE
+          - text: 既存checkerどおり指定本文・通常file・root所有・0644を確認。
+        - cell "不合格"
+      - row "WEB02_LOCAL_HTTP 既存checkerでloopbackの200と本文完全一致。 不合格":
+        - rowheader "WEB02_LOCAL_HTTP 既存checkerでloopbackの200と本文完全一致。":
+          - text: WEB02_LOCAL_HTTP
+          - text: 既存checkerでloopbackの200と本文完全一致。
+        - cell "不合格"
+      - row "WEB02_BASTION_HTTP 既存checkerでprivate IP経由の200と本文完全一致。 不合格":
+        - rowheader "WEB02_BASTION_HTTP 既存checkerでprivate IP経由の200と本文完全一致。":
+          - text: WEB02_BASTION_HTTP
+          - text: 既存checkerでprivate IP経由の200と本文完全一致。
+        - cell "不合格"
+      - row "WEB02_PUBLIC_HTTP 既存checkerでCloudShellからpublic IP経由の200と本文完全一致。 不合格":
+        - rowheader "WEB02_PUBLIC_HTTP 既存checkerでCloudShellからpublic IP経由の200と本文完全一致。":
+          - text: WEB02_PUBLIC_HTTP
+          - text: 既存checkerでCloudShellからpublic IP経由の200と本文完全一致。
+        - cell "不合格"
+      - row "WEB02_ACCESS_LOG 既存checkerで今回のnonce付き要求がaccess logに残る。 不合格":
+        - rowheader "WEB02_ACCESS_LOG 既存checkerで今回のnonce付き要求がaccess logに残る。":
+          - text: WEB02_ACCESS_LOG
+          - text: 既存checkerで今回のnonce付き要求がaccess logに残る。
+        - cell "不合格"
+      - row "WEB02_REPO_PREREQUISITE 合格":
+        - rowheader "WEB02_REPO_PREREQUISITE"
+        - cell "合格"
+  - status: 成績原本に保存しました。
+  - paragraph: "原本への保存日時: 2026-11-03T06:54:28.177Z"
+  - paragraph: 確認後、結果を成績原本へ自動保存します。未確認がある場合は確定済みの点数を維持します。PとM0は成績外です。サーバーは自動起動しません。
+  - paragraph: P3/M3は停止前後の保持確認、P5/M5・P6/M6は既存パスワードを使う機能・権限確認まで進められます。
+  - paragraph:
+    - link "課題を選び直す":
+      - /url: /checks?lang=ja
+    - text: ·
+    - link "保存済み成績を見る":
+      - /url: /grades?lang=ja
+    - text: ·
+    - link "トップへ":
+      - /url: /?lang=ja

@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "scope": "fresh_initial_workflow_replacement_approved_partial_execution",
+  "scope": "fresh_initial_workflow_replacement_completed",
   "prepared_on": "2026-11-03",
   "approved": true,
-  "executed": false,
+  "executed": true,
   "class_id": 193548,
   "teacher_account": "170126527713",
   "student_account": "965244652544",
@@ -73,7 +73,7 @@
       "Db": "t3a.small",
       "Package": "t3a.small"
     },
-    "created": false
+    "created": true
   },
   "new_root_volumes_gib": 96,
   "total_retained_plus_new_storage_gib": 192,
@@ -110,7 +110,8 @@
     "teacher End Lab availability",
     "additional nonfunctional requirements"
   ],
-  "execution_status": "Original five retired; encrypted 96GiB roots retained. New delivery issued and transferred encrypted. Fresh creation awaits human RDP entry; browser acceptance remains pending.",
+  "execution_status": "Approved replacement, P0 resource staging and browser M0/P1/M1 acceptance completed. Original 96GiB roots and old 84 grade rows retained.",
   "credential_issuance_verified": true,
-  "fresh_initial_workflow_passed": false
+  "fresh_initial_workflow_passed": true,
+  "acceptance_record": "2026-11-03-fresh-initial-workflow.accepted.public.json"
 }

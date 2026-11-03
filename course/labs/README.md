@@ -1,6 +1,6 @@
 # Web演習 D12：P/M課題教材
 
-2026-11-03更新：正式配布r3 `web-course-class193548-20261103-r3` は**2027年1月31日末（UZT）まで有効**です。同梱の署名版・P0の教材配置設定・3言語のP/M教材を揃え、教師/学生の実CloudShellで全署名を検証しました。元5台/state/鍵/認証を変更せず更新版を導入し、Web/DBの公開教材資源の配置・同一再実行を確認済みです。教師向けの[初回ワークフローとコマンド](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/blob/main/course/labs/INITIAL-WORKFLOW.md)を参照します。**新規構築からの初回通し確認は残っており、全授業CLASS_READYはfalseです。**
+2026-11-03更新：正式配布r3 `web-course-class193548-20261103-r3` は**2027年1月31日末（UZT）まで有効**です。同梱の署名版・P0の教材配置設定・3言語のP/M教材を揃え、教師/学生の実CloudShellで全署名を検証しました。元state保持の更新導入に加え、本人承認の新5台で、初回配布・SSM/内部SSH/採点登録・教材配置・Google/AWS連携・ブラウザM0/P1/M1・原本保存/教師表示まで実受入済みです。P1だけではM1は3/8、指定ファイル作成後は8/8、新成績8/62。旧成績84行/62点と元暗号化96GiBを保持。[初回ワークフローとコマンド](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/blob/main/course/labs/INITIAL-WORKFLOW.md)を参照します。**全49手順の学生試読・母語校閲等は別に残り、全授業CLASS_READYはfalseです。**
 
 2026-10-30追加：初期設定は既存CloudFormation、その後の課題確認・成績閲覧はブラウザを使います。まず[日本語の確認手順](output/html/ja/portal.html)・[Русский](output/html/ru/portal.html)・[O‘zbekcha](output/html/uz/portal.html)を読みます。本文/PDFのサーバー設定コマンドは維持し、課題確認用CLIとURLコピーをこの追補へ置き換えます。期限切れの署名版は使わず、教師が有効な版を個別発行します。
 
@@ -22,7 +22,7 @@ r1.1では全49段階へコマンド・設定値の説明を加え、各Pに開�
 
 ## 教師の事前準備
 
-1. 受入済みの個別初期配布・5台/96GiB・全台SSM・内部SSH・採点登録と署名版r2 installを先に完了する。新規と既存の手順を混ぜない。学生の匿名Lab ID/本人account/有効期限を案内する。
+1. 受入済みの個別初期配布・5台/96GiB・全台SSM・内部SSH・採点登録と有効な署名版r3 installを先に完了する。新規と既存の手順を混ぜない。学生の匿名Lab ID/本人account/有効期限を案内する。
 2. 共通zipの公開ファイルは共有Windowsへ置いてよい。秘密鍵、token、env、本人進捗URL、教師adminは含めない。学生はzipを本人のCloudShellへアップロードし、ホームで展開する。
 3. P0のstage_resources.pyは署名版/本人binding/元5台/SG/SSMを照合後、WebとDBの固定directoryへ公開アプリ/SQL/helperだけを配置する。package・service・DB・role・password・鍵・採点認証を作らない。異なる既存資源は上書きしない。
 4. Web/DB内のoffline_assets.pyは受入済みapp hashと全fileを照合して公開教材directoryへ展開する。Webの--wheelsだけが既存署名manifestから7 wheel/lockを取得する。pip/サービス設定は学生が各Pの手順で行う。

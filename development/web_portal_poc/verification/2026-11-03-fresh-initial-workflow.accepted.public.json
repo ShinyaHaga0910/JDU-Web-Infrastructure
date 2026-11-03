@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "scope": "approved_fresh_initial_setup_and_browser_M0_P1_M1_acceptance",
+  "verified_at": "2026-11-03T07:06:47.540216+00:00",
+  "class_id": 193548,
+  "teacher_account": "170126527713",
+  "student_account": "965244652544",
+  "lab_id": "class193548-retest1",
+  "deployment_id": "1e757ad7-b719-49d6-be80-209c24df052f",
+  "distribution_id": "web-course-class193548-20261103-r3",
+  "distribution_expires_at": "2027-01-31T19:00:00+00:00",
+  "accepted": true,
+  "completion": {
+    "renewed_signed_distribution": true,
+    "public_material_resources_staged": true,
+    "fresh_five_node_cloudformation": true,
+    "closure_and_network_acceptance": true,
+    "persistent_internal_ssh_after_temporary_key_expiry": true,
+    "all_five_ssm_online": true,
+    "rdp_desktop_and_firefox_confirmed_by_user": true,
+    "encrypted_delivery_and_grading_registration": true,
+    "school_google_and_student_aws_enrollment": true,
+    "browser_five_node_status": true,
+    "actual_ssm_user_p1_and_m1_configuration": true,
+    "p1_passed_not_graded": true,
+    "m1_before_configuration": 3,
+    "m1_after_configuration": 8,
+    "m0_three_passed_not_graded": true,
+    "canonical_automatic_save": true,
+    "student_and_teacher_match": true,
+    "original_84_grade_rows_byte_unchanged": true
+  },
+  "result": {
+    "new_raw_earned": 8,
+    "raw_maximum": 62,
+    "original_lab_raw_earned": 62,
+    "original_encrypted_disks_retained_gib": 96,
+    "new_encrypted_disks_gib": 96,
+    "teacher_history_keeps_both_labs": true
+  },
+  "evidence": {
+    "technical": "2026-11-03-fresh-technical.accepted.public.json",
+    "canonical": "2026-11-03-fresh-canonical.accepted.public.json",
+    "retirement": "2026-11-03-old-five-retirement.public.json",
+    "plan": "2026-11-03-fresh-start-plan.public.json"
+  },
+  "limitations": [
+    "Same approved teacher school Google identity used as the student fixture, with separate teacher/student AWS accounts.",
+    "Fresh P2-P6/M2-M6 and all 49 instructional steps were not rerun; prior special-check acceptance remains separate.",
+    "Native-language review, independent student reading and teacher textbook review remain separate.",
+    "Not a one-command deployment to arbitrary student accounts; per-student browser connector and teacher assignment setup is required.",
+    "Teacher Lab must be started."
+  ],
+  "class_ready": false
+}

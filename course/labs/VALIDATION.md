@@ -4,11 +4,13 @@
 
 ## 2026-11-03：期限更新と教材配置の実受入
 
+同日の追加受入：本人承認の元5台置換後、新5台/96GiB・全SSM・内部SSH・RDP/Firefox・採点登録・新course/公開資源配置を確認。Google/AWS登録からブラウザの5台状態、P1全項目、M1設定前3/8→実ssm-userでの設定後8/8、M0全3項目の成績外保存、本人8/62・教師表示まで合格。原本4report/receipt/hashとLATEST/GRADE一致、旧成績84行/62点byte不変、元暗号化96GiB保持を独立照合した。[初回受入](../../development/web_portal_poc/verification/2026-11-03-fresh-initial-workflow.accepted.public.json)。同じ承認済みGoogleを学生役に使用し、全49手順や新規P2〜P6/M2〜M6、独立学生の試読まで完了したとはしない。
+
 正式配布r3は2027-01-31末（UZT）まで有効。同じ受入済みcore実行物/template/payloadとassessmentの全byteを保ち、期限と配布wrapperを正規署名で更新した。署名済みRENEWAL.jsonが元manifestと新manifestを対応付けるため、新courseの導入・教材配置に元stateをそのまま使える。旧state/command-state/SSH情報の4file不変を実確認。古いcoreの期限検証そのものを無効にするものではない。
 
 実教師/学生CloudShellで署名・全fileを検証し、教師の既存private S3へ新しい配布IDで保存/全GET一致。学生の新しいcourse保存先へ導入後、実stage_resources.pyでWeb/DBへ5つの公開資源を配置し、同一再実行も成功した。元の5台・サービス・認証・成績を初期化していない。既存course/署名物は保持。
 
-期限・再利用の16試験、更新教材510検査/48 Bash block、3言語PDF125頁の生成/全頁画像化/枠外0を確認。新規CloudFormationからの通し受入、母語校閲、教師目視確認は未実施。以下の旧r2の記述は初版時点の履歴で、この最新結果を優先する。
+期限・再利用の16試験、更新教材510検査/48 Bash block、3言語PDF125頁の生成/全頁画像化/枠外0を確認。新規CloudFormationからP1/M1までの追加受入は上記の別記録。全49手順の試読、母語校閲、教師目視確認は未実施。以下の旧r2の記述は初版時点の履歴で、この最新結果を優先する。
 
 2026-10-23、教材改訂r1.1。P0-P6の49手順とM0-M6を日本語/ロシア語/ウズベク語で制作。49段階全ての説明、7つの仕組み/理解確認、HTTP/DNS/SQLの出力読解、7経路の通信表とMの作業計画を追加。初期配布と62素点checkerのAWS受入済み版へ照合する。
 

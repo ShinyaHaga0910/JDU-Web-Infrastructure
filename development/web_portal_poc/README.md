@@ -1,4 +1,4 @@
-> 2026-10-30 完了：初期設定は既存CloudFormation、以降の課題確認・本人の成績・教師進捗はブラウザ。実M3 3/3、M5 13/13、M6 16/16、原本62/62と元5台/96GiB/SSMを保持。[現在の完成条件と試験範囲](PORTAL-ACCEPTANCE.md)・[利用手順](BROWSER-CHECKS.md)。以下の以前の「残件/未適用」は履歴です。旧R1を今回の必須作業へ戻しません。
+> 2026-11-03 完了：①正式r3の期限を2027-01-31末 UZTへ更新、②教材配置、③新5台のCloudFormationから初期登録・Google/AWS連携・M0/P1/M1・自動原本保存・本人/教師表示まで受入済み。P1のみならM1は3/8、指定ファイル作成後は8/8・新成績8/62。旧成績84行/62点と元暗号化96GiBを保持。[初回ワークフロー](../../course/labs/INITIAL-WORKFLOW.md)・[今回の実受入](verification/2026-11-03-fresh-initial-workflow.accepted.public.json)・[完成条件](PORTAL-ACCEPTANCE.md)。全49手順の学生試読とは区別します。以下の以前の「残件/未適用」は履歴で、旧R1の初回5台全自動Web化を必須へ戻しません。
 
 # Webポータル：読取り処理の小規模試作
 

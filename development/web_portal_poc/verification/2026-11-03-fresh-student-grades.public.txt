@@ -1,0 +1,59 @@
+- main:
+  - navigation "Languages":
+    - link "JA":
+      - /url: "?lang=ja"
+    - link "RU":
+      - /url: "?lang=ru"
+    - link "UZ":
+      - /url: "?lang=uz"
+  - heading "保存済みの成績" [level=1]
+  - heading "保存済みの素点" [level=2]
+  - paragraph: 8 / 62
+  - paragraph: 確認できない項目があります
+  - table:
+    - rowgroup:
+      - row "課題 保存済み 最新の確認 確認日時 保存日時":
+        - columnheader "課題"
+        - columnheader "保存済み"
+        - columnheader "最新の確認"
+        - columnheader "確認日時"
+        - columnheader "保存日時"
+    - rowgroup:
+      - row "M1 8 確認済み 2026-11-03 06:58 UTC 2026-11-03 06:59 UTC":
+        - rowheader "M1"
+        - cell "8"
+        - cell "確認済み"
+        - cell "2026-11-03 06:58 UTC"
+        - cell "2026-11-03 06:59 UTC"
+      - row "M2 記録なし 記録なし 記録なし 記録なし":
+        - rowheader "M2"
+        - cell "記録なし"
+        - cell "記録なし"
+        - cell "記録なし"
+        - cell "記録なし"
+      - row "M3 記録なし 記録なし 記録なし 記録なし":
+        - rowheader "M3"
+        - cell "記録なし"
+        - cell "記録なし"
+        - cell "記録なし"
+        - cell "記録なし"
+      - row "M4 記録なし 記録なし 記録なし 記録なし":
+        - rowheader "M4"
+        - cell "記録なし"
+        - cell "記録なし"
+        - cell "記録なし"
+        - cell "記録なし"
+      - row "M5 記録なし 記録なし 記録なし 記録なし":
+        - rowheader "M5"
+        - cell "記録なし"
+        - cell "記録なし"
+        - cell "記録なし"
+        - cell "記録なし"
+      - row "M6 記録なし 記録なし 記録なし 記録なし":
+        - rowheader "M6"
+        - cell "記録なし"
+        - cell "記録なし"
+        - cell "記録なし"
+        - cell "記録なし"
+  - link "トップへ戻る":
+    - /url: /?lang=ja

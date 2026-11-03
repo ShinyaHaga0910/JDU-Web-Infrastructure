@@ -1,0 +1,60 @@
+{
+  "scope": "fresh_initial_technical_observation",
+  "lab_id": "class193548-retest1",
+  "deployment_id": "1e757ad7-b719-49d6-be80-209c24df052f",
+  "stack_status": "UPDATE_COMPLETE",
+  "gui_confirmed": true,
+  "ssm_online": 5,
+  "instances": {
+    "bastion": "i-01044ee85d0f981b1",
+    "web": "i-006a6b8ebabdbcfdc",
+    "dns": "i-01776c5e981344257",
+    "db": "i-0e7d8cf93f302ebb1",
+    "repo": "i-0098d90f88d74ca16"
+  },
+  "new_roots": [
+    {
+      "id": "vol-0aafe4fb1b4e57b65",
+      "size_gib": 16,
+      "encrypted": true
+    },
+    {
+      "id": "vol-0735fc8d0b97dbb16",
+      "size_gib": 24,
+      "encrypted": true
+    },
+    {
+      "id": "vol-0db7b25782be2a444",
+      "size_gib": 32,
+      "encrypted": true
+    },
+    {
+      "id": "vol-09aef77b6cbb1d5de",
+      "size_gib": 16,
+      "encrypted": true
+    },
+    {
+      "id": "vol-0ace03345e0a83b99",
+      "size_gib": 8,
+      "encrypted": true
+    }
+  ],
+  "retained_original_roots_available_gib": 96,
+  "functions": [
+    {
+      "name": "jdu-web-status-class193548-retest1",
+      "code_sha256": "b260831d2f54699d97bfc843defa50dd92e7ef8f437f61b33ba0b23dca96af30",
+      "teacher_principals": [
+        "arn:aws:iam::170126527713:role/LabRole"
+      ]
+    },
+    {
+      "name": "jdu-web-check-class193548-retest1",
+      "code_sha256": "9c245021d6857304ac0f51ab202e439648cac1ebb4dc1b1e248b2b10d0f456e1",
+      "teacher_principals": [
+        "arn:aws:iam::170126527713:role/LabRole"
+      ]
+    }
+  ],
+  "browser_acceptance_included": false
+}

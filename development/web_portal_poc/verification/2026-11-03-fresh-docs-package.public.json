@@ -1,0 +1,13 @@
+{
+  "scope": "fresh_acceptance_documentation_package_consistency",
+  "checked_on": "2026-11-03",
+  "changed_archive_members": ["README.md", "VALIDATION.md", "TEACHING-FILE-HASHES.json"],
+  "other_archive_members_byte_unchanged": true,
+  "pdf_members_byte_unchanged": 6,
+  "archive_member_hashes_verified": 37,
+  "package_sha256": "9874cd29b10f41574c18ea5a7a2c367c122ece5480361256a5b0d06ef9571c60",
+  "acceptance_evidence_references_verified": true,
+  "audit_python_syntax_valid": true,
+  "pdf_regenerated": false,
+  "runtime_or_signed_distribution_changed": false
+}

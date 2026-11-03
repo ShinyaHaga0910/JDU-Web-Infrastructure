@@ -2,7 +2,7 @@
 
 更新：2026-11-03。対象はClass193548の既存教師AWSと学生ごとの別AWS。実行場所は各自のCloudShell（us-east-1）。Windowsの共有アカウントには秘密鍵や採点認証を保存しない。
 
-**更新版r3 `web-course-class193548-20261103-r3` を正規署名し、教師の非公開S3へ保存済みです。有効期限は2027年1月31日末（UZT）。** 元のcore実行物・template・payload・採点処理は全byte保持。実学生の元stateを変更せず新courseへ導入し、Web/DBへ公開教材資源を配置できました。旧r2は期限切れの参照として保存しています。新規構築からの初回通し確認はまだ未実施であり、下記手順をその証拠に読み替えません。
+**①正式r3の期限更新（2027年1月31日末 UZT）、②教材配置、③新5台からの初回手順の受入は完了しました。** `web-course-class193548-20261103-r3`を教師の非公開S3へ保存済み。Class193548の別教師/学生AWSと、承認済みの先生Googleを学生役に使い、暗号化配布→新5台→SSM/SSH/登録→教材配置→本人連携→P1/M1→自動原本保存/教師表示を実確認しました。[実受入](../../development/web_portal_poc/verification/2026-11-03-fresh-initial-workflow.accepted.public.json)。全49手順や新規状態のP2〜P6/M2〜M6を通したという意味ではありません。旧r2と旧62点の成績は履歴として保持しています。
 
 ## 全体の順序
 
@@ -38,19 +38,19 @@ aws cloudformation describe-stacks --region us-east-1 \
 aws sts get-caller-identity --query Account --output text
 # この検証の学生は965244652544
 aws ec2 describe-instances --region us-east-1 \
-  --instance-ids i-0488d26e69614e096 i-0c43b73c9a75c41eb \
-    i-0f4cfc066e59488a6 i-0ccc3e9206d30867b i-08f8a40fdaa5bb240 \
+  --instance-ids i-01044ee85d0f981b1 i-006a6b8ebabdbcfdc \
+    i-01776c5e981344257 i-0e7d8cf93f302ebb1 i-0098d90f88d74ca16 \
   --query 'Reservations[].Instances[].[InstanceId,State.Name,PrivateIpAddress,PublicIpAddress]' \
   --output table
 aws ssm describe-instance-information --region us-east-1 \
-  --filters 'Key=InstanceIds,Values=i-0488d26e69614e096,i-0c43b73c9a75c41eb,i-0f4cfc066e59488a6,i-0ccc3e9206d30867b,i-08f8a40fdaa5bb240' \
+  --filters 'Key=InstanceIds,Values=i-01044ee85d0f981b1,i-006a6b8ebabdbcfdc,i-01776c5e981344257,i-0e7d8cf93f302ebb1,i-0098d90f88d74ca16' \
   --query 'InstanceInformationList[].[InstanceId,PingStatus]' --output table
 ```
 
 5台がrunning、SSMが5台ともOnlineになったら、Webへの接続は次です。
 
 ```bash
-aws ssm start-session --region us-east-1 --target i-0c43b73c9a75c41eb
+aws ssm start-session --region us-east-1 --target i-006a6b8ebabdbcfdc
 # Webのssm-userに入ったら
 hostname
 whoami
@@ -58,6 +58,8 @@ exit
 ```
 
 この5 IDは検証用の固定値です。一般学生へこのまま配りません。学生は自分のCloudFormationのIDを使います。既存環境ではcreate・鍵生成・採点認証発行・本人連携を繰り返しません。
+
+現在の検証先は`class193548-retest1`です。元`class193548-test1`の5台は本人承認で終了し、暗号化ディスク96GiBと成績84行/62点を保持しています。元の5 IDや旧stateで起動・作成をやり直しません。現在の踏み台の公開IPは11/03の確認時点で`100.61.115.107`、Webは`44.212.50.73`です。再開時は上の出力で現IPを確認します。
 
 [課題画面](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws)で学校Googleログイン → 課題の確認 → M0を実行します。既に完成済みの検証環境ならM1等も実行し、保存済み成績と教師一覧を確認できます。未構築の学生環境が初めから満点になることは期待しません。
 
@@ -198,7 +200,7 @@ bash core/jdu-web-lab ssm --state "$STATE" --role web
 - 学生は学校Googleでポータルへログインし「本人AWSとの連携」から指定学生AWSのCloudFormation確認画面を開きます。これは本人確認用3資源で、5台作成とは別です。完了後に元のポータルへ戻ります。
 - 教師は授業用/検証用contextと担当一覧へ追加します。既存検証Labのcontextはverificationのままです。
 
-手動で必要な上記設定が終わる前に「create成功＝ブラウザ課題も準備完了」と案内しません。新規学生向け一連の実機確認はまだ未完です。
+手動で必要な上記設定が終わる前に「create成功＝ブラウザ課題も準備完了」と案内しません。指定検証環境では、この接続設定を含めた初回受入を11/03に完了しました。任意の学生AWSへ固定値の補助ツールをそのまま渡す、という手順にはしていません。
 
 ## C. 課題が実行できることの判定
 
@@ -208,19 +210,37 @@ bash core/jdu-web-lab ssm --state "$STATE" --role web
 4. M1の指定ページを構築し、ブラウザでM1の8点と原本への自動保存を確認する。
 5. 教師一覧で同じ学生・課題・保存結果を確認する。
 
-この順序で新規配布から実行した証拠が揃ったとき、今回の「最初のコマンドから課題へ進める」を合格とします。既存完成環境の62/62は新規学生の通し確認の代わりにしません。既存完成環境をこの確認のために初期化・削除・降点しません。
+新規配布から上記の各操作と結果を確認できたとき、今回の「最初のコマンドから課題へ進める」を合格とします。11/03に新Labで合格しました。既存完成環境の62/62を代用せず、置換は本人の明示承認で実施し、元ディスク・旧成績を保持しました。
 
 ## 2026-11-03の監査とその後の対応
 
 - 完了：正式r3を2027-01-31末まで正規更新。元state/設定を保持した実installを確認。
 - 完了：教材P0をr3へ対応させ、Web/DBに公開教材資源を配置。3言語教材も同期。
-- 残る：学生ごとのブラウザ接続設定を含む初回手順の通し受入。本人の追加指示により、この確認も対象へ含める。
+- 完了：学生ごとのブラウザ接続設定を含む、新5台からP1/M1までの初回手順の受入。全P/M詳細手順の学生試読とは区別する。
+
+## 新5台からの実受入結果（2026-11-03）
+
+| 確認 | 実結果 |
+| --- | --- |
+| 教師発行→学生受信 | 本人用の暗号文だけを受渡し、SHA256・署名を照合。認証情報は各AWS内で保持 |
+| CloudFormation | 新5台CREATE_COMPLETE→演習用通信制限への変更UPDATE_COMPLETE、AWS/role/networkすべて合格 |
+| 管理接続 | 全5台SSM Online、内部4台への恒久SSHを一時鍵の期限後にも確認。Windowsへ秘密鍵を保存しない |
+| GUI | 本人が新踏み台へRDP接続しデスクトップ・Firefoxの起動を確認。preflightも合格 |
+| 教材 | 新course導入、Web/DBの公開教材資源配置。完成アプリやDBを自動構築しない |
+| Google/AWS登録 | 同じ承認済み検証用Googleを新Labへ対応付け、ブラウザから本人確認用CFN3資源を作成→登録完了 |
+| P1実操作 | 実CloudShell→SSM→ssm-userで内部APTからNginxを導入し練習ページを配置。ブラウザ全10項目合格、成績外保存 |
+| M1設定前→後 | P1だけなら3/8。Web内でM1の指定ファイルを作成後は8/8、11:59:44 UZTに原本へ自動保存 |
+| 本人/教師 | 新Lab8/62、M2〜M6記録なし。教師一覧には旧Lab62/62も別行で保持 |
+| M0 | ブラウザで全3項目合格、成績外保存 |
+| 原本・ディスク | 新Labの4件のreport/receipt/hashとLATEST/GRADEを独立照合。旧成績84行はbyte不変、元暗号化96GiB保持、新暗号化96GiB |
+
+[全体記録](../../development/web_portal_poc/verification/2026-11-03-fresh-initial-workflow.accepted.public.json)、[原本照合](../../development/web_portal_poc/verification/2026-11-03-fresh-canonical.accepted.public.json)。確認したのは指定検証環境の初回開始からP1/M1までです。独立した学生Google・母語校閲・教師目視・全49手順の通し試読は別に残り、全授業CLASS_READYはfalseのままです。教師Labを開始して利用します。
 
 ## 今回の実機確認結果
 
 同日その後の①②：r3は2027-01-31末まで全層の署名検証に合格し、教師の既存private S3へ新しい配布IDで保存済み。実学生で元state/command-state/baseline/SSH情報4fileのhash不変を確認して更新導入。P0の5つの公開資源をWeb/DBへ配置し、同一再実行も合格。さらに両台の公開アプリ展開とWeb用の署名wheel7点の検証まで完了した。アプリサービス・DB・パスワードは作成していない。[更新と配置の実測](../../development/web_portal_poc/verification/2026-11-03-renewal-and-material-assets.public.json)。
 
-③の新規状態からの確認用には、新Lab `class193548-retest1` の実作成前計画を準備済み。5台を残すと合計10台で現ツール9台guardを超えるため、元root96GiB/原本を保持して検証5台を置き換える案は、適用前確認待ち。以下の表は更新前に発見した状態とブラウザ動作の記録として保持する。
+③は本人承認の置換を実行し、上記の新規受入まで完了しました。[計画と実行状態](../../development/web_portal_poc/verification/2026-11-03-fresh-start-plan.public.json)。以下の表は、それより前の更新前監査の履歴として保持します。
 
 | 確認 | 結果 |
 | --- | --- |
@@ -234,6 +254,6 @@ bash core/jdu-web-lab ssm --state "$STATE" --role web
 | 原本の独立照合 | 82→84行、M0/M1のREQUESTのみ2行追加。本文hash/receipt一致、元受付・登録metadata・無関係な行は保持 |
 | 旧正式配布を実verify | 実Linux/GPG経路で期限切れ拒否。時計変更や検証の無効化なし |
 
-[実測JSON](../../development/web_portal_poc/verification/2026-11-03-initial-workflow-audit.public.json)。今回は新規5台の構築を再実施していません。既存5台の設定・SSH/RDP/採点認証は保持し、M0/M1の正規検証記録だけ追加しました。アプリへの秘密入力を含む全課題の再受入ではありません。
+[当初監査の実測JSON](../../development/web_portal_poc/verification/2026-11-03-initial-workflow-audit.public.json)。この当初監査時点では既存5台を使い、M0/M1の正規検証記録だけ追加しました。その後の新5台受入は上の別記録です。アプリへの秘密入力を含む全課題の再受入ではありません。
 
 10/30の[ブラウザ機能の完了記録](../../development/web_portal_poc/PORTAL-ACCEPTANCE.md)は維持します。今回の初回手順監査は、その先の一般学生配布まで無条件に合格したという報告を訂正するものです。新規5台の全自動Web化、追加の非機能要件、教師End Lab中の利用を完了条件へ加えません。

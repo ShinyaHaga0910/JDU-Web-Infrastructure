@@ -1,0 +1,72 @@
+{
+  "verified_at": "2026-11-03T07:06:47.540216+00:00",
+  "lab_id": "class193548-retest1",
+  "original_grade_rows": 84,
+  "original_grade_bytes_unchanged": true,
+  "original_raw_earned": 62,
+  "new_grade_rows": 11,
+  "new_raw_earned": 8,
+  "raw_maximum": 62,
+  "selected_latest_m1_matches": true,
+  "practice_and_m0_grade_rows_absent": true,
+  "fresh_identity_bound": true,
+  "teacher_old_and_new_verification_scope": true,
+  "requests": [
+    {
+      "job_id": "e605cdc4-edcb-4dcf-9d1c-5c4cc9629364",
+      "task_id": "P1",
+      "request_id": "0ec02b40-dd94-47de-a4c6-97edc6a77d65",
+      "report_sha256": "c5b4a9805f163b61d4e22846f1f54521d95d22fb13a2ed8afb08abc610c1adfb",
+      "received_at": "2026-11-03T06:52:18.217438+00:00",
+      "raw_earned": 8,
+      "raw_maximum": 8,
+      "unresolved": 0,
+      "readiness_ok": true,
+      "evaluable": true,
+      "complete": true,
+      "counts_toward_assessment": false
+    },
+    {
+      "job_id": "388a2569-9cce-47c7-b5c3-09d32fc4a24d",
+      "task_id": "M1",
+      "request_id": "aa7358c0-87de-4af9-aadf-07d237d9d0da",
+      "report_sha256": "d56db17e0443e0305cdd43b59de2853bf9a174f8afdaa0ca8325394207d028d8",
+      "received_at": "2026-11-03T06:54:28.177596+00:00",
+      "raw_earned": 3,
+      "raw_maximum": 8,
+      "unresolved": 0,
+      "readiness_ok": true,
+      "evaluable": true,
+      "complete": false,
+      "counts_toward_assessment": true
+    },
+    {
+      "job_id": "ac4c9f27-fb33-46f3-83f6-4721b095f701",
+      "task_id": "M1",
+      "request_id": "1c9cc8fd-91e5-42b9-b606-c357db80da4f",
+      "report_sha256": "4173e53c3f973c27b9e0d6276b059f483bca14ceab3ff1d8f9691c3cd04bdcfb",
+      "received_at": "2026-11-03T06:59:44.378133+00:00",
+      "raw_earned": 8,
+      "raw_maximum": 8,
+      "unresolved": 0,
+      "readiness_ok": true,
+      "evaluable": true,
+      "complete": true,
+      "counts_toward_assessment": true
+    },
+    {
+      "job_id": "6a761aed-d181-4e01-9439-44100e5cb9ca",
+      "task_id": "M0",
+      "request_id": "0be86e33-d0a9-4a84-9e75-4c3e8189d7f3",
+      "report_sha256": "5abeecf83c6d7b1e9bb5718341c12c8a8b89aa9e5d8c080992f018a59d21db5e",
+      "received_at": "2026-11-03T07:03:13.918334+00:00",
+      "raw_earned": 0,
+      "raw_maximum": 0,
+      "unresolved": 0,
+      "readiness_ok": true,
+      "evaluable": true,
+      "complete": true,
+      "counts_toward_assessment": false
+    }
+  ]
+}
