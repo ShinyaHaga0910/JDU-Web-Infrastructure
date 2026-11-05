@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1090" viewBox="0 0 1600 1090" role="img">
 <title>300秒のTTLを持つ情報を保存した側で、時間の経過に応じてキャッシュの期限が減る例</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図6-4  キャッシュとTTLの残り時間</text>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図6-5  キャッシュとTTLの残り時間</text>
 <text x="55" y="99" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">同じAレコードをキャッシュした側の動き</text>
 <polyline points="235,200 235,930" fill="none" stroke="#7991aa" stroke-width="5"/><polygon points="235,930 228.04055145422032,915.5928463623571 241.95944854577968,915.5928463623571" fill="#7991aa"/>
 <text x="85" y="217" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">取得時</text>

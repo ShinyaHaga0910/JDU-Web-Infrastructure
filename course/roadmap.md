@@ -39,6 +39,6 @@
 
 [第5章 Nginxによる静的ファイルの配信](textbook/docs/ja/05-nginx-static-files.md)の本文と4図、HTML/PDFを作成しました。NginxとEC2の関係、URLと保存先、www-dataの読み取り権限、設定の検査と再読み込み、三つの接続元、アクセスログとエラーログを説明します。第4章はcurlのコマンド・表示例を見てからレスポンスの分解図へ進む順序に更新しました。
 
-[第6章 DNSによる名前解決の仕組み](textbook/docs/ja/06-dns-name-resolution.md)の本文と5図、HTML/PDFを作成しました。ブラウザへの名前入力からDNSの回答、そのIPへのHTTP接続までを説明します。内部DNSとスマートフォンが普段使うDNS、公開・内部という範囲と権威という役割、リゾルバーと転送先、レコード、キャッシュとTTL、DNSとHTTPの結果を分けて扱います。BINDとUbuntu OSの具体的な設定は第7章へつなげます。
+[第6章 DNSによる名前解決の仕組み](textbook/docs/ja/06-dns-name-resolution.md)の本文と6図、HTML/PDFを作成しました。ブラウザへの名前入力からDNSの回答、そのIPへのHTTP接続までを説明します。内部DNSとスマートフォンが普段使うDNS、インターネット/イントラネットの境界、リゾルバーと転送先、レコード、キャッシュとTTL、DNSとHTTPの結果を分けて扱います。BINDとUbuntu OSの具体的な設定は第7章へつなげます。
 
 第7〜14章の日本語本文、各3図、HTML/PDFを作成しました。[教科書入口](textbook/README.md)から全14章を読めます。BINDと通常の名前解決、保存領域、SQL、PostgreSQL、提供アプリ、配置、最小権限、障害の切り分けへ順に進みます。P5→P6→M5→M6の現行順序と採点条件は保持しています。
