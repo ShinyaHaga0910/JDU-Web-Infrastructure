@@ -25,4 +25,5 @@
 <text x="1195" y="720" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">Webサーバーの80番ポートを使う</text>
 <polyline points="650,718 830,718" fill="none" stroke="#9d651a" stroke-width="4"/><polygon points="830,718 815.5928463623571,724.9594485457797 815.5928463623571,711.0405514542203" fill="#9d651a"/>
 <text x="55" y="930" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">同じ名前でも、それぞれ確かめる範囲が異なる。</text>
+<text x="55" y="995" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">digは回答を見るためのコマンド。OSの問い合わせ先設定は変更しない。</text>
 </svg>

@@ -1,28 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1100" viewBox="0 0 1600 1100" role="img">
-<title>問い合わせる側のOS内の名前解決と、上流の内部DNSを分ける</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1150" viewBox="0 0 1800 1150" role="img">
+<title>接続元のOSへ設定する問い合わせ先DNSのIPと、DNSサーバーが答えるWebサーバーのIPを区別する</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図7-2  OS内の名前解決と、別のEC2の内部DNS</text>
-<rect x="40" y="130" width="940" height="750" rx="18" fill="#f7f9fc" stroke="#2165a7" stroke-width="2"/>
-<text x="510" y="148" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
-<text x="510" y="191" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="middle">踏み台サーバー</text>
-<rect x="100" y="285" width="820" height="115" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
-<text x="510" y="315" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">ブラウザ・getentなどの名前解決の依頼</text>
-<text x="200" y="500" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">OSの機能を利用する方法</text>
-<polyline points="150,400 150,620" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="150,620 143.04055145422032,605.5928463623571 156.95944854577968,605.5928463623571" fill="#2165a7"/>
-<text x="535" y="445" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">ローカルスタブを使う方法</text>
-<text x="535" y="510" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">127.0.0.53の53番ポート</text>
-<polyline points="900,400 900,620" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="900,620 893.0405514542203,605.5928463623571 906.9594485457797,605.5928463623571" fill="#16745b"/>
-<rect x="100" y="620" width="820" height="160" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
-<text x="510" y="638" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="34" dominant-baseline="text-before-edge" text-anchor="middle">systemd-resolved</text>
-<text x="510" y="704" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">上流DNSの設定：10.20.2.10</text>
-<rect x="1160" y="590" width="400" height="225" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
-<text x="1360" y="608" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
-<text x="1360" y="652" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">DNSサーバー</text>
-<text x="1360" y="714" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">10.20.2.10</text>
-<text x="1360" y="767" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">53番ポート</text>
-<polyline points="920,705 1160,705" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="1160,705 1145.5928463623572,711.9594485457797 1145.5928463623572,698.0405514542203" fill="#16745b"/>
-<text x="995" y="588" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">DNS</text>
-<text x="980" y="638" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">UDP/TCP</text>
-<text x="55" y="943" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">127.0.0.53は同じ踏み台サーバー内。10.20.2.10は別のDNSサーバー。</text>
-<text x="55" y="1006" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">すべての名前解決がローカルスタブへのDNS通信を通るとは限らない。</text>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図7-2  OSには問い合わせ先を設定し、DNSから接続先IPを得る</text>
+<rect x="40" y="130" width="1000" height="760" rx="18" fill="#f7f9fc" stroke="#2165a7" stroke-width="2"/>
+<text x="540" y="150" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
+<text x="540" y="195" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="middle">踏み台サーバー（問い合わせる側）</text>
+<rect x="100" y="280" width="880" height="125" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
+<text x="540" y="318" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">ブラウザ・getentが名前解決を依頼する</text>
+<polyline points="540,405 540,510" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="540,510 533.0405514542203,495.5928463623572 546.9594485457797,495.5928463623572" fill="#2165a7"/>
+<rect x="100" y="510" width="880" height="250" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
+<text x="540" y="533" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="middle">OSの名前解決：systemd-resolved</text>
+<text x="540" y="612" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">問い合わせ先DNS：10.20.2.10</text>
+<text x="540" y="692" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">この問い合わせ先をNetplanで設定する</text>
+<rect x="1260" y="455" width="500" height="385" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
+<text x="1510" y="474" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
+<text x="1510" y="517" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">DNSサーバー</text>
+<text x="1510" y="579" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">10.20.2.10</text>
+<text x="1510" y="657" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">名前とIPの対応を管理する</text>
+<text x="1510" y="717" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">guide.lab.test</text>
+<text x="1510" y="775" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">→ 10.20.1.20</text>
+<text x="1060" y="370" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">DNS：UDP/TCP</text>
+<text x="1060" y="416" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">53番ポート</text>
+<polyline points="980,570 1260,570" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="1260,570 1245.5928463623572,576.9594485457797 1245.5928463623572,563.0405514542203" fill="#16745b"/>
+<text x="1045" y="515" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">名前を尋ねる</text>
+<polyline points="1260,690 980,690" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="980,690 994.4071536376429,683.0405514542203 994.4071536376429,696.9594485457797" fill="#16745b"/>
+<text x="1050" y="721" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">接続先IPを回答</text>
+<text x="55" y="945" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">OSが尋ねる相手：10.20.2.10　　回答で得るWebサーバーのIP：10.20.1.20</text>
+<text x="55" y="1010" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">127.0.0.53は同じOS内の受付用アドレス。別のEC2のIPではない。</text>
+<text x="55" y="1075" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">必要な情報をDNSへ尋ねる場合の流れ。Webサーバー側のOSにも問い合わせ先を設定する。</text>
 </svg>
