@@ -31,5 +31,5 @@
 <polyline points="450,892 1110,892" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1110,892 1095.5928463623572,898.9594485457797 1095.5928463623572,885.0405514542203" fill="#2165a7"/>
 <text x="780" y="929" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">⑥ 管理する情報に基づき回答</text>
 <polyline points="1110,1002 450,1002" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="450,1002 464.4071536376428,995.0405514542203 464.4071536376428,1008.9594485457797" fill="#16745b"/>
-<text x="55" y="1150" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">使えるキャッシュがない場合の基本例。ブラウザではなく、リゾルバーが案内をたどる。</text>
+<text x="55" y="1150" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">使えるキャッシュがない場合、リゾルバーが問い合わせ先の案内をたどる基本例。</text>
 </svg>

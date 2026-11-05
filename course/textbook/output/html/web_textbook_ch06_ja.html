@@ -40,7 +40,7 @@
 <p>インターネット上のすべての名前を、一台のDNSサーバーが一覧として持つわけではない。名前の階層に応じて、担当するDNSが情報を分担する。例えば、リゾルバーが<code>www.example.com</code>を調べる際、使える情報が保存されていなければ、ルートDNS、<code>.com</code>のDNS、対象ドメインを担当するDNSというように、問い合わせ先の案内をたどって情報を得る。</p>
 <p>ルートDNSは、すべてのWebサーバーのIPアドレスを返すのではなく、次にどの範囲のDNSへ尋ねればよいかを案内する。<code>.com</code>のDNSは、<code>example.com</code>を担当するDNSを案内する。その案内をたどって、リゾルバーが必要な情報を調べ、依頼した側へ結果を返す。</p>
 <figure><img src="../../assets/figures/ch06-fig04-public-resolution.png" alt="リゾルバーがルートDNSから対象ドメインを担当するDNSまで問い合わせ先をたどる基本の流れ。" width="1600" height="1220"></figure>
-<p><strong>図6-4 インターネットのDNSが情報を分担する。</strong> 左は名前解決を取りまとめるリゾルバー、右は名前の階層を担当する各DNSである。必要な案内や回答が保存されていない場合の基本の流れを示す。ブラウザ自身が順にすべてのDNSへ直接尋ねる図ではない。</p>
+<p><strong>図6-4 インターネットのDNSが情報を分担する。</strong> 左は名前解決を取りまとめるリゾルバー、右は名前の階層を担当する各DNSである。必要な案内や回答が保存されていない場合の基本の流れを示す。</p>
 <p>問い合わせを取りまとめる役割を<strong>再帰リゾルバー</strong>という。次の問い合わせ先を自分でたどる方法に加え、他のリゾルバーへ調査を依頼する方法もある。後者の依頼先が<strong>フォワーダー（転送先DNS）</strong>である。<a href="https://www.rfc-editor.org/rfc/rfc1034.html#section-4.3.1">DNSの問い合わせ処理</a></p>
 <h3 id="今回の内部dnsで使うbind">今回の内部DNSで使うBIND</h3>
 <p>今回のDNSサーバーでは、<strong>BIND 9</strong>というDNSソフトウェアをUbuntu OS上で動かす。BINDは、<code>lab.test</code>については自分が持つゾーン情報から回答する。それ以外の名前については、許可された問い合わせ元からの依頼を受け、転送先DNSを使って名前解決を取りまとめる。</p>
@@ -86,10 +86,15 @@ web IN A 10.20.1.20</code></pre>
 <h3 id="外部の名前は、転送先dnsへ調査を依頼する">外部の名前は、転送先DNSへ調査を依頼する</h3>
 <p>一方、<code>aws.amazon.com</code>のような外部の名前は、今回の<code>lab.test</code>ゾーンの情報には入っていない。使えるキャッシュもなければ、BINDは設定されたフォワーダーへ問い合わせる。今回は、AWSが提供するDNSの機能を転送先に使い、そのアドレスを<code>10.20.0.2</code>とする。</p>
 <p>このAWSのDNSは、EC2上に自分で構築する内部DNSとは別の、AWSが提供する名前解決のサービスである。今回のVPCは<code>10.20.0.0/16</code>なので、VPCのネットワークアドレスに2を加えた<code>10.20.0.2</code>でも利用できる。<a href="https://docs.aws.amazon.com/vpc/latest/userguide/AmazonDNS-concepts.html">AWSが提供するDNS</a></p>
-<figure><img src="../../assets/figures/ch06-fig06-internal-and-forward.png" alt="BINDがlab.testは担当ゾーンから回答し、外部名はキャッシュを調べた後にAWSの転送先DNSへ依頼する。" width="1600" height="1160"></figure>
-<p><strong>図6-6 内部の情報と、外部の情報の調べ方。</strong> 左の踏み台サーバーが尋ねる相手は、どちらの場合もDNSサーバーの<code>10.20.2.10</code>である。DNSサーバーは、内部名を担当ゾーンから答え、外部名では使えるキャッシュを確認してから転送先を使う。右の丸はAWS提供のDNS機能を表し、追加するEC2ではない。</p>
+<figure><img src="../../assets/figures/ch06-fig06-internal-and-forward.png" alt="AWS環境、今回のVPC、インターネットの境界を示し、内部DNSからAWS提供DNSを使って公開DNSの情報を得る流れを描く。" width="1800" height="1740"></figure>
+<p><strong>図6-6 VPC内の問い合わせと、インターネットの公開DNS。</strong> AWSの範囲の中に、今回のVPCの枠を置いている。踏み台サーバーは内部DNSへ尋ね、外部名の情報が必要なら、その内部DNSがAWS提供のDNS機能へ問い合わせる。破線は、AWSのDNS機能がインターネットの公開DNSから情報を調べる流れである。丸はVPCから利用するAWS提供のDNS機能を表す。</p>
 <p>今回使う<code>forward only</code>という設定では、外部名の解決を転送先DNSへ依頼する。BINDが転送先を使えなかったときに、自分でルートDNSから直接問い合わせ直す方法へ切り替えない。踏み台サーバーとWebサーバーが普段使うDNSは<code>10.20.2.10</code>とし、その内部DNSが必要に応じて<code>10.20.0.2</code>を使う、という順序である。<a href="https://bind9.readthedocs.io/en/v9.18.39/reference.html#namedconf-statement-forward">BINDのフォワーダー</a></p>
-<p>外部の名前からIPアドレスを取得できても、その外部WebサーバーへHTTPで接続できるかは別である。DNSで情報を得る通信と、そのIPアドレスへ実際に接続する通信を分けて考えよう。</p>
+<h3 id="googleの名前が分かることと、ページを開けること">Googleの名前が分かることと、ページを開けること</h3>
+<p>今回の構成では、一般の外部サイトへ新しく接続するHTTP・HTTPS通信を許可していない。一方、AWS提供のDNSは、VPCから利用する名前解決の基盤機能である。このDNSへの問い合わせは、SG（AWSのSecurity Group）の通常の送信制限では遮断できない。そのため、一般サイトへの通信を制限しながら、外部名のIPアドレスを調べることができる。<a href="https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html">AWS提供DNSとSGの扱い</a></p>
+<p>例えば、内部DNSの設定を終えた後、RDPで開いた踏み台サーバーのブラウザのURL欄へ<code>https://google.com/</code>を入力した場合を考える。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">処理</th><th scope="col">通信の相手</th><th scope="col">今回の構成での結果</th></tr></thead><tbody><tr><td>google.comの名前解決</td><td>踏み台サーバー→内部DNS→AWS提供のDNS</td><td>DNSが正常に動いていれば、IPアドレスを取得できる</td></tr><tr><td>Googleのページの取得</td><td>踏み台サーバー→得られたGoogleのIPの443番ポート</td><td>一般の外部サイト向けの送信許可がないため接続できず、通常は待ち時間の後にタイムアウトする</td></tr></tbody></table></div>
+<p>ここでのHTTPS接続は、DNSの転送先を通じてWebページも取得する通信ではない。名前解決後、踏み台サーバー自身がGoogleへTCPで接続しようとする。したがって、Googleのページを開けなくても、DNSの名前解決まで失敗したとは限らない。</p>
+<p>利用者PCのブラウザで直接Googleを開く場合は、踏み台サーバーのブラウザとは通信の送信元が違う。その結果は利用者PC側のネットワークによって決まり、今回のVPC内の送信制限だけで決まるものではない。</p>
 <h2 id="67-名前解決の結果と、その後の接続を読む">6.7 名前解決の結果と、その後の接続を読む</h2>
 <h3 id="dnsへ尋ねた結果を文字で見る">DNSへ尋ねた結果を文字で見る</h3>
 <p><strong>dig</strong>は、DNSへ問い合わせて結果を表示するコマンドである。次の例では、踏み台サーバーから、問い合わせ先のDNSサーバーを明示してWebサーバーのIPv4アドレスを尋ねる。</p>
@@ -138,7 +143,7 @@ web.lab.test.  300  IN  A  10.20.1.20
 <h3 id="問6">問6</h3>
 <p>NXDOMAINはDNSが名前の不存在を回答したこと、DNSのタイムアウトは時間内に回答を受け取れなかったことを示す。HTTPの404は、HTTPリクエストに対してWebサーバーなどが返した結果である。DNSの段階と、HTTPで対象を取得する段階を区別する。</p>
 <h2 id="参考資料">参考資料</h2>
-<p>確認日：2026-11-03。レコード、ゾーンファイル、digの出力は仕組みを説明するための例である。</p>
+<p>確認日：2026-11-03。AWSのDNSとSGの説明は2026-11-05に再確認した。レコード、ゾーンファイル、digの出力は仕組みを説明するための例である。</p>
 <p class="bullet">・ <a href="https://www.rfc-editor.org/rfc/rfc1034.html">RFC 1034 Domain Names - Concepts and Facilities</a></p>
 <p class="bullet">・ <a href="https://www.rfc-editor.org/rfc/rfc1035.html">RFC 1035 Domain Names - Implementation and Specification</a></p>
 <p class="bullet">・ <a href="https://www.rfc-editor.org/rfc/rfc9499.html">RFC 9499 DNS Terminology</a></p>
@@ -151,5 +156,6 @@ web.lab.test.  300  IN  A  10.20.1.20
 <p class="bullet">・ <a href="https://bind9.readthedocs.io/en/v9.18.39/reference.html#namedconf-statement-forward">BIND 9 forward / forwarders</a></p>
 <p class="bullet">・ <a href="https://bind9.readthedocs.io/en/v9.18.39/manpages.html#dig-dns-lookup-utility">BIND 9 dig</a></p>
 <p class="bullet">・ <a href="https://docs.aws.amazon.com/vpc/latest/userguide/AmazonDNS-concepts.html">AWS Understanding Amazon DNS</a></p>
+<p class="bullet">・ <a href="https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html">AWS Security group rules</a></p>
 <p class="bullet">・ <a href="../../output/pdf/web_textbook_ch05_ja.pdf">第5章</a></p>
 <p class="bullet">・ <a href="../../../labs/docs/ja/p2.md">練習P2</a></p></main></body></html>

@@ -86,7 +86,7 @@ DNSサーバーが情報を管理するひとまとまりの範囲を**ゾーン
 
 ![リゾルバーがルートDNSから対象ドメインを担当するDNSまで問い合わせ先をたどる基本の流れ。](../../assets/figures/ch06-fig04-public-resolution.png)
 
-**図6-4 インターネットのDNSが情報を分担する。** 左は名前解決を取りまとめるリゾルバー、右は名前の階層を担当する各DNSである。必要な案内や回答が保存されていない場合の基本の流れを示す。ブラウザ自身が順にすべてのDNSへ直接尋ねる図ではない。
+**図6-4 インターネットのDNSが情報を分担する。** 左は名前解決を取りまとめるリゾルバー、右は名前の階層を担当する各DNSである。必要な案内や回答が保存されていない場合の基本の流れを示す。
 
 問い合わせを取りまとめる役割を**再帰リゾルバー**という。次の問い合わせ先を自分でたどる方法に加え、他のリゾルバーへ調査を依頼する方法もある。後者の依頼先が**フォワーダー（転送先DNS）**である。[DNSの問い合わせ処理](https://www.rfc-editor.org/rfc/rfc1034.html#section-4.3.1)
 
@@ -187,13 +187,26 @@ DNSサーバーでIPアドレスの登録を変更しても、他の端末やリ
 
 このAWSのDNSは、EC2上に自分で構築する内部DNSとは別の、AWSが提供する名前解決のサービスである。今回のVPCは`10.20.0.0/16`なので、VPCのネットワークアドレスに2を加えた`10.20.0.2`でも利用できる。[AWSが提供するDNS](https://docs.aws.amazon.com/vpc/latest/userguide/AmazonDNS-concepts.html)
 
-![BINDがlab.testは担当ゾーンから回答し、外部名はキャッシュを調べた後にAWSの転送先DNSへ依頼する。](../../assets/figures/ch06-fig06-internal-and-forward.png)
+![AWS環境、今回のVPC、インターネットの境界を示し、内部DNSからAWS提供DNSを使って公開DNSの情報を得る流れを描く。](../../assets/figures/ch06-fig06-internal-and-forward.png)
 
-**図6-6 内部の情報と、外部の情報の調べ方。** 左の踏み台サーバーが尋ねる相手は、どちらの場合もDNSサーバーの`10.20.2.10`である。DNSサーバーは、内部名を担当ゾーンから答え、外部名では使えるキャッシュを確認してから転送先を使う。右の丸はAWS提供のDNS機能を表し、追加するEC2ではない。
+**図6-6 VPC内の問い合わせと、インターネットの公開DNS。** AWSの範囲の中に、今回のVPCの枠を置いている。踏み台サーバーは内部DNSへ尋ね、外部名の情報が必要なら、その内部DNSがAWS提供のDNS機能へ問い合わせる。破線は、AWSのDNS機能がインターネットの公開DNSから情報を調べる流れである。丸はVPCから利用するAWS提供のDNS機能を表す。
 
 今回使う`forward only`という設定では、外部名の解決を転送先DNSへ依頼する。BINDが転送先を使えなかったときに、自分でルートDNSから直接問い合わせ直す方法へ切り替えない。踏み台サーバーとWebサーバーが普段使うDNSは`10.20.2.10`とし、その内部DNSが必要に応じて`10.20.0.2`を使う、という順序である。[BINDのフォワーダー](https://bind9.readthedocs.io/en/v9.18.39/reference.html#namedconf-statement-forward)
 
-外部の名前からIPアドレスを取得できても、その外部WebサーバーへHTTPで接続できるかは別である。DNSで情報を得る通信と、そのIPアドレスへ実際に接続する通信を分けて考えよう。
+### Googleの名前が分かることと、ページを開けること
+
+今回の構成では、一般の外部サイトへ新しく接続するHTTP・HTTPS通信を許可していない。一方、AWS提供のDNSは、VPCから利用する名前解決の基盤機能である。このDNSへの問い合わせは、SG（AWSのSecurity Group）の通常の送信制限では遮断できない。そのため、一般サイトへの通信を制限しながら、外部名のIPアドレスを調べることができる。[AWS提供DNSとSGの扱い](https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html)
+
+例えば、内部DNSの設定を終えた後、RDPで開いた踏み台サーバーのブラウザのURL欄へ`https://google.com/`を入力した場合を考える。
+
+| 処理 | 通信の相手 | 今回の構成での結果 |
+| --- | --- | --- |
+| google.comの名前解決 | 踏み台サーバー→内部DNS→AWS提供のDNS | DNSが正常に動いていれば、IPアドレスを取得できる |
+| Googleのページの取得 | 踏み台サーバー→得られたGoogleのIPの443番ポート | 一般の外部サイト向けの送信許可がないため接続できず、通常は待ち時間の後にタイムアウトする |
+
+ここでのHTTPS接続は、DNSの転送先を通じてWebページも取得する通信ではない。名前解決後、踏み台サーバー自身がGoogleへTCPで接続しようとする。したがって、Googleのページを開けなくても、DNSの名前解決まで失敗したとは限らない。
+
+利用者PCのブラウザで直接Googleを開く場合は、踏み台サーバーのブラウザとは通信の送信元が違う。その結果は利用者PC側のネットワークによって決まり、今回のVPC内の送信制限だけで決まるものではない。
 
 ## 6.7 名前解決の結果と、その後の接続を読む
 
@@ -298,7 +311,7 @@ NXDOMAINはDNSが名前の不存在を回答したこと、DNSのタイムアウ
 
 ## 参考資料
 
-確認日：2026-11-03。レコード、ゾーンファイル、digの出力は仕組みを説明するための例である。
+確認日：2026-11-03。AWSのDNSとSGの説明は2026-11-05に再確認した。レコード、ゾーンファイル、digの出力は仕組みを説明するための例である。
 
 - [RFC 1034 Domain Names - Concepts and Facilities](https://www.rfc-editor.org/rfc/rfc1034.html)
 - [RFC 1035 Domain Names - Implementation and Specification](https://www.rfc-editor.org/rfc/rfc1035.html)
@@ -312,5 +325,6 @@ NXDOMAINはDNSが名前の不存在を回答したこと、DNSのタイムアウ
 - [BIND 9 forward / forwarders](https://bind9.readthedocs.io/en/v9.18.39/reference.html#namedconf-statement-forward)
 - [BIND 9 dig](https://bind9.readthedocs.io/en/v9.18.39/manpages.html#dig-dns-lookup-utility)
 - [AWS Understanding Amazon DNS](https://docs.aws.amazon.com/vpc/latest/userguide/AmazonDNS-concepts.html)
+- [AWS Security group rules](https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html)
 - [第5章](../../output/pdf/web_textbook_ch05_ja.pdf)
 - [練習P2](../../../labs/docs/ja/p2.md)
