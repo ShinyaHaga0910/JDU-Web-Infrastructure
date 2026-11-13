@@ -221,9 +221,9 @@
 
 **前提：** 第2・7・9章、OS・Linux教材のユーザー・サービス・待受。
 
-**本文：** [第10章 PostgreSQLの接続と認証](textbook/docs/ja/10-postgresql-connections.md)を2026-11-03に作成。図3点と章末問題・解答を備え、設定・観測の理由を説明する。
+**本文：** [第10章 PostgreSQLの接続と認証](textbook/docs/ja/10-postgresql-connections.md)を2026-11-03に作成。図2点と章末問題・解答を備え、設定・観測の理由を説明する。
 
-- **10.1 PostgreSQLサーバーの構成。** サービス、PostgreSQLのcluster、一つ以上のデータベース、schema、保存先を関係付ける。ここでのclusterは複数台による冗長化を意味しない。
+- **10.1 PostgreSQLサーバーの構成。** サービス、PostgreSQLのcluster、一つ以上のデータベース、schema、保存先を関係付ける。
 - **10.2 OSユーザーとDB role。** OS側の`postgres`ユーザー、DB側の管理role、構築用role、通常アプリ用roleを区別する。同じ名前でも権限の管理先が異なり、rootであることを外部DB接続の代わりにしない。
 - **10.3 所有者と許可された操作。** DB・schema・表の所有権と、別roleへ与えるCONNECT・USAGE・SELECTなどの権限を段階的に説明する。GRANT/REVOKEの意味、LOGINとsuperuserの違いをここで導入する。
 - **10.4 DBへ到達する条件。** WebからDB名を解決し、内部IPとTCP5432へ到達し、PostgreSQLがそのアドレスで待ち受ける流れを確認する。SG、待受設定、起動を別の条件として読む。

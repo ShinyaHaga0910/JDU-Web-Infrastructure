@@ -12,10 +12,6 @@ Webサーバーのアプリが備品を読むには、DBサーバーへ接続し
 
 その管理単位の中に複数の**データベース**を置ける。さらに、データベース内の**スキーマ**は、表などの名前を整理するまとまりである。例えば`public.catalog_item`は、publicスキーマ内のcatalog_item表を表す。
 
-![DBサーバー、PostgreSQLクラスター、データベース、スキーマ、表の関係。](../../assets/figures/ch10-fig01-structure.png)
-
-**図10-1 接続先と、その中のデータのまとまり。** 同じDBサーバーでも、選んだデータベースが違えば、同じ表名であっても別の対象になる。
-
 `pg_lsclusters`ではバージョン、クラスター名、ポート、稼働状態、保存先などを読む。今回、実際の処理を行うサービスは`postgresql@16-main`であり、まとめ役のサービスの表示だけで個別クラスターの状態を判断しない。
 
 ## 10.2 OSユーザーとDBロールを区別する
@@ -51,9 +47,9 @@ GRANT SELECT ON public.lesson_item TO lesson_app;
 
 接続の前には、Webサーバーが`db.lab.test`からDBサーバーの内部IP`10.20.2.20`を得る。その後、TCPでDBサーバーの5432番ポートへ接続する。
 
-![名前解決、通信許可、待受、認証、SQL権限という接続条件を分ける。](../../assets/figures/ch10-fig02-connection.png)
+![名前解決、通信許可、待受、認証、SQL権限という接続条件を分ける。](../../assets/figures/ch10-fig01-connection.png)
 
-**図10-2 接続してSQLを使うまでの条件。** 左から順に関係する範囲を読む。パスワードが正しいことは、この中の認証に関わる一つの条件である。
+**図10-1 接続してSQLを使うまでの条件。** 左から順に関係する範囲を読む。パスワードが正しいことは、この中の認証に関わる一つの条件である。
 
 SG（AWSのSecurity Group）がWebサーバーからDBサーバーへの通信を許し、PostgreSQLが正しいIP・ポートで待ち受けている必要がある。`listen_addresses`は、PostgreSQL自身のどのアドレスで受け付けるかを決める。接続元の許可リストではない。[待受設定](https://www.postgresql.org/docs/16/runtime-config-connection.html)
 
@@ -71,9 +67,9 @@ host lesson_catalog lesson_app 10.20.1.20/32 scram-sha-256
 
 `host`はTCP/IPによる接続、`lesson_catalog`はDB名、`lesson_app`は接続するロール、`10.20.1.20/32`は送信元のWebサーバー一台、`scram-sha-256`はパスワード認証に使う方式である。
 
-![HBAの各列を、Webサーバーからの接続情報へ対応させる。](../../assets/figures/ch10-fig03-hba.png)
+![HBAの各列を、Webサーバーからの接続情報へ対応させる。](../../assets/figures/ch10-fig02-hba.png)
 
-**図10-3 一つの接続を、HBAの一行と照合する。** 10.20.1.20は接続元であり、DBサーバー自身の待受アドレス10.20.2.20とは用途が異なる。
+**図10-2 一つの接続を、HBAの一行と照合する。** 10.20.1.20は接続元であり、DBサーバー自身の待受アドレス10.20.2.20とは用途が異なる。
 
 HBAは上から読み、**最初に接続条件が一致した行**を使う。その行で認証が失敗しても、下の別の行へ移って試し直すわけではない。広すぎる許可行が先にあれば、後に置いた制限より先に使われる。[HBAの照合](https://www.postgresql.org/docs/16/auth-pg-hba-conf.html)
 

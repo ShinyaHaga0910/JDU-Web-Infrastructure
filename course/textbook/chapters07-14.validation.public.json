@@ -119,12 +119,12 @@
     {
       "chapter": 10,
       "pages": 8,
-      "text_blocks": 95,
+      "text_blocks": 94,
       "missing_text": [],
-      "pdf_words_within_page": 276,
+      "pdf_words_within_page": 272,
       "rendered_pages": 8,
-      "figure_texts_within_canvas_and_nonoverlapping": 32,
-      "figures": 3,
+      "figure_texts_within_canvas_and_nonoverlapping": 23,
+      "figures": 2,
       "code_blocks": 5,
       "questions": 4,
       "heading_pages": {
@@ -138,7 +138,7 @@
           "width": 320,
           "scale": 100,
           "overflow": false,
-          "images": 3,
+          "images": 2,
           "loaded": true,
           "code": 5
         },
@@ -147,7 +147,7 @@
           "width": 320,
           "scale": 200,
           "overflow": false,
-          "images": 3,
+          "images": 2,
           "loaded": true,
           "code": 5
         },
@@ -156,7 +156,7 @@
           "width": 1280,
           "scale": 100,
           "overflow": false,
-          "images": 3,
+          "images": 2,
           "loaded": true,
           "code": 5
         },
@@ -165,12 +165,12 @@
           "width": 1280,
           "scale": 200,
           "overflow": false,
-          "images": 3,
+          "images": 2,
           "loaded": true,
           "code": 5
         }
       ],
-      "sha256": "09738082117d0a7ed47a4597dfb7298e3e2dd6b9c05b848957e63481ac513b54",
+      "sha256": "ec6d531ebf7f7fffeaaa0da10d4dade920cf2ef094a4453a662d07f18bd3f464",
       "date": "2026-11-13"
     },
     {
@@ -399,11 +399,11 @@
     }
   ],
   "total_pages": 66,
-  "total_figures": 21,
+  "total_figures": 20,
   "total_code_blocks": 21,
-  "total_text_blocks": 770,
-  "total_pdf_words_within_page": 2130,
-  "total_figure_texts_checked": 301,
+  "total_text_blocks": 769,
+  "total_pdf_words_within_page": 2126,
+  "total_figure_texts_checked": 292,
   "teacher_visual_review": "not performed",
   "student_trial": "not performed",
   "aws_operations": "none",
