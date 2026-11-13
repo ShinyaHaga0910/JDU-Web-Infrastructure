@@ -232,22 +232,22 @@
     },
     {
       "chapter": 12,
-      "pages": 8,
-      "text_blocks": 103,
+      "pages": 10,
+      "text_blocks": 116,
       "missing_text": [],
-      "pdf_words_within_page": 247,
-      "rendered_pages": 8,
+      "pdf_words_within_page": 324,
+      "rendered_pages": 10,
       "figure_texts_within_canvas_and_nonoverlapping": 27,
       "figures": 2,
       "code_blocks": 1,
       "questions": 4,
       "heading_pages": {
-        "章末問題": 6,
-        "章末解答": 7,
-        "参考資料": 8
+        "章末問題": 8,
+        "章末解答": 9,
+        "参考資料": 10
       },
       "local_references_checked": 10,
-      "sha256": "ecc20cb7cf9c6ed44c169115256e2a33b1b5494273e62f01006771b9b4a793bf",
+      "sha256": "4ca02ab65a60dd55d9abe28aab115ed46876e77b3ac4b3e9986d078780fc09fe",
       "html_checks": [
         {
           "chapter": 12,
@@ -285,7 +285,8 @@
           "loaded": true,
           "code": 1
         }
-      ]
+      ],
+      "figure_geometry_unchanged_from": "2026-11-13 prior chapter12 revision"
     },
     {
       "chapter": 13,
@@ -400,11 +401,11 @@
       "sha256": "dc2a31db3b660fb1f88fb05204eb68bb89466879c9c9d2844f2dc40c30e81ae4"
     }
   ],
-  "total_pages": 67,
+  "total_pages": 69,
   "total_figures": 19,
   "total_code_blocks": 21,
-  "total_text_blocks": 776,
-  "total_pdf_words_within_page": 2196,
+  "total_text_blocks": 789,
+  "total_pdf_words_within_page": 2273,
   "total_figure_texts_checked": 319,
   "teacher_visual_review": "not performed",
   "student_trial": "not performed",
