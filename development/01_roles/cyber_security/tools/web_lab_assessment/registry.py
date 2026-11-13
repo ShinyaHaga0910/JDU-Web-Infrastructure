@@ -14,6 +14,15 @@ CHECKS = REGISTRY['check_definitions']
 MISSIONS = tuple(t for t in TASKS if TASKS[t]['category'] == 'automated_mission')
 MAXIMUM = sum(TASKS[t]['raw_points_max'] for t in MISSIONS)
 assert MAXIMUM == 62 and len(MISSIONS) == 6
+
+# The signed D11 wire contract above is immutable. The current curriculum is a
+# teacher-owned subset; retired tasks never contribute to current course totals.
+COURSE_ID = 'web-2026-11-13-without-storage-cycle'
+RETIRED_TASKS = frozenset({'P3', 'M3'})
+COURSE_TASKS = {tid: task for tid, task in TASKS.items() if tid not in RETIRED_TASKS}
+COURSE_MISSIONS = tuple(tid for tid in MISSIONS if tid in COURSE_TASKS)
+COURSE_MAXIMUM = sum(TASKS[tid]['raw_points_max'] for tid in COURSE_MISSIONS)
+assert COURSE_MAXIMUM == 59 and len(COURSE_MISSIONS) == 5
 STATUSES = {'PASS', 'FAIL', 'UNKNOWN', 'NOT_APPLICABLE'}
 
 

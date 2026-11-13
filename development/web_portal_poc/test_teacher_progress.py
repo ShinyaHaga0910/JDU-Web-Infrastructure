@@ -55,7 +55,7 @@ class TeacherProgressTest(unittest.TestCase):
         result = self.call()
         self.assertEqual([r['lab_id'] for r in result['students']], ['course-student'])
         grade = result['students'][0]['grade']
-        self.assertEqual((grade['raw_earned'], grade['selected']['M5']['raw_earned']), (62, 13))
+        self.assertEqual((grade['raw_earned'], grade['selected']['M5']['raw_earned']), (59, 13))
         self.assertEqual(grade['current_unresolved'], ['M5'])
         self.assertEqual(self.grades.reads, ['course-student'])
         result = self.call(context='verification')
@@ -97,7 +97,7 @@ class TeacherProgressTest(unittest.TestCase):
         row = self.call()['students'][0]
         self.assertEqual(row['status'], 'ok')
         self.assertEqual(row['grade']['selected'], {})
-        self.assertEqual(len(row['grade']['missing_or_unresolved']), 6)
+        self.assertEqual(len(row['grade']['missing_or_unresolved']), 5)
 
     def test_pagination_is_fixed_to_permitted_labs(self):
         template = self.grades.rows['course-student']

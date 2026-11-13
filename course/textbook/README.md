@@ -1,23 +1,24 @@
 # Webインフラストラクチャー教科書
 
-後半授業の教科書。日本語第1〜14章の本文・図・HTML・PDFを作成済み。[章・節の設計](../textbook-outline.md)と既存P/Mの構成に対応させている。文章は教員が編集しやすい章別Markdownを正本とする。OS・Linux教材の説明形式をそのまま踏襲することを優先せず、全体像・各部の役割・実作業とのつながりを分かりやすく示す。
+後半授業の教科書。日本語全13章（第1〜7章・第9〜14章）の本文・図・HTML・PDFを作成済み。[章・節の設計](../textbook-outline.md)と既存P/Mの構成に対応させている。文章は教員が編集しやすい章別Markdownを正本とする。OS・Linux教材の説明形式をそのまま踏襲することを優先せず、全体像・各部の役割・実作業とのつながりを分かりやすく示す。
+
+2026-11-13：ストレージと停止後のデータの章、およびP3/M3を削除。既存の参照と成績履歴の対応を保つため、第8章とP3/M3は欠番とし、後続の番号は変更しない。現行の採点対象は5課題・合計59素点。
 
 ## 章と練習と課題の対応
 
-Pは手順付きの練習、Mは別の対象を自分で設定する課題である。P1〜P6とM1〜M6はそれぞれ6つあり、P0/M0は共通準備。教科書の章数は演習数とは別である。
+Pは手順付きの練習、Mは別の対象を自分で設定する課題である。P/M3を除くP1・P2・P4・P5・P6と対応するMの5組があり、P0/M0は共通準備。教科書の章数は演習数とは別である。
 
 | 読む章 | 説明すること | 練習 | 自力課題 |
 | --- | --- | --- | --- |
 | 第1〜3章 | 全体像、AWSのネットワーク、接続と作業場所 | P0 | M0・以後の共通準備 |
 | 第4〜5章 | HTTPの仕組み、Nginxによる静的配信 | P1 | M1 |
 | 第6〜7章 | DNSの仕組み、BINDと通常の名前解決 | P2 | M2 |
-| 第8章 | ストレージ、停止と再開後の保持 | P3 | M3 |
 | 第9〜10章 | DBとSQL、PostgreSQLの接続・認証 | P4 | M4 |
 | 第11〜12章 | Web・アプリ・DBの連携、配置と設定 | P5 | M5 |
 | 第13章 | 公開範囲、最小権限、構築用権限の終了 | P6 | M6 |
 | 第14章 | 観測、障害の切り分けと復旧 | 全Pで参照 | 全Mで参照 |
 
-実際の演習順はP0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → M4 → P5 → P6 → M5 → M6。P5のpractice環境をP6で整理してから、M5のmission環境へ切り替える。各単元の課題が満点になったことを学生が課題画面で確認して次へ進む。別の進行用検査は設けない。
+実際の演習順はP0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6。P5のpractice環境をP6で整理してから、M5のmission環境へ切り替える。各単元の課題が満点になったことを学生が課題画面で確認して次へ進む。別の進行用検査は設けない。
 
 通常のP→Mの交互順に対し、現行のP5/P6は例外となる。同じアプリを共用しており、practice側の一時setup設定がある状態ではmissionへ切り替えられないため、P6の終了処理を先に行う。P5→M5→P6→M6へ変更する場合は終了処理とprofile切替の手順・実装を合わせて修正する必要があり、対応表の順序だけを入れ替えない。
 
@@ -46,9 +47,6 @@ Pは手順付きの練習、Mは別の対象を自分で設定する課題であ
 - [第7章 内部DNSの設定と動作確認](docs/ja/07-internal-dns-configuration.md)
 - [第7章 閲覧用HTML](output/html/web_textbook_ch07_ja.html)
 - [第7章 A4縦PDF](output/pdf/web_textbook_ch07_ja.pdf)
-- [第8章 ストレージと停止後のデータ](docs/ja/08-storage-and-restart.md)
-- [第8章 閲覧用HTML](output/html/web_textbook_ch08_ja.html)
-- [第8章 A4縦PDF](output/pdf/web_textbook_ch08_ja.pdf)
 - [第9章 リレーショナルDBとSQLの基本](docs/ja/09-databases-and-sql.md)
 - [第9章 閲覧用HTML](output/html/web_textbook_ch09_ja.html)
 - [第9章 A4縦PDF](output/pdf/web_textbook_ch09_ja.pdf)
@@ -77,7 +75,6 @@ Pは手順付きの練習、Mは別の対象を自分で設定する課題であ
 - [第5章の制作・確認の記録](CHAPTER05_VALIDATION.md)
 - [第6章の制作・確認の記録](CHAPTER06_VALIDATION.md)
 - [第7章の制作・確認の記録](CHAPTER07_VALIDATION.md)
-- [第8章の制作・確認の記録](CHAPTER08_VALIDATION.md)
 - [第9章の制作・確認の記録](CHAPTER09_VALIDATION.md)
 - [第10章の制作・確認の記録](CHAPTER10_VALIDATION.md)
 - [第11章の制作・確認の記録](CHAPTER11_VALIDATION.md)
@@ -101,7 +98,6 @@ python course/textbook/build/build_chapter04.py
 python course/textbook/build/build_chapter05.py
 python course/textbook/build/build_chapter06.py
 python course/textbook/build/build_chapter07.py
-python course/textbook/build/build_chapter08.py
 python course/textbook/build/build_chapter09.py
 python course/textbook/build/build_chapter10.py
 python course/textbook/build/build_chapter11.py

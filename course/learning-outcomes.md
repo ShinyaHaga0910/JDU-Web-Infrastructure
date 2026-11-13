@@ -20,7 +20,7 @@
 | WEB-LO1 | VPC内でEC2上のDNS・Web・DBを配置し、接続経路を要件に合わせる | 構成図、route、許可通信表 |
 | WEB-LO2 | Nginxから静的ページを返す | HTTP response、service、port、access log |
 | WEB-LO3 | BIND 9で内部の名前を答える | 問い合わせ先と回答、recordとTTLの説明 |
-| WEB-LO4 | StorageとPostgreSQLの状態を管理する | 元EBS上のfile保持、認証SQL、role、接続元（backup/restoreは対象外） |
+| WEB-LO4 | PostgreSQLの接続・認証・権限を管理する | 認証SQL、role、接続元 |
 | WEB-LO5 | 教員提供アプリをWeb側に配置し、DBへ接続する | Webからアプリ、アプリからDBへの成功・失敗とlog |
 | WEB-LO6 | 必要な通信・権限だけを許す | 許可試験と拒否試験 |
 | WEB-LO7 | 一つの障害を切り分け、復旧する | 症状、観測、原因、修正、再確認の記録 |

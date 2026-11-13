@@ -13,18 +13,19 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">Qo‘llanmadan foydalanish</a> · <a href="#section-2">Muhit va tayyorgarlik</a> · <a href="#section-3">Qadamlarni qanday o‘qish kerak</a> · <a href="#section-4">Tayyor tizim va ulanish yo‘llari</a> · <a href="#section-5">P0 Shaxsiy muhit va buyruqlarni bajarish joyi</a> · <a href="#section-6">P1 HTTP orqali statik faylni qaytarish</a> · <a href="#section-7">P2 Ichki DNS va odatiy nom yechimi</a> · <a href="#section-8">P3 To‘xtatish va qayta ishga tushirishda ma’lumotlar</a> · <a href="#section-9">P4 PostgreSQL ga autentifikatsiya bilan ulanish</a> · <a href="#section-10">P5 Berilgan app ni Web va DB bilan bog‘lash</a> · <a href="#section-11">P6 Eng kam huquq va ochiq kirish chegarasi</a> · <a href="#section-12">Davom ettirish va natijalar</a> · <a href="#section-13">Manbalar va versiya</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: P0-P6 mashqlar va batafsil qadamlar</h1>
-<p>2026-11-03 | D12 P/M r1.4 | web-course-class193548-20261103-r3</p>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Qo‘llanmadan foydalanish</a> · <a href="#section-2">Muhit va tayyorgarlik</a> · <a href="#section-3">Qadamlarni qanday o‘qish kerak</a> · <a href="#section-4">Tayyor tizim va ulanish yo‘llari</a> · <a href="#section-5">P0 Shaxsiy muhit va buyruqlarni bajarish joyi</a> · <a href="#section-6">P1 HTTP orqali statik faylni qaytarish</a> · <a href="#section-7">P2 Ichki DNS va odatiy nom yechimi</a> · <a href="#section-8">P4 PostgreSQL ga autentifikatsiya bilan ulanish</a> · <a href="#section-9">P5 Berilgan app ni Web va DB bilan bog‘lash</a> · <a href="#section-10">P6 Eng kam huquq va ochiq kirish chegarasi</a> · <a href="#section-11">Davom ettirish va natijalar</a> · <a href="#section-12">Manbalar va versiya</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: P0-P6 mashqlar va batafsil qadamlar</h1>
+<p>2026-11-13 | D12 P/M r1.5 | web-course-class193548-20261103-r3</p>
 <p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
 <p>O‘qituvchi tekshiruvi uchun birinchi nashr. Talabaning qo‘llanma bo‘yicha boshidan oxirigacha o‘tishi hali tekshirilmagan.</p>
 <p>Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga ega. Ona tili mutaxassisi tahriri hali bajarilmagan.</p>
 <p><a href="../ja/practice-full.html">日本語</a> · <a href="../ru/practice-full.html">Русский</a> · <a href="../uz/practice-full.html">O‘zbekcha</a></p>
 <p><a href="start.html">Avval: ulanish va qoidalar</a> · <a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a> · <a href="portal.html">Brauzerda tekshirish</a></p>
+<p><a href="start.html">Avval: ulanish va qoidalar</a> · <a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a> · <a href="portal.html">Brauzerda tekshirish</a></p>
 <h2 id="section-1">Qo‘llanmadan foydalanish</h2>
 <p>Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P - bahoga ball qo‘shmaydigan mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.</p>
-<p>P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → M4 → P5 → P6 → M5 → M6</p>
+<p>P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6</p>
 <p>P5 uchun ham M2 DNS kerak. P4 IP bilan ulanadi, app esa db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating. P ixtiyoriy mashq; checker M ning joriy old shartlarini tekshiradi.</p>
-<p>M1=8, M2=13, M3=3, M4=9, M5=13, M6=16: jami 62 xom ball. M0=0. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.</p>
+<p>M1=8, M2=13, M4=9, M5=13, M6=16: jami 59 xom ball. M0=0. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.</p>
 <h2 id="section-2">Muhit va tayyorgarlik</h2>
 <p>Avval boshlang‘ich tarqatma imzosi, yangi beshta server yoki mavjud muhitga install, ichki SSH va shaxsiy ro‘yxatni tugating. Yo‘riqnoma zip dagi distribution/STUDENT.md da. Maxfiy kalitni umumiy Windows ga saqlamang; shaxsiy Academy hisobining CloudShell idan foydalaning. O‘qituvchi anonim Lab ID, fingerprint va muddatni beradi.</p>
 <p>Umumiy private IP quyida; public IPv4 doimiy emas. AWS region us-east-1, Ubuntu24.04/amd64. RDP: labuser; SSM: ssm-user; ichki SSH: ubuntu. User nomi va server rolini adashtirmang.</p>
@@ -630,121 +631,7 @@ guide.lab.test.  300  IN  A  10.20.1.20
 <p>dig @10.20.2.10 ishlaydi, getent ishlamaydi. Muammo albatta zone dami?</p>
 <p><strong>Izoh:</strong></p>
 <p>Yo‘q. Aniq tanlangan DNS bilan OS ning oddiy resolver i farq qilishi mumkin. Netplan va resolvectl ning amaldagi sozlamalarini tekshiring.</p>
-<h2 id="section-8">P3 To‘xtatish va qayta ishga tushirishda ma’lumotlar</h2>
-<h3>Nimani o‘rganamiz</h3>
-<p>Asl EBS dagi fayl va ruxsatni tekshirish; ayni Web stop/start dan keyin saqlanishini isbotlash.</p>
-<h3>Topshiriq</h3>
-<p>O‘z anonim Lab ID bilan P3 marker yarating. To‘xtashdan oldin, stopped va qayta ishga tushgandan keyingi holatni qayd eting. Yangi disk, mount yoki backup/restore kerak emas.</p>
-<h3>Topshiriq diagrammasi</h3>
-<p><img src="../../../assets/uz/p3.png" alt="P3: Ayni Web ning asl diski → Qayd → Stop → Start → Mazmun saqlangan, boot ID yangi。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Stop/Start AWS API boshqaruvidir; Web kiruvchi 443 portini ochish emas." width="1040" height="680" loading="lazy"></p>
-<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Stop/Start AWS API boshqaruvidir; Web kiruvchi 443 portini ochish emas.</p>
-<p><a href="../../../assets/uz/p3.png">Kattalashtirish</a> · <a href="../../../assets/uz/p3.svg">SVG</a></p>
-<ul>
-<li>File: /var/lib/jdu-web/practice/storage.txt</li>
-</ul>
-<pre><code class="language-text">lab_id={lab_id}
-task=P3
-payload=practice-storage-2026
-</code></pre>
-<h3>Bu qanday ishlaydi</h3>
-<p><strong>Boshlashdan oldingi holat:</strong></p>
-<p>Marker ni ayni Web ning asl root EBS ida saqlash mumkin.</p>
-<p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
-<p>Ayni Web stop/start dan keyin mazmun saqlangani oldingi va keyingi dalil bilan ko‘rsatiladi.</p>
-<p>Ishlayotgan xotira bilan EBS ga saqlangan faylni farqlang. Bu yerda asl EBS saqlangan ayni Web Stop/Start qilinadi. Hash, instance/volume ID va boot ID o‘zgarishini solishtiring. Avtomatik public IPv4 o‘zgarishi mumkin. <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Stop_Start.html">EC2 stop/start</a>.</p>
-<h3>Yechim namunasi: bittadan bajaring</h3>
-<h4>P3.1 Asl saqlash joyi va bo‘sh joyni tekshirish</h4>
-<p><strong>Bajarish joyi:</strong></p>
-<p>Web serverning SSM terminali: ssm-user</p>
-<p><strong>Maqsad va amallar:</strong></p>
-<p>findmnt fayl tizimini, lsblk disk va partition larni, df -h bo‘sh joyni ko‘rsatadi. Berilgan root EBS dan foydalaning; /dev/nvme nomi disk almashtirish sababi emas.</p>
-<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
-<pre><code class="language-bash"># 1. /var/lib joylashgan filesystem ni aniqlash.
-findmnt -T /var/lib
-# 2. Disk nomi, turi, hajmi, mount joyi va ID sini o‘qish.
-lsblk -o NAME,TYPE,SIZE,MOUNTPOINTS,SERIAL
-# 3. /var/lib ishlatilgan va bo‘sh joyini tekshirish.
-df -h /var/lib
-# 4. To‘xtashdan oldin/keyin solishtirish uchun boot ID ni o‘qish.
-cat /proc/sys/kernel/random/boot_id
-</code></pre>
-<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Findmnt path joylashgan filesystem ni, lsblk block device larni, df bo‘sh joyni ko‘rsatadi. Ular turli kuzatuvlar. Boot_id joriy boot ni, hash fayl mazmunini aniqlaydi.</p>
-<p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>Asl root volume ga mos; kamida 20% va 2 GiB bo‘sh. Joriy yuklanish boot_id sini yozib oling.</p>
-<p><strong>Ishlamasa:</strong></p>
-<p>Joy yetishmasligi tayyorlik muammosi. Ball uchun boshqa material yoki diskni o‘chirmang.</p>
-<h4>P3.2 Marker ni yaratish va joylash</h4>
-<p><strong>Bajarish joyi:</strong></p>
-<p>Web serverning SSM terminali: ssm-user</p>
-<p><strong>Maqsad va amallar:</strong></p>
-<p>Bu terminalda ham LAB_ID ni belgilang. printf har qatorni yangi qator bilan tugatadi. install katalogni 0755, faylni 0644/root:root qiladi. Avval mavjud faylni tekshiring; boshqa mazmunni sababini bilmasdan almashtirmang.</p>
-<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
-<pre><code class="language-bash"># 1. O‘qituvchi bergan o‘z Lab ID ni o‘zgaruvchiga yozish.
-LAB_ID='YOUR-LAB-ID'
-# 2. Ish katalogini ~ ga o‘zgartirish.
-cd ~
-# 3. Mashq katalogini yaratish; mavjud bo‘lsa saqlash.
-mkdir -p jdu-web-practice/p3
-# 4. Ish katalogini jdu-web-practice/p3 ga o‘zgartirish.
-cd jdu-web-practice/p3
-# 5. O‘z Lab ID bilan mashq marker matnini ish fayliga yozish.
-printf 'lab_id=%s\ntask=P3\npayload=practice-storage-2026\n' &quot;$LAB_ID&quot; &gt; storage.txt
-# 6. storage.txt mazmunini o‘zgartirmay o‘qish.
-cat storage.txt
-# 7. Belgilangan owner, guruh va permission bilan katalog yaratish.
-sudo install -d -o root -g root -m 0755 /var/lib/jdu-web/practice
-# 8. Faylni joylab owner, guruh va permission ni belgilash.
-sudo install -o root -g root -m 0644 storage.txt /var/lib/jdu-web/practice/storage.txt
-# 9. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
-stat -c '%U:%G %a %n' /var/lib/jdu-web/practice /var/lib/jdu-web/practice/storage.txt
-# 10. Marker mazmunini solishtirish uchun SHA256 chiqarish.
-sha256sum /var/lib/jdu-web/practice/storage.txt
-</code></pre>
-<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Printf %s o‘rniga LAB_ID qo‘yadi; \n yangi qatordir. &gt; ish fayliga yozadi. Install -d katalog yaratadi, keyingi install marker owner va permission ini belgilaydi. Hash mazmun bir xilligini tekshiradi.</p>
-<p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>Oxirida yangi qator bo‘lgan 3 qator, ruxsat 0755/0644. Hash ni yozing. 777 ruxsat mos emas.</p>
-<p><strong>Ishlamasa:</strong></p>
-<p>YOUR-LAB-ID ni o‘z holicha qoldirmang. EC2 nomi yoki email emas, anonim Lab ID ishlating.</p>
-<h4>P3.3 To‘xtatishdan oldingi dalilni saqlash</h4>
-<p><strong>Bajarish joyi:</strong></p>
-<p>Shaxsiy PC brauzeri: Web Portal</p>
-<p><strong>Maqsad va amallar:</strong></p>
-<p>Web dan exit bilan CloudShell ga qayting. Web Portal da P3 ni tanlab to‘xtashdan oldingi holatni yozing. Instance/volume/marker hash/boot_id saqlanadi, EC2 hali to‘xtamaydi. Saqlash muvaffaqiyatini kuting. P3 dalilining barcha bosqichlarini shu brauzer usuli bilan bajaring.</p>
-<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Oldingi holat tugmasi server, boot va marker ni solishtirish uchun saqlaydi, EC2 ni to‘xtatmaydi. Keyin AWS Stop bajaring; brauzer va buyruq dalillarini aralashtirmang.</p>
-<p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>To‘xtashdan oldingi holat saqlandi. Shundan keyin marker ni tahrirlamang.</p>
-<p><strong>Ishlamasa:</strong></p>
-<p>Tayyorlash xatosidan keyin to‘xtatish to‘liq dalil bermaydi. Avval fayl/ruxsat/SSM ni tuzating.</p>
-<h4>P3.4 Ayni Web ni Stop qilib stopped holatini qayd etish</h4>
-<p><strong>Bajarish joyi:</strong></p>
-<p>Talabaning shaxsiy AWS Console oynasi</p>
-<p><strong>Maqsad va amallar:</strong></p>
-<p>EC2 da o‘z Web instance ID ni solishtiring. Instance state → Stop instance ni tanlab stopped ni kuting. Reboot/Terminate emas. Web ni yoqmasdan Web Portal P3 da to‘xtash tugaganini tekshiring. Qolgan to‘rtta serverni to‘xtatmang.</p>
-<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Console da kerakli Web ni Stop qiling; stopped holatini Web Portal da qayd eting. SSM uzilishi to‘xtashni o‘zi isbotlamaydi. Stop reboot va Terminate dan farq qiladi.</p>
-<p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>Ayni instance stopped deb qayd qilinadi. Bu paytda HTTP/SSM ishlamasligi kutilgan holat.</p>
-<p><strong>Ishlamasa:</strong></p>
-<p>stopping bo‘lsa kuting. Kuzatuvdan oldin Start qilsangiz, uch bosqichli dalilni qayta olish kerak bo‘ladi.</p>
-<h4>P3.5 Start qilib saqlanishni solishtirish va yuborish</h4>
-<p><strong>Bajarish joyi:</strong></p>
-<p>Talabaning shaxsiy AWS Console oynasi</p>
-<p><strong>Maqsad va amallar:</strong></p>
-<p>Ayni Web ni Start qilib running/SSM Online ni kuting. SSM da matn/hash va boot_id ni solishtiring: instance/volume/hash bir xil, boot_id yangi bo‘ladi. Web Portal P3 da qayta ishga tushgandan keyingi saqlanishni tekshirib, natija saqlanishini kuting.</p>
-<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Ayni Web ni Start qilib running/SSM Online ni kuting. Checker joriy holatni saqlangan oldingi dalil bilan solishtiradi; start dan keyin marker ni qayta yaratmang. Keyingi tashqi kirishda Web ning yangi public IP sini ishlating.</p>
-<p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>Uchta mashq tekshiruvi PASS. Public IPv4 o‘zgarsa, tashqi HTTP uchun yangi manzil ishlating.</p>
-<p><strong>Ishlamasa:</strong></p>
-<p>Yangi instance saqlanish isboti emas. P3/M3 alohida marker va dalildan foydalanadi.</p>
-<h3>Tushunishni tekshirish (ballsiz)</h3>
-<p>Yangi Web da bir xil matn chiqishi topshiriq uchun yetarlimi?</p>
-<p><strong>Izoh:</strong></p>
-<p>Yo‘q: asl instance va volume saqlanishi hamda stopped holati kuzatilishi kerak.</p>
-<h2 id="section-9">P4 PostgreSQL ga autentifikatsiya bilan ulanish</h2>
+<h2 id="section-8">P4 PostgreSQL ga autentifikatsiya bilan ulanish</h2>
 <h3>Nimani o‘rganamiz</h3>
 <p>Database, role va schema ni farqlash; Web dan belgilangan parol bilan SQL bajarish.</p>
 <h3>Topshiriq</h3>
@@ -943,7 +830,7 @@ jdu_catalog_practice | catalog_practice_app | 1
 <p>Parol qabul qilinib CREATE TABLE rad etildi. Parol albatta xatomi?</p>
 <p><strong>Izoh:</strong></p>
 <p>Authentication va SQL privilege boshqa-boshqa. Runtime uchun setup amalining rad etilishi to‘g‘ri holat bo‘lishi mumkin.</p>
-<h2 id="section-10">P5 Berilgan app ni Web va DB bilan bog‘lash</h2>
+<h2 id="section-9">P5 Berilgan app ni Web va DB bilan bog‘lash</h2>
 <h3>Nimani o‘rganamiz</h3>
 <p>Dastur yozmasdan offline bog‘liqlik, service user, DB tayyorlash, Nginx/systemd va haqiqiy HTTP ni bog‘lash.</p>
 <h3>Topshiriq</h3>
@@ -1245,7 +1132,7 @@ psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &qu
 <p>Ro‘yxatda private yozuv ham chiqsa, faqat HTTP 200 ni to‘g‘ri deb hisoblash mumkinmi?</p>
 <p><strong>Izoh:</strong></p>
 <p>Yo‘q. HTTP yetib borishi, DB qiymati va is_public bo‘yicha ajratishni alohida tekshiring.</p>
-<h2 id="section-11">P6 Eng kam huquq va ochiq kirish chegarasi</h2>
+<h2 id="section-10">P6 Eng kam huquq va ochiq kirish chegarasi</h2>
 <h3>Nimani o‘rganamiz</h3>
 <p>To‘g‘ri ishlashni saqlab, ortiqcha admin yo‘li, SQL huquqi va maxfiy fayl ochilishini rad etish.</p>
 <h3>Topshiriq</h3>
@@ -1397,11 +1284,11 @@ curl --noproxy '*' -i http://web.lab.test/static/app.env
 <p>Setup yopilgach app ham to‘xtadi. Setup ni qayta ochish tayyor yechimmi?</p>
 <p><strong>Izoh:</strong></p>
 <p>Yo‘q. Runtime config, role va kerakli table privilege ni tekshiring; normal ish setup siz ishlashi kerak.</p>
-<h2 id="section-12">Davom ettirish va natijalar</h2>
+<h2 id="section-11">Davom ettirish va natijalar</h2>
 <p>Keyingi safar o‘z Lab va ayni besh serverni ishga tushirib, running/SSM Online va joriy public IP ni tekshiring. Web Portal ga maktab Google orqali kirib, M0 tayyorligidan boshlang. Yaratish, kalit va ro‘yxatni har safar takrorlamang. Muddat tugasa o‘qituvchidan yangilashni so‘rang.</p>
 <p>Natijalar avtomatik saqlanadi. Ishlov paytida natijani yangilang; baholarni saqlangan baholar bo‘limidan ko‘ring. Topshiriq, vaqt va saqlash holatini solishtiring. UNKNOWN o‘lchab bo‘lmagan holat, muvaffaqiyat yoki tasdiqlangan nol emas. Tekshirilmagan M ning tasdiqlangan ballari saqlanadi. Oxirgi baholanadigan natija olinadi; turli urinish PASS lari qo‘shilmaydi, maksimum avtomatik tanlanmaydi.</p>
 <p>Ekran amallari: <a href="portal.html">brauzer yo‘riqnomasi</a>. Parol/token/cookie/maxfiy kalit/env ni hisobot yoki chat ga yubormang.</p>
-<h2 id="section-13">Manbalar va versiya</h2>
+<h2 id="section-12">Manbalar va versiya</h2>
 <p>Baholash shartlari: M jadvallari va tarqatmadagi belgilangan registry.</p>
 <p>web-course-class193548-20261103-r3; web-d11-2026-10-r1; registry SHA256 <code>3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33</code>.</p>
 <p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
@@ -1412,4 +1299,4 @@ curl --noproxy '*' -i http://web.lab.test/static/app.env
 <li><a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">PostgreSQL 16: pg_hba.conf</a></li>
 <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html">EC2 instance states</a></li>
 </ul>
-</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>
+</main><footer>web-course-class193548-20261103-r3 · 59 raw points · 2026-11-13</footer></body></html>

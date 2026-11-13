@@ -3,7 +3,7 @@
 <p>Webサーバーのアプリが備品を読むには、DBサーバーへ接続し、適切なデータベースを選び、許可された操作を実行する必要がある。正しいパスワードだけを用意しても、このすべてが成立するわけではない。</p>
 <p>本章では、PostgreSQLの中のまとまり、OSユーザーとDBのロール、接続を受け付ける設定と認証、個々のSQL操作の権限を順に結び付ける。</p>
 <h2 id="101-postgresqlの中のまとまりを知る">10.1 PostgreSQLの中のまとまりを知る</h2>
-<p>今回のDBサーバーにはPostgreSQL 16を導入する。Ubuntu OSでは、<code>16/main</code>という<strong>クラスター</strong>を管理する。ここでのクラスターは、一つのPostgreSQLの管理単位であり、複数台のサーバーによる冗長化を意味していない。</p>
+<p>今回のDBサーバーにはPostgreSQL 16を導入する。Ubuntu OSでは、<code>16/main</code>という<strong>クラスター</strong>を管理する。ここでのクラスターは、一つのPostgreSQLの管理単位である。</p>
 <p>その管理単位の中に複数の<strong>データベース</strong>を置ける。さらに、データベース内の<strong>スキーマ</strong>は、表などの名前を整理するまとまりである。例えば<code>public.catalog_item</code>は、publicスキーマ内のcatalog_item表を表す。</p>
 <figure><img src="../../assets/figures/ch10-fig01-structure.png" alt="DBサーバー、PostgreSQLクラスター、データベース、スキーマ、表の関係。" width="1600" height="1120"></figure>
 <p><strong>図10-1 接続先と、その中のデータのまとまり。</strong> 同じDBサーバーでも、選んだデータベースが違えば、同じ表名であっても別の対象になる。</p>

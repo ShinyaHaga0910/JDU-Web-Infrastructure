@@ -9,8 +9,8 @@ const credentials='__Host-jdu-session=valid; __Host-jdu-access=session';
 const sessions={check:async(id,token)=>id==='session' && token==='valid',revoke:async()=>{}};
 const verify=async token=>{if(token!=='valid')throw Error('No session');return claims;};
 const req=path=>new Request('https://portal.example'+path,{headers:{cookie:credentials,'x-teacher-email':'attacker@jdu.uz'}});
-const maxima={M1:8,M2:13,M3:3,M4:9,M5:13,M6:16};
-const grade={lab_id:'course-student',raw_earned:62,raw_maximum:62,current_unresolved:['M5'],missing_or_unresolved:[],
+const maxima={M1:8,M2:13,M4:9,M5:13,M6:16};
+const grade={lab_id:'course-student',raw_earned:59,raw_maximum:59,current_unresolved:['M5'],missing_or_unresolved:[],
   current:{M5:{evaluable:false,checked_at:'2026-10-30T04:00:00Z',received_at:'2026-10-30T04:01:00Z'}},
   selected:Object.fromEntries(Object.entries(maxima).map(([m,n])=>[m,{raw_earned:n,received_at:'2026-10-23T00:00:00Z'}]))};
 const progress={class_id:'193548',context:'course',students:[{lab_id:'course-student',context:'course',status:'ok',grade}],next_after:null};
@@ -21,7 +21,7 @@ test('teacher list uses only verified claims and canonical selected grades',asyn
   const response=await app(async e=>{calls.push(e);return {status:'ok',teacher:progress};})(req('/teacher'));
   assert.equal(response.status,200);const html=await response.text();
   assert.deepEqual(calls,[{subject:claims.sub,email:claims.email,operation:'teacher_list',context:'course',after:''}]);
-  assert.match(html,/62 \/ 62/);assert.match(html,/13 \/ 13/);assert.match(html,/M5/);assert.match(html,/2026-10-30 04:01 UTC/);
+  assert.match(html,/59 \/ 59/);assert.match(html,/13 \/ 13/);assert.match(html,/M5/);assert.match(html,/2026-10-30 04:01 UTC/);
   assert.doesNotMatch(html,/teacher@jdu|attacker@jdu|1234567890/);
   assert.match(html,/tabindex="0" role="region" aria-labelledby="teacher-caption"/);
   assert.match(html,/<caption id="teacher-caption">Class 193548/);assert.match(html,/<th scope="col">M1/);
@@ -51,7 +51,7 @@ test('course view and explicit verification view remain separate in all three la
     const response=await instance(req('/teacher?lang='+lang+'&context=verification'));
     assert.equal(response.status,200);const html=await response.text();
     assert.match(html,/context=verification/);assert.match(html,new RegExp(`lang=${lang}`));
-    assert.doesNotMatch(html,/62 \/ 62/);
+    assert.doesNotMatch(html,/59 \/ 59/);
   }
   assert.ok(calls.every(e=>e.context==='verification'));
 });
@@ -60,7 +60,7 @@ test('teacher detail respects backend authorization and preserves the Lab when s
   const instance=app(async e=>e.lab_id==='course-student'?{status:'ok',teacher:{class_id:'193548',student:progress.students[0]}}:{status:'unauthorized'});
   const response=await instance(req('/teacher/student?lang=ru&lab_id=course-student'));
   assert.equal(response.status,200);const html=await response.text();
-  assert.match(html,/62 \/ 62/);assert.match(html,/lang=uz&amp;lab_id=course-student/);
+  assert.match(html,/59 \/ 59/);assert.match(html,/lang=uz&amp;lab_id=course-student/);
   assert.equal((await instance(req('/teacher/student?lab_id=not-assigned'))).status,403);
 });
 
@@ -69,7 +69,7 @@ test('unavailable and never-submitted students are distinct and never invent a f
   const value={...progress,students:[{lab_id:'course-student',context:'course',status:'ok',grade:empty},{lab_id:'unavailable-lab',context:'course',status:'unavailable'}]};
   const response=await app(async()=>({status:'ok',teacher:value}))(req('/teacher'));
   assert.equal(response.status,200);const html=await response.text();
-  assert.match(html,/記録なし/);assert.match(html,/取得できません/);assert.doesNotMatch(html,/0 \/ 62/);
+  assert.match(html,/記録なし/);assert.match(html,/取得できません/);assert.doesNotMatch(html,/0 \/ 59/);
 });
 
 test('extra caller privileges, invalid cursors and malformed score data are rejected',async()=>{

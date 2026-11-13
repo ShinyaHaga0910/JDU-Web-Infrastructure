@@ -1,6 +1,6 @@
 # Web Infrastructure: M0-M6 mustaqil topshiriqlar
 
-2026-11-03 | D12 P/M r1.4 | web-course-class193548-20261103-r3
+2026-11-13 | D12 P/M r1.5 | web-course-class193548-20261103-r3
 
 Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).
 
@@ -12,15 +12,17 @@ Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga 
 
 [Avval: ulanish va qoidalar](start.md) · [Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M6](missions.md) · [Brauzerda tekshirish](portal.md)
 
+[Avval: ulanish va qoidalar](start.md) · [Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M6](missions.md) · [Brauzerda tekshirish](portal.md)
+
 ## Qo‘llanmadan foydalanish
 
 Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P - bahoga ball qo‘shmaydigan mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.
 
-P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → M4 → P5 → P6 → M5 → M6
+P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6
 
 P5 uchun ham M2 DNS kerak. P4 IP bilan ulanadi, app esa db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating. P ixtiyoriy mashq; checker M ning joriy old shartlarini tekshiradi.
 
-M1=8, M2=13, M3=3, M4=9, M5=13, M6=16: jami 62 xom ball. M0=0. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.
+M1=8, M2=13, M4=9, M5=13, M6=16: jami 59 xom ball. M0=0. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.
 
 ## Muhit va tayyorgarlik
 
@@ -183,46 +185,6 @@ Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘sh
 
 1. PC da maktab Google orqali [Web Portal](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws) ga kiring, o‘z Lab va **M2** ni tanlang. Hisobni bog‘lash va ekranlar: [brauzer yo‘riqnomasi](portal.md).
 2. Tanlangan topshiriq tekshiruvini boshlang.
-3. Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida. P va M0 bahoga qo‘shilmaydi.
-
-## M3 To‘xtatish va qayta ishga tushirishda ma’lumotlar (3)
-
-### Tayyor holat talablari
-
-O‘z Lab ID bilan alohida M marker yarating. P3 dan alohida brauzerda oldingi holat → AWS Stop → brauzerda to‘xtashni tekshirish → AWS Start → brauzerda saqlanishni tekshirish ketma-ketligini bajaring. Ayni Web va asl root volume kerak; oddiy reboot yetmaydi. Backup/restore va yangi disk kerak emas.
-
-### Topshiriq diagrammasi
-
-![M3: Ayni Web ning asl diski → Qayd → Stop → Start → Mazmun saqlangan, boot ID yangi。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Stop/Start AWS API boshqaruvidir; Web kiruvchi 443 portini ochish emas. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.](../../assets/uz/m3.png)
-
-Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Stop/Start AWS API boshqaruvidir; Web kiruvchi 443 portini ochish emas. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.
-
-[Kattalashtirish](../../assets/uz/m3.png) · [SVG](../../assets/uz/m3.svg)
-
-- File: /var/lib/jdu-web/mission/storage.txt
-
-```text
-lab_id={lab_id}
-task=M3
-payload=mission-storage-2026
-```
-
-{lab_id} ni o‘z anonim ID ga almashtiring. Fayl 0644/root:root, katalog 0755/root:root. Faqat ayni asl Web/volume ni to‘xtating.
-
-### Shartlar: har tekshiruvga 1 xom ball
-
-| check ID (o‘zgartirmang) | Shart |
-| --- | --- |
-| WEB04_MARKER_CONTENT | Marker path, shaxsiy Lab ID, task va aniq matn topshiriqqa mos. |
-| WEB04_MARKER_PERMISSIONS | Fayl root:root 0644, ota katalog root:root 0755. |
-| WEB04_STOP_START_RETENTION | Stop/start uch bosqichi isbotlangan: ayni instance/volume/hash, yangi boot_id va alohida kuzatilgan stopped. |
-
-Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.
-
-### Tekshirish va yuborish
-
-1. PC da maktab Google orqali [Web Portal](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws) ga kiring, o‘z Lab va **M3** ni tanlang. Hisobni bog‘lash va ekranlar: [brauzer yo‘riqnomasi](portal.md).
-2. To‘xtashdan oldingi holatni yozing → saqlanishini kuting → AWS da ayni Web ni Stop → stopped → to‘xtashni tasdiqlang → yozilishini kuting → ayni Web ni Start → running/SSM Online → qayta ishga tushgach saqlanishni tekshiring. M3 dalilini P3 dan alohida yozing.
 3. Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida. P va M0 bahoga qo‘shilmaydi.
 
 ## M4 PostgreSQL ga autentifikatsiya bilan ulanish (9)

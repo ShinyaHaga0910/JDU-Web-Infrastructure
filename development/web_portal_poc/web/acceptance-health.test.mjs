@@ -11,7 +11,7 @@ function fixture() {
   const db={send:async command=>{queries.push(command.input);return command.constructor.name==='GetItemCommand'
     ? {Item:{lab_id:{S:'test-lab'},deployment_id:{S:env.PORTAL_ACCEPTANCE_DEPLOYMENT_ID},active:{BOOL:true}}} : {Count:1};}};
   const lam={send:async command=>{invokes.push(command.input);return {StatusCode:200,Payload:Buffer.from(JSON.stringify({status:'ok',
-    grade:{lab_id:'test-lab',raw_earned:62,raw_maximum:62,privateDetail:'must not be returned'}}))};}};
+    grade:{lab_id:'test-lab',raw_earned:59,raw_maximum:59,privateDetail:'must not be returned'}}))};}};
   return {db,lam,queries,invokes};
 }
 
@@ -33,7 +33,7 @@ test('closed acceptance reads only fixed metadata and grade availability; never 
   assert.equal(f.queries[1].Select,'COUNT'); assert.equal(f.queries[1].Limit,1);
   assert.equal(f.invokes[0].FunctionName,env.PORTAL_ACCEPTANCE_PROBE_ARN);
   assert.deepEqual(JSON.parse(f.invokes[0].Payload.toString()),{operation:'grade'});
-  assert.doesNotMatch(JSON.stringify(result),/62|privateDetail|test-lab/);
+  assert.doesNotMatch(JSON.stringify(result),/59|privateDetail|test-lab/);
 });
 
 test('concurrent health requests coalesce and new checks have an explicit timestamp',async()=>{
@@ -54,7 +54,7 @@ test('storage or Lambda failure is availability loss, not a grade or exception d
 test('public acceptance route strips all upstream fields and ignores user targets',async()=>{
   let calls=0;
   const app=createApp({env,getAcceptanceHealth:async()=>{calls++;return {storage:true,savedGrades:true,gradeService:true,
-    checkedAt:'2026-10-29T00:00:00Z',token:'secret',grade:62};}});
+    checkedAt:'2026-10-29T00:00:00Z',token:'secret',grade:59};}});
   const response=await app(new Request('https://portal.example/healthz/acceptance?lab_id=another'));
   assert.equal(response.status,200); assert.equal(calls,1);
   assert.deepEqual(await response.json(),{storage:true,savedGrades:true,gradeService:true,checkedAt:'2026-10-29T00:00:00.000Z'});

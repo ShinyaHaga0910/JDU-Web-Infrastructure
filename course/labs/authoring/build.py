@@ -21,12 +21,17 @@ from command_notes import annotated_blocks
 from diagrams import diagram_markdown, write_diagrams
 from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE
 from checks import CHECKS
+from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, RAW_MAXIMUM, active_registry
 from explanations import LABELS, READING, ROUTES, MISSION_PLAN, MODULE_NOTES, STEP_NOTES, OUTPUT_EXAMPLES
+MODULES_BY_NUMBER = {int(m['id'][1:]): m for m in MODULES}
+MODULES = [MODULES_BY_NUMBER[n] for n in ACTIVE_NUMBERS]
+STEP_NOTES = {k: v for k, v in STEP_NOTES.items() if k.split('.')[0] in ACTIVE_ORDER}
+CHECKS = {k: v for k, v in CHECKS.items() if not k.startswith('WEB04_')}
 
 KIT = PROJECT / '03_knowledge/aws_official/web_lab_packages_2026-10-15/web-course-class193548-20261103-r3'
 EXPECTED_REGISTRY = '3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33'
 DIST_ID = 'web-course-class193548-20261103-r3'
-MATERIAL_REVISION = 'r1.4'
+MATERIAL_REVISION = 'r1.5'
 L = {
  'practice': T('Web演習：練習P0〜P6と詳しい操作例', 'Web Infrastructure: практика P0–P6 с подробными шагами', 'Web Infrastructure: P0–P6 mashqlar va batafsil qadamlar'),
  'missions': T('Web演習：自力課題M0〜M6', 'Web Infrastructure: самостоятельные задания M0–M6', 'Web Infrastructure: M0–M6 mustaqil topshiriqlar'),
@@ -51,7 +56,7 @@ L = {
 }
 
 def emit_intro(lang, kind):
-    out = [f'# {L[kind][lang]}', '', f'2026-11-03 | D12 P/M {MATERIAL_REVISION} | {DIST_ID}', '',
+    out = [f'# {L[kind][lang]}', '', f'2026-11-13 | D12 P/M {MATERIAL_REVISION} | {DIST_ID}', '',
         expiry_text(lang), '',
         L['draft'][lang], '', L['translation'][lang], '']
     out += [T('[日本語](../ja/' + kind + '.md) · [Русский](../ru/' + kind + '.md) · [O‘zbekcha](../uz/' + kind + '.md)',
@@ -61,13 +66,13 @@ def emit_intro(lang, kind):
       'まず各Pの課題文を読み、必要なら詳しい操作例を一段ずつ使う。Pは練習で成績に加算しない。Mは別の対象・値で自分で構築する。課題は授業回番号ではなく、自分の進度で進める。Pの完了はMの合格に置き換わらない。',
       'Сначала прочитайте задание P; при необходимости проходите подробный пример по шагам. P — тренировка без оценочных баллов. В M самостоятельно используйте другие объекты/значения. Номера заданий не являются номерами занятий; идите в своём темпе. Выполнение P не означает выполнение M.',
       'Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P — bahoga ball qo‘shmaydigan mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.')[lang], '',
-      'P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → M4 → P5 → P6 → M5 → M6', '',
+      'P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6', '',
       T('P5にもM2のDNSが必要。P4はIP指定だが、アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。Pは任意の練習で、採点は各Mの現在の前提を検査する。',
         'P5 требует DNS из M2. P4 подключается по IP, а приложение — по db.lab.test. Перед переключением practice → mission завершите setup в P6. P — добровольная тренировка; checker оценивает текущие предпосылки M.',
         'P5 uchun ham M2 DNS kerak. P4 IP bilan ulanadi, app esa db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating. P ixtiyoriy mashq; checker M ning joriy old shartlarini tekshiradi.')[lang], '',
-      T('M1=8、M2=13、M3=3、M4=9、M5=13、M6=16、合計62素点。M0は0点。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。',
-        'M1=8, M2=13, M3=3, M4=9, M5=13, M6=16: всего 62 исходных балла. M0=0. Нет личной демонстрации, backup/restore, дополнительных дисков и разработки приложения. Пересчёт в 25 баллов делает преподаватель отдельно. Повторные отправки возможны до объявленного срока. PASS разных попыток не объединяются; максимум автоматически не выбирается.',
-        'M1=8, M2=13, M3=3, M4=9, M5=13, M6=16: jami 62 xom ball. M0=0. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.')[lang], '',
+      T('M1=8、M2=13、M4=9、M5=13、M6=16、合計59素点。M0は0点。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。',
+        'M1=8, M2=13, M4=9, M5=13, M6=16: всего 59 исходных балла. M0=0. Нет личной демонстрации, backup/restore, дополнительных дисков и разработки приложения. Пересчёт в 25 баллов делает преподаватель отдельно. Повторные отправки возможны до объявленного срока. PASS разных попыток не объединяются; максимум автоматически не выбирается.',
+        'M1=8, M2=13, M4=9, M5=13, M6=16: jami 59 xom ball. M0=0. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.')[lang], '',
       '## ' + L['targets'][lang], '',
       T('初期配布の署名確認、新規5台または既存環境へのinstall、内部SSHと個別採点登録までを先に完了する。初期配布の手順は教材zipのdistribution/STUDENT.mdを読む。秘密鍵を共有Windowsへ置かず、CloudShellは本人Academy accountの中で使う。教師は本人用の匿名Lab ID・署名fingerprint・有効期限を案内する。',
         'Сначала завершите проверку подписи начального комплекта, создание пяти узлов либо install в существующую среду, внутренний SSH и личную регистрацию. Инструкция — distribution/STUDENT.md в zip. Не храните приватные ключи в общем Windows; используйте CloudShell личного Academy account. Преподаватель выдаёт личный анонимный Lab ID, fingerprint и срок действия.',
@@ -195,9 +200,9 @@ def make_markdown(reg, lang, kind):
     else:
         out += ['## ' + LABELS['plan'][lang], '']
         out += [p[lang] + '\n' for p in MISSION_PLAN]
-        for number in range(7):
+        for number in ACTIVE_NUMBERS:
             task = tasks['M' + str(number)]
-            title = MODULES[number]['title'][lang]
+            title = MODULES_BY_NUMBER[number]['title'][lang]
             out += [f"## {task['id']} {title} ({task['raw_points_max']})", '', '### ' + L['requirements'][lang], '', MISSION_GUIDANCE[task['id']][lang], '']
             out += diagram_markdown(task['id'],lang)
             out += task_spec(task, reg, lang)
@@ -251,7 +256,7 @@ def render_html(md, lang, kind):
     body = re.sub(r'<h2>(.*?)</h2>', heading, body)
     links = ' · '.join(f'<a href="#{slug}">{text}</a>' for slug, text in toc)
     title = html.escape(md.splitlines()[0].removeprefix('# '))
-    return f'<!doctype html><html lang="{lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><style>{CSS}</style></head><body><a class="skip" href="#content">{html.escape(L["intro"][lang])}</a><header><p>JDU · Web Infrastructure · D12 P/M {MATERIAL_REVISION}</p><nav aria-label="Contents">{links}</nav></header><main id="content" tabindex="-1">{body}</main><footer>{DIST_ID} · 62 raw points · 2026-11-03</footer></body></html>'
+    return f'<!doctype html><html lang="{lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><style>{CSS}</style></head><body><a class="skip" href="#content">{html.escape(L["intro"][lang])}</a><header><p>JDU · Web Infrastructure · D12 P/M {MATERIAL_REVISION}</p><nav aria-label="Contents">{links}</nav></header><main id="content" tabindex="-1">{body}</main><footer>{DIST_ID} · 59 raw points · 2026-11-13</footer></body></html>'
 
 def make_pdf(md, lang, target):
     from reportlab.lib import colors
@@ -365,7 +370,7 @@ def main():
     p=argparse.ArgumentParser();p.add_argument('--no-pdf',action='store_true');a=p.parse_args()
     reg_raw=(KIT/'assessment/assessment-registry.json').read_bytes()
     assert hashlib.sha256(reg_raw).hexdigest()==EXPECTED_REGISTRY
-    reg=json.loads(reg_raw)
+    reg=active_registry(json.loads(reg_raw))
     write_diagrams(ROOT)
     assert set(CHECKS)=={c for t in reg['tasks'] if t['category']=='automated_mission' for c in t['progress_scored_checks']}
     assert set(STEP_NOTES)=={f"{module['id']}.{i}" for module in MODULES for i in range(1,len(module['steps'])+1)}

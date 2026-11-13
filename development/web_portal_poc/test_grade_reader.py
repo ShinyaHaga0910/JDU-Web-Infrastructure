@@ -43,7 +43,7 @@ class GradeTest(unittest.TestCase):
 
     def test_saved_score_and_unknown_current_use_existing_projection(self):
         result = student_grade(self.service, self.event())
-        self.assertEqual((result['raw_earned'], result['raw_maximum']), (62, 62))
+        self.assertEqual((result['raw_earned'], result['raw_maximum']), (59, 59))
         self.assertIn('M5', result['current_unresolved'])
         self.assertEqual(result['selected']['M5']['raw_earned'], 13)
         self.assertEqual(self.store.labs_calls, ['test-lab'])

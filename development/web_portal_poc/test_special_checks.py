@@ -66,28 +66,15 @@ class SpecialChecksTest(unittest.TestCase):
         self.assertEqual(self.call()['job']['phase'],'observing')
         self.assertEqual(self.call('advance')['job']['phase'],'awaiting_password')
 
-    def test_storage_requires_same_stopped_instance_then_accepts_changed_public_ip(self):
-        self.prepared_storage();before_sends=len(self.f.fixture.ssm.sends)
-        self.assertEqual(self.call('storage_observe')['status'],'unavailable')
-        self.ec2_state='stopped';self.bad_volume=True
-        self.assertEqual(self.call('storage_observe')['status'],'unavailable')
-        self.bad_volume=False
-        self.assertEqual(self.call('storage_observe')['job']['phase'],'awaiting_restart')
-        self.assertEqual(len(self.f.fixture.ssm.sends),before_sends)
-        self.ec2_state='running';self.snapshot['public_web_ipv4']='93.184.216.35'
-        self.f.fixture.ssm.output=json.dumps({'report':self.report(retention=True),'storage_evidence':{}})
-        self.assertEqual(self.call('storage_resume')['job']['phase'],'observing')
-        result=self.call('advance');self.assertEqual(result['result']['score']['raw_earned'],3)
-        self.assertEqual(len(self.f.fixture.ssm.sends),2)
-        self.snapshot_error=True
-        self.assertEqual(self.call('result')['result'],result['result'])
-        self.assertEqual(self.call('report')['report']['request_id'],result['result']['request_id'])
-        self.ec2.stop_instances.assert_not_called();self.ec2.start_instances.assert_not_called()
-
-    def test_resume_without_observed_stop_does_not_run_a_second_command(self):
-        self.prepared_storage()
-        self.assertEqual(self.call('storage_resume')['job']['phase'],'awaiting_stop')
-        self.assertEqual(len(self.f.fixture.ssm.sends),1)
+    def test_retired_stop_start_tasks_never_send_commands_or_operate_ec2(self):
+        for task in ('P3', 'M3'):
+            for mode in ('read_only', 'storage', 'storage_prepare'):
+                self.select(task, mode)
+                self.assertEqual(self.call()['status'], 'unavailable')
+        self.assertEqual(len(self.f.fixture.ssm.sends), 0)
+        self.ec2.describe_instances.assert_not_called()
+        self.ec2.stop_instances.assert_not_called()
+        self.ec2.start_instances.assert_not_called()
 
     def test_functional_recipient_ciphertext_and_exact_result_are_retained(self):
         self.prepared_functional()
@@ -120,11 +107,10 @@ class SpecialChecksTest(unittest.TestCase):
         self.assertEqual(self.call('result')['status'],'unavailable')
         self.assertEqual(self.f.fixture.ssm.sends,[])
 
-    def test_changed_original_root_after_stop_cannot_start_final_check(self):
-        self.prepared_storage();self.ec2_state='stopped';self.call('storage_observe')
-        self.snapshot['root_volumes']['web']=['vol-'+'f'*17]
-        self.assertEqual(self.call('storage_resume')['status'],'unavailable')
-        self.assertEqual(len(self.f.fixture.ssm.sends),1)
+    def test_old_storage_resume_is_rejected_without_sending_a_command(self):
+        self.select('M3', 'storage')
+        self.assertEqual(self.call('storage_resume')['status'], 'unavailable')
+        self.assertEqual(len(self.f.fixture.ssm.sends), 0)
 
 
 if __name__=='__main__':unittest.main()

@@ -1,5 +1,16 @@
 # 移管ソースの検証
 
+
+## 2026-11-13：P3/M3の退役と現行59点の集計
+
+本人指示に従い、現行の教材とWebの課題一覧からP3/M3を除いた。既存の署名済みD11 registry・報告形式・過去成績は不変にし、`project_course_lab`がM3を除く59点の読み取り用集計を作る。学生/教師の画面はこの集計を使用する。旧D11のAPI/記録形式は62点の互換用基盤として残し、過去のM3記録を削除・改変しない。新しい課題実行はゲートウェイと実行前の両方でP3/M3を拒否する。IDは再利用しない。
+
+ローカル/模擬テストはPython95件・Web80件が合格。古いM3の有無や未確認が現行の完了判定へ影響しないこと、残る課題の未提出は引き続き判定へ残ること、P3/M3への直接要求でコマンドやEC2操作を行わないことを確認した。三言語教材は3687項目、32個のbash枠構文検査が合格し、6 PDFの全171ページの画像化・文字範囲確認も合格した。教科書第8章を削除し、第9章のpsqlと図、第10章の注記を本人レビューに合わせて改訂した。
+
+grade/checker/servicesのソースのみの候補ZIPを作成し、収録Pythonの構文と元registry bytesの保持を確認した。教師用の生成テンプレートも現行builderから再生成した。WSLの`verify_source_integrity.py`で、学生templateと署名版、教師templateとbuilder、固定アプリと署名manifestの一致を確認した。詳細は[今回の検証記録](web_portal_poc/verification/2026-11-13-curriculum-retirement.public.json)。
+
+今回、AWSの配備や稼働中サービスへの更新適用は行っていない。適用時は、学生/教師の成績読取と課題実行側を含む同じ版のコードを使い、59点を受け取るWebも合わせて更新する。旧署名配布物を書き換える作業と混同しない。教師目視・学生試読・母語校閲・変更後の実機受入は未実施。
+
 ## R1署名付き検証候補（2026-10-30）
 
 `test_initial_candidate_release test_initial_publication test_initial_package test_initial_teaching`の21件と元`test_teacher_endpoint_binding`5件が合格、skipなし。前者の候補検査ではGPGをstubする。別に実際のWSL署名とcore/envelope/assessmentのGPG検査、67 file workerの実Linux import/file照合・合成cryptを確認した。正式配布へ未受入coreを昇格せず、候補flagと期限を保持。AWS初回受入は未実施。[証拠](web_portal_poc/verification/2026-10-30-initial-candidate-release.public.json)。

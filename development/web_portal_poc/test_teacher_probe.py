@@ -26,7 +26,7 @@ class ProbeTest(unittest.TestCase):
         self.client.invoke.side_effect = RuntimeError('student offline')
         before = copy.deepcopy(self.f.row)
         result = serve({'operation': 'grade'}, self.env, self.f.store, self.client)
-        self.assertEqual(result['grade']['raw_earned'], 62)
+        self.assertEqual(result['grade']['raw_earned'], 59)
         self.assertIn('M5', result['grade']['current_unresolved'])
         self.assertNotIn('token_hash', json.dumps(result))
         self.assertEqual(self.f.row, before)
@@ -72,7 +72,7 @@ class ProbeTest(unittest.TestCase):
         self.client.invoke.return_value = {'StatusCode':200,'Payload':io.BytesIO(json.dumps(answer).encode())}
         self.assertEqual(serve({'operation':'status'},self.env,self.f.store,self.client),
             {'status':'unavailable','diagnostic':{'stage':'student_observation',**answer['diagnostic']}})
-        self.assertEqual(serve({'operation':'grade'},self.env,self.f.store,self.client)['grade']['raw_earned'],62)
+        self.assertEqual(serve({'operation':'grade'},self.env,self.f.store,self.client)['grade']['raw_earned'],59)
         answer['diagnostic']['code'] = '<private message>'
         self.client.invoke.return_value = {'StatusCode':200,'Payload':io.BytesIO(json.dumps(answer).encode())}
         self.assertNotIn('private message',repr(serve({'operation':'status'},self.env,self.f.store,self.client)))

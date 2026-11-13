@@ -9,13 +9,13 @@ const subject='1234567890';
 const verified=async token => {if(token!=='valid')throw Error('no session');return {sub:subject};};
 const sessions={check:async(id,token)=>id==='session' && token==='valid',revoke:async()=>{}};
 const credentials='__Host-jdu-session=valid; __Host-jdu-access=session';
-const sample={raw_earned:34,raw_maximum:62,current_unresolved:['M5'],missing_or_unresolved:['M6'],
+const sample={raw_earned:34,raw_maximum:59,current_unresolved:['M5'],missing_or_unresolved:['M6'],
               current:{M5:{evaluable:false,checked_at:'2026-10-27T09:00:00Z'}},selected:{M1:{raw_earned:8},M2:{raw_earned:13},M5:{raw_earned:13,received_at:'2026-10-27T09:05:00Z'}}};
 const req=(path,options={})=>new Request(`https://portal.example${path}`,options);
 
-test('score bounds match the existing assessment registry',async()=>{
+test('score bounds match the active subset of the signed assessment registry',async()=>{
   const registry=JSON.parse(await readFile(new URL('../../01_roles/cyber_security/tools/web_lab_assessment/assessment-registry.json',import.meta.url),'utf8'));
-  const maxima=Object.fromEntries(registry.tasks.filter(t=>t.category==='automated_mission').map(t=>[t.id,t.raw_points_max]));
+  const maxima=Object.fromEntries(registry.tasks.filter(t=>t.category==='automated_mission' && t.id!=='M3').map(t=>[t.id,t.raw_points_max]));
   assert.deepEqual(MISSION_MAXIMA,maxima);
 });
 
@@ -25,7 +25,7 @@ test('verified user sees only the server-resolved score and current unknown',asy
   const res=await app(req('/grades?lang=uz&lab_id=another',{headers:{cookie:credentials}}));
   const body=await res.text();
   assert.equal(res.status,200); assert.deepEqual(calls,[subject]);
-  assert.match(body,/34 \/ 62/); assert.match(body,/Tekshirib bo‘lmagan/); assert.match(body,/2026-10-27 09:05 UTC/);
+  assert.match(body,/34 \/ 59/); assert.match(body,/Tekshirib bo‘lmagan/); assert.match(body,/2026-10-27 09:05 UTC/);
   assert.doesNotMatch(body,/another|1234567890/);
   assert.match(res.headers.get('cache-control'),/no-store/);
   assert.match(res.headers.get('content-security-policy'),/frame-ancestors 'none'/);
@@ -135,7 +135,7 @@ test('malformed or unavailable status is shown as unavailable, not stopped',asyn
 test('an expired check login offers a safe return link without executing or saving',async()=>{
   let calls=0;
   const app=createApp({env:{...env,PORTAL_CHECKER_ENABLED:'true'},verify:verified,sessions:{...sessions,check:async()=>false},checker:async()=>{calls++;}});
-  const path='/checks?lang=ja&task_id=M3&job_id=12345678-1234-4234-8234-123456789abc&check_mode=storage';
+  const path='/checks?lang=ja&task_id=M5&job_id=12345678-1234-4234-8234-123456789abc&check_mode=functional';
   const result=await app(req(path,{headers:{cookie:credentials}}));
   assert.equal(result.status,403);assert.equal(calls,0);
   const html=await result.text();assert.match(html,/ログインし直す/);

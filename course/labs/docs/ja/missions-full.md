@@ -1,6 +1,6 @@
 # Web演習：自力課題M0〜M6
 
-2026-11-03 | D12 P/M r1.4 | web-course-class193548-20261103-r3
+2026-11-13 | D12 P/M r1.5 | web-course-class193548-20261103-r3
 
 配布版の有効期限：2027年1月31日末（UZT）。
 
@@ -12,15 +12,17 @@
 
 [はじめに：接続・操作の約束](start.md) · [練習 P0〜P6](practice.md) · [課題 M0〜M6](missions.md) · [ブラウザで確認する](portal.md)
 
+[はじめに：接続・操作の約束](start.md) · [練習 P0〜P6](practice.md) · [課題 M0〜M6](missions.md) · [ブラウザで確認する](portal.md)
+
 ## 使い方と共通の約束
 
 まず各Pの課題文を読み、必要なら詳しい操作例を一段ずつ使う。Pは練習で成績に加算しない。Mは別の対象・値で自分で構築する。課題は授業回番号ではなく、自分の進度で進める。Pの完了はMの合格に置き換わらない。
 
-P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → M4 → P5 → P6 → M5 → M6
+P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6
 
 P5にもM2のDNSが必要。P4はIP指定だが、アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。Pは任意の練習で、採点は各Mの現在の前提を検査する。
 
-M1=8、M2=13、M3=3、M4=9、M5=13、M6=16、合計62素点。M0は0点。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。
+M1=8、M2=13、M4=9、M5=13、M6=16、合計59素点。M0は0点。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。
 
 ## 対象・前提・準備
 
@@ -183,46 +185,6 @@ JDU WEB-02 mission: independent HTTP delivery.
 
 1. PCの[Web Portal](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws)へ学校Googleでログインし、本人のLabと **M2** を選ぶ。初回の連携・画面の説明は[ブラウザ確認手順](portal.md)を参照する。
 2. 「この課題を確認する」を押す。
-3. 処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。
-
-## M3 保存内容と停止・再開 (3)
-
-### 完成要件
-
-M専用markerを自分のLab IDで作る。P3とは別のブラウザで停止前記録→AWS Stop→ブラウザで停止完了確認→AWS Start→ブラウザで再開後確認を行う。対象は同じWebと元root volume。単なるrebootでは不可。backup/restoreとdisk追加は不要。
-
-### 今回の見取り図
-
-![M3: 同じWebの元ディスク → 記録 → Stop → Start → 内容保持と新boot ID。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 Stop/StartはAWS APIによる管理操作で、Webの受信443番を開く操作ではありません。 図を参考に完成要件から設定値を自分で決めます。](../../assets/ja/m3.png)
-
-図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 Stop/StartはAWS APIによる管理操作で、Webの受信443番を開く操作ではありません。 図を参考に完成要件から設定値を自分で決めます。
-
-[図を拡大する](../../assets/ja/m3.png) · [SVG](../../assets/ja/m3.svg)
-
-- File: /var/lib/jdu-web/mission/storage.txt
-
-```text
-lab_id={lab_id}
-task=M3
-payload=mission-storage-2026
-```
-
-本文の{lab_id}は自分の匿名Lab IDに置き換える。file0644/root:root、親directory0755/root:root。停止はWebのみ、同じ元instance/volumeで行う。
-
-### 合格条件：採点check各1素点
-
-| check ID（変更しない） | 満たすこと |
-| --- | --- |
-| WEB04_MARKER_CONTENT | 学生が作ったP/M別markerのpath・匿名Lab ID・task・本文が一致する。 |
-| WEB04_MARKER_PERMISSIONS | markerはroot:root/0644、親directoryは0755である。 |
-| WEB04_STOP_START_RETENTION | 同じ配備の停止前/停止状態/再開後の証跡で、元instance/volumeとmarker hashが同じ、boot IDが変化したことを確認。単なるrebootや旧fixture記録では代用しない。 |
-
-本人確認・管理・配布元・通信基盤・依存前提等の準備checkは上表の素点に加えない。必要前提が未完了なら、点が一部あっても次段階の準備完了ではない。
-
-### 確認・提出
-
-1. PCの[Web Portal](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws)へ学校Googleでログインし、本人のLabと **M3** を選ぶ。初回の連携・画面の説明は[ブラウザ確認手順](portal.md)を参照する。
-2. 「停止前の状態を記録する」→保存成功→AWSで同じWebをStop→stopped→「停止完了を確認する」→記録成功→AWSで同じWebをStart→running/SSM Online→「再開後の保持を確認する」の順で進める。P3とは別にM3を記録する。
 3. 処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。
 
 ## M4 PostgreSQLへの認証接続 (9)

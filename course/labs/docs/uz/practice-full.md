@@ -1,6 +1,6 @@
 # Web Infrastructure: P0-P6 mashqlar va batafsil qadamlar
 
-2026-11-03 | D12 P/M r1.4 | web-course-class193548-20261103-r3
+2026-11-13 | D12 P/M r1.5 | web-course-class193548-20261103-r3
 
 Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).
 
@@ -12,15 +12,17 @@ Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga 
 
 [Avval: ulanish va qoidalar](start.md) · [Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M6](missions.md) · [Brauzerda tekshirish](portal.md)
 
+[Avval: ulanish va qoidalar](start.md) · [Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M6](missions.md) · [Brauzerda tekshirish](portal.md)
+
 ## Qo‘llanmadan foydalanish
 
 Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P - bahoga ball qo‘shmaydigan mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.
 
-P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → M4 → P5 → P6 → M5 → M6
+P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6
 
 P5 uchun ham M2 DNS kerak. P4 IP bilan ulanadi, app esa db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating. P ixtiyoriy mashq; checker M ning joriy old shartlarini tekshiradi.
 
-M1=8, M2=13, M3=3, M4=9, M5=13, M6=16: jami 62 xom ball. M0=0. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.
+M1=8, M2=13, M4=9, M5=13, M6=16: jami 59 xom ball. M0=0. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.
 
 ## Muhit va tayyorgarlik
 
@@ -893,202 +895,6 @@ dig @10.20.2.10 ishlaydi, getent ishlamaydi. Muammo albatta zone dami?
 **Izoh:**
 
 Yo‘q. Aniq tanlangan DNS bilan OS ning oddiy resolver i farq qilishi mumkin. Netplan va resolvectl ning amaldagi sozlamalarini tekshiring.
-
-## P3 To‘xtatish va qayta ishga tushirishda ma’lumotlar
-
-### Nimani o‘rganamiz
-
-Asl EBS dagi fayl va ruxsatni tekshirish; ayni Web stop/start dan keyin saqlanishini isbotlash.
-
-### Topshiriq
-
-O‘z anonim Lab ID bilan P3 marker yarating. To‘xtashdan oldin, stopped va qayta ishga tushgandan keyingi holatni qayd eting. Yangi disk, mount yoki backup/restore kerak emas.
-
-### Topshiriq diagrammasi
-
-![P3: Ayni Web ning asl diski → Qayd → Stop → Start → Mazmun saqlangan, boot ID yangi。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Stop/Start AWS API boshqaruvidir; Web kiruvchi 443 portini ochish emas.](../../assets/uz/p3.png)
-
-Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Stop/Start AWS API boshqaruvidir; Web kiruvchi 443 portini ochish emas.
-
-[Kattalashtirish](../../assets/uz/p3.png) · [SVG](../../assets/uz/p3.svg)
-
-- File: /var/lib/jdu-web/practice/storage.txt
-
-```text
-lab_id={lab_id}
-task=P3
-payload=practice-storage-2026
-```
-
-### Bu qanday ishlaydi
-
-**Boshlashdan oldingi holat:**
-
-Marker ni ayni Web ning asl root EBS ida saqlash mumkin.
-
-**Ushbu P da nima o‘zgaradi:**
-
-Ayni Web stop/start dan keyin mazmun saqlangani oldingi va keyingi dalil bilan ko‘rsatiladi.
-
-Ishlayotgan xotira bilan EBS ga saqlangan faylni farqlang. Bu yerda asl EBS saqlangan ayni Web Stop/Start qilinadi. Hash, instance/volume ID va boot ID o‘zgarishini solishtiring. Avtomatik public IPv4 o‘zgarishi mumkin. [EC2 stop/start](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Stop_Start.html).
-
-### Yechim namunasi: bittadan bajaring
-
-#### P3.1 Asl saqlash joyi va bo‘sh joyni tekshirish
-
-**Bajarish joyi:**
-
-Web serverning SSM terminali: ssm-user
-
-**Maqsad va amallar:**
-
-findmnt fayl tizimini, lsblk disk va partition larni, df -h bo‘sh joyni ko‘rsatadi. Berilgan root EBS dan foydalaning; /dev/nvme nomi disk almashtirish sababi emas.
-
-Buyruqlar: raqamlar shu qadam ichidagi tartib
-
-```bash
-# 1. /var/lib joylashgan filesystem ni aniqlash.
-findmnt -T /var/lib
-# 2. Disk nomi, turi, hajmi, mount joyi va ID sini o‘qish.
-lsblk -o NAME,TYPE,SIZE,MOUNTPOINTS,SERIAL
-# 3. /var/lib ishlatilgan va bo‘sh joyini tekshirish.
-df -h /var/lib
-# 4. To‘xtashdan oldin/keyin solishtirish uchun boot ID ni o‘qish.
-cat /proc/sys/kernel/random/boot_id
-```
-
-**Buyruq va sozlamalar ma’nosi:**
-
-Findmnt path joylashgan filesystem ni, lsblk block device larni, df bo‘sh joyni ko‘rsatadi. Ular turli kuzatuvlar. Boot_id joriy boot ni, hash fayl mazmunini aniqlaydi.
-
-**Kutilgan natija va ma’nosi:**
-
-Asl root volume ga mos; kamida 20% va 2 GiB bo‘sh. Joriy yuklanish boot_id sini yozib oling.
-
-**Ishlamasa:**
-
-Joy yetishmasligi tayyorlik muammosi. Ball uchun boshqa material yoki diskni o‘chirmang.
-
-#### P3.2 Marker ni yaratish va joylash
-
-**Bajarish joyi:**
-
-Web serverning SSM terminali: ssm-user
-
-**Maqsad va amallar:**
-
-Bu terminalda ham LAB_ID ni belgilang. printf har qatorni yangi qator bilan tugatadi. install katalogni 0755, faylni 0644/root:root qiladi. Avval mavjud faylni tekshiring; boshqa mazmunni sababini bilmasdan almashtirmang.
-
-Buyruqlar: raqamlar shu qadam ichidagi tartib
-
-```bash
-# 1. O‘qituvchi bergan o‘z Lab ID ni o‘zgaruvchiga yozish.
-LAB_ID='YOUR-LAB-ID'
-# 2. Ish katalogini ~ ga o‘zgartirish.
-cd ~
-# 3. Mashq katalogini yaratish; mavjud bo‘lsa saqlash.
-mkdir -p jdu-web-practice/p3
-# 4. Ish katalogini jdu-web-practice/p3 ga o‘zgartirish.
-cd jdu-web-practice/p3
-# 5. O‘z Lab ID bilan mashq marker matnini ish fayliga yozish.
-printf 'lab_id=%s\ntask=P3\npayload=practice-storage-2026\n' "$LAB_ID" > storage.txt
-# 6. storage.txt mazmunini o‘zgartirmay o‘qish.
-cat storage.txt
-# 7. Belgilangan owner, guruh va permission bilan katalog yaratish.
-sudo install -d -o root -g root -m 0755 /var/lib/jdu-web/practice
-# 8. Faylni joylab owner, guruh va permission ni belgilash.
-sudo install -o root -g root -m 0644 storage.txt /var/lib/jdu-web/practice/storage.txt
-# 9. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
-stat -c '%U:%G %a %n' /var/lib/jdu-web/practice /var/lib/jdu-web/practice/storage.txt
-# 10. Marker mazmunini solishtirish uchun SHA256 chiqarish.
-sha256sum /var/lib/jdu-web/practice/storage.txt
-```
-
-**Buyruq va sozlamalar ma’nosi:**
-
-Printf %s o‘rniga LAB_ID qo‘yadi; \n yangi qatordir. > ish fayliga yozadi. Install -d katalog yaratadi, keyingi install marker owner va permission ini belgilaydi. Hash mazmun bir xilligini tekshiradi.
-
-**Kutilgan natija va ma’nosi:**
-
-Oxirida yangi qator bo‘lgan 3 qator, ruxsat 0755/0644. Hash ni yozing. 777 ruxsat mos emas.
-
-**Ishlamasa:**
-
-YOUR-LAB-ID ni o‘z holicha qoldirmang. EC2 nomi yoki email emas, anonim Lab ID ishlating.
-
-#### P3.3 To‘xtatishdan oldingi dalilni saqlash
-
-**Bajarish joyi:**
-
-Shaxsiy PC brauzeri: Web Portal
-
-**Maqsad va amallar:**
-
-Web dan exit bilan CloudShell ga qayting. Web Portal da P3 ni tanlab to‘xtashdan oldingi holatni yozing. Instance/volume/marker hash/boot_id saqlanadi, EC2 hali to‘xtamaydi. Saqlash muvaffaqiyatini kuting. P3 dalilining barcha bosqichlarini shu brauzer usuli bilan bajaring.
-
-**Buyruq va sozlamalar ma’nosi:**
-
-Oldingi holat tugmasi server, boot va marker ni solishtirish uchun saqlaydi, EC2 ni to‘xtatmaydi. Keyin AWS Stop bajaring; brauzer va buyruq dalillarini aralashtirmang.
-
-**Kutilgan natija va ma’nosi:**
-
-To‘xtashdan oldingi holat saqlandi. Shundan keyin marker ni tahrirlamang.
-
-**Ishlamasa:**
-
-Tayyorlash xatosidan keyin to‘xtatish to‘liq dalil bermaydi. Avval fayl/ruxsat/SSM ni tuzating.
-
-#### P3.4 Ayni Web ni Stop qilib stopped holatini qayd etish
-
-**Bajarish joyi:**
-
-Talabaning shaxsiy AWS Console oynasi
-
-**Maqsad va amallar:**
-
-EC2 da o‘z Web instance ID ni solishtiring. Instance state → Stop instance ni tanlab stopped ni kuting. Reboot/Terminate emas. Web ni yoqmasdan Web Portal P3 da to‘xtash tugaganini tekshiring. Qolgan to‘rtta serverni to‘xtatmang.
-
-**Buyruq va sozlamalar ma’nosi:**
-
-Console da kerakli Web ni Stop qiling; stopped holatini Web Portal da qayd eting. SSM uzilishi to‘xtashni o‘zi isbotlamaydi. Stop reboot va Terminate dan farq qiladi.
-
-**Kutilgan natija va ma’nosi:**
-
-Ayni instance stopped deb qayd qilinadi. Bu paytda HTTP/SSM ishlamasligi kutilgan holat.
-
-**Ishlamasa:**
-
-stopping bo‘lsa kuting. Kuzatuvdan oldin Start qilsangiz, uch bosqichli dalilni qayta olish kerak bo‘ladi.
-
-#### P3.5 Start qilib saqlanishni solishtirish va yuborish
-
-**Bajarish joyi:**
-
-Talabaning shaxsiy AWS Console oynasi
-
-**Maqsad va amallar:**
-
-Ayni Web ni Start qilib running/SSM Online ni kuting. SSM da matn/hash va boot_id ni solishtiring: instance/volume/hash bir xil, boot_id yangi bo‘ladi. Web Portal P3 da qayta ishga tushgandan keyingi saqlanishni tekshirib, natija saqlanishini kuting.
-
-**Buyruq va sozlamalar ma’nosi:**
-
-Ayni Web ni Start qilib running/SSM Online ni kuting. Checker joriy holatni saqlangan oldingi dalil bilan solishtiradi; start dan keyin marker ni qayta yaratmang. Keyingi tashqi kirishda Web ning yangi public IP sini ishlating.
-
-**Kutilgan natija va ma’nosi:**
-
-Uchta mashq tekshiruvi PASS. Public IPv4 o‘zgarsa, tashqi HTTP uchun yangi manzil ishlating.
-
-**Ishlamasa:**
-
-Yangi instance saqlanish isboti emas. P3/M3 alohida marker va dalildan foydalanadi.
-
-### Tushunishni tekshirish (ballsiz)
-
-Yangi Web da bir xil matn chiqishi topshiriq uchun yetarlimi?
-
-**Izoh:**
-
-Yo‘q: asl instance va volume saqlanishi hamda stopped holati kuzatilishi kerak.
 
 ## P4 PostgreSQL ga autentifikatsiya bilan ulanish
 

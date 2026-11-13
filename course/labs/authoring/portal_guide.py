@@ -22,7 +22,7 @@ def write_guides(root, css):
               'uz':'Portalni o‘qituvchi Lab i ishlayotganda ishlating. Maktab Google orqali kirib o‘z AWS hisobingizni bir marta bog‘lang. Maxfiy kalitlarni umumiy Windows ga saqlamang.'}[lang]+'\n\n'+body
         nav='[日本語](../ja/portal.md) · [Русский](../ru/portal.md) · [O‘zbekcha](../uz/portal.md)'
         from pages import nav as task_nav
-        md=f'# {titles[lang]}\n\n2026-11-03\n\n{task_nav(lang)}\n\n{nav}\n\n[Web Portal](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws)\n\n> {notices[lang]}\n\n{body}\n\n{expiry[lang]}\n'
+        md=f'# {titles[lang]}\n\n2026-11-13\n\n{task_nav(lang)}\n\n{nav}\n\n[Web Portal](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws)\n\n> {notices[lang]}\n\n{body}\n\n{expiry[lang]}\n'
         (root/'docs'/lang/'portal.md').write_text(md,encoding='utf-8',newline='\n')
         rendered=re.sub(r'href="([^"#]+)\.md"',r'href="\1.html"',parser.render(md))
         content='<!doctype html><html lang="'+lang+'"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+html.escape(titles[lang])+'</title><style>'+css+'</style></head><body><main>'+rendered+'</main></body></html>'

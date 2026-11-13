@@ -1,0 +1,50 @@
+{
+  "curriculum_id": "web-2026-11-13-without-storage-cycle",
+  "effective_date": "2026-11-13",
+  "retired_tasks": [
+    "P3",
+    "M3"
+  ],
+  "active_order": [
+    "P0",
+    "M0",
+    "P1",
+    "M1",
+    "P2",
+    "M2",
+    "P4",
+    "M4",
+    "P5",
+    "P6",
+    "M5",
+    "M6"
+  ],
+  "mission_points": {
+    "M1": 8,
+    "M2": 13,
+    "M4": 9,
+    "M5": 13,
+    "M6": 16
+  },
+  "raw_maximum": 59,
+  "retired_textbook_chapters": [
+    8
+  ],
+  "active_textbook_chapters": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "identifier_policy": "Preserve existing IDs; retired chapter and task IDs are not reused.",
+  "signed_baseline_unchanged": true
+}

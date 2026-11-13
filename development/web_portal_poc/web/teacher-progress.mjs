@@ -46,12 +46,12 @@ export function teacherListHtml(lang,value,{validateGrade,maxima}) {
   const stamp=v=>typeof v==='string' && v.length<=40 && Number.isFinite(Date.parse(v))?new Date(v).toISOString().slice(0,16).replace('T',' ')+' UTC':t.none;
   const rows=value.students.map(row=>{
     const name=`<th scope="row"><a href="/teacher/student?lang=${lang}&amp;lab_id=${row.lab_id}">${escape(row.lab_id)}</a></th>`;
-    if(row.status!=='ok')return `<tr>${name}<td colspan="9">${escape(t.unavailable)}</td></tr>`;
+    if(row.status!=='ok')return `<tr>${name}<td colspan="${missions.length+3}">${escape(t.unavailable)}</td></tr>`;
     const grade=validateGrade(row.grade);
     const cells=missions.map(m=>`<td>${grade.selected[m]?`${grade.selected[m].raw_earned} / ${maxima[m]}`:escape(t.none)}</td>`).join('');
     const dates=[...Object.values(grade.current||{}),...Object.values(grade.selected)].map(r=>r?.received_at).filter(v=>typeof v==='string' && Number.isFinite(Date.parse(v)));
     const latest=dates.sort((a,b)=>Date.parse(a)-Date.parse(b)).at(-1);
-    return `<tr>${name}${cells}<td>${Object.keys(grade.selected).length?`${grade.raw_earned} / 62`:escape(t.none)}</td><td>${escape(grade.current_unresolved.length?grade.current_unresolved.join(', '):t.ok)}</td><td>${escape(stamp(latest))}</td></tr>`;
+    return `<tr>${name}${cells}<td>${Object.keys(grade.selected).length?`${grade.raw_earned} / 59`:escape(t.none)}</td><td>${escape(grade.current_unresolved.length?grade.current_unresolved.join(', '):t.ok)}</td><td>${escape(stamp(latest))}</td></tr>`;
   }).join('');
   const tabs=`<p><a href="/teacher?lang=${lang}&amp;context=course">${escape(t.course)}</a> · <a href="/teacher?lang=${lang}&amp;context=verification">${escape(t.verification)}</a></p>`;
   const table=rows?`<div class="table-wrap teacher-table" tabindex="0" role="region" aria-labelledby="teacher-caption"><table><caption id="teacher-caption">Class ${escape(value.class_id)} — ${escape(t[context])}</caption><thead><tr><th scope="col">${escape(t.lab)}</th>${missions.map(m=>`<th scope="col">${m}</th>`).join('')}<th scope="col">${escape(t.total)}</th><th scope="col">${escape(t.unknown)}</th><th scope="col">${escape(t.latest)}</th></tr></thead><tbody>${rows}</tbody></table></div>`:`<p>${escape(t.empty)}</p>`;

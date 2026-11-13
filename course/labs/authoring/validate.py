@@ -23,6 +23,9 @@ PROJECT=Path(os.environ.get('JDU_WEB_PROJECT_ROOT', str(Path(__file__).resolve()
 from markdown_it import MarkdownIt
 from pypdf import PdfReader
 from content import MODULES,LANGS
+from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, active_registry
+MODULES_BY_NUMBER = {int(m["id"][1:]): m for m in MODULES}
+MODULES = [MODULES_BY_NUMBER[n] for n in ACTIVE_NUMBERS]
 from build import KIT,EXPECTED_REGISTRY,MATERIAL_REVISION
 from pages import expiry_text
 from command_notes import annotated_blocks,command_groups,executable_only,explanation,CONFIG_STEPS
@@ -50,9 +53,9 @@ def main():
     def ok(name,condition):
         if not condition:raise AssertionError(name)
         checks.append(name)
-    registry_raw=(KIT/'assessment/assessment-registry.json').read_bytes();reg=json.loads(registry_raw)
+    registry_raw=(KIT/'assessment/assessment-registry.json').read_bytes();reg=active_registry(json.loads(registry_raw))
     ok('frozen_registry_sha256',hashlib.sha256(registry_raw).hexdigest()==EXPECTED_REGISTRY)
-    ok('fixed_mission_points_62',reg['raw_points_by_mission']==dict(M1=8,M2=13,M3=3,M4=9,M5=13,M6=16))
+    ok('active_mission_points_59',reg['raw_points_by_mission']==dict(M1=8,M2=13,M4=9,M5=13,M6=16))
     parser=MarkdownIt('commonmark',{'html':False}).enable('table')
     docs={};code={};fences=0
     for lang in LANGS:
@@ -66,11 +69,11 @@ def main():
             ok(f'{lang}_{kind}_working_guide',all(p[lang] in value for p in READING))
             ok(f'{lang}_{kind}_routes',all(purpose[lang] in value for _,_,_,purpose in ROUTES))
             code[lang,kind]=[(t.info,t.content) for t in tokens if t.type=='fence']
-            ok(f'{lang}_{kind}_tasks',all(re.search(r'^## '+prefix+str(n)+r'\b',value,re.M) for n in range(7) for prefix in [('P' if kind=='practice' else 'M')]))
+            ok(f'{lang}_{kind}_tasks',all(re.search(r'^## '+prefix+str(n)+r'\b',value,re.M) for n in ACTIVE_NUMBERS for prefix in [('P' if kind=='practice' else 'M')]))
             ok(f'{lang}_{kind}_no_private_student_data',not any(x in value for x in
                 ('965244652544','jdutestuser1@','?session=','X-Amz-Signature=','PRIVATE KEY','Fictional-Practice-Admin-Only')))
             if kind=='missions':
-                ok(f'{lang}_all_62_check_ids',all(value.count(cid)==1 for t in reg['tasks'] if t['category']=='automated_mission' for cid in t['progress_scored_checks']))
+                ok(f'{lang}_all_59_check_ids',all(value.count(cid)==1 for t in reg['tasks'] if t['category']=='automated_mission' for cid in t['progress_scored_checks']))
                 ok(f'{lang}_mission_planning',all(p[lang] in value for p in MISSION_PLAN))
             else:
                 for module in MODULES:
@@ -83,9 +86,9 @@ def main():
             pdf=PdfReader(ROOT/'output/pdf'/f'web_lab_{kind}_{lang}.pdf')
             text='\n'.join(page.extract_text() or '' for page in pdf.pages)
             ok(f'{lang}_{kind}_pdf_A4',all(abs(float(p.mediabox.width)-595.276)<1 and abs(float(p.mediabox.height)-841.890)<1 for p in pdf.pages))
-            ok(f'{lang}_{kind}_pdf_text',len(text)>5000 and all(prefix+str(n) in text for n in range(7) for prefix in [('P' if kind=='practice' else 'M')]) and '\ufffd' not in text and '\x00' not in text)
+            ok(f'{lang}_{kind}_pdf_text',len(text)>5000 and all(prefix+str(n) in text for n in ACTIVE_NUMBERS for prefix in [('P' if kind=='practice' else 'M')]) and '\ufffd' not in text and '\x00' not in text)
             images=sum(sum(obj.get_object().get('/Subtype')=='/Image' for obj in p.get('/Resources',{}).get('/XObject',{}).values()) for p in pdf.pages)
-            ok(f'{lang}_{kind}_pdf_figures',images==7)
+            ok(f'{lang}_{kind}_pdf_figures',images==6)
             if kind=='practice':
                 expected=sum(sum(active for active,_ in command_groups(s['code'])) for m in MODULES for i,s in enumerate(m['steps'],1) if s['code'] and (m['id'],i) not in CONFIG_STEPS)
                 ok(f'{lang}_pdf_numbered_comments',len(re.findall(r'(?:#|--) \d+\.',text))==expected)
@@ -96,13 +99,13 @@ def main():
     for lang in LANGS:
         for kind,prefix in [('practice','P'),('missions','M')]:
             index=(ROOT/'docs'/lang/(kind+'.md')).read_text(encoding='utf-8')
-            ok(f'{lang}_{kind}_index',all(f']({prefix.lower()}{n}.md)' in index for n in range(7)))
-            for number in range(7):
+            ok(f'{lang}_{kind}_index',all(f']({prefix.lower()}{n}.md)' in index for n in ACTIVE_NUMBERS))
+            for number in ACTIVE_NUMBERS:
                 name=prefix+str(number)
                 value=(ROOT/'docs'/lang/(name.lower()+'.md')).read_text(encoding='utf-8')
                 ok(f'{lang}_{name}_page',value.startswith('# '+name+' ') and 'start.md' in value and 'portal.md' in value and expiry_text(lang) in value)
                 if prefix=='P':
-                    for step in range(1,len(MODULES[number]['steps'])+1):
+                    for step in range(1,len(MODULES_BY_NUMBER[number]['steps'])+1):
                         ok(f'{lang}_{name}_{step}_page_step',f'### {name}.{step} ' in value and STEP_NOTES[f'{name}.{step}'][lang] in value)
                 else:
                     task=next(t for t in reg['tasks'] if t['id']==name)
@@ -133,7 +136,7 @@ def main():
                     if lang=='ja':annotations+=expected
     for lang in LANGS:
         for prefix in ('P','M'):
-            for number in range(7):
+            for number in ACTIVE_NUMBERS:
                 task=prefix+str(number)
                 md=(ROOT/'docs'/lang/(task.lower()+'.md')).read_text(encoding='utf-8')
                 images=[c for t in parser.parse(md) for c in t.children or [] if c.type=='image']
@@ -148,7 +151,7 @@ def main():
                     ok(f'{lang}_{task}_internet_aws_boundary',any(t.text=='AWS / VPC 10.20.0.0/16' for t in texts)
                         and any(t.text=='IGW' and float(t.attrib['x'])==boundary for t in texts)
                         and all(float(t.attrib['x'])>boundary for t in texts if t.text=='EC2'))
-    ok('49_detailed_steps',sum(len(m['steps']) for m in MODULES)==49 and all(all(s[k].values()) for m in MODULES for s in m['steps'] for k in ('why','expect','trouble')))
+    ok('44_detailed_steps',sum(len(m['steps']) for m in MODULES)==44 and all(all(s[k].values()) for m in MODULES for s in m['steps'] for k in ('why','expect','trouble')))
     for info,source in code['ja','practice']+code['ja','missions']:
         if info=='bash':
             result=subprocess.run(['wsl.exe','bash','-n'],input=source,text=True,encoding='utf-8',capture_output=True)
@@ -217,10 +220,10 @@ def main():
         ok('zip_exact_inventory',set(z.namelist())=={'web-lab-pm-r1/'+p for p in hashes}|{'web-lab-pm-r1/TEACHING-FILE-HASHES.json'})
         ok('zip_all_hashes',all(hashlib.sha256(z.read('web-lab-pm-r1/'+p)).hexdigest()==v for p,v in hashes.items()))
     result=dict(scope='D12_P_M_materials_local_checks_not_AWS_walkthrough',checked_on=date.today().isoformat(),browser_guide_revision='2026-11-03',
-        languages=list(LANGS),material_revision=MATERIAL_REVISION,practice_tasks=7,practice_steps=49,
-        task_pages=42,task_diagrams=42,numbered_command_comments_per_language=annotations,executable_source_preserved=True,
-        explained_steps=len(STEP_NOTES),module_understanding_questions=len(MODULE_NOTES),communication_routes=len(ROUTES),
-        worked_output_examples=len(OUTPUT_EXAMPLES),mission_tasks=7,scored_checks=62,raw_points=62,
+        languages=list(LANGS),material_revision=MATERIAL_REVISION,practice_tasks=6,practice_steps=44,
+        task_pages=36,task_diagrams=36,numbered_command_comments_per_language=annotations,executable_source_preserved=True,
+        explained_steps=sum(len(m["steps"]) for m in MODULES),module_understanding_questions=len(MODULES),communication_routes=len(ROUTES),
+        worked_output_examples=len(OUTPUT_EXAMPLES),mission_tasks=6,scored_checks=59,raw_points=59,
         checks_passed=len(checks),bash_blocks_syntax_checked=fences,
         pdfs={p.name:dict(pages=len(PdfReader(p).pages),bytes=p.stat().st_size) for p in (ROOT/'output/pdf').glob('*.pdf')},
         distribution_id=pins['distribution_id'],registry_sha256=EXPECTED_REGISTRY,package_sha256=hashlib.sha256(package.read_bytes()).hexdigest(),

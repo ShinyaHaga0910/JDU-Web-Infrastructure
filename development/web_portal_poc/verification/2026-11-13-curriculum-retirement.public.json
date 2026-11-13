@@ -1,0 +1,86 @@
+{
+  "date": "2026-11-13",
+  "curriculum_id": "web-2026-11-13-without-storage-cycle",
+  "retired_tasks": [
+    "P3",
+    "M3"
+  ],
+  "retired_chapters": [
+    8
+  ],
+  "active_missions": 5,
+  "raw_maximum": 59,
+  "legacy_signed_wire_maximum": 62,
+  "historical_grade_rows_modified": false,
+  "python_tests": 95,
+  "node_tests": 80,
+  "teacher_render_tests_rechecked": 8,
+  "material_checks": 3687,
+  "material_pdf_pages_rendered": 171,
+  "pdf_text_out_of_bounds": 0,
+  "source_candidates": [
+    {
+      "kind": "grade",
+      "sha256": "21ef6989a57e6e56467ab0050eae7bf494a6c347e8d350d14a6d49821b544f09",
+      "files": 12,
+      "registry_bytes_preserved": true
+    },
+    {
+      "kind": "checker",
+      "sha256": "25f05acd06dab25219d4722f309e00fb2d0fa95f093d0f414e6460f374ed484e",
+      "files": 38,
+      "registry_bytes_preserved": true
+    },
+    {
+      "kind": "services",
+      "sha256": "56a3ac9a842b4e05154b7ba9396d0d650ab0331a9a74b81f9cf70867ce6ad9e0",
+      "files": 18,
+      "registry_bytes_preserved": true
+    }
+  ],
+  "textbook_checks": [
+    {
+      "chapter": 1,
+      "pages": 14,
+      "words": 565,
+      "figure_labels": 0,
+      "heading_pages": {
+        "章末問題": 11,
+        "章末解答": 13,
+        "参考資料": 13
+      }
+    },
+    {
+      "chapter": 9,
+      "pages": 9,
+      "words": 299,
+      "figure_labels": 56,
+      "heading_pages": {
+        "章末問題": 7,
+        "章末解答": 8,
+        "参考資料": 9
+      }
+    },
+    {
+      "chapter": 10,
+      "pages": 8,
+      "words": 276,
+      "figure_labels": 32,
+      "heading_pages": {
+        "章末問題": 6,
+        "章末解答": 7,
+        "参考資料": 8
+      }
+    }
+  ],
+  "textbook_html_conditions": 12,
+  "relative_links_checked": 200,
+  "relative_links_missing": [],
+  "signed_baseline_bytes_modified": false,
+  "aws_mutations": false,
+  "live_deployment_updated": false,
+  "teacher_visual_review": false,
+  "student_trial": false,
+  "source_integrity_checked": true,
+  "teacher_template_regenerated": true
+}

@@ -17,5 +17,4 @@
 <rect x="160" y="745" width="1280" height="155" rx="18" fill="#f7f9fc" stroke="#2165a7" stroke-width="2"/>
 <text x="800" y="763" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">スキーマと表</text>
 <text x="800" y="827" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">例：public.catalog_item</text>
-<text x="55" y="1010" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">ここでのクラスターは、複数台の冗長構成を意味しない。</text>
 </svg>

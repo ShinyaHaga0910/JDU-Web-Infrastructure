@@ -1,3 +1,4 @@
+from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER
 """Task-sized student pages derived from the complete handbooks, without duplicating steps."""
 from pathlib import Path
 import re
@@ -48,7 +49,7 @@ WORDS = {
  'next': T('次の課題', 'Следующее', 'Keyingi'),
 }
 
-ORDER = ['P0','M0','P1','M1','P2','M2','P3','M3','P4','M4','P5','P6','M5','M6']
+ORDER = list(ACTIVE_ORDER)
 
 def nav(lang):
     return ' · '.join(f'[{WORDS[key][lang]}]({name}.md)' for key,name in
@@ -81,22 +82,23 @@ def write_pages(root, lang, registry, revision, distribution_id, render_html, la
             'Pは詳しい操作例つきの練習です。Mは練習で学んだ設定を別の対象に自分で適用する課題です。サーバーを自分で設定してからブラウザで確認します。',
             'P — практика с подробными шагами. M — самостоятельная настройка других объектов на основе навыков P. Сначала настройте серверы сами, затем проверьте в браузере.',
             'P — batafsil qadamli mashq. M — P da o‘rgangan sozlamani boshqa obyektga mustaqil qo‘llash. Avval serverlarni o‘zingiz sozlang, keyin brauzerda tekshiring.')[lang]
-        index = [f'# {WORDS[kind][lang]}', '', f'2026-11-03 · D12 P/M {revision}', '', nav(lang), '', translations(kind), '', intro, '', expiry_text(lang), '',
+        index = [f'# {WORDS[kind][lang]}', '', f'2026-11-13 · D12 P/M {revision}', '', nav(lang), '', translations(kind), '', intro, '', expiry_text(lang), '',
             '| '+T('練習', 'Практика', 'Mashq')[lang]+' | '+T('自力課題', 'Задание', 'Topshiriq')[lang]+' | '+WORDS['topic'][lang]+' | '+WORDS['points'][lang]+' |', '| --- | --- | --- | --- |']
-        for n,module in enumerate(modules):
+        for module in modules:
+            n = int(module['id'][1:])
             index.append(f'| [P{n}](p{n}.md) | [M{n}](m{n}.md) | {module["title"][lang]} | {tasks["M"+str(n)]["raw_points_max"]} |')
         index += ['', T('おすすめの順序', 'Рекомендуемый порядок', 'Tavsiya etilgan tartib')[lang]+':', '',
             ' → '.join(f'[{task}]({task.lower()}.md)' for task in ORDER), '',
-            T('P5の前にM2、練習から本課題へ切り替える前にP6を終える。Pは成績外、M0は0点、M1〜M6の合計は62素点。',
-              'Завершите M2 до P5 и P6 перед переключением practice → mission. P не оценивается, M0=0; M1–M6 дают 62 исходных балла.',
-              'P5 dan oldin M2 ni, practice → mission almashishdan oldin P6 ni tugating. P bahoga qo‘shilmaydi, M0=0; M1–M6 jami 62 xom ball.')[lang], '',
+            T('P5の前にM2、練習から本課題へ切り替える前にP6を終える。Pは成績外、M0は0点、M1〜M6の合計は59素点。',
+              'Завершите M2 до P5 и P6 перед переключением practice → mission. P не оценивается, M0=0; M1–M6 дают 59 исходных балла.',
+              'P5 dan oldin M2 ni, practice → mission almashishdan oldin P6 ni tugating. P bahoga qo‘shilmaydi, M0=0; M1–M6 jami 59 xom ball.')[lang], '',
             '## '+WORDS['full'][lang], '', f'- [Markdown]({kind}-full.md)', f'- [PDF](../../output/pdf/web_lab_{kind}_{lang}.pdf)', '']
         write(kind,'\n'.join(index))
         # Cross-language links in the complete handbook must keep the reader in that format.
         value = re.sub(r'(\.\./(?:ja|ru|uz)/'+kind+r')\.md',r'\1-full.md',value)
         value = value.replace('\n## '+labels['intro'][lang], '\n'+nav(lang)+'\n\n## '+labels['intro'][lang],1)
         write(kind+'-full',value)
-        for n in range(7):
+        for n in ACTIVE_NUMBERS:
             task = prefix+str(n)
             match = re.search(r'^## '+task+r' ([^\n]+)\n(.*?)(?=^## |\Z)',complete[kind],re.M|re.S)
             assert match, task
@@ -110,5 +112,5 @@ def write_pages(root, lang, registry, revision, distribution_id, render_html, la
             neighbors=[]
             if position:neighbors.append(f'[{WORDS["previous"][lang]}: {ORDER[position-1]}]({ORDER[position-1].lower()}.md)')
             if position+1<len(ORDER):neighbors.append(f'[{WORDS["next"][lang]}: {ORDER[position+1]}]({ORDER[position+1].lower()}.md)')
-            text=f'# {task} {match[1]}\n\n{nav(lang)}\n\n{translations(task.lower())}\n\n2026-11-03 · D12 P/M {revision}\n\n{expiry_text(lang)}\n\n## {WORDS["before"][lang]}\n\n{preparation}\n\n{body.rstrip()}\n\n---\n\n'+ ' · '.join(neighbors)+'\n'
+            text=f'# {task} {match[1]}\n\n{nav(lang)}\n\n{translations(task.lower())}\n\n2026-11-13 · D12 P/M {revision}\n\n{expiry_text(lang)}\n\n## {WORDS["before"][lang]}\n\n{preparation}\n\n{body.rstrip()}\n\n---\n\n'+ ' · '.join(neighbors)+'\n'
             write(task.lower(),text)

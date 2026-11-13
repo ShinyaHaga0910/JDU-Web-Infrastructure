@@ -90,57 +90,37 @@ def chapter07():
          'digは回答を見るためのコマンド。OSの問い合わせ先設定は変更しない。'])
 
 
-def chapter08():
-    s=Scene(1800,1120,'プロセスがファイルの内容をメモリーへ読み込み、作業後にストレージへ保存する関係')
-    s.text(40,18,'図8-1  ストレージから読み込み、メモリーで作業し、保存する',35)
-    s.text(55,104,'今回のWebサーバー：Ubuntu OS上でプロセスを動かす',30)
-    s.rect(50,200,700,650,'#edf5fc',BLUE)
-    s.text(400,226,'ストレージ：EBS',36,BLUE,center=True)
-    s.text(400,306,'ファイルとして内容を残す',30,center=True)
-    s.rect(100,420,600,205,'#ffffff',BLUE)
-    s.text(400,448,'文章ファイルの例',30,BLUE,center=True)
-    s.text(400,515,'/var/lib/example.txt',31,center=True)
-    s.text(400,720,'OSが終了しても保存内容は残る',29,BLUE,center=True)
-    s.rect(1060,200,690,650,'#edf7f0',GREEN)
-    s.text(1405,226,'メモリー：作業する場所',35,GREEN,center=True)
-    s.text(1405,306,'プロセスが必要な内容を扱う',30,center=True)
-    s.rect(1100,420,610,205,'#ffffff',GREEN)
-    s.text(1405,443,'プロセス（実行中のプログラム）',29,GREEN,center=True)
-    s.text(1405,513,'読み込んだ文章を編集する',29,center=True)
-    s.text(1405,715,'終了時、未保存の変更は失われる',28,GREEN,center=True)
-    s.arrow([(750,475),(1060,475)],BLUE)
-    s.text(790,391,'① 読み込む',28,BLUE)
-    s.text(1150,575,'② メモリー上で作業する',27,GREEN)
-    s.arrow([(1060,660),(750,660)],AMBER)
-    s.text(790,697,'③ 保存する',28,AMBER)
-    s.text(55,935,'読み込み：ストレージのファイルから、メモリーへ必要な内容を取り込む。',30)
-    s.text(55,1008,'保存：メモリーで作業した内容を、OSを通じてストレージのファイルへ書き戻す。',30)
-    s.save('ch08-fig01-memory-storage')
-    stack(8,2,'storage','ストレージからファイルまでの対応',[
-        ('AWSのEBSボリューム','EC2へ接続する、SSDやハードディスクに相当するストレージ'),
-        ('Ubuntu OSから見える装置・パーティション','EBSをファイル保存用のディスクとして扱う'),
-        ('ファイルシステムとマウント先','ファイルをディレクトリから利用するための仕組み'),
-        ('ファイルのパス','例：/var/lib の下の保存ファイル')],
-        ['保存の対応関係であり、ネットワーク通信の経路ではない。'])
-    cards(8,3,'lifecycle','停止前・停止中・再開後を比べる',[
-        ('停止前',['プロセスがメモリーで作業','必要な内容をファイルへ保存','EBSに保存した内容を残す']),
-        ('通常の停止中',['OSとプロセスは停止','メモリーでの作業は終了','EBS上の保存ファイルは残る']),
-        ('再開後',['Ubuntu OSが新たに起動','新しいプロセスが動く','保存ファイルを読み込める'])],
-        ['今回は、同じインスタンスと元のEBSを維持するStop/Startを扱う。',
-         '停止前に保存を終えたファイルを、新たな起動後にも利用できる。'])
-    rows(8,4,'evidence','再開後に確かめる対象',[
-        (['ストレージ上のファイル'],['保存したファイルが読めるか','停止前に保存した内容と比べる']),
-        (['インスタンスID・ボリュームID'],['同じEC2とストレージか','停止前と同じものを使っているか']),
-        (['boot ID・現在の公開IP'],['今回の起動と公開側の接続先','古い公開IPへ接続し続けない'])],
-        ['それぞれの値が何を区別するかを明確にする。'])
-
-
 def chapter09():
-    rows(9,1,'dbms','DBを利用する側と、管理する側',[
-        (['EC2 Webサーバー','psql・提供アプリ'],['EC2 DBサーバーのPostgreSQL','TCPで5432番ポートへ接続']),
-        (['接続時に選ぶDB名'],['PostgreSQL内のデータベース','練習用と本課題用などを区別']),
-        (['送信するSQL'],['選んだDBで処理する','接続ロールの権限も判定する'])],
-        ['この図は、利用する対象と選ぶ情報の対応を示す。'])
+    s=Scene(1800,1120,'Webサーバー上のpsqlがDBMSのPostgreSQLへSQLを送り、PostgreSQLが管理する複数のデータベースから利用先を選ぶ')
+    s.text(40,18,'図9-1  クライアントはDBMSを通してDBを利用する',36)
+    s.rect(40,160,600,720,'#edf5fc',BLUE)
+    s.text(340,185,'EC2',26,center=True)
+    s.text(340,235,'Webサーバー',34,BLUE,center=True)
+    s.rect(85,380,510,260,'#ffffff',BLUE)
+    s.text(340,408,'クライアント：psql',32,BLUE,center=True)
+    s.text(340,480,'起動するとプロセスが動く',28,center=True)
+    s.text(340,550,'SQLを送り、結果を表示する',28,center=True)
+    s.rect(770,160,990,720,'#f7f9fc',GREEN)
+    s.text(1265,185,'EC2',26,center=True)
+    s.text(1265,235,'DBサーバー',34,GREEN,center=True)
+    s.rect(810,310,910,525,'#edf7f0',GREEN)
+    s.text(1265,332,'DBMS：PostgreSQL',35,GREEN,center=True)
+    s.text(1010,471,'SQLを受け付ける',29,GREEN,center=True)
+    s.text(1010,540,'選んだDBを操作する',28,center=True)
+    s.rect(1350,420,320,225,'#e1edf6',BLUE)
+    s.text(1510,444,'本課題用のDB',27,BLUE,center=True)
+    s.rect(1290,560,390,225,'#ffffff',GREEN)
+    s.text(1485,585,'練習用のDB',26,GREEN,center=True)
+    s.text(1485,655,'表・備品などのデータ',27,center=True)
+    s.text(1485,717,'接続時に使うDBを選ぶ',26,center=True)
+    s.arrow([(640,480),(810,480)],BLUE)
+    s.text(683,418,'SQL',29,BLUE)
+    s.arrow([(810,625),(640,625)],GREEN)
+    s.text(683,660,'結果',28,GREEN)
+    s.arrow([(1195,585),(1290,635)],GREEN)
+    s.text(55,955,'一台のDBサーバー上で、PostgreSQLが複数のデータベースを管理する。',30)
+    s.text(55,1020,'Webのpsqlが送ったSQLを、DBサーバーのPostgreSQLが処理して結果を返す。',30)
+    s.save('ch09-fig01-dbms')
     s=Scene(1600,950,'備品表の行、列、主キーの位置を示す')
     s.text(40,18,'図9-2  行・列・主キーを表から読む',36)
     cols=[('id',160),('name',520),('quantity',980),('is_public',1360)]
@@ -153,12 +133,26 @@ def chapter09():
     s.text(55,760,'横の一行：一件の備品　　縦の一列：名前・数量などの同じ項目',29)
     s.text(55,832,'idは一件を区別する主キーの例。画面上の行番号を使うのではない。',28)
     s.save('ch09-fig02-table')
-    cards(9,3,'select','SQLの条件と、取得する結果',[
-        ('FROM lesson_item',['備品の表を選ぶ','Desk・Monitor・Keyboard']),
-        ('WHERE is_public = true',['公開する行を選ぶ','DeskとKeyboardが対象']),
-        ('SELECT name, quantity',['名前と数量の列を得る','ORDER BY nameで並べる'])],
-        ['図はSQLを理解するための対応。DB内部の実行順序を規定する図ではない。',
-         '行を選ぶ条件と、取得する列を分けて読む。'])
+    s=Scene(1800,1220,'図に示したSELECT文からFROMで表、WHEREで行、SELECTで列、ORDER BYで順序を指定する対応を読む')
+    s.text(40,18,'図9-3  このSQLで、どの行・列を取り出すか',36)
+    s.rect(55,115,1690,360,'#f7f9fc',BLUE)
+    s.text(85,138,'例に使うSQL',30,BLUE)
+    for i,line in enumerate(('SELECT name, quantity','FROM lesson_item','WHERE is_public = true','ORDER BY name;')):
+        s.text(95,205+i*60,line,32)
+    entries=[('FROM lesson_item',['備品の表を選ぶ','Desk・Monitor・Keyboard']),
+             ('WHERE is_public = true',['公開する行を選ぶ','DeskとKeyboard']),
+             ('SELECT name, quantity',['名前と数量の列を得る','Desk：6、Keyboard：4'])]
+    for i,(heading,lines) in enumerate(entries):
+        x=55+i*575;c=(BLUE,GREEN,AMBER)[i]
+        s.rect(x,575,535,320,'#f7f9fc',c)
+        s.text(x+267,600,heading,29,c,center=True)
+        for j,line in enumerate(lines):s.text(x+267,685+j*77,line,28,center=True)
+        if i<2:s.arrow([(x+535,755),(x+575,755)],c)
+    s.text(55,965,'ORDER BY name：得られた行を、名前の昇順に並べる。',30)
+    s.text(55,1035,'上のSQLと同じ表・条件を例に、取り出す行と列の対応を示している。',29)
+    s.text(55,1105,'図は考え方を順に示すもの。DB内部の実際の処理順序を規定していない。',28)
+    s.save('ch09-fig03-select')
+
 
 
 def chapter10():
@@ -167,7 +161,7 @@ def chapter10():
         ('クラスター：16/main','今回の一つのPostgreSQLの管理単位'),
         ('データベース','接続時に使うデータのまとまりを選ぶ'),
         ('スキーマと表','例：public.catalog_item')],
-        ['ここでのクラスターは、複数台の冗長構成を意味しない。'])
+        [])
     stack(10,2,'connection','WebからDBへ接続して操作する条件',[
         ('名前解決と接続先','db.lab.test → 10.20.2.20'),
         ('通信許可・待受','WebからTCPでDBサーバーの5432番ポートへ'),
@@ -276,5 +270,5 @@ def chapter14():
         ['復旧のために全面開放せず、元の利用要件を保つ。'])
 
 
-BUILDERS={7:chapter07,8:chapter08,9:chapter09,10:chapter10,11:chapter11,
+BUILDERS={7:chapter07,9:chapter09,10:chapter10,11:chapter11,
           12:chapter12,13:chapter13,14:chapter14}

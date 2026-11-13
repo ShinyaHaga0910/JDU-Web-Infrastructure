@@ -17,7 +17,7 @@ LEGACY = ROOT / 'legacy' if (ROOT / 'legacy').is_dir() else ROOT.parent / 'web_l
 BOOTSTRAP = ROOT / 'legacy' if (ROOT / 'legacy').is_dir() else ROOT.parent / 'web_lab_bootstrap'
 sys.path[:0] = [str(LEGACY), str(BOOTSTRAP)]
 
-from registry import TASKS, canonical_checks, build_report, validate_report, score, CONTRACT_ID, CONTRACT_SHA256
+from registry import COURSE_TASKS as TASKS, canonical_checks, build_report, validate_report, score, CONTRACT_ID, CONTRACT_SHA256
 from transport import ssm_command, payload, LOADER
 
 

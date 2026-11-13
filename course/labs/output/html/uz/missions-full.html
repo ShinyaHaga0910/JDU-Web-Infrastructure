@@ -13,18 +13,19 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">Qo‘llanmadan foydalanish</a> · <a href="#section-2">Muhit va tayyorgarlik</a> · <a href="#section-3">Qadamlarni qanday o‘qish kerak</a> · <a href="#section-4">Tayyor tizim va ulanish yo‘llari</a> · <a href="#section-5">Mustaqil topshiriqdan oldin</a> · <a href="#section-6">M0 Shaxsiy muhit va buyruqlarni bajarish joyi (0)</a> · <a href="#section-7">M1 HTTP orqali statik faylni qaytarish (8)</a> · <a href="#section-8">M2 Ichki DNS va odatiy nom yechimi (13)</a> · <a href="#section-9">M3 To‘xtatish va qayta ishga tushirishda ma’lumotlar (3)</a> · <a href="#section-10">M4 PostgreSQL ga autentifikatsiya bilan ulanish (9)</a> · <a href="#section-11">M5 Berilgan app ni Web va DB bilan bog‘lash (13)</a> · <a href="#section-12">M6 Eng kam huquq va ochiq kirish chegarasi (16)</a> · <a href="#section-13">Davom ettirish va natijalar</a> · <a href="#section-14">Manbalar va versiya</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: M0-M6 mustaqil topshiriqlar</h1>
-<p>2026-11-03 | D12 P/M r1.4 | web-course-class193548-20261103-r3</p>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Qo‘llanmadan foydalanish</a> · <a href="#section-2">Muhit va tayyorgarlik</a> · <a href="#section-3">Qadamlarni qanday o‘qish kerak</a> · <a href="#section-4">Tayyor tizim va ulanish yo‘llari</a> · <a href="#section-5">Mustaqil topshiriqdan oldin</a> · <a href="#section-6">M0 Shaxsiy muhit va buyruqlarni bajarish joyi (0)</a> · <a href="#section-7">M1 HTTP orqali statik faylni qaytarish (8)</a> · <a href="#section-8">M2 Ichki DNS va odatiy nom yechimi (13)</a> · <a href="#section-9">M4 PostgreSQL ga autentifikatsiya bilan ulanish (9)</a> · <a href="#section-10">M5 Berilgan app ni Web va DB bilan bog‘lash (13)</a> · <a href="#section-11">M6 Eng kam huquq va ochiq kirish chegarasi (16)</a> · <a href="#section-12">Davom ettirish va natijalar</a> · <a href="#section-13">Manbalar va versiya</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: M0-M6 mustaqil topshiriqlar</h1>
+<p>2026-11-13 | D12 P/M r1.5 | web-course-class193548-20261103-r3</p>
 <p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
 <p>O‘qituvchi tekshiruvi uchun birinchi nashr. Talabaning qo‘llanma bo‘yicha boshidan oxirigacha o‘tishi hali tekshirilmagan.</p>
 <p>Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga ega. Ona tili mutaxassisi tahriri hali bajarilmagan.</p>
 <p><a href="../ja/missions-full.html">日本語</a> · <a href="../ru/missions-full.html">Русский</a> · <a href="../uz/missions-full.html">O‘zbekcha</a></p>
 <p><a href="start.html">Avval: ulanish va qoidalar</a> · <a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a> · <a href="portal.html">Brauzerda tekshirish</a></p>
+<p><a href="start.html">Avval: ulanish va qoidalar</a> · <a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a> · <a href="portal.html">Brauzerda tekshirish</a></p>
 <h2 id="section-1">Qo‘llanmadan foydalanish</h2>
 <p>Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P - bahoga ball qo‘shmaydigan mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.</p>
-<p>P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → M4 → P5 → P6 → M5 → M6</p>
+<p>P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6</p>
 <p>P5 uchun ham M2 DNS kerak. P4 IP bilan ulanadi, app esa db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating. P ixtiyoriy mashq; checker M ning joriy old shartlarini tekshiradi.</p>
-<p>M1=8, M2=13, M3=3, M4=9, M5=13, M6=16: jami 62 xom ball. M0=0. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.</p>
+<p>M1=8, M2=13, M4=9, M5=13, M6=16: jami 59 xom ball. M0=0. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.</p>
 <h2 id="section-2">Muhit va tayyorgarlik</h2>
 <p>Avval boshlang‘ich tarqatma imzosi, yangi beshta server yoki mavjud muhitga install, ichki SSH va shaxsiy ro‘yxatni tugating. Yo‘riqnoma zip dagi distribution/STUDENT.md da. Maxfiy kalitni umumiy Windows ga saqlamang; shaxsiy Academy hisobining CloudShell idan foydalaning. O‘qituvchi anonim Lab ID, fingerprint va muddatni beradi.</p>
 <p>Umumiy private IP quyida; public IPv4 doimiy emas. AWS region us-east-1, Ubuntu24.04/amd64. RDP: labuser; SSM: ssm-user; ichki SSH: ubuntu. User nomi va server rolini adashtirmang.</p>
@@ -321,52 +322,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <li>Tanlangan topshiriq tekshiruvini boshlang.</li>
 <li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida. P va M0 bahoga qo‘shilmaydi.</li>
 </ol>
-<h2 id="section-9">M3 To‘xtatish va qayta ishga tushirishda ma’lumotlar (3)</h2>
-<h3>Tayyor holat talablari</h3>
-<p>O‘z Lab ID bilan alohida M marker yarating. P3 dan alohida brauzerda oldingi holat → AWS Stop → brauzerda to‘xtashni tekshirish → AWS Start → brauzerda saqlanishni tekshirish ketma-ketligini bajaring. Ayni Web va asl root volume kerak; oddiy reboot yetmaydi. Backup/restore va yangi disk kerak emas.</p>
-<h3>Topshiriq diagrammasi</h3>
-<p><img src="../../../assets/uz/m3.png" alt="M3: Ayni Web ning asl diski → Qayd → Stop → Start → Mazmun saqlangan, boot ID yangi。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Stop/Start AWS API boshqaruvidir; Web kiruvchi 443 portini ochish emas. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
-<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Stop/Start AWS API boshqaruvidir; Web kiruvchi 443 portini ochish emas. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
-<p><a href="../../../assets/uz/m3.png">Kattalashtirish</a> · <a href="../../../assets/uz/m3.svg">SVG</a></p>
-<ul>
-<li>File: /var/lib/jdu-web/mission/storage.txt</li>
-</ul>
-<pre><code class="language-text">lab_id={lab_id}
-task=M3
-payload=mission-storage-2026
-</code></pre>
-<p>{lab_id} ni o‘z anonim ID ga almashtiring. Fayl 0644/root:root, katalog 0755/root:root. Faqat ayni asl Web/volume ni to‘xtating.</p>
-<h3>Shartlar: har tekshiruvga 1 xom ball</h3>
-<table>
-<thead>
-<tr>
-<th scope="col">check ID (o‘zgartirmang)</th>
-<th scope="col">Shart</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>WEB04_MARKER_CONTENT</td>
-<td>Marker path, shaxsiy Lab ID, task va aniq matn topshiriqqa mos.</td>
-</tr>
-<tr>
-<td>WEB04_MARKER_PERMISSIONS</td>
-<td>Fayl root:root 0644, ota katalog root:root 0755.</td>
-</tr>
-<tr>
-<td>WEB04_STOP_START_RETENTION</td>
-<td>Stop/start uch bosqichi isbotlangan: ayni instance/volume/hash, yangi boot_id va alohida kuzatilgan stopped.</td>
-</tr>
-</tbody>
-</table>
-<p>Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.</p>
-<h3>Tekshirish va yuborish</h3>
-<ol>
-<li>PC da maktab Google orqali <a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a> ga kiring, o‘z Lab va <strong>M3</strong> ni tanlang. Hisobni bog‘lash va ekranlar: <a href="portal.html">brauzer yo‘riqnomasi</a>.</li>
-<li>To‘xtashdan oldingi holatni yozing → saqlanishini kuting → AWS da ayni Web ni Stop → stopped → to‘xtashni tasdiqlang → yozilishini kuting → ayni Web ni Start → running/SSM Online → qayta ishga tushgach saqlanishni tekshiring. M3 dalilini P3 dan alohida yozing.</li>
-<li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida. P va M0 bahoga qo‘shilmaydi.</li>
-</ol>
-<h2 id="section-10">M4 PostgreSQL ga autentifikatsiya bilan ulanish (9)</h2>
+<h2 id="section-9">M4 PostgreSQL ga autentifikatsiya bilan ulanish (9)</h2>
 <h3>Tayyor holat talablari</h3>
 <p>Asosiy DB va rollarni mustaqil quring. M2 db.lab.test ni odatiy resolver bilan yechib Web runtime role orqali SELECT bajaring. HBA faqat Web/32 va to‘g‘ri DB/role juftiga ruxsat beradi. Mavjud parolni Web mission helper orqali practice dan alohida saqlang. App jadvallari hali kerak emas.</p>
 <h3>Topshiriq diagrammasi</h3>
@@ -434,7 +390,7 @@ payload=mission-storage-2026
 <li>Tanlangan topshiriq tekshiruvini boshlang.</li>
 <li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida. P va M0 bahoga qo‘shilmaydi.</li>
 </ol>
-<h2 id="section-11">M5 Berilgan app ni Web va DB bilan bog‘lash (13)</h2>
+<h2 id="section-10">M5 Berilgan app ni Web va DB bilan bog‘lash (13)</h2>
 <h3>Tayyor holat talablari</h3>
 <p>Ayni app ni mission DB ga ulang. P5 ko‘nikmasi bilan profile=mission tanlang, app/venv ni qayta joylamang. Service ni to‘xtatib: mission runtime yaratish → aniq activate → mission setup yaratish; practice setup P6 da tugatilgan bo‘lsin. Asosiy DB da migrations/seed/admin va grants ni bajaring, ikkita belgilangan yozuvni kiriting. P1/M1 ni saqlab mission ni active qoldiring.</p>
 <h3>Topshiriq diagrammasi</h3>
@@ -548,7 +504,7 @@ payload=mission-storage-2026
 <li>Funksiya/huquq tekshiruvini tanlang, lab_admin mavjud parolini app administratorining yashirin maydoniga kiritib, shu parol bilan tekshiring. Bu RDP paroli emas. Faqat sozlama tekshiruvi funksiyalarni tasdiqlamaydi.</li>
 <li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida. P va M0 bahoga qo‘shilmaydi.</li>
 </ol>
-<h2 id="section-12">M6 Eng kam huquq va ochiq kirish chegarasi (16)</h2>
+<h2 id="section-11">M6 Eng kam huquq va ochiq kirish chegarasi (16)</h2>
 <h3>Tayyor holat talablari</h3>
 <p>Mission eng kam huquqini tugating: catalog_setup NOLOGIN/password NULL, vaqtinchalik setup fayllari qolmasin. Root kod/venv, 600 maxfiy fayl, 80 da admin rad etilishi, private8080 muvaffaqiyati, admin faqat view/add/change, ochiq/yopiq ma’lumot va SQL huquqlarini tekshiring. Brauzerdagi funksional tekshiruv avtomatik; shaxsiy namoyish kerak emas.</p>
 <h3>Topshiriq diagrammasi</h3>
@@ -674,11 +630,11 @@ payload=mission-storage-2026
 <li>Funksiya/huquq tekshiruvini tanlang, lab_admin mavjud parolini app administratorining yashirin maydoniga kiritib, shu parol bilan tekshiring. Bu RDP paroli emas. Faqat sozlama tekshiruvi funksiyalarni tasdiqlamaydi.</li>
 <li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida. P va M0 bahoga qo‘shilmaydi.</li>
 </ol>
-<h2 id="section-13">Davom ettirish va natijalar</h2>
+<h2 id="section-12">Davom ettirish va natijalar</h2>
 <p>Keyingi safar o‘z Lab va ayni besh serverni ishga tushirib, running/SSM Online va joriy public IP ni tekshiring. Web Portal ga maktab Google orqali kirib, M0 tayyorligidan boshlang. Yaratish, kalit va ro‘yxatni har safar takrorlamang. Muddat tugasa o‘qituvchidan yangilashni so‘rang.</p>
 <p>Natijalar avtomatik saqlanadi. Ishlov paytida natijani yangilang; baholarni saqlangan baholar bo‘limidan ko‘ring. Topshiriq, vaqt va saqlash holatini solishtiring. UNKNOWN o‘lchab bo‘lmagan holat, muvaffaqiyat yoki tasdiqlangan nol emas. Tekshirilmagan M ning tasdiqlangan ballari saqlanadi. Oxirgi baholanadigan natija olinadi; turli urinish PASS lari qo‘shilmaydi, maksimum avtomatik tanlanmaydi.</p>
 <p>Ekran amallari: <a href="portal.html">brauzer yo‘riqnomasi</a>. Parol/token/cookie/maxfiy kalit/env ni hisobot yoki chat ga yubormang.</p>
-<h2 id="section-14">Manbalar va versiya</h2>
+<h2 id="section-13">Manbalar va versiya</h2>
 <p>Baholash shartlari: M jadvallari va tarqatmadagi belgilangan registry.</p>
 <p>web-course-class193548-20261103-r3; web-d11-2026-10-r1; registry SHA256 <code>3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33</code>.</p>
 <p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
@@ -689,4 +645,4 @@ payload=mission-storage-2026
 <li><a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">PostgreSQL 16: pg_hba.conf</a></li>
 <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html">EC2 instance states</a></li>
 </ul>
-</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>
+</main><footer>web-course-class193548-20261103-r3 · 59 raw points · 2026-11-13</footer></body></html>

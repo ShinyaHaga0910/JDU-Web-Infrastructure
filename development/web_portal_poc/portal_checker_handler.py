@@ -8,7 +8,7 @@ import progress_api as legacy
 from identity_grade import resolve_student
 from identity_keys import subject_key
 from assessment_command_jobs import checked_spec, JobDenied
-from registry import CONTRACT_SHA256, TASKS
+from registry import COURSE_TASKS as TASKS, CONTRACT_SHA256
 
 
 def serve(event, pepper, bindings, grades, client, submissions=None):

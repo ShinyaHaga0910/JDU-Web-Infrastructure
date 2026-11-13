@@ -1,5 +1,6 @@
 """Fixed-denominator views; latest evaluable attempt is separate from current health."""
-from registry import CONTRACT_ID, CONTRACT_SHA256, MAXIMUM, MISSIONS, TASKS
+from registry import (CONTRACT_ID, CONTRACT_SHA256, MAXIMUM, MISSIONS, TASKS,
+                      COURSE_ID, COURSE_TASKS, COURSE_MISSIONS, COURSE_MAXIMUM)
 
 
 def grade_key(mission_id):
@@ -31,6 +32,24 @@ def project_lab(lab):
                 complete=not pending and all(current.get(m, {}).get('complete') for m in MISSIONS),
                 missing_or_unresolved=pending, current_unresolved=uncertain,
                 current=current, selected=selected)
+
+
+def project_course_lab(lab):
+    """Project preserved D11 reports onto the current 59-point curriculum.
+
+    Historical M3 rows are retained, but neither their points nor missing or
+    unresolved status can affect current course completion.
+    """
+    view = project_lab(lab)
+    current = {key: row for key, row in view['current'].items() if key in COURSE_TASKS}
+    selected = {key: row for key, row in view['selected'].items() if key in COURSE_MISSIONS}
+    pending = [mid for mid in COURSE_MISSIONS if mid not in selected]
+    uncertain = [mid for mid in COURSE_MISSIONS if mid in current and not current[mid].get('evaluable')]
+    return {**view, 'curriculum_id': COURSE_ID, 'raw_maximum': COURSE_MAXIMUM,
+            'raw_earned': sum(int(selected[mid]['raw_earned']) for mid in COURSE_MISSIONS if mid in selected),
+            'current': current, 'selected': selected, 'missing_or_unresolved': pending,
+            'current_unresolved': uncertain, 'fully_evaluated': not pending and not uncertain,
+            'complete': not pending and all(current.get(mid, {}).get('complete') for mid in COURSE_MISSIONS)}
 
 
 def export_labs(labs, after='', limit=25):

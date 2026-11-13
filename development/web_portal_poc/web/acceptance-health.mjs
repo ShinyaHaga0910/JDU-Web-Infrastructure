@@ -31,8 +31,8 @@ export function createAcceptanceHealth(env=process.env,
         {abortSignal:AbortSignal.timeout(12000)});
       if (result.StatusCode===200 && !result.FunctionError && result.Payload?.length<=65536) {
         const value=JSON.parse(Buffer.from(result.Payload).toString('utf8'));
-        gradeService=value.status==='ok' && value.grade?.lab_id===lab && value.grade?.raw_maximum===62
-          && Number.isInteger(value.grade?.raw_earned) && value.grade.raw_earned>=0 && value.grade.raw_earned<=62;
+        gradeService=value.status==='ok' && value.grade?.lab_id===lab && value.grade?.raw_maximum===59
+          && Number.isInteger(value.grade?.raw_earned) && value.grade.raw_earned>=0 && value.grade.raw_earned<=59;
       }
     } catch { /* Availability only; never return a score or upstream body. */ }
     return {storage,savedGrades,gradeService,checkedAt:new Date(clock()).toISOString()};

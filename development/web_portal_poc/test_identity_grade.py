@@ -2,7 +2,7 @@ import copy
 import json
 import unittest
 
-# Sets up the same source paths and realistic 62-point grading fixture.
+# Sets up the same source paths and realistic 59-point grading fixture.
 from test_grade_reader import GradeTest, legacy
 from identity_grade import identity_grade, subject_key
 
@@ -44,7 +44,7 @@ class IdentityGradeTest(unittest.TestCase):
 
     def test_verified_subject_reads_only_own_existing_grade(self):
         view = self.read()
-        self.assertEqual((view['raw_earned'], view['raw_maximum']), (62, 62))
+        self.assertEqual((view['raw_earned'], view['raw_maximum']), (59, 59))
         self.assertIn('M5', view['current_unresolved'])
         self.assertEqual(self.store.labs_calls, ['test-lab'])
         self.assertNotIn(self.subject, json.dumps(view))

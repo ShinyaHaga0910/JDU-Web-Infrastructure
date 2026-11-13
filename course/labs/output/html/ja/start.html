@@ -13,14 +13,14 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.4</p><nav aria-label="Contents"><a href="#section-1">使い方と共通の約束</a> · <a href="#section-2">対象・前提・準備</a> · <a href="#section-3">操作例の読み方</a> · <a href="#section-4">完成像と通信経路</a> · <a href="#section-5">次回の再開・結果の確認</a> · <a href="#section-6">根拠と使用版</a></nav></header><main id="content" tabindex="-1"><h1>はじめに：接続・操作の約束</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">使い方と共通の約束</a> · <a href="#section-2">対象・前提・準備</a> · <a href="#section-3">操作例の読み方</a> · <a href="#section-4">完成像と通信経路</a> · <a href="#section-5">次回の再開・結果の確認</a> · <a href="#section-6">根拠と使用版</a></nav></header><main id="content" tabindex="-1"><h1>はじめに：接続・操作の約束</h1>
 <p><a href="start.html">はじめに：接続・操作の約束</a> · <a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a> · <a href="portal.html">ブラウザで確認する</a></p>
 <p><a href="../ja/start.html">日本語</a> · <a href="../ru/start.html">Русский</a> · <a href="../uz/start.html">O‘zbekcha</a></p>
 <h2 id="section-1">使い方と共通の約束</h2>
 <p>まず各Pの課題文を読み、必要なら詳しい操作例を一段ずつ使う。Pは練習で成績に加算しない。Mは別の対象・値で自分で構築する。課題は授業回番号ではなく、自分の進度で進める。Pの完了はMの合格に置き換わらない。</p>
-<p>P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → M4 → P5 → P6 → M5 → M6</p>
+<p>P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6</p>
 <p>P5にもM2のDNSが必要。P4はIP指定だが、アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。Pは任意の練習で、採点は各Mの現在の前提を検査する。</p>
-<p>M1=8、M2=13、M3=3、M4=9、M5=13、M6=16、合計62素点。M0は0点。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。</p>
+<p>M1=8、M2=13、M4=9、M5=13、M6=16、合計59素点。M0は0点。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。</p>
 <h2 id="section-2">対象・前提・準備</h2>
 <p>初期配布の署名確認、新規5台または既存環境へのinstall、内部SSHと個別採点登録までを先に完了する。初期配布の手順は教材zipのdistribution/STUDENT.mdを読む。秘密鍵を共有Windowsへ置かず、CloudShellは本人Academy accountの中で使う。教師は本人用の匿名Lab ID・署名fingerprint・有効期限を案内する。</p>
 <p>共通IP表。public IPv4は固定しない。AWS regionはus-east-1、Ubuntu24.04/amd64。RDPはlabuser、SSMはssm-user、内部SSHはubuntu。user名とサーバー役割を混同しない。</p>
@@ -138,4 +138,4 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <li><a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">PostgreSQL 16: pg_hba.conf</a></li>
 <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html">EC2 instance states</a></li>
 </ul>
-</main><footer>web-course-class193548-20261103-r3 · 62 raw points · 2026-11-03</footer></body></html>
+</main><footer>web-course-class193548-20261103-r3 · 59 raw points · 2026-11-13</footer></body></html>

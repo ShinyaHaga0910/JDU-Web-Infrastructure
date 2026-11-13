@@ -17,4 +17,4 @@ payload-cache/
 signing-home/
 development/.cache/
 development/output/
-tmp/pdfs/
+tmp/

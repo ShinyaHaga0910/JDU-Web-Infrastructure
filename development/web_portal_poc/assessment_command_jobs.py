@@ -24,7 +24,7 @@ import uuid
 from boto3.dynamodb.types import TypeDeserializer, TypeSerializer
 from botocore.config import Config
 
-from registry import CONTRACT_SHA256, TASKS, validate_report
+from registry import COURSE_TASKS as TASKS, CONTRACT_SHA256, validate_report
 
 SER, DE = TypeSerializer(), TypeDeserializer()
 ROLES = {'bastion', 'web', 'dns', 'db', 'repo'}

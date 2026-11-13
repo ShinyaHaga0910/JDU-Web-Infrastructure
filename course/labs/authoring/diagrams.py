@@ -1,3 +1,4 @@
+from curriculum import ACTIVE_NUMBERS
 """Editable vector scenes and matching PNGs for every P/M task in JA/RU/UZ."""
 import html
 import json
@@ -120,7 +121,7 @@ def write_diagrams(root):
     counts={}
     for lang in LANGS:
         for prefix in ('P','M'):
-            for n in range(7):
+            for n in ACTIVE_NUMBERS:
                 task=prefix+str(n);s=Scene(lang,task)
                 s.text(24,12,f'{task} · '+T('いま何をしているか','Что мы сейчас делаем','Hozir nima qilamiz')[lang],24)
                 for i,(label,value) in enumerate(zip(('before','now','result'),STAGES[n])):

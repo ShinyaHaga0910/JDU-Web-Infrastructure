@@ -45,7 +45,7 @@ test('OAuth state, PKCE and nonce bind a callback to the browser flow',async()=>
 
 
 test('a same-portal task destination is sealed into OAuth and restored after login',async()=>{
-  const target='/checks?lang=ru&task_id=M3&job_id=12345678-1234-4234-8234-123456789abc&check_mode=storage';
+  const target='/checks?lang=ru&task_id=M5&job_id=12345678-1234-4234-8234-123456789abc&check_mode=functional';
   const flow=await login(config,target), flowCookie=flow.flowCookie.split(';')[0];
   const payload=await readFlow(flowCookie.slice(FLOW.length+1),config);
   assert.equal(payload.returnTo,target);

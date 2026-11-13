@@ -1,6 +1,6 @@
 # Web演習：練習P0〜P6と詳しい操作例
 
-2026-11-03 | D12 P/M r1.4 | web-course-class193548-20261103-r3
+2026-11-13 | D12 P/M r1.5 | web-course-class193548-20261103-r3
 
 配布版の有効期限：2027年1月31日末（UZT）。
 
@@ -12,15 +12,17 @@
 
 [はじめに：接続・操作の約束](start.md) · [練習 P0〜P6](practice.md) · [課題 M0〜M6](missions.md) · [ブラウザで確認する](portal.md)
 
+[はじめに：接続・操作の約束](start.md) · [練習 P0〜P6](practice.md) · [課題 M0〜M6](missions.md) · [ブラウザで確認する](portal.md)
+
 ## 使い方と共通の約束
 
 まず各Pの課題文を読み、必要なら詳しい操作例を一段ずつ使う。Pは練習で成績に加算しない。Mは別の対象・値で自分で構築する。課題は授業回番号ではなく、自分の進度で進める。Pの完了はMの合格に置き換わらない。
 
-P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → M4 → P5 → P6 → M5 → M6
+P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6
 
 P5にもM2のDNSが必要。P4はIP指定だが、アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。Pは任意の練習で、採点は各Mの現在の前提を検査する。
 
-M1=8、M2=13、M3=3、M4=9、M5=13、M6=16、合計62素点。M0は0点。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。
+M1=8、M2=13、M4=9、M5=13、M6=16、合計59素点。M0は0点。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。
 
 ## 対象・前提・準備
 
@@ -893,202 +895,6 @@ dig @10.20.2.10は成功し、getentは失敗する。DNSのzoneだけが原因�
 **考え方:**
 
 言えない。明示したDNSへの回答と、OSが通常選ぶresolverは別なので、Netplanとresolvectlの実効設定を確認する。
-
-## P3 保存内容と停止・再開
-
-### 学ぶこと
-
-元のEBS上のfile・権限を確認し、同じWebを停止して再開した保持を証拠で示す。
-
-### 課題
-
-P3用markerを自分の匿名Lab IDで作る。停止前→stopped→再開後を観測する。ディスク追加・mount・backup/restoreは要求しない。
-
-### 今回の見取り図
-
-![P3: 同じWebの元ディスク → 記録 → Stop → Start → 内容保持と新boot ID。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 Stop/StartはAWS APIによる管理操作で、Webの受信443番を開く操作ではありません。](../../assets/ja/p3.png)
-
-図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 Stop/StartはAWS APIによる管理操作で、Webの受信443番を開く操作ではありません。
-
-[図を拡大する](../../assets/ja/p3.png) · [SVG](../../assets/ja/p3.svg)
-
-- File: /var/lib/jdu-web/practice/storage.txt
-
-```text
-lab_id={lab_id}
-task=P3
-payload=practice-storage-2026
-```
-
-### 仕組みを理解する
-
-**始める前の状態:**
-
-同じWebの元root EBS上にmarkerを保存できる。
-
-**このPで変えること:**
-
-Webを停止・起動しても同じ保存内容が残ることを、停止前後の証拠で示す。
-
-起動中のメモリーとEBS上へ保存したファイルを区別する。今回は元root EBSを保持した同じWebのStop/Startを扱う。ファイルのhashとinstance/volume IDを比べ、boot IDの変化で新しい起動も確認する。自動割当のpublic IPv4は変わることがある。[EC2の停止・起動](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Stop_Start.html)。
-
-### 操作例：一つずつ実行する
-
-#### P3.1 元の保存先と空きを調べる
-
-**実行場所:**
-
-WebサーバーのSSM端末：ssm-user
-
-**目的と操作:**
-
-findmntは対象pathのfile system、lsblkは接続されたdisk/partitionを示す。df -hは人が読みやすい単位。提供済みroot EBSを使い、名前が/dev/nvme等でも別diskへ付け替えない。
-
-入力するコマンド（番号はこの手順内の順番）
-
-```bash
-# 1. /var/libが載っているファイルシステムを調べる。
-findmnt -T /var/lib
-# 2. ディスクの名前・種類・容量・マウント先・識別情報を読む。
-lsblk -o NAME,TYPE,SIZE,MOUNTPOINTS,SERIAL
-# 3. /var/libの使用量と空き容量を確認する。
-df -h /var/lib
-# 4. 今回の起動を識別するboot IDを読み、停止前後の比較に使う。
-cat /proc/sys/kernel/random/boot_id
-```
-
-**コマンド・設定値の意味:**
-
-findmntはpathが載るfilesystem、lsblkはOSから見えるblock device、dfは空き容量を読む。それぞれ対象が違う。boot_idは今回の起動を識別し、保存ファイルのhashとは別の証拠になる。
-
-**期待する結果と読み方:**
-
-元root volumeと対応し、空き20%以上かつ2GiB以上。boot_idはこの起動を区別する識別子として記録する。
-
-**うまくいかないとき:**
-
-容量不足は準備状態の問題。成績のために他の教材やdiskを削除せず、教師へ相談する。
-
-#### P3.2 markerを編集して配置する
-
-**実行場所:**
-
-WebサーバーのSSM端末：ssm-user
-
-**目的と操作:**
-
-この端末にも自分のLAB_IDを設定する。printfの各行は改行で終わる。sudo installでdirectoryを0755、fileを0644/root:rootにする。最初に既存内容を確認し、異なる内容がある場合は上書きせず理由を確認する。
-
-入力するコマンド（番号はこの手順内の順番）
-
-```bash
-# 1. 教師から案内された自分のLab IDを変数へ入れる。
-LAB_ID='YOUR-LAB-ID'
-# 2. 作業場所を ~ へ移す。
-cd ~
-# 3. 練習の作業ディレクトリを作る。既存ならそのまま使う。
-mkdir -p jdu-web-practice/p3
-# 4. 作業場所を jdu-web-practice/p3 へ移す。
-cd jdu-web-practice/p3
-# 5. 自分のLab IDを含む練習用marker本文を作業ファイルへ書く。
-printf 'lab_id=%s\ntask=P3\npayload=practice-storage-2026\n' "$LAB_ID" > storage.txt
-# 6. storage.txt の内容を変更せずに読む。
-cat storage.txt
-# 7. 指定した所有者・グループ・権限でディレクトリを作る。
-sudo install -d -o root -g root -m 0755 /var/lib/jdu-web/practice
-# 8. 指定ファイルを配置し、所有者・グループ・権限を揃える。
-sudo install -o root -g root -m 0644 storage.txt /var/lib/jdu-web/practice/storage.txt
-# 9. 指定ファイルの所有者・グループ・権限・名前を読む。
-stat -c '%U:%G %a %n' /var/lib/jdu-web/practice /var/lib/jdu-web/practice/storage.txt
-# 10. markerの内容を比較するためのSHA256を表示する。
-sha256sum /var/lib/jdu-web/practice/storage.txt
-```
-
-**コマンド・設定値の意味:**
-
-printfの%sへ自分のLAB_IDが入り、\nは改行になる。>は自分の作業fileを書き出す指定。install -dは親directoryを作り、続くinstallはmarkerの所有者と権限を揃える。hashは本文の一致確認に使う。
-
-**期待する結果と読み方:**
-
-3行の本文と末尾改行、0755/0644。hashを控える。権限777にすると保存fileの条件から外れる。
-
-**うまくいかないとき:**
-
-YOUR-LAB-IDをそのまま残すと不一致。EC2名やメールではなく匿名Lab IDを使う。
-
-#### P3.3 停止前の証拠を保存する
-
-**実行場所:**
-
-自分のPCのブラウザ：Web Portal
-
-**目的と操作:**
-
-Web端末からexitでCloudShellへ戻る。Web PortalでP3を選び「停止前の状態を記録する」を押す。現在のinstance/volume/marker hash/boot_idを保存する操作で、EC2はまだ停止しない。保存成功を確認する。P3の証拠は最後までこのブラウザ手順で記録する。
-
-**コマンド・設定値の意味:**
-
-停止前記録は比較用の対象・起動・markerを保存する操作。ボタン自体はEC2を止めない。保存後にAWS Stopを行い、ブラウザとコマンドの証拠を混ぜない。
-
-**期待する結果と読み方:**
-
-停止前の証拠が保存される。記録後はmarkerを編集しない。
-
-**うまくいかないとき:**
-
-失敗したまま停止すると有効な三段階の証拠にならない。先にfile/権限/SSMを直す。
-
-#### P3.4 同じWebをStopしstoppedを観測する
-
-**実行場所:**
-
-学生本人のAWSコンソール
-
-**目的と操作:**
-
-EC2で自分のWebのinstance IDを再照合。Instance state → Stop instanceを選び、stoppedになるまで待つ。Reboot/Terminateではない。その状態のままWeb PortalのP3で「停止完了を確認する」を押す。踏み台と他の3台は停止しない。
-
-**コマンド・設定値の意味:**
-
-AWSコンソールで対象WebをStopし、stoppedになった段階をWeb Portalで記録する。SSMが切れたことだけを停止完了の証拠にしない。再起動やTerminateとは違う操作を選ぶ。
-
-**期待する結果と読み方:**
-
-同じinstanceがstoppedと記録される。この間WebへHTTP/SSM接続できないのは予定した停止。
-
-**うまくいかないとき:**
-
-stoppingの間は待つ。先にStartした場合は、三段階の証拠を最初から取り直す必要がある。
-
-#### P3.5 Startし、保持を照合して提出する
-
-**実行場所:**
-
-学生本人のAWSコンソール
-
-**目的と操作:**
-
-同じWebをStartしrunning/SSM Onlineまで待つ。SSMでfileの本文/hashとboot_idを再確認する。instance/volume/hashは同じでboot_idだけが新しくなる。Web PortalのP3で「再開後の保持を確認する」を押し、結果と保存を確認する。
-
-**コマンド・設定値の意味:**
-
-同じWebをStartし、runningとSSM Onlineを待つ。checkerは保存済みの停止前証拠と現在を比べるので、起動後にmarkerを作り直して証拠を上書きしない。以降の外部閲覧には更新後のWeb公開IPを使う。
-
-**期待する結果と読み方:**
-
-練習3項目PASS。EC2のpublic IPv4が変われば外部HTTPの接続先も更新する。
-
-**うまくいかないとき:**
-
-別instanceを作ると保持の証明にならない。P3/M3は別markerと別証拠を使う。
-
-### 理解の確認（採点外）
-
-起動後に同じ本文が読めれば、別のWebを作っても合格と言えるか？
-
-**考え方:**
-
-同じ元instanceとvolumeの保持も条件なので言えない。本文だけでなく、対象の連続性と停止状態の観測が必要。
 
 ## P4 PostgreSQLへの認証接続
 

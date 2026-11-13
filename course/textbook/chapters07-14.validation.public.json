@@ -60,129 +60,15 @@
       "local_references_checked": 10
     },
     {
-      "chapter": 8,
-      "pages": 8,
-      "text_blocks": 79,
-      "missing_text": [],
-      "pdf_words_within_page": 221,
-      "rendered_pages": 8,
-      "figure_texts_within_canvas_and_nonoverlapping": 55,
-      "figures": 4,
-      "code_blocks": 1,
-      "questions": 4,
-      "heading_pages": {
-        "章末問題": 6,
-        "章末解答": 7,
-        "参考資料": 8
-      },
-      "html_checks": [
-        {
-          "chapter": 8,
-          "width": 320,
-          "scale": 100,
-          "overflow": false,
-          "images": 4,
-          "loaded": true,
-          "code": 1
-        },
-        {
-          "chapter": 8,
-          "width": 320,
-          "scale": 200,
-          "overflow": false,
-          "images": 4,
-          "loaded": true,
-          "code": 1
-        },
-        {
-          "chapter": 8,
-          "width": 1280,
-          "scale": 100,
-          "overflow": false,
-          "images": 4,
-          "loaded": true,
-          "code": 1
-        },
-        {
-          "chapter": 8,
-          "width": 1280,
-          "scale": 200,
-          "overflow": false,
-          "images": 4,
-          "loaded": true,
-          "code": 1
-        }
-      ],
-      "sha256": "afdd2aa62a0ef45d301d7b29d6743360d3fb8285754d93e2f361a3ab25611d4b",
-      "date": "2026-11-13",
-      "local_references_checked": 10
-    },
-    {
       "chapter": 9,
-      "pages": 8,
-      "text_blocks": 88,
+      "pages": 9,
+      "text_blocks": 90,
       "missing_text": [],
-      "pdf_words_within_page": 283,
-      "rendered_pages": 8,
-      "figure_texts_within_canvas_and_nonoverlapping": 45,
+      "pdf_words_within_page": 299,
+      "rendered_pages": 9,
+      "figure_texts_within_canvas_and_nonoverlapping": 56,
       "figures": 3,
       "code_blocks": 4,
-      "questions": 4,
-      "heading_pages": {
-        "章末問題": 6,
-        "章末解答": 7,
-        "参考資料": 8
-      },
-      "html_checks": [
-        {
-          "chapter": 9,
-          "width": 320,
-          "scale": 100,
-          "overflow": false,
-          "images": 3,
-          "loaded": true,
-          "code": 4
-        },
-        {
-          "chapter": 9,
-          "width": 320,
-          "scale": 200,
-          "overflow": false,
-          "images": 3,
-          "loaded": true,
-          "code": 4
-        },
-        {
-          "chapter": 9,
-          "width": 1280,
-          "scale": 100,
-          "overflow": false,
-          "images": 3,
-          "loaded": true,
-          "code": 4
-        },
-        {
-          "chapter": 9,
-          "width": 1280,
-          "scale": 200,
-          "overflow": false,
-          "images": 3,
-          "loaded": true,
-          "code": 4
-        }
-      ],
-      "sha256": "3b61e7aae19591d0d074b65521b05fb4a6ef69b42e607f272599af9ccc356251"
-    },
-    {
-      "chapter": 10,
-      "pages": 9,
-      "text_blocks": 95,
-      "missing_text": [],
-      "pdf_words_within_page": 284,
-      "rendered_pages": 9,
-      "figure_texts_within_canvas_and_nonoverlapping": 33,
-      "figures": 3,
-      "code_blocks": 5,
       "questions": 4,
       "heading_pages": {
         "章末問題": 7,
@@ -191,6 +77,63 @@
       },
       "html_checks": [
         {
+          "chapter": 9,
+          "width": 320,
+          "scale": 100,
+          "overflow": false,
+          "images": 3,
+          "loaded": true,
+          "code": 4
+        },
+        {
+          "chapter": 9,
+          "width": 320,
+          "scale": 200,
+          "overflow": false,
+          "images": 3,
+          "loaded": true,
+          "code": 4
+        },
+        {
+          "chapter": 9,
+          "width": 1280,
+          "scale": 100,
+          "overflow": false,
+          "images": 3,
+          "loaded": true,
+          "code": 4
+        },
+        {
+          "chapter": 9,
+          "width": 1280,
+          "scale": 200,
+          "overflow": false,
+          "images": 3,
+          "loaded": true,
+          "code": 4
+        }
+      ],
+      "sha256": "85d8ecdc3e3bf28ff087d978645789a685e7664b8f86a70aebff5f5ec0626453",
+      "date": "2026-11-13"
+    },
+    {
+      "chapter": 10,
+      "pages": 8,
+      "text_blocks": 95,
+      "missing_text": [],
+      "pdf_words_within_page": 276,
+      "rendered_pages": 8,
+      "figure_texts_within_canvas_and_nonoverlapping": 32,
+      "figures": 3,
+      "code_blocks": 5,
+      "questions": 4,
+      "heading_pages": {
+        "章末問題": 6,
+        "章末解答": 7,
+        "参考資料": 8
+      },
+      "html_checks": [
+        {
           "chapter": 10,
           "width": 320,
           "scale": 100,
@@ -227,7 +170,8 @@
           "code": 5
         }
       ],
-      "sha256": "5eeb38cc2b120c7f9de7eb34dcf3339eff0f2c87be61ff0240dc135d77a45bae"
+      "sha256": "09738082117d0a7ed47a4597dfb7298e3e2dd6b9c05b848957e63481ac513b54",
+      "date": "2026-11-13"
     },
     {
       "chapter": 11,
@@ -454,17 +398,20 @@
       "sha256": "dc2a31db3b660fb1f88fb05204eb68bb89466879c9c9d2844f2dc40c30e81ae4"
     }
   ],
-  "total_pages": 74,
-  "total_figures": 25,
-  "total_code_blocks": 22,
-  "total_text_blocks": 847,
-  "total_pdf_words_within_page": 2343,
-  "total_figure_texts_checked": 346,
+  "total_pages": 66,
+  "total_figures": 21,
+  "total_code_blocks": 21,
+  "total_text_blocks": 770,
+  "total_pdf_words_within_page": 2130,
+  "total_figure_texts_checked": 301,
   "teacher_visual_review": "not performed",
   "student_trial": "not performed",
   "aws_operations": "none",
   "local_references_checked": 278,
   "local_references_missing": [],
-  "earlier_chapters_unchanged": true,
-  "updated": "2026-11-13"
+  "earlier_chapters_unchanged": false,
+  "updated": "2026-11-13",
+  "retired_chapters": [
+    8
+  ]
 }

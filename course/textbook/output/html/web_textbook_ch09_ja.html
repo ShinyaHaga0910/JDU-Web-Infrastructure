@@ -6,12 +6,14 @@
 <p>備品を少数だけ記録するなら、テキストファイルや表計算でも一覧を作れる。しかし複数の担当者が同時に変更し、コードの重複を防ぎ、必要な行だけを探すとなると、保存する文章だけでなく、変更の順序や値の整合性を管理する必要がある。</p>
 <p><strong>データベース（DB）</strong>は、関連するデータを整理して管理するまとまりである。<strong>リレーショナルデータベース</strong>では、データを表として扱い、必要に応じて複数の表を関連付ける。</p>
 <p>例えば、数量を数値として管理すれば、6個ある備品だけを探したり、数量を増減したりできる。備品コードに重複を許さない制約を設ければ、同じコードの別の備品を登録しようとしたときに拒否できる。DBは値を保存するだけでなく、許された操作と整合性を管理する。</p>
-<h2 id="92-postgresql、データベース、クライアントを分ける">9.2 PostgreSQL、データベース、クライアントを分ける</h2>
+<h2 id="92-dbを管理する側と使う側">9.2 DBを管理する側と使う側</h2>
 <p><strong>DBMS（Database Management System）</strong>は、DBを管理するソフトウェアである。今回のDBサーバー上では、<strong>PostgreSQL（ポストグレスキューエル）</strong>を使う。PostgreSQLはクライアントから接続を受け、データを読む・書く処理を実行する。</p>
 <p>一つのPostgreSQLで、練習用と本課題用など複数のデータベースを管理できる。接続時には、どのデータベースを使うかも指定する。コンピューターとしてのDBサーバー、管理ソフトウェアとしてのPostgreSQL、その中の個別のデータベースを区別しよう。</p>
-<p><strong>psql</strong>は、PostgreSQLへ接続してSQLを送る端末用のクライアントである。Webサーバー上で動く備品管理アプリも、DBへ問い合わせるときにはクライアントとなる。<a href="https://www.postgresql.org/docs/16/app-psql.html">psql</a></p>
-<figure><img src="../../assets/figures/ch09-fig01-dbms.png" alt="Web側のpsqlやアプリが、DBサーバー上のPostgreSQL内の対象データベースを使う関係。" width="1600" height="1100"></figure>
-<p><strong>図9-1 ソフトウェア、データベース、利用する側。</strong> 通信する相手はDBサーバー上のPostgreSQLであり、その接続で利用するデータベースを選ぶ。</p>
+<p><strong>psql（ピー・エス・キュー・エル）</strong>は、端末からPostgreSQLへ接続し、SQLを入力して結果を見るためのソフトウェアである。起動すると、実行したコンピューター上でプロセスとして動く。<a href="https://www.postgresql.org/docs/16/app-psql.html">psql</a></p>
+<p>今回の演習では、Webサーバーの端末でpsqlを起動する。するとWebサーバー上にpsqlのプロセスが動き、別のDBサーバー上で動くPostgreSQLへ接続する。psqlの画面へ入力したSQLはPostgreSQLへ送られ、DBサーバー側でデータの取得や変更が実行される。その結果がpsqlへ返り、Webサーバーの端末に表示される。</p>
+<p>このように、相手のサービスへ接続して利用する側のソフトウェアを<strong>クライアント</strong>という。psqlはDBを利用する側、PostgreSQLはDBを管理してSQLを処理する側である。Webサーバー上の備品管理アプリも、PostgreSQLへSQLを送るときはDBのクライアントになる。</p>
+<figure><img src="../../assets/figures/ch09-fig01-dbms.png" alt="Web側のpsqlやアプリが、DBサーバー上のPostgreSQL内の対象データベースを使う関係。" width="1800" height="1120"></figure>
+<p><strong>図9-1 クライアントとDBの間で働くDBMS。</strong> 左のpsqlがSQLを送り、右のPostgreSQLが処理して結果を返す。PostgreSQLの枠の中に重ねた四角は、管理される複数のデータベースを表す。接続時に、その中から使うデータベースを選ぶ。</p>
 <h2 id="93-表、行、列、型を読む">9.3 表、行、列、型を読む</h2>
 <p>次は、説明用の<code>lesson_item</code>という表である。表を<strong>テーブル</strong>、横に並ぶ一件のデータを<strong>行</strong>、縦に並ぶ各項目を<strong>列</strong>という。</p>
 <div class="table-wrap"><table><thead><tr><th scope="col">id</th><th scope="col">name</th><th scope="col">quantity</th><th scope="col">is_public</th></tr></thead><tbody><tr><td>1</td><td>Desk</td><td>6</td><td>true</td></tr><tr><td>2</td><td>Monitor</td><td>1</td><td>false</td></tr><tr><td>3</td><td>Keyboard</td><td>4</td><td>true</td></tr></tbody></table></div>
@@ -39,8 +41,8 @@ ORDER BY name;</code></pre>
  Keyboard |        4
 (2 rows)</code></pre>
 <p>公開区分がfalseのMonitorは結果に含まれない。結果の列は二つで、行は二件である。SQLが選ぶ列と、WHEREが選ぶ行を分けて読む。<a href="https://www.postgresql.org/docs/16/tutorial-select.html">SELECTによる取得</a></p>
-<figure><img src="../../assets/figures/ch09-fig03-select.png" alt="表全体からWHEREで行を選び、SELECTで列を選び、結果として受け取る関係。" width="1600" height="910"></figure>
-<p><strong>図9-3 条件と取得結果の対応。</strong> 表示順を決めたい場合はORDER BYで指定する。保存されたときの順番や、以前表示された順番が、次の結果でも保証されるとは限らない。</p>
+<figure><img src="../../assets/figures/ch09-fig03-select.png" alt="表全体からWHEREで行を選び、SELECTで列を選び、結果として受け取る関係。" width="1800" height="1220"></figure>
+<p><strong>図9-3 SQL文と、条件・取得結果の対応。</strong> 図の上部に、例に使うSQLを載せている。 表示順を決めたい場合はORDER BYで指定する。保存されたときの順番や、以前表示された順番が、次の結果でも保証されるとは限らない。</p>
 <h2 id="96-sqlでデータを変更する">9.6 SQLでデータを変更する</h2>
 <p><strong>INSERT</strong>は行の追加、<strong>UPDATE</strong>は既存の行の変更、<strong>DELETE</strong>は行の削除に使う。UPDATEとDELETEでは、WHEREの条件により対象を絞る。条件を付けなければ、対象の表のすべての行が変更・削除の対象になり得る。</p>
 <p><strong>説明用SQL：idが1の数量を変更し、確定せずに取り消す例。</strong></p>
@@ -51,7 +53,7 @@ ROLLBACK;</code></pre>
 <p><strong>トランザクション</strong>は、複数の処理を一つのまとまりとして扱う仕組みである。<code>BEGIN</code>で始め、<code>COMMIT</code>で確定し、確定前なら<code>ROLLBACK</code>でそのトランザクション内の変更を取り消す。この例では、同じ接続で変更後の値を見た後に取り消している。COMMIT済みの変更を、後から単にROLLBACKして戻せるという意味ではない。<a href="https://www.postgresql.org/docs/16/tutorial-transactions.html">トランザクション</a></p>
 <p>実際の備品管理アプリでは、管理画面の追加・変更をアプリがSQLへつなげる。一般の一覧を見る操作と、保存した値を変更する操作は、必要なDB権限も異なる。</p>
 <h2 id="97-sqlを入力する場所と、接続の結果を読む">9.7 SQLを入力する場所と、接続の結果を読む</h2>
-<p>シェルへ入力する<code>psql</code>は、DBクライアントを起動するコマンドである。起動したpsqlの中で、SELECTなどのSQLを入力する。psqlが表示する接続先名付きのプロンプトは、OSのシェルのプロンプトと区別する。</p>
+<p>シェルへ入力する<code>psql</code>は、SQLを入力するためのソフトウェアを起動するコマンドである。起動後は、そのコンピューター上でpsqlのプロセスが動く。起動したpsqlの中で、SELECTなどのSQLを入力する。psqlが表示する接続先名付きのプロンプトは、OSのシェルのプロンプトと区別する。</p>
 <p>psqlには、SQL以外に<code>\conninfo</code>や<code>\q</code>などの<strong>メタコマンド</strong>もある。<code>\conninfo</code>は接続情報を表示し、<code>\q</code>はpsqlを終了する。SQLのように末尾へセミコロンを加える必要はない。</p>
 <p>アプリ用の表をまだ作っていない段階でも、接続先と実行者を調べられる。</p>
 <p><strong>実行場所：接続済みのpsql内。</strong></p>
@@ -78,7 +80,7 @@ SELECT 1;</code></pre>
 <h3 id="問4">問4</h3>
 <p>言えない。接続と定数のSQLの処理は確認できるが、表の存在と、その表を変更する権限は別に必要である。</p>
 <h2 id="参考資料">参考資料</h2>
-<p>確認日：2026-11-03。lesson_itemは説明用の表であり、課題の備品データとは別の例である。</p>
+<p>確認日：2026-11-03。psqlの説明は2026-11-13に再確認した。lesson_itemは説明用の表であり、課題の備品データとは別の例である。</p>
 <p class="bullet">・ <a href="https://www.postgresql.org/docs/16/tutorial-table.html">PostgreSQLの表と型</a></p>
 <p class="bullet">・ <a href="https://www.postgresql.org/docs/16/tutorial-select.html">SELECT</a></p>
 <p class="bullet">・ <a href="https://www.postgresql.org/docs/16/ddl-constraints.html">制約</a></p>

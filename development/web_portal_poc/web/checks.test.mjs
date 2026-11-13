@@ -103,21 +103,18 @@ test('functional browser POST sends only an owned RSA ciphertext to the private 
   assert.ok(html.includes(`lang=ru&amp;task_id=M5&amp;job_id=${value.job_id}&amp;check_mode=functional`));
 });
 
-test('storage screen names the same Web and requires explicit stop and resume observations',async()=>{
-  const selected={...value,task_id:'M3',check_mode:'storage'},calls=[];
-  let phase='awaiting_stop';
-  const app=createApp({...credentials,checker:async event=>{calls.push(event);return {status:'ok',job:{...selected,phase,web_instance_id:'i-'+'1'.repeat(17)}};}});
-  for(const lang of ['ja','ru','uz']) {
-    const response=await app(request(`/checks?lang=${lang}&task_id=M3&job_id=${value.job_id}&check_mode=storage`));
-    assert.equal(response.status,200);const html=await response.text();
-    assert.match(html,/name="operation" value="storage_observe"/);assert.match(html,/InstanceDetails:instanceId=i-11111111111111111/);assert.doesNotMatch(html,/data-check-progress/);
+test('retired storage tasks cannot be selected or execute any checker',async()=>{
+  let calls=0;
+  const app=createApp({...credentials,checker:async()=>{calls++;return {status:'ok'};}});
+  for(const task of ['P3','M3']) {
+    const response=await app(request(`/checks?task_id=${task}&job_id=${value.job_id}&check_mode=storage`));
+    assert.equal(response.status,403);
+    const input=new URLSearchParams({operation:'start',task_id:task,job_id:value.job_id,csrf:'a'.repeat(64)});
+    assert.equal((await app(request('/checks',{method:'POST',headers,body:input.toString()}))).status,403);
   }
-  phase='awaiting_restart';
-  const response=await app(request(`/checks?task_id=M3&job_id=${value.job_id}&check_mode=storage`));
-  assert.match(await response.text(),/name="operation" value="storage_resume"/);
-  const observe={...selected,operation:'storage_observe'};
-  assert.equal((await app(request('/checks',{method:'POST',headers,body:body(observe)}))).status,303);
-  assert.deepEqual(calls.at(-1),{subject:'1234567890',...observe});
+  const html=await (await app(request('/checks'))).text();
+  assert.doesNotMatch(html,/name="task_id" value="[PM]3"/);
+  assert.equal(calls,0);
 });
 
 test('mode changes and plaintext or ciphertext injection cannot bypass the form action',async()=>{
@@ -131,7 +128,7 @@ test('mode changes and plaintext or ciphertext injection cannot bypass the form 
   }
   assert.equal((await app(request('/checks',{method:'POST',headers,body:body()+'&password=SyntheticOnly'}))).status,403);
   assert.equal((await app(request('/checks',{method:'POST',headers,body:body()+'&sealed_password=SyntheticOnly'}))).status,403);
-  const changed={...value,task_id:'M3',check_mode:'storage'};
+  const changed={...value,task_id:'M5',check_mode:'functional'};
   const input=new URLSearchParams(body(changed));input.set('check_mode','read_only');
   assert.equal((await app(request('/checks',{method:'POST',headers,body:input.toString()}))).status,403);
   assert.equal(calls,0);
