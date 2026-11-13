@@ -319,17 +319,12 @@ def chapter11():
 
 
 def chapter12():
-    rows(12,1,'placement','コード・設定・データの保存先',[
-        (['EC2 Webサーバー','コードと依存パッケージ'],['/opt/jdu-catalog/app','/opt/jdu-catalog/venv']),
-        (['EC2 Webサーバー','秘密設定と配信用ファイル'],['/etc/jdu-catalog と staticを分離','秘密をHTTPの配信範囲へ置かない']),
-        (['EC2 DBサーバー','PostgreSQLのデータ'],['備品・管理者・必要な補助データ','WebのアプリからTCP・5432番へ'])],
-        ['保存場所と、それを扱う権限を用途に合わせて分ける。'])
-    cards(12,2,'phases','初期準備と、通常の動作を分ける',[
+    cards(12,1,'phases','初期準備と、通常の動作を分ける',[
         ('構築用の接続',['提供済みmigrationを適用','初期データを準備','アプリ管理者を作成']),
         ('通常用権限を準備',['表・列の必要な操作','シーケンスのUSAGE','接続ロールを分ける']),
         ('通常サービスの起動',['runtime設定で起動','必要な画面操作を使う','構築用接続は後で終了'])],
         ['OSの起動のたびに、表や初期データを作り直す構成ではない。'])
-    rows(12,3,'service','サービスの定義と、起動する対象',[
+    rows(12,2,'service','サービスの定義と、起動する対象',[
         (['User と WorkingDirectory'],['OSユーザー catalog','/opt/jdu-catalog/app']),
         (['EnvironmentFile'],['管理側がroot専用設定を読む','必要な値をプロセスへ渡す']),
         (['ExecStart と Nginxの転送先'],['venv内のGunicornでアプリを実行','HTTP：127.0.0.1の8000番ポート'])],
