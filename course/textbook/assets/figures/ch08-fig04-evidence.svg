@@ -1,19 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1100" viewBox="0 0 1600 1100" role="img">
-<title>比較する証拠と、その意味</title>
+<title>再開後に確かめる対象</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図8-4  比較する証拠と、その意味</text>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図8-4  再開後に確かめる対象</text>
 <text x="55" y="98" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">同じ高さの枠を一組として読む</text>
 <rect x="40" y="180" width="610" height="175" rx="18" fill="#f7f9fc" stroke="#2165a7" stroke-width="2"/>
 <rect x="830" y="180" width="730" height="175" rx="18" fill="#f7f9fc" stroke="#2165a7" stroke-width="2"/>
-<text x="345" y="205" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">内容・ハッシュ・属性</text>
-<text x="1195" y="205" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">ファイルの内容と所有者・権限</text>
-<text x="1195" y="270" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">ハッシュだけで属性まで証明しない</text>
+<text x="345" y="205" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">ストレージ上のファイル</text>
+<text x="1195" y="205" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">保存したファイルが読めるか</text>
+<text x="1195" y="270" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">停止前に保存した内容と比べる</text>
 <polyline points="650,268 830,268" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="830,268 815.5928463623571,274.9594485457797 815.5928463623571,261.0405514542203" fill="#2165a7"/>
 <rect x="40" y="405" width="610" height="175" rx="18" fill="#f7f9fc" stroke="#16745b" stroke-width="2"/>
 <rect x="830" y="405" width="730" height="175" rx="18" fill="#f7f9fc" stroke="#16745b" stroke-width="2"/>
 <text x="345" y="430" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">インスタンスID・ボリュームID</text>
 <text x="1195" y="430" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">同じEC2とストレージか</text>
-<text x="1195" y="495" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">内容のハッシュとは別に比較する</text>
+<text x="1195" y="495" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">停止前と同じものを使っているか</text>
 <polyline points="650,493 830,493" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="830,493 815.5928463623571,499.9594485457797 815.5928463623571,486.0405514542203" fill="#16745b"/>
 <rect x="40" y="630" width="610" height="175" rx="18" fill="#f7f9fc" stroke="#9d651a" stroke-width="2"/>
 <rect x="830" y="630" width="730" height="175" rx="18" fill="#f7f9fc" stroke="#9d651a" stroke-width="2"/>

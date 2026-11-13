@@ -61,19 +61,19 @@
     },
     {
       "chapter": 8,
-      "pages": 9,
-      "text_blocks": 102,
+      "pages": 8,
+      "text_blocks": 79,
       "missing_text": [],
-      "pdf_words_within_page": 279,
-      "rendered_pages": 9,
+      "pdf_words_within_page": 221,
+      "rendered_pages": 8,
       "figure_texts_within_canvas_and_nonoverlapping": 55,
       "figures": 4,
-      "code_blocks": 2,
+      "code_blocks": 1,
       "questions": 4,
       "heading_pages": {
-        "章末問題": 7,
-        "章末解答": 8,
-        "参考資料": 9
+        "章末問題": 6,
+        "章末解答": 7,
+        "参考資料": 8
       },
       "html_checks": [
         {
@@ -83,7 +83,7 @@
           "overflow": false,
           "images": 4,
           "loaded": true,
-          "code": 2
+          "code": 1
         },
         {
           "chapter": 8,
@@ -92,7 +92,7 @@
           "overflow": false,
           "images": 4,
           "loaded": true,
-          "code": 2
+          "code": 1
         },
         {
           "chapter": 8,
@@ -101,7 +101,7 @@
           "overflow": false,
           "images": 4,
           "loaded": true,
-          "code": 2
+          "code": 1
         },
         {
           "chapter": 8,
@@ -110,10 +110,10 @@
           "overflow": false,
           "images": 4,
           "loaded": true,
-          "code": 2
+          "code": 1
         }
       ],
-      "sha256": "35d3f55cbf578aacb029196dd7c219b49152154bedbea6949367074857ac289d",
+      "sha256": "afdd2aa62a0ef45d301d7b29d6743360d3fb8285754d93e2f361a3ab25611d4b",
       "date": "2026-11-13",
       "local_references_checked": 10
     },
@@ -454,11 +454,11 @@
       "sha256": "dc2a31db3b660fb1f88fb05204eb68bb89466879c9c9d2844f2dc40c30e81ae4"
     }
   ],
-  "total_pages": 75,
+  "total_pages": 74,
   "total_figures": 25,
-  "total_code_blocks": 23,
-  "total_text_blocks": 870,
-  "total_pdf_words_within_page": 2401,
+  "total_code_blocks": 22,
+  "total_text_blocks": 847,
+  "total_pdf_words_within_page": 2343,
   "total_figure_texts_checked": 346,
   "teacher_visual_review": "not performed",
   "student_trial": "not performed",

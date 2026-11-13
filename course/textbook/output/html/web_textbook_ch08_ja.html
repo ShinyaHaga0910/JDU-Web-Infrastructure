@@ -20,33 +20,20 @@
 <figure><img src="../../assets/figures/ch08-fig02-storage.png" alt="EBSボリュームからOSの保存装置、ファイルシステム、ファイルのパスへの対応。" width="1600" height="1120"></figure>
 <p><strong>図8-2 AWSのストレージと、Ubuntu OSから見えるファイル。</strong> 下へ進むほど、アプリや利用者が扱うファイルの名前に近付く。図は保存の対応関係であり、ネットワーク通信の経路ではない。</p>
 <p>ここでのrootボリュームは、Ubuntu OSを起動するストレージを指す。管理者ユーザーのrootとは対象が異なる。今回の保存確認では、この元のストレージを使う。</p>
-<h2 id="83-保存先と空き容量を調べる">8.3 保存先と空き容量を調べる</h2>
-<p>ファイルのパスだけを見ても、実際にどの保存装置を使っているかは分からない。途中のディレクトリへ別のファイルシステムをマウントしている場合、その場所より下は別のストレージになるからである。</p>
-<p><strong>実行場所：Webサーバーの管理用端末。保存先を読むための例。</strong></p>
-<pre><code>findmnt -T /var/lib
-lsblk -o NAME,TYPE,SIZE,MOUNTPOINTS,SERIAL
-df -h /var/lib</code></pre>
-<p><code>findmnt -T</code>は、指定したパスを含むファイルシステムとマウント先を調べる。<code>lsblk</code>は、Ubuntu OSから見えるディスクやパーティション、その容量やマウント先などを示す。<code>df -h</code>は、対象が載るファイルシステムの使用量と空き容量を読みやすい単位で表示する。</p>
-<p>OS内の装置名は、環境によって<code>/dev/nvme...</code>などの表記になる。名前を見ただけで別のEBSへ付け替えず、AWS側のボリューム識別情報と対応させる。使用量と空き容量も、保存済みの内容と別に確認する。<a href="https://man7.org/linux/man-pages/man8/lsblk.8.html">lsblk</a>、<a href="https://man7.org/linux/man-pages/man8/findmnt.8.html">findmnt</a></p>
-<h2 id="84-ファイルの内容と属性を別々に比較する">8.4 ファイルの内容と属性を別々に比較する</h2>
-<p>停止前の状態を説明するには、何を保存したか、どこへ置いたか、誰が読めるかを記録する。ファイルには本文だけでなく、所有者や権限などの属性もある。</p>
-<div class="table-wrap"><table><thead><tr><th scope="col">記録するもの</th><th scope="col">比較する目的</th></tr></thead><tbody><tr><td>ファイルのパス</td><td>どの場所のファイルを比較したかを示す</td></tr><tr><td>内容</td><td>保存した文章が読めるかを確かめる</td></tr><tr><td>所有者・権限</td><td>読取りや変更を許す範囲が保たれているかを確かめる</td></tr><tr><td>SHA-256のハッシュ値</td><td>停止前後でファイルの内容を比較する</td></tr></tbody></table></div>
-<p><strong>ハッシュ値</strong>は、内容から一定の方法で計算する値である。例えば、説明用ファイルに対する<code>sha256sum</code>は、内容が変わっていないかを比較する手掛かりになる。改行や空白も内容に含まれる。</p>
-<p>ただし、ハッシュ値はファイル名、所有者、権限、EC2の識別子をまとめて証明する値ではない。同じ内容を別のEC2へコピーしても、内容のハッシュ値は同じになる。何の一致を確かめたのかを区別する。<a href="https://man7.org/linux/man-pages/man1/sha256sum.1.html">SHA-256の計算</a></p>
-<h2 id="85-停止、再開、再起動、終了を区別する">8.5 停止、再開、再起動、終了を区別する</h2>
+<h2 id="83-停止、再開、再起動、終了を区別する">8.3 停止、再開、再起動、終了を区別する</h2>
 <p>EC2の<strong>Stop</strong>はインスタンスを停止し、<strong>Start</strong>は停止したインスタンスを起動する操作である。通常のStop/Startでは、EBS上に保存した内容を保ちながらUbuntu OSを起動し直せる。<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Stop_Start.html">EC2の停止と起動</a></p>
 <div class="table-wrap"><table><thead><tr><th scope="col">操作</th><th scope="col">何をするか</th></tr></thead><tbody><tr><td>Stop → Start</td><td>インスタンスを停止した後、同じインスタンスを再び起動する</td></tr><tr><td>Reboot</td><td>インスタンスを再起動する。Stopの停止状態を経由する操作とは区別する</td></tr><tr><td>Terminate</td><td>インスタンスの利用を終了する。Stopと違い、そのインスタンスをStartして戻すことはできない</td></tr></tbody></table></div>
 <p>Terminateでは、設定により接続されていたEBSも削除されることがある。今回行う保存確認は、同じインスタンスと元のボリュームを維持したStop/Startである。AWSの画面では、対象と操作名を対応させる。</p>
 <figure><img src="../../assets/figures/ch08-fig03-lifecycle.png" alt="停止前、停止中、再開後のプロセス、メモリー、ストレージ上のファイルを比較する。" width="1600" height="910"></figure>
 <p><strong>図8-3 メモリー上の作業は終了し、保存したファイルは残る。</strong> 保存を終えたファイルは元のEBSに残る。再開後のプロセスは、そのファイルを読み込んで利用する。</p>
-<h2 id="86-再開後は、保存と接続の両方を見る">8.6 再開後は、保存と接続の両方を見る</h2>
+<h2 id="84-再開後は、保存と接続の両方を見る">8.4 再開後は、保存と接続の両方を見る</h2>
 <p>同じEC2かどうかは<strong>インスタンスID</strong>、同じストレージかどうかは<strong>ボリュームID</strong>で区別できる。一方、Ubuntu OSの<strong>boot ID</strong>は、一回の起動を区別するための値である。Stop/Start後に、元のインスタンスIDとボリュームIDは同じで、boot IDは変わるという関係を読む。</p>
 <p><strong>実行場所：Webサーバーの端末。現在の起動を区別する値を読む例。</strong></p>
 <pre><code>cat /proc/sys/kernel/random/boot_id</code></pre>
-<p>再開後はファイルの内容、ハッシュ、所有者・権限を停止前と比べる。また、自動割当の公開IPv4アドレスはStop/Startで変わることがある。古い公開IPのURLへ接続できなくても、それだけでファイル消失とは言えない。EC2画面で現在の公開IPを読み、Nginxのサービスと待受の状態も確認する。</p>
-<figure><img src="../../assets/figures/ch08-fig04-evidence.png" alt="内容、属性、EC2・ボリューム・起動の識別子を別々に比較する。" width="1600" height="1100"></figure>
-<p><strong>図8-4 一つの値にすべての意味を持たせない。</strong> 内容の一致、保存した場所の同一性、今回の起動、公開側の接続先を別々の観点で読む。</p>
-<h2 id="87-ファイルが残ることと、復元できることは違う">8.7 ファイルが残ることと、復元できることは違う</h2>
+<p>再開後は、停止前に保存したファイルを開き、内容が残っているかを確かめる。また、自動割当の公開IPv4アドレスはStop/Startで変わることがある。古い公開IPのURLへ接続できなくても、それだけでファイル消失とは言えない。EC2画面で現在の公開IPを読み、Nginxのサービスと待受の状態も確認する。</p>
+<figure><img src="../../assets/figures/ch08-fig04-evidence.png" alt="再開後に保存ファイル、EC2とボリューム、今回の起動と公開IPを確かめる。" width="1600" height="1100"></figure>
+<p><strong>図8-4 再開後に確かめるもの。</strong> 保存したファイルが残っているかを確かめ、同じEC2とEBSを使っているか、現在の接続先はどこかを対応させる。</p>
+<h2 id="85-ファイルが残ることと、復元できることは違う">8.5 ファイルが残ることと、復元できることは違う</h2>
 <p>Stop/Start後にもファイルが残ることは、元のストレージに保存された内容を引き続き利用できることを示す。しかし、誤って削除した内容や、上書きしてしまった以前の内容を戻せると示したわけではない。</p>
 <p><strong>バックアップ</strong>は、失われた内容を戻すために別の保存を用意することであり、<strong>リストア</strong>はその保存から復元することである。今回の保持確認は、それらの復元試験と区別する。単にEC2を止めるだけでは、誤削除したファイルの以前の版は作られない。</p>
 <p>練習・課題3では、元のEBSへ保存したファイルが、同じWebサーバーの停止・再開後も保持されることを確かめる。次の第9章では、保存するデータを表として管理するデータベースへ進む。</p>
@@ -54,7 +41,7 @@ df -h /var/lib</code></pre>
 <h3 id="問1">問1</h3>
 <p>EBS、ファイルシステム、ファイルのパスは、それぞれ何を表すか。</p>
 <h3 id="問2">問2</h3>
-<p>停止前後でファイルのハッシュ値が同じなら、同じEC2だと判断できるか。</p>
+<p>文章をメモリー上で編集したが、ファイルへ保存せずにOSを終了した。その変更を、次の起動後にそのまま利用できるか。</p>
 <h3 id="問3">問3</h3>
 <p>再開後に保存ファイルはあるが、以前のURLでWebページを取得できない。何を調べるか。</p>
 <h3 id="問4">問4</h3>
@@ -63,7 +50,7 @@ df -h /var/lib</code></pre>
 <h3 id="問1">問1</h3>
 <p>EBSはAWSが提供するストレージ、ファイルシステムはその上でファイルなどを管理する仕組み、パスはOSのディレクトリの中でファイルの場所を指定する名前である。</p>
 <h3 id="問2">問2</h3>
-<p>判断できない。ハッシュ値は内容の比較に使う。EC2の同一性はインスタンスID、ストレージはボリュームIDで別に比較する。</p>
+<p>利用できない。変更はメモリー上にだけあり、OSの終了で作業中の状態は失われる。次の起動後にファイルから読み込めるのは、ストレージへ最後に保存した内容である。</p>
 <h3 id="問3">問3</h3>
 <p>現在の公開IP、指定したURL、Nginxのサービス状態、待受IP・ポート、接続経路などを調べる。保存した内容と、稼働・接続の状態を分ける。</p>
 <h3 id="問4">問4</h3>
@@ -72,7 +59,4 @@ df -h /var/lib</code></pre>
 <p>確認日：2026-11-03。EBSと通常のStop/Startの説明は2026-11-13に再確認した。識別子や保存内容は説明用であり、実行環境の値は対象から読む。</p>
 <p class="bullet">・ <a href="https://docs.aws.amazon.com/ebs/latest/userguide/what-is-ebs.html">Amazon EBS</a></p>
 <p class="bullet">・ <a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Stop_Start.html">EC2の停止と起動</a></p>
-<p class="bullet">・ <a href="https://man7.org/linux/man-pages/man8/lsblk.8.html">lsblk</a></p>
-<p class="bullet">・ <a href="https://man7.org/linux/man-pages/man8/findmnt.8.html">findmnt</a></p>
-<p class="bullet">・ <a href="https://man7.org/linux/man-pages/man1/sha256sum.1.html">SHA-256の計算</a></p>
 <p class="bullet">・ <a href="../../../labs/docs/ja/p3.md">練習P3</a></p></main></body></html>
