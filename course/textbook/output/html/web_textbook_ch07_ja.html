@@ -18,7 +18,7 @@
     allow-transfer { none; };
     allow-update { none; };
 };</code></pre>
-<p><code>zone</code>は担当する名前の範囲、<code>type primary</code>は元となるゾーン情報を管理すること、<code>file</code>はレコードを保存したファイルを指定する。<code>allow-transfer</code>はゾーン情報の一括転送、<code>allow-update</code>はDNSの通信による動的な更新を許す相手を指定する。ここでは、どちらも許可しない。</p>
+<p><code>zone</code>は担当する名前の範囲、<code>type primary</code>は元となるゾーン情報を管理すること、<code>file</code>はレコードを保存したファイルを指定する。<code>allow-transfer</code>は、このゾーンの登録情報一式を他のDNSサーバーへコピーする「ゾーン転送」を許す相手を指定する。<code>allow-update</code>は、DNSの通信による動的な更新を許す相手を指定する。ここでは、どちらも許可しない。ゾーン転送の用途は7.3で説明する。</p>
 <p>ゾーンファイルには、第6章で説明したSOA、NS、Aなどを記録する。例えば<code>guide IN A 10.20.1.20</code>という行は、基準が<code>lab.test.</code>であれば<code>guide.lab.test.</code>をWebサーバーの内部IPへ対応させる。名前のつづり、ゾーンの基準、返すIPをそれぞれ読む。設定の構文が正しくても、別のIPを書けば、その別のIPが回答になる。</p>
 <p>SOAのserialは、ゾーンの変更に合わせて増やす。ファイル名を<code>db.lab.test</code>にしただけではゾーン登録にはならず、ゾーン登録だけがあってもレコードの内容が正しいとは限らない。</p>
 <h2 id="73-問い合わせを許す相手と、転送先を決める">7.3 問い合わせを許す相手と、転送先を決める</h2>
@@ -34,8 +34,10 @@
 <div class="table-wrap"><table><thead><tr><th scope="col">設定項目</th><th scope="col">制御すること</th></tr></thead><tbody><tr><td>listen-on</td><td>DNSサーバー自身の、どのIPv4アドレスで接続を受け付けるか</td></tr><tr><td>allow-query</td><td>DNSへの問い合わせを許す相手</td></tr><tr><td>allow-recursion</td><td>外部名などの名前解決を取りまとめる処理を許す相手</td></tr><tr><td>allow-query-cache</td><td>保存しているキャッシュの情報を回答する相手</td></tr></tbody></table></div>
 <p>例えば、<code>allow-query { internal_clients; };</code>は、先ほどのACLに含まれる相手へ問い合わせを許す指定である。問い合わせを受けること、外部名を調べること、キャッシュを利用させることには、別々の設定がある。<a href="https://bind9.readthedocs.io/en/v9.18.39/reference.html">BINDのアクセス制御</a></p>
 <h3 id="外部名の解決と、ゾーン転送を区別する">外部名の解決と、ゾーン転送を区別する</h3>
-<p><code>forwarders</code>には外部名を調べる際の依頼先として<code>10.20.0.2</code>を指定し、<code>forward only</code>でその転送先を使う。これに対し、<strong>AXFR</strong>はゾーンの情報をまとめて取得するための問い合わせである。通常のAレコードの問い合わせとは目的が異なり、今回の構成では転送を許可しない。</p>
-<p>SG（AWSのSecurity Group）は、DNSサーバーの53番ポートまで通信を届けてよいかを制御する。BINDのACLは、届いた問い合わせをどう扱うかを制御する。SGとBINDは異なる場所で働くため、片方の設定だけで両方を説明することはできない。</p>
+<p><code>forwarders</code>には外部名を調べる際の依頼先として<code>10.20.0.2</code>を指定し、<code>forward only</code>でその転送先を使う。これは、名前解決の問い合わせを他のDNSへ依頼する設定である。</p>
+<p>一方、<strong>ゾーン転送</strong>は、あるゾーンに登録したレコード一式を、別のDNSサーバーへコピーするための処理である。例えば、二台のDNSサーバーから同じ情報を回答したい場合、一台で管理する<code>lab.test</code>の登録情報をもう一台へ渡すために使う。そのゾーンの全レコードをまとめて転送する方式を<strong>AXFR（エー・エックス・エフ・アール）</strong>という。<a href="https://www.rfc-editor.org/rfc/rfc5936.html">ゾーン転送の仕様</a></p>
+<div class="table-wrap"><table><thead><tr><th scope="col">問い合わせ</th><th scope="col">求める情報の例</th><th scope="col">主な用途</th></tr></thead><tbody><tr><td>通常のAレコードの問い合わせ</td><td>「guide.lab.testのIPv4アドレスを教えてほしい」</td><td>ブラウザやアプリが接続先を調べる</td></tr><tr><td>ゾーン転送の問い合わせ（AXFR）</td><td>「lab.testゾーンに登録されたレコード一式を渡してほしい」</td><td>別のDNSサーバーにも同じ登録情報を持たせる</td></tr></tbody></table></div>
+<p>今回の構成では、内部DNSをもう一台に複製する作業は行わない。7.2の<code>allow-transfer { none; };</code>は、ゾーンの登録情報一式を渡す相手を許可しない設定である。これを設定しても、許可された相手からの通常のAレコードの問い合わせには回答できる。名前解決を他のDNSへ依頼する<code>forwarders</code>と、ゾーンの登録情報をコピーするAXFRは、用途が異なる。<a href="https://bind9.readthedocs.io/en/v9.18.39/reference.html#namedconf-statement-allow-transfer">BINDのゾーン転送の許可設定</a></p>
 <h3 id="ここから行う確認と、接続元の設定">ここから行う確認と、接続元の設定</h3>
 <p>ここまでで、DNSサーバーのBINDへ登録する情報や、問い合わせを許す相手について説明した。ここからは、DNSが正しく答えることを確認し、そのDNSを普段使うように接続元のOSを設定する。</p>
 <p>学校の備品管理システムで、踏み台サーバーのブラウザから<code>http://guide.lab.test/example.txt</code>を開く場合を考える。ブラウザは、まず<code>guide.lab.test</code>に対応するIPアドレスを調べ、そのIPのWebサーバーへ接続する。この名前解決を利用するには、<strong>情報を答えるDNSサーバーの設定</strong>と、<strong>そのDNSへ尋ねる接続元のOSの設定</strong>が必要になる。</p>
@@ -72,7 +74,7 @@ flags: qr aa rd ra
 guide.lab.test.  300  IN  A  10.20.1.20
 SERVER: 10.20.2.10#53</code></pre>
 <p><code>SERVER</code>は実際の問い合わせ先、<code>NOERROR</code>は処理結果、<code>aa</code>は、このDNSが管理するゾーンの情報に基づく回答を示す。Aレコードの右側が接続先のIPv4アドレス、300はTTLである。名前が正しくても、別のDNSからの回答を見ていないかも合わせて読む。</p>
-<p>未登録名のNXDOMAIN、方針によるREFUSED、時間内に回答を受け取れないタイムアウトも区別する。AXFRの拒否を確かめる場合も、同じ相手から通常の問い合わせが成功することと、転送が明示的に拒否されることを対にして読む。タイムアウトだけでは、転送を拒否したのか、そもそも通信できないのかを区別できない。</p>
+<p>未登録名のNXDOMAIN、方針によるREFUSED、時間内に回答を受け取れないタイムアウトも区別する。ゾーン全体の転送（AXFR）の拒否を確かめる場合も、同じ相手から通常の問い合わせが成功することと、転送が明示的に拒否されることを対にして読む。タイムアウトだけでは、転送を拒否したのか、そもそも通信できないのかを区別できない。</p>
 <h2 id="76-接続元のubuntu-osに、普段使うdnsを設定する">7.6 接続元のUbuntu OSに、普段使うDNSを設定する</h2>
 <h3 id="問い合わせるたびに相手を指定する方法から、osの設定へ">問い合わせるたびに相手を指定する方法から、OSの設定へ</h3>
 <p><code>dig @10.20.2.10 ...</code>は、そのコマンドだけで問い合わせ先を指定している。これに成功しても、ブラウザやアプリが普段使う問い合わせ先が同じであるとは限らない。</p>
@@ -112,7 +114,7 @@ getent ahostsv4 guide.lab.test</code></pre>
 <h3 id="問3">問3</h3>
 <p>127.0.0.53と10.20.2.10は、今回それぞれどこを表すか。</p>
 <h3 id="問4">問4</h3>
-<p>AXFRがタイムアウトしたことだけで、BINDがゾーン転送を明示的に拒否したと判断できるか。</p>
+<p>ゾーン転送（AXFR）の問い合わせがタイムアウトしたことだけで、BINDが転送を明示的に拒否したと判断できるか。</p>
 <h2 id="章末解答">章末解答</h2>
 <h3 id="問1">問1</h3>
 <p>ゾーンの登録は担当する名前の範囲、管理方式、レコードを保存したファイルの場所などを指定する。ゾーンファイルは、その範囲の管理情報や個々のレコードを記録する。</p>
@@ -123,8 +125,9 @@ getent ahostsv4 guide.lab.test</code></pre>
 <h3 id="問4">問4</h3>
 <p>判断できない。通信不能も考えられるため、通常問い合わせの成功と、AXFRに対する明示的な拒否を合わせて読む。</p>
 <h2 id="参考資料">参考資料</h2>
-<p>確認日：2026-11-03。digとOSの名前解決の説明は2026-11-05に再確認した。設定・出力は説明例である。</p>
+<p>確認日：2026-11-03。digとOSの名前解決の説明は2026-11-05、ゾーン転送の説明は2026-11-13に再確認した。設定・出力は説明例である。</p>
 <p class="bullet">・ <a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BINDの設定とゾーン</a></p>
+<p class="bullet">・ <a href="https://www.rfc-editor.org/rfc/rfc5936.html">RFC 5936 DNS Zone Transfer Protocol (AXFR)</a></p>
 <p class="bullet">・ <a href="https://bind9.readthedocs.io/en/v9.18.39/reference.html">BIND設定リファレンス</a></p>
 <p class="bullet">・ <a href="https://bind9.readthedocs.io/en/v9.18.39/manpages.html">BINDのコマンド</a></p>
 <p class="bullet">・ <a href="https://ubuntu.com/server/docs/explanation/networking/configuring-networks/">Ubuntu OSの名前解決とhosts</a></p>

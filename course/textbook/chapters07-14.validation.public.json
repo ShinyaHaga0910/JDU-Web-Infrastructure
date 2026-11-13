@@ -4,9 +4,9 @@
     {
       "chapter": 7,
       "pages": 12,
-      "text_blocks": 153,
+      "text_blocks": 164,
       "missing_text": [],
-      "pdf_words_within_page": 555,
+      "pdf_words_within_page": 588,
       "rendered_pages": 12,
       "figure_texts_within_canvas_and_nonoverlapping": 49,
       "figures": 3,
@@ -55,8 +55,8 @@
           "code": 8
         }
       ],
-      "sha256": "c43d30d81bafc88e62fee327061845b0867091fe12d713f8168bd2d4c1713e19",
-      "date": "2026-11-05",
+      "sha256": "a3a9353464933fc4de93184b482da7b1b92241c21987ac92a700e4ac5b5d619e",
+      "date": "2026-11-13",
       "local_references_checked": 10
     },
     {
@@ -455,8 +455,8 @@
   "total_pages": 74,
   "total_figures": 24,
   "total_code_blocks": 23,
-  "total_text_blocks": 839,
-  "total_pdf_words_within_page": 2317,
+  "total_text_blocks": 850,
+  "total_pdf_words_within_page": 2350,
   "total_figure_texts_checked": 329,
   "teacher_visual_review": "not performed",
   "student_trial": "not performed",
@@ -464,5 +464,5 @@
   "local_references_checked": 278,
   "local_references_missing": [],
   "earlier_chapters_unchanged": true,
-  "updated": "2026-11-05"
+  "updated": "2026-11-13"
 }
