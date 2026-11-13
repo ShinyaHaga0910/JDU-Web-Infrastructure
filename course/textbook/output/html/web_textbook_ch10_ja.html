@@ -28,8 +28,6 @@
 <p><strong>設定の説明例：説明用DB・ロールへの接続を、Webサーバー一台から許す一行。</strong></p>
 <pre><code>host lesson_catalog lesson_app 10.20.1.20/32 scram-sha-256</code></pre>
 <p><code>host</code>はTCP/IPによる接続、<code>lesson_catalog</code>はDB名、<code>lesson_app</code>は接続するロール、<code>10.20.1.20/32</code>は送信元のWebサーバー一台、<code>scram-sha-256</code>はパスワード認証に使う方式である。</p>
-<figure><img src="../../assets/figures/ch10-fig02-hba.png" alt="HBAの各列を、Webサーバーからの接続情報へ対応させる。" width="1600" height="1100"></figure>
-<p><strong>図10-2 一つの接続を、HBAの一行と照合する。</strong> 10.20.1.20は接続元であり、DBサーバー自身の待受アドレス10.20.2.20とは用途が異なる。</p>
 <p>HBAは上から読み、<strong>最初に接続条件が一致した行</strong>を使う。その行で認証が失敗しても、下の別の行へ移って試し直すわけではない。広すぎる許可行が先にあれば、後に置いた制限より先に使われる。<a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBAの照合</a></p>
 <p><code>local</code>は同じDBサーバー内のUnixソケット接続を扱う。今回、OSのpostgresから管理する接続では<code>peer</code>によりOSユーザーを照合する。WebサーバーからのTCP接続では、対応するhost行とパスワード認証を使う。<code>password_encryption</code>を変えても、以前のパスワードの保存形式が自動ですべて更新されるわけではない。</p>
 <h2 id="106-接続した相手と実行者をsqlで読む">10.6 接続した相手と実行者をSQLで読む</h2>
@@ -46,11 +44,6 @@
  lesson_catalog   | lesson_app
 (1 row)</code></pre>
 <p>この結果は、SQLを処理しているDBと実行者を示す。WebサーバーのOSユーザー名や、アプリ管理画面のログイン名ではない。</p>
-<h2 id="107-成功と拒否を、原因の範囲ごとに読む">10.7 成功と拒否を、原因の範囲ごとに読む</h2>
-<div class="table-wrap"><table><thead><tr><th scope="col">見えた結果</th><th scope="col">主に調べる範囲</th></tr></thead><tbody><tr><td>名前解決できない</td><td>Webサーバーの通常のDNS設定とDB名の登録</td></tr><tr><td>接続拒否・タイムアウト</td><td>指定IP・ポート、サービス、待受、通信許可など</td></tr><tr><td>HBAで接続対象外</td><td>DB名、ロール、送信元とHBAの行</td></tr><tr><td>パスワード認証失敗</td><td>接続したロール、入力値、認証方式など</td></tr><tr><td>permission denied for table</td><td>認証後に使おうとした表や操作の権限</td></tr></tbody></table></div>
-<p>例えば、表の権限不足という結果を受けたなら、DBまでの接続と認証を経て、SQLの操作を判定する段階に達している。反対に、タイムアウトだけでパスワードが誤っていると判断することはできない。</p>
-<p>正しい接続の成功を基準に、許可しないDB・ロールの組合せや誤った認証が拒否されることを比べる。拒否を試すために既存データを削除する必要はない。</p>
-<p>練習・課題4では、Webサーバーだけから、必要なDB・ロールで認証付きSQLを実行する構成を作る。アプリ用の表と、通常動作に必要な細かなSQL権限は、提供アプリの準備と合わせて後の章で扱う。</p>
 <h2 id="章末問題">章末問題</h2>
 <h3 id="問1">問1</h3>
 <p>OSユーザーpostgresと、DBロールpostgresは同じ管理対象か。</p>
