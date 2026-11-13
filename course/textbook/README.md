@@ -11,7 +11,7 @@ Pは手順付きの練習、Mは別の対象を自分で設定する課題であ
 | 第1〜3章 | 全体像、AWSのネットワーク、接続と作業場所 | P0 | M0・以後の共通準備 |
 | 第4〜5章 | HTTPの仕組み、Nginxによる静的配信 | P1 | M1 |
 | 第6〜7章 | DNSの仕組み、BINDと通常の名前解決 | P2 | M2 |
-| 第8章 | 保存領域、停止と再開後の保持 | P3 | M3 |
+| 第8章 | ストレージ、停止と再開後の保持 | P3 | M3 |
 | 第9〜10章 | DBとSQL、PostgreSQLの接続・認証 | P4 | M4 |
 | 第11〜12章 | Web・アプリ・DBの連携、配置と設定 | P5 | M5 |
 | 第13章 | 公開範囲、最小権限、構築用権限の終了 | P6 | M6 |
@@ -46,7 +46,7 @@ Pは手順付きの練習、Mは別の対象を自分で設定する課題であ
 - [第7章 内部DNSの設定と動作確認](docs/ja/07-internal-dns-configuration.md)
 - [第7章 閲覧用HTML](output/html/web_textbook_ch07_ja.html)
 - [第7章 A4縦PDF](output/pdf/web_textbook_ch07_ja.pdf)
-- [第8章 保存領域と停止後のデータ](docs/ja/08-storage-and-restart.md)
+- [第8章 ストレージと停止後のデータ](docs/ja/08-storage-and-restart.md)
 - [第8章 閲覧用HTML](output/html/web_textbook_ch08_ja.html)
 - [第8章 A4縦PDF](output/pdf/web_textbook_ch08_ja.pdf)
 - [第9章 リレーショナルDBとSQLの基本](docs/ja/09-databases-and-sql.md)

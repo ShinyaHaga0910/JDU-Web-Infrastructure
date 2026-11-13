@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1120" viewBox="0 0 1800 1120" role="img">
+<title>プロセスがファイルの内容をメモリーへ読み込み、作業後にストレージへ保存する関係</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図8-1  ストレージから読み込み、メモリーで作業し、保存する</text>
+<text x="55" y="104" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">今回のWebサーバー：Ubuntu OS上でプロセスを動かす</text>
+<rect x="50" y="200" width="700" height="650" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
+<text x="400" y="226" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="middle">ストレージ：EBS</text>
+<text x="400" y="306" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">ファイルとして内容を残す</text>
+<rect x="100" y="420" width="600" height="205" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
+<text x="400" y="448" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">文章ファイルの例</text>
+<text x="400" y="515" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">/var/lib/example.txt</text>
+<text x="400" y="720" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">OSが終了しても保存内容は残る</text>
+<rect x="1060" y="200" width="690" height="650" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
+<text x="1405" y="226" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="middle">メモリー：作業する場所</text>
+<text x="1405" y="306" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">プロセスが必要な内容を扱う</text>
+<rect x="1100" y="420" width="610" height="205" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
+<text x="1405" y="443" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">プロセス（実行中のプログラム）</text>
+<text x="1405" y="513" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">読み込んだ文章を編集する</text>
+<text x="1405" y="715" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">終了時、未保存の変更は失われる</text>
+<polyline points="750,475 1060,475" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1060,475 1045.5928463623572,481.9594485457797 1045.5928463623572,468.0405514542203" fill="#2165a7"/>
+<text x="790" y="391" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">① 読み込む</text>
+<text x="1150" y="575" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">② メモリー上で作業する</text>
+<polyline points="1060,660 750,660" fill="none" stroke="#9d651a" stroke-width="4"/><polygon points="750,660 764.4071536376429,653.0405514542203 764.4071536376429,666.9594485457797" fill="#9d651a"/>
+<text x="790" y="697" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">③ 保存する</text>
+<text x="55" y="935" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">読み込み：ストレージのファイルから、メモリーへ必要な内容を取り込む。</text>
+<text x="55" y="1008" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">保存：メモリーで作業した内容を、OSを通じてストレージのファイルへ書き戻す。</text>
+</svg>
