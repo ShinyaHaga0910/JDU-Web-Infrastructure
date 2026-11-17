@@ -55,7 +55,7 @@
           "code": 8
         }
       ],
-      "sha256": "a3a9353464933fc4de93184b482da7b1b92241c21987ac92a700e4ac5b5d619e",
+      "sha256": "a5340b98d281e2002433281d6137f28d34a792c7f85b29651655740a47b425f2",
       "date": "2026-11-13",
       "local_references_checked": 10
     },
@@ -75,7 +75,7 @@
         "章末解答": 8,
         "参考資料": 9
       },
-      "sha256": "01867e4ef08b2af2f8828e4289793f21e87a490a00d372fda78044aa1108e9e4",
+      "sha256": "d11129b66a51fab81b051931ded4cddc877927ea0c464ec6c63f8a939b4d121d",
       "html_checks": [
         {
           "chapter": 8,
@@ -113,7 +113,8 @@
           "loaded": true,
           "code": 4
         }
-      ]
+      ],
+      "local_references_checked": 6
     },
     {
       "chapter": 9,
@@ -131,7 +132,7 @@
         "章末解答": 6,
         "参考資料": 7
       },
-      "sha256": "98b4bb58db9f52baf7686a4a438a6f00bd5b31b7db003ea9030bb80624173df3",
+      "sha256": "0700d6d07b3a5766e5f19f6e796cfa492be3920ca38e478e0730bdb06b580afb",
       "html_checks": [
         {
           "chapter": 9,
@@ -169,7 +170,8 @@
           "loaded": true,
           "code": 5
         }
-      ]
+      ],
+      "local_references_checked": 4
     },
     {
       "chapter": 10,
@@ -187,7 +189,7 @@
         "章末解答": 10,
         "参考資料": 11
       },
-      "sha256": "12fd01460996b604e58f86062ce5b61a81fb530ff07adcb9446c21c7707e7959",
+      "sha256": "8d26ac5088555b1ae0139911c96b44a325a6576eeb02b8eb3e82aa363ff99c61",
       "html_checks": [
         {
           "chapter": 10,
@@ -225,7 +227,8 @@
           "loaded": true,
           "code": 1
         }
-      ]
+      ],
+      "local_references_checked": 12
     },
     {
       "chapter": 11,
@@ -243,7 +246,7 @@
         "章末解答": 9,
         "参考資料": 10
       },
-      "sha256": "939da65ddfe8de7e64ff9d7291d787b239fca0cf6dc5789d0edc7f2371d3c8e6",
+      "sha256": "5491b738a025115868a99c39c9434ea5079fa4b655baacf7c0f5c1488cf1bfe6",
       "html_checks": [
         {
           "chapter": 11,
@@ -281,7 +284,8 @@
           "loaded": true,
           "code": 1
         }
-      ]
+      ],
+      "local_references_checked": 10
     },
     {
       "chapter": 12,
@@ -299,7 +303,7 @@
         "章末解答": 8,
         "参考資料": 9
       },
-      "sha256": "c142aaf026845854b4fbb641029cb7a5640e33fc075d02fdfb480d9a95cd130b",
+      "sha256": "bdcf2bab834e2d111511501772b58db423a89897d689fe57c4de2976072750e1",
       "html_checks": [
         {
           "chapter": 12,
@@ -337,14 +341,15 @@
           "loaded": true,
           "code": 1
         }
-      ]
+      ],
+      "local_references_checked": 8
     },
     {
       "chapter": 13,
       "pages": 9,
-      "text_blocks": 129,
+      "text_blocks": 130,
       "missing_text": [],
-      "pdf_words_within_page": 300,
+      "pdf_words_within_page": 303,
       "rendered_pages": 9,
       "figure_texts_within_canvas_and_nonoverlapping": 0,
       "figures": 0,
@@ -355,7 +360,7 @@
         "章末解答": 8,
         "参考資料": 9
       },
-      "sha256": "bc23fa7551764d88c824465895090d7f79bfb922d9f27e31a4e7924d9a04302d",
+      "sha256": "f993763f4abd0ec57f81da2ebc8f09c9ed26a8ae091766ee438ccb1ece286f8b",
       "html_checks": [
         {
           "chapter": 13,
@@ -393,23 +398,25 @@
           "loaded": true,
           "code": 1
         }
-      ]
+      ],
+      "local_references_checked": 2
     }
   ],
   "total_pages": 67,
   "total_figures": 15,
   "total_code_blocks": 21,
-  "total_text_blocks": 811,
-  "total_pdf_words_within_page": 2378,
+  "total_text_blocks": 812,
+  "total_pdf_words_within_page": 2381,
   "total_figure_texts_checked": 336,
   "teacher_visual_review": "not performed",
   "student_trial": "not performed",
   "aws_operations": "none",
-  "local_references_checked": 242,
+  "local_references_checked": 134,
   "local_references_missing": [],
   "earlier_chapters_unchanged": false,
   "updated": "2026-11-17",
   "chapter_renumbering": "chapter-renumbering.json",
   "control_annotation_arrows_checked": 7,
-  "control_annotation_arrows_crossing_text": 0
+  "control_annotation_arrows_crossing_text": 0,
+  "integration_validation": "textbook.qa.public.json"
 }

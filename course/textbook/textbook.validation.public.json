@@ -1,0 +1,399 @@
+{
+  "date": "2026-11-17",
+  "chapters": [
+    {
+      "chapter": 1,
+      "title": "第1章 Webシステムを構成するもの",
+      "source": "docs/ja/01-web-system.md",
+      "source_sha256": "9da22687ce3da609bd3bcaed59c388f7450061e9ae585f70878b1e83f3eb0315",
+      "pdf": "output/pdf/web_textbook_ch01_ja.pdf",
+      "pdf_sha256": "5c745412f5a1fc016d4cc506b4fcebb46bac31802ac3c6590bacd085ec4a2935",
+      "pages": 14,
+      "start_page": 3,
+      "end_page": 16,
+      "figures": [
+        {
+          "path": "assets/figures/fig01-system-overview.png",
+          "sha256": "0647abe52e2e503c85f88003ae77a79c859632b630af6a631c8765a4bc49e382"
+        },
+        {
+          "path": "assets/figures/fig04-ssh-rdp.png",
+          "sha256": "bc6e87624204fd9b7d109a13c785af639600867915801267c399026ed147b9a9"
+        },
+        {
+          "path": "assets/figures/fig02-web-and-app.png",
+          "sha256": "56d77aca41f917c85806e4be90dfd77951539380f8cd8da4a30410feed7cef45"
+        },
+        {
+          "path": "assets/figures/fig05-network-boundaries.png",
+          "sha256": "90db00c273b0f0a4460af97fca8782bfd2c502b68af831abe52f44db1bc1168c"
+        },
+        {
+          "path": "assets/figures/fig03-first-mission.png",
+          "sha256": "2ff8d0da50ae48f2a91623cd1ac54d046fd4c7bc69349f0310f7b2c672e98aef"
+        }
+      ],
+      "text_blocks": 172
+    },
+    {
+      "chapter": 2,
+      "title": "第2章 AWS上のネットワークと通信経路",
+      "source": "docs/ja/02-network-paths.md",
+      "source_sha256": "5f2b29b09827095c5d6bfc6b1b5fe8fb86b91f1cbdede9d9d7319c7619e7170b",
+      "pdf": "output/pdf/web_textbook_ch02_ja.pdf",
+      "pdf_sha256": "9f3c267b854939c6da1926e25009b98f7b2ccb9ff342efbd732654078a06f99d",
+      "pages": 12,
+      "start_page": 17,
+      "end_page": 28,
+      "figures": [
+        {
+          "path": "assets/figures/ch02-fig01-subnets.png",
+          "sha256": "7ef292824ddb1f45e80fa5ee629d2ca36774bd6687f3837609811da718935e3b"
+        },
+        {
+          "path": "assets/figures/ch02-fig02-public-private.png",
+          "sha256": "ba71b5c1e3999fb665ab5b3e7cc7627d2a35b041c096047273b7458aa269c66c"
+        },
+        {
+          "path": "assets/figures/ch02-fig03-security-groups.png",
+          "sha256": "2ec1cd646f956883016ad5a70dba42ec9936a4b270372832769f4b303224d28d"
+        },
+        {
+          "path": "assets/figures/ch02-fig04-loopback.png",
+          "sha256": "dc663f22f21417adc6540933c1012f4b7575020a1bc2c7293f1462220c565352"
+        }
+      ],
+      "text_blocks": 178
+    },
+    {
+      "chapter": 3,
+      "title": "第3章 サーバーへの接続と作業場所",
+      "source": "docs/ja/03-connecting-and-working.md",
+      "source_sha256": "79090448fac6fc8f935b3ef100e64ade0cf13fa99b77a9191d251c02584ac80c",
+      "pdf": "output/pdf/web_textbook_ch03_ja.pdf",
+      "pdf_sha256": "b4d6210b45d50422a00a1d5bc5512aeca1a1c7bf9f282e6277553911aa2bd241",
+      "pages": 12,
+      "start_page": 29,
+      "end_page": 40,
+      "figures": [
+        {
+          "path": "assets/figures/ch03-fig01-nested-screen.png",
+          "sha256": "241f540bd7d87a2d5dc91f2c26db51a586e25a70a8be709f706a87e2835fe814"
+        },
+        {
+          "path": "assets/figures/ch03-fig02-rdp-desktop-example.png",
+          "sha256": "49934c26b095d0f01fecd8537ffd9a568642b3083b156ae9ad445175391b2f8b"
+        },
+        {
+          "path": "assets/figures/ch03-fig03-rdp-ssh.png",
+          "sha256": "cf6962492ebdd81654866661fba0a7d71e04ca0f79ba6aef1c468e44039b8a8c"
+        },
+        {
+          "path": "assets/figures/ch03-fig04-ssm.png",
+          "sha256": "133de0f53378bd49ba3e2c553d717751cfe1d518913442eda97aa41d14b11d49"
+        },
+        {
+          "path": "assets/figures/ch03-fig05-browsers.png",
+          "sha256": "a97c79531c8deeb5e2bf27de91fd38369e4f60ceae9662af5616eed5e38ada44"
+        }
+      ],
+      "text_blocks": 124
+    },
+    {
+      "chapter": 4,
+      "title": "第4章 HTTPでページをリクエストする仕組み",
+      "source": "docs/ja/04-http-requests-and-responses.md",
+      "source_sha256": "b72b7ffe21ae7f369c8b265b95f69d677f9896a4fcba532c8c1d38c14b234c57",
+      "pdf": "output/pdf/web_textbook_ch04_ja.pdf",
+      "pdf_sha256": "67cd79fa534945b1f84770acee8d4a03a1cb2ef9c71cfc65dd4b4dba8a09f5cf",
+      "pages": 11,
+      "start_page": 41,
+      "end_page": 51,
+      "figures": [
+        {
+          "path": "assets/figures/ch04-fig01-url.png",
+          "sha256": "b4a6e821c98ddce3326c18d3c9d9f2f16a387ac0d5a3a408eb7333cccec57da2"
+        },
+        {
+          "path": "assets/figures/ch04-fig02-roundtrip.png",
+          "sha256": "d1717473626e11781ef9c941d75264f789e2b0e15e07d6583732b53360241e07"
+        },
+        {
+          "path": "assets/figures/ch04-fig03-response.png",
+          "sha256": "8e9c27349357454208ef87094c0706e4a4b6dc145b8186a94480cb1734a1d8ed"
+        }
+      ],
+      "text_blocks": 142
+    },
+    {
+      "chapter": 5,
+      "title": "第5章 Nginxによる静的ファイルの配信",
+      "source": "docs/ja/05-nginx-static-files.md",
+      "source_sha256": "0af885d42237622f9335e077fabf738ddf059c5b6870c66a054a2eacda093181",
+      "pdf": "output/pdf/web_textbook_ch05_ja.pdf",
+      "pdf_sha256": "cd1bf3641ac18c78dc39d53bdb92727128da838a0884e10aec81f7be8fb33de9",
+      "pages": 11,
+      "start_page": 52,
+      "end_page": 62,
+      "figures": [
+        {
+          "path": "assets/figures/ch05-fig01-static-flow.png",
+          "sha256": "52f43013487989badbacd0754b2166996062f95d2099310f87aa80a68d578f39"
+        },
+        {
+          "path": "assets/figures/ch05-fig02-path-mapping.png",
+          "sha256": "892fc7b0aca69f75d9c5a7c0709cf35b78ed732fa393975b9dbfd6dd0ad8ce89"
+        },
+        {
+          "path": "assets/figures/ch05-fig03-permissions.png",
+          "sha256": "ca3791b2af2a2e5ff7276101ba149b18d8b5aad804f101330aad67b89333c084"
+        },
+        {
+          "path": "assets/figures/ch05-fig04-observation-points.png",
+          "sha256": "4968e7dd727f4c3a4c62ddcdb690faa19e71ebbab5416083d7ca2f49485dd5de"
+        }
+      ],
+      "text_blocks": 133
+    },
+    {
+      "chapter": 6,
+      "title": "第6章 DNSによる名前解決の仕組み",
+      "source": "docs/ja/06-dns-name-resolution.md",
+      "source_sha256": "8118805de209c12edab391877305679bfa7b74d93270ab16d798fdd4131a5c69",
+      "pdf": "output/pdf/web_textbook_ch06_ja.pdf",
+      "pdf_sha256": "cc2baf734d7979c2c87b9728c5d3af5ea4670b4cd4cfac97c3ee4de8cada43e7",
+      "pages": 16,
+      "start_page": 63,
+      "end_page": 78,
+      "figures": [
+        {
+          "path": "assets/figures/ch06-fig01-dns-then-http.png",
+          "sha256": "6cf64003814a20f785d5a4aa7a0db16c46f9a8cf3738a9959de9a1598737e33b"
+        },
+        {
+          "path": "assets/figures/ch06-fig02-names-and-zone.png",
+          "sha256": "f640f3821ff513e84d92df12af5c2999899f5de20e1a95b3b9f0866b3e3c3a7f"
+        },
+        {
+          "path": "assets/figures/ch06-fig03-internet-intranet.png",
+          "sha256": "4530047e851541760c7835538f5bde0d0cf6863817c515c9e7442689ce447f4a"
+        },
+        {
+          "path": "assets/figures/ch06-fig04-public-resolution.png",
+          "sha256": "3e60a623d5e42e53cc2bd5d08cd2fbaf17640f52f462eacc8f8af97a8d2a1859"
+        },
+        {
+          "path": "assets/figures/ch06-fig05-cache-ttl.png",
+          "sha256": "1369272f2fa504d981d015c89128a6787cb458c5595d565526b3c3d89137e452"
+        },
+        {
+          "path": "assets/figures/ch06-fig06-internal-and-forward.png",
+          "sha256": "004fd4612bf9adb5005edeff0d2a485f4f9da0e5dd3f5a6acda890b16ac4d789"
+        }
+      ],
+      "text_blocks": 201
+    },
+    {
+      "chapter": 7,
+      "title": "第7章 内部DNSの設定と動作確認",
+      "source": "docs/ja/07-internal-dns-configuration.md",
+      "source_sha256": "e64942bfbcdcb1203d9143312bafc586e31625cbb9f9b3b927066734cc6b404f",
+      "pdf": "output/pdf/web_textbook_ch07_ja.pdf",
+      "pdf_sha256": "a5340b98d281e2002433281d6137f28d34a792c7f85b29651655740a47b425f2",
+      "pages": 12,
+      "start_page": 79,
+      "end_page": 90,
+      "figures": [
+        {
+          "path": "assets/figures/ch07-fig01-configuration.png",
+          "sha256": "bbfc3399bffeb9470ed75014ff031cfe5eb20a22b18cba35fd1502185227b5f0"
+        },
+        {
+          "path": "assets/figures/ch07-fig02-resolver.png",
+          "sha256": "2af71df23f5fb1e56fd8104ec4eeb49284e7e15f0d0a2a3e42a849882b8f0864"
+        },
+        {
+          "path": "assets/figures/ch07-fig03-checks.png",
+          "sha256": "97c353db80bc81652ac88dc8dc6da81e6beeb8ed6f476958bc9b1ae4d6cab4af"
+        }
+      ],
+      "text_blocks": 164
+    },
+    {
+      "chapter": 8,
+      "title": "第8章 リレーショナルDBとSQLの基本",
+      "source": "docs/ja/08-databases-and-sql.md",
+      "source_sha256": "5d9101a877ae1858835c76525b7594aa9d3bd41e5e76c9c01b5e4c04ce7e4618",
+      "pdf": "output/pdf/web_textbook_ch08_ja.pdf",
+      "pdf_sha256": "d11129b66a51fab81b051931ded4cddc877927ea0c464ec6c63f8a939b4d121d",
+      "pages": 9,
+      "start_page": 91,
+      "end_page": 99,
+      "figures": [
+        {
+          "path": "assets/figures/ch08-fig01-dbms.png",
+          "sha256": "0214b2d8a98333ec64e8ed5a9dda97eaf0f2a413f061711beef3125fa60abb8a"
+        },
+        {
+          "path": "assets/figures/ch08-fig02-table.png",
+          "sha256": "a494e5b13d1f4acd38c44482060b548c81b73c06716147ebd3fab86ed4bb755f"
+        },
+        {
+          "path": "assets/figures/ch08-fig03-select.png",
+          "sha256": "0d1402aa3526ff7f60dd5b45a85138c2c3e7a074c9f2b32ce0004e218a717a0d"
+        }
+      ],
+      "text_blocks": 90
+    },
+    {
+      "chapter": 9,
+      "title": "第9章 PostgreSQLの接続と認証",
+      "source": "docs/ja/09-postgresql-connections.md",
+      "source_sha256": "42928cc565aa53b800c9bbeb2b1db3b696e8c8090188df8b69b8169204f802ea",
+      "pdf": "output/pdf/web_textbook_ch09_ja.pdf",
+      "pdf_sha256": "0700d6d07b3a5766e5f19f6e796cfa492be3920ca38e478e0730bdb06b580afb",
+      "pages": 7,
+      "start_page": 100,
+      "end_page": 106,
+      "figures": [
+        {
+          "path": "assets/figures/ch09-fig01-connection.png",
+          "sha256": "8f7540b3c1f2d1c4db838997d8567123733574f55a47e66155185617ae4aff98"
+        }
+      ],
+      "text_blocks": 77
+    },
+    {
+      "chapter": 10,
+      "title": "第10章 WebサーバーとアプリとDBの連携",
+      "source": "docs/ja/10-web-app-and-database.md",
+      "source_sha256": "2b571afa254edb070f1fef56e49310cf264a60ca779b31e033007c07a5dd1696",
+      "pdf": "output/pdf/web_textbook_ch10_ja.pdf",
+      "pdf_sha256": "8d26ac5088555b1ae0139911c96b44a325a6576eeb02b8eb3e82aa363ff99c61",
+      "pages": 11,
+      "start_page": 107,
+      "end_page": 117,
+      "figures": [
+        {
+          "path": "assets/figures/ch10-fig01-components.png",
+          "sha256": "b93ddf3511e21731e9b32e4e153647cf2e51606562fa0c44308fd1c009136f95"
+        },
+        {
+          "path": "assets/figures/ch10-fig02-entries.png",
+          "sha256": "6504ebdd0629faf1cfe3f62d5a4285b78424453858532eda15d909cb3c765ca3"
+        },
+        {
+          "path": "assets/figures/ch10-fig03-list.png",
+          "sha256": "dcbd6228bf855348b72ecb6063df8a9f497a0279d151d3eba949e6ce0cb12152"
+        },
+        {
+          "path": "assets/figures/ch10-fig04-save.png",
+          "sha256": "ae8934bc7a57f52c5ac9f8be2393af8a21a50d99f294a9b0b11a4b1cec96927a"
+        }
+      ],
+      "text_blocks": 109
+    },
+    {
+      "chapter": 11,
+      "title": "第11章 提供アプリの配置と初期設定",
+      "source": "docs/ja/11-application-deployment.md",
+      "source_sha256": "0074c7a10135ecdad8b7c4264083b29ed98c7c08d93f554ae7afe90d026c5487",
+      "pdf": "output/pdf/web_textbook_ch11_ja.pdf",
+      "pdf_sha256": "5491b738a025115868a99c39c9434ea5079fa4b655baacf7c0f5c1488cf1bfe6",
+      "pages": 10,
+      "start_page": 118,
+      "end_page": 127,
+      "figures": [
+        {
+          "path": "assets/figures/ch11-fig01-phases.png",
+          "sha256": "549c67560a1f1fa4cd4fd35a1a3ad57a4c17667763b3f3ab7667a88654308a28"
+        },
+        {
+          "path": "assets/figures/ch11-fig02-service.png",
+          "sha256": "437e0ed13d031e4058f8361b7118637d3340e348252c480a54cab058fc8a92eb"
+        }
+      ],
+      "text_blocks": 116
+    },
+    {
+      "chapter": 12,
+      "title": "第12章 公開範囲と最小権限",
+      "source": "docs/ja/12-access-and-least-privilege.md",
+      "source_sha256": "0cc6af3ea0ae6f07302411a24de8acb5c129c176b5cf0a2b889a437df1eedd38",
+      "pdf": "output/pdf/web_textbook_ch12_ja.pdf",
+      "pdf_sha256": "bdcf2bab834e2d111511501772b58db423a89897d689fe57c4de2976072750e1",
+      "pages": 9,
+      "start_page": 128,
+      "end_page": 136,
+      "figures": [
+        {
+          "path": "assets/figures/ch12-fig01-boundaries.png",
+          "sha256": "d9a768448fa4df3f882c4fe00067b0f23ede493ca2e516c8432077a2b6f15695"
+        },
+        {
+          "path": "assets/figures/ch12-fig02-retirement.png",
+          "sha256": "7c47c8ae2d3a5c8968369e8928915a971ac95648737527d893e4b494463fce64"
+        }
+      ],
+      "text_blocks": 126
+    },
+    {
+      "chapter": 13,
+      "title": "第13章 運用・保守と障害への対応",
+      "source": "docs/ja/13-observation-and-recovery.md",
+      "source_sha256": "2f0dd17fde1a7d09b9c99e1eb992bf4fd2b86297ab68478b0c38c882ed86a76e",
+      "pdf": "output/pdf/web_textbook_ch13_ja.pdf",
+      "pdf_sha256": "f993763f4abd0ec57f81da2ebc8f09c9ed26a8ae091766ee438ccb1ece286f8b",
+      "pages": 9,
+      "start_page": 137,
+      "end_page": 145,
+      "figures": [],
+      "text_blocks": 130
+    }
+  ],
+  "total_pages": 145,
+  "front_matter_pages": 2,
+  "chapter_count": 13,
+  "contents_links": 13,
+  "input_snapshot": {
+    "build\\build_chapter01.py": "2193f6ea57b561defb3983d3d653f3e886add146830dc44d476ba449e7820f8f",
+    "build\\build_chapter02.py": "46d0bb0cc3d8d0a0470092f77aad501c8e1c2d0ea49ad501d6eab33908f34ab8",
+    "build\\build_chapter03.py": "8027b81e466c036fc526263e7867f077776b11e92d70746ec52e930b0aa050ab",
+    "build\\build_chapter04.py": "613d2468bc41ae28a7cf2f4b52d5720a215c02a9e9eb1c9dae8033840bfba499",
+    "build\\build_chapter05.py": "10016f8808f9bd14041a2bee10bd560a7a9e2bdee295ccee9333aea02c07c8d1",
+    "build\\build_chapter06.py": "c045ef1428055de42d49c8490826d70b941efbe8c26a434398e9be9456c09454",
+    "build\\build_chapter07.py": "8d446062f41f893c118e00e2657ac9f70a9c689e004734e52174b22a03acf181",
+    "build\\build_chapter08.py": "2721f75afd3dbc60b971e7d885c2dd75a3ada98d27dc4e9fea329a4505103498",
+    "build\\build_chapter09.py": "87ebdd713784318df59ee72654136d8e0887a223f455f38f5d6ccea5fccf526e",
+    "build\\build_chapter10.py": "c6a0ca00655078c3f16d0580e10a48bb800ef61c8b872540bdd456d50f1f3074",
+    "build\\build_chapter11.py": "28a7d068bce140c9a813efebb83eef2cd08f86de86e51c2e819aa45d5c186d60",
+    "build\\build_chapter12.py": "324d5146b129d69a2e5aeddeb129d804a14d4c77b27c3060b7f6532a2e621b2c",
+    "build\\build_chapter13.py": "4ee8642e0cca71017f3dabe87a2a3ef9c00ad3b60b64987b4d6a44f5459e13a5",
+    "build\\build_textbook.py": "b75904a5cc997702901330475c6592884043447f6ef5a4fbfcfdeff8ff95ef06",
+    "build\\chapter_figures_07_13.py": "27f7a731770ea89c496ce69676faa96dc8f46e399917b5e75c50e2ef4cca8cc5",
+    "docs\\ja\\01-web-system.md": "9da22687ce3da609bd3bcaed59c388f7450061e9ae585f70878b1e83f3eb0315",
+    "docs\\ja\\02-network-paths.md": "5f2b29b09827095c5d6bfc6b1b5fe8fb86b91f1cbdede9d9d7319c7619e7170b",
+    "docs\\ja\\03-connecting-and-working.md": "79090448fac6fc8f935b3ef100e64ade0cf13fa99b77a9191d251c02584ac80c",
+    "docs\\ja\\04-http-requests-and-responses.md": "b72b7ffe21ae7f369c8b265b95f69d677f9896a4fcba532c8c1d38c14b234c57",
+    "docs\\ja\\05-nginx-static-files.md": "0af885d42237622f9335e077fabf738ddf059c5b6870c66a054a2eacda093181",
+    "docs\\ja\\06-dns-name-resolution.md": "8118805de209c12edab391877305679bfa7b74d93270ab16d798fdd4131a5c69",
+    "docs\\ja\\07-internal-dns-configuration.md": "e64942bfbcdcb1203d9143312bafc586e31625cbb9f9b3b927066734cc6b404f",
+    "docs\\ja\\08-databases-and-sql.md": "5d9101a877ae1858835c76525b7594aa9d3bd41e5e76c9c01b5e4c04ce7e4618",
+    "docs\\ja\\09-postgresql-connections.md": "42928cc565aa53b800c9bbeb2b1db3b696e8c8090188df8b69b8169204f802ea",
+    "docs\\ja\\10-web-app-and-database.md": "2b571afa254edb070f1fef56e49310cf264a60ca779b31e033007c07a5dd1696",
+    "docs\\ja\\11-application-deployment.md": "0074c7a10135ecdad8b7c4264083b29ed98c7c08d93f554ae7afe90d026c5487",
+    "docs\\ja\\12-access-and-least-privilege.md": "0cc6af3ea0ae6f07302411a24de8acb5c129c176b5cf0a2b889a437df1eedd38",
+    "docs\\ja\\13-observation-and-recovery.md": "2f0dd17fde1a7d09b9c99e1eb992bf4fd2b86297ab68478b0c38c882ed86a76e"
+  },
+  "fonts": {
+    "C:\\Windows\\Fonts\\NotoSansJP-VF.ttf": "5113756f8a3b5d01b2211025e267c50121e3b36f465b7bbaf3cdaf4c3430bfd0",
+    "C:\\Windows\\Fonts\\NotoSerifJP-VF.ttf": "b7e0d299a21bd2009eff27aca5e9508c75ab494de222f96bd0bbe355a8d8ced5"
+  },
+  "sha256": "56b572d99875bfb473ca4da0322ad7f52e74403e63cd511c07403e74eb7bc13b",
+  "all_chapters_rebuilt": true,
+  "source_inputs_unchanged_during_build": true,
+  "chapter_text_preserved": true,
+  "teacher_visual_review": "not performed",
+  "student_trial": "not performed",
+  "aws_operations": "none"
+}

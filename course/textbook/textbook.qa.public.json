@@ -1,0 +1,1240 @@
+{
+  "date": "2026-11-17",
+  "pages": 145,
+  "rendered_pages": 145,
+  "chapters": 13,
+  "figures": 42,
+  "pdf_images_preserved": 42,
+  "pdf_words_within_page": 5743,
+  "chapter_pdf_words": {
+    "1": 579,
+    "2": 509,
+    "3": 400,
+    "4": 474,
+    "5": 539,
+    "6": 750,
+    "7": 600,
+    "8": 299,
+    "9": 247,
+    "10": 331,
+    "11": 334,
+    "12": 316,
+    "13": 312
+  },
+  "contents_links_checked": 13,
+  "chapter_bookmarks_checked": 13,
+  "continuous_folios_checked": 145,
+  "all_source_hashes_current": true,
+  "all_chapter_text_preserved": true,
+  "all_chapter_images_preserved": true,
+  "html_conditions": 52,
+  "local_references_checked": 134,
+  "local_references_missing": [],
+  "html_checks": [
+    {
+      "chapter": 1,
+      "width": 320,
+      "scale": 100,
+      "overflow": false,
+      "images": 5,
+      "loaded": true,
+      "code": 0
+    },
+    {
+      "chapter": 1,
+      "width": 320,
+      "scale": 200,
+      "overflow": false,
+      "images": 5,
+      "loaded": true,
+      "code": 0
+    },
+    {
+      "chapter": 1,
+      "width": 1280,
+      "scale": 100,
+      "overflow": false,
+      "images": 5,
+      "loaded": true,
+      "code": 0
+    },
+    {
+      "chapter": 1,
+      "width": 1280,
+      "scale": 200,
+      "overflow": false,
+      "images": 5,
+      "loaded": true,
+      "code": 0
+    },
+    {
+      "chapter": 2,
+      "width": 320,
+      "scale": 100,
+      "overflow": false,
+      "images": 4,
+      "loaded": true,
+      "code": 0
+    },
+    {
+      "chapter": 2,
+      "width": 320,
+      "scale": 200,
+      "overflow": false,
+      "images": 4,
+      "loaded": true,
+      "code": 0
+    },
+    {
+      "chapter": 2,
+      "width": 1280,
+      "scale": 100,
+      "overflow": false,
+      "images": 4,
+      "loaded": true,
+      "code": 0
+    },
+    {
+      "chapter": 2,
+      "width": 1280,
+      "scale": 200,
+      "overflow": false,
+      "images": 4,
+      "loaded": true,
+      "code": 0
+    },
+    {
+      "chapter": 3,
+      "width": 320,
+      "scale": 100,
+      "overflow": false,
+      "images": 5,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 3,
+      "width": 320,
+      "scale": 200,
+      "overflow": false,
+      "images": 5,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 3,
+      "width": 1280,
+      "scale": 100,
+      "overflow": false,
+      "images": 5,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 3,
+      "width": 1280,
+      "scale": 200,
+      "overflow": false,
+      "images": 5,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 4,
+      "width": 320,
+      "scale": 100,
+      "overflow": false,
+      "images": 3,
+      "loaded": true,
+      "code": 5
+    },
+    {
+      "chapter": 4,
+      "width": 320,
+      "scale": 200,
+      "overflow": false,
+      "images": 3,
+      "loaded": true,
+      "code": 5
+    },
+    {
+      "chapter": 4,
+      "width": 1280,
+      "scale": 100,
+      "overflow": false,
+      "images": 3,
+      "loaded": true,
+      "code": 5
+    },
+    {
+      "chapter": 4,
+      "width": 1280,
+      "scale": 200,
+      "overflow": false,
+      "images": 3,
+      "loaded": true,
+      "code": 5
+    },
+    {
+      "chapter": 5,
+      "width": 320,
+      "scale": 100,
+      "overflow": false,
+      "images": 4,
+      "loaded": true,
+      "code": 5
+    },
+    {
+      "chapter": 5,
+      "width": 320,
+      "scale": 200,
+      "overflow": false,
+      "images": 4,
+      "loaded": true,
+      "code": 5
+    },
+    {
+      "chapter": 5,
+      "width": 1280,
+      "scale": 100,
+      "overflow": false,
+      "images": 4,
+      "loaded": true,
+      "code": 5
+    },
+    {
+      "chapter": 5,
+      "width": 1280,
+      "scale": 200,
+      "overflow": false,
+      "images": 4,
+      "loaded": true,
+      "code": 5
+    },
+    {
+      "chapter": 6,
+      "width": 320,
+      "scale": 100,
+      "overflow": false,
+      "images": 6,
+      "loaded": true,
+      "code": 4
+    },
+    {
+      "chapter": 6,
+      "width": 320,
+      "scale": 200,
+      "overflow": false,
+      "images": 6,
+      "loaded": true,
+      "code": 4
+    },
+    {
+      "chapter": 6,
+      "width": 1280,
+      "scale": 100,
+      "overflow": false,
+      "images": 6,
+      "loaded": true,
+      "code": 4
+    },
+    {
+      "chapter": 6,
+      "width": 1280,
+      "scale": 200,
+      "overflow": false,
+      "images": 6,
+      "loaded": true,
+      "code": 4
+    },
+    {
+      "chapter": 7,
+      "width": 320,
+      "scale": 100,
+      "overflow": false,
+      "images": 3,
+      "loaded": true,
+      "code": 8
+    },
+    {
+      "chapter": 7,
+      "width": 320,
+      "scale": 200,
+      "overflow": false,
+      "images": 3,
+      "loaded": true,
+      "code": 8
+    },
+    {
+      "chapter": 7,
+      "width": 1280,
+      "scale": 100,
+      "overflow": false,
+      "images": 3,
+      "loaded": true,
+      "code": 8
+    },
+    {
+      "chapter": 7,
+      "width": 1280,
+      "scale": 200,
+      "overflow": false,
+      "images": 3,
+      "loaded": true,
+      "code": 8
+    },
+    {
+      "chapter": 8,
+      "width": 320,
+      "scale": 100,
+      "overflow": false,
+      "images": 3,
+      "loaded": true,
+      "code": 4
+    },
+    {
+      "chapter": 8,
+      "width": 320,
+      "scale": 200,
+      "overflow": false,
+      "images": 3,
+      "loaded": true,
+      "code": 4
+    },
+    {
+      "chapter": 8,
+      "width": 1280,
+      "scale": 100,
+      "overflow": false,
+      "images": 3,
+      "loaded": true,
+      "code": 4
+    },
+    {
+      "chapter": 8,
+      "width": 1280,
+      "scale": 200,
+      "overflow": false,
+      "images": 3,
+      "loaded": true,
+      "code": 4
+    },
+    {
+      "chapter": 9,
+      "width": 320,
+      "scale": 100,
+      "overflow": false,
+      "images": 1,
+      "loaded": true,
+      "code": 5
+    },
+    {
+      "chapter": 9,
+      "width": 320,
+      "scale": 200,
+      "overflow": false,
+      "images": 1,
+      "loaded": true,
+      "code": 5
+    },
+    {
+      "chapter": 9,
+      "width": 1280,
+      "scale": 100,
+      "overflow": false,
+      "images": 1,
+      "loaded": true,
+      "code": 5
+    },
+    {
+      "chapter": 9,
+      "width": 1280,
+      "scale": 200,
+      "overflow": false,
+      "images": 1,
+      "loaded": true,
+      "code": 5
+    },
+    {
+      "chapter": 10,
+      "width": 320,
+      "scale": 100,
+      "overflow": false,
+      "images": 4,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 10,
+      "width": 320,
+      "scale": 200,
+      "overflow": false,
+      "images": 4,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 10,
+      "width": 1280,
+      "scale": 100,
+      "overflow": false,
+      "images": 4,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 10,
+      "width": 1280,
+      "scale": 200,
+      "overflow": false,
+      "images": 4,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 11,
+      "width": 320,
+      "scale": 100,
+      "overflow": false,
+      "images": 2,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 11,
+      "width": 320,
+      "scale": 200,
+      "overflow": false,
+      "images": 2,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 11,
+      "width": 1280,
+      "scale": 100,
+      "overflow": false,
+      "images": 2,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 11,
+      "width": 1280,
+      "scale": 200,
+      "overflow": false,
+      "images": 2,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 12,
+      "width": 320,
+      "scale": 100,
+      "overflow": false,
+      "images": 2,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 12,
+      "width": 320,
+      "scale": 200,
+      "overflow": false,
+      "images": 2,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 12,
+      "width": 1280,
+      "scale": 100,
+      "overflow": false,
+      "images": 2,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 12,
+      "width": 1280,
+      "scale": 200,
+      "overflow": false,
+      "images": 2,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 13,
+      "width": 320,
+      "scale": 100,
+      "overflow": false,
+      "images": 0,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 13,
+      "width": 320,
+      "scale": 200,
+      "overflow": false,
+      "images": 0,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 13,
+      "width": 1280,
+      "scale": 100,
+      "overflow": false,
+      "images": 0,
+      "loaded": true,
+      "code": 1
+    },
+    {
+      "chapter": 13,
+      "width": 1280,
+      "scale": 200,
+      "overflow": false,
+      "images": 0,
+      "loaded": true,
+      "code": 1
+    }
+  ],
+  "sha256": "56b572d99875bfb473ca4da0322ad7f52e74403e63cd511c07403e74eb7bc13b",
+  "teacher_visual_review": "not performed",
+  "student_trial": "not performed",
+  "aws_operations": "none",
+  "section_bookmarks_checked": 130,
+  "individual_pages_checked": 143,
+  "chapter_checks": [
+    {
+      "chapter": 1,
+      "pages": 14,
+      "text_blocks": 172,
+      "missing_text": [],
+      "pdf_words_within_page": 565,
+      "rendered_pages": 14,
+      "figures": 5,
+      "code_blocks": 0,
+      "questions": 4,
+      "heading_pages": {
+        "章末問題": 11,
+        "章末解答": 13,
+        "参考資料": 13
+      },
+      "local_references_checked": 16,
+      "sha256": "5c745412f5a1fc016d4cc506b4fcebb46bac31802ac3c6590bacd085ec4a2935",
+      "html_checks": [
+        {
+          "chapter": 1,
+          "width": 320,
+          "scale": 100,
+          "overflow": false,
+          "images": 5,
+          "loaded": true,
+          "code": 0
+        },
+        {
+          "chapter": 1,
+          "width": 320,
+          "scale": 200,
+          "overflow": false,
+          "images": 5,
+          "loaded": true,
+          "code": 0
+        },
+        {
+          "chapter": 1,
+          "width": 1280,
+          "scale": 100,
+          "overflow": false,
+          "images": 5,
+          "loaded": true,
+          "code": 0
+        },
+        {
+          "chapter": 1,
+          "width": 1280,
+          "scale": 200,
+          "overflow": false,
+          "images": 5,
+          "loaded": true,
+          "code": 0
+        }
+      ]
+    },
+    {
+      "chapter": 2,
+      "pages": 12,
+      "text_blocks": 178,
+      "missing_text": [],
+      "pdf_words_within_page": 497,
+      "rendered_pages": 12,
+      "figures": 4,
+      "code_blocks": 0,
+      "questions": 4,
+      "heading_pages": {
+        "章末問題": 10,
+        "章末解答": 12,
+        "参考資料": 12
+      },
+      "local_references_checked": 14,
+      "sha256": "9f3c267b854939c6da1926e25009b98f7b2ccb9ff342efbd732654078a06f99d",
+      "html_checks": [
+        {
+          "chapter": 2,
+          "width": 320,
+          "scale": 100,
+          "overflow": false,
+          "images": 4,
+          "loaded": true,
+          "code": 0
+        },
+        {
+          "chapter": 2,
+          "width": 320,
+          "scale": 200,
+          "overflow": false,
+          "images": 4,
+          "loaded": true,
+          "code": 0
+        },
+        {
+          "chapter": 2,
+          "width": 1280,
+          "scale": 100,
+          "overflow": false,
+          "images": 4,
+          "loaded": true,
+          "code": 0
+        },
+        {
+          "chapter": 2,
+          "width": 1280,
+          "scale": 200,
+          "overflow": false,
+          "images": 4,
+          "loaded": true,
+          "code": 0
+        }
+      ]
+    },
+    {
+      "chapter": 3,
+      "pages": 12,
+      "text_blocks": 124,
+      "missing_text": [],
+      "pdf_words_within_page": 388,
+      "rendered_pages": 12,
+      "figures": 5,
+      "code_blocks": 1,
+      "questions": 4,
+      "heading_pages": {
+        "章末問題": 10,
+        "章末解答": 11,
+        "参考資料": 12
+      },
+      "local_references_checked": 16,
+      "sha256": "b4d6210b45d50422a00a1d5bc5512aeca1a1c7bf9f282e6277553911aa2bd241",
+      "html_checks": [
+        {
+          "chapter": 3,
+          "width": 320,
+          "scale": 100,
+          "overflow": false,
+          "images": 5,
+          "loaded": true,
+          "code": 1
+        },
+        {
+          "chapter": 3,
+          "width": 320,
+          "scale": 200,
+          "overflow": false,
+          "images": 5,
+          "loaded": true,
+          "code": 1
+        },
+        {
+          "chapter": 3,
+          "width": 1280,
+          "scale": 100,
+          "overflow": false,
+          "images": 5,
+          "loaded": true,
+          "code": 1
+        },
+        {
+          "chapter": 3,
+          "width": 1280,
+          "scale": 200,
+          "overflow": false,
+          "images": 5,
+          "loaded": true,
+          "code": 1
+        }
+      ]
+    },
+    {
+      "chapter": 4,
+      "pages": 11,
+      "text_blocks": 142,
+      "missing_text": [],
+      "pdf_words_within_page": 472,
+      "rendered_pages": 11,
+      "figures": 3,
+      "code_blocks": 5,
+      "questions": 4,
+      "heading_pages": {
+        "章末問題": 9,
+        "章末解答": 10,
+        "参考資料": 11
+      },
+      "local_references_checked": 8,
+      "sha256": "67cd79fa534945b1f84770acee8d4a03a1cb2ef9c71cfc65dd4b4dba8a09f5cf",
+      "html_checks": [
+        {
+          "chapter": 4,
+          "width": 320,
+          "scale": 100,
+          "overflow": false,
+          "images": 3,
+          "loaded": true,
+          "code": 5
+        },
+        {
+          "chapter": 4,
+          "width": 320,
+          "scale": 200,
+          "overflow": false,
+          "images": 3,
+          "loaded": true,
+          "code": 5
+        },
+        {
+          "chapter": 4,
+          "width": 1280,
+          "scale": 100,
+          "overflow": false,
+          "images": 3,
+          "loaded": true,
+          "code": 5
+        },
+        {
+          "chapter": 4,
+          "width": 1280,
+          "scale": 200,
+          "overflow": false,
+          "images": 3,
+          "loaded": true,
+          "code": 5
+        }
+      ]
+    },
+    {
+      "chapter": 5,
+      "pages": 11,
+      "text_blocks": 133,
+      "missing_text": [],
+      "pdf_words_within_page": 528,
+      "rendered_pages": 11,
+      "figures": 4,
+      "code_blocks": 5,
+      "questions": 5,
+      "heading_pages": {
+        "章末問題": 9,
+        "章末解答": 10,
+        "参考資料": 11
+      },
+      "local_references_checked": 12,
+      "sha256": "cd1bf3641ac18c78dc39d53bdb92727128da838a0884e10aec81f7be8fb33de9",
+      "html_checks": [
+        {
+          "chapter": 5,
+          "width": 320,
+          "scale": 100,
+          "overflow": false,
+          "images": 4,
+          "loaded": true,
+          "code": 5
+        },
+        {
+          "chapter": 5,
+          "width": 320,
+          "scale": 200,
+          "overflow": false,
+          "images": 4,
+          "loaded": true,
+          "code": 5
+        },
+        {
+          "chapter": 5,
+          "width": 1280,
+          "scale": 100,
+          "overflow": false,
+          "images": 4,
+          "loaded": true,
+          "code": 5
+        },
+        {
+          "chapter": 5,
+          "width": 1280,
+          "scale": 200,
+          "overflow": false,
+          "images": 4,
+          "loaded": true,
+          "code": 5
+        }
+      ]
+    },
+    {
+      "chapter": 6,
+      "pages": 16,
+      "text_blocks": 201,
+      "missing_text": [],
+      "pdf_words_within_page": 734,
+      "rendered_pages": 16,
+      "figures": 6,
+      "code_blocks": 4,
+      "questions": 6,
+      "heading_pages": {
+        "章末問題": 14,
+        "章末解答": 15,
+        "参考資料": 16
+      },
+      "local_references_checked": 16,
+      "sha256": "cc2baf734d7979c2c87b9728c5d3af5ea4670b4cd4cfac97c3ee4de8cada43e7",
+      "html_checks": [
+        {
+          "chapter": 6,
+          "width": 320,
+          "scale": 100,
+          "overflow": false,
+          "images": 6,
+          "loaded": true,
+          "code": 4
+        },
+        {
+          "chapter": 6,
+          "width": 320,
+          "scale": 200,
+          "overflow": false,
+          "images": 6,
+          "loaded": true,
+          "code": 4
+        },
+        {
+          "chapter": 6,
+          "width": 1280,
+          "scale": 100,
+          "overflow": false,
+          "images": 6,
+          "loaded": true,
+          "code": 4
+        },
+        {
+          "chapter": 6,
+          "width": 1280,
+          "scale": 200,
+          "overflow": false,
+          "images": 6,
+          "loaded": true,
+          "code": 4
+        }
+      ]
+    },
+    {
+      "chapter": 7,
+      "pages": 12,
+      "text_blocks": 164,
+      "missing_text": [],
+      "pdf_words_within_page": 588,
+      "rendered_pages": 12,
+      "figures": 3,
+      "code_blocks": 8,
+      "questions": 4,
+      "heading_pages": {
+        "章末問題": 10,
+        "章末解答": 11,
+        "参考資料": 12
+      },
+      "local_references_checked": 10,
+      "sha256": "a5340b98d281e2002433281d6137f28d34a792c7f85b29651655740a47b425f2",
+      "html_checks": [
+        {
+          "chapter": 7,
+          "width": 320,
+          "scale": 100,
+          "overflow": false,
+          "images": 3,
+          "loaded": true,
+          "code": 8
+        },
+        {
+          "chapter": 7,
+          "width": 320,
+          "scale": 200,
+          "overflow": false,
+          "images": 3,
+          "loaded": true,
+          "code": 8
+        },
+        {
+          "chapter": 7,
+          "width": 1280,
+          "scale": 100,
+          "overflow": false,
+          "images": 3,
+          "loaded": true,
+          "code": 8
+        },
+        {
+          "chapter": 7,
+          "width": 1280,
+          "scale": 200,
+          "overflow": false,
+          "images": 3,
+          "loaded": true,
+          "code": 8
+        }
+      ]
+    },
+    {
+      "chapter": 8,
+      "pages": 9,
+      "text_blocks": 90,
+      "missing_text": [],
+      "pdf_words_within_page": 299,
+      "rendered_pages": 9,
+      "figures": 3,
+      "code_blocks": 4,
+      "questions": 4,
+      "heading_pages": {
+        "章末問題": 7,
+        "章末解答": 8,
+        "参考資料": 9
+      },
+      "local_references_checked": 6,
+      "sha256": "d11129b66a51fab81b051931ded4cddc877927ea0c464ec6c63f8a939b4d121d",
+      "html_checks": [
+        {
+          "chapter": 8,
+          "width": 320,
+          "scale": 100,
+          "overflow": false,
+          "images": 3,
+          "loaded": true,
+          "code": 4
+        },
+        {
+          "chapter": 8,
+          "width": 320,
+          "scale": 200,
+          "overflow": false,
+          "images": 3,
+          "loaded": true,
+          "code": 4
+        },
+        {
+          "chapter": 8,
+          "width": 1280,
+          "scale": 100,
+          "overflow": false,
+          "images": 3,
+          "loaded": true,
+          "code": 4
+        },
+        {
+          "chapter": 8,
+          "width": 1280,
+          "scale": 200,
+          "overflow": false,
+          "images": 3,
+          "loaded": true,
+          "code": 4
+        }
+      ]
+    },
+    {
+      "chapter": 9,
+      "pages": 7,
+      "text_blocks": 77,
+      "missing_text": [],
+      "pdf_words_within_page": 240,
+      "rendered_pages": 7,
+      "figures": 1,
+      "code_blocks": 5,
+      "questions": 4,
+      "heading_pages": {
+        "章末問題": 5,
+        "章末解答": 6,
+        "参考資料": 7
+      },
+      "local_references_checked": 4,
+      "sha256": "0700d6d07b3a5766e5f19f6e796cfa492be3920ca38e478e0730bdb06b580afb",
+      "html_checks": [
+        {
+          "chapter": 9,
+          "width": 320,
+          "scale": 100,
+          "overflow": false,
+          "images": 1,
+          "loaded": true,
+          "code": 5
+        },
+        {
+          "chapter": 9,
+          "width": 320,
+          "scale": 200,
+          "overflow": false,
+          "images": 1,
+          "loaded": true,
+          "code": 5
+        },
+        {
+          "chapter": 9,
+          "width": 1280,
+          "scale": 100,
+          "overflow": false,
+          "images": 1,
+          "loaded": true,
+          "code": 5
+        },
+        {
+          "chapter": 9,
+          "width": 1280,
+          "scale": 200,
+          "overflow": false,
+          "images": 1,
+          "loaded": true,
+          "code": 5
+        }
+      ]
+    },
+    {
+      "chapter": 10,
+      "pages": 11,
+      "text_blocks": 109,
+      "missing_text": [],
+      "pdf_words_within_page": 320,
+      "rendered_pages": 11,
+      "figures": 4,
+      "code_blocks": 1,
+      "questions": 4,
+      "heading_pages": {
+        "章末問題": 9,
+        "章末解答": 10,
+        "参考資料": 11
+      },
+      "local_references_checked": 12,
+      "sha256": "8d26ac5088555b1ae0139911c96b44a325a6576eeb02b8eb3e82aa363ff99c61",
+      "html_checks": [
+        {
+          "chapter": 10,
+          "width": 320,
+          "scale": 100,
+          "overflow": false,
+          "images": 4,
+          "loaded": true,
+          "code": 1
+        },
+        {
+          "chapter": 10,
+          "width": 320,
+          "scale": 200,
+          "overflow": false,
+          "images": 4,
+          "loaded": true,
+          "code": 1
+        },
+        {
+          "chapter": 10,
+          "width": 1280,
+          "scale": 100,
+          "overflow": false,
+          "images": 4,
+          "loaded": true,
+          "code": 1
+        },
+        {
+          "chapter": 10,
+          "width": 1280,
+          "scale": 200,
+          "overflow": false,
+          "images": 4,
+          "loaded": true,
+          "code": 1
+        }
+      ]
+    },
+    {
+      "chapter": 11,
+      "pages": 10,
+      "text_blocks": 116,
+      "missing_text": [],
+      "pdf_words_within_page": 324,
+      "rendered_pages": 10,
+      "figures": 2,
+      "code_blocks": 1,
+      "questions": 4,
+      "heading_pages": {
+        "章末問題": 8,
+        "章末解答": 9,
+        "参考資料": 10
+      },
+      "local_references_checked": 10,
+      "sha256": "5491b738a025115868a99c39c9434ea5079fa4b655baacf7c0f5c1488cf1bfe6",
+      "html_checks": [
+        {
+          "chapter": 11,
+          "width": 320,
+          "scale": 100,
+          "overflow": false,
+          "images": 2,
+          "loaded": true,
+          "code": 1
+        },
+        {
+          "chapter": 11,
+          "width": 320,
+          "scale": 200,
+          "overflow": false,
+          "images": 2,
+          "loaded": true,
+          "code": 1
+        },
+        {
+          "chapter": 11,
+          "width": 1280,
+          "scale": 100,
+          "overflow": false,
+          "images": 2,
+          "loaded": true,
+          "code": 1
+        },
+        {
+          "chapter": 11,
+          "width": 1280,
+          "scale": 200,
+          "overflow": false,
+          "images": 2,
+          "loaded": true,
+          "code": 1
+        }
+      ]
+    },
+    {
+      "chapter": 12,
+      "pages": 9,
+      "text_blocks": 126,
+      "missing_text": [],
+      "pdf_words_within_page": 307,
+      "rendered_pages": 9,
+      "figures": 2,
+      "code_blocks": 1,
+      "questions": 4,
+      "heading_pages": {
+        "章末問題": 7,
+        "章末解答": 8,
+        "参考資料": 9
+      },
+      "local_references_checked": 8,
+      "sha256": "bdcf2bab834e2d111511501772b58db423a89897d689fe57c4de2976072750e1",
+      "html_checks": [
+        {
+          "chapter": 12,
+          "width": 320,
+          "scale": 100,
+          "overflow": false,
+          "images": 2,
+          "loaded": true,
+          "code": 1
+        },
+        {
+          "chapter": 12,
+          "width": 320,
+          "scale": 200,
+          "overflow": false,
+          "images": 2,
+          "loaded": true,
+          "code": 1
+        },
+        {
+          "chapter": 12,
+          "width": 1280,
+          "scale": 100,
+          "overflow": false,
+          "images": 2,
+          "loaded": true,
+          "code": 1
+        },
+        {
+          "chapter": 12,
+          "width": 1280,
+          "scale": 200,
+          "overflow": false,
+          "images": 2,
+          "loaded": true,
+          "code": 1
+        }
+      ]
+    },
+    {
+      "chapter": 13,
+      "pages": 9,
+      "text_blocks": 130,
+      "missing_text": [],
+      "pdf_words_within_page": 303,
+      "rendered_pages": 9,
+      "figures": 0,
+      "code_blocks": 1,
+      "questions": 4,
+      "heading_pages": {
+        "章末問題": 7,
+        "章末解答": 8,
+        "参考資料": 9
+      },
+      "local_references_checked": 2,
+      "sha256": "f993763f4abd0ec57f81da2ebc8f09c9ed26a8ae091766ee438ccb1ece286f8b",
+      "html_checks": [
+        {
+          "chapter": 13,
+          "width": 320,
+          "scale": 100,
+          "overflow": false,
+          "images": 0,
+          "loaded": true,
+          "code": 1
+        },
+        {
+          "chapter": 13,
+          "width": 320,
+          "scale": 200,
+          "overflow": false,
+          "images": 0,
+          "loaded": true,
+          "code": 1
+        },
+        {
+          "chapter": 13,
+          "width": 1280,
+          "scale": 100,
+          "overflow": false,
+          "images": 0,
+          "loaded": true,
+          "code": 1
+        },
+        {
+          "chapter": 13,
+          "width": 1280,
+          "scale": 200,
+          "overflow": false,
+          "images": 0,
+          "loaded": true,
+          "code": 1
+        }
+      ]
+    }
+  ],
+  "front_matter_words_nonoverlapping": 53
+}
