@@ -1,89 +1,78 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第12章 提供アプリの配置と初期設定</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}h1,h2,h3{overflow-wrap:anywhere}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第12章-提供アプリの配置と初期設定">第12章 提供アプリの配置と初期設定</h1>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第12章 公開範囲と最小権限</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}h1,h2,h3{overflow-wrap:anywhere}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第12章-公開範囲と最小権限">第12章 公開範囲と最小権限</h1>
 <h2 id="この章で分かること">この章で分かること</h2>
-<p>備品管理アプリを使えるようにするには、プログラムをWebサーバーへコピーした後、そのプログラムが動く条件を整える必要がある。例えば、アプリが接続先のDBを知らなければ、備品の一覧を取り出せない。接続できても、備品を保存する表や操作の権限がなければ、追加・変更はできない。</p>
-<p>本章で扱う設定は、「どのソフトウェアを使って動かすか」「どこにあるデータを使うか」「どの権限で操作するか」を、OSやアプリへ伝えるためのものである。設定を理解すると、アプリが起動しない場合と、起動しているがDBへ接続できない場合で、調べる対象が異なることも分かる。</p>
-<p>第11章では、ブラウザ、Nginx、Gunicorn、アプリ、DBが連携する仕組みを説明した。本章では、その連携を成立させる準備を、目的と理由から説明する。練習・課題5では、これらの設定を行い、提供アプリがDBを利用して動く状態を作る。</p>
-<h2 id="121-コード、依存、設定、データを分ける">12.1 コード、依存、設定、データを分ける</h2>
-<p>例えば、備品の数量を4個から6個へ変更するときは、DBに保存した数量を更新する。一方、練習用のDBから本課題用のDBへ接続先を変えるときは、アプリの接続設定を変更する。どちらも、備品一覧を作るプログラムそのものを書き換える作業ではない。何を変えたいのかによって、扱う対象が異なる。</p>
-<p><strong>コード</strong>は、一覧の取得や保存などの処理を記述したプログラムである。<strong>依存パッケージ</strong>は、そのプログラムが利用するDjangoやDB接続のライブラリなどである。<strong>設定</strong>は、接続先DBや実行時に使う値である。<strong>データ</strong>は、DBへ保存した備品やアプリ管理者などの情報である。</p>
-<p>これらを分けて管理すると、同じコードを使いながら、接続先や保存する備品を変えられる。パスワードもコードから分けることで、秘密を含まない提供プログラムを共通に使える。今回の主な保存先は次のとおりである。</p>
-<div class="table-wrap"><table><thead><tr><th scope="col">種類</th><th scope="col">今回の主な保存先</th></tr></thead><tbody><tr><td>提供アプリのコード</td><td>Webサーバーの/opt/jdu-catalog/app</td></tr><tr><td>Pythonの実行環境と依存</td><td>Webサーバーの/opt/jdu-catalog/venv</td></tr><tr><td>通常アプリの秘密設定</td><td>Webサーバーの/etc/jdu-catalog/app.envなど</td></tr><tr><td>配信用CSSなど</td><td>Webサーバーの/var/lib/jdu-catalog/static</td></tr><tr><td>備品などのDBデータ</td><td>DBサーバー上のPostgreSQLが管理するデータベース</td></tr></tbody></table></div>
-<h2 id="122-アプリ専用のpython環境を用意する">12.2 アプリ専用のPython環境を用意する</h2>
-<p>提供アプリのプログラムは、DjangoやDB接続用ライブラリの機能を呼び出して動く。そのため、アプリのコードとともに、呼び出される側のパッケージも用意する必要がある。必要なパッケージがなければ、その機能を呼び出すところでエラーになり、アプリは処理を続けられない。</p>
-<p>パッケージは、版によって使える機能や動作が変わることがある。提供コードに合う版をそろえ、OS側や別のアプリのためのパッケージ管理から分けておくと、アプリ用の環境を保ちやすい。このために使うのが<strong>venv</strong>である。venvは、アプリ専用のPython環境を、同じWebサーバー内にディレクトリとして作成する仕組みである。<a href="https://docs.python.org/3/library/venv.html">Pythonのvenv</a></p>
-<p>今回は、Webサーバーの<code>/opt/jdu-catalog/venv</code>にvenvを作り、内部の配布サーバーに用意された指定版のパッケージを導入する。DjangoとGunicornも、このアプリ用の環境にそろえる。</p>
-<p>初期準備には<code>/opt/jdu-catalog/venv/bin/python</code>を、サービスの起動にはこのvenv内のGunicornを使う。こうして実行ファイルのパスを指定することで、準備のときも通常の起動のときも、用意した同じパッケージを使える。</p>
-<h2 id="123-管理するユーザーと、動かすユーザーを分ける">12.3 管理するユーザーと、動かすユーザーを分ける</h2>
-<p>Webアプリは、ブラウザから届いた入力を処理するプログラムである。その処理もOS上のプロセスとして動くため、実行しているOSユーザーの権限の影響を受ける。rootで動かせば、アプリにもOS全体を変更できる大きな権限を持たせることになる。</p>
-<p>備品一覧を作ったり、DBへ数量の変更を送ったりする日常の処理に、OS全体を管理する権限は必要ない。そこで、今回のアプリは<strong>catalog</strong>という専用のOSユーザーで動かす。catalogには、アプリのコードを読んで実行するための権限を用意する。</p>
-<p>一方、コードとvenvはrootが管理し、catalogから自由に書き換えられないようにする。実行する権限と書き換える権限を分けることで、アプリの不具合などを通じて、次回実行するプログラムやパッケージまで変更されることを防ぐ。</p>
-<p>この分担は、「管理側が実行する内容を用意し、アプリは用意された内容を必要な権限で動かす」という関係である。catalogは、ブラウザから管理画面へログインするアプリ管理者とは別の、プロセスを動かすためのOSユーザーである。</p>
-<h2 id="124-アプリからdbへ接続するための設定">12.4 アプリからDBへ接続するための設定</h2>
-<p>ここからは、備品管理アプリがDBを利用するための準備を説明する。アプリは、Webサーバーの中だけで備品データを探すのではなく、DBサーバーへ接続してデータを読み書きする。そのため、「接続する相手」と「接続後に使うDBと権限」を設定で伝える必要がある。設定する場所はWebサーバーであり、接続する相手はDBサーバーである。</p>
-<p>第9章で説明したように、一つのPostgreSQLが複数のデータベースを管理できる。そのため、DBサーバーの名前が分かるだけでは、練習用と本課題用のどちらのDBを使うかは決まらない。また、同じDBへ接続しても、使うDBロールによって許可される操作が変わる。</p>
-<div class="table-wrap"><table><thead><tr><th scope="col">項目</th><th scope="col">何を決めるための設定か</th></tr></thead><tbody><tr><td>DB_HOST</td><td>接続するDBサーバーを指定する。今回はdb.lab.testを使う</td></tr><tr><td>DB_PORT</td><td>DBサーバー上のPostgreSQLの受付を指定する。今回は5432番ポートを使う</td></tr><tr><td>DB_NAME</td><td>PostgreSQLが管理するDBのうち、どれを利用するかを選ぶ</td></tr><tr><td>DB_USER</td><td>どのDBロールの権限で操作するかを指定する</td></tr><tr><td>DB_PASSWORD</td><td>指定したDBロールで接続するための認証に使う</td></tr></tbody></table></div>
-<p>例えば、練習用DBを使うつもりで本課題用のDB名を設定すれば、別の備品を読んだり、別の場所へ保存したりする原因になる。接続先の名前、DB名、DBロールは、使いたいデータと操作権限を選ぶための一組の情報である。</p>
-<p>DBのパスワードを、サーバー内の誰でも読めるファイルに保存すると、意図しないDB接続に利用されるおそれがある。そこで今回は、DB接続設定をroot所有で<code>0600</code>の通常ファイルとして保存する。この権限は、所有者のrootだけがファイルを読み書きできることを表す。</p>
-<p>アプリがDBへ接続するには、パスワードなどの値を受け取る必要がある。今回の構成では、systemdのシステム側の管理機能が<code>EnvironmentFile</code>で指定した設定ファイルを読み、その値を<strong>環境変数</strong>としてアプリのプロセスへ渡す。環境変数は、プロセスが名前を指定して参照できる設定値である。catalogに設定ファイルを直接読む権限を追加しなくても、アプリは起動時に必要な値を受け取れる。<a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html">systemdの実行環境</a></p>
-<p>初期準備用の補助処理も、管理権限で設定を読んだ後、必要な値を渡し、許可した処理をcatalogユーザーの権限で実行する。どちらの場合も、アプリのプロセス自身はDB認証に必要な値を受け取る。保存した秘密ファイルの保護と、アプリへ必要な値を渡す処理を組み合わせている。</p>
-<p>設定が用意できたかは、秘密を全文表示するのではなく、設定検査の結果とファイルの所有者・権限で確認する。また、DB用、RDP用、アプリ管理者用のパスワードは、認証する相手が異なるため、それぞれの用途で使い分ける。</p>
-<h2 id="125-dbに表・初期データ・アプリ管理者を準備する">12.5 DBに表・初期データ・アプリ管理者を準備する</h2>
-<p>接続先のDBを用意しても、その中にアプリが使う表がなければ、備品を読み出したり保存したりできない。例えば、アプリが備品名と数量の列を読みたいときには、それに合う表と列が必要である。そこで、提供アプリが想定している構造をDBの中へ用意する。</p>
-<p>この準備には<strong>マイグレーション</strong>を使う。マイグレーションは、アプリが必要とする表などの構造を、指定された定義に沿ってDBへ適用する仕組みである。今回は提供済みの定義を使い、アプリのコードに合う構造を作る。準備処理を実行する場所はWebサーバーであり、その処理が構築用ロールでDBサーバーへ接続する。<a href="https://docs.djangoproject.com/en/5.2/topics/migrations/">Djangoのマイグレーション</a></p>
-<p>表を用意した後は、その中へ初期データとアプリ管理者の情報を入れる。それぞれの目的は次のとおりである。</p>
-<p class="bullet">・ <strong>seedによる初期データの投入。</strong> 用意された架空の備品データを入れる。これにより、一覧へ表示するデータがある状態からアプリを使い始められる。</p>
-<p class="bullet">・ <strong>アプリ管理者の作成。</strong> 管理画面へログインし、備品を追加・変更する担当者を登録する。管理者の情報もDBへ保存され、アプリのログインや操作権限の判定に使われる。</p>
-<figure><img src="../../assets/figures/ch12-fig01-phases.png" alt="構築用ロールでの準備から、通常ロールによる運用へ移る段階。" width="1600" height="910"></figure>
-<p><strong>図12-1 一度行う初期準備と、通常のサービス起動。</strong> 表や初期データ、管理者を用意してから、通常のアプリを起動する。</p>
-<p>準備を終えた後の日常の起動では、既に保存されている備品や管理者を使う。登録したデータを保つため、起動のたびにDBを初期化したり、同じ初期データや管理者を作り直したりしない。補助処理が既存状態を検出した場合も、保存済みの内容を確認して扱う。</p>
-<h2 id="126-構築用と通常用のdbロールを切り替える">12.6 構築用と通常用のDBロールを切り替える</h2>
-<p>ここで分けるのは、PostgreSQLへ接続するDBロールである。最初の準備では表を作る権限が必要だが、日常の備品一覧では表の中の値を読み、管理画面では備品の行を追加・変更する。構築時と通常時では、必要な操作が異なる。</p>
-<p>例えば、数量を変更するアプリが表そのものを削除する権限まで持っていると、不具合や不正な操作が起きたときの影響が大きくなる。そこで、表を作る構築用ロールと、通常の読み書きを行うアプリ用ロールを分ける。通常時は、必要な操作に権限を絞ったロールを使う。</p>
-<p>表の準備後には、通常用ロールへ必要なSQL権限を付ける。備品のSELECT・INSERT・UPDATE、補助表の用途に応じた操作、必要なシーケンスのUSAGEなどである。DBへ接続する認証に成功しても、表などへの操作権限がなければ、その操作は拒否される。必要な権限を付けることも、アプリを動かす準備の一部である。</p>
-<p>通常サービスが使うロールは、起動時に渡す設定のDB_USERで指定する。権限不足が起きたときも、通常ロールを所有者やsuperuserへ変更するのではなく、どの対象のどの操作が必要かを調べる。構築用接続を終了する方法は、第13章で扱う。</p>
-<h2 id="127-systemdとnginxの起動設定を対応させる">12.7 systemdとNginxの起動設定を対応させる</h2>
-<p>備品管理アプリは、利用者がページを開いたときに処理できるよう、Gunicornを起動して待ち受ける必要がある。その際には、実行するOSユーザー、使うコードとPython環境、DB接続設定をそろえる。これらを起動方法として記録し、OSにサービスとして管理させるのがsystemdの設定である。</p>
-<p><strong>ユニットファイル</strong>は、systemdにサービスの起動方法などを伝える定義である。今回の<code>jdu-catalog.service</code>に起動条件をまとめることで、サービスを起動し直すときも同じ条件で動かせる。自動起動の設定と組み合わせ、Ubuntu OSの起動後にもアプリを起動できるようにする。</p>
-<p><strong>設定の説明例：配布ユニットの主要な項目の抜粋。</strong></p>
-<pre><code>User=catalog
-WorkingDirectory=/opt/jdu-catalog/app
-EnvironmentFile=/etc/jdu-catalog/app.env</code></pre>
-<p><code>User</code>は「どのOSユーザーの権限で動かすか」、<code>WorkingDirectory</code>は「どのディレクトリを作業場所にするか」、<code>EnvironmentFile</code>は「どの設定ファイルの値を渡すか」を指定する。これらが、ここまでに用意した専用ユーザー、コードの配置先、DB接続設定につながる。<code>ExecStart</code>では、venv内のGunicornで提供アプリを実行し、<code>127.0.0.1:8000</code>で待ち受ける起動方法を指定する。</p>
-<figure><img src="../../assets/figures/ch12-fig02-service.png" alt="systemdの定義、起動するプロセス、Nginxからの転送先をつなぐ。" width="1600" height="1100"></figure>
-<p><strong>図12-2 準備したものを、サービスの起動条件へ結び付ける。</strong> 実行ユーザー、コードの場所、渡す設定、起動するソフトウェアが対応している。</p>
-<p>ブラウザからのHTTP接続はNginxへ届くため、Nginxにも、受け取ったリクエストをどこへ渡すかを設定する。公開用80番ポートと管理用8080番ポートの入口から、同じWebサーバー内のGunicornへ転送する設定を、実際の待受とそろえる。</p>
-<p>また、ブラウザで画面の見た目を整えるには、HTMLとともにCSSなども取得できる必要がある。<code>collectstatic</code>は、アプリが使うCSSなどを、Nginxが配信するディレクトリへ集める処理である。今回は<code>/var/lib/jdu-catalog/static</code>を使う。秘密設定はこの配信先へ置かず、従来の静的URLも引き続き配信できるようにする。</p>
-<p>配置した新しいユニットをsystemdに認識させるために、<code>systemctl daemon-reload</code>を行う。Nginxの配信・転送設定を変えたときは、Nginxを<code>reload</code>して読み直させる。DB接続設定のようにアプリの起動時に受け取る値を変えたときは、サービスを再起動するなどして新しいプロセスへ値を渡す。変更する対象によって、設定を反映する操作も異なる。</p>
-<h2 id="128-practiceとmissionで使う設定を切り替える">12.8 practiceとmissionで使う設定を切り替える</h2>
-<p>練習と本課題では同じ提供アプリを使うが、そこで登録する備品や管理者は分けて扱う。練習で数量を変更したり備品を追加したりしても、本課題側のデータへ影響させないためである。このため、練習用と本課題用で、接続するDBとDBロールを分ける。</p>
-<p>今回の<strong>profile</strong>は、練習用のpracticeと本課題用のmissionの設定を、一組ずつまとめた名前である。どちらを選ぶかによって、アプリへ渡すDB名やDBロールが切り替わる。同じプログラムでも、接続するDBを変えれば、別に保存された備品や管理者を使うことになる。</p>
-<div class="table-wrap"><table><thead><tr><th scope="col">対象</th><th scope="col">切替で意識すること</th></tr></thead><tbody><tr><td>コードとvenv</td><td>同じ提供版を使うため、切替のために再配置する必要はない</td></tr><tr><td>DB名とロール</td><td>利用するデータと操作権限を選ぶため、同じprofileの組へ切り替える</td></tr><tr><td>一時構築用設定</td><td>選んだprofileの初期準備だけに使い、完了後に終了する</td></tr><tr><td>起動中のアプリ</td><td>起動時に受け取った古い接続設定を使い続けないよう、停止・明示切替・再開を行う</td></tr></tbody></table></div>
-<p>設定ファイルを切り替えても、既に動いているプロセスへ起動時に渡した値は、その操作だけでは変わらない。そのため、サービスを停止して使用するprofileを明示的に切り替え、新しい設定で起動する。DB名とロールの組をそろえることで、意図した側のデータへ、意図した権限で接続できる。</p>
-<p>現行の演習は、P5で練習アプリを動かした後、P6で練習側の構築用接続を終了してからM5へ進む。順序は<strong>P5 → P6 → M5 → M6</strong>である。前の構築用設定と次の設定を混在させないよう、練習側の準備を終えてから本課題用のprofileへ切り替える。</p>
-<p>練習・課題5では、コード、依存、設定、DBの準備とサービスを一組にする。次の第13章では、必要な動作を保ちながら公開範囲と権限を絞る。</p>
+<p>備品管理アプリには、一般利用者が一覧を見る入口と、管理担当者が備品を追加・変更する入口がある。この使い分けを成立させるには、通信を許す範囲、アプリを動かすOSユーザー、DBで許す操作、管理画面で許す機能を、それぞれの場所で設定する必要がある。</p>
+<p>権限が不足すれば、必要な機能が動かない。一方、必要以上の権限があると、不具合や攻撃によって不正な操作をされた場合に、被害が広がるおそれがある。本章では、何を許可し、どこで制限するかを、備品管理アプリの構成に沿って説明する。</p>
+<h2 id="121-アクセス制御を入れる場所">12.1 アクセス制御を入れる場所</h2>
+<p>利用者PCからDBの備品データまでの間には、異なる役割のソフトウェアやサーバーがある。そのため、一つの設定で全体を制御するのではなく、各場所で扱う対象に合わせて制限を設ける。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">制御する場所</th><th scope="col">主に決めること</th></tr></thead><tbody><tr><td>AWSのネットワーク</td><td>どの接続元から、どのEC2の何番ポートへ通信を許すか</td></tr><tr><td>Webサーバー内のNginx</td><td>受け付ける入口とURL、アプリへ転送するリクエストを決める</td></tr><tr><td>OS</td><td>どのOSユーザーがプロセスを動かし、ファイルを読み書きできるか</td></tr><tr><td>DBMS（PostgreSQL）</td><td>接続を認証し、DBロールごとに表などの操作を許可する</td></tr><tr><td>備品管理アプリ</td><td>誰がログインし、備品の閲覧・追加・変更をできるか</td></tr></tbody></table></div>
+<figure><img src="../../assets/figures/ch12-fig01-boundaries.png" alt="クライアントPC、AWS内のゲートウェイとVPC、踏み台・Web・DBサーバーを配置し、SG、Nginx、OS、アプリ、DBMSで制限する境界を、注釈から伸びる矢印の先端で示す。" width="2400" height="1900"></figure>
+<p><strong>図12-1 通信経路と、アクセス制御を入れる場所。</strong> Web利用とDB接続に関係する部分を示す。紫の枠はEC2に関連付けたSG（AWSのSecurity Group）である。紫の破線矢印は、注釈から制御する境界へ向かい、先端がその位置を示す。SGの注釈はSGの枠へ、Nginx・OS・アプリ・DBMSの注釈は、それぞれの受付や実行するプロセスの境界へ向けている。青・緑・茶の実線矢印は、利用する通信を示す。</p>
+<p>SGは、関連付けたEC2へ届く通信や、そこから出る通信を制御する。例えば、Webサーバーの8080番ポートへの通信は踏み台サーバーからだけ許し、DBサーバーの5432番ポートへの通信はWebサーバーからだけ許す。<a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html">AWSのSecurity Group</a></p>
+<p>通信が届いた後は、Nginxが入口とURLを判断し、アプリが利用者の認証や操作権限を判断する。DBへSQLが届けば、PostgreSQLがDBロールに許された操作かを判断する。アプリの管理者であっても、そのことだけでOSの管理権限やDBMSの管理権限を持つわけではない。</p>
+<h2 id="122-権限の設計について">12.2 権限の設計について</h2>
+<p>権限を設計するときは、まず「誰が、何のために、どの操作を行うか」を決める。今回の一般利用者には公開された備品一覧を見てもらい、アプリの管理担当者には備品の閲覧・追加・変更をしてもらう。備品の削除や、ほかの利用者の権限を変更する機能は含めない。</p>
+<p>次に、その機能を実現するために必要な権限を選ぶ。例えば、一覧を作るアプリには備品を読むSELECT、備品の追加にはINSERT、数量や保管場所の変更にはUPDATEが必要である。アプリ全体のDB権限を読取り専用にすると、一覧を表示できても追加・変更はできなくなる。</p>
+<p>必要以上の権限も与えない。例えば、備品の数量を更新する処理に、備品表を丸ごと削除する権限は必要ない。強すぎる権限があると、アプリの不具合や攻撃を通じて、その権限を本来の用途以外に使われた場合の影響が大きくなる。</p>
+<p>このように、必要な機能が成立する範囲で、権限を必要最低限に絞る考え方を<strong>最小権限</strong>という。権限を減らすことだけを目的にせず、利用用途と許可する操作を一組にして考える。</p>
+<h2 id="123-webサーバーとアプリのセキュリティ設定">12.3 Webサーバーとアプリのセキュリティ設定</h2>
+<p>ここでは、Webサーバーと備品管理アプリで行っている制限を、具体例で説明する。一般利用者はWebサーバーの80番ポートで一覧を使い、アプリの管理担当者は踏み台サーバーのブラウザから、内部IPの8080番ポートで管理画面を使う。</p>
+<p>Nginxは、一般向けの80番ポートで受け取った<code>/admin/</code>へのアクセスには、管理画面を返さず404を返す。管理向けの8080番ポートは、踏み台サーバーの内部IPからの接続だけを受け付ける。この段階で、どの入口から管理画面を利用できるかを絞っている。</p>
+<p>さらにNginxは、アプリへ転送するHTTPリクエストに、どの入口で受け付けたかを表す情報を付ける。HTTPの付加情報を入れる<strong>ヘッダー</strong>のうち、今回は<code>X-JDU-Entry</code>という項目を使う。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Nginxが受け付けた入口</th><th scope="col">Nginxが転送時に設定する値</th><th scope="col">意味</th></tr></thead><tbody><tr><td>Webサーバーの80番ポート</td><td>X-JDU-Entry: public</td><td>一般利用の入口で受け付けた</td></tr><tr><td>Webサーバーの8080番ポート</td><td>X-JDU-Entry: admin</td><td>管理用の入口で受け付けた</td></tr></tbody></table></div>
+<p><strong>この値を上書きするのは、Webサーバー上のNginxである。</strong> 利用者が同じヘッダーに別の値を入れて送っても、Nginxは自分が受け付けた入口に合わせて値を設定し直す。対象はアプリへ渡す入口情報であり、備品名や数量などのフォーム入力を書き換える処理ではない。<a href="https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_set_header">Nginxのproxy_set_header</a></p>
+<p><strong>アプリ側は、その入口情報を確認する。</strong> 管理画面へのリクエストでは、同じWebサーバー内のNginxから転送され、管理用入口の情報が付いていることを確認する。そのうえで、アプリ管理者のログインと操作権限を確かめる。Nginxの入口判定と、アプリの認証・権限判定を組み合わせている。</p>
+<p>OS側では、第11章で説明したように、アプリを専用のcatalogユーザーで動かし、コードとvenvはrootが管理する。アプリを実行するユーザーにコードの書換えまで許さず、秘密設定はroot所有の0600で保護する。秘密設定をHTTPの配信先へ置かないことで、ブラウザから取得されることも防ぐ。</p>
+<p>アプリ管理者に許可する機能は、備品の閲覧・追加・変更である。備品の削除や利用者・グループの管理まで許可しない。アプリで利用者に許す機能と、アプリがDBへ接続するロールに許すSQL操作は、それぞれの目的に合わせて設定する。</p>
+<h2 id="124-dbmsのセキュリティ設定">12.4 DBMSのセキュリティ設定</h2>
+<p>ここからは、DBサーバー上のPostgreSQLの設定を説明する。PostgreSQLは、接続元やDB名、DBロールをHBA設定と照合し、指定された方式で認証する。接続後は、そのロールに許された範囲でSQLを実行する。接続時の設定は第9章、ここでは主に接続後の操作権限を扱う。</p>
+<p>アプリが使うDBには、備品だけでなく、利用者の認証に使う情報や、管理画面で行った操作の記録もある。すべての表に同じ権限を与えると、必要な処理まで止めたり、不要な変更まで許したりするため、保存する情報の用途ごとに操作を選ぶ。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">対象</th><th scope="col">通常運用用ロールに許す操作</th><th scope="col">何に使うか</th></tr></thead><tbody><tr><td>備品（catalog_item）</td><td>SELECT・INSERT・UPDATE</td><td>備品の一覧・追加・変更</td></tr><tr><td>アプリ利用者（auth_user）</td><td>SELECTとlast_login・password列だけのUPDATE</td><td>認証、最終ログイン時刻の記録、許可された補助処理</td></tr><tr><td>権限の対応表など</td><td>SELECT</td><td>アプリ利用者に許された操作の参照</td></tr><tr><td>ログインに使う一時情報（django_session）</td><td>SELECT・INSERT・UPDATE・DELETE</td><td>ログイン中の利用に必要な情報の管理と後片付け</td></tr><tr><td>管理操作の記録（django_admin_log）</td><td>SELECT・INSERT</td><td>記録を残し、読む</td></tr><tr><td>DB構造の適用履歴（django_migrations）</td><td>許可しない</td><td>第11章で行った構造の準備が、どこまで済んでいるかを記録する</td></tr><tr><td>自動で番号を発行する仕組み（シーケンス）</td><td>必要なものにUSAGE</td><td>新しい備品や操作記録へIDを付ける</td></tr></tbody></table></div>
+<p>例えば、ログインに使う一時情報は、不要になれば削除する必要がある。一方、備品そのものを削除する機能は今回のアプリには用意しない。同じDELETEでも、何を削除する権限かによって必要性が異なる。</p>
+<p>利用者の情報も、最終ログイン時刻などの更新が必要な項目だけを許す。表全体を自由に変更できる権限を与えると、管理者の属性や操作権限まで書き換えられる範囲が広がる。DB構造の適用履歴は構築時の管理に使う情報であり、通常の備品の追加・変更では書き換える必要がない。</p>
+<p><strong>シーケンス</strong>は、新しい行へ付ける番号を順に発行するDBの仕組みである。例えば、新しく登録した備品へIDを割り当てるときに使う。通常運用用ロールには、必要な番号を受け取るUSAGEを許すが、番号を管理する値を任意に変更する権限まで与える必要はない。確認するときも、番号を発行・変更する操作は実行せず、設定された権限の情報を読む。<a href="https://www.postgresql.org/docs/16/sql-grant.html">PostgreSQLのGRANT</a></p>
+<h3 id="dbで実際に使える権限を確認する">DBで実際に使える権限を確認する</h3>
+<p>DBロールへ直接与えた許可だけを見ても、実際にできる操作を判断できない場合がある。例えば、表の所有者には、表自体を変更・削除する強い権限がある。ほかのロールに所属して、その権限を受け継ぐ場合もある。</p>
+<p>また、PostgreSQLの<strong>PUBLIC</strong>は、すべてのDBロールに共通する許可先である。インターネット公開という意味ではない。通常運用用ロールへ直接許可していなくても、PUBLICに与えた権限を通じて操作できる場合がある。</p>
+<p>その接続で実際に使える権限を<strong>実効権限</strong>という。今回の提供SQLは、通常運用用ロールが所有者やsuperuserになっていないことなどを確認し、PUBLICを含む余分な許可を整理してから、必要な権限を与える。以前に与えた列単位の権限も整理する。これは、指定したロールが必要以上の操作をできないようにするためである。</p>
+<p><strong>実行場所：DBサーバーで、対象DBへ接続した管理用psql内。権限を読む例。</strong></p>
+<pre><code>\du
+\dp public.*</code></pre>
+<p><code>\du</code>はロールの属性、<code>\dp</code>は表などのアクセス権を読む。表示される<code>r</code>はSELECT、<code>a</code>はINSERT、<code>w</code>はUPDATE、<code>d</code>はDELETEを表す。表全体の許可と、特定の列だけの許可を分け、所有者やほかの許可から使える権限も合わせて考える。<a href="https://www.postgresql.org/docs/16/ddl-priv.html">所有者と権限</a>、<a href="https://www.postgresql.org/docs/16/app-psql.html">psqlの権限表示</a></p>
+<h2 id="125-構築用の強い権限を通常運用へ残さない">12.5 構築用の強い権限を通常運用へ残さない</h2>
+<p><strong>構築用ロールで接続できる状態を残すと、認証情報が漏れた場合に、攻撃者もその高い権限を利用できるおそれがある。</strong> 構築用ロールには表の作成・変更などを行う権限があり、表の所有者でもある。悪用されれば、備品の値だけでなく、表そのものを変更・削除されるなど、被害が広がる可能性がある。</p>
+<p>そのため、構築時だけ必要なユーザーやロールは、運用を始める際に利用を終える。不要なものは削除し、所有者として残す必要があるものは、その強い権限で接続できる経路を無効化する。通常のアプリは、備品の閲覧・追加・変更に必要な権限を持つ<strong>通常運用用ロール</strong>で動かす。</p>
+<p>今回のDBでは、構築用のsetupロールがDBや表の所有者になっている。所有者としての役割を保つため、このロール自体は削除しない。次の対策を組み合わせ、構築用ロールでの接続と、構築時に使った認証情報を使い続けない状態にする。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">終了する対象</th><th scope="col">行う対策と、その理由</th></tr></thead><tbody><tr><td>構築用ロールの新規ログイン</td><td>NOLOGINにして、新たな直接ログインを禁止する</td></tr><tr><td>構築用ロールのパスワード</td><td>PASSWORD NULLにして、保存されたパスワード認証情報を消去する</td></tr><tr><td>接続済みの構築用ロール</td><td>既存の接続も終了し、接続済みの状態から強い操作を続けられないようにする</td></tr><tr><td>Web上の一時的な構築用設定</td><td>構築用パスワードを含む一時設定ファイルを削除する</td></tr></tbody></table></div>
+<p><strong>NOLOGIN</strong>は、新しい直接ログインを止める属性である。これだけでは、既に接続している処理は自動終了しない。そのため、残っている構築用の接続も別に終了する。通常運用用ロールが構築用ロールの権限を受け継ぐことのないよう、所属するロールも前節の権限設計に含める。<a href="https://www.postgresql.org/docs/16/sql-alterrole.html">ALTER ROLE</a></p>
+<figure><img src="../../assets/figures/ch12-fig02-retirement.png" alt="構築時に使う高い権限が悪用されるリスクから、中央の矢印形に示す無効化と認証情報の削除を行い、通常運用用ロールで動く状態へ移る。" width="2400" height="1340"></figure>
+<p><strong>図12-2 構築時のリスクを、運用開始時の対策で減らす。</strong> 左右の四角は構築時と通常運用時、中央の矢印形は移行時に行う対策である。今回、削除するのは構築用の一時設定であり、DBロール自体は所有者として残したままログインを無効化し、パスワードを消去する。</p>
+<p>通常運用用の接続設定、DBと表、備品データ、提供コードは運用に必要なので残す。構築用設定を片付ける際は、通常運用用の設定までまとめて削除しない。構築用ロールの所有権を通常運用用ロールへ移すと、通常運用側へ不要な強い権限まで渡すことになるため、今回の構成では移さない。</p>
+<p>練習・課題6では、必要な通常機能を保ちながら、構築用の接続と一時設定を終了し、用途に合うアクセス制御を整える。</p>
 <h2 id="章末問題">章末問題</h2>
 <h3 id="問1">問1</h3>
-<p>提供アプリに必要なPythonパッケージを、アプリ専用のvenvへ用意するのはなぜか。</p>
+<p>通常運用用のDBロールを読取り専用にすれば、今回の備品管理アプリに必要な機能を満たせるか。</p>
 <h3 id="問2">問2</h3>
-<p>通常アプリを構築用ロールで動かし続けないのはなぜか。</p>
+<p>通常運用用ロールへのGRANTにDELETEがなければ、そのロールは必ず削除できないと言えるか。</p>
 <h3 id="問3">問3</h3>
-<p>DB接続設定のファイルを誰でも読める状態にしないのはなぜか。root専用の設定から、アプリへ必要な値はどう渡されるか。</p>
+<p>構築用ロールを運用開始後も接続できる状態で残すと、どのようなリスクがあるか。NOLOGINだけで既存の接続も終了するか。</p>
 <h3 id="問4">問4</h3>
-<p>practiceからmissionへ切り替えるとき、同じコードを使っていればDB名とロールを意識しなくてもよいか。</p>
+<p>アプリへ渡す入口情報のヘッダーは、どのソフトウェアが設定し直すか。アプリ側はその後に何を確かめるか。</p>
 <h2 id="章末解答">章末解答</h2>
 <h3 id="問1">問1</h3>
-<p>Ubuntu OS側のPython環境と分けて管理し、アプリが使うパッケージを提供コードに合う指定版でそろえるためである。</p>
+<p>満たせない。備品の追加・変更や、補助データの操作がある。必要な機能と表の用途に合わせて権限を選ぶ。</p>
 <h3 id="問2">問2</h3>
-<p>通常動作に不要な構造変更などの権限が残るためである。通常用へ必要な操作だけを許す。</p>
+<p>言えない。所有者、PUBLIC、ほかのロールへの所属などから使える実効権限も調べる必要がある。</p>
 <h3 id="問3">問3</h3>
-<p>DBパスワードなどが、意図しないDB接続に利用されることを防ぐためである。systemdの管理側や許可された準備処理が設定ファイルを読み、必要な値を環境変数としてアプリのプロセスへ渡す。</p>
+<p>構築用の認証情報が漏れると、攻撃者に高い権限を使われ、表の変更・削除などをされるおそれがある。NOLOGINは新しい直接ログインを禁止するが、既存の接続は終了しないため、接続終了も別に行う。</p>
 <h3 id="問4">問4</h3>
-<p>意識する必要がある。共通のコードでも、選んだDBとロールによって読み書きするデータと権限が変わる。</p>
+<p>Nginxが、受け付けた入口に合わせてヘッダーを設定し直す。アプリ側は、Nginxから管理用の入口を通って届いたことを確認し、アプリ管理者のログインと操作権限を確かめる。</p>
 <h2 id="参考資料">参考資料</h2>
-<p>確認日：2026-11-13。配置・profile・権限の説明は提供アプリと現行P5/P6の構成に基づく。</p>
-<p class="bullet">・ <a href="https://docs.python.org/3/library/venv.html">Python venv</a></p>
-<p class="bullet">・ <a href="https://docs.djangoproject.com/en/5.2/topics/migrations/">Djangoマイグレーション</a></p>
-<p class="bullet">・ <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html">systemdの実行環境</a></p>
-<p class="bullet">・ <a href="../../../../development/01_roles/cyber_security/tools/web_lab_catalog/README.md">提供アプリ</a></p>
-<p class="bullet">・ <a href="../../../labs/docs/ja/p5.md">練習P5</a></p>
-<p class="bullet">・ <a href="../../../labs/docs/ja/p6.md">練習P6</a></p></main></body></html>
+<p>確認日：2026-11-17。設定の説明は、提供されたNginx設定、アプリの入口判定、DB権限のSQL、構築用接続の終了処理と照合している。</p>
+<p class="bullet">・ <a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html">AWSのSecurity Group</a></p>
+<p class="bullet">・ <a href="https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_set_header">Nginxのproxy_set_header</a></p>
+<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/ddl-priv.html">PostgreSQLの権限</a></p>
+<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/sql-grant.html">GRANT</a></p>
+<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/sql-alterrole.html">ALTER ROLE</a></p>
+<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/app-psql.html">psql</a></p>
+<p class="bullet">・ <a href="../../../labs/docs/ja/p6.md">練習P6</a></p>
+<p class="bullet">・ <a href="../../../labs/docs/ja/m6.md">課題M6</a></p></main></body></html>

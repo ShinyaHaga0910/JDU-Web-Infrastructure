@@ -1,6 +1,6 @@
 """Build chapter 7 from its editable source and diagrams."""
 from build_chapter01 import ROOT, build
-from chapter_figures_07_14 import BUILDERS
+from chapter_figures_07_13 import BUILDERS
 
 if __name__ == '__main__':
     build(source=ROOT/'docs/ja/07-internal-dns-configuration.md', chapter=7,

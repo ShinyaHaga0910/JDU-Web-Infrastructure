@@ -1,91 +1,89 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第11章 WebサーバーとアプリとDBの連携</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}h1,h2,h3{overflow-wrap:anywhere}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第11章-webサーバーとアプリとdbの連携">第11章 WebサーバーとアプリとDBの連携</h1>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第11章 提供アプリの配置と初期設定</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}h1,h2,h3{overflow-wrap:anywhere}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第11章-提供アプリの配置と初期設定">第11章 提供アプリの配置と初期設定</h1>
 <h2 id="この章で分かること">この章で分かること</h2>
-<p>これまでに、ファイルを返すWebサーバー、名前を答える内部DNS、データを管理するDBを学んだ。ここからは、それらを学校の備品管理アプリへつなげる。アプリのプログラムは提供済みであり、サーバー上で動かすための土台を構築する。</p>
-<p>本章では、一覧を開いたときと、管理画面で備品を追加したときに、どのソフトウェアが何を担当するかを追う。ブラウザ、Webサーバー内の処理、DBサーバーを一つの流れとして理解しよう。</p>
-<h2 id="111-保存済みファイルと、その場で作るページ">11.1 保存済みファイルと、その場で作るページ</h2>
-<p>第5章の静的配信では、Nginxが保存済みのファイルを読み、内容をHTTPレスポンスとして返した。一方、備品一覧は、その時点のDBの値を読んで作る。管理担当者が数量を変更すれば、後から取得する一覧にも変更後の値が反映される。</p>
-<p>このように、リクエストの処理中にデータを取得して本文を作る処理を<strong>動的なページの生成</strong>として考える。表示のたびにPythonコードそのものを書き換えるのではなく、提供されたアプリがDBの値を読み、HTMLの本文へ組み込む。</p>
-<div class="table-wrap"><table><thead><tr><th scope="col">対象</th><th scope="col">本文やデータの準備方法</th></tr></thead><tbody><tr><td>説明用のテキストファイル</td><td>保存したファイルの内容を配信する</td></tr><tr><td>備品一覧のHTML</td><td>アプリがDBの公開対象の備品を読み、その値から作る</td></tr><tr><td>CSSや画像</td><td>動的なページと一緒に使う場合も、静的ファイルとして配信できる</td></tr></tbody></table></div>
-<p>動的な一覧と静的なCSSは、一つのWebシステムで同時に使える。ページの内容を作る処理と、画面の見た目を指定するファイルの配信は、役割が違う。</p>
-<h2 id="112-nginx、gunicorn、djangoの分担">11.2 Nginx、Gunicorn、Djangoの分担</h2>
-<p>今回の備品管理アプリは、Pythonというプログラミング言語で作られている。その開発に使われているのが<strong>Django（ジャンゴ）</strong>である。Djangoは、URLに応じた処理、DBの読み書き、HTMLの生成、管理画面など、Webアプリでよく使う機能をまとめたフレームワークである。提供アプリは、その機能を使って備品の一覧表示や追加・変更を行う。</p>
-<p><strong>Gunicorn（グニコーン）</strong>は、そのPython製アプリを動かすためのソフトウェアである。起動時に提供アプリのPythonコードを読み込み、処理用のプロセスで実行する。NginxからHTTPリクエストを受け取ると、アプリの処理を呼び出し、アプリが作った結果をHTTPレスポンスとして返す。</p>
-<p>この呼び出しには、PythonのWebアプリと、それを動かすソフトウェアとの接続方法を定めた<strong>WSGI（Web Server Gateway Interface）</strong>という取り決めを使う。Djangoには、この方法で処理を受け付ける入口がある。Gunicornはその入口を呼び出すため、アプリをGunicorn専用の形式へビルドし直す必要はない。<a href="https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/gunicorn/">DjangoとGunicornの接続</a></p>
-<div class="table-wrap"><table><thead><tr><th scope="col">ソフトウェア</th><th scope="col">今回の役割</th></tr></thead><tbody><tr><td>Nginx</td><td>ブラウザからHTTP接続を受ける。静的ファイルを返し、アプリの処理が必要なリクエストをGunicornへ渡す</td></tr><tr><td>Gunicorn</td><td>HTTPリクエストをPythonのアプリの処理へつなぎ、その結果をHTTPレスポンスとして返す</td></tr><tr><td>Django</td><td>提供アプリが利用するフレームワーク。DBの利用、HTMLの生成、アプリ管理者の認証や管理画面などを支える</td></tr></tbody></table></div>
-<p>NginxとGunicornは、同じEC2 Webサーバー上で動く。Djangoを使った提供アプリの処理は、Gunicornの処理用プロセス内で実行される。PostgreSQLは別のEC2 DBサーバー上で動き、アプリから送られたSQLを処理する。</p>
-<figure><img src="../../assets/figures/ch11-fig01-components.png" alt="同じWebサーバー内のNginx、Gunicornの処理用プロセスとDjango製アプリ、別のDBサーバーの関係。" width="2000" height="1160"></figure>
-<p><strong>図11-1 HTTPを受ける処理と、アプリの処理。</strong> NginxからGunicornへは同じWebサーバー内でHTTP転送する。GunicornはWSGIの取り決めでアプリを呼び出し、アプリが別のDBサーバーへ接続する。</p>
-<h2 id="113-リバースプロキシで、入口からアプリへ渡す">11.3 リバースプロキシで、入口からアプリへ渡す</h2>
-<p>ブラウザから来たHTTPリクエストをNginxが受け取り、アプリを動かすGunicornへ転送する。Gunicornからレスポンスが返ると、Nginxがそれをブラウザへ返す。このように、アプリの手前で接続を受け、代わりに転送先へ接続する仕組みを<strong>リバースプロキシ</strong>という。ブラウザはNginxの入口へアクセスするだけで、その後ろのGunicornの接続先を指定する必要がない。</p>
-<p>今回のGunicornは、Webサーバー自身の<code>127.0.0.1:8000</code>で待ち受ける。Nginxは、同じWebサーバー内からTCPで8000番ポートへ接続し、HTTPリクエストを渡す。利用者PCや踏み台サーバーから、この127.0.0.1へ接続してもWebサーバー内のGunicornには届かない。127.0.0.1は、接続操作を行ったコンピュータ自身を指すためである。</p>
-<p><strong>設定の説明例：Nginxがアプリへ渡す転送先。</strong></p>
-<pre><code>proxy_pass http://127.0.0.1:8000;</code></pre>
-<p>リバースプロキシは、複数台のアプリへ処理を分散するときにも使えるが、転送先が一つでも利用できる。今回のNginxは、次の役割を担当する。</p>
-<p class="bullet">・ <strong>一般用と管理用の入口を分ける。</strong> 一般用はWebサーバーの80番ポート、アプリ管理用は内部IPの8080番ポートで受け付ける。管理用は踏み台サーバーからの接続に限定する。</p>
-<p class="bullet">・ <strong>入口に応じて通すリクエストを決める。</strong> 一般用の入口では管理画面の<code>/admin/</code>を転送せず、404を返す。アプリへ転送するときも、どちらの入口で受けたかをNginxが指定し、アプリ側が管理画面への経路を判定する。</p>
-<p class="bullet">・ <strong>静的ファイルを配信する。</strong> CSSなどの保存済みファイルはNginxが読み、Gunicornへ転送せずに返す。</p>
-<p>Gunicornの待受や通信許可を変更すれば、Nginxを介さずHTTPで接続する構成も技術的には作れる。しかし、今回Nginxに担当させている入口の制限や静的配信も含めて設計する必要がある。今回は、その役割をNginxへ持たせ、Gunicornは同じWebサーバー内からだけ利用する。</p>
-<p>管理者のユーザー名・パスワードを確かめ、備品の追加や変更を許可するのは、Djangoを使ったアプリの機能である。Nginxは「どの入口から、どの接続元の通信を通すか」を扱う。<a href="https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass">Nginxのリバースプロキシ設定</a></p>
-<h2 id="114-アプリの一般利用と管理者利用">11.4 アプリの一般利用と管理者利用</h2>
-<p>備品管理アプリには、<strong>一般利用者が備品一覧を見る機能</strong>と、<strong>アプリの管理担当者が備品を登録・変更する機能</strong>がある。同じアプリを使う場合でも、利用目的に応じて入口と使える機能を分ける。</p>
-<div class="table-wrap"><table><thead><tr><th scope="col">利用する人</th><th scope="col">アプリで行うこと</th><th scope="col">今回の接続方法</th></tr></thead><tbody><tr><td>一般利用者</td><td>公開対象の備品の名前、数量、保管場所などを見る</td><td>手元のPCのブラウザから、インターネット経由でWebサーバーの公開IPの80番ポートへ接続する</td></tr><tr><td>アプリの管理担当者</td><td>管理画面へログインし、備品を閲覧・追加・変更する</td><td>RDPで踏み台サーバーへ入り、その中のブラウザからWebサーバーの内部IPの8080番ポートへ接続する</td></tr></tbody></table></div>
-<p>一般利用者が開く一覧には、備品を追加・変更する操作は置かない。管理担当者は、踏み台サーバーのデスクトップ内でブラウザを開き、<code>http://admin.lab.test:8080/admin/</code>へアクセスする。内部DNSが<code>admin.lab.test</code>をWebサーバーの内部IP <code>10.20.1.20</code>に名前解決し、ブラウザはその8080番ポートへHTTPで接続する。</p>
-<figure><img src="../../assets/figures/ch11-fig02-entries.png" alt="インターネット経由の一般利用と、RDPで踏み台に入り内部ネットワーク経由でアプリ管理画面を使う構成。" width="2020" height="1540"></figure>
-<p><strong>図11-2 備品管理アプリの二つの入口。</strong> 青は一般利用、緑はアプリ管理者の利用経路。管理担当者のPCから踏み台まではRDP、踏み台内のブラウザからWebサーバーまではHTTPで接続する。どちらの入口も、同じWebサーバー上のGunicornとアプリにつながる。</p>
-<p>RDPに接続すると操作できるのは、踏み台サーバーのデスクトップである。その中のブラウザで管理画面を開いた後、<strong>備品管理アプリの管理者として、改めてログインする</strong>。RDP接続とアプリへのログインは、別の操作である。</p>
-<p>ここでいう管理操作は、アプリの中で備品の情報を追加・変更することである。Ubuntu OSの設定やサービスを変更する操作とは区別する。OSを操作する場合は、踏み台サーバーの端末から対象サーバーへSSHで接続する方法などを使う。</p>
-<h2 id="115-dbの値が一覧になるまで">11.5 DBの値が一覧になるまで</h2>
-<p>一般利用者が備品一覧を開くと、アプリはDBから公開対象の備品を読み、その値を組み込んだページを作る。図11-3の番号に沿って、リクエストからレスポンスまでを追ってみよう。名前を使って接続する場所では、接続前にDNSで名前解決する。</p>
-<figure><img src="../../assets/figures/ch11-fig03-list.png" alt="一般利用のブラウザ、Webサーバー内のNginxとアプリ、DBサーバーの間で一覧を作る六つの処理。" width="2020" height="1560"></figure>
-<p><strong>図11-3 一覧を表示する処理の順序。</strong> 1〜6は、次の説明の番号に対応する。Django製アプリはGunicornの処理用プロセス内で動く。</p>
-<p>1. <strong>一覧をリクエストする。</strong> 利用者PCのブラウザが、Webサーバーの80番ポートへHTTPのGETリクエストを送る。</p>
-<p>2. <strong>アプリへ渡す。</strong> Nginxが、同じWebサーバー内のGunicornの8000番ポートへHTTPで転送する。Gunicornがアプリの一覧処理を呼び出す。</p>
-<p>3. <strong>公開する備品を読む。</strong> アプリがDBサーバーの5432番ポートへ接続し、公開対象の備品を取得するSELECT文を送る。</p>
-<p>4. <strong>備品の値を返す。</strong> DBサーバーのPostgreSQLがSQLを処理し、該当する行の値をWebサーバー上のアプリへ返す。</p>
-<p>5. <strong>ページの本文を作る。</strong> アプリが、取得した備品の名前や数量などをHTMLへ組み込む。</p>
-<p>6. <strong>一覧を表示する。</strong> 作られたHTMLがGunicorn、Nginxを通じてHTTPレスポンスとしてブラウザへ返り、画面に表示される。</p>
-<p>今回の提供アプリでは、<code>is_public</code>がtrueの備品を一般一覧へ表示する。falseの備品もDBには保存されているが、一般一覧の取得対象から除く。これはアプリのデータの公開区分であり、サブネットの公開・非公開の区分や、SG（AWSのSecurity Group）の通信許可とは別の意味である。</p>
-<p>ブラウザが直接DBサーバーの5432番ポートへ接続するわけではない。DBへの接続元はWebサーバー上のアプリであり、DBのパスワードもそのサーバー側の設定で使う。</p>
-<h2 id="116-アプリ管理者が備品を追加・変更する">11.6 アプリ管理者が備品を追加・変更する</h2>
-<p>管理担当者が使うのは、<strong>備品管理アプリの管理機能</strong>である。例えば、新しいプロジェクターを登録したり、既存の備品の数量や保管場所を変更したりする。これらは、ブラウザの管理画面から行うアプリの操作である。</p>
-<p>管理画面へログインした後、備品名、数量、保管場所、公開区分などを入力して保存する。図11-4は、そのときの処理を示している。</p>
-<figure><img src="../../assets/figures/ch11-fig04-save.png" alt="踏み台サーバー内のブラウザから保存を依頼し、アプリが権限と入力値を確かめてDBへ追加・変更する順序。" width="2020" height="1560"></figure>
-<p><strong>図11-4 アプリの管理機能から備品を保存する。</strong> 1〜6は、次の説明の番号に対応する。管理画面を使うために、ブラウザからDBへ直接SQLを送る必要はない。</p>
-<p>1. <strong>入力内容を送る。</strong> 踏み台サーバー内のブラウザが、Webサーバーの8080番ポートへ、入力内容を含むHTTPのPOSTリクエストを送る。</p>
-<p>2. <strong>アプリへ渡す。</strong> Nginxが、同じWebサーバー内のGunicornへHTTPで転送し、Gunicornがアプリの管理画面の処理を呼び出す。</p>
-<p>3. <strong>保存してよいか確かめる。</strong> アプリが、ログインした管理者の操作権限と入力値を確認する。例えば、備品を追加する権限があるか、必要な項目が入力されているかを調べる。</p>
-<p>4. <strong>DBへ保存する。</strong> 条件を満たしていれば、アプリがDBへSQLを送る。新規の備品ならINSERTで行を追加し、既存の備品の変更ならUPDATEで対象の行を更新する。</p>
-<p>5. <strong>保存結果を返す。</strong> PostgreSQLがSQLを処理し、その結果をアプリへ返す。</p>
-<p>6. <strong>保存後の画面へ進む。</strong> アプリが作る保存後の移動先を含むHTTPレスポンスが、GunicornとNginxを通じてブラウザへ返る。ブラウザはその画面を改めてGETし、DBから読み出された新しい値を表示する。</p>
-<p>公開対象として保存した備品は、一般利用者が一覧を次に取得したときにも表示される。非公開として保存した備品は管理画面では扱えるが、一般向け一覧には表示されない。</p>
-<p>今回のアプリ管理者が使う機能は、備品の閲覧・追加・変更である。備品の削除、利用者やグループの管理は提供しない。これらの機能を使うために、OSのroot権限やDB管理者の権限をアプリ管理者へ与える必要はない。</p>
-<h2 id="117-画面の表示と、保存した値を照合する">11.7 画面の表示と、保存した値を照合する</h2>
-<p>アプリの動作を見るときは、どの備品のどの値を保存し、どこへ表示する想定かを決めて比較する。例えば、公開する備品の数量を変更したら、管理画面、DBの該当行、一般一覧の値を対応させる。</p>
-<p>一方、非公開にした備品は管理画面とDBにはあるが、一般一覧には出ないことを読む。一般一覧が空でも、DBが空なのか、公開対象がないのかは、画面だけでは一つに決められない。</p>
-<p>SQLで照合するときは、対象のコードなどを条件にしてSELECTで読む。確認のために同じ備品を何度も追加したり、既存の備品を削除したりせず、保存された対象を特定して比べる。</p>
-<p>練習・課題5では、提供アプリを配置し、公開一覧と踏み台サーバーからの管理操作をDBへ接続する構成を作る。第12章では、この仕組みを動かすためのコード、依存パッケージ、設定、DBの準備を扱う。</p>
+<p>備品管理アプリを使えるようにするには、プログラムをWebサーバーへコピーした後、そのプログラムが動く条件を整える必要がある。例えば、アプリが接続先のDBを知らなければ、備品の一覧を取り出せない。接続できても、備品を保存する表や操作の権限がなければ、追加・変更はできない。</p>
+<p>本章で扱う設定は、「どのソフトウェアを使って動かすか」「どこにあるデータを使うか」「どの権限で操作するか」を、OSやアプリへ伝えるためのものである。設定を理解すると、アプリが起動しない場合と、起動しているがDBへ接続できない場合で、調べる対象が異なることも分かる。</p>
+<p>第10章では、ブラウザ、Nginx、Gunicorn、アプリ、DBが連携する仕組みを説明した。本章では、その連携を成立させる準備を、目的と理由から説明する。練習・課題5では、これらの設定を行い、提供アプリがDBを利用して動く状態を作る。</p>
+<h2 id="111-コード、依存、設定、データを分ける">11.1 コード、依存、設定、データを分ける</h2>
+<p>例えば、備品の数量を4個から6個へ変更するときは、DBに保存した数量を更新する。一方、練習用のDBから本課題用のDBへ接続先を変えるときは、アプリの接続設定を変更する。どちらも、備品一覧を作るプログラムそのものを書き換える作業ではない。何を変えたいのかによって、扱う対象が異なる。</p>
+<p><strong>コード</strong>は、一覧の取得や保存などの処理を記述したプログラムである。<strong>依存パッケージ</strong>は、そのプログラムが利用するDjangoやDB接続のライブラリなどである。<strong>設定</strong>は、接続先DBや実行時に使う値である。<strong>データ</strong>は、DBへ保存した備品やアプリ管理者などの情報である。</p>
+<p>これらを分けて管理すると、同じコードを使いながら、接続先や保存する備品を変えられる。パスワードもコードから分けることで、秘密を含まない提供プログラムを共通に使える。今回の主な保存先は次のとおりである。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">種類</th><th scope="col">今回の主な保存先</th></tr></thead><tbody><tr><td>提供アプリのコード</td><td>Webサーバーの/opt/jdu-catalog/app</td></tr><tr><td>Pythonの実行環境と依存</td><td>Webサーバーの/opt/jdu-catalog/venv</td></tr><tr><td>通常アプリの秘密設定</td><td>Webサーバーの/etc/jdu-catalog/app.envなど</td></tr><tr><td>配信用CSSなど</td><td>Webサーバーの/var/lib/jdu-catalog/static</td></tr><tr><td>備品などのDBデータ</td><td>DBサーバー上のPostgreSQLが管理するデータベース</td></tr></tbody></table></div>
+<h2 id="112-アプリ専用のpython環境を用意する">11.2 アプリ専用のPython環境を用意する</h2>
+<p>提供アプリのプログラムは、DjangoやDB接続用ライブラリの機能を呼び出して動く。そのため、アプリのコードとともに、呼び出される側のパッケージも用意する必要がある。必要なパッケージがなければ、その機能を呼び出すところでエラーになり、アプリは処理を続けられない。</p>
+<p>パッケージは、版によって使える機能や動作が変わることがある。提供コードに合う版をそろえ、OS側や別のアプリのためのパッケージ管理から分けておくと、アプリ用の環境を保ちやすい。このために使うのが<strong>venv</strong>である。venvは、アプリ専用のPython環境を、同じWebサーバー内にディレクトリとして作成する仕組みである。<a href="https://docs.python.org/3/library/venv.html">Pythonのvenv</a></p>
+<p>今回は、Webサーバーの<code>/opt/jdu-catalog/venv</code>にvenvを作り、内部の配布サーバーに用意された指定版のパッケージを導入する。DjangoとGunicornも、このアプリ用の環境にそろえる。</p>
+<p>初期準備には<code>/opt/jdu-catalog/venv/bin/python</code>を、サービスの起動にはこのvenv内のGunicornを使う。こうして実行ファイルのパスを指定することで、準備のときも通常の起動のときも、用意した同じパッケージを使える。</p>
+<h2 id="113-管理するユーザーと、動かすユーザーを分ける">11.3 管理するユーザーと、動かすユーザーを分ける</h2>
+<p>Webアプリは、ブラウザから届いた入力を処理するプログラムである。その処理もOS上のプロセスとして動くため、実行しているOSユーザーの権限の影響を受ける。rootで動かせば、アプリにもOS全体を変更できる大きな権限を持たせることになる。</p>
+<p>備品一覧を作ったり、DBへ数量の変更を送ったりする日常の処理に、OS全体を管理する権限は必要ない。そこで、今回のアプリは<strong>catalog</strong>という専用のOSユーザーで動かす。catalogには、アプリのコードを読んで実行するための権限を用意する。</p>
+<p>一方、コードとvenvはrootが管理し、catalogから自由に書き換えられないようにする。実行する権限と書き換える権限を分けることで、アプリの不具合などを通じて、次回実行するプログラムやパッケージまで変更されることを防ぐ。</p>
+<p>この分担は、「管理側が実行する内容を用意し、アプリは用意された内容を必要な権限で動かす」という関係である。catalogは、ブラウザから管理画面へログインするアプリ管理者とは別の、プロセスを動かすためのOSユーザーである。</p>
+<h2 id="114-アプリからdbへ接続するための設定">11.4 アプリからDBへ接続するための設定</h2>
+<p>ここからは、備品管理アプリがDBを利用するための準備を説明する。アプリは、Webサーバーの中だけで備品データを探すのではなく、DBサーバーへ接続してデータを読み書きする。そのため、「接続する相手」と「接続後に使うDBと権限」を設定で伝える必要がある。設定する場所はWebサーバーであり、接続する相手はDBサーバーである。</p>
+<p>第8章で説明したように、一つのPostgreSQLが複数のデータベースを管理できる。そのため、DBサーバーの名前が分かるだけでは、練習用と本課題用のどちらのDBを使うかは決まらない。また、同じDBへ接続しても、使うDBロールによって許可される操作が変わる。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">項目</th><th scope="col">何を決めるための設定か</th></tr></thead><tbody><tr><td>DB_HOST</td><td>接続するDBサーバーを指定する。今回はdb.lab.testを使う</td></tr><tr><td>DB_PORT</td><td>DBサーバー上のPostgreSQLの受付を指定する。今回は5432番ポートを使う</td></tr><tr><td>DB_NAME</td><td>PostgreSQLが管理するDBのうち、どれを利用するかを選ぶ</td></tr><tr><td>DB_USER</td><td>どのDBロールの権限で操作するかを指定する</td></tr><tr><td>DB_PASSWORD</td><td>指定したDBロールで接続するための認証に使う</td></tr></tbody></table></div>
+<p>例えば、練習用DBを使うつもりで本課題用のDB名を設定すれば、別の備品を読んだり、別の場所へ保存したりする原因になる。接続先の名前、DB名、DBロールは、使いたいデータと操作権限を選ぶための一組の情報である。</p>
+<p>DBのパスワードを、サーバー内の誰でも読めるファイルに保存すると、意図しないDB接続に利用されるおそれがある。そこで今回は、DB接続設定をroot所有で<code>0600</code>の通常ファイルとして保存する。この権限は、所有者のrootだけがファイルを読み書きできることを表す。</p>
+<p>アプリがDBへ接続するには、パスワードなどの値を受け取る必要がある。今回の構成では、systemdのシステム側の管理機能が<code>EnvironmentFile</code>で指定した設定ファイルを読み、その値を<strong>環境変数</strong>としてアプリのプロセスへ渡す。環境変数は、プロセスが名前を指定して参照できる設定値である。catalogに設定ファイルを直接読む権限を追加しなくても、アプリは起動時に必要な値を受け取れる。<a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html">systemdの実行環境</a></p>
+<p>初期準備用の補助処理も、管理権限で設定を読んだ後、必要な値を渡し、許可した処理をcatalogユーザーの権限で実行する。どちらの場合も、アプリのプロセス自身はDB認証に必要な値を受け取る。保存した秘密ファイルの保護と、アプリへ必要な値を渡す処理を組み合わせている。</p>
+<p>設定が用意できたかは、秘密を全文表示するのではなく、設定検査の結果とファイルの所有者・権限で確認する。また、DB用、RDP用、アプリ管理者用のパスワードは、認証する相手が異なるため、それぞれの用途で使い分ける。</p>
+<h2 id="115-dbに表・初期データ・アプリ管理者を準備する">11.5 DBに表・初期データ・アプリ管理者を準備する</h2>
+<p>接続先のDBを用意しても、その中にアプリが使う表がなければ、備品を読み出したり保存したりできない。例えば、アプリが備品名と数量の列を読みたいときには、それに合う表と列が必要である。そこで、提供アプリが想定している構造をDBの中へ用意する。</p>
+<p>この準備には<strong>マイグレーション</strong>を使う。マイグレーションは、アプリが必要とする表などの構造を、指定された定義に沿ってDBへ適用する仕組みである。今回は提供済みの定義を使い、アプリのコードに合う構造を作る。準備処理を実行する場所はWebサーバーであり、その処理が構築用ロールでDBサーバーへ接続する。<a href="https://docs.djangoproject.com/en/5.2/topics/migrations/">Djangoのマイグレーション</a></p>
+<p>表を用意した後は、その中へ初期データとアプリ管理者の情報を入れる。それぞれの目的は次のとおりである。</p>
+<p class="bullet">・ <strong>seedによる初期データの投入。</strong> 用意された架空の備品データを入れる。これにより、一覧へ表示するデータがある状態からアプリを使い始められる。</p>
+<p class="bullet">・ <strong>アプリ管理者の作成。</strong> 管理画面へログインし、備品を追加・変更する担当者を登録する。管理者の情報もDBへ保存され、アプリのログインや操作権限の判定に使われる。</p>
+<figure><img src="../../assets/figures/ch11-fig01-phases.png" alt="構築用ロールでの準備から、通常ロールによる運用へ移る段階。" width="1600" height="910"></figure>
+<p><strong>図11-1 一度行う初期準備と、通常のサービス起動。</strong> 表や初期データ、管理者を用意してから、通常のアプリを起動する。</p>
+<p>準備を終えた後の日常の起動では、既に保存されている備品や管理者を使う。登録したデータを保つため、起動のたびにDBを初期化したり、同じ初期データや管理者を作り直したりしない。補助処理が既存状態を検出した場合も、保存済みの内容を確認して扱う。</p>
+<h2 id="116-構築用と通常用のdbロールを切り替える">11.6 構築用と通常用のDBロールを切り替える</h2>
+<p>ここで分けるのは、PostgreSQLへ接続するDBロールである。最初の準備では表を作る権限が必要だが、日常の備品一覧では表の中の値を読み、管理画面では備品の行を追加・変更する。構築時と通常時では、必要な操作が異なる。</p>
+<p>例えば、数量を変更するアプリが表そのものを削除する権限まで持っていると、不具合や不正な操作が起きたときの影響が大きくなる。そこで、表を作る構築用ロールと、通常の読み書きを行うアプリ用ロールを分ける。通常時は、必要な操作に権限を絞ったロールを使う。</p>
+<p>表の準備後には、通常用ロールへ必要なSQL権限を付ける。備品のSELECT・INSERT・UPDATE、補助表の用途に応じた操作、必要なシーケンスのUSAGEなどである。DBへ接続する認証に成功しても、表などへの操作権限がなければ、その操作は拒否される。必要な権限を付けることも、アプリを動かす準備の一部である。</p>
+<p>通常サービスが使うロールは、起動時に渡す設定のDB_USERで指定する。権限不足が起きたときも、通常ロールを所有者やsuperuserへ変更するのではなく、どの対象のどの操作が必要かを調べる。構築用接続を終了する方法は、第12章で扱う。</p>
+<h2 id="117-systemdとnginxの起動設定を対応させる">11.7 systemdとNginxの起動設定を対応させる</h2>
+<p>備品管理アプリは、利用者がページを開いたときに処理できるよう、Gunicornを起動して待ち受ける必要がある。その際には、実行するOSユーザー、使うコードとPython環境、DB接続設定をそろえる。これらを起動方法として記録し、OSにサービスとして管理させるのがsystemdの設定である。</p>
+<p><strong>ユニットファイル</strong>は、systemdにサービスの起動方法などを伝える定義である。今回の<code>jdu-catalog.service</code>に起動条件をまとめることで、サービスを起動し直すときも同じ条件で動かせる。自動起動の設定と組み合わせ、Ubuntu OSの起動後にもアプリを起動できるようにする。</p>
+<p><strong>設定の説明例：配布ユニットの主要な項目の抜粋。</strong></p>
+<pre><code>User=catalog
+WorkingDirectory=/opt/jdu-catalog/app
+EnvironmentFile=/etc/jdu-catalog/app.env</code></pre>
+<p><code>User</code>は「どのOSユーザーの権限で動かすか」、<code>WorkingDirectory</code>は「どのディレクトリを作業場所にするか」、<code>EnvironmentFile</code>は「どの設定ファイルの値を渡すか」を指定する。これらが、ここまでに用意した専用ユーザー、コードの配置先、DB接続設定につながる。<code>ExecStart</code>では、venv内のGunicornで提供アプリを実行し、<code>127.0.0.1:8000</code>で待ち受ける起動方法を指定する。</p>
+<figure><img src="../../assets/figures/ch11-fig02-service.png" alt="systemdの定義、起動するプロセス、Nginxからの転送先をつなぐ。" width="1600" height="1100"></figure>
+<p><strong>図11-2 準備したものを、サービスの起動条件へ結び付ける。</strong> 実行ユーザー、コードの場所、渡す設定、起動するソフトウェアが対応している。</p>
+<p>ブラウザからのHTTP接続はNginxへ届くため、Nginxにも、受け取ったリクエストをどこへ渡すかを設定する。公開用80番ポートと管理用8080番ポートの入口から、同じWebサーバー内のGunicornへ転送する設定を、実際の待受とそろえる。</p>
+<p>また、ブラウザで画面の見た目を整えるには、HTMLとともにCSSなども取得できる必要がある。<code>collectstatic</code>は、アプリが使うCSSなどを、Nginxが配信するディレクトリへ集める処理である。今回は<code>/var/lib/jdu-catalog/static</code>を使う。秘密設定はこの配信先へ置かず、従来の静的URLも引き続き配信できるようにする。</p>
+<p>配置した新しいユニットをsystemdに認識させるために、<code>systemctl daemon-reload</code>を行う。Nginxの配信・転送設定を変えたときは、Nginxを<code>reload</code>して読み直させる。DB接続設定のようにアプリの起動時に受け取る値を変えたときは、サービスを再起動するなどして新しいプロセスへ値を渡す。変更する対象によって、設定を反映する操作も異なる。</p>
+<h2 id="118-practiceとmissionで使う設定を切り替える">11.8 practiceとmissionで使う設定を切り替える</h2>
+<p>練習と本課題では同じ提供アプリを使うが、そこで登録する備品や管理者は分けて扱う。練習で数量を変更したり備品を追加したりしても、本課題側のデータへ影響させないためである。このため、練習用と本課題用で、接続するDBとDBロールを分ける。</p>
+<p>今回の<strong>profile</strong>は、練習用のpracticeと本課題用のmissionの設定を、一組ずつまとめた名前である。どちらを選ぶかによって、アプリへ渡すDB名やDBロールが切り替わる。同じプログラムでも、接続するDBを変えれば、別に保存された備品や管理者を使うことになる。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">対象</th><th scope="col">切替で意識すること</th></tr></thead><tbody><tr><td>コードとvenv</td><td>同じ提供版を使うため、切替のために再配置する必要はない</td></tr><tr><td>DB名とロール</td><td>利用するデータと操作権限を選ぶため、同じprofileの組へ切り替える</td></tr><tr><td>一時構築用設定</td><td>選んだprofileの初期準備だけに使い、完了後に終了する</td></tr><tr><td>起動中のアプリ</td><td>起動時に受け取った古い接続設定を使い続けないよう、停止・明示切替・再開を行う</td></tr></tbody></table></div>
+<p>設定ファイルを切り替えても、既に動いているプロセスへ起動時に渡した値は、その操作だけでは変わらない。そのため、サービスを停止して使用するprofileを明示的に切り替え、新しい設定で起動する。DB名とロールの組をそろえることで、意図した側のデータへ、意図した権限で接続できる。</p>
+<p>現行の演習は、P5で練習アプリを動かした後、P6で練習側の構築用接続を終了してからM5へ進む。順序は<strong>P5 → P6 → M5 → M6</strong>である。前の構築用設定と次の設定を混在させないよう、練習側の準備を終えてから本課題用のprofileへ切り替える。</p>
+<p>練習・課題5では、コード、依存、設定、DBの準備とサービスを一組にする。次の第12章では、必要な動作を保ちながら公開範囲と権限を絞る。</p>
 <h2 id="章末問題">章末問題</h2>
 <h3 id="問1">問1</h3>
-<p>備品一覧が動的なページであっても、CSSを静的ファイルとして配信できるのはなぜか。</p>
+<p>提供アプリに必要なPythonパッケージを、アプリ専用のvenvへ用意するのはなぜか。</p>
 <h3 id="問2">問2</h3>
-<p>一般利用者のブラウザが、DBの5432番ポートへ直接接続する構成か。</p>
+<p>通常アプリを構築用ロールで動かし続けないのはなぜか。</p>
 <h3 id="問3">問3</h3>
-<p>Webサーバーの80番ポート、8080番ポート、127.0.0.1の8000番ポートは、それぞれ何の入口か。</p>
+<p>DB接続設定のファイルを誰でも読める状態にしないのはなぜか。root専用の設定から、アプリへ必要な値はどう渡されるか。</p>
 <h3 id="問4">問4</h3>
-<p>非公開の備品を保存した後、一般一覧に表示されないことだけで保存失敗と判断できるか。</p>
+<p>practiceからmissionへ切り替えるとき、同じコードを使っていればDB名とロールを意識しなくてもよいか。</p>
 <h2 id="章末解答">章末解答</h2>
 <h3 id="問1">問1</h3>
-<p>一覧の本文をDBの値から作る処理と、見た目を指定する保存済みCSSの配信は役割が異なり、同じシステムで組み合わせて使えるからである。</p>
+<p>Ubuntu OS側のPython環境と分けて管理し、アプリが使うパッケージを提供コードに合う指定版でそろえるためである。</p>
 <h3 id="問2">問2</h3>
-<p>異なる。ブラウザはWebサーバーへHTTPで接続し、Webサーバー上のアプリがDBへ接続する。</p>
+<p>通常動作に不要な構造変更などの権限が残るためである。通常用へ必要な操作だけを許す。</p>
 <h3 id="問3">問3</h3>
-<p>80番ポートは一般向けのHTTP、8080番ポートは踏み台サーバーから使うアプリ管理用HTTP、同じWebサーバー内の127.0.0.1の8000番ポートはNginxから転送するアプリの待受である。</p>
+<p>DBパスワードなどが、意図しないDB接続に利用されることを防ぐためである。systemdの管理側や許可された準備処理が設定ファイルを読み、必要な値を環境変数としてアプリのプロセスへ渡す。</p>
 <h3 id="問4">問4</h3>
-<p>判断できない。非公開なら一般一覧に出さない動作が想定される。管理画面とDBの対象行に保存されているかを比較する。</p>
+<p>意識する必要がある。共通のコードでも、選んだDBとロールによって読み書きするデータと権限が変わる。</p>
 <h2 id="参考資料">参考資料</h2>
-<p>確認日：2026-11-13。今回の動作は提供アプリの一覧処理、管理画面、入口判定、Nginx設定と照合している。</p>
-<p class="bullet">・ <a href="https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/gunicorn/">DjangoとGunicornの接続</a></p>
-<p class="bullet">・ <a href="https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass">Nginx proxy_pass</a></p>
-<p class="bullet">・ <a href="https://docs.djangoproject.com/en/5.2/ref/contrib/admin/">Django管理画面</a></p>
+<p>確認日：2026-11-13。配置・profile・権限の説明は提供アプリと現行P5/P6の構成に基づく。</p>
+<p class="bullet">・ <a href="https://docs.python.org/3/library/venv.html">Python venv</a></p>
+<p class="bullet">・ <a href="https://docs.djangoproject.com/en/5.2/topics/migrations/">Djangoマイグレーション</a></p>
+<p class="bullet">・ <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html">systemdの実行環境</a></p>
 <p class="bullet">・ <a href="../../../../development/01_roles/cyber_security/tools/web_lab_catalog/README.md">提供アプリ</a></p>
-<p class="bullet">・ <a href="../../../labs/docs/ja/p5.md">練習P5</a></p></main></body></html>
+<p class="bullet">・ <a href="../../../labs/docs/ja/p5.md">練習P5</a></p>
+<p class="bullet">・ <a href="../../../labs/docs/ja/p6.md">練習P6</a></p></main></body></html>

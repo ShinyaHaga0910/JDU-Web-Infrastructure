@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="910" viewBox="0 0 1600 910" role="img">
+<title>初期準備と、通常の動作を分ける</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図11-1  初期準備と、通常の動作を分ける</text>
+<text x="55" y="100" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">左から順に、情報や処理の対応を読む</text>
+<rect x="40" y="210" width="490" height="420" rx="18" fill="#f7f9fc" stroke="#2165a7" stroke-width="2"/>
+<text x="285" y="240" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">構築用の接続</text>
+<text x="285" y="330" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">提供済みmigrationを適用</text>
+<text x="285" y="398" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">初期データを準備</text>
+<text x="285" y="466" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">アプリ管理者を作成</text>
+<polyline points="530,465 575,465" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="575,465 560.5928463623571,471.9594485457797 560.5928463623571,458.0405514542203" fill="#2165a7"/>
+<rect x="575" y="210" width="490" height="420" rx="18" fill="#f7f9fc" stroke="#16745b" stroke-width="2"/>
+<text x="820" y="240" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">通常用権限を準備</text>
+<text x="820" y="330" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">表・列の必要な操作</text>
+<text x="820" y="398" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">シーケンスのUSAGE</text>
+<text x="820" y="466" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">接続ロールを分ける</text>
+<polyline points="1065,465 1110,465" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="1110,465 1095.5928463623572,471.9594485457797 1095.5928463623572,458.0405514542203" fill="#16745b"/>
+<rect x="1110" y="210" width="490" height="420" rx="18" fill="#f7f9fc" stroke="#9d651a" stroke-width="2"/>
+<text x="1355" y="240" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">通常サービスの起動</text>
+<text x="1355" y="330" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">runtime設定で起動</text>
+<text x="1355" y="398" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">必要な画面操作を使う</text>
+<text x="1355" y="466" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">構築用接続は後で終了</text>
+<text x="55" y="725" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">OSの起動のたびに、表や初期データを作り直す構成ではない。</text>
+</svg>

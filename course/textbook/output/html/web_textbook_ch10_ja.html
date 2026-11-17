@@ -1,73 +1,91 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第10章 PostgreSQLの接続と認証</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}h1,h2,h3{overflow-wrap:anywhere}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第10章-postgresqlの接続と認証">第10章 PostgreSQLの接続と認証</h1>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第10章 WebサーバーとアプリとDBの連携</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}h1,h2,h3{overflow-wrap:anywhere}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第10章-webサーバーとアプリとdbの連携">第10章 WebサーバーとアプリとDBの連携</h1>
 <h2 id="この章で分かること">この章で分かること</h2>
-<p>Webサーバーのアプリが備品を読むには、DBサーバーへ接続し、適切なデータベースを選び、許可された操作を実行する必要がある。正しいパスワードだけを用意しても、このすべてが成立するわけではない。</p>
-<p>本章では、PostgreSQLの中のまとまり、OSユーザーとDBのロール、接続を受け付ける設定と認証、個々のSQL操作の権限を順に結び付ける。</p>
-<h2 id="101-postgresqlの中のまとまりを知る">10.1 PostgreSQLの中のまとまりを知る</h2>
-<p>今回のDBサーバーにはPostgreSQL 16を導入する。Ubuntu OSでは、<code>16/main</code>という<strong>クラスター</strong>を管理する。ここでのクラスターは、一つのPostgreSQLの管理単位である。</p>
-<p>その管理単位の中に複数の<strong>データベース</strong>を置ける。さらに、データベース内の<strong>スキーマ</strong>は、表などの名前を整理するまとまりである。例えば<code>public.catalog_item</code>は、publicスキーマ内のcatalog_item表を表す。</p>
-<p><code>pg_lsclusters</code>ではバージョン、クラスター名、ポート、稼働状態、保存先などを読む。今回、実際の処理を行うサービスは<code>postgresql@16-main</code>であり、まとめ役のサービスの表示だけで個別クラスターの状態を判断しない。</p>
-<h2 id="102-osユーザーとdbロールを区別する">10.2 OSユーザーとDBロールを区別する</h2>
-<p><strong>ロール（role）</strong>は、PostgreSQL内で権限を管理する単位である。ログインできるロール、他のロールへ権限をまとめて与えるロールなどとして利用できる。ロールはクラスター内で管理され、個別のデータベースだけに属するOSユーザーではない。<a href="https://www.postgresql.org/docs/16/database-roles.html">DBロール</a></p>
-<p>今回のDBサーバーには、OSユーザーとしての<code>postgres</code>と、DBの管理ロールとしての<code>postgres</code>がある。同じ名前でも管理する場所が違う。OSのroot権限やsudoが、そのまま別サーバーのDBへの接続資格になるわけではない。</p>
-<div class="table-wrap"><table><thead><tr><th scope="col">種類</th><th scope="col">主な仕事</th></tr></thead><tbody><tr><td>OSの管理用ユーザー</td><td>PostgreSQLの設定ファイル、サービス、ログなどを管理する</td></tr><tr><td>DBの管理ロール</td><td>データベースやロールを作成し、権限を管理する</td></tr><tr><td>構築用ロール</td><td>アプリ用の表や初期データなどを準備する</td></tr><tr><td>通常アプリ用ロール</td><td>一覧の取得や管理画面の保存に必要なSQLを実行する</td></tr></tbody></table></div>
-<p><strong>LOGIN</strong>は、そのロールとして直接接続できる属性である。<strong>SUPERUSER</strong>はDB内の広い管理権限を持つ属性であり、LOGINと同じ意味ではない。通常アプリのために管理ロールの権限を使い続けず、用途を分ける。</p>
-<h2 id="103-所有者と、許された操作を分ける">10.3 所有者と、許された操作を分ける</h2>
-<p>DBや表などには<strong>所有者</strong>がいる。所有者はその対象の管理を行えるため、通常アプリを表の所有者にすると、必要以上の操作が可能になる。今回の構成では、構築用と通常用を分け、通常用へ必要な権限を与える。</p>
-<p><strong>GRANT</strong>は権限を与え、<strong>REVOKE</strong>は与えられている権限を取り除くSQLである。例えば、DBへのCONNECT、スキーマへのUSAGE、表へのSELECTは対象が異なる権限である。<a href="https://www.postgresql.org/docs/16/ddl-priv.html">権限</a></p>
-<p><strong>説明用SQL：lesson_appへ表を読む権限を与える例。</strong></p>
-<pre><code>GRANT SELECT ON public.lesson_item TO lesson_app;</code></pre>
-<p>これは特定の表の読取りを許す例であり、表の作成、変更、削除をすべて許す指定ではない。INSERTやUPDATEを必要とする機能には、それぞれに対応する権限を検討する。番号を採番する場合には、シーケンス側の権限も別に読む。<a href="https://www.postgresql.org/docs/16/sql-grant.html">GRANT</a></p>
-<h2 id="104-webサーバーからdbへ届く条件をつなげる">10.4 WebサーバーからDBへ届く条件をつなげる</h2>
-<p>接続の前には、Webサーバーが<code>db.lab.test</code>からDBサーバーの内部IP<code>10.20.2.20</code>を得る。その後、TCPでDBサーバーの5432番ポートへ接続する。</p>
-<figure><img src="../../assets/figures/ch10-fig01-connection.png" alt="名前解決、通信許可、待受、認証、SQL権限という接続条件を分ける。" width="1600" height="1120"></figure>
-<p><strong>図10-1 接続してSQLを使うまでの条件。</strong> 左から順に関係する範囲を読む。パスワードが正しいことは、この中の認証に関わる一つの条件である。</p>
-<p>SG（AWSのSecurity Group）がWebサーバーからDBサーバーへの通信を許し、PostgreSQLが正しいIP・ポートで待ち受けている必要がある。<code>listen_addresses</code>は、PostgreSQL自身のどのアドレスで受け付けるかを決める。接続元の許可リストではない。<a href="https://www.postgresql.org/docs/16/runtime-config-connection.html">待受設定</a></p>
-<p>今回の待受はDBサーバーの内部IPを使う。サービスの起動、待受IP、SG、名前解決をそれぞれ対応させる。DBサーバーはインターネットから直接使う入口として公開しない。</p>
-<h2 id="105-pg_hbaconfで接続条件と認証方式を読む">10.5 pg_hba.confで接続条件と認証方式を読む</h2>
-<p>PostgreSQLは、<code>pg_hba.conf</code>で接続する方法、対象DB、ロール、送信元、認証方式を定める。HBAは<strong>Host-Based Authentication</strong>の略である。</p>
-<p><strong>設定の説明例：説明用DB・ロールへの接続を、Webサーバー一台から許す一行。</strong></p>
-<pre><code>host lesson_catalog lesson_app 10.20.1.20/32 scram-sha-256</code></pre>
-<p><code>host</code>はTCP/IPによる接続、<code>lesson_catalog</code>はDB名、<code>lesson_app</code>は接続するロール、<code>10.20.1.20/32</code>は送信元のWebサーバー一台、<code>scram-sha-256</code>はパスワード認証に使う方式である。</p>
-<p>HBAは上から読み、<strong>最初に接続条件が一致した行</strong>を使う。その行で認証が失敗しても、下の別の行へ移って試し直すわけではない。広すぎる許可行が先にあれば、後に置いた制限より先に使われる。<a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBAの照合</a></p>
-<p><code>local</code>は同じDBサーバー内のUnixソケット接続を扱う。今回、OSのpostgresから管理する接続では<code>peer</code>によりOSユーザーを照合する。WebサーバーからのTCP接続では、対応するhost行とパスワード認証を使う。<code>password_encryption</code>を変えても、以前のパスワードの保存形式が自動ですべて更新されるわけではない。</p>
-<h2 id="106-接続した相手と実行者をsqlで読む">10.6 接続した相手と実行者をSQLで読む</h2>
-<p>接続するときは、接続先ホスト、ポート、DB名、ロールをそろえる。パスワードは端末の非表示入力で渡し、共有資料やコマンドの引数へ書かない。</p>
-<p><strong>実行場所：Webサーバーの端末。説明用DB・ロールへ接続する例。</strong></p>
-<pre><code>psql -h db.lab.test -p 5432 \
-  -U lesson_app -d lesson_catalog -W</code></pre>
-<p><code>-h</code>はホスト、<code>-p</code>はポート、<code>-U</code>はDBロール、<code>-d</code>はデータベースを指定する。<code>-W</code>はパスワード入力を求めるオプションである。実際には、自分の構成で作成した対象を指定する。</p>
-<p><strong>実行場所：接続後のpsql内。</strong></p>
-<pre><code>SELECT current_database(), current_user;</code></pre>
-<p><strong>表示例：説明用DBとロールの場合。</strong></p>
-<pre><code> current_database | current_user
-------------------+--------------
- lesson_catalog   | lesson_app
-(1 row)</code></pre>
-<p>この結果は、SQLを処理しているDBと実行者を示す。WebサーバーのOSユーザー名や、アプリ管理画面のログイン名ではない。</p>
+<p>これまでに、ファイルを返すWebサーバー、名前を答える内部DNS、データを管理するDBを学んだ。ここからは、それらを学校の備品管理アプリへつなげる。アプリのプログラムは提供済みであり、サーバー上で動かすための土台を構築する。</p>
+<p>本章では、一覧を開いたときと、管理画面で備品を追加したときに、どのソフトウェアが何を担当するかを追う。ブラウザ、Webサーバー内の処理、DBサーバーを一つの流れとして理解しよう。</p>
+<h2 id="101-保存済みファイルと、その場で作るページ">10.1 保存済みファイルと、その場で作るページ</h2>
+<p>第5章の静的配信では、Nginxが保存済みのファイルを読み、内容をHTTPレスポンスとして返した。一方、備品一覧は、その時点のDBの値を読んで作る。管理担当者が数量を変更すれば、後から取得する一覧にも変更後の値が反映される。</p>
+<p>このように、リクエストの処理中にデータを取得して本文を作る処理を<strong>動的なページの生成</strong>として考える。表示のたびにPythonコードそのものを書き換えるのではなく、提供されたアプリがDBの値を読み、HTMLの本文へ組み込む。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">対象</th><th scope="col">本文やデータの準備方法</th></tr></thead><tbody><tr><td>説明用のテキストファイル</td><td>保存したファイルの内容を配信する</td></tr><tr><td>備品一覧のHTML</td><td>アプリがDBの公開対象の備品を読み、その値から作る</td></tr><tr><td>CSSや画像</td><td>動的なページと一緒に使う場合も、静的ファイルとして配信できる</td></tr></tbody></table></div>
+<p>動的な一覧と静的なCSSは、一つのWebシステムで同時に使える。ページの内容を作る処理と、画面の見た目を指定するファイルの配信は、役割が違う。</p>
+<h2 id="102-nginx、gunicorn、djangoの分担">10.2 Nginx、Gunicorn、Djangoの分担</h2>
+<p>今回の備品管理アプリは、Pythonというプログラミング言語で作られている。その開発に使われているのが<strong>Django（ジャンゴ）</strong>である。Djangoは、URLに応じた処理、DBの読み書き、HTMLの生成、管理画面など、Webアプリでよく使う機能をまとめたフレームワークである。提供アプリは、その機能を使って備品の一覧表示や追加・変更を行う。</p>
+<p><strong>Gunicorn（グニコーン）</strong>は、そのPython製アプリを動かすためのソフトウェアである。起動時に提供アプリのPythonコードを読み込み、処理用のプロセスで実行する。NginxからHTTPリクエストを受け取ると、アプリの処理を呼び出し、アプリが作った結果をHTTPレスポンスとして返す。</p>
+<p>この呼び出しには、PythonのWebアプリと、それを動かすソフトウェアとの接続方法を定めた<strong>WSGI（Web Server Gateway Interface）</strong>という取り決めを使う。Djangoには、この方法で処理を受け付ける入口がある。Gunicornはその入口を呼び出すため、アプリをGunicorn専用の形式へビルドし直す必要はない。<a href="https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/gunicorn/">DjangoとGunicornの接続</a></p>
+<div class="table-wrap"><table><thead><tr><th scope="col">ソフトウェア</th><th scope="col">今回の役割</th></tr></thead><tbody><tr><td>Nginx</td><td>ブラウザからHTTP接続を受ける。静的ファイルを返し、アプリの処理が必要なリクエストをGunicornへ渡す</td></tr><tr><td>Gunicorn</td><td>HTTPリクエストをPythonのアプリの処理へつなぎ、その結果をHTTPレスポンスとして返す</td></tr><tr><td>Django</td><td>提供アプリが利用するフレームワーク。DBの利用、HTMLの生成、アプリ管理者の認証や管理画面などを支える</td></tr></tbody></table></div>
+<p>NginxとGunicornは、同じEC2 Webサーバー上で動く。Djangoを使った提供アプリの処理は、Gunicornの処理用プロセス内で実行される。PostgreSQLは別のEC2 DBサーバー上で動き、アプリから送られたSQLを処理する。</p>
+<figure><img src="../../assets/figures/ch10-fig01-components.png" alt="同じWebサーバー内のNginx、Gunicornの処理用プロセスとDjango製アプリ、別のDBサーバーの関係。" width="2000" height="1160"></figure>
+<p><strong>図10-1 HTTPを受ける処理と、アプリの処理。</strong> NginxからGunicornへは同じWebサーバー内でHTTP転送する。GunicornはWSGIの取り決めでアプリを呼び出し、アプリが別のDBサーバーへ接続する。</p>
+<h2 id="103-リバースプロキシで、入口からアプリへ渡す">10.3 リバースプロキシで、入口からアプリへ渡す</h2>
+<p>ブラウザから来たHTTPリクエストをNginxが受け取り、アプリを動かすGunicornへ転送する。Gunicornからレスポンスが返ると、Nginxがそれをブラウザへ返す。このように、アプリの手前で接続を受け、代わりに転送先へ接続する仕組みを<strong>リバースプロキシ</strong>という。ブラウザはNginxの入口へアクセスするだけで、その後ろのGunicornの接続先を指定する必要がない。</p>
+<p>今回のGunicornは、Webサーバー自身の<code>127.0.0.1:8000</code>で待ち受ける。Nginxは、同じWebサーバー内からTCPで8000番ポートへ接続し、HTTPリクエストを渡す。利用者PCや踏み台サーバーから、この127.0.0.1へ接続してもWebサーバー内のGunicornには届かない。127.0.0.1は、接続操作を行ったコンピュータ自身を指すためである。</p>
+<p><strong>設定の説明例：Nginxがアプリへ渡す転送先。</strong></p>
+<pre><code>proxy_pass http://127.0.0.1:8000;</code></pre>
+<p>リバースプロキシは、複数台のアプリへ処理を分散するときにも使えるが、転送先が一つでも利用できる。今回のNginxは、次の役割を担当する。</p>
+<p class="bullet">・ <strong>一般用と管理用の入口を分ける。</strong> 一般用はWebサーバーの80番ポート、アプリ管理用は内部IPの8080番ポートで受け付ける。管理用は踏み台サーバーからの接続に限定する。</p>
+<p class="bullet">・ <strong>入口に応じて通すリクエストを決める。</strong> 一般用の入口では管理画面の<code>/admin/</code>を転送せず、404を返す。アプリへ転送するときも、どちらの入口で受けたかをNginxが指定し、アプリ側が管理画面への経路を判定する。</p>
+<p class="bullet">・ <strong>静的ファイルを配信する。</strong> CSSなどの保存済みファイルはNginxが読み、Gunicornへ転送せずに返す。</p>
+<p>Gunicornの待受や通信許可を変更すれば、Nginxを介さずHTTPで接続する構成も技術的には作れる。しかし、今回Nginxに担当させている入口の制限や静的配信も含めて設計する必要がある。今回は、その役割をNginxへ持たせ、Gunicornは同じWebサーバー内からだけ利用する。</p>
+<p>管理者のユーザー名・パスワードを確かめ、備品の追加や変更を許可するのは、Djangoを使ったアプリの機能である。Nginxは「どの入口から、どの接続元の通信を通すか」を扱う。<a href="https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass">Nginxのリバースプロキシ設定</a></p>
+<h2 id="104-アプリの一般利用と管理者利用">10.4 アプリの一般利用と管理者利用</h2>
+<p>備品管理アプリには、<strong>一般利用者が備品一覧を見る機能</strong>と、<strong>アプリの管理担当者が備品を登録・変更する機能</strong>がある。同じアプリを使う場合でも、利用目的に応じて入口と使える機能を分ける。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">利用する人</th><th scope="col">アプリで行うこと</th><th scope="col">今回の接続方法</th></tr></thead><tbody><tr><td>一般利用者</td><td>公開対象の備品の名前、数量、保管場所などを見る</td><td>手元のPCのブラウザから、インターネット経由でWebサーバーの公開IPの80番ポートへ接続する</td></tr><tr><td>アプリの管理担当者</td><td>管理画面へログインし、備品を閲覧・追加・変更する</td><td>RDPで踏み台サーバーへ入り、その中のブラウザからWebサーバーの内部IPの8080番ポートへ接続する</td></tr></tbody></table></div>
+<p>一般利用者が開く一覧には、備品を追加・変更する操作は置かない。管理担当者は、踏み台サーバーのデスクトップ内でブラウザを開き、<code>http://admin.lab.test:8080/admin/</code>へアクセスする。内部DNSが<code>admin.lab.test</code>をWebサーバーの内部IP <code>10.20.1.20</code>に名前解決し、ブラウザはその8080番ポートへHTTPで接続する。</p>
+<figure><img src="../../assets/figures/ch10-fig02-entries.png" alt="インターネット経由の一般利用と、RDPで踏み台に入り内部ネットワーク経由でアプリ管理画面を使う構成。" width="2020" height="1540"></figure>
+<p><strong>図10-2 備品管理アプリの二つの入口。</strong> 青は一般利用、緑はアプリ管理者の利用経路。管理担当者のPCから踏み台まではRDP、踏み台内のブラウザからWebサーバーまではHTTPで接続する。どちらの入口も、同じWebサーバー上のGunicornとアプリにつながる。</p>
+<p>RDPに接続すると操作できるのは、踏み台サーバーのデスクトップである。その中のブラウザで管理画面を開いた後、<strong>備品管理アプリの管理者として、改めてログインする</strong>。RDP接続とアプリへのログインは、別の操作である。</p>
+<p>ここでいう管理操作は、アプリの中で備品の情報を追加・変更することである。Ubuntu OSの設定やサービスを変更する操作とは区別する。OSを操作する場合は、踏み台サーバーの端末から対象サーバーへSSHで接続する方法などを使う。</p>
+<h2 id="105-dbの値が一覧になるまで">10.5 DBの値が一覧になるまで</h2>
+<p>一般利用者が備品一覧を開くと、アプリはDBから公開対象の備品を読み、その値を組み込んだページを作る。図10-3の番号に沿って、リクエストからレスポンスまでを追ってみよう。名前を使って接続する場所では、接続前にDNSで名前解決する。</p>
+<figure><img src="../../assets/figures/ch10-fig03-list.png" alt="一般利用のブラウザ、Webサーバー内のNginxとアプリ、DBサーバーの間で一覧を作る六つの処理。" width="2020" height="1560"></figure>
+<p><strong>図10-3 一覧を表示する処理の順序。</strong> 1〜6は、次の説明の番号に対応する。Django製アプリはGunicornの処理用プロセス内で動く。</p>
+<p>1. <strong>一覧をリクエストする。</strong> 利用者PCのブラウザが、Webサーバーの80番ポートへHTTPのGETリクエストを送る。</p>
+<p>2. <strong>アプリへ渡す。</strong> Nginxが、同じWebサーバー内のGunicornの8000番ポートへHTTPで転送する。Gunicornがアプリの一覧処理を呼び出す。</p>
+<p>3. <strong>公開する備品を読む。</strong> アプリがDBサーバーの5432番ポートへ接続し、公開対象の備品を取得するSELECT文を送る。</p>
+<p>4. <strong>備品の値を返す。</strong> DBサーバーのPostgreSQLがSQLを処理し、該当する行の値をWebサーバー上のアプリへ返す。</p>
+<p>5. <strong>ページの本文を作る。</strong> アプリが、取得した備品の名前や数量などをHTMLへ組み込む。</p>
+<p>6. <strong>一覧を表示する。</strong> 作られたHTMLがGunicorn、Nginxを通じてHTTPレスポンスとしてブラウザへ返り、画面に表示される。</p>
+<p>今回の提供アプリでは、<code>is_public</code>がtrueの備品を一般一覧へ表示する。falseの備品もDBには保存されているが、一般一覧の取得対象から除く。これはアプリのデータの公開区分であり、サブネットの公開・非公開の区分や、SG（AWSのSecurity Group）の通信許可とは別の意味である。</p>
+<p>ブラウザが直接DBサーバーの5432番ポートへ接続するわけではない。DBへの接続元はWebサーバー上のアプリであり、DBのパスワードもそのサーバー側の設定で使う。</p>
+<h2 id="106-アプリ管理者が備品を追加・変更する">10.6 アプリ管理者が備品を追加・変更する</h2>
+<p>管理担当者が使うのは、<strong>備品管理アプリの管理機能</strong>である。例えば、新しいプロジェクターを登録したり、既存の備品の数量や保管場所を変更したりする。これらは、ブラウザの管理画面から行うアプリの操作である。</p>
+<p>管理画面へログインした後、備品名、数量、保管場所、公開区分などを入力して保存する。図10-4は、そのときの処理を示している。</p>
+<figure><img src="../../assets/figures/ch10-fig04-save.png" alt="踏み台サーバー内のブラウザから保存を依頼し、アプリが権限と入力値を確かめてDBへ追加・変更する順序。" width="2020" height="1560"></figure>
+<p><strong>図10-4 アプリの管理機能から備品を保存する。</strong> 1〜6は、次の説明の番号に対応する。管理画面を使うために、ブラウザからDBへ直接SQLを送る必要はない。</p>
+<p>1. <strong>入力内容を送る。</strong> 踏み台サーバー内のブラウザが、Webサーバーの8080番ポートへ、入力内容を含むHTTPのPOSTリクエストを送る。</p>
+<p>2. <strong>アプリへ渡す。</strong> Nginxが、同じWebサーバー内のGunicornへHTTPで転送し、Gunicornがアプリの管理画面の処理を呼び出す。</p>
+<p>3. <strong>保存してよいか確かめる。</strong> アプリが、ログインした管理者の操作権限と入力値を確認する。例えば、備品を追加する権限があるか、必要な項目が入力されているかを調べる。</p>
+<p>4. <strong>DBへ保存する。</strong> 条件を満たしていれば、アプリがDBへSQLを送る。新規の備品ならINSERTで行を追加し、既存の備品の変更ならUPDATEで対象の行を更新する。</p>
+<p>5. <strong>保存結果を返す。</strong> PostgreSQLがSQLを処理し、その結果をアプリへ返す。</p>
+<p>6. <strong>保存後の画面へ進む。</strong> アプリが作る保存後の移動先を含むHTTPレスポンスが、GunicornとNginxを通じてブラウザへ返る。ブラウザはその画面を改めてGETし、DBから読み出された新しい値を表示する。</p>
+<p>公開対象として保存した備品は、一般利用者が一覧を次に取得したときにも表示される。非公開として保存した備品は管理画面では扱えるが、一般向け一覧には表示されない。</p>
+<p>今回のアプリ管理者が使う機能は、備品の閲覧・追加・変更である。備品の削除、利用者やグループの管理は提供しない。これらの機能を使うために、OSのroot権限やDB管理者の権限をアプリ管理者へ与える必要はない。</p>
+<h2 id="107-画面の表示と、保存した値を照合する">10.7 画面の表示と、保存した値を照合する</h2>
+<p>アプリの動作を見るときは、どの備品のどの値を保存し、どこへ表示する想定かを決めて比較する。例えば、公開する備品の数量を変更したら、管理画面、DBの該当行、一般一覧の値を対応させる。</p>
+<p>一方、非公開にした備品は管理画面とDBにはあるが、一般一覧には出ないことを読む。一般一覧が空でも、DBが空なのか、公開対象がないのかは、画面だけでは一つに決められない。</p>
+<p>SQLで照合するときは、対象のコードなどを条件にしてSELECTで読む。確認のために同じ備品を何度も追加したり、既存の備品を削除したりせず、保存された対象を特定して比べる。</p>
+<p>練習・課題5では、提供アプリを配置し、公開一覧と踏み台サーバーからの管理操作をDBへ接続する構成を作る。第11章では、この仕組みを動かすためのコード、依存パッケージ、設定、DBの準備を扱う。</p>
 <h2 id="章末問題">章末問題</h2>
 <h3 id="問1">問1</h3>
-<p>OSユーザーpostgresと、DBロールpostgresは同じ管理対象か。</p>
+<p>備品一覧が動的なページであっても、CSSを静的ファイルとして配信できるのはなぜか。</p>
 <h3 id="問2">問2</h3>
-<p>listen_addressesとHBAの送信元IPは、それぞれどちら側のアドレスを指定するか。</p>
+<p>一般利用者のブラウザが、DBの5432番ポートへ直接接続する構成か。</p>
 <h3 id="問3">問3</h3>
-<p>HBAで最初に一致した行のパスワード認証が失敗したら、下の行で認証をやり直すか。</p>
+<p>Webサーバーの80番ポート、8080番ポート、127.0.0.1の8000番ポートは、それぞれ何の入口か。</p>
 <h3 id="問4">問4</h3>
-<p>ログインに成功すれば、すべての表をUPDATEできるか。</p>
+<p>非公開の備品を保存した後、一般一覧に表示されないことだけで保存失敗と判断できるか。</p>
 <h2 id="章末解答">章末解答</h2>
 <h3 id="問1">問1</h3>
-<p>異なる。OSユーザーはUbuntu OSが管理し、DBロールはPostgreSQLが管理する。同名でも権限と照合する場所を区別する。</p>
+<p>一覧の本文をDBの値から作る処理と、見た目を指定する保存済みCSSの配信は役割が異なり、同じシステムで組み合わせて使えるからである。</p>
 <h3 id="問2">問2</h3>
-<p>listen_addressesはDBサーバー自身が待ち受けるIP、HBAの送信元は接続してくるWebサーバーなどのIPである。</p>
+<p>異なる。ブラウザはWebサーバーへHTTPで接続し、Webサーバー上のアプリがDBへ接続する。</p>
 <h3 id="問3">問3</h3>
-<p>やり直さない。最初に条件が一致した行で認証する。その認証の失敗は、後続の行へ移る理由にならない。</p>
+<p>80番ポートは一般向けのHTTP、8080番ポートは踏み台サーバーから使うアプリ管理用HTTP、同じWebサーバー内の127.0.0.1の8000番ポートはNginxから転送するアプリの待受である。</p>
 <h3 id="問4">問4</h3>
-<p>できない。接続の認証と、各表で許可する操作は別であり、必要なSQL権限が要る。</p>
+<p>判断できない。非公開なら一般一覧に出さない動作が想定される。管理画面とDBの対象行に保存されているかを比較する。</p>
 <h2 id="参考資料">参考資料</h2>
-<p>確認日：2026-11-03。lesson_catalog、lesson_appは接続条件を読むための説明用の名前である。</p>
-<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/database-roles.html">DBロール</a></p>
-<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/ddl-priv.html">権限</a></p>
-<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/sql-grant.html">GRANT</a></p>
-<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/runtime-config-connection.html">待受設定</a></p>
-<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBA</a></p>
-<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/app-psql.html">psql</a></p>
-<p class="bullet">・ <a href="../../../labs/docs/ja/p4.md">練習P4</a></p></main></body></html>
+<p>確認日：2026-11-13。今回の動作は提供アプリの一覧処理、管理画面、入口判定、Nginx設定と照合している。</p>
+<p class="bullet">・ <a href="https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/gunicorn/">DjangoとGunicornの接続</a></p>
+<p class="bullet">・ <a href="https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass">Nginx proxy_pass</a></p>
+<p class="bullet">・ <a href="https://docs.djangoproject.com/en/5.2/ref/contrib/admin/">Django管理画面</a></p>
+<p class="bullet">・ <a href="../../../../development/01_roles/cyber_security/tools/web_lab_catalog/README.md">提供アプリ</a></p>
+<p class="bullet">・ <a href="../../../labs/docs/ja/p5.md">練習P5</a></p></main></body></html>

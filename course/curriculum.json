@@ -27,9 +27,6 @@
     "M6": 16
   },
   "raw_maximum": 59,
-  "retired_textbook_chapters": [
-    8
-  ],
   "active_textbook_chapters": [
     1,
     2,
@@ -38,13 +35,25 @@
     5,
     6,
     7,
+    8,
     9,
     10,
     11,
     12,
-    13,
-    14
+    13
   ],
-  "identifier_policy": "Preserve existing IDs; retired chapter and task IDs are not reused.",
-  "signed_baseline_unchanged": true
+  "identifier_policy": "Preserve task IDs, signed reports and historical grades; textbook chapters use consecutive numbers 1-13.",
+  "signed_baseline_unchanged": true,
+  "retired_textbook_topics": [
+    "ストレージと停止後のデータ（旧第8章）"
+  ],
+  "textbook_numbering_effective_date": "2026-11-17",
+  "textbook_previous_to_current": {
+    "9": 8,
+    "10": 9,
+    "11": 10,
+    "12": 11,
+    "13": 12,
+    "14": 13
+  }
 }

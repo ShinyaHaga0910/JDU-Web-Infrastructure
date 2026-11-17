@@ -1,89 +1,73 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第9章 リレーショナルDBとSQLの基本</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}h1,h2,h3{overflow-wrap:anywhere}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第9章-リレーショナルdbとsqlの基本">第9章 リレーショナルDBとSQLの基本</h1>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第9章 PostgreSQLの接続と認証</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}h1,h2,h3{overflow-wrap:anywhere}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第9章-postgresqlの接続と認証">第9章 PostgreSQLの接続と認証</h1>
 <h2 id="この章で分かること">この章で分かること</h2>
-<p>学校の備品管理システムでは、備品の名前、数量、保管場所、一般向けに表示するかどうかを管理する。Webサーバーが一覧ページを作るたびに、保存したデータから必要な備品を取り出せる必要がある。</p>
-<p>本章では、データベースが管理する仕事を、備品の表から考える。表、行、列、主キーを理解した後、SQLでデータを読む意味と書き換える意味を学ぶ。SQLの例は説明用の表を使い、アプリのプログラムを書く作業とは分けて扱う。</p>
-<h2 id="91-備品の情報を、まとまりとして管理する">9.1 備品の情報を、まとまりとして管理する</h2>
-<p>備品を少数だけ記録するなら、テキストファイルや表計算でも一覧を作れる。しかし複数の担当者が同時に変更し、コードの重複を防ぎ、必要な行だけを探すとなると、保存する文章だけでなく、変更の順序や値の整合性を管理する必要がある。</p>
-<p><strong>データベース（DB）</strong>は、関連するデータを整理して管理するまとまりである。<strong>リレーショナルデータベース</strong>では、データを表として扱い、必要に応じて複数の表を関連付ける。</p>
-<p>例えば、数量を数値として管理すれば、6個ある備品だけを探したり、数量を増減したりできる。備品コードに重複を許さない制約を設ければ、同じコードの別の備品を登録しようとしたときに拒否できる。DBは値を保存するだけでなく、許された操作と整合性を管理する。</p>
-<h2 id="92-dbを管理する側と使う側">9.2 DBを管理する側と使う側</h2>
-<p><strong>DBMS（Database Management System）</strong>は、DBを管理するソフトウェアである。今回のDBサーバー上では、<strong>PostgreSQL（ポストグレスキューエル）</strong>を使う。PostgreSQLはクライアントから接続を受け、データを読む・書く処理を実行する。</p>
-<p>一つのPostgreSQLで、練習用と本課題用など複数のデータベースを管理できる。接続時には、どのデータベースを使うかも指定する。コンピューターとしてのDBサーバー、管理ソフトウェアとしてのPostgreSQL、その中の個別のデータベースを区別しよう。</p>
-<p><strong>psql（ピー・エス・キュー・エル）</strong>は、端末からPostgreSQLへ接続し、SQLを入力して結果を見るためのソフトウェアである。起動すると、実行したコンピューター上でプロセスとして動く。<a href="https://www.postgresql.org/docs/16/app-psql.html">psql</a></p>
-<p>今回の演習では、Webサーバーの端末でpsqlを起動する。するとWebサーバー上にpsqlのプロセスが動き、別のDBサーバー上で動くPostgreSQLへ接続する。psqlの画面へ入力したSQLはPostgreSQLへ送られ、DBサーバー側でデータの取得や変更が実行される。その結果がpsqlへ返り、Webサーバーの端末に表示される。</p>
-<p>このように、相手のサービスへ接続して利用する側のソフトウェアを<strong>クライアント</strong>という。psqlはDBを利用する側、PostgreSQLはDBを管理してSQLを処理する側である。Webサーバー上の備品管理アプリも、PostgreSQLへSQLを送るときはDBのクライアントになる。</p>
-<figure><img src="../../assets/figures/ch09-fig01-dbms.png" alt="Web側のpsqlやアプリが、DBサーバー上のPostgreSQL内の対象データベースを使う関係。" width="1800" height="1120"></figure>
-<p><strong>図9-1 クライアントとDBの間で働くDBMS。</strong> 左のpsqlがSQLを送り、右のPostgreSQLが処理して結果を返す。PostgreSQLの枠の中に重ねた四角は、管理される複数のデータベースを表す。接続時に、その中から使うデータベースを選ぶ。</p>
-<h2 id="93-表、行、列、型を読む">9.3 表、行、列、型を読む</h2>
-<p>次は、説明用の<code>lesson_item</code>という表である。表を<strong>テーブル</strong>、横に並ぶ一件のデータを<strong>行</strong>、縦に並ぶ各項目を<strong>列</strong>という。</p>
-<div class="table-wrap"><table><thead><tr><th scope="col">id</th><th scope="col">name</th><th scope="col">quantity</th><th scope="col">is_public</th></tr></thead><tbody><tr><td>1</td><td>Desk</td><td>6</td><td>true</td></tr><tr><td>2</td><td>Monitor</td><td>1</td><td>false</td></tr><tr><td>3</td><td>Keyboard</td><td>4</td><td>true</td></tr></tbody></table></div>
-<p>一行が一件の備品を表す。<code>name</code>列は名前、<code>quantity</code>列は数量、<code>is_public</code>列は一般向けに表示するかどうかである。<code>true</code>と<code>false</code>は、真・偽を表す値である。</p>
-<p>列には<strong>データ型</strong>を定める。例えば、名前は文字列、数量は整数、公開区分は真偽値として扱う。値が同じ文字で見えても、数値として保存した6と、文字列として保存した&#x27;6&#x27;では、使う演算や比較の意味が異なる。<a href="https://www.postgresql.org/docs/16/tutorial-table.html">表とデータ型</a></p>
-<figure><img src="../../assets/figures/ch09-fig02-table.png" alt="備品表の一行、一列、主キーを区別する。" width="1600" height="950"></figure>
-<p><strong>図9-2 一件を表す行と、項目を表す列。</strong> idは一件を区別する手掛かりである。表の見た目の何行目かを識別子として使うわけではない。</p>
-<h2 id="94-主キーと制約で、データの整合性を保つ">9.4 主キーと制約で、データの整合性を保つ</h2>
-<p><strong>主キー</strong>は、表の中の一行を一意に区別するために選ぶ列、または列の組である。上の例ではidを使う。同じ名前の備品が複数あっても、idが違えば別の行として区別できる。主キーには重複とNULLを許さない。</p>
-<p><strong>制約</strong>は、保存する値が満たす条件である。重複しないこと、必須の値が欠けないこと、数量が許された範囲であることなどを定める。NULLは値がないことを表し、数値の0や空の文字列とは異なる。<a href="https://www.postgresql.org/docs/16/ddl-constraints.html">制約</a></p>
-<p>複数の表を関連付ける場合には、別の表のキーを参照する<strong>外部キー</strong>を使える。例えば保管場所を別の表で管理し、備品側でその場所のidを参照すれば、存在しない場所への関連付けを防げる。</p>
-<p>また、番号を自動で割り当てるために<strong>シーケンス</strong>という仕組みを使う場合がある。表へ行を追加する権限と、シーケンスから番号を取得する権限は別である。自動の番号には欠番が生じる場合もあり、番号を行数の代わりとして扱わない。<a href="https://www.postgresql.org/docs/16/functions-sequence.html">シーケンス</a></p>
-<h2 id="95-sqlで、必要な列と行を取り出す">9.5 SQLで、必要な列と行を取り出す</h2>
-<p><strong>SQL（Structured Query Language）</strong>は、DBへデータの取得や変更などを伝える言語である。データを読む基本の文が<strong>SELECT</strong>である。</p>
-<p><strong>説明用SQL：公開する備品の名前と数量を取り出す。入力場所はpsql内である。</strong></p>
-<pre><code>SELECT name, quantity
-FROM lesson_item
-WHERE is_public = true
-ORDER BY name;</code></pre>
-<p><code>SELECT</code>の後で取り出す列、<code>FROM</code>で対象の表、<code>WHERE</code>で取り出す行の条件を指定する。<code>ORDER BY</code>は結果を並べる順序であり、この例では名前の昇順になる。SQLの終わりにはセミコロンを書く。</p>
-<p><strong>表示例：先ほどの説明用の表から得られる結果。</strong></p>
-<pre><code>   name   | quantity
-----------+----------
- Desk     |        6
- Keyboard |        4
-(2 rows)</code></pre>
-<p>公開区分がfalseのMonitorは結果に含まれない。結果の列は二つで、行は二件である。SQLが選ぶ列と、WHEREが選ぶ行を分けて読む。<a href="https://www.postgresql.org/docs/16/tutorial-select.html">SELECTによる取得</a></p>
-<figure><img src="../../assets/figures/ch09-fig03-select.png" alt="表全体からWHEREで行を選び、SELECTで列を選び、結果として受け取る関係。" width="1800" height="1220"></figure>
-<p><strong>図9-3 SQL文と、条件・取得結果の対応。</strong> 図の上部に、例に使うSQLを載せている。 表示順を決めたい場合はORDER BYで指定する。保存されたときの順番や、以前表示された順番が、次の結果でも保証されるとは限らない。</p>
-<h2 id="96-sqlでデータを変更する">9.6 SQLでデータを変更する</h2>
-<p><strong>INSERT</strong>は行の追加、<strong>UPDATE</strong>は既存の行の変更、<strong>DELETE</strong>は行の削除に使う。UPDATEとDELETEでは、WHEREの条件により対象を絞る。条件を付けなければ、対象の表のすべての行が変更・削除の対象になり得る。</p>
-<p><strong>説明用SQL：idが1の数量を変更し、確定せずに取り消す例。</strong></p>
-<pre><code>BEGIN;
-UPDATE lesson_item SET quantity = 7 WHERE id = 1;
-SELECT id, name, quantity FROM lesson_item WHERE id = 1;
-ROLLBACK;</code></pre>
-<p><strong>トランザクション</strong>は、複数の処理を一つのまとまりとして扱う仕組みである。<code>BEGIN</code>で始め、<code>COMMIT</code>で確定し、確定前なら<code>ROLLBACK</code>でそのトランザクション内の変更を取り消す。この例では、同じ接続で変更後の値を見た後に取り消している。COMMIT済みの変更を、後から単にROLLBACKして戻せるという意味ではない。<a href="https://www.postgresql.org/docs/16/tutorial-transactions.html">トランザクション</a></p>
-<p>実際の備品管理アプリでは、管理画面の追加・変更をアプリがSQLへつなげる。一般の一覧を見る操作と、保存した値を変更する操作は、必要なDB権限も異なる。</p>
-<h2 id="97-sqlを入力する場所と、接続の結果を読む">9.7 SQLを入力する場所と、接続の結果を読む</h2>
-<p>シェルへ入力する<code>psql</code>は、SQLを入力するためのソフトウェアを起動するコマンドである。起動後は、そのコンピューター上でpsqlのプロセスが動く。起動したpsqlの中で、SELECTなどのSQLを入力する。psqlが表示する接続先名付きのプロンプトは、OSのシェルのプロンプトと区別する。</p>
-<p>psqlには、SQL以外に<code>\conninfo</code>や<code>\q</code>などの<strong>メタコマンド</strong>もある。<code>\conninfo</code>は接続情報を表示し、<code>\q</code>はpsqlを終了する。SQLのように末尾へセミコロンを加える必要はない。</p>
-<p>アプリ用の表をまだ作っていない段階でも、接続先と実行者を調べられる。</p>
-<p><strong>実行場所：接続済みのpsql内。</strong></p>
-<pre><code>SELECT current_database(), current_user;
-SELECT 1;</code></pre>
-<p>最初のSQLは、現在のデータベース名とDB側の実行者を返す。二つ目は定数を返すため、備品表がなくてもSQLが処理されることを確認できる。ただし、接続できたことと、個別の備品表を読む権限があることは別である。</p>
-<p>練習・課題4では、WebサーバーからDBサーバーへ認証して接続し、SQLを実行できる構成を作る。接続条件とDBの権限を、次の第10章で詳しく扱う。</p>
+<p>Webサーバーのアプリが備品を読むには、DBサーバーへ接続し、適切なデータベースを選び、許可された操作を実行する必要がある。正しいパスワードだけを用意しても、このすべてが成立するわけではない。</p>
+<p>本章では、PostgreSQLの中のまとまり、OSユーザーとDBのロール、接続を受け付ける設定と認証、個々のSQL操作の権限を順に結び付ける。</p>
+<h2 id="91-postgresqlの中のまとまりを知る">9.1 PostgreSQLの中のまとまりを知る</h2>
+<p>今回のDBサーバーにはPostgreSQL 16を導入する。Ubuntu OSでは、<code>16/main</code>という<strong>クラスター</strong>を管理する。ここでのクラスターは、一つのPostgreSQLの管理単位である。</p>
+<p>その管理単位の中に複数の<strong>データベース</strong>を置ける。さらに、データベース内の<strong>スキーマ</strong>は、表などの名前を整理するまとまりである。例えば<code>public.catalog_item</code>は、publicスキーマ内のcatalog_item表を表す。</p>
+<p><code>pg_lsclusters</code>ではバージョン、クラスター名、ポート、稼働状態、保存先などを読む。今回、実際の処理を行うサービスは<code>postgresql@16-main</code>であり、まとめ役のサービスの表示だけで個別クラスターの状態を判断しない。</p>
+<h2 id="92-osユーザーとdbロールを区別する">9.2 OSユーザーとDBロールを区別する</h2>
+<p><strong>ロール（role）</strong>は、PostgreSQL内で権限を管理する単位である。ログインできるロール、他のロールへ権限をまとめて与えるロールなどとして利用できる。ロールはクラスター内で管理され、個別のデータベースだけに属するOSユーザーではない。<a href="https://www.postgresql.org/docs/16/database-roles.html">DBロール</a></p>
+<p>今回のDBサーバーには、OSユーザーとしての<code>postgres</code>と、DBの管理ロールとしての<code>postgres</code>がある。同じ名前でも管理する場所が違う。OSのroot権限やsudoが、そのまま別サーバーのDBへの接続資格になるわけではない。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">種類</th><th scope="col">主な仕事</th></tr></thead><tbody><tr><td>OSの管理用ユーザー</td><td>PostgreSQLの設定ファイル、サービス、ログなどを管理する</td></tr><tr><td>DBの管理ロール</td><td>データベースやロールを作成し、権限を管理する</td></tr><tr><td>構築用ロール</td><td>アプリ用の表や初期データなどを準備する</td></tr><tr><td>通常アプリ用ロール</td><td>一覧の取得や管理画面の保存に必要なSQLを実行する</td></tr></tbody></table></div>
+<p><strong>LOGIN</strong>は、そのロールとして直接接続できる属性である。<strong>SUPERUSER</strong>はDB内の広い管理権限を持つ属性であり、LOGINと同じ意味ではない。通常アプリのために管理ロールの権限を使い続けず、用途を分ける。</p>
+<h2 id="93-所有者と、許された操作を分ける">9.3 所有者と、許された操作を分ける</h2>
+<p>DBや表などには<strong>所有者</strong>がいる。所有者はその対象の管理を行えるため、通常アプリを表の所有者にすると、必要以上の操作が可能になる。今回の構成では、構築用と通常用を分け、通常用へ必要な権限を与える。</p>
+<p><strong>GRANT</strong>は権限を与え、<strong>REVOKE</strong>は与えられている権限を取り除くSQLである。例えば、DBへのCONNECT、スキーマへのUSAGE、表へのSELECTは対象が異なる権限である。<a href="https://www.postgresql.org/docs/16/ddl-priv.html">権限</a></p>
+<p><strong>説明用SQL：lesson_appへ表を読む権限を与える例。</strong></p>
+<pre><code>GRANT SELECT ON public.lesson_item TO lesson_app;</code></pre>
+<p>これは特定の表の読取りを許す例であり、表の作成、変更、削除をすべて許す指定ではない。INSERTやUPDATEを必要とする機能には、それぞれに対応する権限を検討する。番号を採番する場合には、シーケンス側の権限も別に読む。<a href="https://www.postgresql.org/docs/16/sql-grant.html">GRANT</a></p>
+<h2 id="94-webサーバーからdbへ届く条件をつなげる">9.4 WebサーバーからDBへ届く条件をつなげる</h2>
+<p>接続の前には、Webサーバーが<code>db.lab.test</code>からDBサーバーの内部IP<code>10.20.2.20</code>を得る。その後、TCPでDBサーバーの5432番ポートへ接続する。</p>
+<figure><img src="../../assets/figures/ch09-fig01-connection.png" alt="名前解決、通信許可、待受、認証、SQL権限という接続条件を分ける。" width="1600" height="1120"></figure>
+<p><strong>図9-1 接続してSQLを使うまでの条件。</strong> 左から順に関係する範囲を読む。パスワードが正しいことは、この中の認証に関わる一つの条件である。</p>
+<p>SG（AWSのSecurity Group）がWebサーバーからDBサーバーへの通信を許し、PostgreSQLが正しいIP・ポートで待ち受けている必要がある。<code>listen_addresses</code>は、PostgreSQL自身のどのアドレスで受け付けるかを決める。接続元の許可リストではない。<a href="https://www.postgresql.org/docs/16/runtime-config-connection.html">待受設定</a></p>
+<p>今回の待受はDBサーバーの内部IPを使う。サービスの起動、待受IP、SG、名前解決をそれぞれ対応させる。DBサーバーはインターネットから直接使う入口として公開しない。</p>
+<h2 id="95-pg_hbaconfで接続条件と認証方式を読む">9.5 pg_hba.confで接続条件と認証方式を読む</h2>
+<p>PostgreSQLは、<code>pg_hba.conf</code>で接続する方法、対象DB、ロール、送信元、認証方式を定める。HBAは<strong>Host-Based Authentication</strong>の略である。</p>
+<p><strong>設定の説明例：説明用DB・ロールへの接続を、Webサーバー一台から許す一行。</strong></p>
+<pre><code>host lesson_catalog lesson_app 10.20.1.20/32 scram-sha-256</code></pre>
+<p><code>host</code>はTCP/IPによる接続、<code>lesson_catalog</code>はDB名、<code>lesson_app</code>は接続するロール、<code>10.20.1.20/32</code>は送信元のWebサーバー一台、<code>scram-sha-256</code>はパスワード認証に使う方式である。</p>
+<p>HBAは上から読み、<strong>最初に接続条件が一致した行</strong>を使う。その行で認証が失敗しても、下の別の行へ移って試し直すわけではない。広すぎる許可行が先にあれば、後に置いた制限より先に使われる。<a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBAの照合</a></p>
+<p><code>local</code>は同じDBサーバー内のUnixソケット接続を扱う。今回、OSのpostgresから管理する接続では<code>peer</code>によりOSユーザーを照合する。WebサーバーからのTCP接続では、対応するhost行とパスワード認証を使う。<code>password_encryption</code>を変えても、以前のパスワードの保存形式が自動ですべて更新されるわけではない。</p>
+<h2 id="96-接続した相手と実行者をsqlで読む">9.6 接続した相手と実行者をSQLで読む</h2>
+<p>接続するときは、接続先ホスト、ポート、DB名、ロールをそろえる。パスワードは端末の非表示入力で渡し、共有資料やコマンドの引数へ書かない。</p>
+<p><strong>実行場所：Webサーバーの端末。説明用DB・ロールへ接続する例。</strong></p>
+<pre><code>psql -h db.lab.test -p 5432 \
+  -U lesson_app -d lesson_catalog -W</code></pre>
+<p><code>-h</code>はホスト、<code>-p</code>はポート、<code>-U</code>はDBロール、<code>-d</code>はデータベースを指定する。<code>-W</code>はパスワード入力を求めるオプションである。実際には、自分の構成で作成した対象を指定する。</p>
+<p><strong>実行場所：接続後のpsql内。</strong></p>
+<pre><code>SELECT current_database(), current_user;</code></pre>
+<p><strong>表示例：説明用DBとロールの場合。</strong></p>
+<pre><code> current_database | current_user
+------------------+--------------
+ lesson_catalog   | lesson_app
+(1 row)</code></pre>
+<p>この結果は、SQLを処理しているDBと実行者を示す。WebサーバーのOSユーザー名や、アプリ管理画面のログイン名ではない。</p>
 <h2 id="章末問題">章末問題</h2>
 <h3 id="問1">問1</h3>
-<p>PostgreSQL、個別のデータベース、psqlは、それぞれ何を担当するか。</p>
+<p>OSユーザーpostgresと、DBロールpostgresは同じ管理対象か。</p>
 <h3 id="問2">問2</h3>
-<p>数量が6の備品について、名前だけを読むには、SELECT、FROM、WHEREでそれぞれ何を指定するか。</p>
+<p>listen_addressesとHBAの送信元IPは、それぞれどちら側のアドレスを指定するか。</p>
 <h3 id="問3">問3</h3>
-<p>主キーには、表を画面へ表示したときの行番号ではなく、一件を区別する値を使うのはなぜか。</p>
+<p>HBAで最初に一致した行のパスワード認証が失敗したら、下の行で認証をやり直すか。</p>
 <h3 id="問4">問4</h3>
-<p>DBへ接続してSELECT 1に成功すれば、備品表のUPDATEも許されていると言えるか。</p>
+<p>ログインに成功すれば、すべての表をUPDATEできるか。</p>
 <h2 id="章末解答">章末解答</h2>
 <h3 id="問1">問1</h3>
-<p>PostgreSQLはDBを管理するソフトウェア、個別のデータベースは管理するデータのまとまり、psqlは接続してSQLを送るクライアントである。</p>
+<p>異なる。OSユーザーはUbuntu OSが管理し、DBロールはPostgreSQLが管理する。同名でも権限と照合する場所を区別する。</p>
 <h3 id="問2">問2</h3>
-<p>SELECTでname、FROMでlesson_item、WHEREでquantity = 6を指定する。</p>
+<p>listen_addressesはDBサーバー自身が待ち受けるIP、HBAの送信元は接続してくるWebサーバーなどのIPである。</p>
 <h3 id="問3">問3</h3>
-<p>取得条件や並べ方によって表示上の位置は変わる。主キーは位置によらず同じ行を一意に識別するために使う。</p>
+<p>やり直さない。最初に条件が一致した行で認証する。その認証の失敗は、後続の行へ移る理由にならない。</p>
 <h3 id="問4">問4</h3>
-<p>言えない。接続と定数のSQLの処理は確認できるが、表の存在と、その表を変更する権限は別に必要である。</p>
+<p>できない。接続の認証と、各表で許可する操作は別であり、必要なSQL権限が要る。</p>
 <h2 id="参考資料">参考資料</h2>
-<p>確認日：2026-11-03。psqlの説明は2026-11-13に再確認した。lesson_itemは説明用の表であり、課題の備品データとは別の例である。</p>
-<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/tutorial-table.html">PostgreSQLの表と型</a></p>
-<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/tutorial-select.html">SELECT</a></p>
-<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/ddl-constraints.html">制約</a></p>
-<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/tutorial-transactions.html">トランザクション</a></p>
-<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/functions-sequence.html">シーケンス</a></p>
-<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/app-psql.html">psql</a></p></main></body></html>
+<p>確認日：2026-11-03。lesson_catalog、lesson_appは接続条件を読むための説明用の名前である。</p>
+<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/database-roles.html">DBロール</a></p>
+<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/ddl-priv.html">権限</a></p>
+<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/sql-grant.html">GRANT</a></p>
+<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/runtime-config-connection.html">待受設定</a></p>
+<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBA</a></p>
+<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/app-psql.html">psql</a></p>
+<p class="bullet">・ <a href="../../../labs/docs/ja/p4.md">練習P4</a></p></main></body></html>

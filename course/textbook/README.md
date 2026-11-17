@@ -1,8 +1,8 @@
 # Webインフラストラクチャー教科書
 
-後半授業の教科書。日本語全13章（第1〜7章・第9〜14章）の本文・図・HTML・PDFを作成済み。[章・節の設計](../textbook-outline.md)と既存P/Mの構成に対応させている。文章は教員が編集しやすい章別Markdownを正本とする。OS・Linux教材の説明形式をそのまま踏襲することを優先せず、全体像・各部の役割・実作業とのつながりを分かりやすく示す。
+後半授業の教科書。日本語全13章（第1〜13章）の本文・図・HTML・PDFを作成済み。[章・節の設計](../textbook-outline.md)と既存P/Mの構成に対応させている。文章は教員が編集しやすい章別Markdownを正本とする。OS・Linux教材の説明形式をそのまま踏襲することを優先せず、全体像・各部の役割・実作業とのつながりを分かりやすく示す。
 
-2026-11-13：ストレージと停止後のデータの章、およびP3/M3を削除。既存の参照と成績履歴の対応を保つため、第8章とP3/M3は欠番とし、後続の番号は変更しない。現行の採点対象は5課題・合計59素点。
+2026-11-17：削除済みのストレージの旧第8章を詰め、第1〜13章の連番へ整理した。旧第9〜14章は第8〜13章に対応する。P3/M3は削除済みの演習IDとして欠番を保持し、現行の採点対象は5課題・合計59素点。
 
 ## 章と練習と課題の対応
 
@@ -13,10 +13,10 @@ Pは手順付きの練習、Mは別の対象を自分で設定する課題であ
 | 第1〜3章 | 全体像、AWSのネットワーク、接続と作業場所 | P0 | M0・以後の共通準備 |
 | 第4〜5章 | HTTPの仕組み、Nginxによる静的配信 | P1 | M1 |
 | 第6〜7章 | DNSの仕組み、BINDと通常の名前解決 | P2 | M2 |
-| 第9〜10章 | DBとSQL、PostgreSQLの接続・認証 | P4 | M4 |
-| 第11〜12章 | Web・アプリ・DBの連携、配置と設定 | P5 | M5 |
-| 第13章 | 公開範囲、最小権限、構築用権限の終了 | P6 | M6 |
-| 第14章 | 観測、障害の切り分けと復旧 | 全Pで参照 | 全Mで参照 |
+| 第8〜9章 | DBとSQL、PostgreSQLの接続・認証 | P4 | M4 |
+| 第10〜11章 | Web・アプリ・DBの連携、配置と設定 | P5 | M5 |
+| 第12章 | 公開範囲、最小権限、構築用権限の終了 | P6 | M6 |
+| 第13章 | 運用・保守、ITILに沿った障害対応 | 全Pで参照 | 全Mで参照 |
 
 実際の演習順はP0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6。P5のpractice環境をP6で整理してから、M5のmission環境へ切り替える。各単元の課題が満点になったことを学生が課題画面で確認して次へ進む。別の進行用検査は設けない。
 
@@ -47,24 +47,24 @@ Pは手順付きの練習、Mは別の対象を自分で設定する課題であ
 - [第7章 内部DNSの設定と動作確認](docs/ja/07-internal-dns-configuration.md)
 - [第7章 閲覧用HTML](output/html/web_textbook_ch07_ja.html)
 - [第7章 A4縦PDF](output/pdf/web_textbook_ch07_ja.pdf)
-- [第9章 リレーショナルDBとSQLの基本](docs/ja/09-databases-and-sql.md)
+- [第8章 リレーショナルDBとSQLの基本](docs/ja/08-databases-and-sql.md)
+- [第8章 閲覧用HTML](output/html/web_textbook_ch08_ja.html)
+- [第8章 A4縦PDF](output/pdf/web_textbook_ch08_ja.pdf)
+- [第9章 PostgreSQLの接続と認証](docs/ja/09-postgresql-connections.md)
 - [第9章 閲覧用HTML](output/html/web_textbook_ch09_ja.html)
 - [第9章 A4縦PDF](output/pdf/web_textbook_ch09_ja.pdf)
-- [第10章 PostgreSQLの接続と認証](docs/ja/10-postgresql-connections.md)
+- [第10章 WebサーバーとアプリとDBの連携](docs/ja/10-web-app-and-database.md)
 - [第10章 閲覧用HTML](output/html/web_textbook_ch10_ja.html)
 - [第10章 A4縦PDF](output/pdf/web_textbook_ch10_ja.pdf)
-- [第11章 WebサーバーとアプリとDBの連携](docs/ja/11-web-app-and-database.md)
+- [第11章 提供アプリの配置と初期設定](docs/ja/11-application-deployment.md)
 - [第11章 閲覧用HTML](output/html/web_textbook_ch11_ja.html)
 - [第11章 A4縦PDF](output/pdf/web_textbook_ch11_ja.pdf)
-- [第12章 提供アプリの配置と初期設定](docs/ja/12-application-deployment.md)
+- [第12章 公開範囲と最小権限](docs/ja/12-access-and-least-privilege.md)
 - [第12章 閲覧用HTML](output/html/web_textbook_ch12_ja.html)
 - [第12章 A4縦PDF](output/pdf/web_textbook_ch12_ja.pdf)
-- [第13章 公開範囲と最小権限](docs/ja/13-access-and-least-privilege.md)
+- [第13章 運用・保守と障害への対応](docs/ja/13-observation-and-recovery.md)
 - [第13章 閲覧用HTML](output/html/web_textbook_ch13_ja.html)
 - [第13章 A4縦PDF](output/pdf/web_textbook_ch13_ja.pdf)
-- [第14章 観測による障害の切り分けと復旧](docs/ja/14-observation-and-recovery.md)
-- [第14章 閲覧用HTML](output/html/web_textbook_ch14_ja.html)
-- [第14章 A4縦PDF](output/pdf/web_textbook_ch14_ja.pdf)
 - [全体構成図 PNG](assets/figures/fig01-system-overview.png) / [SVG](assets/figures/fig01-system-overview.svg)
 - [SSHとRDPの比較図](assets/figures/fig04-ssh-rdp.png)
 - [VPC・公開範囲・SGの関係図](assets/figures/fig05-network-boundaries.png)
@@ -75,20 +75,20 @@ Pは手順付きの練習、Mは別の対象を自分で設定する課題であ
 - [第5章の制作・確認の記録](CHAPTER05_VALIDATION.md)
 - [第6章の制作・確認の記録](CHAPTER06_VALIDATION.md)
 - [第7章の制作・確認の記録](CHAPTER07_VALIDATION.md)
+- [第8章の制作・確認の記録](CHAPTER08_VALIDATION.md)
 - [第9章の制作・確認の記録](CHAPTER09_VALIDATION.md)
 - [第10章の制作・確認の記録](CHAPTER10_VALIDATION.md)
 - [第11章の制作・確認の記録](CHAPTER11_VALIDATION.md)
 - [第12章の制作・確認の記録](CHAPTER12_VALIDATION.md)
 - [第13章の制作・確認の記録](CHAPTER13_VALIDATION.md)
-- [第14章の制作・確認の記録](CHAPTER14_VALIDATION.md)
 
 第1章はP0/M0のための共通導入であり、第1章だけを読んでM1へ直行する構成ではない。M1に必要なHTTPとNginxの説明は第4〜5章で扱う。
 
-第7〜14章の集計は[制作と自動確認](CHAPTER07_14_VALIDATION.md)を参照する。
+第7〜13章の集計は[制作と自動確認](CHAPTER07_13_VALIDATION.md)を参照する。
 
 ## 更新方法
 
-本文は`docs/ja/`の章別Markdown、図とHTML/PDFの生成元は`build/build_chapter01.py`〜`build/build_chapter14.py`。第7〜14章の図は`build/chapter_figures_07_14.py`で管理する。表示用の共通処理は第1章の生成元に置き、各章は自分の原稿・図・出力を指定して生成する。コマンド例は実行場所を本文で示し、改行を保った独立した枠へ出力する。Python 3とPillow・ReportLab・pypdf、および日本語フォントを使う。フォントは同梱しない。
+本文は`docs/ja/`の章別Markdown、図とHTML/PDFの生成元は`build/build_chapter01.py`〜`build/build_chapter13.py`。第7〜13章の図は`build/chapter_figures_07_13.py`で管理する。表示用の共通処理は第1章の生成元に置き、各章は自分の原稿・図・出力を指定して生成する。コマンド例は実行場所を本文で示し、改行を保った独立した枠へ出力する。Python 3とPillow・ReportLab・pypdf、および日本語フォントを使う。フォントは同梱しない。
 
 ```powershell
 python course/textbook/build/build_chapter01.py
@@ -98,12 +98,12 @@ python course/textbook/build/build_chapter04.py
 python course/textbook/build/build_chapter05.py
 python course/textbook/build/build_chapter06.py
 python course/textbook/build/build_chapter07.py
+python course/textbook/build/build_chapter08.py
 python course/textbook/build/build_chapter09.py
 python course/textbook/build/build_chapter10.py
 python course/textbook/build/build_chapter11.py
 python course/textbook/build/build_chapter12.py
 python course/textbook/build/build_chapter13.py
-python course/textbook/build/build_chapter14.py
 ```
 
 `JDU_FONT_SANS`と`JDU_FONT_SERIF`で日本語TrueTypeフォントを指定できる。既定はWindowsのNoto Sans JP / Noto Serif JP。出力は同じ最新版ファイルを更新する。
