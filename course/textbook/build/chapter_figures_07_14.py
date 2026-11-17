@@ -332,23 +332,136 @@ def chapter12():
 
 
 def chapter13():
-    stack(13,1,'boundaries','権限を判定する場所を分ける',[
-        ('通信：接続元と入口','一般80番・踏み台からの管理8080番・WebからDB5432番'),
-        ('OS：ユーザーとファイル','catalogで実行、コードや秘密は管理側で保護'),
-        ('DB：ロールとSQL操作','対象の表・列・シーケンスへ必要な権限'),
-        ('アプリ：認証と操作権限','備品の閲覧・追加・変更を許された担当者')],
-        ['図は判定対象の整理。上から下へ同じ認証情報を流す図ではない。'])
-    rows(13,2,'privileges','表の用途ごとに、必要な操作を決める',[
-        (['備品：catalog_item'],['SELECT・INSERT・UPDATE','備品のDELETEは与えない']),
-        (['補助データ・操作記録'],['補助データは用途ごとの更新や削除','操作記録はSELECT・INSERT']),
-        (['採番用シーケンス'],['必要なものへUSAGE','番号を書き換える権限は与えない'])],
-        ['すべて読取り専用でも、すべての操作を許す設定でも、用途と合わない。'])
-    cards(13,3,'retirement','構築用接続を終え、通常用で動かす',[
-        ('構築時',['setupロールを使用','表と初期データを準備','必要なSQL権限を設定']),
-        ('構築用接続の終了',['NOLOGIN・パスワード終了','残存setup接続を終了','一時setup設定を片付ける']),
-        ('通常時',['runtime接続で動く','必要な成功を確認','不要な操作の拒否も維持'])],
-        ['NOLOGINは新しい直接ログインを止める。既存接続は別に扱う。',
-         '表やDBは保持し、通常ロールへ所有権を移して済ませない。'])
+    purple='#7354a0'
+    red='#ad3842'
+    s=Scene(2400,1900,'クライアントPCからAWSのIGW、踏み台・Web・DBサーバーへの経路と、SG・Nginx・OS・アプリ・DBMSのアクセス制御を吹き出しで示す')
+    s.text(40,20,'図13-1  どのコンポーネントで、何を制限するか',43)
+    s.rect(390,145,1970,1680,'#fafbfe','#8298ad')
+    s.text(425,168,'AWS',35)
+    s.rect(660,225,1655,1555,'#f7f9fc','#8298ad')
+    s.text(700,247,'今回のVPC（内部ネットワーク）',33)
+    s.text(190,675,'インターネット側',31,center=True)
+    s.rect(50,770,280,230,'#ffffff',BLUE)
+    s.text(190,795,'一般利用者のPC',29,BLUE,center=True)
+    s.text(190,865,'ブラウザ',30,center=True)
+    s.text(190,935,'備品一覧を見る',28,center=True)
+    s.rect(50,1200,280,230,'#ffffff',GREEN)
+    s.text(190,1225,'アプリ管理者のPC',28,GREEN,center=True)
+    s.text(190,1300,'RDPで遠隔操作',29,center=True)
+    s.text(190,1370,'踏み台へ接続',28,center=True)
+    s.rect(425,800,180,600,'#ffffff','#8298ad')
+    for y,line in [(1005,'Internet'),(1065,'Gateway'),(1145,'AWS IGW')]:s.text(515,y,line,27,center=True)
+    s.rect(1110,650,640,750,'#f6f0fc',purple)
+    s.text(1430,663,'SG-Web',31,purple,center=True)
+    s.rect(1140,710,580,650,'#ffffff',BLUE)
+    s.text(1430,725,'EC2',29,center=True)
+    s.text(1430,777,'Webサーバー',36,BLUE,center=True)
+    s.rect(1170,855,230,245,'#edf5fc',BLUE)
+    s.text(1285,878,'Nginx',34,BLUE,center=True)
+    s.text(1285,946,'80番／8080番',27,center=True)
+    s.text(1285,1018,'HTTPの受付',28,center=True)
+    s.rect(1450,855,240,245,'#edf7f0',GREEN)
+    s.text(1570,878,'提供アプリ',32,GREEN,center=True)
+    s.text(1570,946,'Gunicornで実行',26,center=True)
+    s.text(1570,1018,'認証・操作権限',27,center=True)
+    s.arrow([(1400,980),(1450,980)],GREEN)
+    s.text(1430,1113,'同じWeb内：TCP・8000番ポート',27,GREEN,center=True)
+    s.rect(700,1040,360,360,'#f6f0fc',purple)
+    s.text(880,1054,'SG-Bastion',29,purple,center=True)
+    s.rect(730,1110,300,255,'#ffffff',GREEN)
+    s.text(880,1127,'EC2',28,center=True)
+    s.text(880,1176,'踏み台サーバー',32,GREEN,center=True)
+    s.text(880,1245,'10.20.1.10',27,center=True)
+    s.text(880,1315,'この中のブラウザ',28,center=True)
+    s.rect(1860,800,450,430,'#f6f0fc',purple)
+    s.text(2085,814,'SG-DB',30,purple,center=True)
+    s.rect(1890,865,390,325,'#ffffff',AMBER)
+    s.text(2085,884,'EC2',28,center=True)
+    s.text(2085,932,'DBサーバー',35,AMBER,center=True)
+    s.text(2085,1015,'PostgreSQL',34,AMBER,center=True)
+    s.text(2085,1110,'備品・利用者などの表',27,center=True)
+    s.arrow([(330,890),(425,890)],BLUE)
+    s.arrow([(605,890),(1080,890),(1080,920),(1170,920)],BLUE)
+    s.text(845,800,'HTTP：TCP・80番ポート',28,BLUE,center=True)
+    s.arrow([(330,1320),(425,1320)],GREEN)
+    s.arrow([(605,1320),(730,1320)],GREEN)
+    s.arrow([(1030,1280),(1080,1280),(1080,1050),(1170,1050)],GREEN)
+    s.text(850,1460,'HTTP：TCP・8080番ポート',27,GREEN,center=True)
+    s.arrow([(1690,1050),(1890,1050)],AMBER)
+    s.text(1800,941,'TCP',28,AMBER,center=True)
+    s.text(1800,994,'5432番ポート',25,AMBER,center=True)
+
+    def bubble(x,y,w,h,title,lines,dots=(),color=purple,size=29):
+        for cx,cy,r in dots:
+            s.draw.ellipse((cx-r,cy-r,cx+r,cy+r),fill='#fff9e9',outline=color,width=2)
+            s.svg.append(f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="#fff9e9" stroke="{color}" stroke-width="2"/>')
+        s.rect(x,y,w,h,'#fff9e9',color,36)
+        s.text(x+w/2,y+23,title,31,color,center=True)
+        for i,line in enumerate(lines):s.text(x+w/2,y+88+i*56,line,size,center=True)
+
+    bubble(1140,315,610,290,'通信：SG-Web（AWS）',[
+        '80番は一般利用者向け',
+        '8080番・22番は踏み台から',
+        '接続元・ポートで通信を制限'],[(1430,628,11)],size=29)
+    bubble(700,325,380,375,'Web側：Nginx',[
+        '公開80番の入口では',
+        '/admin/ を拒否',
+        '入口ラベルを上書き',
+        '管理側は踏み台のみ'],[(1110,755,11),(1160,814,7)],size=28)
+    bubble(1810,315,500,355,'DBMS：PostgreSQL',[
+        '接続元・DB・ロールを確認',
+        'HBAと認証で接続を判定',
+        '表ごとにSQL権限を設定',
+        '番号の発行権限も用途別に'],[(2100,730,15),(2100,775,8)],size=28)
+    bubble(1175,1190,510,155,'OS：catalogで実行',[
+        'コードはroot管理／秘密設定は0600'],[(1450,1160,9)],color=GREEN,size=26)
+    bubble(1130,1520,620,235,'アプリ：ログインと操作権限',[
+        '認証した管理者に閲覧・追加・変更',
+        '備品削除・利用者管理は許可しない'],[(1570,1440,10),(1570,1485,15)],color=GREEN,size=29)
+    bubble(1830,1400,480,330,'通信：SG-DB（AWS）',[
+        '5432番ポートへの接続は',
+        'Webサーバーからだけ',
+        'インターネットからDBへ',
+        '直接接続させない'],[(2100,1300,9),(2100,1350,15)],size=28)
+    bubble(430,1520,630,235,'通信：SG-Bastion（AWS）',[
+        'RDPは許可した接続元のみ',
+        '踏み台サーバーのTCP・3389番ポート'],[(850,1430,9),(850,1480,15)],size=28)
+    s.text(55,1845,'紫の枠：EC2に関連付けたSG　　吹き出し：その場所でのアクセス制御　　矢印：利用する通信',32)
+    s.save('ch13-fig01-boundaries')
+
+    s=Scene(2400,1340,'構築時と通常運用時は四角、移行時の対策は矢印形で示す。構築用の高い権限の悪用リスクと、ログイン無効化・認証情報消去・接続終了・一時設定削除を示す')
+    s.text(40,20,'図13-2  構築用の強い権限を、通常運用へ残さない',43)
+    s.rect(40,210,620,870,'#f7f9fc',BLUE)
+    s.text(350,240,'構築時',43,BLUE,center=True)
+    s.text(350,350,'構築用の高い権限で接続',35,center=True)
+    s.text(350,440,'表の作成・変更ができる',34,center=True)
+    s.text(350,515,'DB・表の所有者になる',34,center=True)
+    s.rect(80,650,540,355,'#fff1f2',red,36)
+    s.text(350,676,'接続できる状態を残すリスク',31,red,center=True)
+    s.text(350,760,'認証情報を盗まれると、',31,center=True)
+    s.text(350,828,'攻撃者にも強い操作を許す',31,center=True)
+    s.text(350,905,'表の変更・削除などの被害',31,red,center=True)
+    points=[(730,320),(1480,320),(1725,645),(1480,970),(730,970),(850,645)]
+    s.draw.polygon(points,fill='#fff1d2',outline=AMBER,width=3)
+    poly=' '.join(f'{x},{y}' for x,y in points)
+    s.svg.append(f'<polygon points="{poly}" fill="#fff1d2" stroke="{AMBER}" stroke-width="3"/>')
+    s.text(1200,368,'構築用の強い権限の利用を終了',32,AMBER,center=True)
+    s.text(1200,485,'DBロールのログインを無効化',31,center=True)
+    s.text(1200,590,'パスワードを消去',32,center=True)
+    s.text(1200,675,'既存の構築用接続を終了',31,center=True)
+    s.text(1200,790,'構築用の一時設定を削除',31,center=True)
+    s.text(1200,878,'使える経路と認証情報を残さない',29,AMBER,center=True)
+    s.rect(1770,210,590,870,'#edf7f0',GREEN)
+    s.text(2065,240,'通常運用時',43,GREEN,center=True)
+    s.text(2065,350,'通常運用用ロールで接続',34,center=True)
+    s.text(2065,440,'備品の閲覧・追加・変更',34,center=True)
+    s.text(2065,560,'必要な権限だけを利用する',32,GREEN,center=True)
+    s.text(2065,730,'構築用のDBロールでは',31,center=True)
+    s.text(2065,800,'新しい直接ログインをしない',30,center=True)
+    s.text(2065,930,'通常の設定とデータは保持',31,GREEN,center=True)
+    s.text(55,1140,'今回のDB：構築用ロールはDB・表の所有者として残し、ログインを無効化する。',34)
+    s.text(55,1225,'通常運用用ロールへ所有権を移したり、DB・表を削除したりして終了する構成ではない。',32)
+    s.save('ch13-fig02-retirement')
 
 
 def chapter14():

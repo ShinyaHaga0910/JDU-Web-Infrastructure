@@ -290,27 +290,29 @@
     },
     {
       "chapter": 13,
-      "pages": 10,
-      "text_blocks": 118,
+      "pages": 9,
+      "text_blocks": 126,
       "missing_text": [],
-      "pdf_words_within_page": 261,
-      "rendered_pages": 10,
-      "figure_texts_within_canvas_and_nonoverlapping": 38,
-      "figures": 3,
+      "pdf_words_within_page": 306,
+      "rendered_pages": 9,
+      "figure_texts_within_canvas_and_nonoverlapping": 89,
+      "figures": 2,
       "code_blocks": 1,
       "questions": 4,
       "heading_pages": {
-        "章末問題": 8,
-        "章末解答": 9,
-        "参考資料": 10
+        "章末問題": 7,
+        "章末解答": 8,
+        "参考資料": 9
       },
+      "local_references_checked": 8,
+      "sha256": "75d63485d3931bd844b5dc620dae3052d99bb68535fd692fe2d6771a1d65b62e",
       "html_checks": [
         {
           "chapter": 13,
           "width": 320,
           "scale": 100,
           "overflow": false,
-          "images": 3,
+          "images": 2,
           "loaded": true,
           "code": 1
         },
@@ -319,7 +321,7 @@
           "width": 320,
           "scale": 200,
           "overflow": false,
-          "images": 3,
+          "images": 2,
           "loaded": true,
           "code": 1
         },
@@ -328,7 +330,7 @@
           "width": 1280,
           "scale": 100,
           "overflow": false,
-          "images": 3,
+          "images": 2,
           "loaded": true,
           "code": 1
         },
@@ -337,12 +339,11 @@
           "width": 1280,
           "scale": 200,
           "overflow": false,
-          "images": 3,
+          "images": 2,
           "loaded": true,
           "code": 1
         }
-      ],
-      "sha256": "fdc038fbbcb7b38b15e2931e009eacf4012fd6fd3510cbc1caba7bbada198296"
+      ]
     },
     {
       "chapter": 14,
@@ -401,19 +402,19 @@
       "sha256": "dc2a31db3b660fb1f88fb05204eb68bb89466879c9c9d2844f2dc40c30e81ae4"
     }
   ],
-  "total_pages": 69,
-  "total_figures": 19,
+  "total_pages": 68,
+  "total_figures": 18,
   "total_code_blocks": 21,
-  "total_text_blocks": 789,
-  "total_pdf_words_within_page": 2273,
-  "total_figure_texts_checked": 319,
+  "total_text_blocks": 797,
+  "total_pdf_words_within_page": 2318,
+  "total_figure_texts_checked": 370,
   "teacher_visual_review": "not performed",
   "student_trial": "not performed",
   "aws_operations": "none",
   "local_references_checked": 56,
   "local_references_missing": [],
   "earlier_chapters_unchanged": false,
-  "updated": "2026-11-13",
+  "updated": "2026-11-17",
   "retired_chapters": [
     8
   ]

@@ -1,74 +1,78 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第13章 公開範囲と最小権限</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}h1,h2,h3{overflow-wrap:anywhere}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第13章-公開範囲と最小権限">第13章 公開範囲と最小権限</h1>
 <h2 id="この章で分かること">この章で分かること</h2>
-<p>備品一覧が表示され、管理画面で追加できるようになったら、次は「誰が、どの入口から、何をできるか」を読む。必要な機能が動くことに加え、必要のない操作を許さないことも、インフラストラクチャーの構築に含まれる。</p>
-<p>本章では、通信、OS、DB、アプリの四つの制御を整理し、通常の機能を保つための権限と、構築時だけ使う権限を分ける。</p>
-<h2 id="131-四つの場所で、違う権限を管理する">13.1 四つの場所で、違う権限を管理する</h2>
-<p>同じ「管理者」という呼び方でも、管理する対象が違う。OSのrootはファイルやプロセスを管理し、PostgreSQLの管理ロールはDBを管理し、アプリ管理者は管理画面で許された機能を使う。</p>
-<div class="table-wrap"><table><thead><tr><th scope="col">制御する場所</th><th scope="col">主に決めること</th></tr></thead><tbody><tr><td>通信</td><td>どの接続元から、どのサーバーの何番ポートへ接続できるか</td></tr><tr><td>OS</td><td>どのユーザーがファイルを読み、変更し、プロセスを動かせるか</td></tr><tr><td>DB</td><td>どのロールが、どのデータに、どのSQL操作を行えるか</td></tr><tr><td>アプリ</td><td>どのログイン利用者が、どの画面や操作を使えるか</td></tr></tbody></table></div>
-<figure><img src="../../assets/figures/ch13-fig01-boundaries.png" alt="通信、OS、DB、アプリという別々の制御を整理する。" width="1600" height="1120"></figure>
-<p><strong>図13-1 権限を判定する場所を分ける。</strong> 例えば、管理画面での追加を許可しても、OSのsudoやDBのsuperuserを与える必要はない。</p>
-<p><strong>最小権限</strong>は、必要な仕事ができる範囲へ権限を絞る考え方である。単に何もできない状態を目指すのではなく、必要な操作を先に定め、それを実現する権限を用意する。</p>
-<h2 id="132-正規の操作から必要な権限を考える">13.2 正規の操作から必要な権限を考える</h2>
-<p>今回の一般利用者は公開された備品一覧を読む。管理担当者は、踏み台サーバー上のブラウザで認証して、備品を閲覧・追加・変更する。備品の削除やユーザー管理は必要な機能に含めない。</p>
-<p>アプリは、それらの操作を実現するためにDBへ接続する。公開一覧では備品をSELECTし、登録ではINSERTし、変更ではUPDATEする。同じ通常アプリ用ロールがこれらの処理を支えるため、アプリ全体のDB権限を読取り専用にすると、必要な保存もできなくなる。</p>
-<p>また、アプリの通常動作には備品表以外の補助データも使う。どの表でも同じ操作を許すのではなく、その表の用途と、必要な機能を対応させる。</p>
-<h2 id="133-公開入口、管理入口、秘密の保存先を分ける">13.3 公開入口、管理入口、秘密の保存先を分ける</h2>
-<p>一般向けの80番ポートからは一覧を使い、管理画面はWebサーバーの内部IPの8080番ポートで踏み台サーバーから利用する。SG（AWSのSecurity Group）とNginxの制限を、接続元、待受IP、ポート、対象パスへ対応させる。</p>
-<p>公開側からの/admin/は管理画面を返さず、管理側では正しく認証して必要な操作ができることを比べる。Nginxがアプリへ渡す入口情報は、利用者が送った値をそのまま信頼せず、各入口で上書きする配布設定を使う。</p>
-<p>コードとvenvはrootが管理し、catalogユーザーへ不要な書換え権限を与えない。秘密設定はroot所有の0600とし、通常のHTTP配信範囲へ置かない。公開のファイルを返す場所と、秘密の値を起動処理へ渡す場所は異なる。</p>
-<p>ここでのアプリ管理者は、staffとして備品の閲覧・追加・変更を許された利用者であり、アプリのsuperuserとしてすべてを扱う設定にはしない。画面の権限とDBロールの権限は、それぞれ別に保つ。<a href="https://docs.djangoproject.com/en/5.2/ref/contrib/admin/">Djangoの管理画面</a></p>
-<h2 id="134-dbの権限を、表の用途ごとに読む">13.4 DBの権限を、表の用途ごとに読む</h2>
-<p>今回の通常アプリ用ロールが使う主な操作を整理する。表名が違えば、必要な権限も異なる。</p>
-<div class="table-wrap"><table><thead><tr><th scope="col">対象</th><th scope="col">通常動作で許す操作</th><th scope="col">用途</th></tr></thead><tbody><tr><td>catalog_item</td><td>SELECT・INSERT・UPDATE</td><td>備品の一覧・追加・変更</td></tr><tr><td>auth_user</td><td>SELECTとlast_login・password列だけのUPDATE</td><td>認証と許可された管理用補助処理</td></tr><tr><td>権限や関連の参照用の表</td><td>SELECT</td><td>アプリ利用者の許可内容などの参照</td></tr><tr><td>django_session</td><td>SELECT・INSERT・UPDATE・DELETE</td><td>ログインに必要な補助データの管理</td></tr><tr><td>django_admin_log</td><td>SELECT・INSERT</td><td>管理操作の記録と参照</td></tr><tr><td>必要な採番用シーケンス</td><td>USAGE</td><td>備品や操作記録へ新しい番号を割り当てる</td></tr></tbody></table></div>
-<figure><img src="../../assets/figures/ch13-fig02-privileges.png" alt="備品表、補助表、操作記録、採番用シーケンスで必要な操作が違うことを示す。" width="1600" height="1100"></figure>
-<p><strong>図13-2 許可する操作を対象ごとに決める。</strong> 補助データのDELETEを必要とすることと、備品そのものの削除を許すことは異なる。</p>
-<p>auth_userに対する列単位のUPDATEは、表全体のUPDATEとは範囲が違う。通常ロールが、管理者属性や権限を自由に書き換えられる状態へ広げない。django_migrationsは構造の適用履歴を管理する表であり、通常ロールの作業対象にはしない。</p>
-<p>シーケンスのUSAGEは採番に必要だが、値を任意に設定するUPDATEまで与える必要はない。確認のためにnextvalやsetvalを呼ぶと実際の番号の状態を変えるため、定義と権限の情報を読む。<a href="https://www.postgresql.org/docs/16/sql-grant.html">SQL権限</a>、<a href="https://www.postgresql.org/docs/16/functions-sequence.html">シーケンスの権限</a></p>
-<h2 id="135-明示したgrantだけで、実効権限は決まらない">13.5 明示したGRANTだけで、実効権限は決まらない</h2>
-<p><strong>実効権限</strong>は、その接続で実際に行える操作の範囲である。直接GRANTした内容だけでなく、所有者であること、所属するロールから受ける権限、PUBLICへの許可、列単位の権限なども影響する。</p>
-<p>PostgreSQLの<strong>PUBLIC</strong>は、すべてのロールに共通する許可先である。インターネットへ公開するという意味ではない。通常ロールへの許可を消しても、PUBLICから同じ権限を受ければ、その操作が可能な場合がある。</p>
+<p>備品管理アプリには、一般利用者が一覧を見る入口と、管理担当者が備品を追加・変更する入口がある。この使い分けを成立させるには、通信を許す範囲、アプリを動かすOSユーザー、DBで許す操作、管理画面で許す機能を、それぞれの場所で設定する必要がある。</p>
+<p>権限が不足すれば、必要な機能が動かない。一方、必要以上の権限があると、不具合や攻撃によって不正な操作をされた場合に、被害が広がるおそれがある。本章では、何を許可し、どこで制限するかを、備品管理アプリの構成に沿って説明する。</p>
+<h2 id="131-アクセス制御を入れる場所">13.1 アクセス制御を入れる場所</h2>
+<p>利用者PCからDBの備品データまでの間には、異なる役割のソフトウェアやサーバーがある。そのため、一つの設定で全体を制御するのではなく、各場所で扱う対象に合わせて制限を設ける。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">制御する場所</th><th scope="col">主に決めること</th></tr></thead><tbody><tr><td>AWSのネットワーク</td><td>どの接続元から、どのEC2の何番ポートへ通信を許すか</td></tr><tr><td>Webサーバー内のNginx</td><td>受け付ける入口とURL、アプリへ転送するリクエストを決める</td></tr><tr><td>OS</td><td>どのOSユーザーがプロセスを動かし、ファイルを読み書きできるか</td></tr><tr><td>DBMS（PostgreSQL）</td><td>接続を認証し、DBロールごとに表などの操作を許可する</td></tr><tr><td>備品管理アプリ</td><td>誰がログインし、備品の閲覧・追加・変更をできるか</td></tr></tbody></table></div>
+<figure><img src="../../assets/figures/ch13-fig01-boundaries.png" alt="クライアントPC、AWS内のゲートウェイとVPC、踏み台・Web・DBサーバーを配置し、SG、Nginx、OS、アプリ、DBMSで制限する場所を吹き出しで示す。" width="2400" height="1900"></figure>
+<p><strong>図13-1 通信経路と、アクセス制御を入れる場所。</strong> Web利用とDB接続に関係する部分を示す。紫の枠はEC2に関連付けたSG（AWSのSecurity Group）であり、吹き出しはその場所で行う制御の説明である。矢印は利用する通信の向きを示す。</p>
+<p>SGは、関連付けたEC2へ届く通信や、そこから出る通信を制御する。例えば、Webサーバーの8080番ポートへの通信は踏み台サーバーからだけ許し、DBサーバーの5432番ポートへの通信はWebサーバーからだけ許す。<a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html">AWSのSecurity Group</a></p>
+<p>通信が届いた後は、Nginxが入口とURLを判断し、アプリが利用者の認証や操作権限を判断する。DBへSQLが届けば、PostgreSQLがDBロールに許された操作かを判断する。アプリの管理者であっても、そのことだけでOSの管理権限やDBMSの管理権限を持つわけではない。</p>
+<h2 id="132-権限の設計について">13.2 権限の設計について</h2>
+<p>権限を設計するときは、まず「誰が、何のために、どの操作を行うか」を決める。今回の一般利用者には公開された備品一覧を見てもらい、アプリの管理担当者には備品の閲覧・追加・変更をしてもらう。備品の削除や、ほかの利用者の権限を変更する機能は含めない。</p>
+<p>次に、その機能を実現するために必要な権限を選ぶ。例えば、一覧を作るアプリには備品を読むSELECT、備品の追加にはINSERT、数量や保管場所の変更にはUPDATEが必要である。アプリ全体のDB権限を読取り専用にすると、一覧を表示できても追加・変更はできなくなる。</p>
+<p>必要以上の権限も与えない。例えば、備品の数量を更新する処理に、備品表を丸ごと削除する権限は必要ない。強すぎる権限があると、アプリの不具合や攻撃を通じて、その権限を本来の用途以外に使われた場合の影響が大きくなる。</p>
+<p>このように、必要な機能が成立する範囲で、権限を必要最低限に絞る考え方を<strong>最小権限</strong>という。権限を減らすことだけを目的にせず、利用用途と許可する操作を一組にして考える。</p>
+<h2 id="133-webサーバーとアプリのセキュリティ設定">13.3 Webサーバーとアプリのセキュリティ設定</h2>
+<p>ここでは、Webサーバーと備品管理アプリで行っている制限を、具体例で説明する。一般利用者はWebサーバーの80番ポートで一覧を使い、アプリの管理担当者は踏み台サーバーのブラウザから、内部IPの8080番ポートで管理画面を使う。</p>
+<p>Nginxは、一般向けの80番ポートで受け取った<code>/admin/</code>へのアクセスには、管理画面を返さず404を返す。管理向けの8080番ポートは、踏み台サーバーの内部IPからの接続だけを受け付ける。この段階で、どの入口から管理画面を利用できるかを絞っている。</p>
+<p>さらにNginxは、アプリへ転送するHTTPリクエストに、どの入口で受け付けたかを表す情報を付ける。HTTPの付加情報を入れる<strong>ヘッダー</strong>のうち、今回は<code>X-JDU-Entry</code>という項目を使う。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">Nginxが受け付けた入口</th><th scope="col">Nginxが転送時に設定する値</th><th scope="col">意味</th></tr></thead><tbody><tr><td>Webサーバーの80番ポート</td><td>X-JDU-Entry: public</td><td>一般利用の入口で受け付けた</td></tr><tr><td>Webサーバーの8080番ポート</td><td>X-JDU-Entry: admin</td><td>管理用の入口で受け付けた</td></tr></tbody></table></div>
+<p><strong>この値を上書きするのは、Webサーバー上のNginxである。</strong> 利用者が同じヘッダーに別の値を入れて送っても、Nginxは自分が受け付けた入口に合わせて値を設定し直す。対象はアプリへ渡す入口情報であり、備品名や数量などのフォーム入力を書き換える処理ではない。<a href="https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_set_header">Nginxのproxy_set_header</a></p>
+<p><strong>アプリ側は、その入口情報を確認する。</strong> 管理画面へのリクエストでは、同じWebサーバー内のNginxから転送され、管理用入口の情報が付いていることを確認する。そのうえで、アプリ管理者のログインと操作権限を確かめる。Nginxの入口判定と、アプリの認証・権限判定を組み合わせている。</p>
+<p>OS側では、第12章で説明したように、アプリを専用のcatalogユーザーで動かし、コードとvenvはrootが管理する。アプリを実行するユーザーにコードの書換えまで許さず、秘密設定はroot所有の0600で保護する。秘密設定をHTTPの配信先へ置かないことで、ブラウザから取得されることも防ぐ。</p>
+<p>アプリ管理者に許可する機能は、備品の閲覧・追加・変更である。備品の削除や利用者・グループの管理まで許可しない。アプリで利用者に許す機能と、アプリがDBへ接続するロールに許すSQL操作は、それぞれの目的に合わせて設定する。</p>
+<h2 id="134-dbmsのセキュリティ設定">13.4 DBMSのセキュリティ設定</h2>
+<p>ここからは、DBサーバー上のPostgreSQLの設定を説明する。PostgreSQLは、接続元やDB名、DBロールをHBA設定と照合し、指定された方式で認証する。接続後は、そのロールに許された範囲でSQLを実行する。接続時の設定は第10章、ここでは主に接続後の操作権限を扱う。</p>
+<p>アプリが使うDBには、備品だけでなく、利用者の認証に使う情報や、管理画面で行った操作の記録もある。すべての表に同じ権限を与えると、必要な処理まで止めたり、不要な変更まで許したりするため、保存する情報の用途ごとに操作を選ぶ。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">対象</th><th scope="col">通常運用用ロールに許す操作</th><th scope="col">何に使うか</th></tr></thead><tbody><tr><td>備品（catalog_item）</td><td>SELECT・INSERT・UPDATE</td><td>備品の一覧・追加・変更</td></tr><tr><td>アプリ利用者（auth_user）</td><td>SELECTとlast_login・password列だけのUPDATE</td><td>認証、最終ログイン時刻の記録、許可された補助処理</td></tr><tr><td>権限の対応表など</td><td>SELECT</td><td>アプリ利用者に許された操作の参照</td></tr><tr><td>ログインに使う一時情報（django_session）</td><td>SELECT・INSERT・UPDATE・DELETE</td><td>ログイン中の利用に必要な情報の管理と後片付け</td></tr><tr><td>管理操作の記録（django_admin_log）</td><td>SELECT・INSERT</td><td>記録を残し、読む</td></tr><tr><td>DB構造の適用履歴（django_migrations）</td><td>許可しない</td><td>第12章で行った構造の準備が、どこまで済んでいるかを記録する</td></tr><tr><td>自動で番号を発行する仕組み（シーケンス）</td><td>必要なものにUSAGE</td><td>新しい備品や操作記録へIDを付ける</td></tr></tbody></table></div>
+<p>例えば、ログインに使う一時情報は、不要になれば削除する必要がある。一方、備品そのものを削除する機能は今回のアプリには用意しない。同じDELETEでも、何を削除する権限かによって必要性が異なる。</p>
+<p>利用者の情報も、最終ログイン時刻などの更新が必要な項目だけを許す。表全体を自由に変更できる権限を与えると、管理者の属性や操作権限まで書き換えられる範囲が広がる。DB構造の適用履歴は構築時の管理に使う情報であり、通常の備品の追加・変更では書き換える必要がない。</p>
+<p><strong>シーケンス</strong>は、新しい行へ付ける番号を順に発行するDBの仕組みである。例えば、新しく登録した備品へIDを割り当てるときに使う。通常運用用ロールには、必要な番号を受け取るUSAGEを許すが、番号を管理する値を任意に変更する権限まで与える必要はない。確認するときも、番号を発行・変更する操作は実行せず、設定された権限の情報を読む。<a href="https://www.postgresql.org/docs/16/sql-grant.html">PostgreSQLのGRANT</a></p>
+<h3 id="dbで実際に使える権限を確認する">DBで実際に使える権限を確認する</h3>
+<p>DBロールへ直接与えた許可だけを見ても、実際にできる操作を判断できない場合がある。例えば、表の所有者には、表自体を変更・削除する強い権限がある。ほかのロールに所属して、その権限を受け継ぐ場合もある。</p>
+<p>また、PostgreSQLの<strong>PUBLIC</strong>は、すべてのDBロールに共通する許可先である。インターネット公開という意味ではない。通常運用用ロールへ直接許可していなくても、PUBLICに与えた権限を通じて操作できる場合がある。</p>
+<p>その接続で実際に使える権限を<strong>実効権限</strong>という。今回の提供SQLは、通常運用用ロールが所有者やsuperuserになっていないことなどを確認し、PUBLICを含む余分な許可を整理してから、必要な権限を与える。以前に与えた列単位の権限も整理する。これは、指定したロールが必要以上の操作をできないようにするためである。</p>
 <p><strong>実行場所：DBサーバーで、対象DBへ接続した管理用psql内。権限を読む例。</strong></p>
 <pre><code>\du
-\drg
 \dp public.*</code></pre>
-<p><code>\du</code>はロールの属性、<code>\drg</code>はロール同士の所属・権限継承の情報、<code>\dp</code>は表などのアクセス権を読む。権限表に出る<code>r</code>はSELECT、<code>a</code>はINSERT、<code>w</code>はUPDATE、<code>d</code>はDELETEを表す。列単位の許可も、表全体の許可と分けて読む。<a href="https://www.postgresql.org/docs/16/app-psql.html">psqlの権限表示</a></p>
-<p>表全体の権限をREVOKEしただけでは、以前に与えた列単位の権限が残る場合がある。通常ロールが所有者やsuperuserではないことも含め、最終的に可能な操作を確認する。<a href="https://www.postgresql.org/docs/16/ddl-priv.html">所有者と権限</a></p>
-<h2 id="136-構築用の接続を終了する">13.6 構築用の接続を終了する</h2>
-<p>表の作成や初期データの準備が終われば、日々のアプリ動作に構築用の接続は必要ない。通常の機能がruntimeロールで動くことを確かめ、構築用ロールの新しいログインを止める。</p>
-<div class="table-wrap"><table><thead><tr><th scope="col">終了する対象</th><th scope="col">目的</th></tr></thead><tbody><tr><td>setupロールのLOGIN</td><td>新たに構築用ロールとして直接ログインさせない</td></tr><tr><td>setupロールのパスワード</td><td>構築時の認証情報を利用し続けない</td></tr><tr><td>残っているsetup接続</td><td>既存の構築用接続を終了する</td></tr><tr><td>一時的なsetup設定ファイル</td><td>Webサーバー側に構築用秘密を残さない</td></tr></tbody></table></div>
-<p><strong>NOLOGIN</strong>は、新しい直接ログインを止める属性である。設定しただけで既存の接続が自動終了するわけではないため、残存接続の扱いも分ける。<a href="https://www.postgresql.org/docs/16/sql-alterrole.html">ALTER ROLE</a></p>
-<figure><img src="../../assets/figures/ch13-fig03-retirement.png" alt="構築用ロールの準備から、その接続を終了し、通常ロールだけで動く状態へ移る。" width="1600" height="910"></figure>
-<p><strong>図13-3 終えるのは構築用の接続である。</strong> DBや表の所有者としてsetupロールが残ることと、そのロールで通常ログインできることは異なる。所有者を通常ロールへ移したり、表を削除したりして終了する構成ではない。</p>
-<p>残すのは、通常アプリの接続設定、必要なDBデータ、提供コードなどである。一時setup設定とruntime設定をファイル名・profileで区別し、まとめて削除する操作へ置き換えない。</p>
-<h2 id="137-許された成功と、意図した拒否を対で見る">13.7 許された成功と、意図した拒否を対で見る</h2>
-<p>入口や権限の確認では、動いてほしい機能と、拒否してほしい操作を組にする。</p>
-<div class="table-wrap"><table><thead><tr><th scope="col">正規の動作</th><th scope="col">比較する拒否・制限</th></tr></thead><tbody><tr><td>一般一覧に公開備品が出る</td><td>同じ時点の非公開備品は出ない</td></tr><tr><td>管理入口で正しくログインできる</td><td>誤ったパスワードでは認証が成立しない</td></tr><tr><td>認証した担当者が備品を追加・変更できる</td><td>未認証の利用者は同じ保存操作を行えない</td></tr><tr><td>管理入口で管理画面を使える</td><td>公開入口の/admin/からは管理画面を取得できない</td></tr><tr><td>runtime接続でアプリが動く</td><td>終了したsetup接続は使えない</td></tr></tbody></table></div>
-<p>何も表示できず、何も保存できない状態なら、単に全体が故障している可能性もある。拒否だけを見ず、必要な成功を同じ構成で比較する。既存のパスワードを変えて試すのではなく、指定された範囲で正しい認証と一回の誤認証を比べる。</p>
-<p>練習・課題6では、構築用接続を終了し、公開範囲、ファイル、DB、管理画面の権限を用途に合わせる。現行の演習順はP5 → P6 → M5 → M6であり、practiceの構築用接続を終えてからmissionへ切り替える。</p>
+<p><code>\du</code>はロールの属性、<code>\dp</code>は表などのアクセス権を読む。表示される<code>r</code>はSELECT、<code>a</code>はINSERT、<code>w</code>はUPDATE、<code>d</code>はDELETEを表す。表全体の許可と、特定の列だけの許可を分け、所有者やほかの許可から使える権限も合わせて考える。<a href="https://www.postgresql.org/docs/16/ddl-priv.html">所有者と権限</a>、<a href="https://www.postgresql.org/docs/16/app-psql.html">psqlの権限表示</a></p>
+<h2 id="135-構築用の強い権限を通常運用へ残さない">13.5 構築用の強い権限を通常運用へ残さない</h2>
+<p><strong>構築用ロールで接続できる状態を残すと、認証情報が漏れた場合に、攻撃者もその高い権限を利用できるおそれがある。</strong> 構築用ロールには表の作成・変更などを行う権限があり、表の所有者でもある。悪用されれば、備品の値だけでなく、表そのものを変更・削除されるなど、被害が広がる可能性がある。</p>
+<p>そのため、構築時だけ必要なユーザーやロールは、運用を始める際に利用を終える。不要なものは削除し、所有者として残す必要があるものは、その強い権限で接続できる経路を無効化する。通常のアプリは、備品の閲覧・追加・変更に必要な権限を持つ<strong>通常運用用ロール</strong>で動かす。</p>
+<p>今回のDBでは、構築用のsetupロールがDBや表の所有者になっている。所有者としての役割を保つため、このロール自体は削除しない。次の対策を組み合わせ、構築用ロールでの接続と、構築時に使った認証情報を使い続けない状態にする。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">終了する対象</th><th scope="col">行う対策と、その理由</th></tr></thead><tbody><tr><td>構築用ロールの新規ログイン</td><td>NOLOGINにして、新たな直接ログインを禁止する</td></tr><tr><td>構築用ロールのパスワード</td><td>PASSWORD NULLにして、保存されたパスワード認証情報を消去する</td></tr><tr><td>接続済みの構築用ロール</td><td>既存の接続も終了し、接続済みの状態から強い操作を続けられないようにする</td></tr><tr><td>Web上の一時的な構築用設定</td><td>構築用パスワードを含む一時設定ファイルを削除する</td></tr></tbody></table></div>
+<p><strong>NOLOGIN</strong>は、新しい直接ログインを止める属性である。これだけでは、既に接続している処理は自動終了しない。そのため、残っている構築用の接続も別に終了する。通常運用用ロールが構築用ロールの権限を受け継ぐことのないよう、所属するロールも前節の権限設計に含める。<a href="https://www.postgresql.org/docs/16/sql-alterrole.html">ALTER ROLE</a></p>
+<figure><img src="../../assets/figures/ch13-fig02-retirement.png" alt="構築時に使う高い権限が悪用されるリスクから、中央の矢印形に示す無効化と認証情報の削除を行い、通常運用用ロールで動く状態へ移る。" width="2400" height="1340"></figure>
+<p><strong>図13-2 構築時のリスクを、運用開始時の対策で減らす。</strong> 左右の四角は構築時と通常運用時、中央の矢印形は移行時に行う対策である。今回、削除するのは構築用の一時設定であり、DBロール自体は所有者として残したままログインを無効化し、パスワードを消去する。</p>
+<p>通常運用用の接続設定、DBと表、備品データ、提供コードは運用に必要なので残す。構築用設定を片付ける際は、通常運用用の設定までまとめて削除しない。構築用ロールの所有権を通常運用用ロールへ移すと、通常運用側へ不要な強い権限まで渡すことになるため、今回の構成では移さない。</p>
+<p>練習・課題6では、必要な通常機能を保ちながら、構築用の接続と一時設定を終了し、用途に合うアクセス制御を整える。</p>
 <h2 id="章末問題">章末問題</h2>
 <h3 id="問1">問1</h3>
-<p>通常アプリのDB接続を、すべて読取り専用にすれば、今回の必要な機能を満たせるか。</p>
+<p>通常運用用のDBロールを読取り専用にすれば、今回の備品管理アプリに必要な機能を満たせるか。</p>
 <h3 id="問2">問2</h3>
-<p>通常ロールへのGRANTにDELETEがなければ、そのロールは必ず削除できないと言えるか。</p>
+<p>通常運用用ロールへのGRANTにDELETEがなければ、そのロールは必ず削除できないと言えるか。</p>
 <h3 id="問3">問3</h3>
-<p>setupロールをNOLOGINにすれば、既存のsetup接続も自動的に閉じるか。</p>
+<p>構築用ロールを運用開始後も接続できる状態で残すと、どのようなリスクがあるか。NOLOGINだけで既存の接続も終了するか。</p>
 <h3 id="問4">問4</h3>
-<p>公開側の管理画面が表示されないことだけで、正常な制限ができたと判断してよいか。</p>
+<p>アプリへ渡す入口情報のヘッダーは、どのソフトウェアが設定し直すか。アプリ側はその後に何を確かめるか。</p>
 <h2 id="章末解答">章末解答</h2>
 <h3 id="問1">問1</h3>
-<p>満たせない。備品の追加・変更や、通常動作に必要な補助データの操作がある。表と用途に応じて権限を決める。</p>
+<p>満たせない。備品の追加・変更や、補助データの操作がある。必要な機能と表の用途に合わせて権限を選ぶ。</p>
 <h3 id="問2">問2</h3>
-<p>言えない。所有者、PUBLIC、他のロールへの所属などによる実効権限も調べる必要がある。</p>
+<p>言えない。所有者、PUBLIC、ほかのロールへの所属などから使える実効権限も調べる必要がある。</p>
 <h3 id="問3">問3</h3>
-<p>閉じない。新たな直接ログインを止めることと、既存の接続を終了することは別である。</p>
+<p>構築用の認証情報が漏れると、攻撃者に高い権限を使われ、表の変更・削除などをされるおそれがある。NOLOGINは新しい直接ログインを禁止するが、既存の接続は終了しないため、接続終了も別に行う。</p>
 <h3 id="問4">問4</h3>
-<p>判断できない。公開一覧の成功や管理入口での正規操作の成功と比べ、意図した対象だけが拒否されていることを確かめる。</p>
+<p>Nginxが、受け付けた入口に合わせてヘッダーを設定し直す。アプリ側は、Nginxから管理用の入口を通って届いたことを確認し、アプリ管理者のログインと操作権限を確かめる。</p>
 <h2 id="参考資料">参考資料</h2>
-<p>確認日：2026-11-03。権限の用途は提供されたSQLと管理画面の実装に基づく。</p>
+<p>確認日：2026-11-17。設定の説明は、提供されたNginx設定、アプリの入口判定、DB権限のSQL、構築用接続の終了処理と照合している。</p>
+<p class="bullet">・ <a href="https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html">AWSのSecurity Group</a></p>
+<p class="bullet">・ <a href="https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_set_header">Nginxのproxy_set_header</a></p>
 <p class="bullet">・ <a href="https://www.postgresql.org/docs/16/ddl-priv.html">PostgreSQLの権限</a></p>
 <p class="bullet">・ <a href="https://www.postgresql.org/docs/16/sql-grant.html">GRANT</a></p>
 <p class="bullet">・ <a href="https://www.postgresql.org/docs/16/sql-alterrole.html">ALTER ROLE</a></p>
-<p class="bullet">・ <a href="https://www.postgresql.org/docs/16/functions-sequence.html">シーケンス</a></p>
 <p class="bullet">・ <a href="https://www.postgresql.org/docs/16/app-psql.html">psql</a></p>
-<p class="bullet">・ <a href="https://docs.djangoproject.com/en/5.2/ref/contrib/admin/">Django管理画面</a></p>
-<p class="bullet">・ <a href="../../../labs/docs/ja/p6.md">練習P6</a></p></main></body></html>
+<p class="bullet">・ <a href="../../../labs/docs/ja/p6.md">練習P6</a></p>
+<p class="bullet">・ <a href="../../../labs/docs/ja/m6.md">課題M6</a></p></main></body></html>
