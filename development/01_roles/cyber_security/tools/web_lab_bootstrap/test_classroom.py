@@ -30,6 +30,11 @@ class ClassroomTests(unittest.TestCase):
                         screen.step(stage)
                     self.assertIn(f'01/{total:02d}', output.getvalue())
                     self.assertIn(f'{total:02d}/{total:02d}  {screen.text["done"]}', output.getvalue())
+                    if role == 'student':
+                        with patch.object(classroom.getpass, 'getpass') as secret_prompt:
+                            for key in ('invite', 'password'):
+                                screen.prompt(key, secret=True)
+                                self.assertIn(screen.text[key], secret_prompt.call_args.args[0])
 
     def test_aws_wait_reports_elapsed_time_and_propagates_errors(self):
         with contextlib.redirect_stdout(io.StringIO()), patch.object(classroom, 'AWS_PROGRESS_INTERVAL', 0.01):
@@ -118,19 +123,21 @@ class ClassroomTests(unittest.TestCase):
         session.client.return_value.get_caller_identity.return_value = {'Account': '123456789012'}
         boto3 = Mock()
         boto3.Session.return_value = session
-        output = io.StringIO()
-        with tempfile.TemporaryDirectory() as temp, contextlib.redirect_stdout(output), \
-                patch.dict(sys.modules, boto3=boto3), patch.object(sys, 'path', list(sys.path)), \
-                patch.object(sys, 'argv', ['classroom.py', 'teacher', '--ref', 'a' * 40]), \
-                patch.object(sys.stdin, 'isatty', return_value=True), patch('builtins.input', return_value='2') as prompt, \
-                patch.object(classroom.Path, 'home', return_value=Path(temp)), patch.object(classroom.os, 'umask'), \
-                patch.object(classroom, 'remote_source', return_value=b'# offline fixture'), \
-                patch.object(classroom, 'teacher_run', return_value='jdu2.offline-fixture'):
-            self.assertEqual(classroom.main(), 0)
-        prompt.assert_called_once()
-        self.assertIn('[2] Japanese', output.getvalue())
-        self.assertEqual(output.getvalue().rstrip().splitlines()[-2:],
-                         ['授業の共通登録コード', 'jdu2.offline-fixture'])
+        instructions = ('Share this code with your students.', 'このコードを学生に伝えてください。',
+                        'Передайте этот код студентам.', 'Ushbu kodni talabalarga bering.')
+        for selection, instruction in zip('1234', instructions):
+            output = io.StringIO()
+            with self.subTest(selection=selection), tempfile.TemporaryDirectory() as temp, contextlib.redirect_stdout(output), \
+                    patch.dict(sys.modules, boto3=boto3), patch.object(sys, 'path', list(sys.path)), \
+                    patch.object(sys, 'argv', ['classroom.py', 'teacher', '--ref', 'a' * 40]), \
+                    patch.object(sys.stdin, 'isatty', return_value=True), patch('builtins.input', return_value=selection) as prompt, \
+                    patch.object(classroom.Path, 'home', return_value=Path(temp)), patch.object(classroom.os, 'umask'), \
+                    patch.object(classroom, 'remote_source', return_value=b'# offline fixture'), \
+                    patch.object(classroom, 'teacher_run', return_value='jdu2.offline-fixture'):
+                self.assertEqual(classroom.main(), 0)
+                prompt.assert_called_once()
+                self.assertIn('[2] Japanese', output.getvalue())
+                self.assertEqual(output.getvalue().rstrip().splitlines()[-2:], [instruction, 'jdu2.offline-fixture'])
 
     def test_template_keeps_private_topology_and_all_nodes_use_ssm(self):
         source = ROOT / 'development/templates/web-lab-student.template.json'

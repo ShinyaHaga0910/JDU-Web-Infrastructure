@@ -53,31 +53,31 @@ STAGES = {
 }
 
 # UI messages follow the same order for all four languages.
-LABELS = ('teacher', 'student', 'invite', 'password', 'aws', 'stack', 'waiting',
+LABELS = ('teacher', 'student', 'invite', 'share_code', 'password', 'aws', 'stack', 'waiting',
           'invites', 'assets', 'repo', 'nodes', 'ssh', 'lessons', 'grading', 'done', 'stopped', 'tty', 'input_error', 'notice')
 TEXT = {
-    'en': ('Teacher setup', 'Student setup', 'Course enrollment code',
+    'en': ('Teacher setup', 'Student setup', 'Course enrollment code', 'Share this code with your students.',
            'RDP password (12–128 characters)', 'Checking the AWS account and prerequisites',
            'Deploying with CloudFormation', 'Waiting for the AWS resources', 'Preparing the shared course enrollment code',
            'Verifying and transferring dependencies', 'Building the signed internal package repository',
            'Preparing and checking the five servers', 'Verifying internal SSH', 'Staging lesson files', 'Registering and testing grading',
            'Foundation setup complete', 'Setup stopped at stage', 'Use an interactive CloudShell terminal.',
            'Check the values entered and the current AWS account.', 'Google login and browser grading require separate setup.'),
-    'ja': ('教師側の構築', '学生側の構築', '授業の共通登録コード',
+    'ja': ('教師側の構築', '学生側の構築', '授業の共通登録コード', 'このコードを学生に伝えてください。',
            'RDPパスワード（12〜128文字）', 'AWSアカウントと前提条件を確認',
            'CloudFormationで構築', 'AWSリソースの準備を待機', '授業の共通登録コードを準備',
            '依存パッケージを検証・転送', '署名付きの内部パッケージ配布先を構築',
            'サーバー5台を準備・確認', '内部SSHを確認', '授業用ファイルを配置', '採点登録と試験送信', '基盤の構築・確認が完了',
            '停止した工程', '対話型のCloudShellで実行してください。', '入力内容と現在のAWSアカウントを確認してください。',
            'Googleログインとブラウザ採点には別途設定が必要です。'),
-    'ru': ('Настройка преподавателя', 'Настройка студента', 'Код регистрации на курс',
+    'ru': ('Настройка преподавателя', 'Настройка студента', 'Код регистрации на курс', 'Передайте этот код студентам.',
            'Пароль RDP (12–128 символов)', 'Проверка аккаунта AWS и требований',
            'Развёртывание через CloudFormation', 'Ожидание ресурсов AWS', 'Подготовка общего кода регистрации на курс',
            'Проверка и передача зависимостей', 'Создание подписанного внутреннего репозитория пакетов',
            'Настройка и проверка пяти серверов', 'Проверка внутреннего SSH', 'Размещение учебных файлов', 'Регистрация и проверка оценивания',
            'Базовая настройка завершена', 'Настройка остановлена на этапе', 'Используйте интерактивный терминал CloudShell.',
            'Проверьте введённые данные и текущий аккаунт AWS.', 'Вход через Google и проверку в браузере нужно настроить отдельно.'),
-    'uz': ('O‘qituvchi muhiti', 'Talaba muhiti', 'Kursga ro‘yxatdan o‘tish kodi',
+    'uz': ('O‘qituvchi muhiti', 'Talaba muhiti', 'Kursga ro‘yxatdan o‘tish kodi', 'Ushbu kodni talabalarga bering.',
            'RDP paroli (12–128 belgi)', 'AWS hisobi va talablarni tekshirish',
            'CloudFormation orqali yaratish', 'AWS resurslarini kutish', 'Kurs uchun umumiy ro‘yxatdan o‘tish kodini tayyorlash',
            'Bog‘liqliklarni tekshirish va uzatish', 'Imzolangan ichki paket repozitoriysini yaratish',
@@ -753,7 +753,7 @@ def main():
         screen.step('done')
         screen.record(screen.text['notice'])
         if args.role == 'teacher':
-            print(f'\n{screen.text["invite"]}\n{enrollment_code}', flush=True)
+            print(f'\n{screen.text["invite"]}\n{screen.text["share_code"]}\n{enrollment_code}', flush=True)
         return 0
     except KeyboardInterrupt:
         print(f'\n{screen.text["stopped"]} · {screen.text[screen.current]}', file=sys.stderr)
