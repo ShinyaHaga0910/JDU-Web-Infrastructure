@@ -12,6 +12,8 @@ JDUのWebインフラストラクチャー構築教材です。今セミスタ�
 
 AWS Academyで対象のLearner Labを開始し、米国東部（バージニア北部、`us-east-1`）のCloudShellに次を貼り付けます。開始画面で English・Japanese・Русский・O‘zbekcha を選ぶと、その後の入力案内、進捗、完了結果、エラー案内が選択した言語で表示されます。
 
+#### 教師側のコマンド
+
 ```bash
 setup=$(mktemp)
 curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/refs/heads/main/development/setup-classroom.sh -o "$setup" &&
@@ -20,8 +22,19 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
 
 新規構築には起動時のGitHub最新版を使います。学生側の構築を再開するときは、開始時の版から必要なファイルを取得します。
 
-1. **教師用Learner Lab** では上記のまま実行します。言語を選ぶと構築と確認が自動で進みます。完了画面の最後に表示される共通登録コードを、受講者だけが閲覧できる場所で共有します。
-2. **学生用Learner Lab** では最後の `teacher` を `student` に変更して実行します。授業の共通登録コードを入力し、踏み台のRDPパスワードを設定します。どちらの入力も画面に表示されません。スクリプトはLab IDと採点用トークンを個別に生成し、CloudFormationでEC2 5台を構築します。授業用ファイルの配置と内部SSHの確認後、踏み台から教師の採点APIに構築結果を試験送信します。
+**教師用Learner Lab** では上記のまま実行します。言語を選ぶと構築と確認が自動で進みます。完了画面の最後に表示される共通登録コードを、受講者だけが閲覧できる場所で共有します。
+
+#### 学生側のコマンド
+
+学生用Learner LabのCloudShell（`us-east-1`）で、次のコマンドをそのまま貼り付けます。
+
+```bash
+setup=$(mktemp)
+curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/refs/heads/main/development/setup-classroom.sh -o "$setup" &&
+  bash "$setup" student
+```
+
+言語を選び、教師から受け取った共通登録コードをコピー＆ペーストして、踏み台のRDPパスワードを設定します。どちらの入力も画面に表示されません。スクリプトはLab IDと採点用トークンを個別に生成し、CloudFormationでEC2 5台を構築します。授業用ファイルの配置と内部SSHの確認後、踏み台から教師の採点APIに構築結果を試験送信します。
 
 依存パッケージはGitHubに記録した版とSHA-256で検証してから、CloudShellとAWS Systems Managerを通して配布サーバーへ転送します。教材用S3の作成とClass IDの入力は不要です。
 

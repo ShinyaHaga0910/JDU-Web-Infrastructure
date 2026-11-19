@@ -12,6 +12,8 @@ Talabalar AWS VPC ichidagi EC2 instanslarida DNS, veb-server va ma’lumotlar ba
 
 AWS Academy’da o‘zingizga tegishli Learner Lab’ni ishga tushiring va quyidagi buyruqlarni Shimoliy Virjiniya (`us-east-1`) regionidagi CloudShell’ga joylang. Avval English, Japanese, Русский yoki O‘zbekcha tilini tanlang. Kiritish ko‘rsatmalari, jarayon holati, yakuniy natijalar va xatolar tanlangan tilda ko‘rsatiladi.
 
+#### O‘qituvchi uchun buyruq
+
 ```bash
 setup=$(mktemp)
 curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/refs/heads/main/development/setup-classroom.sh -o "$setup" &&
@@ -20,8 +22,19 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
 
 Yangi muhit uchun GitHub’dagi joriy versiya ishlatiladi. Talaba sozlashni davom ettirganda, kerakli fayllar sozlash boshlangan versiyadan olinadi.
 
-1. **O‘qituvchi** buyruqlarni o‘zining Learner Lab muhitida `teacher` argumenti bilan bajaradi. Til tanlangach, sozlash va tekshirish avtomatik davom etadi. Oxirida ekranda ko‘rsatilgan umumiy ro‘yxatdan o‘tish kodini faqat kurs qatnashchilariga yuboring.
-2. **Talaba** oxirgi qatordagi `teacher` so‘zini `student` bilan almashtirib, buyruqlarni o‘zining Learner Lab muhitida bajaradi. Umumiy ro‘yxatdan o‘tish kodini kiriting va oraliq server uchun RDP parolini belgilang. Kiritilgan qiymatlar ekranda ko‘rinmaydi. Skript alohida Lab ID va baholash tokenini yaratadi. CloudFormation beshta EC2 instansini yaratadi. Skript dars fayllarini joylab, ichki SSH aloqasini tekshirgach, oraliq serverdan o‘qituvchining baholash API’siga sinov natijasini yuboradi.
+**O‘qituvchi** buyruqlarni o‘zining Learner Lab muhitida `teacher` argumenti bilan bajaradi. Til tanlangach, sozlash va tekshirish avtomatik davom etadi. Oxirida ekranda ko‘rsatilgan umumiy ro‘yxatdan o‘tish kodini faqat kurs qatnashchilariga yuboring.
+
+#### Talaba uchun buyruq
+
+Quyidagi buyruqlarni o‘zingizning talaba Learner Lab muhitingizdagi CloudShell’ga (`us-east-1`) o‘zgartirmasdan joylang.
+
+```bash
+setup=$(mktemp)
+curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/refs/heads/main/development/setup-classroom.sh -o "$setup" &&
+  bash "$setup" student
+```
+
+Tilni tanlang, o‘qituvchi bergan umumiy ro‘yxatdan o‘tish kodini nusxalab kiriting va oraliq server uchun RDP parolini belgilang. Kiritilgan qiymatlar ekranda ko‘rinmaydi. Skript alohida Lab ID va baholash tokenini yaratadi. CloudFormation beshta EC2 instansini yaratadi. Skript dars fayllarini joylab, ichki SSH aloqasini tekshirgach, oraliq serverdan o‘qituvchining baholash API’siga sinov natijasini yuboradi.
 
 Skript GitHub’da belgilangan paket versiyalari va SHA-256 qiymatlarini tekshiradi. Paketlarni CloudShell va AWS Systems Manager orqali ichki paket tarqatish serveriga yuboradi. O‘quv materiallari uchun S3 yaratish va Class ID kiritish shart emas.
 
