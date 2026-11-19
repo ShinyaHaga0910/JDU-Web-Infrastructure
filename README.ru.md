@@ -42,6 +42,18 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
 
 Полная проверка нового порядка в Learner Lab ещё не завершена. Вход через учебный аккаунт Google и проверка заданий через Web Portal настраиваются отдельно.
 
+#### Если вы забыли пароль RDP
+
+Запустите сервер доступа, созданный по новой инструкции, и вставьте команды ниже в CloudShell (`us-east-1`), где вы настраивали студенческую среду.
+
+```bash
+setup=$(mktemp)
+curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/refs/heads/main/development/setup-classroom.sh -o "$setup" &&
+  bash "$setup" reset-rdp
+```
+
+Выберите язык. Если скрипт найдёт несколько сред Lab, выберите нужную. Введите новый пароль дважды. Каждый введённый символ отображается как `*`. Старый пароль и общий код регистрации вводить не нужно. После сброса подключитесь под именем `labuser` с новым паролем.
+
 ## Прежний порядок выдачи материалов через S3
 
 ### Для преподавателя

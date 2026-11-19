@@ -3,7 +3,7 @@
 
 import argparse
 import base64
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 import fcntl
 import hashlib
 import http.client
@@ -51,6 +51,7 @@ STAGES = {
     'teacher': ('aws', 'stack', 'invites', 'done'),
     'student': ('aws', 'session_tool', 'stack', 'waiting', 'assets', 'repo', 'nodes',
                 'ssh', 'lessons', 'grading', 'done'),
+    'reset-rdp': ('aws', 'reset_target', 'reset_password', 'reset_done'),
 }
 
 # UI messages follow the same order for all four languages.
@@ -133,11 +134,27 @@ PROGRESS_TEXT = {
     'uz': ('Jami {total} bosqich', 'Bu bir necha daqiqa olishi mumkin. Terminalni ochiq qoldiring.',
            'AWS jarayoni davom etmoqda · o‘tgan vaqt {elapsed}'),
 }
+RESET_LABELS = ('reset-rdp', 'reset_target', 'reset_choice', 'reset_password', 'reset_done', 'reset_error')
+RESET_TEXT = {
+    'en': ('Reset your RDP password', 'Check your bastion server', 'Enter the number of your Lab',
+           'Set a new password', 'RDP password reset complete',
+           'Use the CloudShell where you set up this Lab. Check that the bastion is running and managed by Systems Manager.'),
+    'ja': ('RDPパスワードの再設定', '自分の踏み台サーバーを確認', '対象のLabの番号を入力',
+           '新しいパスワードを設定', 'RDPパスワードの再設定が完了しました',
+           'このLabを構築したCloudShellを開き、踏み台サーバーが稼働中でSystems Managerに接続されていることを確認してください。'),
+    'ru': ('Сброс пароля RDP', 'Проверка вашего сервера доступа', 'Введите номер вашей лабораторной среды',
+           'Задайте новый пароль', 'Пароль RDP успешно изменён',
+           'Откройте CloudShell, где вы настроили эту среду. Убедитесь, что сервер доступа запущен и подключён к Systems Manager.'),
+    'uz': ('RDP parolini qayta o‘rnatish', 'Oraliq serveringizni tekshirish', 'Lab raqamingizni kiriting',
+           'Yangi parolni tanlang', 'RDP paroli qayta o‘rnatildi',
+           'Lab muhitini sozlagan CloudShell’ni oching. Oraliq server ishlayotganini va Systems Manager’ga ulanganini tekshiring.'),
+}
 
 
 class Screen:
     def __init__(self, language, role):
         self.text = dict(zip(LABELS, TEXT[language]))
+        self.text.update(zip(RESET_LABELS, RESET_TEXT[language]))
         self.text['session_tool'] = SESSION_TOOL[language]
         self.current = 'aws'
         self.stages = STAGES[role]
@@ -765,9 +782,127 @@ def setup_student(args, screen, session, account, config, work):
     screen.record(f'RDP: {output["BastionPublicIp"]}  /  labuser')
 
 
+def reset_labs(cfn, account, parent):
+    from install_teacher import find_stack, read_private
+
+    candidates = {}
+    for directory in sorted(parent.glob('lab-*')):
+        lab_id = directory.name
+        if directory.is_symlink() or not directory.is_dir() or not re.fullmatch(r'lab-[a-z0-9-]{1,28}', lab_id):
+            continue
+        info = directory.stat()
+        if info.st_mode & 0o077 or info.st_uid != os.getuid():
+            continue
+        intent, receipt = directory / 'deployment.json', directory / 'stack.json'
+        if not intent.is_file() or not receipt.is_file():
+            continue
+        try:
+            state = read_private(intent)
+            stack_id = read_private(receipt)['id']
+            deployment = str(uuid.UUID(state['deployment_id']))
+        except (AttributeError, KeyError, OSError, TypeError, ValueError):
+            continue
+        name = STUDENT_STACK_PREFIX + lab_id
+        expected_arn = f'arn:aws:cloudformation:{REGION}:{account}:stack/{name}/'
+        if (state.get('account') != account or state.get('name') != name or not isinstance(stack_id, str)
+                or not stack_id.startswith(expected_arn) or deployment != state['deployment_id']):
+            continue
+        stack = find_stack(cfn, stack_id)
+        if (not stack or stack['StackId'] != stack_id or stack['StackName'] != name
+                or stack['StackStatus'] not in ('CREATE_COMPLETE', 'UPDATE_COMPLETE', 'UPDATE_ROLLBACK_COMPLETE')):
+            continue
+        parameters = {item['ParameterKey']: item['ParameterValue'] for item in stack['Parameters']}
+        if (parameters.get('LabId'), parameters.get('DeploymentId')) == (lab_id, deployment):
+            candidates[lab_id] = (stack, deployment)
+    return candidates
+
+
+def reset_bastion(cfn, ec2, ssm, account, lab_id, stack, deployment):
+    resource = cfn.describe_stack_resource(StackName=stack['StackId'],
+                                           LogicalResourceId='BastionInstance')['StackResourceDetail']
+    node = resource['PhysicalResourceId']
+    output = {item['OutputKey']: item['OutputValue'] for item in stack['Outputs']}
+    if (resource['ResourceType'] != 'AWS::EC2::Instance' or resource['StackId'] != stack['StackId']
+            or resource['ResourceStatus'] not in ('CREATE_COMPLETE', 'UPDATE_COMPLETE')
+            or not re.fullmatch(r'i-[0-9a-f]{8}(?:[0-9a-f]{9})?', node) or output.get('BastionInstanceId') != node):
+        raise ValueError('RDP_RESET_TARGET')
+    reservations = ec2.describe_instances(InstanceIds=[node])['Reservations']
+    instances = [instance for reservation in reservations if reservation['OwnerId'] == account
+                 for instance in reservation['Instances'] if instance['InstanceId'] == node]
+    if len(instances) != 1:
+        raise ValueError('RDP_RESET_TARGET')
+    instance, = instances
+    tags = {tag['Key']: tag['Value'] for tag in instance.get('Tags', [])}
+    if ((tags.get('LabId'), tags.get('DeploymentId'), tags.get('Name')) !=
+            (lab_id, deployment, stack['StackName'] + '-bastion') or instance['PrivateIpAddress'] != IPS['bastion']):
+        raise ValueError('RDP_RESET_TARGET')
+    if instance['State']['Name'] != 'running':
+        raise ValueError('RDP_RESET_BASTION_NOT_RUNNING')
+    records = ssm.describe_instance_information(Filters=[{'Key': 'InstanceIds', 'Values': [node]}])
+    if not any(record['InstanceId'] == node and record['PingStatus'] == 'Online'
+               for record in records['InstanceInformationList']):
+        raise ValueError('RDP_RESET_SSM_OFFLINE')
+    return instance
+
+
+def reset_rdp(args, screen, session, account, parent):
+    from enroll_five_node_progress import encrypt
+
+    screen.step('reset_target')
+    cfn, ec2, ssm = (session.client(service) for service in ('cloudformation', 'ec2', 'ssm'))
+    with os.fdopen(os.open(parent / 'install.lock', os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW, 0o600)) as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        candidates = reset_labs(cfn, account, parent)
+        if not candidates:
+            raise ValueError('RDP_RESET_NO_LAB')
+        labs = list(candidates)
+        lab_id = labs[0]
+        if len(labs) > 1:
+            choices = {str(index): lab for index, lab in enumerate(labs, 1)}
+            for number, lab in choices.items():
+                screen.record(f'{number}. {lab}')
+            while True:
+                selection = screen.prompt('reset_choice').strip()
+                if selection in choices:
+                    lab_id = choices[selection]
+                    break
+        stack, deployment = candidates[lab_id]
+        instance = reset_bastion(cfn, ec2, ssm, account, lab_id, stack, deployment)
+        node = instance['InstanceId']
+        screen.record(f'{lab_id} / {node}')
+        screen.step('reset_password')
+        binding = dict(lab_id=lab_id, deployment_id=deployment, instance_id=node, nonce=secrets.token_hex(16))
+        source = base64.b64encode(remote_source(args.ref, BOOT + '/rdp_reset_guest.py')).decode()
+        program = ('import base64,sys; '
+                   f'sys.path.insert(0,{GUEST_ROOT!r}); exec(base64.b64decode({source!r}))')
+
+        def request(phase, **fields):
+            payload = base64.b64encode(encoded(dict(binding, phase=phase, **fields))).decode()
+            shell = f'printf %s {shlex.quote(payload)} | base64 -d | python3 -B -c {shlex.quote(program)}'
+            return json.loads(command(ssm, node, shell, seconds=25 if phase == 'cancel' else 90))
+
+        envelope = encoded(dict(binding, purpose='rdp-password-reset', password_hash=rdp_password_hash(screen)))
+        try:
+            recipient = request('prepare')
+            certificate = recipient['certificate_pem'].encode()
+            if (recipient['nonce'] != binding['nonce'] or not certificate.startswith(b'-----BEGIN CERTIFICATE-----')
+                    or hashlib.sha256(certificate).hexdigest() != recipient['certificate_sha256']):
+                raise ValueError('RDP_RESET_CERTIFICATE')
+            ciphertext = base64.b64encode(encrypt(certificate, envelope)).decode()
+            if request('apply', ciphertext=ciphertext) != dict(binding, applied=True):
+                raise ValueError('RDP_RESET_RECEIPT')
+        except (Exception, KeyboardInterrupt):
+            with suppress(Exception):
+                request('cancel')
+            raise
+    screen.step('reset_done')
+    if instance.get('PublicIpAddress'):
+        screen.record(f'RDP: {instance["PublicIpAddress"]}  /  labuser')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('role', choices=('teacher', 'student'))
+    parser.add_argument('role', choices=STAGES)
     parser.add_argument('--ref', required=True, help='Exact GitHub commit for the installer and accompanying source files.')
     parser.add_argument('--lang', choices=TEXT)
     args = parser.parse_args()
@@ -817,16 +952,23 @@ def main():
             if not ACCOUNT.fullmatch(account):
                 raise ValueError('AWS_ACCOUNT')
             screen.record(f'{account} / {REGION}')
-            work = Path.home() / '.local/share/jdu-web-classroom' / account / args.role
-            work.mkdir(parents=True, mode=0o700, exist_ok=True)
-            if work.is_symlink() or work.stat().st_mode & 0o077 or work.stat().st_uid != os.getuid():
+            role_dir = 'teacher' if args.role == 'teacher' else 'student'
+            work = Path.home() / '.local/share/jdu-web-classroom' / account / role_dir
+            if args.role != 'reset-rdp':
+                work.mkdir(parents=True, mode=0o700, exist_ok=True)
+            if args.role == 'reset-rdp' and not work.exists():
+                raise ValueError('RDP_RESET_NO_LAB')
+            if work.is_symlink() or not work.is_dir() or work.stat().st_mode & 0o077 or work.stat().st_uid != os.getuid():
                 raise ValueError('PRIVATE_WORKSPACE')
             if args.role == 'teacher':
                 with os.fdopen(os.open(work / 'install.lock', os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW, 0o600)) as lock:
                     fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
                     enrollment_code = teacher_run(args, screen, session, account, work)
-            else:
+            elif args.role == 'student':
                 student_run(args, screen, session, account, work)
+            else:
+                reset_rdp(args, screen, session, account, work)
+                return 0
         screen.step('done')
         screen.record(screen.text['notice'])
         if args.role == 'teacher':
@@ -840,7 +982,7 @@ def main():
         if type(exc) is ValueError and re.fullmatch('[A-Za-z0-9_.+%~: -]{1,220}', str(exc)):
             code = str(exc)
         print(f'\n{screen.text["stopped"]} · {screen.text[screen.current]} [{code}]', file=sys.stderr)
-        print(screen.text['input_error'], file=sys.stderr)
+        print(screen.text['reset_error' if args.role == 'reset-rdp' else 'input_error'], file=sys.stderr)
         return 1
 
 

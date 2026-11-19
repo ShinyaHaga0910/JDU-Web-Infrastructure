@@ -42,6 +42,18 @@ O‘qituvchining yangi steki `jdu-web-infrastructure-teacher`, talabaniki esa `j
 
 Yangi tartib Learner Lab’da boshidan oxirigacha hali tekshirilmagan. Ta’lim muassasasining Google hisobi bilan kirish va Web Portal orqali topshiriqlarni baholash alohida sozlanadi.
 
+#### RDP parolini unutganingizda
+
+Yangi tartibda yaratilgan oraliq server ishlayotganiga ishonch hosil qiling. Quyidagi buyruqlarni talaba muhitini sozlagan CloudShell’ga (`us-east-1`) joylang.
+
+```bash
+setup=$(mktemp)
+curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/refs/heads/main/development/setup-classroom.sh -o "$setup" &&
+  bash "$setup" reset-rdp
+```
+
+Tilni tanlang. Bir nechta Lab topilsa, keraklisini tanlang. Yangi parolni ikki marta kiriting. Har bir belgi `*` ko‘rinishida chiqadi. Eski parol va umumiy ro‘yxatdan o‘tish kodini kiritish shart emas. Sozlash tugagach, `labuser` foydalanuvchisi sifatida yangi parol bilan ulaning.
+
 ## S3 orqali tarqatishning avvalgi tartibi
 
 ### O‘qituvchi uchun

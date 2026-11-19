@@ -42,6 +42,18 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
 
 新手順のLearner Labでの通し確認は未完了です。学校Googleアカウントでのログインと、Web Portalからの各課題の採点は別途設定が必要です。
 
+#### RDPパスワードを忘れたとき
+
+新手順で構築した踏み台サーバーを起動し、環境構築に使った学生用CloudShell（`us-east-1`）に次を貼り付けます。
+
+```bash
+setup=$(mktemp)
+curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/refs/heads/main/development/setup-classroom.sh -o "$setup" &&
+  bash "$setup" reset-rdp
+```
+
+言語を選び、対象のLabが複数ある場合は画面で選びます。新しく決めたパスワードを2回入力すると、入力した文字が `*` で表示されます。以前のパスワードと共通登録コードの入力は不要です。完了後は新しいパスワードで `labuser` として接続します。
+
 ## 従来の配布手順（教材用S3を使用）
 
 ### 教師側
