@@ -208,6 +208,18 @@ STUDENT_SUCCESS = {
 }
 
 
+STUDENT_RDP = {
+    'en': ('Use Windows Remote Desktop Connection (RDP) to connect to the bastion server.',
+           'Public IP  {ip}  |  Username  labuser'),
+    'ja': ('Windowsの「リモート デスクトップ接続」（RDP）で踏み台サーバーに接続してください。',
+           '公開IP  {ip}  |  ユーザー名  labuser'),
+    'ru': ('Подключитесь к серверу доступа через «Подключение к удалённому рабочему столу» (RDP) в Windows.',
+           'Публичный IP  {ip}  |  Имя пользователя  labuser'),
+    'uz': ('Windows’dagi Remote Desktop Connection (RDP) orqali oraliq serverga ulaning.',
+           'Ommaviy IP  {ip}  |  Foydalanuvchi nomi  labuser'),
+}
+
+
 class Screen:
     def __init__(self, language, role):
         self.text = dict(zip(LABELS, TEXT[language]))
@@ -216,6 +228,7 @@ class Screen:
         self.text.update(zip(PACKAGE_LABELS, PACKAGE_TEXT[language]))
         self.text['session_tool'] = SESSION_TOOL[language]
         self.text['student_success'] = STUDENT_SUCCESS[language]
+        self.text['rdp_instruction'], self.text['rdp_details'] = STUDENT_RDP[language]
         self.stages = STAGES[role]
         self.total = len(self.stages)
         total_label, wait_hint, self.wait_update = PROGRESS_TEXT[language]
@@ -908,7 +921,7 @@ def student_run(args, screen, session, account, parent):
             write(credential_path, encoded(config))
         elif install_teacher.read_private(credential_path) != config:
             raise ValueError('OLD_STUDENT_CREDENTIAL_DIFFERS')
-        setup_student(args, screen, session, account, config, work)
+        return setup_student(args, screen, session, account, config, work)
 
 
 def setup_student(args, screen, session, account, config, work):
@@ -921,7 +934,8 @@ def setup_student(args, screen, session, account, config, work):
     cfn = session.client('cloudformation')
     ssm = session.client('ssm')
     index, versions, roles, definitions, requirements = assets(ref)
-    state, stack_id = stack_setup(cfn, session.client('ec2'), account, config, work, ref, screen)
+    ec2 = session.client('ec2')
+    state, stack_id = stack_setup(cfn, ec2, account, config, work, ref, screen)
     screen.step('waiting')
     with screen.aws_wait():
         cfn.get_waiter('stack_create_complete').wait(StackName=stack_id)
@@ -1029,8 +1043,12 @@ def setup_student(args, screen, session, account, config, work):
                       dict(id=f'CLASSROOM_{r.upper()}', role=r, instance_id=nodes[r], status='PASS') for r in nodes])
     receipt = guest(ssm, bastion, {'operation': 'submit', 'report': report})
     screen.record('✓  ' + receipt['received_at'])
+    # The stack output can contain an old address after an instance stop and start.
+    instance = ec2.describe_instances(InstanceIds=[bastion])['Reservations'][0]['Instances'][0]
+    if not instance.get('PublicIpAddress'):
+        raise ValueError('BASTION_PUBLIC_IP')
     shutil.rmtree(cache, ignore_errors=True)
-    screen.record(f'RDP: {output["BastionPublicIp"]}  /  labuser')
+    return instance['PublicIpAddress']
 
 
 def reset_labs(cfn, account, parent):
@@ -1224,7 +1242,7 @@ def run_cli():
                     fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
                     enrollment_code = teacher_run(args, screen, session, account, work)
             elif args.role == 'student':
-                student_run(args, screen, session, account, work)
+                bastion_ip = student_run(args, screen, session, account, work)
             else:
                 reset_rdp(args, screen, session, account, work)
                 return 0
@@ -1234,6 +1252,8 @@ def run_cli():
             print(f'\n{screen.text["invite"]}\n{screen.text["share_code"]}\n{enrollment_code}', flush=True)
         else:
             screen.record('✓  ' + screen.text['student_success'])
+            screen.record(screen.text['rdp_instruction'])
+            screen.record(screen.text['rdp_details'].format(ip=bastion_ip))
         return 0
     except Exception as exc:
         code = getattr(exc, 'response', {}).get('Error', {}).get('Code', type(exc).__name__)

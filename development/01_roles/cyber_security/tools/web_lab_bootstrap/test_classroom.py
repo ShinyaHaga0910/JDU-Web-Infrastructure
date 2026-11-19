@@ -178,7 +178,7 @@ class ClassroomTests(unittest.TestCase):
                 self.assertIn('[2] Japanese', output.getvalue())
                 self.assertEqual(output.getvalue().rstrip().splitlines()[-2:], [instruction, 'jdu2.offline-fixture'])
 
-    def test_student_console_prints_localized_success_after_browser_notice(self):
+    def test_student_console_prints_localized_rdp_information_in_final_stage(self):
         boto3 = Mock()
         boto3.Session.return_value.client.return_value.get_caller_identity.return_value = {'Account': '123456789012'}
         for selection, language in zip('1234', ('en', 'ja', 'ru', 'uz')):
@@ -188,9 +188,13 @@ class ClassroomTests(unittest.TestCase):
                     patch.object(sys, 'argv', ['classroom.py', 'student', '--ref', 'a' * 40]), \
                     patch.object(sys.stdin, 'isatty', return_value=True), patch('builtins.input', return_value=selection), \
                     patch.object(classroom.Path, 'home', return_value=Path(temp)), patch.object(classroom.os, 'umask'), \
-                    patch.object(classroom, 'remote_source', return_value=b'# offline fixture'), patch.object(classroom, 'student_run'):
+                    patch.object(classroom, 'remote_source', return_value=b'# offline fixture'), \
+                    patch.object(classroom, 'student_run', return_value='192.0.2.10'):
                 self.assertEqual(classroom.main(), 0)
-                self.assertEqual(output.getvalue().rstrip().splitlines()[-1], '│  ✓  ' + classroom.STUDENT_SUCCESS[language])
+                final = output.getvalue().split('┌─ 11/11', 1)[1].rstrip().splitlines()
+                instruction, details = classroom.STUDENT_RDP[language]
+                self.assertEqual(final[-3:], ['│  ✓  ' + classroom.STUDENT_SUCCESS[language],
+                                              '│  ' + instruction, '│  ' + details.format(ip='192.0.2.10')])
 
     def test_template_keeps_private_topology_and_all_nodes_use_ssm(self):
         source = ROOT / 'development/templates/web-lab-student.template.json'
@@ -385,6 +389,9 @@ class ClassroomTests(unittest.TestCase):
         session.client.return_value.describe_stacks.return_value = {'Stacks': [{
             'Outputs': [{'OutputKey': k, 'OutputValue': v} for k, v in outputs.items()],
         }]}
+        session.client.return_value.describe_instances.return_value = {
+            'Reservations': [{'Instances': [{'PublicIpAddress': '192.0.2.20'}]}],
+        }
         screen.aws_wait.side_effect = lambda **kwargs: contextlib.nullcontext()
         screen.text = dict(download_progress='{done}/{total}', archive_progress='{done}/{total}', packing='packing',
                            wait_for_ssm='waiting', deploy_helpers='deploying')
@@ -434,7 +441,9 @@ class ClassroomTests(unittest.TestCase):
                                wait_online=Mock(), deploy_guest=Mock(), download_packages=Mock(),
                                build_archives=Mock(return_value={}), transfer=Mock(), guest=guest, command=command,
                                stage_lessons=Mock(), register_bastion=Mock()):
-            classroom.setup_student(Mock(ref='a' * 40), screen, session, '012345678901', config, Path(scratch))
+            ip = classroom.setup_student(Mock(ref='a' * 40), screen, session, '012345678901', config, Path(scratch))
+        self.assertEqual(ip, '192.0.2.20')
+        session.client.return_value.describe_instances.assert_called_once_with(InstanceIds=[nodes['bastion']])
 
     def test_lesson_transfer_fits_run_command_and_targets_web_and_db(self):
         ssm = Mock()
