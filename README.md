@@ -34,7 +34,7 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
   bash "$setup" student
 ```
 
-言語を選び、教師から受け取った共通登録コードをコピー＆ペーストして、踏み台のRDPパスワードを設定します。どちらの入力も画面に表示されません。スクリプトはLab IDと採点用トークンを個別に生成し、CloudFormationでEC2 5台を構築します。授業用ファイルの配置と内部SSHの確認後、踏み台から教師の採点APIに構築結果を試験送信します。
+言語を選び、教師から受け取った共通登録コードをコピー＆ペーストして、踏み台のRDPパスワードを設定します。貼り付けた登録コードは画面に表示されます。RDPパスワードは非表示で入力します。スクリプトはLab IDと採点用トークンを個別に生成し、CloudFormationでEC2 5台を構築します。授業用ファイルの配置と内部SSHの確認後、踏み台から教師の採点APIに構築結果を試験送信します。
 
 依存パッケージはGitHubに記録した版とSHA-256で検証してから、CloudShellとAWS Systems Managerを通して配布サーバーへ転送します。教材用S3の作成とClass IDの入力は不要です。
 

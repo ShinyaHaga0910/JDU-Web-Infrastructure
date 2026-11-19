@@ -34,7 +34,7 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
   bash "$setup" student
 ```
 
-Tilni tanlang, o‘qituvchi bergan umumiy ro‘yxatdan o‘tish kodini nusxalab kiriting va oraliq server uchun RDP parolini belgilang. Kiritilgan qiymatlar ekranda ko‘rinmaydi. Skript alohida Lab ID va baholash tokenini yaratadi. CloudFormation beshta EC2 instansini yaratadi. Skript dars fayllarini joylab, ichki SSH aloqasini tekshirgach, oraliq serverdan o‘qituvchining baholash API’siga sinov natijasini yuboradi.
+Tilni tanlang, o‘qituvchi bergan umumiy ro‘yxatdan o‘tish kodini nusxalab kiriting va oraliq server uchun RDP parolini belgilang. Kiritilgan ro‘yxatdan o‘tish kodi ekranda ko‘rinadi. RDP paroli ekranda ko‘rsatilmaydi. Skript alohida Lab ID va baholash tokenini yaratadi. CloudFormation beshta EC2 instansini yaratadi. Skript dars fayllarini joylab, ichki SSH aloqasini tekshirgach, oraliq serverdan o‘qituvchining baholash API’siga sinov natijasini yuboradi.
 
 Skript GitHub’da belgilangan paket versiyalari va SHA-256 qiymatlarini tekshiradi. Paketlarni CloudShell va AWS Systems Manager orqali ichki paket tarqatish serveriga yuboradi. O‘quv materiallari uchun S3 yaratish va Class ID kiritish shart emas.
 

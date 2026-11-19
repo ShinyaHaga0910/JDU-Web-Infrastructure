@@ -608,7 +608,7 @@ def student_run(args, screen, session, account, parent):
     import install_teacher
 
     screen.record(screen.text['paste_code'])
-    invite = parse_invitation(screen.prompt('invite', secret=True).strip(), account)
+    invite = parse_invitation(screen.prompt('invite').strip(), account)
     if not shutil.which('aws'):
         raise ValueError('SSM_CLIENT')
     with os.fdopen(os.open(parent / 'install.lock', os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW, 0o600)) as lock:

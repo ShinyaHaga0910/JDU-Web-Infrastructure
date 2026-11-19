@@ -31,10 +31,14 @@ class ClassroomTests(unittest.TestCase):
                     self.assertIn(f'01/{total:02d}', output.getvalue())
                     self.assertIn(f'{total:02d}/{total:02d}  {screen.text["done"]}', output.getvalue())
                     if role == 'student':
+                        with patch('builtins.input', return_value='invalid') as code_prompt, \
+                                patch.dict(sys.modules, install_teacher=Mock()):
+                            with self.assertRaisesRegex(ValueError, 'INVITATION_FORMAT'):
+                                classroom.student_run(None, screen, None, '012345678901', None)
+                            self.assertIn(screen.text['invite'], code_prompt.call_args.args[0])
                         with patch.object(classroom.getpass, 'getpass') as secret_prompt:
-                            for key in ('invite', 'password'):
-                                screen.prompt(key, secret=True)
-                                self.assertIn(screen.text[key], secret_prompt.call_args.args[0])
+                            screen.prompt('password', secret=True)
+                            self.assertIn(screen.text['password'], secret_prompt.call_args.args[0])
 
     def test_aws_wait_reports_elapsed_time_and_propagates_errors(self):
         with contextlib.redirect_stdout(io.StringIO()), patch.object(classroom, 'AWS_PROGRESS_INTERVAL', 0.01):
