@@ -22,11 +22,33 @@ class ClassroomTests(unittest.TestCase):
             with self.subTest(language=language), contextlib.redirect_stdout(io.StringIO()) as output:
                 self.assertEqual(len(messages), len(classroom.LABELS))
                 self.assertEqual(len(classroom.SERVER_NAMES[language]), len(classroom.ROLES))
-                screen = classroom.Screen(language, 'student')
-                screen.step('lessons')
-                screen.step('grading')
-                self.assertIn('01', output.getvalue())
-                self.assertIn(screen.text['grading'], output.getvalue())
+                for role, total in (('teacher', 4), ('student', 11)):
+                    screen = classroom.Screen(language, role)
+                    self.assertEqual(screen.total, total)
+                    self.assertIn(classroom.PROGRESS_TEXT[language][0].format(total=total), output.getvalue())
+                    for stage in screen.stages:
+                        screen.step(stage)
+                    self.assertIn(f'01/{total:02d}', output.getvalue())
+                    self.assertIn(f'{total:02d}/{total:02d}  {screen.text["done"]}', output.getvalue())
+
+    def test_aws_wait_reports_elapsed_time_and_propagates_errors(self):
+        with contextlib.redirect_stdout(io.StringIO()), patch.object(classroom, 'AWS_PROGRESS_INTERVAL', 0.01):
+            screen = classroom.Screen('ja', 'teacher')
+            reported = threading.Event()
+            messages = []
+
+            def record(message):
+                messages.append(message)
+                if message.startswith('AWSで処理中です'):
+                    reported.set()
+
+            with patch.object(screen, 'record', side_effect=record):
+                with self.assertRaisesRegex(ValueError, 'offline fixture'):
+                    with screen.aws_wait():
+                        self.assertTrue(reported.wait(timeout=2))
+                        raise ValueError('offline fixture')
+            self.assertEqual(messages[0], screen.wait_hint)
+            self.assertRegex(messages[1], r'経過 \d{2}:\d{2}$')
 
     def test_invitation_is_rejected_in_another_aws_account(self):
         invited = dict(student_account='012345678901', teacher_account='123456789012',
@@ -75,6 +97,7 @@ class ClassroomTests(unittest.TestCase):
                                             api_base_url='https://abc.execute-api.us-east-1.amazonaws.com',
                                             fixed_ingress_ipv4='8.8.8.8')
         screen = Mock(text={'waiting': 'Waiting'})
+        screen.aws_wait.side_effect = contextlib.nullcontext
         with tempfile.TemporaryDirectory() as temp, patch.dict(sys.modules, install_teacher=teacher), \
                 patch.object(classroom, 'assessment_api_source', return_value='api source'):
             work = Path(temp)

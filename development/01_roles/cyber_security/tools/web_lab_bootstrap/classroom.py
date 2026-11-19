@@ -3,6 +3,7 @@
 
 import argparse
 import base64
+from contextlib import contextmanager
 import fcntl
 import getpass
 import hashlib
@@ -20,6 +21,7 @@ import socket
 import subprocess
 import sys
 import tempfile
+from threading import Event, Thread
 import time
 from unicodedata import east_asian_width
 from urllib.parse import urlsplit
@@ -43,6 +45,12 @@ RELEASE = 'web-2026-10-r1'
 GUEST_ROOT = '/var/lib/jdu-web-classroom'
 PORT = 18974
 MAX_ASSET = 200 * 1024 * 1024
+AWS_PROGRESS_INTERVAL = 30
+STAGES = {
+    'teacher': ('aws', 'stack', 'invites', 'done'),
+    'student': ('aws', 'session_tool', 'stack', 'waiting', 'assets', 'repo', 'nodes',
+                'ssh', 'lessons', 'grading', 'done'),
+}
 
 # UI messages follow the same order for all four languages.
 LABELS = ('teacher', 'student', 'invite', 'password', 'aws', 'stack', 'waiting',
@@ -89,6 +97,16 @@ SESSION_TOOL = {
     'ru': 'Подготовка плагина AWS Session Manager',
     'uz': 'AWS Session Manager plaginini tayyorlash',
 }
+PROGRESS_TEXT = {
+    'en': ('Total stages: {total}', 'This may take several minutes. Keep this terminal open.',
+           'Waiting for AWS · elapsed {elapsed}'),
+    'ja': ('全{total}工程', '数分かかることがあります。この画面を開いたままお待ちください。',
+           'AWSで処理中です · 経過 {elapsed}'),
+    'ru': ('Всего этапов: {total}', 'Это может занять несколько минут. Оставьте терминал открытым.',
+           'Ожидание AWS · прошло {elapsed}'),
+    'uz': ('Jami {total} bosqich', 'Bu bir necha daqiqa olishi mumkin. Terminalni ochiq qoldiring.',
+           'AWS jarayoni davom etmoqda · o‘tgan vaqt {elapsed}'),
+}
 
 
 class Screen:
@@ -96,18 +114,39 @@ class Screen:
         self.text = dict(zip(LABELS, TEXT[language]))
         self.text['session_tool'] = SESSION_TOOL[language]
         self.current = 'aws'
-        self.number = 0
-        self.role = role
+        self.stages = STAGES[role]
+        self.total = len(self.stages)
+        total_label, self.wait_hint, self.wait_update = PROGRESS_TEXT[language]
         self.servers = dict(zip(ROLES, SERVER_NAMES[language]))
-        print('\n' + '═' * 56 + f'\n  JDU WEB INFRASTRUCTURE  /  {self.text[role]}\n' + '═' * 56)
+        print('\n' + '═' * 56 + f'\n  JDU WEB INFRASTRUCTURE  /  {self.text[role]}\n'
+              f'  {total_label.format(total=self.total)}\n' + '═' * 56)
 
     def step(self, key):
         self.current = key
-        self.number += 1
-        print(f'\n┌─ {self.number:02d}  {self.text[key]}', flush=True)
+        number = self.stages.index(key) + 1
+        print(f'\n┌─ {number:02d}/{self.total:02d}  {self.text[key]}', flush=True)
 
     def record(self, value):
         print(f'│  {value}', flush=True)
+
+    @contextmanager
+    def aws_wait(self):
+        self.record(self.wait_hint)
+        started = time.monotonic()
+        finished = Event()
+
+        def show_elapsed():
+            while not finished.wait(AWS_PROGRESS_INTERVAL):
+                minutes, seconds = divmod(int(time.monotonic() - started), 60)
+                self.record(self.wait_update.format(elapsed=f'{minutes:02d}:{seconds:02d}'))
+
+        reporter = Thread(target=show_elapsed, daemon=True)
+        reporter.start()
+        try:
+            yield
+        finally:
+            finished.set()
+            reporter.join()
 
     def prompt(self, key, secret=False):
         operation = getpass.getpass if secret else input
@@ -247,10 +286,10 @@ def teacher_run(args, screen, session, account, work):
     enrollment = (assessment_api_source(args.ref), hashlib.sha256(token.encode()).hexdigest())
     screen.step('stack')
     name = TEACHER_STACK
-    screen.record(screen.text['waiting'])
-    credentials = install_teacher.install(session, session.client('cloudformation'), session.client('ec2'), account,
-                                          name, work, distribution_bucket=False, inform=lambda *_, **__: None,
-                                          enrollment=enrollment)
+    with screen.aws_wait():
+        credentials = install_teacher.install(session, session.client('cloudformation'), session.client('ec2'), account,
+                                              name, work, distribution_bucket=False, inform=lambda *_, **__: None,
+                                              enrollment=enrollment)
     screen.record(name)
     screen.step('invites')
     info = {k: credentials[k] for k in ('schema_version', 'api_base_url', 'fixed_ingress_ipv4', 'release_id')}
@@ -335,7 +374,8 @@ def stack_setup(cfn, ec2, account, invite, work, ref, screen):
     if not receipt.exists():
         write(receipt, encoded({'id': stack_id}))
     screen.step('waiting')
-    cfn.get_waiter('stack_create_complete').wait(StackName=stack_id)
+    with screen.aws_wait():
+        cfn.get_waiter('stack_create_complete').wait(StackName=stack_id)
     result = cfn.describe_stacks(StackName=stack_id)['Stacks'][0]
     output = {x['OutputKey']: x['OutputValue'] for x in result['Outputs']}
     return state, {r: output[n+'InstanceId'] for r, n in ROLES.items()}, output
