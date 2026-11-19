@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="920" viewBox="0 0 1600 920" role="img">
 <title>127.0.0.1はそれぞれのホスト自身を指す</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図2-4  127.0.0.1が指す相手</text>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図2-5  127.0.0.1が指す相手</text>
 <rect x="40" y="110" width="680" height="640" rx="18" fill="#edf5fc" stroke="#9ebed8" stroke-width="2"/>
 <rect x="880" y="110" width="680" height="640" rx="18" fill="#f1f7f3" stroke="#a7c2af" stroke-width="2"/>
 <text x="380" y="130" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>

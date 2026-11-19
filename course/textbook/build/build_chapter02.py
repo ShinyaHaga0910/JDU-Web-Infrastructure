@@ -62,35 +62,49 @@ def figures():
     s.text(45,1129,'青：公開IPで外部から接続　　緑：VPC内で内部IPを使って接続',26)
     s.save('ch02-fig02-public-private')
 
-    s=Scene(1800,920,'オレンジ色のSGと青色のEC2を分けて示すWebサーバーとDBの接続')
-    s.text(40,18,'図2-3  WebサーバーからDBへの接続とSecurity Group',35)
-    s.text(900,126,'WebサーバーがDBへ接続を開始する：TCP / 宛先ポート5432',32,BLUE,center=True)
-    for x,role,ip in [(40,'Webサーバー','10.20.1.20'),(1450,'DBサーバー','10.20.2.20')]:
-        s.rect(x,220,310,380,'#edf5fc',BLUE)
-        s.text(x+155,266,'EC2',30,BLUE,center=True)
-        s.text(x+155,323,role,32,center=True)
-        s.text(x+155,385,ip,28,center=True)
-    for x,name,rule,peer in [(420,'SG-Web','送信規則','宛先：SG-DB'),(930,'SG-DB','受信規則','送信元：SG-Web')]:
-        s.rect(x,220,450,380,'#fff3df',AMBER)
-        s.text(x+225,242,'Security Group（SG）',31,AMBER,center=True)
-        s.text(x+225,300,name,36,AMBER,center=True)
-        s.text(x+225,365,rule,31,center=True)
-        s.text(x+225,419,peer,29,center=True)
-        s.text(x+225,474,'TCP / 宛先ポート5432',29,center=True)
-    for start,end in [(350,420),(870,930),(1380,1450)]:
-        s.arrow([(start,540),(end,540)])
-    s.arrow([(1605,640),(195,640)],GREEN,True)
-    s.text(900,667,'許可された接続への応答（SGが認識する）',29,GREEN,center=True)
-    s.rect(75,750,32,32,'#edf5fc',BLUE)
-    s.text(125,746,'青の枠：EC2',28,BLUE)
-    s.rect(490,750,32,32,'#fff3df',AMBER)
-    s.text(540,746,'オレンジの枠：通信を許可するSG',28,AMBER)
-    s.text(75,811,'SG-WebはWebサーバーに、SG-DBはDBに関連付ける。図は通信の許可を読む順序を示す。',28)
-    s.text(75,864,'DBの待受とユーザー認証は、SGとは別にPostgreSQLで設定する。',27)
+    s=Scene(1600,480,'WebサーバーとDBサーバーのEC2を、それぞれに適用するSGの枠で囲む')
+    s.text(40,18,'図2-3  EC2とSecurity Groupの対応',36)
+    s.rect(40,85,1520,355,'#f8fafc','#7991aa')
+    s.text(65,100,'VPC',28)
+    for x,group,role,ip in [
+        (95,'SG-Web','Webサーバー','10.20.1.20'),
+        (1035,'SG-DB','DBサーバー','10.20.2.20'),
+    ]:
+        center=x+235
+        s.rect(x,150,470,245,'#fff3df',AMBER)
+        s.text(center,162,f'Security Group：{group}',30,AMBER,center=True)
+        s.rect(x+35,222,400,145,'#edf5fc',BLUE)
+        s.text(center,231,'EC2',26,BLUE,center=True)
+        s.text(center,268,role,32,center=True)
+        s.text(center,317,ip,28,center=True)
+    s.arrow([(530,295),(1070,295)],GREEN,width=5)
+    s.text(800,249,'DBへの内部通信',30,GREEN,center=True)
+    s.text(800,312,'TCP / 宛先ポート5432',28,GREEN,center=True)
     s.save('ch02-fig03-security-groups')
 
+    s=Scene(1600,485,'WebからDBへ向かう通信を送信側と受信側のSGが許可する流れ')
+    s.text(40,18,'図2-4  DBへ接続するときのSGの判定',36)
+    s.text(800,94,'Webサーバー  →  DBサーバー（10.20.2.20）',32,GREEN,center=True)
+    s.text(800,145,'TCP / 宛先ポート5432',30,GREEN,center=True)
+    for x,title,condition in [
+        (45,'① SG-Webの送信規則','宛先がSG-DBなら許可'),
+        (610,'② SG-DBの受信規則','送信元がSG-Webなら許可'),
+    ]:
+        center=x+245
+        s.rect(x,218,490,184,'#fff3df',AMBER)
+        s.text(center,232,title,34,AMBER,center=True)
+        s.text(center,289,condition,31,center=True)
+        s.text(center,340,'TCP / 宛先ポート5432',27,center=True)
+    s.rect(1175,218,380,184,'#f1f7f3',GREEN)
+    s.text(1365,260,'DBサーバーに届く',32,GREEN,center=True)
+    s.text(1365,320,'10.20.2.20:5432',29,center=True)
+    for left,right in [(535,610),(1100,1175)]:
+        s.arrow([(left,311),(right,311)],GREEN,width=5)
+    s.text(800,431,'通信が届くには、①と②の両方の許可が必要',29,center=True)
+    s.save('ch02-fig04-sg-rule-checks')
+
     s=Scene(1600,920,'127.0.0.1はそれぞれのホスト自身を指す')
-    s.text(40,18,'図2-4  127.0.0.1が指す相手',36)
+    s.text(40,18,'図2-5  127.0.0.1が指す相手',36)
     s.rect(40,110,680,640,'#edf5fc','#9ebed8')
     s.rect(880,110,680,640,'#f1f7f3','#a7c2af')
     for center,role in [(380,'Webサーバー'),(1220,'踏み台サーバー')]:
@@ -118,9 +132,10 @@ def figures():
     s.text(915,684,'127.0.0.1は踏み台自身',28,GREEN)
     s.text(55,796,'踏み台からWebサーバーの管理画面を開くときの宛先：10.20.1.20:8080',28)
     s.text(55,851,'同じアドレスでも、どこで接続を実行するかによって相手が変わる。',26)
-    s.save('ch02-fig04-loopback')
+    s.save('ch02-fig05-loopback')
 
 
 if __name__=='__main__':
     build(source=ROOT/'docs/ja/02-network-paths.md', chapter=2,
-          diagram_builder=figures, report_name='chapter02.validation.public.json')
+          diagram_builder=figures, report_name='chapter02.validation.public.json',
+          new_page_headings=('2.5 Security Groupで通信する相手を制限する', '章末解答'))

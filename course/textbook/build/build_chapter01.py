@@ -352,7 +352,8 @@ def build(*, source=SOURCE, chapter=1, diagram_builder=figures, report_name='val
     body=ParagraphStyle('Body',fontName='JSerif',fontSize=10.4,leading=18,wordWrap='CJK',spaceAfter=9,textColor=colors.HexColor(INK))
     styles={1:ParagraphStyle('H1',parent=body,fontName='JSans',fontSize=22,leading=32,spaceAfter=20,keepWithNext=True),
             2:ParagraphStyle('H2',parent=body,fontName='JSans',fontSize=15,leading=23,spaceBefore=17,spaceAfter=10,keepWithNext=True),
-            3:ParagraphStyle('H3',parent=body,fontName='JSans',fontSize=12,leading=20,spaceBefore=12,spaceAfter=7,keepWithNext=True)}
+            3:ParagraphStyle('H3',parent=body,fontName='JSans',fontSize=12,leading=20,spaceBefore=12,spaceAfter=7,keepWithNext=True),
+            4:ParagraphStyle('H4',parent=body,fontName='JSans',fontSize=10.8,leading=18,spaceBefore=9,spaceAfter=5,keepWithNext=True)}
     cell_style=ParagraphStyle('Cell',parent=body,fontName='JSans',fontSize=8.7,leading=14,spaceAfter=0)
     code_style=ParagraphStyle('Code',fontName='JSans',fontSize=9,leading=15,spaceBefore=4,spaceAfter=12,
                               backColor=colors.HexColor('#edf2f7'),borderPadding=7)
