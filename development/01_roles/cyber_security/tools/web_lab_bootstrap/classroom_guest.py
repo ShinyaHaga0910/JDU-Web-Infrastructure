@@ -12,6 +12,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tarfile
 import tempfile
 
 
@@ -21,6 +22,7 @@ RELEASE = 'web-2026-10-r1'
 REPO = f'http://10.20.2.30/releases/{RELEASE}'
 FILES = re.compile(r'[a-zA-Z0-9_.+%~:-]{1,200}')
 HEX = re.compile(r'[a-f0-9]{64}')
+ARCHIVE = re.compile(r'jdu-dependencies-[0-9]{4}\.tar')
 MAX_ASSET = 200 * 1024 * 1024
 PORT = 18974
 
@@ -118,6 +120,41 @@ def signed_index(apt_root, gpg_home):
     gpg = ['gpg', '--no-options', '--homedir', str(gpg_home), '--batch', '--yes', '--digest-algo', 'SHA256']
     call(*gpg, '--output', str(release_file.with_name('InRelease')), '--clearsign', str(release_file), stdout=sys.stderr)
     return call(*gpg, '--export', capture_output=True).stdout
+
+
+def unpack_archives(directory, archives, inventory):
+    remaining = set(inventory)
+    for name, digest in archives.items():
+        if not ARCHIVE.fullmatch(name) or name in inventory or not HEX.fullmatch(digest):
+            raise ValueError('Invalid dependency archive name or digest')
+        path = directory / name
+        if not 0 < path.stat().st_size <= MAX_ASSET or sha(path) != digest:
+            raise ValueError(f'Dependency archive hash differs: {name}')
+        with tarfile.open(path, 'r:') as archive:
+            for member in archive:
+                filename = member.name
+                if (not member.isfile() or filename not in remaining
+                        or not 0 < member.size <= MAX_ASSET):
+                    raise ValueError(f'Unexpected dependency archive member: {filename}')
+                remaining.remove(filename)
+                target = directory / filename
+                if target.is_file() and sha(target) == inventory[filename]:
+                    continue
+                temp = None
+                try:
+                    with tempfile.NamedTemporaryFile(dir=directory, delete=False) as stream:
+                        temp = Path(stream.name)
+                        with archive.extractfile(member) as contents:
+                            shutil.copyfileobj(contents, stream, 1024 * 1024)
+                    if sha(temp) != inventory[filename]:
+                        raise ValueError(f'Dependency file hash differs: {filename}')
+                    temp.chmod(0o644)
+                    temp.replace(target)
+                finally:
+                    if temp is not None:
+                        temp.unlink(missing_ok=True)
+    if remaining:
+        raise ValueError('Dependency archives do not cover the entire package inventory')
 
 
 def repository(config):
@@ -249,6 +286,8 @@ def main():
             for name, digest in definition['assets'].items()
         ):
             raise ValueError('Invalid repository recipe')
+        if 'archives' in definition:
+            unpack_archives(recipe.parent, definition['archives'], definition['assets'])
         value = repository(definition)
     elif config['operation'] == 'configure':
         marker = ROOT / 'configured.json'

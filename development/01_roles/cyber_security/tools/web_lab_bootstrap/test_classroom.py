@@ -4,6 +4,7 @@ import io
 import json
 from pathlib import Path
 import sys
+import tarfile
 import tempfile
 import threading
 import unittest
@@ -24,6 +25,7 @@ class ClassroomTests(unittest.TestCase):
                 self.assertEqual(len(classroom.SERVER_NAMES[language]), len(classroom.ROLES))
                 for role, total in (('teacher', 4), ('student', 11)):
                     screen = classroom.Screen(language, role)
+                    self.assertEqual(len(classroom.PACKAGE_TEXT[language]), len(classroom.PACKAGE_LABELS))
                     self.assertEqual(screen.total, total)
                     self.assertIn(classroom.PROGRESS_TEXT[language][0].format(total=total), output.getvalue())
                     for stage in screen.stages:
@@ -64,12 +66,15 @@ class ClassroomTests(unittest.TestCase):
             screen = classroom.Screen('ja', 'student')
             reported = threading.Event()
 
+            progress = ''
+
             def record(message):
-                if message.startswith('AWSで処理中です') and message.endswith(' (56/1135)'):
+                if message.startswith('処理中です') and message.endswith(' (取得・検証済みのファイル 56/1135)'):
                     reported.set()
 
-            with patch.object(screen, 'record', side_effect=record), screen.aws_wait(total=1135) as update_count:
-                update_count(56)
+            with patch.object(screen, 'record', side_effect=record), screen.aws_wait(
+                    hint='package_hint', progress=lambda: progress):
+                progress = screen.text['download_progress'].format(done=56, total=1135)
                 self.assertTrue(reported.wait(timeout=2))
 
     def test_password_is_only_hashed_after_matching_confirmation(self):
@@ -200,42 +205,48 @@ class ClassroomTests(unittest.TestCase):
                     assets.assert_called_once_with(expected)
                 (work / 'deployment.json').touch()
 
-    def test_transfer_downloads_in_parallel_and_reuses_verified_files(self):
-        contents = {f'package-{i}.deb': f'fixture-{i}'.encode() for i in range(9)}
+    def test_downloads_eight_in_parallel_then_packs_and_unpacks(self):
+        contents = {f'package-{i}.deb': f'fixture-{i}'.encode() for i in range(8)}
         index = {name: (name, hashlib.sha256(raw).hexdigest()) for name, raw in contents.items()}
-        cached = 'package-0.deb'
+        inventory = {name: digest for name, (_, digest) in index.items()}
         workers = threading.Barrier(8)
 
         def open_package(url, *, timeout):
-            self.assertNotEqual(url, cached)
             workers.wait(timeout=5)
             return io.BytesIO(contents[url])
 
-        def exchange(port, method, name, digest, path=None):
-            if method == 'HEAD':
-                return 200 if name == cached else 404
-            self.assertEqual(method, 'PUT')
-            self.assertEqual(path.read_bytes(), contents[name])
-            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), digest)
-            return 201
-
         with tempfile.TemporaryDirectory() as scratch, patch.object(classroom, 'urlopen', side_effect=open_package), \
-                patch.object(classroom, 'exchange', side_effect=exchange) as requests:
+                patch.object(classroom, 'ARCHIVE_TARGET', 10000):
+            directory = Path(scratch)
             progress = []
-            classroom.transfer_assets(1234, index, Path(scratch), Mock(), progress.append)
-            self.assertEqual(list(Path(scratch).iterdir()), [])
-        uploaded = {request.args[2] for request in requests.call_args_list if request.args[1] == 'PUT'}
-        self.assertEqual(uploaded, set(index) - {cached})
+            classroom.download_packages(index, directory, progress.append)
+            archives = classroom.build_archives(index, directory)
+            self.assertEqual(len(archives), 2)
+            self.assertEqual({f.name for f in directory.iterdir()}, set(archives))
+            classroom_guest.unpack_archives(directory, archives, inventory)
+            self.assertEqual({name: (directory / name).read_bytes() for name in contents}, contents)
         self.assertEqual(progress, list(range(1, len(index) + 1)))
 
-    def test_transfer_does_not_upload_a_corrupt_download(self):
-        with tempfile.TemporaryDirectory() as scratch, patch.object(classroom, 'urlopen', return_value=io.BytesIO(b'wrong')), \
-                patch.object(classroom, 'exchange', return_value=404) as requests:
+    def test_corrupt_download_is_not_counted(self):
+        with tempfile.TemporaryDirectory() as scratch, patch.object(classroom, 'urlopen', return_value=io.BytesIO(b'wrong')):
             progress = Mock()
             with self.assertRaisesRegex(ValueError, 'ASSET_VERIFICATION package.deb'):
-                classroom.transfer_assets(1234, {'package.deb': ('url', '0' * 64)}, Path(scratch), Mock(), progress)
-        requests.assert_called_once_with(1234, 'HEAD', 'package.deb', '0' * 64)
+                classroom.download_packages({'package.deb': ('url', '0' * 64)}, Path(scratch), progress)
         progress.assert_not_called()
+
+    def test_extract_rejects_wrong_digest_and_members_outside_inventory(self):
+        for name, error in (('package.deb', 'file hash differs'), ('../outside', 'Unexpected dependency')):
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as scratch:
+                directory = Path(scratch)
+                path = directory / 'jdu-dependencies-0001.tar'
+                member = tarfile.TarInfo(name)
+                member.size = 4
+                with tarfile.open(path, 'w') as archive:
+                    archive.addfile(member, io.BytesIO(b'fake'))
+                with self.assertRaisesRegex(ValueError, error):
+                    classroom_guest.unpack_archives(directory, {path.name: classroom.summary(path)},
+                                                    {'package.deb': '0' * 64})
+                self.assertEqual(list(directory.iterdir()), [path])
 
     def test_receiver_rejects_wrong_hash_and_reuses_verified_asset(self):
         with tempfile.TemporaryDirectory() as temp, patch.object(classroom_guest, 'ROOT', Path(temp)):

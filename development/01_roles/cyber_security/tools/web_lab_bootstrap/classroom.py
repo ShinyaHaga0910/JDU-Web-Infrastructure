@@ -3,7 +3,7 @@
 
 import argparse
 import base64
-from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager, suppress
 import fcntl
 import hashlib
@@ -20,6 +20,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import tarfile
 import tempfile
 import termios
 from threading import Event, Thread
@@ -47,6 +48,7 @@ RELEASE = 'web-2026-10-r1'
 GUEST_ROOT = '/var/lib/jdu-web-classroom'
 PORT = 18974
 MAX_ASSET = 200 * 1024 * 1024
+ARCHIVE_TARGET = 160 * 1024 * 1024
 ASSET_DOWNLOAD_WORKERS = 8
 AWS_PROGRESS_INTERVAL = 30
 STAGES = {
@@ -70,7 +72,7 @@ TEXT = {
            'Use 4–128 characters on one line.', 'The two entries do not match. Enter your password again.',
            'Checking the AWS account and prerequisites',
            'Deploying with CloudFormation', 'Waiting for the AWS resources', 'Preparing the shared course enrollment code',
-           'Verifying and transferring dependencies', 'Building the signed internal package repository',
+           'Preparing and transferring package archives', 'Building the signed internal package repository',
            'Preparing and checking the five servers', 'Verifying internal SSH', 'Staging lesson files', 'Registering and testing grading',
            'Foundation setup complete', 'Use an interactive CloudShell terminal.',
            'Check the values entered and the current AWS account.',
@@ -85,7 +87,7 @@ TEXT = {
            'パスワードは1行で4〜128文字にしてください。', '2回の入力が一致しません。もう一度設定してください。',
            'AWSアカウントと前提条件を確認',
            'CloudFormationで構築', 'AWSリソースの準備を待機', '授業の共通登録コードを準備',
-           '依存パッケージを検証・転送', '署名付きの内部パッケージ配布先を構築',
+           '依存パッケージをまとめて転送', '署名付きの内部パッケージ配布先を構築',
            'サーバー5台を準備・確認', '内部SSHを確認', '授業用ファイルを配置', '採点登録と試験送信', '基盤の構築・確認が完了',
            '対話型のCloudShellで実行してください。', '入力内容と現在のAWSアカウントを確認してください。',
            '共通登録コードが違います。最初からやり直してください。',
@@ -99,7 +101,7 @@ TEXT = {
            'Введите от 4 до 128 символов в одной строке.', 'Введённые пароли не совпадают. Попробуйте ещё раз.',
            'Проверка аккаунта AWS и требований',
            'Развёртывание через CloudFormation', 'Ожидание ресурсов AWS', 'Подготовка общего кода регистрации на курс',
-           'Проверка и передача зависимостей', 'Создание подписанного внутреннего репозитория пакетов',
+           'Подготовка и передача архивов с пакетами', 'Создание подписанного внутреннего репозитория пакетов',
            'Настройка и проверка пяти серверов', 'Проверка внутреннего SSH', 'Размещение учебных файлов', 'Регистрация и проверка оценивания',
            'Базовая настройка завершена', 'Используйте интерактивный терминал CloudShell.',
            'Проверьте введённые данные и текущий аккаунт AWS.',
@@ -114,7 +116,7 @@ TEXT = {
            'Parol bir qatorda 4–128 belgidan iborat bo‘lsin.', 'Parollar mos kelmadi. Qaytadan kiriting.',
            'AWS hisobi va talablarni tekshirish',
            'CloudFormation orqali yaratish', 'AWS resurslarini kutish', 'Kurs uchun umumiy ro‘yxatdan o‘tish kodini tayyorlash',
-           'Bog‘liqliklarni tekshirish va uzatish', 'Imzolangan ichki paket repozitoriysini yaratish',
+           'Paket arxivlarini tayyorlash va uzatish', 'Imzolangan ichki paket repozitoriysini yaratish',
            'Beshta serverni tayyorlash va tekshirish', 'Ichki SSH aloqasini tekshirish', 'Dars fayllarini joylash', 'Ro‘yxatdan o‘tkazish va baholashni tekshirish',
            'Asosiy muhit tayyor', 'Interaktiv CloudShell terminalidan foydalaning.',
            'Kiritilgan ma’lumotlar va joriy AWS hisobini tekshiring.',
@@ -170,17 +172,42 @@ STUDENT_WAIT_TEXT = {
 }
 
 
+PACKAGE_LABELS = ('package_hint', 'download_progress', 'packing', 'archive_progress', 'repo_hint', 'package_elapsed')
+PACKAGE_TEXT = {
+    'en': ('Downloading and transferring packages may take about 20 minutes. Keep this terminal open.',
+           'Files downloaded and verified {done}/{total}', 'Grouping verified files into archives.',
+           'Archives transferred and verified {done}/{total}',
+           'The package server is unpacking the archives and verifying each file. Keep this terminal open.',
+           'Working · elapsed {elapsed}'),
+    'ja': ('パッケージの取得と転送は、通信状況によって20分程度かかることがあります。この画面を開いたままお待ちください。',
+           '取得・検証済みのファイル {done}/{total}', '検証済みのファイルをアーカイブにまとめています。',
+           '転送・検証済みのアーカイブ {done}/{total}',
+           '配布サーバーでアーカイブを展開し、ファイルを一つずつ検証しています。この画面を開いたままお待ちください。',
+           '処理中です · 経過 {elapsed}'),
+    'ru': ('Загрузка и передача пакетов могут занять около 20 минут. Оставьте терминал открытым.',
+           'Файлов загружено и проверено {done}/{total}', 'Проверенные файлы объединяются в архивы.',
+           'Архивов передано и проверено {done}/{total}',
+           'Сервер пакетов распаковывает архивы и проверяет каждый файл. Оставьте терминал открытым.',
+           'Выполняется · прошло {elapsed}'),
+    'uz': ('Paketlarni yuklab olish va uzatish taxminan 20 daqiqa olishi mumkin. Terminalni ochiq qoldiring.',
+           'Yuklab olingan va tekshirilgan fayllar {done}/{total}', 'Tekshirilgan fayllar arxivlarga yig‘ilmoqda.',
+           'Uzatilib, tekshirilgan arxivlar {done}/{total}',
+           'Paket tarqatish serveri arxivlarni ochib, har bir faylni tekshirmoqda. Terminalni ochiq qoldiring.',
+           'Jarayon davom etmoqda · o‘tgan vaqt {elapsed}'),
+}
+
+
 class Screen:
     def __init__(self, language, role):
         self.text = dict(zip(LABELS, TEXT[language]))
         self.text.update(zip(RESET_LABELS, RESET_TEXT[language]))
         self.text.update(zip(('wait_for_ssm', 'deploy_helpers'), STUDENT_WAIT_TEXT[language]))
+        self.text.update(zip(PACKAGE_LABELS, PACKAGE_TEXT[language]))
         self.text['session_tool'] = SESSION_TOOL[language]
         self.stages = STAGES[role]
         self.total = len(self.stages)
         total_label, wait_hint, self.wait_update = PROGRESS_TEXT[language]
         self.wait_hint = wait_hint.format(minutes=5)
-        self.transfer_hint = wait_hint.format(minutes=20)
         self.servers = dict(zip(ROLES, SERVER_NAMES[language]))
         print('\n' + '═' * 56 + f'\n  JDU WEB INFRASTRUCTURE  /  {self.text[role]}\n'
               f'  {total_label.format(total=self.total)}\n' + '═' * 56)
@@ -193,26 +220,23 @@ class Screen:
         print(f'│  {value}', flush=True)
 
     @contextmanager
-    def aws_wait(self, total=None):
-        self.record(self.wait_hint if total is None else self.transfer_hint)
+    def aws_wait(self, *, hint=None, progress=None):
+        self.record(self.wait_hint if hint is None else self.text[hint])
+        template = self.wait_update if hint is None else self.text['package_elapsed']
         started = time.monotonic()
         finished = Event()
-        completed = 0
-
-        def update_count(number):
-            nonlocal completed
-            completed = number
 
         def show_elapsed():
             while not finished.wait(AWS_PROGRESS_INTERVAL):
                 minutes, seconds = divmod(int(time.monotonic() - started), 60)
-                count = f' ({completed}/{total})' if total is not None else ''
-                self.record(self.wait_update.format(elapsed=f'{minutes:02d}:{seconds:02d}') + count)
+                detail = progress() if progress is not None else ''
+                suffix = f' ({detail})' if detail else ''
+                self.record(template.format(elapsed=f'{minutes:02d}:{seconds:02d}') + suffix)
 
         reporter = Thread(target=show_elapsed, daemon=True)
         reporter.start()
         try:
-            yield update_count
+            yield
         finally:
             finished.set()
             reporter.join()
@@ -530,9 +554,14 @@ def command(ssm, node, shell, seconds=300):
     raise ValueError(f'SSM_TIMEOUT {request}')
 
 
-def deploy_guest(ref, ssm, nodes):
+def deploy_guest(ref, ssm, nodes, installer_ref):
     files = ('classroom_guest.py', 'node_bootstrap.py', 'payload_runtime.py', 'release_validation.py', 'internal_ssh_guest.py')
-    encoded_files = {name: base64.b64encode(remote_source(ref, BOOT + '/' + name)).decode() for name in files}
+    # The receiver follows the installer protocol when resuming a lab pinned to an older commit.
+    encoded_files = {
+        name: base64.b64encode(remote_source(installer_ref if name == 'classroom_guest.py' else ref,
+                                             BOOT + '/' + name)).decode()
+        for name in files
+    }
     for node in nodes.values():
         # Separate invocations keep every command comfortably below the SSM input limit.
         for name, data in encoded_files.items():
@@ -616,7 +645,9 @@ def assets(ref):
         index[wheel['filename']] = (matches[0]['url'], wheel['sha256'])
     firefox = definition['firefox']
     index[firefox['filename']] = (firefox['url'], firefox['sha256'])
-    if not all(re.fullmatch(r'[a-zA-Z0-9_.+%~:-]{1,200}', k) and re.fullmatch('[a-f0-9]{64}', v[1]) for k, v in index.items()):
+    if not all(re.fullmatch(r'[a-zA-Z0-9_.+%~:-]{1,200}', k)
+               and k not in ('.', '..', 'recipe.json') and not k.startswith('jdu-dependencies-')
+               and re.fullmatch('[a-f0-9]{64}', v[1]) for k, v in index.items()):
         raise ValueError('DEPENDENCY_LOCK')
     return index, versions, profile['roles'], definition, remote_source(ref, LOCK + '/requirements.lock').decode()
 
@@ -652,48 +683,58 @@ def download_asset(name, url, expected, path):
         raise ValueError(f'ASSET_VERIFICATION {name}')
 
 
-def transfer_assets(port, index, directory, screen, update_count):
-    total = len(index)
-    completed = 0
-    pending = {}
-
-    def record_completed():
-        nonlocal completed
-        completed += 1
-        update_count(completed)
-        if completed % 50 == 0 or completed == total:
-            screen.record(f'{completed}/{total}')
-
-    def send_verified_downloads():
-        ready, _ = wait(pending, return_when=FIRST_COMPLETED)
-        for download in ready:
-            name, expected, path = pending.pop(download)
-            download.result()
-            if exchange(port, 'PUT', name, expected, path) != 201:
-                raise ValueError(f'ASSET_VERIFICATION {name}')
-            path.unlink()
-            record_completed()
+def download_packages(index, directory, update_count):
+    def download(name):
+        url, expected = index[name]
+        download_asset(name, url, expected, directory / name)
 
     with ThreadPoolExecutor(max_workers=ASSET_DOWNLOAD_WORKERS) as executor:
+        futures = [executor.submit(download, name) for name in index]
         try:
-            for number, (name, (url, expected)) in enumerate(index.items(), 1):
-                if exchange(port, 'HEAD', name, expected) == 200:
-                    record_completed()
-                    continue
-                path = directory / f'asset-{number}'
-                download = executor.submit(download_asset, name, url, expected, path)
-                pending[download] = (name, expected, path)
-                # Bound the temporary files and keep the SSM requests on this thread.
-                if len(pending) >= ASSET_DOWNLOAD_WORKERS:
-                    send_verified_downloads()
-            while pending:
-                send_verified_downloads()
+            for number, future in enumerate(as_completed(futures), 1):
+                future.result()
+                update_count(number)
         finally:
-            for download in pending:
-                download.cancel()
+            for future in futures:
+                future.cancel()
 
 
-def transfer(ssm, node, index, recipe, screen, update_count):
+def build_archives(names, directory):
+    archives = {}
+    group = []
+    size = 0
+
+    def pack():
+        name = f'jdu-dependencies-{len(archives) + 1:04d}.tar'
+        path = directory / name
+        with tarfile.open(path, 'w', format=tarfile.GNU_FORMAT) as archive:
+            for member in group:
+                source = directory / member
+                info = tarfile.TarInfo(member)
+                info.size = source.stat().st_size
+                with source.open('rb') as stream:
+                    archive.addfile(info, stream)
+        if path.stat().st_size > MAX_ASSET:
+            raise ValueError(f'ASSET_SIZE {name}')
+        archives[name] = summary(path)
+        for member in group:
+            (directory / member).unlink()
+
+    for name in sorted(names):
+        # Allow for block padding and long-name headers in the target size.
+        member_size = (directory / name).stat().st_size + 2048
+        if group and size + member_size > ARCHIVE_TARGET:
+            pack()
+            group = []
+            size = 0
+        group.append(name)
+        size += member_size
+    if group:
+        pack()
+    return archives
+
+
+def transfer(ssm, node, directory, recipe, update_count):
     command(ssm, node, 'systemctl stop jdu-classroom-receiver.service 2>/dev/null || true; '
             f'systemd-run --unit=jdu-classroom-receiver --property=RuntimeMaxSec=3600 python3 -B {GUEST_ROOT}/classroom_guest.py receive')
     with socket.socket() as probe:
@@ -715,15 +756,17 @@ def transfer(ssm, node, index, recipe, screen, update_count):
                 time.sleep(2)
         else:
             raise ValueError('SSM_PORT_FORWARD_TIMEOUT')
-        with tempfile.TemporaryDirectory() as scratch:
-            directory = Path(scratch)
-            transfer_assets(port, index, directory, screen, update_count)
-            temp = directory / 'recipe.json'
-            temp.write_bytes(encoded(recipe))
-            expected = summary(temp)
-            if exchange(port, 'PUT', 'recipe.json', expected, temp) != 201:
-                raise ValueError('RECIPE_TRANSFER')
-            return expected
+        for number, (name, expected) in enumerate(recipe['archives'].items(), 1):
+            if exchange(port, 'HEAD', name, expected) != 200:
+                if exchange(port, 'PUT', name, expected, directory / name) != 201:
+                    raise ValueError(f'ASSET_VERIFICATION {name}')
+            update_count(number)
+        temp = directory / 'recipe.json'
+        temp.write_bytes(encoded(recipe))
+        expected = summary(temp)
+        if exchange(port, 'PUT', 'recipe.json', expected, temp) != 201:
+            raise ValueError('RECIPE_TRANSFER')
+        return expected
     finally:
         if process and process.poll() is None:
             process.terminate()
@@ -808,7 +851,7 @@ def setup_student(args, screen, session, account, config, work):
         screen.record(screen.text['wait_for_ssm'])
         wait_online(ssm, nodes)
         screen.record(screen.text['deploy_helpers'])
-        deploy_guest(ref, ssm, nodes)
+        deploy_guest(ref, ssm, nodes, args.ref)
     common = dict(lab_id=config['lab_id'], deployment_id=state['deployment_id'], release_id=RELEASE,
                   student_public_key=state['public_key'], grading_api_url=config['api_base_url'],
                   grading_ipv4=config['fixed_ingress_ipv4'], instances=nodes)
@@ -819,10 +862,31 @@ def setup_student(args, screen, session, account, config, work):
     screen.step('assets')
     recipe = dict(assets={n: item[1] for n, item in index.items()}, requirements=requirements,
                   packages=pinned(roles['common'] + roles['repo']))
-    with screen.aws_wait(total=len(index)) as update_count:
-        repo_hash = transfer(ssm, nodes['repo'], index, recipe, screen, update_count)
+    progress = screen.text['download_progress'].format(done=0, total=len(index))
+
+    def download_progress(done):
+        nonlocal progress
+        progress = screen.text['download_progress'].format(done=done, total=len(index))
+        if done == len(index):
+            screen.record(progress)
+
+    def archive_progress(done):
+        nonlocal progress
+        progress = screen.text['archive_progress'].format(done=done, total=len(recipe['archives']))
+        screen.record(progress)
+
+    with tempfile.TemporaryDirectory() as scratch, screen.aws_wait(hint='package_hint', progress=lambda: progress):
+        directory = Path(scratch)
+        screen.record(progress)
+        download_packages(index, directory, download_progress)
+        progress = screen.text['packing']
+        screen.record(progress)
+        recipe['archives'] = build_archives(index, directory)
+        archive_progress(0)
+        repo_hash = transfer(ssm, nodes['repo'], directory, recipe, archive_progress)
     screen.step('repo')
-    public_key = guest(ssm, nodes['repo'], {'operation': 'repo', 'recipe_sha256': repo_hash})['key']
+    with screen.aws_wait(hint='repo_hint'):
+        public_key = guest(ssm, nodes['repo'], {'operation': 'repo', 'recipe_sha256': repo_hash})['key']
     screen.step('nodes')
     roles_checked = {}
     for role, node in nodes.items():
