@@ -1,4 +1,5 @@
 import contextlib
+import errno
 import hashlib
 import io
 import json
@@ -177,6 +178,20 @@ class ClassroomTests(unittest.TestCase):
                 self.assertIn('[2] Japanese', output.getvalue())
                 self.assertEqual(output.getvalue().rstrip().splitlines()[-2:], [instruction, 'jdu2.offline-fixture'])
 
+    def test_student_console_prints_localized_success_after_browser_notice(self):
+        boto3 = Mock()
+        boto3.Session.return_value.client.return_value.get_caller_identity.return_value = {'Account': '123456789012'}
+        for selection, language in zip('1234', ('en', 'ja', 'ru', 'uz')):
+            output = io.StringIO()
+            with self.subTest(language=language), tempfile.TemporaryDirectory() as temp, contextlib.redirect_stdout(output), \
+                    patch.dict(sys.modules, boto3=boto3), patch.object(sys, 'path', list(sys.path)), \
+                    patch.object(sys, 'argv', ['classroom.py', 'student', '--ref', 'a' * 40]), \
+                    patch.object(sys.stdin, 'isatty', return_value=True), patch('builtins.input', return_value=selection), \
+                    patch.object(classroom.Path, 'home', return_value=Path(temp)), patch.object(classroom.os, 'umask'), \
+                    patch.object(classroom, 'remote_source', return_value=b'# offline fixture'), patch.object(classroom, 'student_run'):
+                self.assertEqual(classroom.main(), 0)
+                self.assertEqual(output.getvalue().rstrip().splitlines()[-1], '│  ✓  ' + classroom.STUDENT_SUCCESS[language])
+
     def test_template_keeps_private_topology_and_all_nodes_use_ssm(self):
         source = ROOT / 'development/templates/web-lab-student.template.json'
         template = classroom.classroom_template(json.loads(source.read_bytes()))
@@ -219,20 +234,60 @@ class ClassroomTests(unittest.TestCase):
                 patch.object(classroom, 'ARCHIVE_TARGET', 10000):
             directory = Path(scratch)
             progress = []
-            classroom.download_packages(index, directory, progress.append)
-            archives = classroom.build_archives(index, directory)
+            cache = directory / 'cache'
+            sources = classroom.download_packages(index, cache, directory, progress.append)
+            archives = classroom.build_archives(sources, directory)
             self.assertEqual(len(archives), 2)
-            self.assertEqual({f.name for f in directory.iterdir()}, set(archives))
+            self.assertEqual({f.name for f in directory.iterdir()}, set(archives) | {'cache'})
             classroom_guest.unpack_archives(directory, archives, inventory)
             self.assertEqual({name: (directory / name).read_bytes() for name in contents}, contents)
-        self.assertEqual(progress, list(range(1, len(index) + 1)))
+        self.assertEqual(progress, list(range(len(index) + 1)))
 
     def test_corrupt_download_is_not_counted(self):
         with tempfile.TemporaryDirectory() as scratch, patch.object(classroom, 'urlopen', return_value=io.BytesIO(b'wrong')):
             progress = Mock()
             with self.assertRaisesRegex(ValueError, 'ASSET_VERIFICATION package.deb'):
-                classroom.download_packages({'package.deb': ('url', '0' * 64)}, Path(scratch), progress)
-        progress.assert_not_called()
+                classroom.download_packages({'package.deb': ('url', '0' * 64)}, Path(scratch) / 'cache',
+                                            Path(scratch), progress)
+        progress.assert_called_once_with(0)
+
+    def test_resume_checks_cached_files_before_downloading_missing_or_corrupt_files(self):
+        data = b'locked file'
+        digest = hashlib.sha256(data).hexdigest()
+        names = ('valid.deb', 'corrupt.deb', 'missing.deb')
+        index = {name: (name, digest) for name in names}
+        with tempfile.TemporaryDirectory() as scratch, patch.object(classroom, 'urlopen') as fetch:
+            directory = Path(scratch)
+            cache = directory / 'cache'
+            cache.mkdir()
+            (cache / 'valid.deb').write_bytes(data)
+            (cache / 'corrupt.deb').write_bytes(b'corrupt')
+            (cache / '.partial-stale').write_bytes(b'interrupted')
+            fetch.side_effect = lambda *_args, **_kwargs: io.BytesIO(data)
+            progress = []
+            sources = classroom.download_packages(index, cache, directory, progress.append)
+            self.assertCountEqual([call.args[0] for call in fetch.call_args_list], ['corrupt.deb', 'missing.deb'])
+            self.assertEqual(progress, [1, 2, 3])
+            classroom.build_archives(sources, directory)
+            self.assertEqual({path.name: path.read_bytes() for path in cache.iterdir()}, dict.fromkeys(names, data))
+
+            fetch.reset_mock()
+            progress.clear()
+            classroom.download_packages(index, cache, directory, progress.append)
+            self.assertEqual(progress, [3])
+            fetch.assert_not_called()
+
+    def test_full_cache_falls_back_to_temporary_storage(self):
+        data = b'locked file'
+        digest = hashlib.sha256(data).hexdigest()
+        with tempfile.TemporaryDirectory() as scratch, patch.object(classroom, 'urlopen', return_value=io.BytesIO(data)), \
+                patch.object(classroom.shutil, 'copyfileobj', side_effect=OSError(errno.ENOSPC, 'full')):
+            directory = Path(scratch)
+            cache = directory / 'cache'
+            sources = classroom.download_packages({'file.deb': ('url', digest)}, cache, directory, Mock())
+            self.assertEqual(sources, {'file.deb': directory / 'file.deb'})
+            self.assertEqual(sources['file.deb'].read_bytes(), data)
+            self.assertEqual(list(cache.iterdir()), [])
 
     def test_extract_rejects_wrong_digest_and_members_outside_inventory(self):
         for name, error in (('package.deb', 'file hash differs'), ('../outside', 'Unexpected dependency')):

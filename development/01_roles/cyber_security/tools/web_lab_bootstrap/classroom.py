@@ -5,6 +5,7 @@ import argparse
 import base64
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager, suppress
+import errno
 import fcntl
 import hashlib
 import http.client
@@ -199,6 +200,14 @@ PACKAGE_TEXT = {
 }
 
 
+STUDENT_SUCCESS = {
+    'en': 'Student environment setup is complete.',
+    'ja': '学生用の環境設定が完了しました。',
+    'ru': 'Настройка учебной среды студента завершена.',
+    'uz': 'Talaba muhiti sozlandi.',
+}
+
+
 class Screen:
     def __init__(self, language, role):
         self.text = dict(zip(LABELS, TEXT[language]))
@@ -206,6 +215,7 @@ class Screen:
         self.text.update(zip(('wait_for_ssm', 'deploy_helpers'), STUDENT_WAIT_TEXT[language]))
         self.text.update(zip(PACKAGE_LABELS, PACKAGE_TEXT[language]))
         self.text['session_tool'] = SESSION_TOOL[language]
+        self.text['student_success'] = STUDENT_SUCCESS[language]
         self.stages = STAGES[role]
         self.total = len(self.stages)
         total_label, wait_hint, self.wait_update = PROGRESS_TEXT[language]
@@ -691,23 +701,58 @@ def download_asset(name, url, expected, path):
         raise ValueError(f'ASSET_VERIFICATION {name}')
 
 
-def download_packages(index, directory, update_count):
+def download_packages(index, cache, directory, update_count):
+    if cache.is_symlink():
+        raise ValueError('PACKAGE_CACHE_PATH')
+    cache.mkdir(mode=0o700, exist_ok=True)
+    for partial in cache.glob('.partial-*'):
+        partial.unlink(missing_ok=True)
+
+    def reuse(name):
+        path = cache / name
+        if not path.is_symlink() and path.is_file() and 0 < path.stat().st_size <= MAX_ASSET:
+            if summary(path) == index[name][1]:
+                return path
+        return None
+
     def download(name):
         url, expected = index[name]
-        download_asset(name, url, expected, directory / name)
+        source = directory / name
+        download_asset(name, url, expected, source)
+        partial = None
+        try:
+            with tempfile.NamedTemporaryFile(dir=cache, prefix='.partial-', delete=False) as stream:
+                partial = Path(stream.name)
+                with source.open('rb') as verified:
+                    shutil.copyfileobj(verified, stream, 1024 * 1024)
+            saved = cache / name
+            partial.replace(saved)
+        except OSError as exc:
+            if exc.errno not in (errno.ENOSPC, errno.EDQUOT):
+                raise
+            # CloudShell home storage is limited. This package can still be used in this run.
+            return source
+        finally:
+            if partial is not None:
+                partial.unlink(missing_ok=True)
+        source.unlink()
+        return saved
 
     with ThreadPoolExecutor(max_workers=ASSET_DOWNLOAD_WORKERS) as executor:
-        futures = [executor.submit(download, name) for name in index]
+        sources = {name: path for name, path in zip(index, executor.map(reuse, index)) if path is not None}
+        update_count(len(sources))
+        futures = {executor.submit(download, name): name for name in index if name not in sources}
         try:
-            for number, future in enumerate(as_completed(futures), 1):
-                future.result()
-                update_count(number)
+            for future in as_completed(futures):
+                sources[futures[future]] = future.result()
+                update_count(len(sources))
         finally:
             for future in futures:
                 future.cancel()
+    return sources
 
 
-def build_archives(names, directory):
+def build_archives(sources, directory):
     archives = {}
     group = []
     size = 0
@@ -717,7 +762,7 @@ def build_archives(names, directory):
         path = directory / name
         with tarfile.open(path, 'w', format=tarfile.GNU_FORMAT) as archive:
             for member in group:
-                source = directory / member
+                source = sources[member]
                 info = tarfile.TarInfo(member)
                 info.size = source.stat().st_size
                 with source.open('rb') as stream:
@@ -726,11 +771,12 @@ def build_archives(names, directory):
             raise ValueError(f'ASSET_SIZE {name}')
         archives[name] = summary(path)
         for member in group:
-            (directory / member).unlink()
+            if sources[member].parent == directory:
+                sources[member].unlink()
 
-    for name in sorted(names):
+    for name in sorted(sources):
         # Allow for block padding and long-name headers in the target size.
-        member_size = (directory / name).stat().st_size + 2048
+        member_size = sources[name].stat().st_size + 2048
         if group and size + member_size > ARCHIVE_TARGET:
             pack()
             group = []
@@ -896,12 +942,14 @@ def setup_student(args, screen, session, account, config, work):
     screen.step('assets')
     recipe = dict(assets={n: item[1] for n, item in index.items()}, requirements=requirements,
                   packages=pinned(roles['common'] + roles['repo']))
-    progress = screen.text['download_progress'].format(done=0, total=len(index))
+    cache = work / '.package-cache'
+    progress = ''
 
     def download_progress(done):
         nonlocal progress
+        first_update = not progress
         progress = screen.text['download_progress'].format(done=done, total=len(index))
-        if done == len(index):
+        if first_update or done == len(index):
             screen.record(progress)
 
     def archive_progress(done):
@@ -911,11 +959,10 @@ def setup_student(args, screen, session, account, config, work):
 
     with tempfile.TemporaryDirectory() as scratch, screen.aws_wait(hint='package_hint', progress=lambda: progress):
         directory = Path(scratch)
-        screen.record(progress)
-        download_packages(index, directory, download_progress)
+        sources = download_packages(index, cache, directory, download_progress)
         progress = screen.text['packing']
         screen.record(progress)
-        recipe['archives'] = build_archives(index, directory)
+        recipe['archives'] = build_archives(sources, directory)
         archive_progress(0)
         repo_hash = transfer(ssm, nodes['repo'], directory, recipe, archive_progress)
     screen.step('repo')
@@ -982,6 +1029,7 @@ def setup_student(args, screen, session, account, config, work):
                       dict(id=f'CLASSROOM_{r.upper()}', role=r, instance_id=nodes[r], status='PASS') for r in nodes])
     receipt = guest(ssm, bastion, {'operation': 'submit', 'report': report})
     screen.record('✓  ' + receipt['received_at'])
+    shutil.rmtree(cache, ignore_errors=True)
     screen.record(f'RDP: {output["BastionPublicIp"]}  /  labuser')
 
 
@@ -1184,6 +1232,8 @@ def run_cli():
         screen.record(screen.text['notice'])
         if args.role == 'teacher':
             print(f'\n{screen.text["invite"]}\n{screen.text["share_code"]}\n{enrollment_code}', flush=True)
+        else:
+            screen.record('✓  ' + screen.text['student_success'])
         return 0
     except Exception as exc:
         code = getattr(exc, 'response', {}).get('Error', {}).get('Code', type(exc).__name__)

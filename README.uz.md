@@ -38,6 +38,8 @@ Tilni tanlang, o‘qituvchi bergan umumiy ro‘yxatdan o‘tish kodini nusxalab 
 
 Skript rasmiy manbalardan bir vaqtda sakkiztagacha paketni yuklab, ularni GitHub’da belgilangan versiyalar va SHA-256 qiymatlari bilan solishtiradi. CloudShell fayllarni bir nechta arxivga yig‘adi va AWS Systems Manager orqali ichki paket tarqatish serveriga bir vaqtda beshtagacha arxivni yuboradi. Server arxivlarni ochib, har bir faylni qayta tekshiradi. Yuklangan fayllar va uzatilgan arxivlar soni har 30 soniyada ko‘rsatiladi. O‘quv materiallari uchun S3 yaratish va Class ID kiritish shart emas.
 
+Aloqa uzilsa, talaba buyrug‘ini o‘sha CloudShell muhitida qayta ishga tushiring. Skript uy katalogidagi fayllarning SHA-256 qiymatini tekshiradi va mos kelgan fayllardan qayta foydalanadi. Baholash tizimiga sinov natijasi muvaffaqiyatli yuborilgach, skript bu vaqtinchalik nusxalarni o‘chiradi.
+
 Ichki paket repozitoriysi tayyor bo‘lgach, skript beshta serverni bir vaqtda sozlaydi va tekshiradi. Ichki SSH uchun to‘rtta serverning kalitlari parallel olinadi, keyin oraliq server kaliti ularga parallel qo‘shiladi. Dars fayllari Veb va ma’lumotlar bazasi serverlariga bir vaqtda joylanadi.
 
 O‘qituvchining yangi steki `jdu-web-infrastructure-teacher`, talabaniki esa `jdu-web-infrastructure-student-<Lab ID>` deb nomlanadi.
