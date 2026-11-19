@@ -1,5 +1,24 @@
 # Web実習の教師用採点受付
 
+## 教師のAWS環境を新規構築する
+
+AWS Academyで対象クラスの**教師用Learner Lab**を開始し、米国東部（バージニア北部、`us-east-1`）のCloudShellで実行します。
+
+```bash
+work=$(mktemp -d "$HOME/web-teacher-download.XXXXXX")
+cd "$work"
+url='https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/main/development/01_roles/cyber_security/tools/web_lab_teacher/install_teacher.py'
+curl -fSs "$url" -o install_teacher.py && python3 -B install_teacher.py
+```
+
+Class IDはLearner LabのクラスURLにある数字を入力します。AWSアカウントはログイン中のCloudShellから取得されます。表示されたアカウントが教師用であることを確かめ、番号を入力すると構築が始まります。
+
+スクリプトは、教師専用のVPC、EC2 1台と固定IPv4、採点API、採点結果用DynamoDB、非公開の教材用S3をCloudFormationで作成します。対応するAZ、CanonicalのUbuntu AMI、LabRole、EC2台数、テンプレートを作成前に確認します。構築後は固定IPv4経由のHTTPS、認証なしの教師画面へのアクセス拒否、DynamoDB、S3の公開ブロックと暗号化を確認します。教師用設定は表示された専用ディレクトリ内に保存されます。
+
+`--plan` を付けるとAWSの前提とテンプレートのみを確認できます。構築が中断した場合はCloudFormationのイベントを確認してください。構築待ちやHTTPS検査の再開には、同じクラスと同じ `--name` でコマンドを再実行します。同じクラスで別の新規環境を作る場合は `--name trial2` のように名前を変えます。
+
+ここまでで終わるのは教師側のAWS基盤構築です。学生に演習を配布する前に、教材を登録し、新しい採点先に対応する署名済み配布版を作成します。学校Googleログイン付きのブラウザ課題画面も別途配備・確認が必要です。[初回授業の配布・生徒側の手順](../../../../../course/labs/INITIAL-WORKFLOW.md)
+
 10/22正式配布追記：D08初期環境版r3を教師private S3へ保存/全GET一致、教師/学生実CloudShellで署名・全file検証を完了。新学生への発行と同じ学生への再配布は[共通正式配布の教師手順](../web_lab_distribution/TEACHER.md)を使用する。既存Labはreuseで元credentialを保持し、新規発行し直さない。Class193548固定helperは旧検証専用として残す。distribution_ready=true、CLASS_READY=false、期限10/27 14:24:57 UZT。以下の昇格未完表記は追記前の履歴。
 
 10/22確定：**Class193548の教師AWS170126527713と学生AWS965244652544を分けた候補受入が合格**。学生の新規5台・S3閉鎖・恒久SSM/内部SSH・個別登録・停止再開保持・本人GUI・実WEB-02の9段階13提出を確認した。教師側で全17提出の本文/受領/hash/最新進捗/実5台登録を独立照合し一致。教師/学生JA/UZ/RUの実HTTP全6ページ、no-store/30秒更新も合格。現在は基盤47/47、P1/M1各2/10、完了0/2（学生の作業開始状態）。科目の素点ではない。正式配布への昇格・全課題/配点の確定は別で、CLASS_READY=falseを維持する。最新の証跡・再開手順は[検証状況](../../../../03_knowledge/aws_official/web_lab_ami_2026-10-15/verification_status.md)最上部。
