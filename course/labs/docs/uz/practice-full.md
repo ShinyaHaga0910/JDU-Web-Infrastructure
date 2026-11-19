@@ -12,8 +12,6 @@ Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga 
 
 [Avval: ulanish va qoidalar](start.md) · [Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M6](missions.md) · [Brauzerda tekshirish](portal.md)
 
-[Avval: ulanish va qoidalar](start.md) · [Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M6](missions.md) · [Brauzerda tekshirish](portal.md)
-
 ## Qo‘llanmadan foydalanish
 
 Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P - bahoga ball qo‘shmaydigan mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.
@@ -74,7 +72,7 @@ CloudShell, Windows va beshta Ubuntu serverni farqlash; kerakli serverga SSM orq
 
 ### Topshiriq
 
-Lab ID, tarqatma ID va beshta rolning instance ID qiymatlarini tekshiring. Bu tayyor muhit tekshiruvi, 0 ball. Besh server hali bo‘lmasa, avval boshlang‘ich o‘rnatishni tugating. Tayyor muhit uchun create, kalit yaratish va ro‘yxatdan o‘tishni takrorlamang.
+Tayyor muhitingizda beshta serverning instance ID si va rolini tekshiring. Qaysi serverga va qaysi foydalanuvchi sifatida ulanganingizni aniqlang. P0 bahoga ball qo‘shmaydi.
 
 ### Topshiriq diagrammasi
 
@@ -98,44 +96,7 @@ AWS Console resurslarni boshqaradi; CloudShell - AWS CLI bor shaxsiy terminal; S
 
 ### Yechim namunasi: bittadan bajaring
 
-#### P0.1 Shaxsiy CloudShell va tarqatmani tekshirish
-
-**Bajarish joyi:**
-
-Talabaning shaxsiy AWS hisobidagi CloudShell
-
-**Maqsad va amallar:**
-
-Academy dagi o‘z Class’ingizdan AWS va CloudShell ni oching. LAB_ID ni o‘qituvchi bergan qiymatga almashtiring. INSTALL keyingi material joylash uchun katalogdir. O‘rnatilgan fayl va AWS hisobini tekshiring; topshiriqni oxirida brauzerda tekshirasiz.
-
-Buyruqlar: raqamlar shu qadam ichidagi tartib
-
-```bash
-# 1. O‘qituvchi bergan o‘z Lab ID ni o‘zgaruvchiga yozish.
-LAB_ID='YOUR-LAB-ID'
-# 2. Ishlatiladigan imzolangan tarqatma ID sini belgilash.
-COURSE_ID='web-course-class193548-20261103-r3'
-# 3. O‘z tarqatmangiz o‘rnatilgan katalog yo‘lini saqlash.
-INSTALL="$HOME/.local/share/jdu-web/courses/$COURSE_ID/$LAB_ID"
-# 4. Joriy AWS hisob raqamini ko‘rsatish.
-aws sts get-caller-identity --query Account --output text
-# 5. Boshlang‘ich o‘rnatish fayli bo‘lsa INSTALL_OK chiqarish.
-test -f "$INSTALL/activate.sh" && printf 'INSTALL_OK\n'
-```
-
-**Buyruq va sozlamalar ma’nosi:**
-
-INSTALL oldin o‘rnatilgan katalogni bildiradi. test -f fayl borligini tekshiradi, muhitni qayta yaratmaydi. AWS hisobini tekshirish topshiriqdan o‘tish degani emas.
-
-**Kutilgan natija va ma’nosi:**
-
-Account o‘zingizniki bo‘lsin. INSTALL_OK boshlang‘ich o‘rnatish fayli borligini bildiradi. Bu topshiriqdan o‘tish emas, keyingi ishga tayyorgarlik.
-
-**Ishlamasa:**
-
-No such file chiqsa, boshlang‘ich o‘rnatish va install ni tekshiring. Eski buyruq barcha topshiriqlarni qo‘llamaydi. Muddati o‘tgan tarqatmani o‘qituvchi yangilaydi.
-
-#### P0.2 Beshta serverning instance ID qiymatini yozib olish
+#### P0.1 Beshta serverning instance ID qiymatini yozib olish
 
 **Bajarish joyi:**
 
@@ -157,7 +118,7 @@ Beshala server running, SSM Online; private IP umumiy jadvalga mos. To‘xtatib 
 
 Boshqa Lab, hisob yoki noma’lum serverni o‘zgartirmang. To‘xtagan server uchun ishga tushirish yo‘riqnomasidan foydalaning. Reset yoki Terminate ni bosmang.
 
-#### P0.3 SSM orqali kirish va qaytish
+#### P0.2 SSM orqali kirish va qaytish
 
 **Bajarish joyi:**
 
@@ -196,7 +157,7 @@ ssm-user va web ko‘rinadi. Har safar serverni almashtirganda tekshiring. SSH o
 
 TargetNotConnected bo‘lsa, running, SSM Online va us-east-1 ni tekshiring. SG portlarini to‘liq ochmang, Windows ga kalit yuklamang.
 
-#### P0.4 Faqat ochiq o‘quv fayllarini tayyorlash
+#### P0.3 Faqat ochiq o‘quv fayllarini tayyorlash
 
 **Bajarish joyi:**
 
@@ -204,7 +165,7 @@ Talabaning shaxsiy AWS hisobidagi CloudShell
 
 **Maqsad va amallar:**
 
-Ushbu qo‘llanma zip faylini CloudShell → Actions → Upload file orqali yuklang; unzip web-lab-pm-r1.zip bilan oching. resources katalogiga o‘ting va buyruqni bajaring. Yordamchi shaxsiy imzolangan tarqatma va asl besh serverni tekshirib, Web/DB ga ochiq app, SQL va yashirin kiritish vositasini joylaydi. Service yoki DB qurmaydi, maxfiy qiymat yubormaydi.
+Bu qadam imzolangan tarqatma uchun. Umumiy kod orqali sozlanganda fayllar oldindan joylanadi. Ushbu qo‘llanma zip faylini CloudShell → Actions → Upload file orqali yuklang; unzip web-lab-pm-r1.zip bilan oching. resources katalogiga o‘ting va YOUR-INSTALLATION-DIRECTORY o‘rniga imzolangan tarqatmaning activate.sh fayli joylashgan katalog yo‘lini kiriting. Yordamchi shaxsiy imzolangan tarqatma va asl besh serverni tekshirib, Web/DB ga ochiq app, SQL va yashirin kiritish vositasini joylaydi. Service yoki DB qurmaydi, maxfiy qiymat yubormaydi.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
@@ -212,7 +173,7 @@ Buyruqlar: raqamlar shu qadam ichidagi tartib
 # 1. Ish katalogini $HOME/web-lab-pm-r1/resources ga o‘zgartirish.
 cd "$HOME/web-lab-pm-r1/resources"
 # 2. Imzolangan tarqatma va o‘z besh serverini solishtirib, materialni Web/DB ga joylash.
-python3 -B stage_resources.py --installation "$INSTALL"
+python3 -B stage_resources.py --installation 'YOUR-INSTALLATION-DIRECTORY'
 ```
 
 **Buyruq va sozlamalar ma’nosi:**
@@ -227,7 +188,7 @@ PUBLIC_LESSON_RESOURCES_READY=web va =db chiqadi. Ochiq fayllar /var/lib/jdu-web
 
 Boshlang‘ich o‘rnatish tugamagan, versiya boshqa yoki muddat o‘tgan bo‘lsa, to‘xtab o‘qituvchiga ayting. Tayyor yechim quradigan test fixture bilan almashtirmang.
 
-#### P0.5 Tayyorlikni brauzerda tekshirish
+#### P0.4 Tayyorlikni brauzerda tekshirish
 
 **Bajarish joyi:**
 
@@ -249,7 +210,7 @@ O‘z Lab, topshiriq ID va vaqtni tekshiring. Check natijalari va saqlash holati
 
 Yordam uchun check ID, vaqt va server rolini yozing. Token, parol va shaxsiy URL ni ulashmang.
 
-#### P0.6 RDP orqali bastion ish stolini ochish
+#### P0.5 RDP orqali bastion ish stolini ochish
 
 **Bajarish joyi:**
 

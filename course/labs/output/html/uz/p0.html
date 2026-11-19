@@ -23,7 +23,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-2">Nimani o‘rganamiz</h2>
 <p>CloudShell, Windows va beshta Ubuntu serverni farqlash; kerakli serverga SSM orqali kirish va o‘zini tekshirish.</p>
 <h2 id="section-3">Topshiriq</h2>
-<p>Lab ID, tarqatma ID va beshta rolning instance ID qiymatlarini tekshiring. Bu tayyor muhit tekshiruvi, 0 ball. Besh server hali bo‘lmasa, avval boshlang‘ich o‘rnatishni tugating. Tayyor muhit uchun create, kalit yaratish va ro‘yxatdan o‘tishni takrorlamang.</p>
+<p>Tayyor muhitingizda beshta serverning instance ID si va rolini tekshiring. Qaysi serverga va qaysi foydalanuvchi sifatida ulanganingizni aniqlang. P0 bahoga ball qo‘shmaydi.</p>
 <h2 id="section-4">Topshiriq diagrammasi</h2>
 <p><img src="../../../assets/uz/p0.png" alt="P0: Besh server oldin yaratilgan → Hisob va serverni tekshirish → To‘g‘ri serverga SSM bilan kirish。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. SSM strelkasi AWS orqali ulanishdir; EC2 kiruvchi 443 portini ochish ko‘rsatmasi emas." width="1040" height="680" loading="lazy"></p>
 <p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. SSM strelkasi AWS orqali ulanishdir; EC2 kiruvchi 443 portini ochish ko‘rsatmasi emas.</p>
@@ -35,30 +35,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>Account, role va ish joyini farqlaysiz; ochiq o‘quv resurslari tayyorlanadi.</p>
 <p>AWS Console resurslarni boshqaradi; CloudShell - AWS CLI bor shaxsiy terminal; SSM tanlangan EC2 OS ichida session ochadi. Besh server alohida OS bo‘lib qoladi: Web dagi /var/www DB dagi katalog bilan bir joy emas. Server role va OS user ni alohida tekshiring.</p>
 <h2 id="section-6">Yechim namunasi: bittadan bajaring</h2>
-<h3>P0.1 Shaxsiy CloudShell va tarqatmani tekshirish</h3>
-<p><strong>Bajarish joyi:</strong></p>
-<p>Talabaning shaxsiy AWS hisobidagi CloudShell</p>
-<p><strong>Maqsad va amallar:</strong></p>
-<p>Academy dagi o‘z Class’ingizdan AWS va CloudShell ni oching. LAB_ID ni o‘qituvchi bergan qiymatga almashtiring. INSTALL keyingi material joylash uchun katalogdir. O‘rnatilgan fayl va AWS hisobini tekshiring; topshiriqni oxirida brauzerda tekshirasiz.</p>
-<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
-<pre><code class="language-bash"># 1. O‘qituvchi bergan o‘z Lab ID ni o‘zgaruvchiga yozish.
-LAB_ID='YOUR-LAB-ID'
-# 2. Ishlatiladigan imzolangan tarqatma ID sini belgilash.
-COURSE_ID='web-course-class193548-20261103-r3'
-# 3. O‘z tarqatmangiz o‘rnatilgan katalog yo‘lini saqlash.
-INSTALL=&quot;$HOME/.local/share/jdu-web/courses/$COURSE_ID/$LAB_ID&quot;
-# 4. Joriy AWS hisob raqamini ko‘rsatish.
-aws sts get-caller-identity --query Account --output text
-# 5. Boshlang‘ich o‘rnatish fayli bo‘lsa INSTALL_OK chiqarish.
-test -f &quot;$INSTALL/activate.sh&quot; &amp;&amp; printf 'INSTALL_OK\n'
-</code></pre>
-<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>INSTALL oldin o‘rnatilgan katalogni bildiradi. test -f fayl borligini tekshiradi, muhitni qayta yaratmaydi. AWS hisobini tekshirish topshiriqdan o‘tish degani emas.</p>
-<p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>Account o‘zingizniki bo‘lsin. INSTALL_OK boshlang‘ich o‘rnatish fayli borligini bildiradi. Bu topshiriqdan o‘tish emas, keyingi ishga tayyorgarlik.</p>
-<p><strong>Ishlamasa:</strong></p>
-<p>No such file chiqsa, boshlang‘ich o‘rnatish va install ni tekshiring. Eski buyruq barcha topshiriqlarni qo‘llamaydi. Muddati o‘tgan tarqatmani o‘qituvchi yangilaydi.</p>
-<h3>P0.2 Beshta serverning instance ID qiymatini yozib olish</h3>
+<h3>P0.1 Beshta serverning instance ID qiymatini yozib olish</h3>
 <p><strong>Bajarish joyi:</strong></p>
 <p>Talabaning shaxsiy AWS Console oynasi</p>
 <p><strong>Maqsad va amallar:</strong></p>
@@ -69,7 +46,7 @@ test -f &quot;$INSTALL/activate.sh&quot; &amp;&amp; printf 'INSTALL_OK\n'
 <p>Beshala server running, SSM Online; private IP umumiy jadvalga mos. To‘xtatib ishga tushirganda public IPv4 o‘zgarishi mumkin.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Boshqa Lab, hisob yoki noma’lum serverni o‘zgartirmang. To‘xtagan server uchun ishga tushirish yo‘riqnomasidan foydalaning. Reset yoki Terminate ni bosmang.</p>
-<h3>P0.3 SSM orqali kirish va qaytish</h3>
+<h3>P0.2 SSM orqali kirish va qaytish</h3>
 <p><strong>Bajarish joyi:</strong></p>
 <p>Talabaning shaxsiy AWS hisobidagi CloudShell</p>
 <p><strong>Maqsad va amallar:</strong></p>
@@ -94,16 +71,16 @@ exit
 <p>ssm-user va web ko‘rinadi. Har safar serverni almashtirganda tekshiring. SSH orqali kirganda Ubuntu foydalanuvchisi ubuntu bo‘lishi mumkin.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>TargetNotConnected bo‘lsa, running, SSM Online va us-east-1 ni tekshiring. SG portlarini to‘liq ochmang, Windows ga kalit yuklamang.</p>
-<h3>P0.4 Faqat ochiq o‘quv fayllarini tayyorlash</h3>
+<h3>P0.3 Faqat ochiq o‘quv fayllarini tayyorlash</h3>
 <p><strong>Bajarish joyi:</strong></p>
 <p>Talabaning shaxsiy AWS hisobidagi CloudShell</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>Ushbu qo‘llanma zip faylini CloudShell → Actions → Upload file orqali yuklang; unzip web-lab-pm-r1.zip bilan oching. resources katalogiga o‘ting va buyruqni bajaring. Yordamchi shaxsiy imzolangan tarqatma va asl besh serverni tekshirib, Web/DB ga ochiq app, SQL va yashirin kiritish vositasini joylaydi. Service yoki DB qurmaydi, maxfiy qiymat yubormaydi.</p>
+<p>Bu qadam imzolangan tarqatma uchun. Umumiy kod orqali sozlanganda fayllar oldindan joylanadi. Ushbu qo‘llanma zip faylini CloudShell → Actions → Upload file orqali yuklang; unzip web-lab-pm-r1.zip bilan oching. resources katalogiga o‘ting va YOUR-INSTALLATION-DIRECTORY o‘rniga imzolangan tarqatmaning activate.sh fayli joylashgan katalog yo‘lini kiriting. Yordamchi shaxsiy imzolangan tarqatma va asl besh serverni tekshirib, Web/DB ga ochiq app, SQL va yashirin kiritish vositasini joylaydi. Service yoki DB qurmaydi, maxfiy qiymat yubormaydi.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. Ish katalogini $HOME/web-lab-pm-r1/resources ga o‘zgartirish.
 cd &quot;$HOME/web-lab-pm-r1/resources&quot;
 # 2. Imzolangan tarqatma va o‘z besh serverini solishtirib, materialni Web/DB ga joylash.
-python3 -B stage_resources.py --installation &quot;$INSTALL&quot;
+python3 -B stage_resources.py --installation 'YOUR-INSTALLATION-DIRECTORY'
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
 <p>Ochiq resurslar app va SQL materiallaridir, tayyor service emas. Stage_resources.py CloudShell da ishga tushib ularni Web/DB ga joylaydi. Zip ni Windows ga saqlashning o‘zi EC2 da fayl yaratmaydi.</p>
@@ -111,7 +88,7 @@ python3 -B stage_resources.py --installation &quot;$INSTALL&quot;
 <p>PUBLIC_LESSON_RESOURCES_READY=web va =db chiqadi. Ochiq fayllar /var/lib/jdu-web/lesson-resources-r1 da. Mavjud boshqa mazmunli fayl ustiga yozilmaydi.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Boshlang‘ich o‘rnatish tugamagan, versiya boshqa yoki muddat o‘tgan bo‘lsa, to‘xtab o‘qituvchiga ayting. Tayyor yechim quradigan test fixture bilan almashtirmang.</p>
-<h3>P0.5 Tayyorlikni brauzerda tekshirish</h3>
+<h3>P0.4 Tayyorlikni brauzerda tekshirish</h3>
 <p><strong>Bajarish joyi:</strong></p>
 <p>Shaxsiy PC brauzeri: Web Portal</p>
 <p><strong>Maqsad va amallar:</strong></p>
@@ -122,7 +99,7 @@ python3 -B stage_resources.py --installation &quot;$INSTALL&quot;
 <p>O‘z Lab, topshiriq ID va vaqtni tekshiring. Check natijalari va saqlash holatini o‘qing; tugashi va saqlanishini kuting. UNKNOWN o‘lchab bo‘lmagan holat, muvaffaqiyat emas.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Yordam uchun check ID, vaqt va server rolini yozing. Token, parol va shaxsiy URL ni ulashmang.</p>
-<h3>P0.6 RDP orqali bastion ish stolini ochish</h3>
+<h3>P0.5 RDP orqali bastion ish stolini ochish</h3>
 <p><strong>Bajarish joyi:</strong></p>
 <p>Talabaning Windows PC si (umumiy hisob)</p>
 <p><strong>Maqsad va amallar:</strong></p>

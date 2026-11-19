@@ -20,7 +20,6 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>ロシア語・ウズベク語は日本語原稿と同じ手順・条件の翻訳初稿。母語話者校閲は未実施。</p>
 <p><a href="../ja/practice-full.html">日本語</a> · <a href="../ru/practice-full.html">Русский</a> · <a href="../uz/practice-full.html">O‘zbekcha</a></p>
 <p><a href="start.html">はじめに：接続・操作の約束</a> · <a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a> · <a href="portal.html">ブラウザで確認する</a></p>
-<p><a href="start.html">はじめに：接続・操作の約束</a> · <a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a> · <a href="portal.html">ブラウザで確認する</a></p>
 <h2 id="section-1">使い方と共通の約束</h2>
 <p>まず各Pの課題文を読み、必要なら詳しい操作例を一段ずつ使う。Pは練習で成績に加算しない。Mは別の対象・値で自分で構築する。課題は授業回番号ではなく、自分の進度で進める。Pの完了はMの合格に置き換わらない。</p>
 <p>P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6</p>
@@ -132,7 +131,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h3>学ぶこと</h3>
 <p>CloudShell、Windows、5台のUbuntuを区別し、正しいサーバーへSSMで入り、採点を自己確認できる。</p>
 <h3>課題</h3>
-<p>自分のLab ID・配布ID・5役割のinstance IDを確認する。これは提供済み環境の確認で、0点。5台がまだない場合は先に初期配布手順を完了する。作成済みならcreate・鍵生成・採点再登録を繰り返さない。</p>
+<p>構築済みの自分の環境で、5台のインスタンスIDと役割を確認し、接続先と操作ユーザーを確かめる。P0は成績に加算しない。</p>
 <h3>今回の見取り図</h3>
 <p><img src="../../../assets/ja/p0.png" alt="P0: 5台は初期配備済み → 本人・接続先を確かめる → 正しい役割へSSMで入る。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。" width="1040" height="680" loading="lazy"></p>
 <p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。</p>
@@ -144,30 +143,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>対象account・役割・実行場所を見分け、公開教材資源を準備する。</p>
 <p>AWSコンソールはAWS資源を管理する画面、CloudShellはAWS CLIを使う自分の端末、SSMは選んだEC2のOS内へ入る接続である。SSMへ入っても5台が一つのOSになるわけではない。Webの/var/wwwとDBの/var/wwwは別の保存先である。サーバーの役割と、そこで操作するOS userを別々に確認する。</p>
 <h3>操作例：一つずつ実行する</h3>
-<h4>P0.1 本人のCloudShellと使用版を確認する</h4>
-<p><strong>実行場所:</strong></p>
-<p>CloudShell（学生本人のAWS）</p>
-<p><strong>目的と操作:</strong></p>
-<p>AWS Academyの自分のClassからAWSを開き、CloudShellを起動する。LAB_IDを教師案内の値に置き換える。INSTALLは後の教材配置で使う保存先。初期導入済みのファイルとAWSアカウントを確認する。課題の判定は最後にブラウザで行う。</p>
-<p>入力するコマンド（番号はこの手順内の順番）</p>
-<pre><code class="language-bash"># 1. 教師から案内された自分のLab IDを変数へ入れる。
-LAB_ID='YOUR-LAB-ID'
-# 2. 使用する署名配布版のIDを変数へ入れる。
-COURSE_ID='web-course-class193548-20261103-r3'
-# 3. 自分の配布版が導入されている保存先を変数へ入れる。
-INSTALL=&quot;$HOME/.local/share/jdu-web/courses/$COURSE_ID/$LAB_ID&quot;
-# 4. 現在操作中のAWSアカウント番号を表示する。
-aws sts get-caller-identity --query Account --output text
-# 5. 初期導入のファイルがあればINSTALL_OKを表示する。
-test -f &quot;$INSTALL/activate.sh&quot; &amp;&amp; printf 'INSTALL_OK\n'
-</code></pre>
-<p><strong>コマンド・設定値の意味:</strong></p>
-<p>INSTALLは初期導入済みの場所を表す変数。test -fはファイルの有無を調べるだけで、環境を作り直さない。AWS本人確認と課題の合格確認は別。</p>
-<p><strong>期待する結果と読み方:</strong></p>
-<p>AWS accountは教師から指定された自分のもの。INSTALL_OKなら初期導入のファイルがある。これは課題合格ではなく、後の操作を始める準備確認。</p>
-<p><strong>うまくいかないとき:</strong></p>
-<p>No such fileなら初期導入とinstallを確認する。旧版は全課題に対応しない。期限切れは教師へ更新を依頼し、日付の書換えで回避しない。</p>
-<h4>P0.2 5台のinstance IDを記録する</h4>
+<h4>P0.1 5台のinstance IDを記録する</h4>
 <p><strong>実行場所:</strong></p>
 <p>学生本人のAWSコンソール</p>
 <p><strong>目的と操作:</strong></p>
@@ -178,7 +154,7 @@ test -f &quot;$INSTALL/activate.sh&quot; &amp;&amp; printf 'INSTALL_OK\n'
 <p>5台ともrunning、SSM Online。private IPは本書の共通表と一致する。公開IPv4は停止・起動後に変わることがある。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>別Lab・別account・不明な台を操作しない。停止中は教師の起動案内に従う。ResetやTerminateで開始状態を作り直さない。</p>
-<h4>P0.3 SSMで入り、戻る</h4>
+<h4>P0.2 SSMで入り、戻る</h4>
 <p><strong>実行場所:</strong></p>
 <p>CloudShell（学生本人のAWS）</p>
 <p><strong>目的と操作:</strong></p>
@@ -203,16 +179,16 @@ exit
 <p>userはssm-user、roleはweb。以降もサーバーを替えるたびに確認する。SSHで入ったUbuntuのuserはubuntuになる場合がある。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>TargetNotConnectedならrunning/SSM Online/region us-east-1を確認する。SGを全面開放したりWindowsへ鍵をダウンロードしない。</p>
-<h4>P0.4 公開教材資源だけを準備する</h4>
+<h4>P0.3 公開教材資源だけを準備する</h4>
 <p><strong>実行場所:</strong></p>
 <p>CloudShell（学生本人のAWS）</p>
 <p><strong>目的と操作:</strong></p>
-<p>本教材zipをCloudShellのActions→Upload fileでアップロードし、unzip web-lab-pm-r1.zipで展開する。resourcesへ移動し次を実行する。補助処理は本人の署名版と元5台を照合し、Web/DBへアプリ資源・SQL・秘密の非表示入力helperを置くだけ。サービスやDBは構築しない。秘密は送らない。</p>
+<p>署名付き配布を使う場合の手順です。共通登録コード方式では構築時に配置済みです。本教材zipをCloudShellのActions→Upload fileでアップロードし、unzip web-lab-pm-r1.zipで展開する。resourcesへ移動し、YOUR-INSTALLATION-DIRECTORYを署名付き配布の導入先に置き換える。導入先は、初回に表示されたactivate.shがあるディレクトリ。補助処理は本人の署名版と元5台を照合し、Web/DBへアプリ資源・SQL・秘密の非表示入力helperを置くだけ。サービスやDBは構築しない。秘密は送らない。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. 作業場所を $HOME/web-lab-pm-r1/resources へ移す。
 cd &quot;$HOME/web-lab-pm-r1/resources&quot;
 # 2. 署名版と本人の5台を照合し、公開教材をWeb/DBへ配置する。
-python3 -B stage_resources.py --installation &quot;$INSTALL&quot;
+python3 -B stage_resources.py --installation 'YOUR-INSTALLATION-DIRECTORY'
 </code></pre>
 <p><strong>コマンド・設定値の意味:</strong></p>
 <p>公開教材資源はアプリやSQLの材料であり、完成済みのサービスではない。stage_resources.pyをCloudShellで実行して初めてWeb/DBへ配置される。Windowsへzipを保存しただけではEC2内のファイルは増えない。</p>
@@ -220,7 +196,7 @@ python3 -B stage_resources.py --installation &quot;$INSTALL&quot;
 <p>PUBLIC_LESSON_RESOURCES_READY=web と =db。各台の/var/lib/jdu-web/lesson-resources-r1に公開ファイルがある。既存の異なるファイルは上書きしない。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>初期化未完・版違い・期限切れならここで止めて教師へ状況を知らせる。検証用fixtureや完成アプリの自動適用ツールで代用しない。</p>
-<h4>P0.5 ブラウザで準備を確認する</h4>
+<h4>P0.4 ブラウザで準備を確認する</h4>
 <p><strong>実行場所:</strong></p>
 <p>自分のPCのブラウザ：Web Portal</p>
 <p><strong>目的と操作:</strong></p>
@@ -231,7 +207,7 @@ python3 -B stage_resources.py --installation &quot;$INSTALL&quot;
 <p>本人のLab・課題ID・確認時刻が正しい。各checkの結果と保存状態を読む。処理完了と保存を確認する。UNKNOWNは観測できなかった状態で、合格とは別。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>失敗行のcheck ID・実行時刻・対象roleだけを相談に使う。token・password・本人用URLを共有しない。</p>
-<h4>P0.6 RDPで踏み台のデスクトップを開く</h4>
+<h4>P0.5 RDPで踏み台のデスクトップを開く</h4>
 <p><strong>実行場所:</strong></p>
 <p>学生のWindows PC（共有アカウント）</p>
 <p><strong>目的と操作:</strong></p>

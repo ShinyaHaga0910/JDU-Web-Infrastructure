@@ -92,7 +92,7 @@ def main():
             if kind=='practice':
                 expected=sum(sum(active for active,_ in command_groups(s['code'])) for m in MODULES for i,s in enumerate(m['steps'],1) if s['code'] and (m['id'],i) not in CONFIG_STEPS)
                 ok(f'{lang}_pdf_numbered_comments',len(re.findall(r'(?:#|--) \d+\.',text))==expected)
-                ok(f'{lang}_pdf_comment_text',re.sub(r'\s+','',explanation("LAB_ID='YOUR-LAB-ID'",lang)) in re.sub(r'\s+','',text))
+                ok(f'{lang}_pdf_comment_text',re.sub(r'\s+','',explanation('id -un',lang)) in re.sub(r'\s+','',text))
     for kind in ('practice','missions'):
         normalized={lang:[(info,executable_only(source)) for info,source in code[lang,kind]] for lang in LANGS}
         ok(kind+'_identical_executable_code_in_3_languages',normalized['ja']==normalized['ru']==normalized['uz'])
@@ -151,7 +151,7 @@ def main():
                     ok(f'{lang}_{task}_internet_aws_boundary',any(t.text=='AWS / VPC 10.20.0.0/16' for t in texts)
                         and any(t.text=='IGW' and float(t.attrib['x'])==boundary for t in texts)
                         and all(float(t.attrib['x'])>boundary for t in texts if t.text=='EC2'))
-    ok('44_detailed_steps',sum(len(m['steps']) for m in MODULES)==44 and all(all(s[k].values()) for m in MODULES for s in m['steps'] for k in ('why','expect','trouble')))
+    ok('43_detailed_steps',sum(len(m['steps']) for m in MODULES)==43 and all(all(s[k].values()) for m in MODULES for s in m['steps'] for k in ('why','expect','trouble')))
     for info,source in code['ja','practice']+code['ja','missions']:
         if info=='bash':
             result=subprocess.run(['wsl.exe','bash','-n'],input=source,text=True,encoding='utf-8',capture_output=True)
@@ -220,7 +220,7 @@ def main():
         ok('zip_exact_inventory',set(z.namelist())=={'web-lab-pm-r1/'+p for p in hashes}|{'web-lab-pm-r1/TEACHING-FILE-HASHES.json'})
         ok('zip_all_hashes',all(hashlib.sha256(z.read('web-lab-pm-r1/'+p)).hexdigest()==v for p,v in hashes.items()))
     result=dict(scope='D12_P_M_materials_local_checks_not_AWS_walkthrough',checked_on=date.today().isoformat(),browser_guide_revision='2026-11-03',
-        languages=list(LANGS),material_revision=MATERIAL_REVISION,practice_tasks=6,practice_steps=44,
+        languages=list(LANGS),material_revision=MATERIAL_REVISION,practice_tasks=6,practice_steps=43,
         task_pages=36,task_diagrams=36,numbered_command_comments_per_language=annotations,executable_source_preserved=True,
         explained_steps=sum(len(m["steps"]) for m in MODULES),module_understanding_questions=len(MODULES),communication_routes=len(ROUTES),
         worked_output_examples=len(OUTPUT_EXAMPLES),mission_tasks=6,scored_checks=59,raw_points=59,

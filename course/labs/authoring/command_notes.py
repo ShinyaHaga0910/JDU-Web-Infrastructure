@@ -153,7 +153,7 @@ def annotated_blocks(module, index, source, lang):
             out.append(('bash','\n'.join(parts)));parts=[];psql=True
         prefix='--' if psql else '#'
         parts += [f'{prefix} {number}. {explanation(command,lang)}',command]
-    out.append(('sql' if psql else ('powershell' if (module,index)==('P0',6) else 'bash'),'\n'.join(parts)))
+    out.append(('sql' if psql else ('powershell' if (module,index)==('P0',5) else 'bash'),'\n'.join(parts)))
     return out
 
 def executable_only(source):

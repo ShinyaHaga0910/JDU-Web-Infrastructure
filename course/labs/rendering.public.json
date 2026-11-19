@@ -1,6 +1,6 @@
 {
   "scope": "D12_P_M_all_page_render_and_bounds_not_visual_approval",
-  "checked_on": "2026-11-13",
+  "checked_on": "2026-11-19",
   "pdfs": [
     {
       "file": "web_lab_missions_ja.pdf",
@@ -28,7 +28,7 @@
     },
     {
       "file": "web_lab_practice_ja.pdf",
-      "sha256": "7771bacb82312c07260976e74bf740b152f1b73608f49b5dd2477d0f6f16bfd9",
+      "sha256": "e8075fafa33ecc3a3804ad18f47a5a12af669e0aee1a910bdbd081c0d4abf7f9",
       "pages": 41,
       "rendered_pages": 41,
       "out_of_bounds_words": 0,
@@ -36,23 +36,23 @@
     },
     {
       "file": "web_lab_practice_ru.pdf",
-      "sha256": "5b0158e31455a60790a65244e148b15f854032339c4ab695a976c7ce9e824c44",
-      "pages": 43,
-      "rendered_pages": 43,
+      "sha256": "27b6cc9b214bd1b22d6fe0e5599ad161937c2d6da3d7956488963221ce25f459",
+      "pages": 42,
+      "rendered_pages": 42,
       "out_of_bounds_words": 0,
       "issues": []
     },
     {
       "file": "web_lab_practice_uz.pdf",
-      "sha256": "23f59a4c0cf9106a14ca1a639637a17ae72fd5c6fdcb14ffc95b1367c2e6cacc",
-      "pages": 43,
-      "rendered_pages": 43,
+      "sha256": "1a97705cea6affa0446085e111a98cc094b5c375010ccfac430eadfe2effc8b6",
+      "pages": 42,
+      "rendered_pages": 42,
       "out_of_bounds_words": 0,
       "issues": []
     }
   ],
-  "pdf_pages_checked": 171,
-  "rendered_pages": 171,
+  "pdf_pages_checked": 169,
+  "rendered_pages": 169,
   "out_of_bounds_words": 0,
   "teacher_visual_review": false,
   "native_language_review": false,
