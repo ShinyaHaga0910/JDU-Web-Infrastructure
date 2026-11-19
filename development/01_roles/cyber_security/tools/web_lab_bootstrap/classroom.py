@@ -622,11 +622,16 @@ def main():
         print(dict(zip(LABELS, TEXT[args.lang or 'en']))['tty'], file=sys.stderr)
         return 2
     if not args.lang:
-        print('\nJDU WEB INFRASTRUCTURE\n  [1] English    [2] 日本語    [3] Русский    [4] O‘zbekcha')
+        border = '=' * 56
+        print(f'\n{border}\n  JDU WEB INFRASTRUCTURE\n'
+              '  Choose your language.\n'
+              '  Enter one number from 1 to 4, then press Enter.\n\n'
+              '  [1] English\n  [2] 日本語\n  [3] Русский\n  [4] O‘zbekcha\n'
+              f'{border}')
         selections = dict(zip('1234', TEXT))
-        answer = input('  ▸ 1–4: ').strip()
+        answer = input('  Enter your number (1-4): ').strip()
         while answer not in selections:
-            answer = input('  ▸ 1–4: ').strip()
+            answer = input('  Please enter 1, 2, 3, or 4: ').strip()
         args.lang = selections[answer]
     screen = Screen(args.lang, args.role)
     try:
