@@ -143,7 +143,39 @@ def verify_stack_owner(stack, intent):
         raise ValueError("同名スタックは別の構築に属します。--name で別名を指定してください。")
 
 
-def verify_services(session, stack, *, inform=print):
+def enrollment_template(template, enrollment):
+    source, key_hash = enrollment
+    resources = template["Resources"]
+    function = resources["ProgressFunction"]["Properties"]
+    function["Code"]["ZipFile"] = source
+    function["Environment"]["Variables"]["ENROLLMENT_KEY_HASH"] = key_hash
+    resources["ClassroomEnrollmentRoute"] = {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {
+            "ApiId": {"Ref": "ProgressApi"},
+            "RouteKey": "POST /api/web/enroll",
+            "Target": {"Fn::Join": ["/", ["integrations", {"Ref": "Integration"}]]},
+        },
+    }
+    return template
+
+
+def update_enrollment(cfn, stack, enrollment):
+    stack_id = stack["StackId"]
+    body = cfn.get_template(StackName=stack_id, TemplateStage="Original")["TemplateBody"]
+    current = json.loads(body) if isinstance(body, str) else body
+    before = json.dumps(current, separators=(",", ":"), ensure_ascii=False)
+    after = json.dumps(enrollment_template(current, enrollment), separators=(",", ":"), ensure_ascii=False)
+    if before != after:
+        cfn.validate_template(TemplateBody=after)
+        previous = [{"ParameterKey": item["ParameterKey"], "UsePreviousValue": True} for item in stack["Parameters"]]
+        cfn.update_stack(StackName=stack_id, TemplateBody=after, Parameters=previous)
+        cfn.get_waiter("stack_update_complete").wait(StackName=stack_id)
+        return find_stack(cfn, stack_id)
+    return stack
+
+
+def verify_services(session, stack, *, inform=print, enrollment=False):
     outputs = {item["OutputKey"]: item["OutputValue"] for item in stack["Outputs"]}
     if bucket := outputs.get("DistributionBucket"):
         s3 = session.client("s3")
@@ -178,6 +210,17 @@ def verify_services(session, stack, *, inform=print):
     status = subprocess.check_output(curl + ["-o", os.devnull, "-w", "%{http_code}", url + "/dashboard"])
     if status != b"401":
         raise ValueError("認証なしの教師ダッシュボードへのアクセスが拒否されませんでした。")
+    if enrollment:
+        request = curl + ["-o", os.devnull, "-w", "%{http_code}", "-X", "POST", url + "/api/web/enroll"]
+        for _ in range(12):
+            status = subprocess.check_output(request)
+            if status == b"401":
+                break
+            if status != b"404":
+                raise ValueError("ENROLLMENT_AUTH")
+            time.sleep(5)
+        else:
+            raise ValueError("ENROLLMENT_ROUTE")
     return outputs
 
 
@@ -216,7 +259,7 @@ def run(args):
         install(session, cfn, ec2, account, name, work)
 
 
-def install(session, cfn, ec2, account, name, work, *, distribution_bucket=True, inform=print):
+def install(session, cfn, ec2, account, name, work, *, distribution_bucket=True, inform=print, enrollment=None):
     intent_path = work / "installation.private.json"
     receipt_path = work / "stack.private.json"
     stack = find_stack(cfn, name)
@@ -233,6 +276,9 @@ def install(session, cfn, ec2, account, name, work, *, distribution_bucket=True,
     else:
         template = (load_template(*select_capacity(ec2)) if distribution_bucket
                     else load_template(*select_capacity(ec2), distribution_bucket=False))
+        if enrollment:
+            template = json.dumps(enrollment_template(json.loads(template), enrollment),
+                                  separators=(",", ":"), ensure_ascii=False)
         preflight(session, ec2, template)
         cfn.validate_template(TemplateBody=template)
         intent = {"account": account, "stack_name": name, "template": template,
@@ -258,9 +304,16 @@ def install(session, cfn, ec2, account, name, work, *, distribution_bucket=True,
         cfn.get_waiter("stack_create_complete").wait(StackName=stack_id)
         stack = find_stack(cfn, stack_id)
         verify_stack_owner(stack, intent)
-    if stack["StackStatus"] != "CREATE_COMPLETE":
+    if enrollment and stack["StackStatus"] == "UPDATE_IN_PROGRESS":
+        cfn.get_waiter("stack_update_complete").wait(StackName=stack_id)
+        stack = find_stack(cfn, stack_id)
+    ready = ("CREATE_COMPLETE", "UPDATE_COMPLETE", "UPDATE_ROLLBACK_COMPLETE") if enrollment else ("CREATE_COMPLETE",)
+    if stack["StackStatus"] not in ready:
         raise ValueError(f"CloudFormationの状態は {stack['StackStatus']} です。スタックのイベントを確認してください。")
-    outputs = verify_services(session, stack) if distribution_bucket else verify_services(session, stack, inform=inform)
+    if enrollment:
+        stack = update_enrollment(cfn, stack, enrollment)
+    outputs = (verify_services(session, stack) if distribution_bucket and not enrollment
+               else verify_services(session, stack, inform=inform, enrollment=bool(enrollment)))
     credentials = {"schema_version": 1, "api_base_url": outputs["ApiBaseUrl"],
                    "fixed_ingress_ipv4": outputs["FixedIngressIpv4"], "release_id": "web-2026-10-r1",
                    "admin_key": intent["admin_key"]}

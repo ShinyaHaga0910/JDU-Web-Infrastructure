@@ -84,6 +84,23 @@ class ProgressTests(unittest.TestCase):
     def test_issue_requires_teacher(self):
         self.assertEqual(self.call("POST /api/web/admin/issue", {}, self.token)["statusCode"],401)
 
+    def test_shared_enrollment_code_admits_multiple_labs_but_cannot_submit_or_replace_tokens(self):
+        shared = secrets.token_urlsafe(32)
+        self.app.enrollment_hash = api.digest(shared)
+        body = dict(lab_id="new-lab", release_id="web-2026-10-r1", lab_token=secrets.token_urlsafe(32))
+        route = "POST /api/web/enroll"
+        self.assertEqual(self.call(route, body, self.token)["statusCode"], 401)
+        self.assertEqual(self.call(route, dict(body, lab_token=shared), shared)["statusCode"], 400)
+        self.assertEqual(self.call(route, body, shared)["statusCode"], 200)
+        self.assertEqual(self.call(route, body, shared)["statusCode"], 200)
+        self.assertEqual(self.call(route, dict(body, lab_token=secrets.token_urlsafe(32)), shared)["statusCode"], 409)
+        self.assertEqual(self.call(route, dict(body, lab_id="another-lab", lab_token=secrets.token_urlsafe(32)), shared)["statusCode"], 200)
+        registration = dict(self.registration, lab_id=body['lab_id'])
+        self.assertEqual(self.call("POST /api/web/register", registration, shared)["statusCode"], 401)
+        self.assertEqual(self.call("POST /api/web/register", registration, body['lab_token'])["statusCode"], 200)
+        self.assertEqual(self.call("POST /api/web/submit", dict(self.report(), lab_id=body['lab_id']), shared)["statusCode"], 401)
+        self.assertNotIn("lab_token", self.store.get("LAB#new-lab", "META"))
+
     def test_issue_cannot_replace_credentials(self):
         body={"lab_id":"test-lab","release_id":"web-2026-10-r1","lab_token":secrets.token_urlsafe(32)}
         self.assertEqual(self.call("POST /api/web/admin/issue",body,self.admin)["statusCode"],409)

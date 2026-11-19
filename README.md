@@ -20,8 +20,8 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
 
 新規構築には起動時のGitHub最新版を使います。学生側の構築を再開するときは、開始時の版から必要なファイルを取得します。
 
-1. **教師用Learner Lab** では上記のまま実行します。教師のAWSアカウントはCloudShellから取得します。登録する学生のAWSアカウント番号だけを空白区切りで入力します。実行の最後に表示される `*.invitation.txt` の内容を、該当する学生へ個別に共有します。
-2. **学生用Learner Lab** では最後の `teacher` を `student` に変更して実行します。自分専用の招待コードを貼り付け、踏み台のRDPパスワードを設定します。どちらの入力も画面に表示されません。CloudFormationでEC2 5台を構築し、授業用ファイルを配置します。内部SSHの確認後、踏み台から教師の採点APIへ登録し、構築結果の試験送信まで行います。
+1. **教師用Learner Lab** では上記のまま実行します。学生のAWSアカウント番号の入力は不要です。構築後に表示される `classroom.invitation.txt` を開き、中にある共通登録コードを受講者だけが閲覧できる場所で共有します。
+2. **学生用Learner Lab** では最後の `teacher` を `student` に変更して実行します。授業の共通登録コードを入力し、踏み台のRDPパスワードを設定します。どちらの入力も画面に表示されません。スクリプトはLab IDと採点用トークンを個別に生成し、CloudFormationでEC2 5台を構築します。授業用ファイルの配置と内部SSHの確認後、踏み台から教師の採点APIに構築結果を試験送信します。
 
 依存パッケージはGitHubに記録した版とSHA-256で検証してから、CloudShellとAWS Systems Managerを通して配布サーバーへ転送します。教材用S3の作成とClass IDの入力は不要です。
 

@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 import platform
 import re
+import secrets
 import shlex
 import shutil
 import socket
@@ -43,33 +44,33 @@ PORT = 18974
 MAX_ASSET = 200 * 1024 * 1024
 
 # UI messages follow the same order for all four languages.
-LABELS = ('teacher', 'student', 'accounts', 'invite', 'password', 'again', 'aws', 'stack', 'waiting',
+LABELS = ('teacher', 'student', 'invite', 'password', 'again', 'aws', 'stack', 'waiting',
           'invites', 'assets', 'repo', 'nodes', 'ssh', 'lessons', 'grading', 'done', 'stopped', 'tty', 'input_error', 'notice')
 TEXT = {
-    'en': ('Teacher setup', 'Student setup', 'Student AWS account numbers (space-separated)', 'Private invitation code',
+    'en': ('Teacher setup', 'Student setup', 'Course enrollment code',
            'RDP password (12–128 characters)', 'Repeat the RDP password', 'Checking the AWS account and prerequisites',
-           'Deploying with CloudFormation', 'Waiting for the AWS resources', 'Issuing private invitations',
+           'Deploying with CloudFormation', 'Waiting for the AWS resources', 'Preparing the shared course enrollment code',
            'Verifying and transferring dependencies', 'Building the signed internal package repository',
            'Preparing and checking the five servers', 'Verifying internal SSH', 'Staging lesson files', 'Registering and testing grading',
            'Foundation setup complete', 'Setup stopped at stage', 'Use an interactive CloudShell terminal.',
            'Check the values entered and the current AWS account.', 'Google login and browser grading require separate setup.'),
-    'ja': ('教師側の構築', '学生側の構築', '学生のAWSアカウント番号（空白区切り）', '本人用の秘密招待コード',
+    'ja': ('教師側の構築', '学生側の構築', '授業の共通登録コード',
            'RDPパスワード（12〜128文字）', 'RDPパスワードを再入力', 'AWSアカウントと前提条件を確認',
-           'CloudFormationで構築', 'AWSリソースの準備を待機', '学生別の秘密招待コードを発行',
+           'CloudFormationで構築', 'AWSリソースの準備を待機', '授業の共通登録コードを準備',
            '依存パッケージを検証・転送', '署名付きの内部パッケージ配布先を構築',
            'サーバー5台を準備・確認', '内部SSHを確認', '授業用ファイルを配置', '採点登録と試験送信', '基盤の構築・確認が完了',
            '停止した工程', '対話型のCloudShellで実行してください。', '入力内容と現在のAWSアカウントを確認してください。',
            'Googleログインとブラウザ採点には別途設定が必要です。'),
-    'ru': ('Настройка преподавателя', 'Настройка студента', 'Номера аккаунтов AWS студентов через пробел', 'Секретный код приглашения',
+    'ru': ('Настройка преподавателя', 'Настройка студента', 'Код регистрации на курс',
            'Пароль RDP (12–128 символов)', 'Повторите пароль RDP', 'Проверка аккаунта AWS и требований',
-           'Развёртывание через CloudFormation', 'Ожидание ресурсов AWS', 'Выдача личных приглашений',
+           'Развёртывание через CloudFormation', 'Ожидание ресурсов AWS', 'Подготовка общего кода регистрации на курс',
            'Проверка и передача зависимостей', 'Создание подписанного внутреннего репозитория пакетов',
            'Настройка и проверка пяти серверов', 'Проверка внутреннего SSH', 'Размещение учебных файлов', 'Регистрация и проверка оценивания',
            'Базовая настройка завершена', 'Настройка остановлена на этапе', 'Используйте интерактивный терминал CloudShell.',
            'Проверьте введённые данные и текущий аккаунт AWS.', 'Вход через Google и проверку в браузере нужно настроить отдельно.'),
-    'uz': ('O‘qituvchi muhiti', 'Talaba muhiti', 'Talabalarning AWS hisob raqamlari (bo‘sh joy bilan ajrating)', 'Maxfiy taklif kodi',
+    'uz': ('O‘qituvchi muhiti', 'Talaba muhiti', 'Kursga ro‘yxatdan o‘tish kodi',
            'RDP paroli (12–128 belgi)', 'RDP parolini takrorlang', 'AWS hisobi va talablarni tekshirish',
-           'CloudFormation orqali yaratish', 'AWS resurslarini kutish', 'Shaxsiy takliflarni yaratish',
+           'CloudFormation orqali yaratish', 'AWS resurslarini kutish', 'Kurs uchun umumiy ro‘yxatdan o‘tish kodini tayyorlash',
            'Bog‘liqliklarni tekshirish va uzatish', 'Imzolangan ichki paket repozitoriysini yaratish',
            'Beshta serverni tayyorlash va tekshirish', 'Ichki SSH aloqasini tekshirish', 'Dars fayllarini joylash', 'Ro‘yxatdan o‘tkazish va baholashni tekshirish',
            'Asosiy muhit tayyor', 'Sozlash to‘xtagan bosqich', 'Interaktiv CloudShell terminalidan foydalaning.',
@@ -170,21 +171,25 @@ def ensure_session_plugin(ref):
 
 
 def invitation(value):
-    return 'jdu1.' + base64.urlsafe_b64encode(encoded(value)).decode().rstrip('=')
+    prefix = 'jdu2.' if 'enrollment_token' in value else 'jdu1.'
+    return prefix + base64.urlsafe_b64encode(encoded(value)).decode().rstrip('=')
 
 
 def parse_invitation(value, account):
-    if len(value) > 2048 or not re.fullmatch(r'jdu1\.[A-Za-z0-9_-]+', value):
+    if len(value) > 2048 or not re.fullmatch(r'jdu[12]\.[A-Za-z0-9_-]+', value):
         raise ValueError('INVITATION_FORMAT')
     body = value[5:]
     info = json.loads(base64.urlsafe_b64decode(body + '=' * (-len(body) % 4)))
-    fields = {'student_account', 'teacher_account', 'api_base_url', 'fixed_ingress_ipv4', 'lab_id', 'lab_token', 'release_id', 'schema_version'}
-    if (not isinstance(info, dict) or set(info) != fields or info['student_account'] != account
+    fields = {'teacher_account', 'api_base_url', 'fixed_ingress_ipv4', 'release_id', 'schema_version'}
+    shared = value.startswith('jdu2.')
+    fields |= {'enrollment_token'} if shared else {'student_account', 'lab_id', 'lab_token'}
+    if (not isinstance(info, dict) or set(info) != fields
             or not all(isinstance(info[k], str) for k in fields - {'schema_version'})
             or not ACCOUNT.fullmatch(info['teacher_account']) or info['teacher_account'] == account
-            or not re.fullmatch(r'[a-z0-9][a-z0-9-]{2,31}', info['lab_id'])
-            or not re.fullmatch(r'[A-Za-z0-9_-]{43}', info['lab_token'])
+            or not re.fullmatch(r'[A-Za-z0-9_-]{43}', info['enrollment_token' if shared else 'lab_token'])
             or info['release_id'] != RELEASE or info['schema_version'] != 1):
+        raise ValueError('INVITATION_ACCOUNT_OR_SCOPE')
+    if not shared and (info['student_account'] != account or not re.fullmatch(r'[a-z0-9][a-z0-9-]{2,31}', info['lab_id'])):
         raise ValueError('INVITATION_ACCOUNT_OR_SCOPE')
     return info
 
@@ -221,30 +226,31 @@ def classroom_template(base):
 
 def teacher_run(args, screen, session, account, work):
     import install_teacher
-    import web_progress
 
-    students = args.students or screen.prompt('accounts').split()
-    if not students or len(set(students)) != len(students) or any(not ACCOUNT.fullmatch(n) or n == account for n in students):
-        raise ValueError('STUDENT_ACCOUNT_LIST')
+    key_path = work / 'enrollment.private.json'
+    if not key_path.exists():
+        write(key_path, encoded({'token': secrets.token_urlsafe(32)}))
+    token = install_teacher.read_private(key_path)['token']
+    if not re.fullmatch(r'[A-Za-z0-9_-]{43}', token):
+        raise ValueError('ENROLLMENT_KEY')
+    enrollment = (remote_source(args.ref, TEACHER + '/progress_api.py').decode(),
+                  hashlib.sha256(token.encode()).hexdigest())
     screen.step('stack')
     name = TEACHER_STACK
     screen.record(screen.text['waiting'])
     credentials = install_teacher.install(session, session.client('cloudformation'), session.client('ec2'), account,
-                                          name, work, distribution_bucket=False, inform=lambda *_, **__: None)
+                                          name, work, distribution_bucket=False, inform=lambda *_, **__: None,
+                                          enrollment=enrollment)
     screen.record(name)
     screen.step('invites')
-    for student in students:
-        lab = 'lab-' + hashlib.sha256(f'{credentials["api_base_url"]}:{student}'.encode()).hexdigest()[:20]
-        path = work / f'{student}.credentials.json'
-        web_progress.issue(credentials, lab, path)
-        info = web_progress.private_json(path)
-        code = work / f'{student}.invitation.txt'
-        data = (invitation(dict(info, teacher_account=account, student_account=student)) + '\n').encode()
-        if not code.exists():
-            write(code, data)
-        elif code.is_symlink() or code.stat().st_mode & 0o077 or code.read_bytes() != data:
-            raise ValueError('EXISTING_INVITATION_DIFFERS')
-        screen.record(code)
+    info = {k: credentials[k] for k in ('schema_version', 'api_base_url', 'fixed_ingress_ipv4', 'release_id')}
+    code = work / 'classroom.invitation.txt'
+    data = (invitation(dict(info, teacher_account=account, enrollment_token=token)) + '\n').encode()
+    if not code.exists():
+        write(code, data)
+    elif code.is_symlink() or code.stat().st_mode & 0o077 or code.read_bytes() != data:
+        raise ValueError('EXISTING_INVITATION_DIFFERS')
+    screen.record(code)
 
 
 def capacity(ec2):
@@ -522,31 +528,52 @@ def transfer(ssm, node, index, recipe, screen):
         command(ssm, node, 'systemctl stop jdu-classroom-receiver.service')
 
 
-def student_run(args, screen, session, account, parent):
+def student_credentials(invite, parent):
     import install_teacher
     import web_progress
 
+    config = {k: invite[k] for k in ('schema_version', 'api_base_url', 'fixed_ingress_ipv4', 'release_id')}
+    if 'enrollment_token' not in invite:
+        config.update(lab_id=invite['lab_id'], lab_token=invite['lab_token'])
+        web_progress.request(config, '/api/web/student/session', {'lab_id': config['lab_id']}, config['lab_token'])
+        return config
+
+    endpoint = hashlib.sha256(config['api_base_url'].rstrip('/').encode()).hexdigest()
+    identity = parent / f'enrollment-{endpoint}.json'
+    if not identity.exists():
+        write(identity, encoded({'lab_id': 'lab-' + secrets.token_hex(10), 'lab_token': secrets.token_urlsafe(32)}))
+    lab = install_teacher.read_private(identity)
+    config.update(lab_id=lab['lab_id'], lab_token=lab['lab_token'])
+    request = {k: config[k] for k in ('lab_id', 'lab_token', 'release_id')}
+    result = web_progress.request(config, '/api/web/enroll', request, invite['enrollment_token'])
+    if result.get('ok') is not True or any(result.get(k) != config[k] for k in ('lab_id', 'release_id')):
+        raise ValueError('ENROLLMENT_RECEIPT')
+    return config
+
+
+def student_run(args, screen, session, account, parent):
+    import install_teacher
+
     invite = parse_invitation(screen.prompt('invite', secret=True).strip(), account)
-    config = {k: v for k, v in invite.items() if k not in ('teacher_account', 'student_account')}
-    web_progress.request(config, '/api/web/student/session', {'lab_id': config['lab_id']}, config['lab_token'])
     if not shutil.which('aws'):
         raise ValueError('SSM_CLIENT')
-    screen.step('session_tool')
-    ensure_session_plugin(args.ref)
-    screen.step('stack')
-    work = parent / config['lab_id']
-    work.mkdir(mode=0o700, exist_ok=True)
-    credential_path = work / 'student.credentials.json'
-    if not credential_path.exists():
-        write(credential_path, encoded(config))
-    elif install_teacher.read_private(credential_path) != config:
-        raise ValueError('OLD_STUDENT_CREDENTIAL_DIFFERS')
-    with os.fdopen(os.open(work / 'install.lock', os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW, 0o600)) as lock:
+    with os.fdopen(os.open(parent / 'install.lock', os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW, 0o600)) as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        setup_student(args, screen, session, account, invite, config, work)
+        config = student_credentials(invite, parent)
+        screen.step('session_tool')
+        ensure_session_plugin(args.ref)
+        screen.step('stack')
+        work = parent / config['lab_id']
+        work.mkdir(mode=0o700, exist_ok=True)
+        credential_path = work / 'student.credentials.json'
+        if not credential_path.exists():
+            write(credential_path, encoded(config))
+        elif install_teacher.read_private(credential_path) != config:
+            raise ValueError('OLD_STUDENT_CREDENTIAL_DIFFERS')
+        setup_student(args, screen, session, account, config, work)
 
 
-def setup_student(args, screen, session, account, invite, config, work):
+def setup_student(args, screen, session, account, config, work):
     import install_teacher
 
     intent = work / 'deployment.json'
@@ -555,7 +582,7 @@ def setup_student(args, screen, session, account, invite, config, work):
         raise ValueError('SOURCE_REVISION')
     ssm = session.client('ssm')
     index, versions, roles, definitions, requirements = assets(ref)
-    state, nodes, output = stack_setup(session.client('cloudformation'), session.client('ec2'), account, invite, work, ref, screen)
+    state, nodes, output = stack_setup(session.client('cloudformation'), session.client('ec2'), account, config, work, ref, screen)
     wait_online(ssm, nodes)
     deploy_guest(ref, ssm, nodes)
     common = dict(lab_id=config['lab_id'], deployment_id=state['deployment_id'], release_id=RELEASE,
@@ -617,7 +644,6 @@ def main():
     parser.add_argument('role', choices=('teacher', 'student'))
     parser.add_argument('--ref', required=True, help='Exact GitHub commit for the installer and accompanying source files.')
     parser.add_argument('--lang', choices=TEXT)
-    parser.add_argument('--students', nargs='+', metavar='AWS_ACCOUNT')
     args = parser.parse_args()
     if not sys.stdin.isatty():
         print(dict(zip(LABELS, TEXT[args.lang or 'en']))['tty'], file=sys.stderr)

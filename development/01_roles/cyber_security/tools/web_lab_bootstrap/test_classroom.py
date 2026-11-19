@@ -38,6 +38,56 @@ class ClassroomTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'INVITATION_ACCOUNT_OR_SCOPE'):
             classroom.parse_invitation(code, invited['teacher_account'])
 
+    def test_shared_code_accepts_multiple_accounts_and_reuses_a_private_identity(self):
+        invite = dict(teacher_account='123456789012', api_base_url='https://abc.execute-api.us-east-1.amazonaws.com',
+                      fixed_ingress_ipv4='8.8.8.8', enrollment_token='a' * 43, release_id=classroom.RELEASE,
+                      schema_version=1)
+        code = classroom.invitation(invite)
+        for account in ('012345678901', '987654321012'):
+            self.assertEqual(classroom.parse_invitation(code, account), invite)
+        with self.assertRaisesRegex(ValueError, 'INVITATION_ACCOUNT_OR_SCOPE'):
+            classroom.parse_invitation(code, invite['teacher_account'])
+
+        teacher, progress = Mock(), Mock()
+        teacher.read_private.side_effect = lambda path: json.loads(path.read_bytes())
+        progress.request.side_effect = lambda _, path, body, token: {
+            'ok': path == '/api/web/enroll' and token == invite['enrollment_token'],
+            'lab_id': body['lab_id'], 'release_id': body['release_id'],
+        }
+        with tempfile.TemporaryDirectory() as temp, patch.dict(sys.modules, install_teacher=teacher, web_progress=progress):
+            first, second = (Path(temp, name) for name in ('first', 'second'))
+            first.mkdir()
+            second.mkdir()
+            initial = classroom.student_credentials(invite, first)
+            self.assertEqual(initial, classroom.student_credentials(invite, first))
+            other = classroom.student_credentials(invite, second)
+            self.assertNotEqual(initial['lab_id'], other['lab_id'])
+            self.assertNotEqual(initial['lab_token'], other['lab_token'])
+            self.assertNotIn('enrollment_token', initial)
+            for call in progress.request.call_args_list:
+                self.assertEqual(set(call.args[2]), {'lab_id', 'lab_token', 'release_id'})
+
+    def test_teacher_emits_one_reusable_code_without_asking_for_accounts(self):
+        account = '123456789012'
+        teacher = Mock()
+        teacher.read_private.side_effect = lambda path: json.loads(path.read_bytes())
+        teacher.install.return_value = dict(schema_version=1, release_id=classroom.RELEASE,
+                                            api_base_url='https://abc.execute-api.us-east-1.amazonaws.com',
+                                            fixed_ingress_ipv4='8.8.8.8')
+        screen = Mock(text={'waiting': 'Waiting'})
+        with tempfile.TemporaryDirectory() as temp, patch.dict(sys.modules, install_teacher=teacher), \
+                patch.object(classroom, 'remote_source', return_value=b'api source'):
+            work = Path(temp)
+            classroom.teacher_run(Mock(), screen, Mock(), account, work)
+            code = work / 'classroom.invitation.txt'
+            invite = classroom.parse_invitation(code.read_text().strip(), '012345678901')
+            classroom.teacher_run(Mock(), screen, Mock(), account, work)
+            self.assertEqual(code.read_text().strip(), classroom.invitation(invite))
+            self.assertEqual(code.stat().st_mode & 0o777, 0o600)
+        screen.prompt.assert_not_called()
+        self.assertEqual(teacher.install.call_args.kwargs['enrollment'],
+                         ('api source', hashlib.sha256(invite['enrollment_token'].encode()).hexdigest()))
+
     def test_template_keeps_private_topology_and_all_nodes_use_ssm(self):
         source = ROOT / 'development/templates/web-lab-student.template.json'
         template = classroom.classroom_template(json.loads(source.read_bytes()))
@@ -62,7 +112,7 @@ class ClassroomTests(unittest.TestCase):
             for expected in (latest, saved):
                 with patch.object(classroom, 'assets', side_effect=ValueError('STOP_BEFORE_DEPLOY')) as assets:
                     with self.assertRaisesRegex(ValueError, 'STOP_BEFORE_DEPLOY'):
-                        classroom.setup_student(Mock(ref=latest), Mock(), Mock(), '012345678901', {}, {}, work)
+                        classroom.setup_student(Mock(ref=latest), Mock(), Mock(), '012345678901', {}, work)
                     assets.assert_called_once_with(expected)
                 (work / 'deployment.json').touch()
 

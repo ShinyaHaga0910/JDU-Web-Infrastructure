@@ -20,8 +20,8 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
 
 Yangi muhit uchun GitHub’dagi joriy versiya ishlatiladi. Talaba sozlashni davom ettirganda, kerakli fayllar sozlash boshlangan versiyadan olinadi.
 
-1. **O‘qituvchi** buyruqlarni o‘zining Learner Lab muhitida `teacher` argumenti bilan bajaradi. Skript o‘qituvchining AWS hisobini CloudShell seansidan aniqlaydi. Faqat talabalar AWS hisob raqamlarini bo‘sh joy bilan ajratib kiriting. Har bir `*.invitation.txt` faylining mazmunini tegishli talabaga shaxsan yuboring.
-2. **Talaba** oxirgi qatordagi `teacher` so‘zini `student` bilan almashtirib, buyruqlarni o‘zining Learner Lab muhitida bajaradi. Shaxsiy taklif kodini kiriting va oraliq server uchun RDP parolini belgilang. Kiritilgan qiymatlar ekranda ko‘rinmaydi. CloudFormation beshta EC2 instansini yaratadi. Skript dars fayllarini joylaydi, ichki SSH aloqasini tekshiradi, so‘ng oraliq serverdan o‘qituvchining baholash API’sida ro‘yxatdan o‘tib, sinov natijasini yuboradi.
+1. **O‘qituvchi** buyruqlarni o‘zining Learner Lab muhitida `teacher` argumenti bilan bajaradi. Talabalarning AWS hisob raqamlarini kiritish shart emas. Sozlash oxirida ko‘rsatilgan `classroom.invitation.txt` faylini oching va umumiy ro‘yxatdan o‘tish kodini faqat kurs qatnashchilariga yuboring.
+2. **Talaba** oxirgi qatordagi `teacher` so‘zini `student` bilan almashtirib, buyruqlarni o‘zining Learner Lab muhitida bajaradi. Umumiy ro‘yxatdan o‘tish kodini kiriting va oraliq server uchun RDP parolini belgilang. Kiritilgan qiymatlar ekranda ko‘rinmaydi. Skript alohida Lab ID va baholash tokenini yaratadi. CloudFormation beshta EC2 instansini yaratadi. Skript dars fayllarini joylab, ichki SSH aloqasini tekshirgach, oraliq serverdan o‘qituvchining baholash API’siga sinov natijasini yuboradi.
 
 Skript GitHub’da belgilangan paket versiyalari va SHA-256 qiymatlarini tekshiradi. Paketlarni CloudShell va AWS Systems Manager orqali ichki paket tarqatish serveriga yuboradi. O‘quv materiallari uchun S3 yaratish va Class ID kiritish shart emas.
 

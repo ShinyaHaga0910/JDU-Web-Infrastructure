@@ -49,6 +49,32 @@ class InstallTeacherTests(TestCase):
             with self.assertRaisesRegex(ValueError, "SHA-256"):
                 installer.load_template("us-east-1a", "t3a.small")
 
+    def test_enrollment_updates_only_the_api_and_reuses_existing_parameters(self):
+        raw = Path(__file__).with_name("web-teacher.template.json").read_bytes()
+        with mock.patch.object(installer.subprocess, "check_output", return_value=raw):
+            original = installer.load_template("us-east-1b", "t3.small", distribution_bucket=False)
+        stack = {"StackId": "existing-stack", "Parameters": [{"ParameterKey": "AdminKeyHash"}]}
+        cfn = mock.Mock()
+        cfn.get_template.return_value = {"TemplateBody": original}
+        source = Path(__file__).with_name("progress_api.py").read_text(encoding="utf-8")
+        enrollment = (source, "a" * 64)
+        with mock.patch.object(installer, "find_stack", return_value=stack):
+            self.assertEqual(installer.update_enrollment(cfn, stack, enrollment), stack)
+        options = cfn.update_stack.call_args.kwargs
+        self.assertEqual(options["Parameters"], [{"ParameterKey": "AdminKeyHash", "UsePreviousValue": True}])
+        self.assertLess(len(options["TemplateBody"].encode()), 51200)
+        resources = json.loads(options["TemplateBody"])["Resources"]
+        route = resources.pop("ClassroomEnrollmentRoute")
+        self.assertEqual(route["Properties"]["RouteKey"], "POST /api/web/enroll")
+        previous = json.loads(original)["Resources"]
+        self.assertEqual(resources.pop("ProgressFunction")["Properties"]["Environment"]["Variables"]["ENROLLMENT_KEY_HASH"], "a" * 64)
+        del previous["ProgressFunction"]
+        self.assertEqual(resources, previous)
+        cfn.reset_mock()
+        cfn.get_template.return_value = {"TemplateBody": options["TemplateBody"]}
+        self.assertEqual(installer.update_enrollment(cfn, stack, enrollment), stack)
+        cfn.update_stack.assert_not_called()
+
     def test_capacity_falls_back_to_available_alternative(self):
         ec2 = mock.Mock()
         ec2.describe_availability_zones.return_value = {"AvailabilityZones": [{"ZoneName": "us-east-1b"}]}

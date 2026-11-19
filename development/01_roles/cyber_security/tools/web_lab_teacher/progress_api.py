@@ -1,7 +1,7 @@
 """Separate Web Lab progress API. No Linux tables, functions or keys are used.
 
 Stores anonymous Lab IDs and authenticated reports, not authoritative exam grades.
-The teacher issues a unique credential before the student binds a five-node lab.
+An individual credential is required to bind a five-node lab and submit reports.
 """
 
 import base64
@@ -212,8 +212,9 @@ class DynamoStore:
 
 
 class ProgressService:
-    def __init__(self, store, admin_hash, api_base_url):
+    def __init__(self, store, admin_hash, api_base_url, enrollment_hash=""):
         self.store, self.admin_hash, self.base_url = store, admin_hash, api_base_url
+        self.enrollment_hash = enrollment_hash
 
     def admin(self, event):
         token = authorization(event)
@@ -231,7 +232,18 @@ class ProgressService:
 
     def issue(self, event):
         self.admin(event)
+        return self.create_lab(parse_body(event))
+
+    def enroll(self, event):
+        token = authorization(event)
+        if len(token) != 43 or not self.enrollment_hash or not hmac.compare_digest(digest(token), self.enrollment_hash):
+            raise ApiError(401, "unauthorized")
         body = parse_body(event)
+        if body.get("lab_token") == token:
+            raise ApiError(400, "an individual token is required")
+        return self.create_lab(body)
+
+    def create_lab(self, body):
         require_keys(body, ("lab_id", "release_id", "lab_token"))
         lab_id = field(body, "lab_id", LAB_RE, maximum=32)
         release_id = field(body, "release_id", RELEASE_RE, maximum=64)
@@ -344,6 +356,8 @@ class ProgressService:
                 return response(200, {"ok": True, "service": "jdu-web-progress", "schema_version": 1})
             if route == "POST /api/web/admin/issue":
                 return self.issue(event)
+            if route == "POST /api/web/enroll":
+                return self.enroll(event)
             if route == "POST /api/web/register":
                 return self.register(event)
             if route == "POST /api/web/submit":
@@ -443,5 +457,6 @@ _service = None
 def handler(event, context):
     global _service
     if _service is None:
-        _service = ProgressService(DynamoStore(os.environ["TABLE_NAME"]), os.environ["ADMIN_KEY_HASH"], os.environ["API_BASE_URL"])
+        _service = ProgressService(DynamoStore(os.environ["TABLE_NAME"]), os.environ["ADMIN_KEY_HASH"],
+                                   os.environ["API_BASE_URL"], os.environ.get("ENROLLMENT_KEY_HASH", ""))
     return _service.handle(event)
