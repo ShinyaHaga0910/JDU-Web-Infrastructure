@@ -768,7 +768,8 @@ def setup_student(args, screen, session, account, config, work):
     screen.step('assets')
     recipe = dict(assets={n: item[1] for n, item in index.items()}, requirements=requirements,
                   packages=pinned(roles['common'] + roles['repo']))
-    repo_hash = transfer(ssm, nodes['repo'], index, recipe, screen)
+    with screen.aws_wait():
+        repo_hash = transfer(ssm, nodes['repo'], index, recipe, screen)
     screen.step('repo')
     public_key = guest(ssm, nodes['repo'], {'operation': 'repo', 'recipe_sha256': repo_hash})['key']
     screen.step('nodes')
