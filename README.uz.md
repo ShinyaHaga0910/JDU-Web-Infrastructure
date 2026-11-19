@@ -8,6 +8,30 @@ Talabalar AWS VPC ichidagi EC2 instanslarida DNS, veb-server va ma’lumotlar ba
 
 ## AWS o‘quv muhitini yaratish
 
+### Har bir rol uchun bir martalik sinov tartibi
+
+AWS Academy’da o‘zingizga tegishli Learner Lab’ni ishga tushiring va quyidagi buyruqlarni Shimoliy Virjiniya (`us-east-1`) regionidagi CloudShell’ga joylang. Avval English, 日本語, Русский yoki O‘zbekcha tilini tanlang. Kiritish ko‘rsatmalari, jarayon holati, yakuniy natijalar va xatolar tanlangan tilda ko‘rsatiladi.
+
+```bash
+role=teacher
+ref='efd96d963d1eb34e7fca0dd054735fa6ab924ef0'
+url="https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/$ref/development/01_roles/cyber_security/tools/web_lab_bootstrap/classroom.py"
+script=$(mktemp) &&
+  curl -q -fsS --proto '=https' "$url" -o "$script" &&
+  (cd -- "$(dirname -- "$script")" &&
+    printf '%s  %s\n' 'c9f3aaa4b64a765c538903edb7a3d2c76984af6662bdb76f8ba071bb9610be1a' "$(basename -- "$script")" | sha256sum --check --status) &&
+  python3 -B "$script" "$role" --ref "$ref"
+```
+
+1. **O‘qituvchi** buyruqlarni o‘zining Learner Lab muhitida `role=teacher` bilan bajaradi. Skript o‘qituvchining AWS hisobini CloudShell seansidan aniqlaydi. Faqat talabalar AWS hisob raqamlarini bo‘sh joy bilan ajratib kiriting. Har bir `*.invitation.txt` faylining mazmunini tegishli talabaga shaxsan yuboring.
+2. **Talaba** buyruqlarni o‘zining Learner Lab muhitida birinchi qatorni `role=student` qilib bajaradi. Shaxsiy taklif kodini kiriting va oraliq server uchun RDP parolini belgilang. Kiritilgan qiymatlar ekranda ko‘rinmaydi. CloudFormation beshta EC2 instansini yaratadi. Skript dars fayllarini joylaydi, ichki SSH aloqasini tekshiradi, so‘ng oraliq serverdan o‘qituvchining baholash API’sida ro‘yxatdan o‘tib, sinov natijasini yuboradi.
+
+Skript GitHub’da belgilangan paket versiyalari va SHA-256 qiymatlarini tekshiradi. Paketlarni CloudShell va AWS Systems Manager orqali ichki paket tarqatish serveriga yuboradi. O‘quv materiallari uchun S3 yaratish va Class ID kiritish shart emas.
+
+Yangi tartib Learner Lab’da boshidan oxirigacha hali tekshirilmagan. Ta’lim muassasasining Google hisobi bilan kirish va Web Portal orqali topshiriqlarni baholash alohida sozlanadi.
+
+## S3 orqali tarqatishning avvalgi tartibi
+
 ### O‘qituvchi uchun
 
 AWS Academy’da kerakli guruhning **o‘qituvchi uchun Learner Lab** muhitini ishga tushiring. Quyidagi buyruqlarni Shimoliy Virjiniya (`us-east-1`) regionidagi CloudShell’da bajaring.
