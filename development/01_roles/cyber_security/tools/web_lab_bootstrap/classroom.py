@@ -178,7 +178,7 @@ class Screen:
         self.total = len(self.stages)
         total_label, wait_hint, self.wait_update = PROGRESS_TEXT[language]
         self.wait_hint = wait_hint.format(minutes=5)
-        self.transfer_hint = wait_hint.format(minutes=15)
+        self.transfer_hint = wait_hint.format(minutes=20)
         self.servers = dict(zip(ROLES, SERVER_NAMES[language]))
         print('\n' + '═' * 56 + f'\n  JDU WEB INFRASTRUCTURE  /  {self.text[role]}\n'
               f'  {total_label.format(total=self.total)}\n' + '═' * 56)
