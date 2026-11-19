@@ -64,8 +64,8 @@ TEXT = {
            'Choose your own password. You will use it later to open the desktop of the lab’s bastion server (RDP).',
            'Remember this password. If you forget it, you cannot connect and continue the lab.',
            'Each character appears as *. Enter the same password twice.',
-           'Choose a password (12–128 characters)', 'Enter the same password again',
-           'Use 12–128 characters on one line.', 'The two entries do not match. Enter your password again.',
+           'Choose a password (4–128 characters)', 'Enter the same password again',
+           'Use 4–128 characters on one line.', 'The two entries do not match. Enter your password again.',
            'Checking the AWS account and prerequisites',
            'Deploying with CloudFormation', 'Waiting for the AWS resources', 'Preparing the shared course enrollment code',
            'Verifying and transferring dependencies', 'Building the signed internal package repository',
@@ -79,8 +79,8 @@ TEXT = {
            '自分でパスワードを決めてください。後で、演習用の踏み台サーバーのデスクトップを開くとき（RDP接続）に使います。',
            'このパスワードを忘れないでください。忘れると踏み台サーバーに接続できず、演習を進められません。',
            '入力した文字は1文字ずつ * で表示されます。同じパスワードを2回入力してください。',
-           '自分で決めたパスワード（12〜128文字）', '同じパスワードをもう一度入力',
-           'パスワードは1行で12〜128文字にしてください。', '2回の入力が一致しません。もう一度設定してください。',
+           '自分で決めたパスワード（4〜128文字）', '同じパスワードをもう一度入力',
+           'パスワードは1行で4〜128文字にしてください。', '2回の入力が一致しません。もう一度設定してください。',
            'AWSアカウントと前提条件を確認',
            'CloudFormationで構築', 'AWSリソースの準備を待機', '授業の共通登録コードを準備',
            '依存パッケージを検証・転送', '署名付きの内部パッケージ配布先を構築',
@@ -93,8 +93,8 @@ TEXT = {
            'Придумайте свой пароль. Позже он понадобится, чтобы открыть рабочий стол учебного сервера доступа (RDP).',
            'Запомните этот пароль. Если вы его забудете, то не сможете подключиться к серверу и продолжить практикум.',
            'Каждый введённый символ отображается как *. Введите один и тот же пароль дважды.',
-           'Придуманный пароль (12–128 символов)', 'Введите тот же пароль ещё раз',
-           'Введите от 12 до 128 символов в одной строке.', 'Введённые пароли не совпадают. Попробуйте ещё раз.',
+           'Придуманный пароль (4–128 символов)', 'Введите тот же пароль ещё раз',
+           'Введите от 4 до 128 символов в одной строке.', 'Введённые пароли не совпадают. Попробуйте ещё раз.',
            'Проверка аккаунта AWS и требований',
            'Развёртывание через CloudFormation', 'Ожидание ресурсов AWS', 'Подготовка общего кода регистрации на курс',
            'Проверка и передача зависимостей', 'Создание подписанного внутреннего репозитория пакетов',
@@ -108,8 +108,8 @@ TEXT = {
            'Parolni o‘zingiz tanlang. Keyin undan amaliyotdagi oraliq serverning ish stolini ochishda (RDP) foydalanasiz.',
            'Bu parolni unutmang. Parolni unutsangiz, serverga ulana olmaysiz va amaliyotni davom ettira olmaysiz.',
            'Har bir kiritilgan belgi * ko‘rinishida chiqadi. Bir xil parolni ikki marta kiriting.',
-           'O‘zingiz tanlagan parol (12–128 belgi)', 'Xuddi shu parolni yana kiriting',
-           'Parol bir qatorda 12–128 belgidan iborat bo‘lsin.', 'Parollar mos kelmadi. Qaytadan kiriting.',
+           'O‘zingiz tanlagan parol (4–128 belgi)', 'Xuddi shu parolni yana kiriting',
+           'Parol bir qatorda 4–128 belgidan iborat bo‘lsin.', 'Parollar mos kelmadi. Qaytadan kiriting.',
            'AWS hisobi va talablarni tekshirish',
            'CloudFormation orqali yaratish', 'AWS resurslarini kutish', 'Kurs uchun umumiy ro‘yxatdan o‘tish kodini tayyorlash',
            'Bog‘liqliklarni tekshirish va uzatish', 'Imzolangan ichki paket repozitoriysini yaratish',
@@ -413,7 +413,7 @@ def rdp_password_hash(screen):
     screen.record(screen.text['password_masked'])
     while True:
         password = screen.prompt('password', secret=True)
-        if not 12 <= len(password) <= 128 or any(ch in password for ch in '\r\n\0'):
+        if not 4 <= len(password) <= 128 or any(ch in password for ch in '\r\n\0'):
             screen.record(screen.text['password_invalid'])
             continue
         if password != screen.prompt('password_again', secret=True):

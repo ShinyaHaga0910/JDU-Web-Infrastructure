@@ -34,7 +34,7 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
   bash "$setup" student
 ```
 
-Tilni tanlang, o‘qituvchi bergan umumiy ro‘yxatdan o‘tish kodini nusxalab kiriting va keyin oraliq serverning ish stolini ochish uchun ishlatiladigan parolni o‘zingiz tanlang. Kiritilgan ro‘yxatdan o‘tish kodi ekranda ko‘rinadi. Tasdiqlash uchun bir xil parolni ikki marta kiriting. Har ikki safar ham har bir belgi `*` ko‘rinishida chiqadi. Parolni unutmang. Parolni unutsangiz, serverga ulana olmaysiz va amaliyotni davom ettira olmaysiz. Skript alohida Lab ID va baholash tokenini yaratadi. CloudFormation beshta EC2 instansini yaratadi. Skript dars fayllarini joylab, ichki SSH aloqasini tekshirgach, oraliq serverdan o‘qituvchining baholash API’siga sinov natijasini yuboradi.
+Tilni tanlang, o‘qituvchi bergan umumiy ro‘yxatdan o‘tish kodini nusxalab kiriting va keyin oraliq serverning ish stolini ochish uchun ishlatiladigan 4–128 belgidan iborat parolni o‘zingiz tanlang. Kiritilgan ro‘yxatdan o‘tish kodi ekranda ko‘rinadi. Tasdiqlash uchun bir xil parolni ikki marta kiriting. Har ikki safar ham har bir belgi `*` ko‘rinishida chiqadi. Parolni unutmang. Parolni unutsangiz, serverga ulana olmaysiz va amaliyotni davom ettira olmaysiz. Skript alohida Lab ID va baholash tokenini yaratadi. CloudFormation beshta EC2 instansini yaratadi. Skript dars fayllarini joylab, ichki SSH aloqasini tekshirgach, oraliq serverdan o‘qituvchining baholash API’siga sinov natijasini yuboradi.
 
 Skript GitHub’da belgilangan paket versiyalari va SHA-256 qiymatlarini tekshiradi. Paketlarni CloudShell va AWS Systems Manager orqali ichki paket tarqatish serveriga yuboradi. O‘quv materiallari uchun S3 yaratish va Class ID kiritish shart emas.
 
@@ -52,7 +52,7 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
   bash "$setup" reset-rdp
 ```
 
-Tilni tanlang. Bir nechta Lab topilsa, keraklisini tanlang. Yangi parolni ikki marta kiriting. Har bir belgi `*` ko‘rinishida chiqadi. Eski parol va umumiy ro‘yxatdan o‘tish kodini kiritish shart emas. Sozlash tugagach, `labuser` foydalanuvchisi sifatida yangi parol bilan ulaning.
+Tilni tanlang. Bir nechta Lab topilsa, keraklisini tanlang. 4–128 belgidan iborat yangi parolni ikki marta kiriting. Har bir belgi `*` ko‘rinishida chiqadi. Eski parol va umumiy ro‘yxatdan o‘tish kodini kiritish shart emas. Sozlash tugagach, `labuser` foydalanuvchisi sifatida yangi parol bilan ulaning.
 
 ## S3 orqali tarqatishning avvalgi tartibi
 

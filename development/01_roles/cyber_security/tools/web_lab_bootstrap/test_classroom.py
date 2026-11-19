@@ -60,10 +60,10 @@ class ClassroomTests(unittest.TestCase):
             self.assertRegex(messages[1], r'経過 \d{2}:\d{2}$')
 
     def test_password_is_only_hashed_after_matching_confirmation(self):
-        chosen = 'test-password-only'
+        chosen = 'Qx6!'
         with contextlib.redirect_stdout(io.StringIO()) as output:
             screen = classroom.Screen('ja', 'student')
-            with patch.object(classroom, 'masked_password', side_effect=['short', chosen, 'different', chosen, chosen]) as prompt, \
+            with patch.object(classroom, 'masked_password', side_effect=['abc', chosen, 'different', chosen, chosen]) as prompt, \
                     patch.object(classroom.subprocess, 'check_output', return_value=b'fixture-hash\n') as openssl:
                 self.assertEqual(classroom.rdp_password_hash(screen), 'fixture-hash')
         self.assertEqual(prompt.call_count, 5)
