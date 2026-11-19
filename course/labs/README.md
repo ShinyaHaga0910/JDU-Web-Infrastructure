@@ -1,7 +1,7 @@
 # Web演習：練習P・課題M
 
 サーバーを自分で設定し、ブラウザで結果を確認する演習です。
-**Pは詳しい手順つきの練習、Mは別の対象を自分で構築する課題**です。
+**C（Chapter）は教科書の章、P（Practice）は手順付きの練習、M（Mission）は自分で取り組む課題**です。
 
 ## 言語を選ぶ
 
@@ -21,19 +21,30 @@ P3/M3は2026-11-13に削除したため欠番です。DNSからDBへ進みます
 
 | 学ぶテーマ | 先に読む教科書 | 次に取り組む演習 | 課題画面で確認する点数 |
 | --- | --- | --- | --- |
-| システムの全体像と接続 | [第1章 Webシステムの構成](../textbook/docs/ja/01-web-system.md)<br>[第2章 AWSのネットワークと通信経路](../textbook/docs/ja/02-network-paths.md)<br>[第3章 サーバーへの接続と作業場所](../textbook/docs/ja/03-connecting-and-working.md) | [P0 環境と実行場所](docs/ja/p0.md) → [M0 環境と実行場所](docs/ja/m0.md) | M0は0点 |
-| HTTPでファイルを配信する | [第4章 HTTPの仕組み](../textbook/docs/ja/04-http-requests-and-responses.md)<br>[第5章 Nginxで静的ファイルを配信](../textbook/docs/ja/05-nginx-static-files.md) | [P1](docs/ja/p1.md) → [M1](docs/ja/m1.md) | 8/8 |
-| DNSで名前を解決する | [第6章 DNSによる名前解決](../textbook/docs/ja/06-dns-name-resolution.md)<br>[第7章 内部DNSの設定と動作確認](../textbook/docs/ja/07-internal-dns-configuration.md) | [P2](docs/ja/p2.md) → [M2](docs/ja/m2.md) | 13/13 |
-| PostgreSQLの接続と認証 | [第8章 リレーショナルDBとSQL](../textbook/docs/ja/08-databases-and-sql.md)<br>[第9章 PostgreSQLの接続と認証](../textbook/docs/ja/09-postgresql-connections.md) | [P4](docs/ja/p4.md) → [M4](docs/ja/m4.md) | 9/9 |
-| 提供アプリを練習用DBへ接続する | [第10章 Web・アプリ・DBの連携](../textbook/docs/ja/10-web-app-and-database.md)<br>[第11章 提供アプリの配置と初期設定](../textbook/docs/ja/11-application-deployment.md) | [P5](docs/ja/p5.md) | — |
-| 練習環境の公開範囲と権限を整える | [第12章 公開範囲と最小権限](../textbook/docs/ja/12-access-and-least-privilege.md) | [P6](docs/ja/p6.md) | — |
-| 提供アプリを自力課題用DBへ接続する | 必要な箇所を第10・11章で読み返す | [M5](docs/ja/m5.md) | 13/13 |
-| 自力課題の公開範囲と権限を仕上げる | 必要な箇所を第12章で読み返す | [M6](docs/ja/m6.md) | 16/16 |
-| 運用・保守と障害への対応 | [第13章 運用・保守と障害への対応](../textbook/docs/ja/13-observation-and-recovery.md) | M6の後に読みます。演習中にエラーが出たときも参照できます。 | — |
-
-共通登録コードで環境構築を済ませた場合は、P0で操作する端末と接続先を確認します。P0の冒頭にある署名付き配布版の確認は、署名付き配布を使うときの手順です。
+| システムの全体像と接続 | [C1 Webシステムの構成](../textbook/docs/ja/01-web-system.md)<br>[C2 AWSのネットワークと通信経路](../textbook/docs/ja/02-network-paths.md)<br>[C3 サーバーへの接続と作業場所](../textbook/docs/ja/03-connecting-and-working.md) | [P0 環境と実行場所](docs/ja/p0.md) → [M0 環境と実行場所](docs/ja/m0.md) | M0は0点 |
+| HTTPでファイルを配信する | [C4 HTTPの仕組み](../textbook/docs/ja/04-http-requests-and-responses.md)<br>[C5 Nginxで静的ファイルを配信](../textbook/docs/ja/05-nginx-static-files.md) | [P1](docs/ja/p1.md) → [M1](docs/ja/m1.md) | 8/8 |
+| DNSで名前を解決する | [C6 DNSによる名前解決](../textbook/docs/ja/06-dns-name-resolution.md)<br>[C7 内部DNSの設定と動作確認](../textbook/docs/ja/07-internal-dns-configuration.md) | [P2](docs/ja/p2.md) → [M2](docs/ja/m2.md) | 13/13 |
+| PostgreSQLの接続と認証 | [C8 リレーショナルDBとSQL](../textbook/docs/ja/08-databases-and-sql.md)<br>[C9 PostgreSQLの接続と認証](../textbook/docs/ja/09-postgresql-connections.md) | [P4](docs/ja/p4.md) → [M4](docs/ja/m4.md) | 9/9 |
+| 提供アプリを練習用DBへ接続する | [C10 Web・アプリ・DBの連携](../textbook/docs/ja/10-web-app-and-database.md)<br>[C11 提供アプリの配置と初期設定](../textbook/docs/ja/11-application-deployment.md) | [P5](docs/ja/p5.md) | — |
+| 練習環境の公開範囲と権限を整える | [C12 公開範囲と最小権限](../textbook/docs/ja/12-access-and-least-privilege.md) | [P6](docs/ja/p6.md) | — |
+| 提供アプリを自力課題用DBへ接続する | 必要な箇所をC10・C11で読み返す | [M5](docs/ja/m5.md) | 13/13 |
+| 自力課題の公開範囲と権限を仕上げる | 必要な箇所をC12で読み返す | [M6](docs/ja/m6.md) | 16/16 |
+| 運用・保守と障害への対応 | [C13 運用・保守と障害への対応](../textbook/docs/ja/13-observation-and-recovery.md) | M6の後に読みます。演習中にエラーが出たときも参照できます。 | — |
 
 P5で使った練習環境をP6で整理してから、M5の自力課題用環境へ切り替えます。Pは成績外です。M1・M2・M4・M5・M6は合計**59素点**で、科目の25点への換算は教師が行います。
+
+### C1 → C2 → C3 → P0 → M0の進め方
+
+C1では備品管理システムの全体像と5台の役割をつかみます。C1の「練習・課題1」は、後でP1・M1で構築するWeb配信の予告です。C2では、Windowsから踏み台の公開IPへRDPでつなぐ経路と、踏み台からWebの内部IPへSSHでつなぐ経路に注目します。C3では、RDP・内部SSH・SSMで、それぞれどの端末とユーザーを使うのかを確認します。
+
+共通登録コードで環境構築を完了した場合は、次の順でP0に取り組みます。署名付き配布の確認（P0.1）と教材ファイルの配置（P0.4）は、署名付き配布を使う場合に参照してください。
+
+1. [P0.2](docs/ja/p0.md#p02-5台のinstance-idを記録する)で、自分の5台と各インスタンスIDを照合します。
+2. [P0.6](docs/ja/p0.md#p06-rdpで踏み台のデスクトップを開く)で、Windowsから踏み台のデスクトップにRDPで入り、ユーザー名 `labuser` と操作場所を確認します。
+3. 踏み台のデスクトップ内で端末を開き、`lab-ssh web` を実行します。接続後の `id -un` は `ubuntu`、`hostname -I` にはWebの内部IP `10.20.1.20` が表示されます。
+4. [P0.3](docs/ja/p0.md#p03-ssmで入り戻る)に沿って、学生用CloudShellからWebへSSM接続します。ユーザー `ssm-user` とサーバーの役割 `web` を確認します。P1の設定作業でもこの経路を使います。
+
+[M0](docs/ja/m0.md)では、自分の環境で操作先とユーザーを選べることを確かめます。教師が課題画面を案内したら、P0.5とM0を画面でも確認します。共通登録コード方式のウォークスルーで課題画面の接続設定がこれからの場合は、P0の接続確認を済ませてC4・C5へ進み、P1の設定作業に入れます。
 
 各Pでは、実行場所・目的・操作・設定の意味・期待結果・困ったときの確認先を順に読みます。
 Mには完成要件と採点条件を載せています。
