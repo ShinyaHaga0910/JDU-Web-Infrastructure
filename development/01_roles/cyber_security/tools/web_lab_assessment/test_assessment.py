@@ -72,6 +72,29 @@ class AssessmentTests(unittest.TestCase):
     def view(self):
         return project_lab(self.store.labs()[0])
 
+    def test_shared_code_admits_a_student_to_the_current_grading_api(self):
+        shared = secrets.token_urlsafe(32)
+        self.app.enrollment_hash = legacy.digest(shared)
+        self.identity.update(lab_id='new-student', deployment_id=str(uuid.uuid4()))
+        admission = {key: self.identity[key] for key in ('lab_id', 'release_id')} | {'lab_token': self.token}
+        self.assertEqual(self.call('POST /api/web/enroll', admission, shared)['statusCode'], 200)
+        self.assertEqual(self.call('POST /api/web/register', self.identity)['statusCode'], 200)
+        self.assertEqual(self.call('POST /api/web/submit', self.report(), shared)['statusCode'], 401)
+        for task in ('M1', 'M2', 'M4', 'M5', 'M6'):
+            self.submit(self.report(task))
+        classification = {key: self.identity[key] for key in ('lab_id', 'deployment_id')}
+        classification.update(context='course', contract_id=CONTRACT_ID)
+        self.assertEqual(self.call('POST /api/web/admin/assessment-context', classification, self.admin)['statusCode'], 200)
+        export = json.loads(self.call('POST /api/web/admin/grades', {}, self.admin)['body'])
+        row = export['students'][0]
+        self.assertEqual((row['lab_id'], row['raw_earned'], export['raw_maximum']), ('new-student', 59, 59))
+        self.assertNotIn('M3', row['missions'])
+        student_session = self.call('POST /api/web/student/session', {'lab_id': 'new-student'})
+        url = json.loads(student_session['body'])['url']
+        dashboard = self.app.handle({'routeKey': 'GET /dashboard', 'queryStringParameters': {'session': url.split('session=')[1]}})
+        self.assertIn('59 / 59', dashboard['body'])
+        self.assertNotIn('M3 /', dashboard['body'])
+
     def test_all_missions_exactly_62_and_preparation_zero(self):
         for mid in ('M0', *['M' + str(i) for i in range(1, 7)]):
             self.submit(self.report(mid))

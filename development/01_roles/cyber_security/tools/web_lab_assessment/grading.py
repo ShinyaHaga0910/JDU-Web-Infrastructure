@@ -52,12 +52,15 @@ def project_course_lab(lab):
             'complete': not pending and all(current.get(mid, {}).get('complete') for mid in COURSE_MISSIONS)}
 
 
-def export_labs(labs, after='', limit=25):
+def export_labs(labs, after='', limit=25, *, current_curriculum=False):
     """No email, secret, normalized 25-point grade, or fixture grade enters this export."""
     exported = []
+    projector = project_course_lab if current_curriculum else project_lab
+    missions = COURSE_MISSIONS if current_curriculum else MISSIONS
+    maximum = COURSE_MAXIMUM if current_curriculum else MAXIMUM
     candidates = sorted(labs, key=lambda r: r['lab_id'])
     for lab in candidates:
-        view = project_lab(lab)
+        view = projector(lab)
         if not view['course_export_eligible'] or lab['lab_id'] <= after:
             continue
         if len(exported) == limit:
@@ -71,8 +74,8 @@ def export_labs(labs, after='', limit=25):
         exported.append({k: v for k, v in view.items() if k not in ('current', 'selected')} | {
             'missions': {m: dict(raw_maximum=TASKS[m]['raw_points_max'],
                                 selected=compact(view['selected'].get(m)), current=compact(view['current'].get(m)))
-                         for m in MISSIONS}})
+                             for m in missions}})
     last = exported[-1]['lab_id'] if exported else after
     more = any(l['lab_id'] > last and l.get('assessment_context') == 'course' for l in candidates)
-    return dict(contract_id=CONTRACT_ID, contract_sha256=CONTRACT_SHA256, raw_maximum=MAXIMUM,
+    return dict(contract_id=CONTRACT_ID, contract_sha256=CONTRACT_SHA256, raw_maximum=maximum,
                 normalized_course_points_included=False, students=exported, next_after=last if more else None)

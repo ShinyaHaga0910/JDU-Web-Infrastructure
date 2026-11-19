@@ -34,6 +34,7 @@ REPO = 'https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure'
 TOOLS = 'development/01_roles/cyber_security/tools'
 BOOT = TOOLS + '/web_lab_bootstrap'
 TEACHER = TOOLS + '/web_lab_teacher'
+ASSESSMENT = TOOLS + '/web_lab_assessment'
 LOCK = 'development/03_knowledge/aws_official/web_lab_packages_2026-10-15'
 ROLES = {role.lower(): role for role in ('Bastion', 'Web', 'Dns', 'Db', 'Repo')}
 IPS = dict(bastion='10.20.1.10', web='10.20.1.20', dns='10.20.2.10', db='10.20.2.20', repo='10.20.2.30')
@@ -44,32 +45,32 @@ PORT = 18974
 MAX_ASSET = 200 * 1024 * 1024
 
 # UI messages follow the same order for all four languages.
-LABELS = ('teacher', 'student', 'invite', 'password', 'again', 'aws', 'stack', 'waiting',
+LABELS = ('teacher', 'student', 'invite', 'password', 'aws', 'stack', 'waiting',
           'invites', 'assets', 'repo', 'nodes', 'ssh', 'lessons', 'grading', 'done', 'stopped', 'tty', 'input_error', 'notice')
 TEXT = {
     'en': ('Teacher setup', 'Student setup', 'Course enrollment code',
-           'RDP password (12–128 characters)', 'Repeat the RDP password', 'Checking the AWS account and prerequisites',
+           'RDP password (12–128 characters)', 'Checking the AWS account and prerequisites',
            'Deploying with CloudFormation', 'Waiting for the AWS resources', 'Preparing the shared course enrollment code',
            'Verifying and transferring dependencies', 'Building the signed internal package repository',
            'Preparing and checking the five servers', 'Verifying internal SSH', 'Staging lesson files', 'Registering and testing grading',
            'Foundation setup complete', 'Setup stopped at stage', 'Use an interactive CloudShell terminal.',
            'Check the values entered and the current AWS account.', 'Google login and browser grading require separate setup.'),
     'ja': ('教師側の構築', '学生側の構築', '授業の共通登録コード',
-           'RDPパスワード（12〜128文字）', 'RDPパスワードを再入力', 'AWSアカウントと前提条件を確認',
+           'RDPパスワード（12〜128文字）', 'AWSアカウントと前提条件を確認',
            'CloudFormationで構築', 'AWSリソースの準備を待機', '授業の共通登録コードを準備',
            '依存パッケージを検証・転送', '署名付きの内部パッケージ配布先を構築',
            'サーバー5台を準備・確認', '内部SSHを確認', '授業用ファイルを配置', '採点登録と試験送信', '基盤の構築・確認が完了',
            '停止した工程', '対話型のCloudShellで実行してください。', '入力内容と現在のAWSアカウントを確認してください。',
            'Googleログインとブラウザ採点には別途設定が必要です。'),
     'ru': ('Настройка преподавателя', 'Настройка студента', 'Код регистрации на курс',
-           'Пароль RDP (12–128 символов)', 'Повторите пароль RDP', 'Проверка аккаунта AWS и требований',
+           'Пароль RDP (12–128 символов)', 'Проверка аккаунта AWS и требований',
            'Развёртывание через CloudFormation', 'Ожидание ресурсов AWS', 'Подготовка общего кода регистрации на курс',
            'Проверка и передача зависимостей', 'Создание подписанного внутреннего репозитория пакетов',
            'Настройка и проверка пяти серверов', 'Проверка внутреннего SSH', 'Размещение учебных файлов', 'Регистрация и проверка оценивания',
            'Базовая настройка завершена', 'Настройка остановлена на этапе', 'Используйте интерактивный терминал CloudShell.',
            'Проверьте введённые данные и текущий аккаунт AWS.', 'Вход через Google и проверку в браузере нужно настроить отдельно.'),
     'uz': ('O‘qituvchi muhiti', 'Talaba muhiti', 'Kursga ro‘yxatdan o‘tish kodi',
-           'RDP paroli (12–128 belgi)', 'RDP parolini takrorlang', 'AWS hisobi va talablarni tekshirish',
+           'RDP paroli (12–128 belgi)', 'AWS hisobi va talablarni tekshirish',
            'CloudFormation orqali yaratish', 'AWS resurslarini kutish', 'Kurs uchun umumiy ro‘yxatdan o‘tish kodini tayyorlash',
            'Bog‘liqliklarni tekshirish va uzatish', 'Imzolangan ichki paket repozitoriysini yaratish',
            'Beshta serverni tayyorlash va tekshirish', 'Ichki SSH aloqasini tekshirish', 'Dars fayllarini joylash', 'Ro‘yxatdan o‘tkazish va baholashni tekshirish',
@@ -224,6 +225,16 @@ def classroom_template(base):
     return base
 
 
+def assessment_api_source(ref):
+    from build_teacher import inline_source
+
+    sources = {name: remote_source(ref, f'{ASSESSMENT}/{name}.py').decode()
+               for name in ('registry', 'grading', 'dashboard', 'progress_api_v2')}
+    sources['progress_api'] = remote_source(ref, TEACHER + '/progress_api.py').decode()
+    sources['registry_data'] = remote_source(ref, ASSESSMENT + '/assessment-registry.json').decode()
+    return inline_source(sources)
+
+
 def teacher_run(args, screen, session, account, work):
     import install_teacher
 
@@ -233,8 +244,7 @@ def teacher_run(args, screen, session, account, work):
     token = install_teacher.read_private(key_path)['token']
     if not re.fullmatch(r'[A-Za-z0-9_-]{43}', token):
         raise ValueError('ENROLLMENT_KEY')
-    enrollment = (remote_source(args.ref, TEACHER + '/progress_api.py').decode(),
-                  hashlib.sha256(token.encode()).hexdigest())
+    enrollment = (assessment_api_source(args.ref), hashlib.sha256(token.encode()).hexdigest())
     screen.step('stack')
     name = TEACHER_STACK
     screen.record(screen.text['waiting'])
@@ -250,7 +260,7 @@ def teacher_run(args, screen, session, account, work):
         write(code, data)
     elif code.is_symlink() or code.stat().st_mode & 0o077 or code.read_bytes() != data:
         raise ValueError('EXISTING_INVITATION_DIFFERS')
-    screen.record(code)
+    return data.decode().strip()
 
 
 def capacity(ec2):
@@ -302,11 +312,10 @@ def stack_setup(cfn, ec2, account, invite, work, ref, screen):
         write(intent_path, encoded(state))
     if not stack:
         password = screen.prompt('password', secret=True)
-        again = screen.prompt('again', secret=True)
-        if password != again or not 12 <= len(password) <= 128 or any(ch in password for ch in '\r\n\0'):
+        if not 12 <= len(password) <= 128 or any(ch in password for ch in '\r\n\0'):
             raise ValueError('RDP_PASSWORD')
         password_hash = subprocess.check_output(['openssl', 'passwd', '-6', '-stdin'], input=(password + '\n').encode()).decode().strip()
-        del password, again
+        del password
         values = dict(AvailabilityZone=state['zone'], StudentKeyName='vockey', RdpPasswordHash=password_hash,
                       LabId=invite['lab_id'], DeploymentId=state['deployment_id'], GradingIpv4=invite['fixed_ingress_ipv4'])
         for field, size in (('Bastion', 'medium'), ('Small', 'small'), ('Dns', 'micro')):
@@ -656,7 +665,7 @@ def main():
             'Enter one number from 1 to 4, then press Enter.',
             '',
             '[1] English',
-            '[2] 日本語',
+            '[2] Japanese',
             '[3] Русский',
             '[4] O‘zbekcha',
         )
@@ -683,6 +692,8 @@ def main():
             sys.path.insert(0, temp)
             for name in ('install_teacher.py', 'web_progress.py', 'enroll_five_node_progress.py'):
                 Path(temp, name).write_bytes(remote_source(args.ref, TEACHER + '/' + name))
+            if args.role == 'teacher':
+                Path(temp, 'build_teacher.py').write_bytes(remote_source(args.ref, ASSESSMENT + '/build_teacher.py'))
             import boto3
             session = boto3.Session(region_name=REGION)
             account = session.client('sts').get_caller_identity()['Account']
@@ -696,11 +707,13 @@ def main():
             if args.role == 'teacher':
                 with os.fdopen(os.open(work / 'install.lock', os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW, 0o600)) as lock:
                     fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    teacher_run(args, screen, session, account, work)
+                    enrollment_code = teacher_run(args, screen, session, account, work)
             else:
                 student_run(args, screen, session, account, work)
         screen.step('done')
         screen.record(screen.text['notice'])
+        if args.role == 'teacher':
+            print(f'\n{screen.text["invite"]}\n{enrollment_code}', flush=True)
         return 0
     except KeyboardInterrupt:
         print(f'\n{screen.text["stopped"]} · {screen.text[screen.current]}', file=sys.stderr)

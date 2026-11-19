@@ -132,7 +132,8 @@ class AssessmentService(legacy.ProgressService):
             if not meta or not meta.get('active') or not hmac.compare_digest(meta['token_hash'], session['token_hash']):
                 raise legacy.ApiError(401, 'session expired')
         labs = self.store.labs(session['lab_id'] if session['role'] == 'student' else None)
-        return legacy.response(200, render(labs, session['role'], token, query.get('lang', 'ja'), query.get('pause') == '1'),
+        return legacy.response(200, render(labs, session['role'], token, query.get('lang', 'ja'), query.get('pause') == '1',
+                                           current_curriculum=bool(self.enrollment_hash)),
                                'text/html; charset=utf-8')
 
     def handle(self, event):
@@ -144,7 +145,7 @@ class AssessmentService(legacy.ProgressService):
                 body = legacy.parse_body(event)
                 legacy.require_keys(body, (), ('after',))
                 after = legacy.field(body, 'after', legacy.LAB_RE, maximum=32) if 'after' in body else ''
-                return legacy.response(200, export_labs(self.store.labs(), after))
+                return legacy.response(200, export_labs(self.store.labs(), after, current_curriculum=bool(self.enrollment_hash)))
             return super().handle(event)
         except legacy.ApiError as exc:
             return legacy.response(exc.status, {'error': exc.message})
@@ -159,5 +160,6 @@ def handler(event, context):
     global _service
     if _service is None:
         import os
-        _service = AssessmentService(AssessmentStore(os.environ['TABLE_NAME']), os.environ['ADMIN_KEY_HASH'], os.environ['API_BASE_URL'])
+        _service = AssessmentService(AssessmentStore(os.environ['TABLE_NAME']), os.environ['ADMIN_KEY_HASH'],
+                                     os.environ['API_BASE_URL'], os.environ.get('ENROLLMENT_KEY_HASH', ''))
     return _service.handle(event)

@@ -66,6 +66,8 @@ class InstallTeacherTests(TestCase):
         resources = json.loads(options["TemplateBody"])["Resources"]
         route = resources.pop("ClassroomEnrollmentRoute")
         self.assertEqual(route["Properties"]["RouteKey"], "POST /api/web/enroll")
+        self.assertEqual(resources.pop("Route8")["Properties"]["RouteKey"], "POST /api/web/admin/assessment-context")
+        self.assertEqual(resources.pop("Route9")["Properties"]["RouteKey"], "POST /api/web/admin/grades")
         previous = json.loads(original)["Resources"]
         self.assertEqual(resources.pop("ProgressFunction")["Properties"]["Environment"]["Variables"]["ENROLLMENT_KEY_HASH"], "a" * 64)
         del previous["ProgressFunction"]

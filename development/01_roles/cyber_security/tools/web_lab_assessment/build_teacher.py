@@ -7,9 +7,6 @@ import zlib
 
 ROOT = Path(__file__).resolve().parent
 LEGACY = ROOT / 'legacy' if (ROOT / 'legacy').is_dir() else ROOT.parent / 'web_lab_teacher'
-sys.path.insert(0, str(LEGACY))
-from build_template import build as legacy_build
-
 ROUTES = ('POST /api/web/admin/assessment-context', 'POST /api/web/admin/grades')
 
 
@@ -19,10 +16,12 @@ def admin_route(route):
         Target={'Fn::Join': ['/', ['integrations', {'Ref': 'Integration'}]]}))
 
 
-def inline_source():
-    sources = {name: (ROOT / (name + '.py')).read_text() for name in ('registry', 'grading', 'dashboard', 'progress_api_v2')}
-    sources['progress_api'] = (LEGACY / 'progress_api.py').read_text()
-    sources['registry_data'] = (ROOT / 'assessment-registry.json').read_text()
+def inline_source(sources=None):
+    if sources is None:
+        sources = {name: (ROOT / (name + '.py')).read_text(encoding='utf-8')
+                   for name in ('registry', 'grading', 'dashboard', 'progress_api_v2')}
+        sources['progress_api'] = (LEGACY / 'progress_api.py').read_text(encoding='utf-8')
+        sources['registry_data'] = (ROOT / 'assessment-registry.json').read_bytes().decode()
     encoded = base64.b64encode(zlib.compress(json.dumps(sources).encode(), 9)).decode()
     return ("import base64,json,sys,types,zlib\n_s=json.loads(zlib.decompress(base64.b64decode(" + repr(encoded) + ")))\n"
             "for _n in ('registry','grading','dashboard','progress_api','progress_api_v2'):\n"
@@ -33,6 +32,9 @@ def inline_source():
 
 
 def build():
+    sys.path.insert(0, str(LEGACY))
+    from build_template import build as legacy_build
+
     template = legacy_build()
     template['Resources']['ProgressFunction']['Properties']['Code'] = dict(ZipFile=inline_source())
     for index, route in enumerate(ROUTES, 8):

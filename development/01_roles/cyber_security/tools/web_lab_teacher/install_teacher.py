@@ -157,6 +157,16 @@ def enrollment_template(template, enrollment):
             "Target": {"Fn::Join": ["/", ["integrations", {"Ref": "Integration"}]]},
         },
     }
+    # Keep the formal grading routes when updating a classroom created with the progress-only API.
+    for index, operation in enumerate(("assessment-context", "grades"), start=8):
+        resources[f"Route{index}"] = {
+            "Type": "AWS::ApiGatewayV2::Route",
+            "Properties": {
+                "ApiId": {"Ref": "ProgressApi"},
+                "RouteKey": f"POST /api/web/admin/{operation}",
+                "Target": {"Fn::Join": ["/", ["integrations", {"Ref": "Integration"}]]},
+            },
+        }
     return template
 
 

@@ -2,15 +2,15 @@
 from html import escape
 from urllib.parse import urlencode
 
-from grading import project_lab
-from registry import MAXIMUM, MISSIONS, TASKS
+from grading import project_course_lab, project_lab
+from registry import MAXIMUM, MISSIONS, TASKS, COURSE_MAXIMUM, COURSE_MISSIONS, COURSE_TASKS
 
 TEXT = {
     'ja': dict(title='Web実習・素点と進捗', table='自力課題の素点', practice='練習の進捗',
                ready='準備確認', lab='Lab', total='素点合計', current='最新の確認',
                selected='参照する提出', missing='未提出', unknown='確認待ち', partial='未完了',
                complete='合格', provisional='暫定', detail='確認項目', legacy='旧版の進捗（素点集計外）',
-               note='満点は62点です。準備と練習には成績の点を付けません。25点への換算は教師が行います。',
+               note='満点は{maximum}点です。準備と練習には成績の点を付けません。25点への換算は教師が行います。',
                status='現在の状態と、最後に採点できた提出を分けて表示しています。',
                verification='検証用・成績出力の対象外', unassigned='成績対象の指定待ち', course='授業用',
                refresh='更新', pause='自動更新を止める', resume='30秒ごとの更新を再開',
@@ -20,7 +20,7 @@ TEXT = {
                current='Oxirgi tekshiruv', selected='Baholash uchun topshirish', missing='Topshirilmagan',
                unknown='Tekshiruv kutilmoqda', partial='Tugallanmagan', complete='Bajarildi',
                provisional='Dastlabki', detail='Tekshiruvlar', legacy='Eski natijalar (ballga kirmaydi)',
-               note='Maksimal xom ball 62. Tayyorgarlik va mashqlar bahoga kirmaydi. 25 ballga o‘qituvchi aylantiradi.',
+               note='Maksimal xom ball {maximum}. Tayyorgarlik va mashqlar bahoga kirmaydi. 25 ballga o‘qituvchi aylantiradi.',
                status='Joriy holat va oxirgi baholash mumkin bo‘lgan topshirish alohida ko‘rsatiladi.',
                verification='Sinov uchun; baho eksportiga kirmaydi', unassigned='Baho turi belgilanmagan',
                course='Dars uchun', refresh='Yangilash', pause='Avtomatik yangilashni to‘xtatish',
@@ -30,7 +30,7 @@ TEXT = {
                current='Последняя проверка', selected='Попытка для оценки', missing='Не отправлено',
                unknown='Ожидает проверки', partial='Не завершено', complete='Выполнено',
                provisional='Предварительно', detail='Проверки', legacy='Старые результаты (без оценки)',
-               note='Максимум 62 сырых балла. Подготовка и упражнения не оцениваются. В 25 баллов переводит преподаватель.',
+               note='Максимум {maximum} сырых балла. Подготовка и упражнения не оцениваются. В 25 баллов переводит преподаватель.',
                status='Текущее состояние и последняя оцениваемая попытка показаны отдельно.',
                verification='Проверочная среда; исключена из экспорта оценок', unassigned='Тип оценки не назначен',
                course='Учебная среда', refresh='Обновить', pause='Приостановить автообновление',
@@ -38,9 +38,14 @@ TEXT = {
 }
 
 
-def render(labs, role, token, language='ja', paused=False):
+def render(labs, role, token, language='ja', paused=False, *, current_curriculum=False):
     language = language if language in TEXT else 'ja'
     t = TEXT[language]
+    projector = project_course_lab if current_curriculum else project_lab
+    missions = COURSE_MISSIONS if current_curriculum else MISSIONS
+    practices = [task for task in (f'P{i}' for i in range(7)) if not current_curriculum or task in COURSE_TASKS]
+    maximum = COURSE_MAXIMUM if current_curriculum else MAXIMUM
+    note = t['note'].format(maximum=maximum)
     esc = lambda x: escape(str(x), quote=True)
     url = lambda **kw: '/dashboard?' + urlencode(dict(session=token, lang=language, pause=int(paused)) | kw)
 
@@ -59,19 +64,19 @@ def render(labs, role, token, language='ja', paused=False):
 
     mission_rows, practice_rows, historic = [], [], []
     for lab in sorted(labs, key=lambda row: row['lab_id']):
-        view = project_lab(lab)
+        view = projector(lab)
         context = view['assessment_context'] if view['assessment_context'] in ('course', 'verification') else 'unassigned'
         label = esc(lab['lab_id']) + '<br><small>' + esc(t[context]) + '</small>'
         row = '<tr><th scope="row">' + label + '</th>'
-        row += ''.join(cell(view['current'].get(m), view['selected'].get(m)) for m in MISSIONS)
+        row += ''.join(cell(view['current'].get(m), view['selected'].get(m)) for m in missions)
         pending = bool(view['missing_or_unresolved'] or view['current_unresolved'])
-        row += '<td><strong>' + str(view['raw_earned']) + ' / ' + str(MAXIMUM) + '</strong>'
+        row += '<td><strong>' + str(view['raw_earned']) + ' / ' + str(maximum) + '</strong>'
         if pending:
             row += '<br>' + esc(t['provisional'])
         row += '</td></tr>'
         mission_rows.append(row)
         practice_rows.append('<tr><th scope="row">' + label + '</th>'
-                             + ''.join(cell(view['current'].get('P' + str(i))) for i in range(7))
+                             + ''.join(cell(view['current'].get(task)) for task in practices)
                              + cell(view['current'].get('M0')) + '</tr>')
         old = [r for r in lab.get('results', []) if r['sk'].startswith('LATEST#') and 'contract_sha256' not in r]
         if old:
@@ -104,10 +109,10 @@ def render(labs, role, token, language='ja', paused=False):
             '.skip{position:absolute;inset-inline-start:-100rem}.skip:focus{inset-inline-start:1rem;background:white}'
             '</style></head><body><header><a class="skip" href="#content">' + esc(t['table'])
             + '</a><nav aria-label="Language">' + links + '</nav><p>' + refresh + '</p></header>'
-            '<main id="content" tabindex="-1"><h1>' + esc(t['title']) + '</h1><p>' + esc(t['note'])
+            '<main id="content" tabindex="-1"><h1>' + esc(t['title']) + '</h1><p>' + esc(note)
             + '</p><p>' + esc(t['status']) + '</p><h2>' + esc(t['table']) + '</h2>'
-            + table(t['table'], [t['lab'], *[m + ' / ' + str(TASKS[m]['raw_points_max']) for m in MISSIONS], t['total']], mission_rows)
+            + table(t['table'], [t['lab'], *[m + ' / ' + str(TASKS[m]['raw_points_max']) for m in missions], t['total']], mission_rows)
             + '<h2>' + esc(t['practice']) + '</h2>'
-            + table(t['practice'], [t['lab'], *['P' + str(i) for i in range(7)], 'M0'], practice_rows)
+            + table(t['practice'], [t['lab'], *practices, 'M0'], practice_rows)
             + ('<details><summary>' + esc(t['legacy']) + '</summary><ul>' + ''.join(historic) + '</ul></details>' if historic else '')
-            + '</main><footer>' + esc(t['note']) + '</footer></body></html>')
+            + '</main><footer>' + esc(note) + '</footer></body></html>')

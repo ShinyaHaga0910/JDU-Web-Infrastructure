@@ -76,17 +76,38 @@ class ClassroomTests(unittest.TestCase):
                                             fixed_ingress_ipv4='8.8.8.8')
         screen = Mock(text={'waiting': 'Waiting'})
         with tempfile.TemporaryDirectory() as temp, patch.dict(sys.modules, install_teacher=teacher), \
-                patch.object(classroom, 'remote_source', return_value=b'api source'):
+                patch.object(classroom, 'assessment_api_source', return_value='api source'):
             work = Path(temp)
-            classroom.teacher_run(Mock(), screen, Mock(), account, work)
+            issued = classroom.teacher_run(Mock(), screen, Mock(), account, work)
             code = work / 'classroom.invitation.txt'
             invite = classroom.parse_invitation(code.read_text().strip(), '012345678901')
-            classroom.teacher_run(Mock(), screen, Mock(), account, work)
+            self.assertEqual(issued, classroom.teacher_run(Mock(), screen, Mock(), account, work))
+            self.assertEqual(issued, code.read_text().strip())
             self.assertEqual(code.read_text().strip(), classroom.invitation(invite))
             self.assertEqual(code.stat().st_mode & 0o777, 0o600)
         screen.prompt.assert_not_called()
+        self.assertTrue(all(issued not in str(call) for call in screen.record.call_args_list))
         self.assertEqual(teacher.install.call_args.kwargs['enrollment'],
                          ('api source', hashlib.sha256(invite['enrollment_token'].encode()).hexdigest()))
+
+    def test_teacher_console_asks_only_for_language_and_prints_code_last(self):
+        session = Mock()
+        session.client.return_value.get_caller_identity.return_value = {'Account': '123456789012'}
+        boto3 = Mock()
+        boto3.Session.return_value = session
+        output = io.StringIO()
+        with tempfile.TemporaryDirectory() as temp, contextlib.redirect_stdout(output), \
+                patch.dict(sys.modules, boto3=boto3), patch.object(sys, 'path', list(sys.path)), \
+                patch.object(sys, 'argv', ['classroom.py', 'teacher', '--ref', 'a' * 40]), \
+                patch.object(sys.stdin, 'isatty', return_value=True), patch('builtins.input', return_value='2') as prompt, \
+                patch.object(classroom.Path, 'home', return_value=Path(temp)), patch.object(classroom.os, 'umask'), \
+                patch.object(classroom, 'remote_source', return_value=b'# offline fixture'), \
+                patch.object(classroom, 'teacher_run', return_value='jdu2.offline-fixture'):
+            self.assertEqual(classroom.main(), 0)
+        prompt.assert_called_once()
+        self.assertIn('[2] Japanese', output.getvalue())
+        self.assertEqual(output.getvalue().rstrip().splitlines()[-2:],
+                         ['授業の共通登録コード', 'jdu2.offline-fixture'])
 
     def test_template_keeps_private_topology_and_all_nodes_use_ssm(self):
         source = ROOT / 'development/templates/web-lab-student.template.json'
