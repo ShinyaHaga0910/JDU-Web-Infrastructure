@@ -248,6 +248,59 @@ class ClassroomTests(unittest.TestCase):
                                                     {'package.deb': '0' * 64})
                 self.assertEqual(list(directory.iterdir()), [path])
 
+    def test_five_transfers_overlap_and_recipe_follows_verified_archives(self):
+        with tempfile.TemporaryDirectory() as scratch, patch.object(classroom_guest, 'ROOT', Path(scratch)):
+            directory = Path(scratch) / 'source'
+            directory.mkdir()
+            assets = Path(scratch) / 'assets'
+            assets.mkdir()
+            archives = {}
+            for number in range(1, 7):
+                path = directory / f'jdu-dependencies-{number:04d}.tar'
+                path.write_bytes(f'archive {number}'.encode())
+                archives[path.name] = classroom.summary(path)
+            cached = path.name
+            (assets / cached).write_bytes(path.read_bytes())
+            recipe = {'archives': archives}
+            barrier = threading.Barrier(5)
+            progress = []
+            exchange = classroom.exchange
+
+            def check_exchange(port, method, name, digest, path=None):
+                if method == 'PUT':
+                    self.assertNotEqual(name, cached)
+                    if name == 'recipe.json':
+                        self.assertEqual(progress, list(range(1, 7)))
+                    else:
+                        barrier.wait(timeout=5)
+                return exchange(port, method, name, digest, path)
+
+            with classroom_guest.ThreadingHTTPServer(('127.0.0.1', 0), classroom_guest.Receiver) as server:
+                thread = threading.Thread(target=server.serve_forever)
+                thread.start()
+                try:
+                    with patch.object(classroom, 'transfer_session',
+                                      side_effect=lambda node: contextlib.nullcontext(server.server_address[1])), \
+                            patch.object(classroom, 'command'), patch.object(classroom, 'exchange', side_effect=check_exchange):
+                        recipe_hash = classroom.transfer(None, 'repo', directory, recipe, progress.append)
+                finally:
+                    server.shutdown()
+                    thread.join()
+
+            self.assertEqual({name: classroom.summary(assets / name) for name in archives}, archives)
+            self.assertEqual(classroom.summary(assets / 'recipe.json'), recipe_hash)
+
+    def test_archive_rejection_prevents_sending_recipe(self):
+        recipe = {'archives': {'jdu-dependencies-0001.tar': '0' * 64}}
+        with tempfile.TemporaryDirectory() as scratch, \
+                patch.object(classroom, 'transfer_session', return_value=contextlib.nullcontext(12345)), \
+                patch.object(classroom, 'command'), patch.object(classroom, 'exchange', side_effect=[404, 400]) as exchange:
+            progress = Mock()
+            with self.assertRaisesRegex(ValueError, 'ASSET_VERIFICATION'):
+                classroom.transfer(None, 'repo', Path(scratch), recipe, progress)
+        self.assertEqual(exchange.call_count, 2)
+        progress.assert_not_called()
+
     def test_receiver_rejects_wrong_hash_and_reuses_verified_asset(self):
         with tempfile.TemporaryDirectory() as temp, patch.object(classroom_guest, 'ROOT', Path(temp)):
             assets = Path(temp, 'assets')

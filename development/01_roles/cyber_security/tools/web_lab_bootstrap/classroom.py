@@ -17,6 +17,7 @@ import re
 import secrets
 import shlex
 import shutil
+import signal
 import socket
 import subprocess
 import sys
@@ -50,6 +51,7 @@ PORT = 18974
 MAX_ASSET = 200 * 1024 * 1024
 ARCHIVE_TARGET = 160 * 1024 * 1024
 ASSET_DOWNLOAD_WORKERS = 8
+ARCHIVE_TRANSFER_WORKERS = 5
 AWS_PROGRESS_INTERVAL = 30
 STAGES = {
     'teacher': ('aws', 'stack', 'invites', 'done'),
@@ -734,9 +736,8 @@ def build_archives(names, directory):
     return archives
 
 
-def transfer(ssm, node, directory, recipe, update_count):
-    command(ssm, node, 'systemctl stop jdu-classroom-receiver.service 2>/dev/null || true; '
-            f'systemd-run --unit=jdu-classroom-receiver --property=RuntimeMaxSec=3600 python3 -B {GUEST_ROOT}/classroom_guest.py receive')
+@contextmanager
+def transfer_session(node):
     with socket.socket() as probe:
         probe.bind(('127.0.0.1', 0))
         port = probe.getsockname()[1]
@@ -745,7 +746,8 @@ def transfer(ssm, node, directory, recipe, update_count):
     try:
         process = subprocess.Popen(['aws', 'ssm', 'start-session', '--region', REGION, '--target', node,
                                     '--document-name', 'AWS-StartPortForwardingSession', '--parameters', params],
-                                   stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                                   stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                                   start_new_session=True)
         for _ in range(30):
             if process.poll() is not None:
                 raise ValueError('SSM_PORT_FORWARD')
@@ -756,25 +758,51 @@ def transfer(ssm, node, directory, recipe, update_count):
                 time.sleep(2)
         else:
             raise ValueError('SSM_PORT_FORWARD_TIMEOUT')
-        for number, (name, expected) in enumerate(recipe['archives'].items(), 1):
-            if exchange(port, 'HEAD', name, expected) != 200:
-                if exchange(port, 'PUT', name, expected, directory / name) != 201:
-                    raise ValueError(f'ASSET_VERIFICATION {name}')
-            update_count(number)
-        temp = directory / 'recipe.json'
-        temp.write_bytes(encoded(recipe))
-        expected = summary(temp)
-        if exchange(port, 'PUT', 'recipe.json', expected, temp) != 201:
-            raise ValueError('RECIPE_TRANSFER')
-        return expected
+        yield port
     finally:
-        if process and process.poll() is None:
-            process.terminate()
+        if process is not None:
+            # The AWS CLI starts the Session Manager plugin as a child process.
+            with suppress(ProcessLookupError):
+                os.killpg(process.pid, signal.SIGTERM)
             try:
                 process.wait(timeout=15)
             except subprocess.TimeoutExpired:
-                process.kill()
+                with suppress(ProcessLookupError):
+                    os.killpg(process.pid, signal.SIGKILL)
                 process.wait()
+
+
+def transfer(ssm, node, directory, recipe, update_count):
+    command(ssm, node, 'systemctl stop jdu-classroom-receiver.service 2>/dev/null || true; '
+            f'systemd-run --unit=jdu-classroom-receiver --property=RuntimeMaxSec=3600 python3 -B {GUEST_ROOT}/classroom_guest.py receive')
+
+    def send_archive(name, expected):
+        # Each upload uses its own tunnel to avoid sharing a single SSM data stream.
+        with transfer_session(node) as port:
+            if exchange(port, 'HEAD', name, expected) == 200:
+                return
+            if exchange(port, 'PUT', name, expected, directory / name) != 201:
+                raise ValueError(f'ASSET_VERIFICATION {name}')
+
+    try:
+        with ThreadPoolExecutor(max_workers=ARCHIVE_TRANSFER_WORKERS) as executor:
+            futures = [executor.submit(send_archive, name, digest) for name, digest in recipe['archives'].items()]
+            try:
+                for number, future in enumerate(as_completed(futures), 1):
+                    future.result()
+                    update_count(number)
+            finally:
+                for future in futures:
+                    future.cancel()
+
+        temp = directory / 'recipe.json'
+        temp.write_bytes(encoded(recipe))
+        expected = summary(temp)
+        with transfer_session(node) as port:
+            if exchange(port, 'PUT', 'recipe.json', expected, temp) != 201:
+                raise ValueError('RECIPE_TRANSFER')
+        return expected
+    finally:
         command(ssm, node, 'systemctl stop jdu-classroom-receiver.service')
 
 
