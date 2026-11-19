@@ -57,7 +57,7 @@ STAGES = {
 # UI messages follow the same order for all four languages.
 LABELS = ('teacher', 'student', 'invite', 'share_code', 'paste_code', 'rdp_setup', 'password_reminder', 'password_masked',
           'password', 'password_again', 'password_invalid', 'password_mismatch', 'aws', 'stack', 'waiting',
-          'invites', 'assets', 'repo', 'nodes', 'ssh', 'lessons', 'grading', 'done', 'stopped', 'tty', 'input_error', 'notice')
+          'invites', 'assets', 'repo', 'nodes', 'ssh', 'lessons', 'grading', 'done', 'tty', 'input_error', 'invitation_error', 'notice')
 TEXT = {
     'en': ('Teacher setup', 'Student setup', 'Course enrollment code', 'Share this code with your students.',
            'Copy and paste the code you received from your teacher.',
@@ -70,8 +70,10 @@ TEXT = {
            'Deploying with CloudFormation', 'Waiting for the AWS resources', 'Preparing the shared course enrollment code',
            'Verifying and transferring dependencies', 'Building the signed internal package repository',
            'Preparing and checking the five servers', 'Verifying internal SSH', 'Staging lesson files', 'Registering and testing grading',
-           'Foundation setup complete', 'Setup stopped at stage', 'Use an interactive CloudShell terminal.',
-           'Check the values entered and the current AWS account.', 'Google login and browser grading require separate setup.'),
+           'Foundation setup complete', 'Use an interactive CloudShell terminal.',
+           'Check the values entered and the current AWS account.',
+           'The course enrollment code is incorrect. Please restart the setup.',
+           'Google login and browser grading require separate setup.'),
     'ja': ('教師側の構築', '学生側の構築', '授業の共通登録コード', 'このコードを学生に伝えてください。',
            '教師から教えられたコードをコピー＆ペーストで入力してください。',
            '自分でパスワードを決めてください。後で、演習用の踏み台サーバーのデスクトップを開くとき（RDP接続）に使います。',
@@ -83,7 +85,8 @@ TEXT = {
            'CloudFormationで構築', 'AWSリソースの準備を待機', '授業の共通登録コードを準備',
            '依存パッケージを検証・転送', '署名付きの内部パッケージ配布先を構築',
            'サーバー5台を準備・確認', '内部SSHを確認', '授業用ファイルを配置', '採点登録と試験送信', '基盤の構築・確認が完了',
-           '停止した工程', '対話型のCloudShellで実行してください。', '入力内容と現在のAWSアカウントを確認してください。',
+           '対話型のCloudShellで実行してください。', '入力内容と現在のAWSアカウントを確認してください。',
+           '共通登録コードが違います。最初からやり直してください。',
            'Googleログインとブラウザ採点には別途設定が必要です。'),
     'ru': ('Настройка преподавателя', 'Настройка студента', 'Код регистрации на курс', 'Передайте этот код студентам.',
            'Скопируйте и вставьте код, который вам дал преподаватель.',
@@ -96,8 +99,10 @@ TEXT = {
            'Развёртывание через CloudFormation', 'Ожидание ресурсов AWS', 'Подготовка общего кода регистрации на курс',
            'Проверка и передача зависимостей', 'Создание подписанного внутреннего репозитория пакетов',
            'Настройка и проверка пяти серверов', 'Проверка внутреннего SSH', 'Размещение учебных файлов', 'Регистрация и проверка оценивания',
-           'Базовая настройка завершена', 'Настройка остановлена на этапе', 'Используйте интерактивный терминал CloudShell.',
-           'Проверьте введённые данные и текущий аккаунт AWS.', 'Вход через Google и проверку в браузере нужно настроить отдельно.'),
+           'Базовая настройка завершена', 'Используйте интерактивный терминал CloudShell.',
+           'Проверьте введённые данные и текущий аккаунт AWS.',
+           'Неверный код регистрации на курс. Запустите настройку заново.',
+           'Вход через Google и проверку в браузере нужно настроить отдельно.'),
     'uz': ('O‘qituvchi muhiti', 'Talaba muhiti', 'Kursga ro‘yxatdan o‘tish kodi', 'Ushbu kodni talabalarga bering.',
            'O‘qituvchi bergan kodni nusxalab, kiritish maydoniga joylang.',
            'Parolni o‘zingiz tanlang. Keyin undan amaliyotdagi oraliq serverning ish stolini ochishda (RDP) foydalanasiz.',
@@ -109,8 +114,10 @@ TEXT = {
            'CloudFormation orqali yaratish', 'AWS resurslarini kutish', 'Kurs uchun umumiy ro‘yxatdan o‘tish kodini tayyorlash',
            'Bog‘liqliklarni tekshirish va uzatish', 'Imzolangan ichki paket repozitoriysini yaratish',
            'Beshta serverni tayyorlash va tekshirish', 'Ichki SSH aloqasini tekshirish', 'Dars fayllarini joylash', 'Ro‘yxatdan o‘tkazish va baholashni tekshirish',
-           'Asosiy muhit tayyor', 'Sozlash to‘xtagan bosqich', 'Interaktiv CloudShell terminalidan foydalaning.',
-           'Kiritilgan ma’lumotlar va joriy AWS hisobini tekshiring.', 'Google orqali kirish va brauzerda tekshirish alohida sozlanadi.'),
+           'Asosiy muhit tayyor', 'Interaktiv CloudShell terminalidan foydalaning.',
+           'Kiritilgan ma’lumotlar va joriy AWS hisobini tekshiring.',
+           'Kursga ro‘yxatdan o‘tish kodi noto‘g‘ri. Sozlashni boshidan boshlang.',
+           'Google orqali kirish va brauzerda tekshirish alohida sozlanadi.'),
 }
 SERVER_NAMES = {
     'en': ('Bastion server', 'Web server', 'DNS server', 'Database server', 'Package server'),
@@ -156,7 +163,6 @@ class Screen:
         self.text = dict(zip(LABELS, TEXT[language]))
         self.text.update(zip(RESET_LABELS, RESET_TEXT[language]))
         self.text['session_tool'] = SESSION_TOOL[language]
-        self.current = 'aws'
         self.stages = STAGES[role]
         self.total = len(self.stages)
         total_label, self.wait_hint, self.wait_update = PROGRESS_TEXT[language]
@@ -165,7 +171,6 @@ class Screen:
               f'  {total_label.format(total=self.total)}\n' + '═' * 56)
 
     def step(self, key):
-        self.current = key
         number = self.stages.index(key) + 1
         print(f'\n┌─ {number:02d}/{self.total:02d}  {self.text[key]}', flush=True)
 
@@ -299,7 +304,10 @@ def parse_invitation(value, account):
     if len(value) > 2048 or not re.fullmatch(r'jdu[12]\.[A-Za-z0-9_-]+', value):
         raise ValueError('INVITATION_FORMAT')
     body = value[5:]
-    info = json.loads(base64.urlsafe_b64decode(body + '=' * (-len(body) % 4)))
+    try:
+        info = json.loads(base64.urlsafe_b64decode(body + '=' * (-len(body) % 4)))
+    except ValueError:
+        raise ValueError('INVITATION_FORMAT') from None
     fields = {'teacher_account', 'api_base_url', 'fixed_ingress_ipv4', 'release_id', 'schema_version'}
     shared = value.startswith('jdu2.')
     fields |= {'enrollment_token'} if shared else {'student_account', 'lab_id', 'lab_token'}
@@ -702,7 +710,14 @@ def student_run(args, screen, session, account, parent):
         raise ValueError('SSM_CLIENT')
     with os.fdopen(os.open(parent / 'install.lock', os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW, 0o600)) as lock:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        config = student_credentials(invite, parent)
+        from web_progress import ProgressHttpError
+
+        try:
+            config = student_credentials(invite, parent)
+        except ProgressHttpError as exc:
+            if exc.status == 401:
+                raise ValueError('INVITATION_REJECTED') from None
+            raise
         screen.step('session_tool')
         ensure_session_plugin(args.ref)
         screen.step('stack')
@@ -901,6 +916,14 @@ def reset_rdp(args, screen, session, account, parent):
 
 
 def main():
+    try:
+        return run_cli()
+    except KeyboardInterrupt:
+        print(file=sys.stderr)
+        return 130
+
+
+def run_cli():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('role', choices=STAGES)
     parser.add_argument('--ref', required=True, help='Exact GitHub commit for the installer and accompanying source files.')
@@ -974,15 +997,14 @@ def main():
         if args.role == 'teacher':
             print(f'\n{screen.text["invite"]}\n{screen.text["share_code"]}\n{enrollment_code}', flush=True)
         return 0
-    except KeyboardInterrupt:
-        print(f'\n{screen.text["stopped"]} · {screen.text[screen.current]}', file=sys.stderr)
-        return 130
     except Exception as exc:
         code = getattr(exc, 'response', {}).get('Error', {}).get('Code', type(exc).__name__)
         if type(exc) is ValueError and re.fullmatch('[A-Za-z0-9_.+%~: -]{1,220}', str(exc)):
             code = str(exc)
-        print(f'\n{screen.text["stopped"]} · {screen.text[screen.current]} [{code}]', file=sys.stderr)
-        print(screen.text['reset_error' if args.role == 'reset-rdp' else 'input_error'], file=sys.stderr)
+        guidance = 'reset_error' if args.role == 'reset-rdp' else 'input_error'
+        if code in ('INVITATION_FORMAT', 'INVITATION_ACCOUNT_OR_SCOPE', 'INVITATION_REJECTED'):
+            guidance = 'invitation_error'
+        print(f'\nError: [{code}]\n{screen.text[guidance]}', file=sys.stderr)
         return 1
 
 

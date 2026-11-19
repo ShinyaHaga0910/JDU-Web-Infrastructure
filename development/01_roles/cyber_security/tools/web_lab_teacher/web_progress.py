@@ -21,6 +21,12 @@ class ProgressError(Exception):
     pass
 
 
+class ProgressHttpError(ProgressError):
+    def __init__(self, status):
+        super().__init__(f"Progress API rejected request: HTTP {status}")
+        self.status = status
+
+
 class PinnedHTTPSConnection(http.client.HTTPSConnection):
     """Override only the TCP destination. Preserve SNI and hostname/CA checks."""
     def __init__(self, hostname, fixed_ipv4):
@@ -75,7 +81,7 @@ def request(config, path, body, secret, *, fixed=True):
         if len(data)>128*1024:
             raise ProgressError("Progress response exceeds its limit")
         if response.status != 200:
-            raise ProgressError("Progress API rejected request: HTTP "+str(response.status))
+            raise ProgressHttpError(response.status)
         return json.loads(data)
     finally:
         conn.close()
