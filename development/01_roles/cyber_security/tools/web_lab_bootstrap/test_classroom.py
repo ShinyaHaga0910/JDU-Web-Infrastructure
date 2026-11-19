@@ -322,9 +322,74 @@ class ClassroomTests(unittest.TestCase):
                     thread.join()
             self.assertEqual((assets / 'sample.deb').read_bytes(), data.read_bytes())
 
+    def test_student_parallelizes_initial_configuration_and_ssh_preparation(self):
+        nodes = {role: f'node-{role}' for role in classroom.ROLES}
+        outputs = {label + 'InstanceId': nodes[role] for role, label in classroom.ROLES.items()}
+        outputs['BastionPublicIp'] = '192.0.2.10'
+        session, screen = Mock(), Mock()
+        session.client.return_value.describe_stacks.return_value = {'Stacks': [{
+            'Outputs': [{'OutputKey': k, 'OutputValue': v} for k, v in outputs.items()],
+        }]}
+        screen.aws_wait.side_effect = lambda **kwargs: contextlib.nullcontext()
+        screen.text = dict(download_progress='{done}/{total}', archive_progress='{done}/{total}', packing='packing',
+                           wait_for_ssm='waiting', deploy_helpers='deploying')
+        screen.servers = dict(zip(nodes, nodes))
+        configure_barrier = threading.Barrier(5)
+        keys_barrier = threading.Barrier(4)
+        authorize_barrier = threading.Barrier(4)
+        verified_connections = []
+        prepared = set()
+
+        def guest(ssm, node, request, file='classroom_guest.py'):
+            operation = request.get('operation') or request['command']
+            if operation == 'repo':
+                return {'key': 'repository-key'}
+            if operation == 'configure':
+                self.assertEqual(request['public_key'], 'repository-key')
+                configure_barrier.wait(timeout=5)
+                return {'role': request['role'], 'instance_id': node, 'checks': {'service': True}}
+            if operation == 'init':
+                self.assertEqual(set(request['peers']), set(nodes) - {'bastion'})
+                return {'public_key': 'bastion-key'}
+            if operation == 'authorize':
+                self.assertEqual(request['public_key'], 'bastion-key')
+                authorize_barrier.wait(timeout=5)
+                prepared.add(request['role'])
+                return {'role': request['role'], 'instance_id': node, 'authorized': True}
+            self.assertEqual(operation, 'submit')
+            self.assertEqual([r['role'] for r in request['report']['checks']], list(nodes))
+            self.assertEqual(verified_connections, list(nodes)[1:])
+            return {'received_at': 'complete'}
+
+        def command(ssm, node, shell):
+            if shell.startswith('cut '):
+                keys_barrier.wait(timeout=5)
+                return f'key-for-{node}'
+            self.assertEqual(node, nodes['bastion'])
+            self.assertEqual(prepared, set(nodes) - {'bastion'})
+            verified_connections.append(shell.split()[-3])
+
+        dependencies = ({}, {}, {'common': [], 'repo': []},
+                        {'firefox_libraries': [], 'desktop_tools': [], 'firefox': {}}, '')
+        config = dict(lab_id='lab-1', api_base_url='https://example.com', fixed_ingress_ipv4='192.0.2.1')
+        installer = Mock(read_private=lambda path: json.loads(path.read_bytes()))
+        with tempfile.TemporaryDirectory() as scratch, patch.dict(sys.modules, install_teacher=installer), \
+                patch.multiple(classroom, assets=Mock(return_value=dependencies),
+                               stack_setup=Mock(return_value=({'deployment_id': 'deployment', 'public_key': 'key'}, 'stack')),
+                               wait_online=Mock(), deploy_guest=Mock(), download_packages=Mock(),
+                               build_archives=Mock(return_value={}), transfer=Mock(), guest=guest, command=command,
+                               stage_lessons=Mock(), register_bastion=Mock()):
+            classroom.setup_student(Mock(ref='a' * 40), screen, session, '012345678901', config, Path(scratch))
+
     def test_lesson_transfer_fits_run_command_and_targets_web_and_db(self):
         ssm = Mock()
-        ssm.send_command.return_value = {'Command': {'CommandId': 'command'}}
+        barrier = threading.Barrier(2)
+
+        def send_command(**kwargs):
+            barrier.wait(timeout=5)
+            return {'Command': {'CommandId': 'command'}}
+
+        ssm.send_command.side_effect = send_command
         ssm.get_command_invocation.side_effect = lambda **args: {
             'Status': 'Success',
             'StandardOutputContent': json.dumps({'public_resources_ready': True, 'role': args['InstanceId']}),
@@ -333,7 +398,7 @@ class ClassroomTests(unittest.TestCase):
             classroom.stage_lessons('ref', ssm, {'web': 'web', 'db': 'db'},
                                     {'lab_id': 'lab-1', 'deployment_id': 'deployment'})
         calls = [item.kwargs for item in ssm.send_command.call_args_list]
-        self.assertEqual([item['InstanceIds'] for item in calls], [['web'], ['db']])
+        self.assertCountEqual([item['InstanceIds'] for item in calls], [['web'], ['db']])
         self.assertTrue(all(len(item['Parameters']['commands'][0]) < 60000 for item in calls))
 
 

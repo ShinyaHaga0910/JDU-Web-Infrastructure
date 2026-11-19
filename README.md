@@ -38,6 +38,8 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
 
 学生用スクリプトは、GitHubに記録した版とSHA-256に基づき、公式配布元から依存パッケージを最大8件ずつ並行して取得・検証します。CloudShellで複数のアーカイブにまとめてAWS Systems Manager経由で最大5本ずつ並行して配布サーバーに転送し、展開後に各ファイルを再検証します。取得済みファイル数と転送済みアーカイブ数は30秒ごとに表示されます。教材用S3の作成とClass IDの入力は不要です。
 
+内部パッケージの配布先ができたら、サーバー5台の初期設定と確認を同時に進めます。内部SSHの準備では接続先4台のホスト鍵を同時に取得し、踏み台の公開鍵も4台へ同時に登録します。授業用ファイルはWebとDBへ同時に配置します。
+
 新規スタックは、教師側が `jdu-web-infrastructure-teacher`、学生側が `jdu-web-infrastructure-student-<Lab ID>` です。
 
 新手順のLearner Labでの通し確認は未完了です。学校Googleアカウントでのログインと、Web Portalからの各課題の採点は別途設定が必要です。

@@ -615,13 +615,19 @@ def stage_lessons(ref, ssm, nodes, common):
         spec = importlib.util.spec_from_file_location('stage_resources', helper_path)
         helper = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(helper)
-        for role in ('web', 'db'):
+        encoded_files = {name: base64.b64encode(data).decode() for name, data in files.items()}
+
+        def stage(role):
             request = {k: common[k] for k in ('lab_id', 'deployment_id')}
-            request.update(role=role, instance_id=nodes[role],
-                           files={name: base64.b64encode(data).decode() for name, data in files.items()})
+            request.update(role=role, instance_id=nodes[role], files=encoded_files)
             outcome = helper.send_stage(ssm, nodes[role], request)
             if not outcome['public_resources_ready'] or outcome['role'] != role:
                 raise ValueError('LESSON_RESOURCES')
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            placements = [executor.submit(stage, role) for role in ('web', 'db')]
+            for placement in placements:
+                placement.result()
 
 
 def assets(ref):
@@ -916,8 +922,9 @@ def setup_student(args, screen, session, account, config, work):
     with screen.aws_wait(hint='repo_hint'):
         public_key = guest(ssm, nodes['repo'], {'operation': 'repo', 'recipe_sha256': repo_hash})['key']
     screen.step('nodes')
-    roles_checked = {}
-    for role, node in nodes.items():
+
+    def configure_node(role):
+        node = nodes[role]
         packages = roles['common'] + roles.get(role, [])
         if role == 'bastion':
             packages += definitions['firefox_libraries'] + definitions['desktop_tools']
@@ -926,19 +933,41 @@ def setup_student(args, screen, session, account, config, work):
         check = guest(ssm, node, request)
         if check['role'] != role or check['instance_id'] != node or not all(check['checks'].values()):
             raise ValueError('ROLE_VERIFICATION')
-        roles_checked[role] = check
-        screen.record(f'✓  {screen.servers[role]}  {node}')
+        return role, node
+
+    with ThreadPoolExecutor(max_workers=len(nodes)) as executor:
+        settings = [executor.submit(configure_node, role) for role in nodes]
+        for setting in as_completed(settings):
+            role, node = setting.result()
+            screen.record(f'✓  {screen.servers[role]}  {node}')
 
     screen.step('ssh')
-    peers = {r: dict(private_ip=IPS[r], instance_id=node,
-                     host_key=command(ssm, node, "cut -d ' ' -f1,2 /etc/ssh/ssh_host_ed25519_key.pub"))
-             for r, node in nodes.items() if r != 'bastion'}
+    peer_roles = [role for role in nodes if role != 'bastion']
+
+    def read_host_key(role):
+        node = nodes[role]
+        key = command(ssm, node, "cut -d ' ' -f1,2 /etc/ssh/ssh_host_ed25519_key.pub")
+        return role, dict(private_ip=IPS[role], instance_id=node, host_key=key)
+
     bastion = nodes['bastion']
     ssh_id = dict(lab_id=config['lab_id'], deployment_id=state['deployment_id'])
     helper = 'internal_ssh_guest.py'
-    local_key = guest(ssm, bastion, dict(ssh_id, command='init', instance_id=bastion, peers=peers), helper)['public_key']
-    for role, peer in peers.items():
-        guest(ssm, peer['instance_id'], dict(ssh_id, command='authorize', role=role, instance_id=peer['instance_id'], public_key=local_key), helper)
+    with ThreadPoolExecutor(max_workers=len(peer_roles)) as executor:
+        peers = dict(executor.map(read_host_key, peer_roles))
+        local_key = guest(ssm, bastion, dict(ssh_id, command='init', instance_id=bastion, peers=peers), helper)['public_key']
+
+        def authorize_peer(role):
+            node = peers[role]['instance_id']
+            request = dict(ssh_id, command='authorize', role=role, instance_id=node, public_key=local_key)
+            reply = guest(ssm, node, request, helper)
+            if reply != {'role': role, 'instance_id': node, 'authorized': True}:
+                raise ValueError('SSH_PEER_VERIFICATION')
+
+        authorizations = [executor.submit(authorize_peer, role) for role in peer_roles]
+        for authorization in authorizations:
+            authorization.result()
+
+    for role in peer_roles:
         command(ssm, bastion, f'sudo -u labuser timeout 15 /usr/local/bin/lab-ssh {role} < /dev/null')
     screen.step('lessons')
     stage_lessons(ref, ssm, nodes, common)
@@ -950,7 +979,7 @@ def setup_student(args, screen, session, account, config, work):
         write(request_path, encoded({'id': str(uuid.uuid4())}))
     report = dict(schema_version=1, kind='bootstrap', lab_id=config['lab_id'], release_id=RELEASE,
                   deployment_id=state['deployment_id'], request_id=install_teacher.read_private(request_path)['id'], checks=[
-                      dict(id=f'CLASSROOM_{r.upper()}', role=r, instance_id=nodes[r], status='PASS') for r in roles_checked])
+                      dict(id=f'CLASSROOM_{r.upper()}', role=r, instance_id=nodes[r], status='PASS') for r in nodes])
     receipt = guest(ssm, bastion, {'operation': 'submit', 'report': report})
     screen.record('✓  ' + receipt['received_at'])
     screen.record(f'RDP: {output["BastionPublicIp"]}  /  labuser')
