@@ -33,7 +33,7 @@ def digest(data):
     return hashlib.sha256(data).hexdigest()
 
 
-def load_template(availability_zone, instance_type):
+def load_template(availability_zone, instance_type, *, distribution_bucket=True):
     raw = subprocess.check_output(CURL + ["--fail", f"{REPO}/{BASE_REVISION}/{BASE_PATH}"])
     if digest(raw) != BASE_SHA256:
         raise ValueError("GitHubから取得した教師用テンプレートのSHA-256が一致しません。")
@@ -65,14 +65,15 @@ def load_template(availability_zone, instance_type):
     for logical_id, (aws_type, properties) in network.items():
         resources[logical_id] = {"Type": f"AWS::EC2::{aws_type}", "Properties": properties}
     resources["TeacherInternetRoute"]["DependsOn"] = "TeacherGatewayAttachment"
-    resources["DistributionBucket"] = {
-        "Type": "AWS::S3::Bucket", "DeletionPolicy": "Retain", "UpdateReplacePolicy": "Retain",
-        "Properties": {"PublicAccessBlockConfiguration": PUBLIC_ACCESS_BLOCK,
-                       "OwnershipControls": {"Rules": [{"ObjectOwnership": "BucketOwnerEnforced"}]},
-                       "BucketEncryption": {"ServerSideEncryptionConfiguration": [
-                           {"ServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]}},
-    }
-    template["Outputs"]["DistributionBucket"] = {"Value": {"Ref": "DistributionBucket"}}
+    if distribution_bucket:
+        resources["DistributionBucket"] = {
+            "Type": "AWS::S3::Bucket", "DeletionPolicy": "Retain", "UpdateReplacePolicy": "Retain",
+            "Properties": {"PublicAccessBlockConfiguration": PUBLIC_ACCESS_BLOCK,
+                           "OwnershipControls": {"Rules": [{"ObjectOwnership": "BucketOwnerEnforced"}]},
+                           "BucketEncryption": {"ServerSideEncryptionConfiguration": [
+                               {"ServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]}},
+        }
+        template["Outputs"]["DistributionBucket"] = {"Value": {"Ref": "DistributionBucket"}}
     template["Outputs"]["TeacherVpcId"] = {"Value": {"Ref": "TeacherVpc"}}
     return json.dumps(template, separators=(",", ":"))
 
@@ -142,15 +143,15 @@ def verify_stack_owner(stack, intent):
         raise ValueError("同名スタックは別の構築に属します。--name で別名を指定してください。")
 
 
-def verify_services(session, stack):
+def verify_services(session, stack, *, inform=print):
     outputs = {item["OutputKey"]: item["OutputValue"] for item in stack["Outputs"]}
-    bucket = outputs["DistributionBucket"]
-    s3 = session.client("s3")
-    if s3.get_public_access_block(Bucket=bucket)["PublicAccessBlockConfiguration"] != PUBLIC_ACCESS_BLOCK:
-        raise ValueError("教材用S3の公開ブロック設定が一致しません。")
-    rules = s3.get_bucket_encryption(Bucket=bucket)["ServerSideEncryptionConfiguration"]["Rules"]
-    if not any(rule.get("ApplyServerSideEncryptionByDefault", {}).get("SSEAlgorithm") == "AES256" for rule in rules):
-        raise ValueError("教材用S3の暗号化設定を確認できません。")
+    if bucket := outputs.get("DistributionBucket"):
+        s3 = session.client("s3")
+        if s3.get_public_access_block(Bucket=bucket)["PublicAccessBlockConfiguration"] != PUBLIC_ACCESS_BLOCK:
+            raise ValueError("教材用S3の公開ブロック設定が一致しません。")
+        rules = s3.get_bucket_encryption(Bucket=bucket)["ServerSideEncryptionConfiguration"]["Rules"]
+        if not any(rule.get("ApplyServerSideEncryptionByDefault", {}).get("SSEAlgorithm") == "AES256" for rule in rules):
+            raise ValueError("教材用S3の暗号化設定を確認できません。")
     table = session.client("dynamodb").describe_table(TableName=outputs["TableName"])["Table"]
     if table["TableStatus"] != "ACTIVE":
         raise ValueError("採点データ用DynamoDBの準備が完了していません。")
@@ -158,7 +159,7 @@ def verify_services(session, stack):
     if not host or not re.fullmatch(r"[a-z0-9]+\.execute-api\.us-east-1\.amazonaws\.com", host):
         raise ValueError("出力の採点APIが想定するAWS HTTPSホストと一致しません。")
     ip = str(ipaddress.IPv4Address(outputs["FixedIngressIpv4"]))
-    print("新しい固定IPv4を経由して採点APIのHTTPSを確認します。", flush=True)
+    inform("新しい固定IPv4を経由して採点APIのHTTPSを確認します。", flush=True)
     curl = CURL + ["--noproxy", "*", "--resolve", f"{host}:443:{ip}"]
     url = f"https://{host}"
     for attempt in range(36):
@@ -215,7 +216,7 @@ def run(args):
         install(session, cfn, ec2, account, name, work)
 
 
-def install(session, cfn, ec2, account, name, work):
+def install(session, cfn, ec2, account, name, work, *, distribution_bucket=True, inform=print):
     intent_path = work / "installation.private.json"
     receipt_path = work / "stack.private.json"
     stack = find_stack(cfn, name)
@@ -225,20 +226,24 @@ def install(session, cfn, ec2, account, name, work):
         intent = read_private(intent_path)
         if (intent["account"], intent["stack_name"]) != (account, name):
             raise ValueError("保存済みの構築情報とAWSアカウント・スタックが一致しません。")
+        if bool(intent.get("distribution_bucket", True)) != distribution_bucket:
+            raise ValueError("Existing installation uses a different distribution mode")
     elif stack:
         raise ValueError("同名スタックの構築記録がありません。--name で別名を指定してください。")
     else:
-        template = load_template(*select_capacity(ec2))
+        template = (load_template(*select_capacity(ec2)) if distribution_bucket
+                    else load_template(*select_capacity(ec2), distribution_bucket=False))
         preflight(session, ec2, template)
         cfn.validate_template(TemplateBody=template)
         intent = {"account": account, "stack_name": name, "template": template,
-                  "installation_id": secrets.token_hex(16), "admin_key": secrets.token_urlsafe(48)}
+                  "installation_id": secrets.token_hex(16), "admin_key": secrets.token_urlsafe(48),
+                  "distribution_bucket": distribution_bucket}
         save_private(intent_path, intent)
     if stack:
         verify_stack_owner(stack, intent)
         stack_id = stack["StackId"]
     else:
-        print("CloudFormationで教師用リソースを作成します。", flush=True)
+        inform("CloudFormation: CreateStack", flush=True)
         created = cfn.create_stack(
             StackName=name, TemplateBody=intent["template"], DisableRollback=True,
             ClientRequestToken=intent["installation_id"],
@@ -249,13 +254,13 @@ def install(session, cfn, ec2, account, name, work):
     if not receipt_path.exists():
         save_private(receipt_path, {"stack_id": stack_id})
     if not stack or stack["StackStatus"] == "CREATE_IN_PROGRESS":
-        print("CloudFormationの作成完了を待ちます。", flush=True)
+        inform("CloudFormation: waiting for CREATE_COMPLETE", flush=True)
         cfn.get_waiter("stack_create_complete").wait(StackName=stack_id)
         stack = find_stack(cfn, stack_id)
         verify_stack_owner(stack, intent)
     if stack["StackStatus"] != "CREATE_COMPLETE":
         raise ValueError(f"CloudFormationの状態は {stack['StackStatus']} です。スタックのイベントを確認してください。")
-    outputs = verify_services(session, stack)
+    outputs = verify_services(session, stack) if distribution_bucket else verify_services(session, stack, inform=inform)
     credentials = {"schema_version": 1, "api_base_url": outputs["ApiBaseUrl"],
                    "fixed_ingress_ipv4": outputs["FixedIngressIpv4"], "release_id": "web-2026-10-r1",
                    "admin_key": intent["admin_key"]}
@@ -264,8 +269,10 @@ def install(session, cfn, ec2, account, name, work):
         save_private(credential_path, credentials)
     elif read_private(credential_path) != credentials:
         raise ValueError("保存済みの教師用設定が構築結果と一致しません。")
-    print(f"教師基盤の構築・確認完了: {name}\n非公開S3: {outputs['DistributionBucket']}\n教師用設定: {credential_path}")
-    print("今回の確認範囲は教師基盤です。教材登録、新しい署名済み配布版、Googleログイン付き課題画面は別途準備が必要です。")
+    if distribution_bucket:
+        inform(f"教師基盤の構築・確認完了: {name}\n非公開S3: {outputs['DistributionBucket']}\n教師用設定: {credential_path}")
+        inform("今回の確認範囲は教師基盤です。教材登録、新しい署名済み配布版、Googleログイン付き課題画面は別途準備が必要です。")
+    return credentials
 
 
 def main():

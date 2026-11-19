@@ -65,6 +65,23 @@ def main():
     print('PUBLIC_APP_RESOURCES_VERIFIED; no application installed')
     if not a.wheels:
         return
+    if (ROOT / 'classroom-python-packages.json').is_file():
+        # The CloudShell installer staged this lock from the same immutable GitHub commit.
+        wheels = json.loads((ROOT / 'classroom-python-packages.json').read_text())
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        prefix = 'http://10.20.2.30/releases/' + b['release_id'] + '/artifacts/python/wheelhouse/'
+        for wheel in wheels:
+            name, size = wheel['filename'], wheel['size_bytes']
+            if Path(name).name != name or not name.endswith('.whl') or not 0 < size <= 32 * 1024 * 1024:
+                raise ValueError('Unsafe wheel lock')
+            with opener.open(prefix + name, timeout=45) as response:
+                raw = response.read(size + 1)
+            if len(raw) != size or hashlib.sha256(raw).hexdigest() != wheel['sha256']:
+                raise ValueError('Offline wheel differs from the GitHub lock')
+            retain(ROOT / 'wheels' / name, raw)
+        retain(ROOT / 'requirements.lock', (ROOT / 'classroom-requirements.lock').read_bytes())
+        print('OFFLINE_WHEELS_READY=' + str(len(wheels)) + '; pip has not been run')
+        return
     sys.path.insert(0, '/usr/local/lib/jdu-web/' + b['release_id'])
     from payload_runtime import signed_manifest
     _, sums = signed_manifest('/var/lib/jdu-web/initial/client-metadata', '/var/lib/jdu-web/initial/archive-key.asc',

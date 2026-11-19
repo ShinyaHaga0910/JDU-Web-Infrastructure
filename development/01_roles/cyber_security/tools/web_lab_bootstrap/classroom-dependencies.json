@@ -1,0 +1,9 @@
+{
+  "ubuntu_snapshot": "20261015T090000Z",
+  "firefox": {
+    "filename": "firefox-158.0.tar.xz",
+    "url": "https://archive.mozilla.org/pub/firefox/releases/158.0/linux-x86_64/en-US/firefox-158.0.tar.xz",
+    "sha256": "9549b054ec4cf85f50f6a19d8c6fb79580312e71ebc4ec2cb217ec9af09dc12a"
+  },
+  "firefox_libraries": ["libgtk-3-0t64", "libdbus-glib-1-2", "libasound2t64", "libx11-xcb1", "libxt6t64"]
+}
