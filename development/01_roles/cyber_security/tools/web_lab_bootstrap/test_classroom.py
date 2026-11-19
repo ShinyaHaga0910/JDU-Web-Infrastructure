@@ -59,6 +59,19 @@ class ClassroomTests(unittest.TestCase):
             self.assertEqual(messages[0], screen.wait_hint)
             self.assertRegex(messages[1], r'経過 \d{2}:\d{2}$')
 
+    def test_aws_wait_displays_current_transfer_count(self):
+        with contextlib.redirect_stdout(io.StringIO()), patch.object(classroom, 'AWS_PROGRESS_INTERVAL', 0.01):
+            screen = classroom.Screen('ja', 'student')
+            reported = threading.Event()
+
+            def record(message):
+                if message.startswith('AWSで処理中です') and message.endswith(' (56/1135)'):
+                    reported.set()
+
+            with patch.object(screen, 'record', side_effect=record), screen.aws_wait(total=1135) as update_count:
+                update_count(56)
+                self.assertTrue(reported.wait(timeout=2))
+
     def test_password_is_only_hashed_after_matching_confirmation(self):
         chosen = 'Qx6!'
         with contextlib.redirect_stdout(io.StringIO()) as output:

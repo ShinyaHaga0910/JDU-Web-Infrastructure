@@ -189,20 +189,26 @@ class Screen:
         print(f'│  {value}', flush=True)
 
     @contextmanager
-    def aws_wait(self):
+    def aws_wait(self, total=None):
         self.record(self.wait_hint)
         started = time.monotonic()
         finished = Event()
+        completed = 0
+
+        def update_count(number):
+            nonlocal completed
+            completed = number
 
         def show_elapsed():
             while not finished.wait(AWS_PROGRESS_INTERVAL):
                 minutes, seconds = divmod(int(time.monotonic() - started), 60)
-                self.record(self.wait_update.format(elapsed=f'{minutes:02d}:{seconds:02d}'))
+                count = f' ({completed}/{total})' if total is not None else ''
+                self.record(self.wait_update.format(elapsed=f'{minutes:02d}:{seconds:02d}') + count)
 
         reporter = Thread(target=show_elapsed, daemon=True)
         reporter.start()
         try:
-            yield
+            yield update_count
         finally:
             finished.set()
             reporter.join()
@@ -628,7 +634,7 @@ def exchange(port, method, name, digest, path=None):
         conn.close()
 
 
-def transfer(ssm, node, index, recipe, screen):
+def transfer(ssm, node, index, recipe, screen, update_count):
     command(ssm, node, 'systemctl stop jdu-classroom-receiver.service 2>/dev/null || true; '
             f'systemd-run --unit=jdu-classroom-receiver --property=RuntimeMaxSec=3600 python3 -B {GUEST_ROOT}/classroom_guest.py receive')
     with socket.socket() as probe:
@@ -666,6 +672,7 @@ def transfer(ssm, node, index, recipe, screen):
                     if digest.hexdigest() != expected or exchange(port, 'PUT', name, expected, temp) != 201:
                         raise ValueError(f'ASSET_VERIFICATION {name}')
                     temp.unlink()
+                update_count(number)
                 if number % 50 == 0 or number == len(index):
                     screen.record(f'{number}/{len(index)}')
             temp.write_bytes(encoded(recipe))
@@ -768,8 +775,8 @@ def setup_student(args, screen, session, account, config, work):
     screen.step('assets')
     recipe = dict(assets={n: item[1] for n, item in index.items()}, requirements=requirements,
                   packages=pinned(roles['common'] + roles['repo']))
-    with screen.aws_wait():
-        repo_hash = transfer(ssm, nodes['repo'], index, recipe, screen)
+    with screen.aws_wait(total=len(index)) as update_count:
+        repo_hash = transfer(ssm, nodes['repo'], index, recipe, screen, update_count)
     screen.step('repo')
     public_key = guest(ssm, nodes['repo'], {'operation': 'repo', 'recipe_sha256': repo_hash})['key']
     screen.step('nodes')
