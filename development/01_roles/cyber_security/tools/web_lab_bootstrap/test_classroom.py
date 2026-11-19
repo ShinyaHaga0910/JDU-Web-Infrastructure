@@ -36,7 +36,7 @@ class ClassroomTests(unittest.TestCase):
                             with self.assertRaisesRegex(ValueError, 'INVITATION_FORMAT'):
                                 classroom.student_run(None, screen, None, '012345678901', None)
                             self.assertIn(screen.text['invite'], code_prompt.call_args.args[0])
-                        with patch.object(classroom.getpass, 'getpass') as secret_prompt:
+                        with patch.object(classroom, 'masked_password') as secret_prompt:
                             screen.prompt('password', secret=True)
                             self.assertIn(screen.text['password'], secret_prompt.call_args.args[0])
 
@@ -59,16 +59,17 @@ class ClassroomTests(unittest.TestCase):
             self.assertEqual(messages[0], screen.wait_hint)
             self.assertRegex(messages[1], r'経過 \d{2}:\d{2}$')
 
-    def test_password_is_hidden_and_only_hashed_after_matching_confirmation(self):
+    def test_password_is_only_hashed_after_matching_confirmation(self):
         chosen = 'test-password-only'
         with contextlib.redirect_stdout(io.StringIO()) as output:
             screen = classroom.Screen('ja', 'student')
-            with patch.object(classroom.getpass, 'getpass', side_effect=['short', chosen, 'different', chosen, chosen]) as prompt, \
+            with patch.object(classroom, 'masked_password', side_effect=['short', chosen, 'different', chosen, chosen]) as prompt, \
                     patch.object(classroom.subprocess, 'check_output', return_value=b'fixture-hash\n') as openssl:
                 self.assertEqual(classroom.rdp_password_hash(screen), 'fixture-hash')
         self.assertEqual(prompt.call_count, 5)
         self.assertIn(screen.text['password_again'], prompt.call_args.args[0])
-        self.assertIn(screen.text['password_hidden'], output.getvalue())
+        self.assertIn(screen.text['password_reminder'], output.getvalue())
+        self.assertIn(screen.text['password_masked'], output.getvalue())
         self.assertIn(screen.text['password_invalid'], output.getvalue())
         self.assertIn(screen.text['password_mismatch'], output.getvalue())
         self.assertNotIn(chosen, output.getvalue())

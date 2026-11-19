@@ -5,7 +5,6 @@ import argparse
 import base64
 from contextlib import contextmanager
 import fcntl
-import getpass
 import hashlib
 import http.client
 import importlib.util
@@ -21,13 +20,14 @@ import socket
 import subprocess
 import sys
 import tempfile
+import termios
 from threading import Event, Thread
 import time
+import tty
 from unicodedata import east_asian_width
 from urllib.parse import urlsplit
 from urllib.request import urlopen
 import uuid
-import warnings
 
 
 REGION = 'us-east-1'
@@ -54,14 +54,15 @@ STAGES = {
 }
 
 # UI messages follow the same order for all four languages.
-LABELS = ('teacher', 'student', 'invite', 'share_code', 'paste_code', 'rdp_setup', 'password_hidden',
+LABELS = ('teacher', 'student', 'invite', 'share_code', 'paste_code', 'rdp_setup', 'password_reminder', 'password_masked',
           'password', 'password_again', 'password_invalid', 'password_mismatch', 'aws', 'stack', 'waiting',
           'invites', 'assets', 'repo', 'nodes', 'ssh', 'lessons', 'grading', 'done', 'stopped', 'tty', 'input_error', 'notice')
 TEXT = {
     'en': ('Teacher setup', 'Student setup', 'Course enrollment code', 'Share this code with your students.',
            'Copy and paste the code you received from your teacher.',
            'Choose your own password. You will use it later to open the desktop of the lab’s bastion server (RDP).',
-           'The characters you type will not appear on the screen. Enter your password twice.',
+           'Remember this password. If you forget it, you cannot connect and continue the lab.',
+           'Each character appears as *. Enter the same password twice.',
            'Choose a password (12–128 characters)', 'Enter the same password again',
            'Use 12–128 characters on one line.', 'The two entries do not match. Enter your password again.',
            'Checking the AWS account and prerequisites',
@@ -73,7 +74,8 @@ TEXT = {
     'ja': ('教師側の構築', '学生側の構築', '授業の共通登録コード', 'このコードを学生に伝えてください。',
            '教師から教えられたコードをコピー＆ペーストで入力してください。',
            '自分でパスワードを決めてください。後で、演習用の踏み台サーバーのデスクトップを開くとき（RDP接続）に使います。',
-           '入力した文字は画面に表示されません。同じパスワードを2回入力してください。',
+           'このパスワードを忘れないでください。忘れると踏み台サーバーに接続できず、演習を進められません。',
+           '入力した文字は1文字ずつ * で表示されます。同じパスワードを2回入力してください。',
            '自分で決めたパスワード（12〜128文字）', '同じパスワードをもう一度入力',
            'パスワードは1行で12〜128文字にしてください。', '2回の入力が一致しません。もう一度設定してください。',
            'AWSアカウントと前提条件を確認',
@@ -85,7 +87,8 @@ TEXT = {
     'ru': ('Настройка преподавателя', 'Настройка студента', 'Код регистрации на курс', 'Передайте этот код студентам.',
            'Скопируйте и вставьте код, который вам дал преподаватель.',
            'Придумайте свой пароль. Позже он понадобится, чтобы открыть рабочий стол учебного сервера доступа (RDP).',
-           'Вводимые символы не отображаются на экране. Введите один и тот же пароль дважды.',
+           'Запомните этот пароль. Если вы его забудете, то не сможете подключиться к серверу и продолжить практикум.',
+           'Каждый введённый символ отображается как *. Введите один и тот же пароль дважды.',
            'Придуманный пароль (12–128 символов)', 'Введите тот же пароль ещё раз',
            'Введите от 12 до 128 символов в одной строке.', 'Введённые пароли не совпадают. Попробуйте ещё раз.',
            'Проверка аккаунта AWS и требований',
@@ -97,7 +100,8 @@ TEXT = {
     'uz': ('O‘qituvchi muhiti', 'Talaba muhiti', 'Kursga ro‘yxatdan o‘tish kodi', 'Ushbu kodni talabalarga bering.',
            'O‘qituvchi bergan kodni nusxalab, kiritish maydoniga joylang.',
            'Parolni o‘zingiz tanlang. Keyin undan amaliyotdagi oraliq serverning ish stolini ochishda (RDP) foydalanasiz.',
-           'Kiritilgan belgilar ekranda ko‘rinmaydi. Bir xil parolni ikki marta kiriting.',
+           'Bu parolni unutmang. Parolni unutsangiz, serverga ulana olmaysiz va amaliyotni davom ettira olmaysiz.',
+           'Har bir kiritilgan belgi * ko‘rinishida chiqadi. Bir xil parolni ikki marta kiriting.',
            'O‘zingiz tanlagan parol (12–128 belgi)', 'Xuddi shu parolni yana kiriting',
            'Parol bir qatorda 12–128 belgidan iborat bo‘lsin.', 'Parollar mos kelmadi. Qaytadan kiriting.',
            'AWS hisobi va talablarni tekshirish',
@@ -172,11 +176,44 @@ class Screen:
 
     def prompt(self, key, secret=False):
         prompt = f'  ▸ {self.text[key]}: '
-        if not secret:
-            return input(prompt)
-        with warnings.catch_warnings():
-            warnings.simplefilter('error', getpass.GetPassWarning)
-            return getpass.getpass(prompt)
+        return masked_password(prompt) if secret else input(prompt)
+
+
+def masked_password(prompt):
+    fd = sys.stdin.fileno()
+    original = termios.tcgetattr(fd)
+    characters = []
+    escape = ''
+
+    try:
+        tty.setcbreak(fd)
+        print(prompt, end='', file=sys.stderr, flush=True)
+        while True:
+            char = sys.stdin.read(1)
+            if not char or char == '\x04':
+                raise EOFError
+            if char in '\r\n':
+                return ''.join(characters)
+            if char == '\x1b':
+                escape = char
+                continue
+            if escape == '\x1b':
+                escape = char if char in '[O' else ''
+                if escape:
+                    continue
+            elif escape:
+                if '@' <= char <= '~':
+                    escape = ''
+                continue
+            if char in ('\x7f', '\b') and characters:
+                characters.pop()
+                print('\b \b', end='', file=sys.stderr, flush=True)
+            elif char.isprintable():
+                characters.append(char)
+                print('*', end='', file=sys.stderr, flush=True)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, original)
+        print(file=sys.stderr, flush=True)
 
 
 def encoded(data):
@@ -347,7 +384,8 @@ def capacity(ec2):
 
 def rdp_password_hash(screen):
     screen.record(screen.text['rdp_setup'])
-    screen.record(screen.text['password_hidden'])
+    screen.record(screen.text['password_reminder'])
+    screen.record(screen.text['password_masked'])
     while True:
         password = screen.prompt('password', secret=True)
         if not 12 <= len(password) <= 128 or any(ch in password for ch in '\r\n\0'):
