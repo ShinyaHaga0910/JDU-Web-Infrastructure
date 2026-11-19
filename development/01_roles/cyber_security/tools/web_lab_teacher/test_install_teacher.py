@@ -1,13 +1,33 @@
 import io
 import json
 from pathlib import Path
+import sys
 import tempfile
+from types import SimpleNamespace
 from unittest import TestCase, mock
 
 import install_teacher as installer
 
 
 class InstallTeacherTests(TestCase):
+    def test_run_uses_cloudshell_account_without_prompting(self):
+        account = "246801357924"
+        session = mock.Mock()
+        session.client.return_value.get_caller_identity.return_value = {"Account": account}
+        boto3 = SimpleNamespace(Session=mock.Mock(return_value=session))
+        with tempfile.TemporaryDirectory() as directory, \
+                mock.patch.dict(sys.modules, boto3=boto3), \
+                mock.patch.object(installer.Path, "home", return_value=Path(directory)), \
+                mock.patch("builtins.input", side_effect=AssertionError("unexpected prompt")), \
+                mock.patch("sys.stdout", new_callable=io.StringIO), \
+                mock.patch.object(installer, "install") as install:
+            installer.run(SimpleNamespace(name="walkthrough", plan=False))
+
+        name = "jdu-web-teacher-walkthrough"
+        self.assertEqual(install.call_args.args[3:], (
+            account, name, Path(directory) / ".local/share/jdu-web-teacher-install" / account / name,
+        ))
+
     def test_template_uses_fresh_network_and_bucket(self):
         raw = Path(__file__).with_name("web-teacher.template.json").read_text(encoding="utf-8").encode()
         with mock.patch.object(installer.subprocess, "check_output", return_value=raw):
@@ -64,11 +84,11 @@ class InstallTeacherTests(TestCase):
             cfn = mock.Mock()
             with mock.patch.object(installer, "find_stack", return_value={"StackStatus": "CREATE_COMPLETE"}):
                 with self.assertRaisesRegex(ValueError, "構築記録がありません"):
-                    installer.install(mock.Mock(), cfn, mock.Mock(), "246801357924", "24680", "new", Path(directory))
+                    installer.install(mock.Mock(), cfn, mock.Mock(), "246801357924", "new", Path(directory))
             cfn.create_stack.assert_not_called()
 
     def test_create_then_recheck_same_stack_for_another_teacher(self):
-        account, class_id, name = "246801357924", "24680", "jdu-web-teacher-24680-test"
+        account, name = "246801357924", "jdu-web-teacher-test"
         stack_id = f"arn:aws:cloudformation:us-east-1:{account}:stack/{name}/test"
         stack = {"StackId": stack_id, "StackStatus": "CREATE_COMPLETE",
                  "Tags": [{"Key": installer.OWNER_TAG, "Value": "abc"}]}
@@ -85,11 +105,30 @@ class InstallTeacherTests(TestCase):
                 mock.patch.object(installer.secrets, "token_hex", return_value="abc"), \
                 mock.patch("sys.stdout", new_callable=io.StringIO):
             work = Path(directory)
-            installer.install(mock.Mock(), cfn, mock.Mock(), account, class_id, name, work)
-            installer.install(mock.Mock(), cfn, mock.Mock(), account, class_id, name, work)
+            installer.install(mock.Mock(), cfn, mock.Mock(), account, name, work)
+            installer.install(mock.Mock(), cfn, mock.Mock(), account, name, work)
             credentials = installer.read_private(work / "teacher.credentials.json")
             self.assertEqual(credentials["api_base_url"], outputs["ApiBaseUrl"])
             self.assertEqual((work / "teacher.credentials.json").stat().st_mode & 0o777, 0o600)
         cfn.create_stack.assert_called_once()
         cfn.get_waiter.return_value.wait.assert_called_once_with(StackName=stack_id)
         self.assertEqual(verify.call_count, 2)
+
+    def test_existing_installation_with_legacy_class_field_can_be_checked(self):
+        account, name = "246801357924", "jdu-web-teacher-24680-walkthrough"
+        stack = {"StackId": f"arn:aws:cloudformation:us-east-1:{account}:stack/{name}/test",
+                 "StackStatus": "CREATE_COMPLETE", "Tags": [{"Key": installer.OWNER_TAG, "Value": "abc"}]}
+        outputs = {"ApiBaseUrl": "https://api.example.test", "FixedIngressIpv4": "192.0.2.10",
+                   "DistributionBucket": "test-bucket"}
+        cfn = mock.Mock()
+        with tempfile.TemporaryDirectory() as directory, \
+                mock.patch.object(installer, "find_stack", return_value=stack), \
+                mock.patch.object(installer, "verify_services", return_value=outputs), \
+                mock.patch("sys.stdout", new_callable=io.StringIO):
+            work = Path(directory)
+            installer.save_private(work / "installation.private.json", {
+                "account": account, "class_id": "24680", "stack_name": name,
+                "installation_id": "abc", "admin_key": "test-key",
+            })
+            installer.install(mock.Mock(), cfn, mock.Mock(), account, name, work)
+        cfn.create_stack.assert_not_called()

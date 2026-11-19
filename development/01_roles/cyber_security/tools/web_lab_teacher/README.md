@@ -11,11 +11,11 @@ url='https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/mai
 curl -fSs "$url" -o install_teacher.py && python3 -B install_teacher.py
 ```
 
-Class IDはLearner LabのクラスURLにある数字を入力します。AWSアカウントはログイン中のCloudShellから取得されます。表示されたアカウントが教師用であることを確かめ、番号を入力すると構築が始まります。
+ログイン中のCloudShellからAWSアカウントを取得し、そのアカウントに構築します。Class IDやアカウント番号の入力は不要です。実行前に対象の教師用Learner Labを開いてください。
 
 スクリプトは、教師専用のVPC、EC2 1台と固定IPv4、採点API、採点結果用DynamoDB、非公開の教材用S3をCloudFormationで作成します。対応するAZ、CanonicalのUbuntu AMI、LabRole、EC2台数、テンプレートを作成前に確認します。構築後は固定IPv4経由のHTTPS、認証なしの教師画面へのアクセス拒否、DynamoDB、S3の公開ブロックと暗号化を確認します。教師用設定は表示された専用ディレクトリ内に保存されます。
 
-`--plan` を付けるとAWSの前提とテンプレートのみを確認できます。構築が中断した場合はCloudFormationのイベントを確認してください。構築待ちやHTTPS検査の再開には、同じクラスと同じ `--name` でコマンドを再実行します。同じクラスで別の新規環境を作る場合は `--name trial2` のように名前を変えます。
+`--plan` を付けるとAWSの前提とテンプレートのみを確認できます。構築が中断した場合はCloudFormationのイベントを確認してください。構築待ちやHTTPS検査の再開には、同じAWSアカウントと同じ `--name` で再実行します。標準のスタック名は `jdu-web-teacher-walkthrough` です。同じAWSアカウントで別の新規環境を作る場合は `--name trial2` のように名前を変えます。旧版で作成したスタックを再確認する場合は、スタック名から `jdu-web-teacher-` を除いた文字列を `--name` に指定します。
 
 ここまでで終わるのは教師側のAWS基盤構築です。学生に演習を配布する前に、教材を登録し、新しい採点先に対応する署名済み配布版を作成します。学校Googleログイン付きのブラウザ課題画面も別途配備・確認が必要です。[初回授業の配布・生徒側の手順](../../../../../course/labs/INITIAL-WORKFLOW.md)
 

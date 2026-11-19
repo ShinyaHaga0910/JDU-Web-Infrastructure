@@ -185,16 +185,13 @@ def run(args):
 
     session = boto3.Session(region_name=REGION)
     account = session.client("sts").get_caller_identity()["Account"]
-    if not re.fullmatch(r"[0-9]{12}", account) or (args.expected_account and args.expected_account != account):
-        raise ValueError("AWSアカウントが指定と一致しません。")
-    class_id = args.class_id or input("AWS AcademyのClass IDを入力してください: ").strip()
-    if not re.fullmatch(r"[1-9][0-9]{0,11}", class_id):
-        raise ValueError("Class IDにはAWS AcademyのクラスURLにある数字を指定してください。")
-    if not re.fullmatch(r"[a-z][a-z0-9-]{0,23}", args.name):
-        raise ValueError("--name は英小文字で始まる24文字以内の英小文字・数字・ハイフンです。")
-    name = f"jdu-web-teacher-{class_id}-{args.name}"
+    if not re.fullmatch(r"[0-9]{12}", account):
+        raise ValueError("CloudShellのAWSアカウントを確認できません。")
+    if not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,36}", args.name):
+        raise ValueError("--name は英小文字または数字で始まる37文字以内の英小文字・数字・ハイフンです。")
+    name = f"jdu-web-teacher-{args.name}"
     work = Path.home() / ".local" / "share" / "jdu-web-teacher-install" / account / name
-    print(f"AWS {account} / Class {class_id} / {REGION}\nCloudFormation: {name}\n作業先: {work}", flush=True)
+    print(f"AWS {account} / {REGION}\nCloudFormation: {name}\n作業先: {work}", flush=True)
     cfn = session.client("cloudformation")
     ec2 = session.client("ec2")
     if args.plan:
@@ -205,9 +202,6 @@ def run(args):
         cfn.validate_template(TemplateBody=template)
         print("計画確認完了。教師用EC2 1台、専用VPC、固定IPv4、採点API、DynamoDB、非公開S3を構築します。")
         return
-    if input(f"表示された教師用AWSで構築・再確認する場合はアカウント番号 {account} を入力: ").strip() != account:
-        raise ValueError("教師用AWSの確認が一致しません。AWSの作成処理を中止しました。")
-
     os.umask(0o077)
     work.mkdir(parents=True, exist_ok=True)
     info = work.lstat()
@@ -218,10 +212,10 @@ def run(args):
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError as exc:
             raise ValueError("同じスタックの構築・確認が別の端末で実行中です。") from exc
-        install(session, cfn, ec2, account, class_id, name, work)
+        install(session, cfn, ec2, account, name, work)
 
 
-def install(session, cfn, ec2, account, class_id, name, work):
+def install(session, cfn, ec2, account, name, work):
     intent_path = work / "installation.private.json"
     receipt_path = work / "stack.private.json"
     stack = find_stack(cfn, name)
@@ -229,15 +223,15 @@ def install(session, cfn, ec2, account, class_id, name, work):
         raise ValueError("構築記録のスタックが見つからないか、置き換えられています。--name で別名を指定してください。")
     if intent_path.exists():
         intent = read_private(intent_path)
-        if (intent["account"], intent["class_id"], intent["stack_name"]) != (account, class_id, name):
-            raise ValueError("保存済みの構築情報と指定されたAWS・Class・スタックが一致しません。")
+        if (intent["account"], intent["stack_name"]) != (account, name):
+            raise ValueError("保存済みの構築情報とAWSアカウント・スタックが一致しません。")
     elif stack:
         raise ValueError("同名スタックの構築記録がありません。--name で別名を指定してください。")
     else:
         template = load_template(*select_capacity(ec2))
         preflight(session, ec2, template)
         cfn.validate_template(TemplateBody=template)
-        intent = {"account": account, "class_id": class_id, "stack_name": name, "template": template,
+        intent = {"account": account, "stack_name": name, "template": template,
                   "installation_id": secrets.token_hex(16), "admin_key": secrets.token_urlsafe(48)}
         save_private(intent_path, intent)
     if stack:
@@ -248,8 +242,7 @@ def install(session, cfn, ec2, account, class_id, name, work):
         created = cfn.create_stack(
             StackName=name, TemplateBody=intent["template"], DisableRollback=True,
             ClientRequestToken=intent["installation_id"],
-            Tags=[{"Key": OWNER_TAG, "Value": intent["installation_id"]},
-                  {"Key": "JduAcademyClass", "Value": class_id}],
+            Tags=[{"Key": OWNER_TAG, "Value": intent["installation_id"]}],
             Parameters=[{"ParameterKey": "AdminKeyHash", "ParameterValue": digest(intent["admin_key"].encode())}],
         )
         stack_id = created["StackId"]
@@ -277,14 +270,12 @@ def install(session, cfn, ec2, account, class_id, name, work):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--class-id", help="AWS AcademyのClass ID。省略時は実行中に入力します。")
-    parser.add_argument("--expected-account", help="AWSアカウントを別途指定して照合する場合に使います。")
-    parser.add_argument("--name", default="walkthrough", help="同じClassで複数の環境を分けるための名前。")
+    parser.add_argument("--name", default="walkthrough", help="同じAWSアカウントで複数の環境を分けるための名前。")
     parser.add_argument("--plan", action="store_true", help="AWSの前提とテンプレートを検査します。構築は実行しません。")
     args = parser.parse_args()
     try:
         run(args)
-    except (ValueError, OSError, EOFError, subprocess.SubprocessError, ImportError) as exc:
+    except (ValueError, OSError, subprocess.SubprocessError, ImportError) as exc:
         print(f"教師基盤の確認が停止しました: {exc}", file=sys.stderr)
         return 1
     except Exception as exc:
