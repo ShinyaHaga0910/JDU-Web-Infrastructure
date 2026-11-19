@@ -27,6 +27,7 @@ from unicodedata import east_asian_width
 from urllib.parse import urlsplit
 from urllib.request import urlopen
 import uuid
+import warnings
 
 
 REGION = 'us-east-1'
@@ -53,12 +54,17 @@ STAGES = {
 }
 
 # UI messages follow the same order for all four languages.
-LABELS = ('teacher', 'student', 'invite', 'share_code', 'paste_code', 'password', 'aws', 'stack', 'waiting',
+LABELS = ('teacher', 'student', 'invite', 'share_code', 'paste_code', 'rdp_setup', 'password_hidden',
+          'password', 'password_again', 'password_invalid', 'password_mismatch', 'aws', 'stack', 'waiting',
           'invites', 'assets', 'repo', 'nodes', 'ssh', 'lessons', 'grading', 'done', 'stopped', 'tty', 'input_error', 'notice')
 TEXT = {
     'en': ('Teacher setup', 'Student setup', 'Course enrollment code', 'Share this code with your students.',
            'Copy and paste the code you received from your teacher.',
-           'RDP password (12–128 characters)', 'Checking the AWS account and prerequisites',
+           'Choose your own password. You will use it later to open the desktop of the lab’s bastion server (RDP).',
+           'The characters you type will not appear on the screen. Enter your password twice.',
+           'Choose a password (12–128 characters)', 'Enter the same password again',
+           'Use 12–128 characters on one line.', 'The two entries do not match. Enter your password again.',
+           'Checking the AWS account and prerequisites',
            'Deploying with CloudFormation', 'Waiting for the AWS resources', 'Preparing the shared course enrollment code',
            'Verifying and transferring dependencies', 'Building the signed internal package repository',
            'Preparing and checking the five servers', 'Verifying internal SSH', 'Staging lesson files', 'Registering and testing grading',
@@ -66,7 +72,11 @@ TEXT = {
            'Check the values entered and the current AWS account.', 'Google login and browser grading require separate setup.'),
     'ja': ('教師側の構築', '学生側の構築', '授業の共通登録コード', 'このコードを学生に伝えてください。',
            '教師から教えられたコードをコピー＆ペーストで入力してください。',
-           'RDPパスワード（12〜128文字）', 'AWSアカウントと前提条件を確認',
+           '自分でパスワードを決めてください。後で、演習用の踏み台サーバーのデスクトップを開くとき（RDP接続）に使います。',
+           '入力した文字は画面に表示されません。同じパスワードを2回入力してください。',
+           '自分で決めたパスワード（12〜128文字）', '同じパスワードをもう一度入力',
+           'パスワードは1行で12〜128文字にしてください。', '2回の入力が一致しません。もう一度設定してください。',
+           'AWSアカウントと前提条件を確認',
            'CloudFormationで構築', 'AWSリソースの準備を待機', '授業の共通登録コードを準備',
            '依存パッケージを検証・転送', '署名付きの内部パッケージ配布先を構築',
            'サーバー5台を準備・確認', '内部SSHを確認', '授業用ファイルを配置', '採点登録と試験送信', '基盤の構築・確認が完了',
@@ -74,7 +84,11 @@ TEXT = {
            'Googleログインとブラウザ採点には別途設定が必要です。'),
     'ru': ('Настройка преподавателя', 'Настройка студента', 'Код регистрации на курс', 'Передайте этот код студентам.',
            'Скопируйте и вставьте код, который вам дал преподаватель.',
-           'Пароль RDP (12–128 символов)', 'Проверка аккаунта AWS и требований',
+           'Придумайте свой пароль. Позже он понадобится, чтобы открыть рабочий стол учебного сервера доступа (RDP).',
+           'Вводимые символы не отображаются на экране. Введите один и тот же пароль дважды.',
+           'Придуманный пароль (12–128 символов)', 'Введите тот же пароль ещё раз',
+           'Введите от 12 до 128 символов в одной строке.', 'Введённые пароли не совпадают. Попробуйте ещё раз.',
+           'Проверка аккаунта AWS и требований',
            'Развёртывание через CloudFormation', 'Ожидание ресурсов AWS', 'Подготовка общего кода регистрации на курс',
            'Проверка и передача зависимостей', 'Создание подписанного внутреннего репозитория пакетов',
            'Настройка и проверка пяти серверов', 'Проверка внутреннего SSH', 'Размещение учебных файлов', 'Регистрация и проверка оценивания',
@@ -82,7 +96,11 @@ TEXT = {
            'Проверьте введённые данные и текущий аккаунт AWS.', 'Вход через Google и проверку в браузере нужно настроить отдельно.'),
     'uz': ('O‘qituvchi muhiti', 'Talaba muhiti', 'Kursga ro‘yxatdan o‘tish kodi', 'Ushbu kodni talabalarga bering.',
            'O‘qituvchi bergan kodni nusxalab, kiritish maydoniga joylang.',
-           'RDP paroli (12–128 belgi)', 'AWS hisobi va talablarni tekshirish',
+           'Parolni o‘zingiz tanlang. Keyin undan amaliyotdagi oraliq serverning ish stolini ochishda (RDP) foydalanasiz.',
+           'Kiritilgan belgilar ekranda ko‘rinmaydi. Bir xil parolni ikki marta kiriting.',
+           'O‘zingiz tanlagan parol (12–128 belgi)', 'Xuddi shu parolni yana kiriting',
+           'Parol bir qatorda 12–128 belgidan iborat bo‘lsin.', 'Parollar mos kelmadi. Qaytadan kiriting.',
+           'AWS hisobi va talablarni tekshirish',
            'CloudFormation orqali yaratish', 'AWS resurslarini kutish', 'Kurs uchun umumiy ro‘yxatdan o‘tish kodini tayyorlash',
            'Bog‘liqliklarni tekshirish va uzatish', 'Imzolangan ichki paket repozitoriysini yaratish',
            'Beshta serverni tayyorlash va tekshirish', 'Ichki SSH aloqasini tekshirish', 'Dars fayllarini joylash', 'Ro‘yxatdan o‘tkazish va baholashni tekshirish',
@@ -153,8 +171,12 @@ class Screen:
             reporter.join()
 
     def prompt(self, key, secret=False):
-        operation = getpass.getpass if secret else input
-        return operation(f'  ▸ {self.text[key]}: ')
+        prompt = f'  ▸ {self.text[key]}: '
+        if not secret:
+            return input(prompt)
+        with warnings.catch_warnings():
+            warnings.simplefilter('error', getpass.GetPassWarning)
+            return getpass.getpass(prompt)
 
 
 def encoded(data):
@@ -323,6 +345,22 @@ def capacity(ec2):
     raise ValueError('EC2_CAPACITY')
 
 
+def rdp_password_hash(screen):
+    screen.record(screen.text['rdp_setup'])
+    screen.record(screen.text['password_hidden'])
+    while True:
+        password = screen.prompt('password', secret=True)
+        if not 12 <= len(password) <= 128 or any(ch in password for ch in '\r\n\0'):
+            screen.record(screen.text['password_invalid'])
+            continue
+        if password != screen.prompt('password_again', secret=True):
+            screen.record(screen.text['password_mismatch'])
+            continue
+        return subprocess.check_output(
+            ['openssl', 'passwd', '-6', '-stdin'], input=(password + '\n').encode()
+        ).decode().strip()
+
+
 def stack_setup(cfn, ec2, account, invite, work, ref, screen):
     import install_teacher
     name = STUDENT_STACK_PREFIX + invite['lab_id']
@@ -354,11 +392,7 @@ def stack_setup(cfn, ec2, account, invite, work, ref, screen):
         state = dict(account=account, name=name, ref=ref, deployment_id=str(uuid.uuid4()), public_key=public, zone=zone, family=family)
         write(intent_path, encoded(state))
     if not stack:
-        password = screen.prompt('password', secret=True)
-        if not 12 <= len(password) <= 128 or any(ch in password for ch in '\r\n\0'):
-            raise ValueError('RDP_PASSWORD')
-        password_hash = subprocess.check_output(['openssl', 'passwd', '-6', '-stdin'], input=(password + '\n').encode()).decode().strip()
-        del password
+        password_hash = rdp_password_hash(screen)
         values = dict(AvailabilityZone=state['zone'], StudentKeyName='vockey', RdpPasswordHash=password_hash,
                       LabId=invite['lab_id'], DeploymentId=state['deployment_id'], GradingIpv4=invite['fixed_ingress_ipv4'])
         for field, size in (('Bastion', 'medium'), ('Small', 'small'), ('Dns', 'micro')):

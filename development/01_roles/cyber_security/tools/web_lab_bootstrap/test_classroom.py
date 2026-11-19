@@ -59,6 +59,21 @@ class ClassroomTests(unittest.TestCase):
             self.assertEqual(messages[0], screen.wait_hint)
             self.assertRegex(messages[1], r'経過 \d{2}:\d{2}$')
 
+    def test_password_is_hidden_and_only_hashed_after_matching_confirmation(self):
+        chosen = 'test-password-only'
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            screen = classroom.Screen('ja', 'student')
+            with patch.object(classroom.getpass, 'getpass', side_effect=['short', chosen, 'different', chosen, chosen]) as prompt, \
+                    patch.object(classroom.subprocess, 'check_output', return_value=b'fixture-hash\n') as openssl:
+                self.assertEqual(classroom.rdp_password_hash(screen), 'fixture-hash')
+        self.assertEqual(prompt.call_count, 5)
+        self.assertIn(screen.text['password_again'], prompt.call_args.args[0])
+        self.assertIn(screen.text['password_hidden'], output.getvalue())
+        self.assertIn(screen.text['password_invalid'], output.getvalue())
+        self.assertIn(screen.text['password_mismatch'], output.getvalue())
+        self.assertNotIn(chosen, output.getvalue())
+        openssl.assert_called_once_with(['openssl', 'passwd', '-6', '-stdin'], input=(chosen + '\n').encode())
+
     def test_invitation_is_rejected_in_another_aws_account(self):
         invited = dict(student_account='012345678901', teacher_account='123456789012',
                        api_base_url='https://abc.execute-api.us-east-1.amazonaws.com',
