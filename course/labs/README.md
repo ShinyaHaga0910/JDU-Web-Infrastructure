@@ -21,7 +21,7 @@ P3/M3は2026-11-13に削除したため欠番です。DNSからDBへ進みます
 
 | 学ぶテーマ | 先に読む教科書 | 次に取り組む演習 | 課題画面で確認する点数 |
 | --- | --- | --- | --- |
-| システムの全体像と接続 | [C1 Webシステムの構成](../textbook/docs/ja/01-web-system.md)<br>[C2 AWSのネットワークと通信経路](../textbook/docs/ja/02-network-paths.md)<br>[C3 サーバーへの接続と作業場所](../textbook/docs/ja/03-connecting-and-working.md) | [P0 環境と実行場所](docs/ja/p0.md) → [M0 環境と実行場所](docs/ja/m0.md) | M0は0点 |
+| システムの全体像と接続 | [C1 Webシステムの構成](../textbook/docs/ja/01-web-system.md)<br>[C2 AWSのネットワークと通信経路](../textbook/docs/ja/02-network-paths.md)<br>[C3 サーバーへの接続と作業場所](../textbook/docs/ja/03-connecting-and-working.md) | [P0 環境と実行場所](#p0-共通登録コード方式で接続を練習する) → [M0 環境と実行場所](docs/ja/m0.md) | M0は0点 |
 | HTTPでファイルを配信する | [C4 HTTPの仕組み](../textbook/docs/ja/04-http-requests-and-responses.md)<br>[C5 Nginxで静的ファイルを配信](../textbook/docs/ja/05-nginx-static-files.md) | [P1](docs/ja/p1.md) → [M1](docs/ja/m1.md) | 8/8 |
 | DNSで名前を解決する | [C6 DNSによる名前解決](../textbook/docs/ja/06-dns-name-resolution.md)<br>[C7 内部DNSの設定と動作確認](../textbook/docs/ja/07-internal-dns-configuration.md) | [P2](docs/ja/p2.md) → [M2](docs/ja/m2.md) | 13/13 |
 | PostgreSQLの接続と認証 | [C8 リレーショナルDBとSQL](../textbook/docs/ja/08-databases-and-sql.md)<br>[C9 PostgreSQLの接続と認証](../textbook/docs/ja/09-postgresql-connections.md) | [P4](docs/ja/p4.md) → [M4](docs/ja/m4.md) | 9/9 |
@@ -37,7 +37,9 @@ P5で使った練習環境をP6で整理してから、M5の自力課題用環�
 
 C1では備品管理システムの全体像と5台の役割をつかみます。C1の「練習・課題1」は、後でP1・M1で構築するWeb配信の予告です。C2では、Windowsから踏み台の公開IPへRDPでつなぐ経路と、踏み台からWebの内部IPへSSHでつなぐ経路に注目します。C3では、RDP・内部SSH・SSMで、それぞれどの端末とユーザーを使うのかを確認します。
 
-共通登録コードで環境構築を完了した場合は、次の順でP0に取り組みます。署名付き配布の確認（P0.1）と教材ファイルの配置（P0.4）は、署名付き配布を使う場合に参照してください。
+#### P0 共通登録コード方式で接続を練習する
+
+学生用スクリプトが完了したら、以下の接続練習を始めます。スクリプトがLab IDを自動で発行し、教材の配置と採点先への登録を済ませます。
 
 1. [P0.2](docs/ja/p0.md#p02-5台のinstance-idを記録する)で、自分の5台と各インスタンスIDを照合します。
 2. [P0.6](docs/ja/p0.md#p06-rdpで踏み台のデスクトップを開く)で、Windowsから踏み台のデスクトップにRDPで入り、ユーザー名 `labuser` と操作場所を確認します。
@@ -45,6 +47,8 @@ C1では備品管理システムの全体像と5台の役割をつかみます�
 4. [P0.3](docs/ja/p0.md#p03-ssmで入り戻る)に沿って、学生用CloudShellからWebへSSM接続します。ユーザー `ssm-user` とサーバーの役割 `web` を確認します。P1の設定作業でもこの経路を使います。
 
 [M0](docs/ja/m0.md)では、自分の環境で操作先とユーザーを選べることを確かめます。教師が課題画面を案内したら、P0.5とM0を画面でも確認します。共通登録コード方式のウォークスルーで課題画面の接続設定がこれからの場合は、P0の接続確認を済ませてC4・C5へ進み、P1の設定作業に入れます。
+
+[署名付き配布方式のP0](docs/ja/p0.md)を使う場合は、P0.1で配布版とLab IDを指定し、P0.4で教材を配置します。
 
 各Pでは、実行場所・目的・操作・設定の意味・期待結果・困ったときの確認先を順に読みます。
 Mには完成要件と採点条件を載せています。
