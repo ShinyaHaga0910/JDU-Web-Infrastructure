@@ -13,18 +13,13 @@ JDUのWebインフラストラクチャー構築教材です。今セミスタ�
 AWS Academyで対象のLearner Labを開始し、米国東部（バージニア北部、`us-east-1`）のCloudShellに次を貼り付けます。開始画面で English・日本語・Русский・O‘zbekcha を選ぶと、その後の入力案内、進捗、完了結果、エラー案内が選択した言語で表示されます。
 
 ```bash
-role=teacher
-ref='1b5d55149d43383c63b013e8c159da559524bb0d'
-url="https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/$ref/development/01_roles/cyber_security/tools/web_lab_bootstrap/classroom.py"
-script=$(mktemp) &&
-  curl -q -fsS --proto '=https' "$url" -o "$script" &&
-  (cd -- "$(dirname -- "$script")" &&
-    printf '%s  %s\n' 'd73eb490825b31f6bcc9c272673784055b7e2890ff13db58ec65e1ebb018237f' "$(basename -- "$script")" | sha256sum --check --status) &&
-  python3 -B "$script" "$role" --ref "$ref"
+setup=$(mktemp)
+curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/main/development/setup-classroom.sh -o "$setup" &&
+  bash "$setup" teacher
 ```
 
-1. **教師用Learner Lab** では先頭の `role=teacher` のまま実行します。教師のAWSアカウントはCloudShellから取得します。登録する学生のAWSアカウント番号だけを空白区切りで入力します。実行の最後に表示される `*.invitation.txt` の内容を、該当する学生へ個別に共有します。
-2. **学生用Learner Lab** では先頭を `role=student` に変更して実行します。自分専用の招待コードを貼り付け、踏み台のRDPパスワードを設定します。どちらの入力も画面に表示されません。CloudFormationでEC2 5台を構築し、授業用ファイルを配置します。内部SSHの確認後、踏み台から教師の採点APIへ登録し、構築結果の試験送信まで行います。
+1. **教師用Learner Lab** では上記のまま実行します。教師のAWSアカウントはCloudShellから取得します。登録する学生のAWSアカウント番号だけを空白区切りで入力します。実行の最後に表示される `*.invitation.txt` の内容を、該当する学生へ個別に共有します。
+2. **学生用Learner Lab** では最後の `teacher` を `student` に変更して実行します。自分専用の招待コードを貼り付け、踏み台のRDPパスワードを設定します。どちらの入力も画面に表示されません。CloudFormationでEC2 5台を構築し、授業用ファイルを配置します。内部SSHの確認後、踏み台から教師の採点APIへ登録し、構築結果の試験送信まで行います。
 
 依存パッケージはGitHubに記録した版とSHA-256で検証してから、CloudShellとAWS Systems Managerを通して配布サーバーへ転送します。教材用S3の作成とClass IDの入力は不要です。
 

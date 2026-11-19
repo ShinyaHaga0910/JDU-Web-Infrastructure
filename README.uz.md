@@ -13,18 +13,13 @@ Talabalar AWS VPC ichidagi EC2 instanslarida DNS, veb-server va ma’lumotlar ba
 AWS Academy’da o‘zingizga tegishli Learner Lab’ni ishga tushiring va quyidagi buyruqlarni Shimoliy Virjiniya (`us-east-1`) regionidagi CloudShell’ga joylang. Avval English, 日本語, Русский yoki O‘zbekcha tilini tanlang. Kiritish ko‘rsatmalari, jarayon holati, yakuniy natijalar va xatolar tanlangan tilda ko‘rsatiladi.
 
 ```bash
-role=teacher
-ref='1b5d55149d43383c63b013e8c159da559524bb0d'
-url="https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/$ref/development/01_roles/cyber_security/tools/web_lab_bootstrap/classroom.py"
-script=$(mktemp) &&
-  curl -q -fsS --proto '=https' "$url" -o "$script" &&
-  (cd -- "$(dirname -- "$script")" &&
-    printf '%s  %s\n' 'd73eb490825b31f6bcc9c272673784055b7e2890ff13db58ec65e1ebb018237f' "$(basename -- "$script")" | sha256sum --check --status) &&
-  python3 -B "$script" "$role" --ref "$ref"
+setup=$(mktemp)
+curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/main/development/setup-classroom.sh -o "$setup" &&
+  bash "$setup" teacher
 ```
 
-1. **O‘qituvchi** buyruqlarni o‘zining Learner Lab muhitida `role=teacher` bilan bajaradi. Skript o‘qituvchining AWS hisobini CloudShell seansidan aniqlaydi. Faqat talabalar AWS hisob raqamlarini bo‘sh joy bilan ajratib kiriting. Har bir `*.invitation.txt` faylining mazmunini tegishli talabaga shaxsan yuboring.
-2. **Talaba** buyruqlarni o‘zining Learner Lab muhitida birinchi qatorni `role=student` qilib bajaradi. Shaxsiy taklif kodini kiriting va oraliq server uchun RDP parolini belgilang. Kiritilgan qiymatlar ekranda ko‘rinmaydi. CloudFormation beshta EC2 instansini yaratadi. Skript dars fayllarini joylaydi, ichki SSH aloqasini tekshiradi, so‘ng oraliq serverdan o‘qituvchining baholash API’sida ro‘yxatdan o‘tib, sinov natijasini yuboradi.
+1. **O‘qituvchi** buyruqlarni o‘zining Learner Lab muhitida `teacher` argumenti bilan bajaradi. Skript o‘qituvchining AWS hisobini CloudShell seansidan aniqlaydi. Faqat talabalar AWS hisob raqamlarini bo‘sh joy bilan ajratib kiriting. Har bir `*.invitation.txt` faylining mazmunini tegishli talabaga shaxsan yuboring.
+2. **Talaba** oxirgi qatordagi `teacher` so‘zini `student` bilan almashtirib, buyruqlarni o‘zining Learner Lab muhitida bajaradi. Shaxsiy taklif kodini kiriting va oraliq server uchun RDP parolini belgilang. Kiritilgan qiymatlar ekranda ko‘rinmaydi. CloudFormation beshta EC2 instansini yaratadi. Skript dars fayllarini joylaydi, ichki SSH aloqasini tekshiradi, so‘ng oraliq serverdan o‘qituvchining baholash API’sida ro‘yxatdan o‘tib, sinov natijasini yuboradi.
 
 Skript GitHub’da belgilangan paket versiyalari va SHA-256 qiymatlarini tekshiradi. Paketlarni CloudShell va AWS Systems Manager orqali ichki paket tarqatish serveriga yuboradi. O‘quv materiallari uchun S3 yaratish va Class ID kiritish shart emas.
 

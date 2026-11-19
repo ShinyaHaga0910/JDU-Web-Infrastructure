@@ -13,18 +13,13 @@
 Запустите свой Learner Lab в AWS Academy и вставьте команды ниже в CloudShell региона Северная Вирджиния (`us-east-1`). В начале выберите English, 日本語, Русский или O‘zbekcha. На выбранном языке отображаются подсказки ввода, ход настройки, результаты и сообщения об ошибках.
 
 ```bash
-role=teacher
-ref='1b5d55149d43383c63b013e8c159da559524bb0d'
-url="https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/$ref/development/01_roles/cyber_security/tools/web_lab_bootstrap/classroom.py"
-script=$(mktemp) &&
-  curl -q -fsS --proto '=https' "$url" -o "$script" &&
-  (cd -- "$(dirname -- "$script")" &&
-    printf '%s  %s\n' 'd73eb490825b31f6bcc9c272673784055b7e2890ff13db58ec65e1ebb018237f' "$(basename -- "$script")" | sha256sum --check --status) &&
-  python3 -B "$script" "$role" --ref "$ref"
+setup=$(mktemp)
+curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/main/development/setup-classroom.sh -o "$setup" &&
+  bash "$setup" teacher
 ```
 
-1. **Преподаватель** запускает команды в своём Learner Lab и оставляет `role=teacher`. Скрипт определяет аккаунт преподавателя по сеансу CloudShell. Введите через пробел только номера аккаунтов AWS студентов. Передайте содержимое каждого файла `*.invitation.txt` лично соответствующему студенту.
-2. **Студент** запускает команды в своём Learner Lab, заменив первую строку на `role=student`. Введите личный код приглашения и задайте пароль RDP для сервера доступа. Введённые значения скрыты. CloudFormation создаёт пять экземпляров EC2. Скрипт размещает учебные файлы, проверяет внутреннее SSH-подключение и с сервера доступа регистрирует среду и отправляет пробный результат в API преподавателя.
+1. **Преподаватель** запускает команды в своём Learner Lab с аргументом `teacher`. Скрипт определяет аккаунт преподавателя по сеансу CloudShell. Введите через пробел только номера аккаунтов AWS студентов. Передайте содержимое каждого файла `*.invitation.txt` лично соответствующему студенту.
+2. **Студент** запускает команды в своём Learner Lab, заменив `teacher` на `student` в последней строке. Введите личный код приглашения и задайте пароль RDP для сервера доступа. Введённые значения скрыты. CloudFormation создаёт пять экземпляров EC2. Скрипт размещает учебные файлы, проверяет внутреннее SSH-подключение и с сервера доступа регистрирует среду и отправляет пробный результат в API преподавателя.
 
 Скрипт сверяет версии и SHA-256 пакетов по данным GitHub и передаёт их на сервер пакетов через CloudShell и AWS Systems Manager. Создавать S3 для учебных материалов и вводить Class ID не нужно.
 
