@@ -26,6 +26,8 @@ import uuid
 
 
 REGION = 'us-east-1'
+TEACHER_STACK = 'jdu-web-infrastructure-teacher'
+STUDENT_STACK_PREFIX = 'jdu-web-infrastructure-student-'
 REPO = 'https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure'
 TOOLS = 'development/01_roles/cyber_security/tools'
 BOOT = TOOLS + '/web_lab_bootstrap'
@@ -224,7 +226,7 @@ def teacher_run(args, screen, session, account, work):
     if not students or len(set(students)) != len(students) or any(not ACCOUNT.fullmatch(n) or n == account for n in students):
         raise ValueError('STUDENT_ACCOUNT_LIST')
     screen.step('stack')
-    name = 'jdu-web-teacher-classroom'
+    name = TEACHER_STACK
     screen.record(screen.text['waiting'])
     credentials = install_teacher.install(session, session.client('cloudformation'), session.client('ec2'), account,
                                           name, work, distribution_bucket=False, inform=lambda *_, **__: None)
@@ -263,7 +265,7 @@ def capacity(ec2):
 
 def stack_setup(cfn, ec2, account, invite, work, ref, screen):
     import install_teacher
-    name = 'jdu-web-' + invite['lab_id']
+    name = STUDENT_STACK_PREFIX + invite['lab_id']
     # Validate bytes even on resume. A changed installer revision must not adopt a different stack.
     body = json.dumps(classroom_template(json.loads(remote_source(ref, 'development/templates/web-lab-student.template.json'))), separators=(',', ':'))
     intent_path = work / 'deployment.json'
@@ -568,7 +570,7 @@ def setup_student(args, screen, session, account, invite, config, work):
     for role, node in nodes.items():
         packages = roles['common'] + roles.get(role, [])
         if role == 'bastion':
-            packages += definitions['firefox_libraries']
+            packages += definitions['firefox_libraries'] + definitions['desktop_tools']
         request = dict(common, operation='configure', role=role, instance_id=node, public_key=public_key,
                        packages=pinned(packages), firefox=definitions['firefox'])
         check = guest(ssm, node, request)

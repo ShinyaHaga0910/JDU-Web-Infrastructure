@@ -224,7 +224,8 @@ def verify(config):
     if role == 'bastion':
         checks['rdp'] = subprocess.run(['systemctl', 'is-active', '--quiet', 'xrdp']).returncode == 0
         user = pwd.getpwnam('labuser')
-        checks['desktop'] = bool(shutil.which('startxfce4') and shutil.which('firefox') and Path(user.pw_dir, '.xsession').is_file())
+        checks['desktop'] = all(shutil.which(name) for name in ('startxfce4', 'firefox', 'gnome-terminal', 'dbus-run-session'))
+        checks['desktop'] = checks['desktop'] and Path(user.pw_dir, '.xsession').is_file()
     result = subprocess.run(['curl', '-q', '-fsS', '--max-time', '15', REPO + '/apt/dists/jdu-noble/InRelease'], capture_output=True)
     checks['internal_repository'] = result.returncode == 0
     if not all(checks.values()):
