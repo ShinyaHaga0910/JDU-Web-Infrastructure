@@ -547,11 +547,16 @@ def student_run(args, screen, session, account, parent):
 
 def setup_student(args, screen, session, account, invite, config, work):
     import install_teacher
+
+    intent = work / 'deployment.json'
+    ref = install_teacher.read_private(intent)['ref'] if intent.exists() else args.ref
+    if not re.fullmatch('[a-f0-9]{40}', ref):
+        raise ValueError('SOURCE_REVISION')
     ssm = session.client('ssm')
-    index, versions, roles, definitions, requirements = assets(args.ref)
-    state, nodes, output = stack_setup(session.client('cloudformation'), session.client('ec2'), account, invite, work, args.ref, screen)
+    index, versions, roles, definitions, requirements = assets(ref)
+    state, nodes, output = stack_setup(session.client('cloudformation'), session.client('ec2'), account, invite, work, ref, screen)
     wait_online(ssm, nodes)
-    deploy_guest(args.ref, ssm, nodes)
+    deploy_guest(ref, ssm, nodes)
     common = dict(lab_id=config['lab_id'], deployment_id=state['deployment_id'], release_id=RELEASE,
                   student_public_key=state['public_key'], grading_api_url=config['api_base_url'],
                   grading_ipv4=config['fixed_ingress_ipv4'], instances=nodes)
@@ -591,10 +596,10 @@ def setup_student(args, screen, session, account, invite, config, work):
         guest(ssm, peer['instance_id'], dict(ssh_id, command='authorize', role=role, instance_id=peer['instance_id'], public_key=local_key), helper)
         command(ssm, bastion, f'sudo -u labuser timeout 15 /usr/local/bin/lab-ssh {role} < /dev/null')
     screen.step('lessons')
-    stage_lessons(args.ref, ssm, nodes, common)
+    stage_lessons(ref, ssm, nodes, common)
 
     screen.step('grading')
-    register_bastion(args.ref, ssm, bastion, config, state['deployment_id'])
+    register_bastion(ref, ssm, bastion, config, state['deployment_id'])
     request_path = work / 'foundation-request.json'
     if not request_path.exists():
         write(request_path, encoded({'id': str(uuid.uuid4())}))

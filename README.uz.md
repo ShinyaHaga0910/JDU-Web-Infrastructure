@@ -18,6 +18,8 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
   bash "$setup" teacher
 ```
 
+Yangi muhit uchun GitHub’dagi joriy versiya ishlatiladi. Talaba sozlashni davom ettirganda, kerakli fayllar sozlash boshlangan versiyadan olinadi.
+
 1. **O‘qituvchi** buyruqlarni o‘zining Learner Lab muhitida `teacher` argumenti bilan bajaradi. Skript o‘qituvchining AWS hisobini CloudShell seansidan aniqlaydi. Faqat talabalar AWS hisob raqamlarini bo‘sh joy bilan ajratib kiriting. Har bir `*.invitation.txt` faylining mazmunini tegishli talabaga shaxsan yuboring.
 2. **Talaba** oxirgi qatordagi `teacher` so‘zini `student` bilan almashtirib, buyruqlarni o‘zining Learner Lab muhitida bajaradi. Shaxsiy taklif kodini kiriting va oraliq server uchun RDP parolini belgilang. Kiritilgan qiymatlar ekranda ko‘rinmaydi. CloudFormation beshta EC2 instansini yaratadi. Skript dars fayllarini joylaydi, ichki SSH aloqasini tekshiradi, so‘ng oraliq serverdan o‘qituvchining baholash API’sida ro‘yxatdan o‘tib, sinov natijasini yuboradi.
 

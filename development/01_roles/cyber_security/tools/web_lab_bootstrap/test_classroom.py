@@ -3,6 +3,7 @@ import hashlib
 import io
 import json
 from pathlib import Path
+import sys
 import tempfile
 import threading
 import unittest
@@ -51,6 +52,19 @@ class ClassroomTests(unittest.TestCase):
             self.assertIn({'Ref': 'BootstrapSg'}, instance['Properties']['SecurityGroupIds'])
             self.assertEqual('UserData' in instance['Properties'], role == 'bastion')
         self.assertTrue(template['Parameters']['RdpPasswordHash']['NoEcho'])
+
+    def test_student_uses_latest_source_for_new_install_and_saved_source_on_resume(self):
+        latest, saved = 'a' * 40, 'b' * 40
+        teacher = Mock()
+        teacher.read_private.return_value = {'ref': saved}
+        with tempfile.TemporaryDirectory() as temp, patch.dict(sys.modules, install_teacher=teacher):
+            work = Path(temp)
+            for expected in (latest, saved):
+                with patch.object(classroom, 'assets', side_effect=ValueError('STOP_BEFORE_DEPLOY')) as assets:
+                    with self.assertRaisesRegex(ValueError, 'STOP_BEFORE_DEPLOY'):
+                        classroom.setup_student(Mock(ref=latest), Mock(), Mock(), '012345678901', {}, {}, work)
+                    assets.assert_called_once_with(expected)
+                (work / 'deployment.json').touch()
 
     def test_receiver_rejects_wrong_hash_and_reuses_verified_asset(self):
         with tempfile.TemporaryDirectory() as temp, patch.object(classroom_guest, 'ROOT', Path(temp)):
