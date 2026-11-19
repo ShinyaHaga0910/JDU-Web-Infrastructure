@@ -14,12 +14,12 @@ AWS Academyで対象のLearner Labを開始し、米国東部（バージニア�
 
 ```bash
 role=teacher
-ref='efd96d963d1eb34e7fca0dd054735fa6ab924ef0'
+ref='1b5d55149d43383c63b013e8c159da559524bb0d'
 url="https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/$ref/development/01_roles/cyber_security/tools/web_lab_bootstrap/classroom.py"
 script=$(mktemp) &&
   curl -q -fsS --proto '=https' "$url" -o "$script" &&
   (cd -- "$(dirname -- "$script")" &&
-    printf '%s  %s\n' 'c9f3aaa4b64a765c538903edb7a3d2c76984af6662bdb76f8ba071bb9610be1a' "$(basename -- "$script")" | sha256sum --check --status) &&
+    printf '%s  %s\n' 'd73eb490825b31f6bcc9c272673784055b7e2890ff13db58ec65e1ebb018237f' "$(basename -- "$script")" | sha256sum --check --status) &&
   python3 -B "$script" "$role" --ref "$ref"
 ```
 
@@ -27,6 +27,8 @@ script=$(mktemp) &&
 2. **学生用Learner Lab** では先頭を `role=student` に変更して実行します。自分専用の招待コードを貼り付け、踏み台のRDPパスワードを設定します。どちらの入力も画面に表示されません。CloudFormationでEC2 5台を構築し、授業用ファイルを配置します。内部SSHの確認後、踏み台から教師の採点APIへ登録し、構築結果の試験送信まで行います。
 
 依存パッケージはGitHubに記録した版とSHA-256で検証してから、CloudShellとAWS Systems Managerを通して配布サーバーへ転送します。教材用S3の作成とClass IDの入力は不要です。
+
+新規スタックは、教師側が `jdu-web-infrastructure-teacher`、学生側が `jdu-web-infrastructure-student-<Lab ID>` です。
 
 新手順のLearner Labでの通し確認は未完了です。学校Googleアカウントでのログインと、Web Portalからの各課題の採点は別途設定が必要です。
 

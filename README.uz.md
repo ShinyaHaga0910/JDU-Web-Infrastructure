@@ -14,12 +14,12 @@ AWS Academy’da o‘zingizga tegishli Learner Lab’ni ishga tushiring va quyid
 
 ```bash
 role=teacher
-ref='efd96d963d1eb34e7fca0dd054735fa6ab924ef0'
+ref='1b5d55149d43383c63b013e8c159da559524bb0d'
 url="https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/$ref/development/01_roles/cyber_security/tools/web_lab_bootstrap/classroom.py"
 script=$(mktemp) &&
   curl -q -fsS --proto '=https' "$url" -o "$script" &&
   (cd -- "$(dirname -- "$script")" &&
-    printf '%s  %s\n' 'c9f3aaa4b64a765c538903edb7a3d2c76984af6662bdb76f8ba071bb9610be1a' "$(basename -- "$script")" | sha256sum --check --status) &&
+    printf '%s  %s\n' 'd73eb490825b31f6bcc9c272673784055b7e2890ff13db58ec65e1ebb018237f' "$(basename -- "$script")" | sha256sum --check --status) &&
   python3 -B "$script" "$role" --ref "$ref"
 ```
 
@@ -27,6 +27,8 @@ script=$(mktemp) &&
 2. **Talaba** buyruqlarni o‘zining Learner Lab muhitida birinchi qatorni `role=student` qilib bajaradi. Shaxsiy taklif kodini kiriting va oraliq server uchun RDP parolini belgilang. Kiritilgan qiymatlar ekranda ko‘rinmaydi. CloudFormation beshta EC2 instansini yaratadi. Skript dars fayllarini joylaydi, ichki SSH aloqasini tekshiradi, so‘ng oraliq serverdan o‘qituvchining baholash API’sida ro‘yxatdan o‘tib, sinov natijasini yuboradi.
 
 Skript GitHub’da belgilangan paket versiyalari va SHA-256 qiymatlarini tekshiradi. Paketlarni CloudShell va AWS Systems Manager orqali ichki paket tarqatish serveriga yuboradi. O‘quv materiallari uchun S3 yaratish va Class ID kiritish shart emas.
+
+O‘qituvchining yangi steki `jdu-web-infrastructure-teacher`, talabaniki esa `jdu-web-infrastructure-student-<Lab ID>` deb nomlanadi.
 
 Yangi tartib Learner Lab’da boshidan oxirigacha hali tekshirilmagan. Ta’lim muassasasining Google hisobi bilan kirish va Web Portal orqali topshiriqlarni baholash alohida sozlanadi.
 
