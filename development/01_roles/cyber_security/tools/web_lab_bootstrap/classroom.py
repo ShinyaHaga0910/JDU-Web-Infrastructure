@@ -11,6 +11,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import platform
 import re
 import shlex
 import shutil
@@ -77,11 +78,18 @@ SERVER_NAMES = {
     'ru': ('Сервер доступа', 'Веб-сервер', 'DNS-сервер', 'Сервер базы данных', 'Сервер пакетов'),
     'uz': ('Oraliq server', 'Veb-server', 'DNS serveri', 'Ma’lumotlar bazasi serveri', 'Paket tarqatish serveri'),
 }
+SESSION_TOOL = {
+    'en': 'Preparing the AWS Session Manager plugin',
+    'ja': 'AWS Session Managerプラグインを準備',
+    'ru': 'Подготовка плагина AWS Session Manager',
+    'uz': 'AWS Session Manager plaginini tayyorlash',
+}
 
 
 class Screen:
     def __init__(self, language, role):
         self.text = dict(zip(LABELS, TEXT[language]))
+        self.text['session_tool'] = SESSION_TOOL[language]
         self.current = 'aws'
         self.number = 0
         self.role = role
@@ -124,6 +132,38 @@ def remote_source(ref, path):
     if len(data) > 4 * 1024 * 1024:
         raise ValueError('SOURCE_SIZE')
     return data
+
+
+def ensure_session_plugin(ref):
+    if shutil.which('session-manager-plugin'):
+        return
+    platform_name = {'x86_64': 'linux_64bit', 'aarch64': 'linux_arm64'}.get(platform.machine())
+    if not platform_name or not shutil.which('rpm'):
+        raise ValueError('SSM_PLUGIN_PLATFORM')
+    url = ('https://s3.amazonaws.com/session-manager-downloads/plugin/latest/'
+           f'{platform_name}/session-manager-plugin.rpm')
+    with tempfile.TemporaryDirectory() as scratch:
+        root = Path(scratch)
+        key = root / 'aws.asc'
+        key.write_bytes(remote_source(ref, BOOT + '/session-manager-signer.asc'))
+        package = root / 'session-manager-plugin.rpm'
+        signature = root / 'session-manager-plugin.rpm.sig'
+        for path, address, limit in ((package, url, 32 * 1024 * 1024), (signature, url + '.sig', 8192)):
+            with urlopen(address, timeout=40) as response:
+                data = response.read(limit + 1)
+            if not 0 < len(data) <= limit:
+                raise ValueError('SSM_PLUGIN_SIZE')
+            path.write_bytes(data)
+        gpg = ['gpg', '--homedir', scratch, '--batch', '--no-options']
+        subprocess.run(gpg + ['--import', str(key)], check=True, capture_output=True)
+        status = subprocess.check_output(gpg + ['--status-fd', '1', '--verify', str(signature), str(package)],
+                                         stderr=subprocess.DEVNULL, text=True)
+        fingerprint = '7959637124CE093AD501D47A2C4D4AFF6F6757EE'
+        if not any(line.startswith(f'[GNUPG:] VALIDSIG {fingerprint} ') for line in status.splitlines()):
+            raise ValueError('SSM_PLUGIN_SIGNATURE')
+        subprocess.run(['sudo', '-n', 'rpm', '-U', str(package)], capture_output=True, check=True)
+    if not shutil.which('session-manager-plugin'):
+        raise ValueError('SSM_PLUGIN_MISSING')
 
 
 def invitation(value):
@@ -486,8 +526,10 @@ def student_run(args, screen, session, account, parent):
     invite = parse_invitation(screen.prompt('invite', secret=True).strip(), account)
     config = {k: v for k, v in invite.items() if k not in ('teacher_account', 'student_account')}
     web_progress.request(config, '/api/web/student/session', {'lab_id': config['lab_id']}, config['lab_token'])
-    if not shutil.which('session-manager-plugin') or not shutil.which('aws'):
+    if not shutil.which('aws'):
         raise ValueError('SSM_CLIENT')
+    screen.step('session_tool')
+    ensure_session_plugin(args.ref)
     screen.step('stack')
     work = parent / config['lab_id']
     work.mkdir(mode=0o700, exist_ok=True)
