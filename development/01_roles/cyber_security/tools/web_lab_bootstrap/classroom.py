@@ -20,6 +20,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from unicodedata import east_asian_width
 from urllib.parse import urlsplit
 from urllib.request import urlopen
 import uuid
@@ -622,12 +623,24 @@ def main():
         print(dict(zip(LABELS, TEXT[args.lang or 'en']))['tty'], file=sys.stderr)
         return 2
     if not args.lang:
-        border = '=' * 56
-        print(f'\n{border}\n  JDU WEB INFRASTRUCTURE\n'
-              '  Choose your language.\n'
-              '  Enter one number from 1 to 4, then press Enter.\n\n'
-              '  [1] English\n  [2] 日本語\n  [3] Русский\n  [4] O‘zbekcha\n'
-              f'{border}')
+        lines = (
+            'JDU WEB INFRASTRUCTURE',
+            '',
+            'Choose your language',
+            'Enter one number from 1 to 4, then press Enter.',
+            '',
+            '[1] English',
+            '[2] 日本語',
+            '[3] Русский',
+            '[4] O‘zbekcha',
+        )
+        width = 52
+        border = '─' * (width + 4)
+        print(f'\n┌{border}┐')
+        for line in lines:
+            columns = sum(2 if east_asian_width(char) in ('W', 'F') else 1 for char in line)
+            print(f'│  {line}{" " * (width - columns)}  │')
+        print(f'└{border}┘')
         selections = dict(zip('1234', TEXT))
         answer = input('  Enter your number (1-4): ').strip()
         while answer not in selections:
