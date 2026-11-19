@@ -35,11 +35,11 @@
 <text x="1265" y="377" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">同じWebサーバーへ届く</text>
 <polyline points="875,650 1020,650" fill="none" stroke="#16745b" stroke-width="4" stroke-dasharray="13 9"/><polygon points="1020,650 1005.5928463623571,656.9594485457797 1005.5928463623571,643.0405514542203" fill="#16745b"/>
 <text x="490" y="798" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">踏み台 → Webサーバー：内部IP 10.20.1.20 / SSH TCP22</text>
-<polyline points="1245,755 1245,880" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1245,880 1238.0405514542203,865.5928463623571 1251.9594485457797,865.5928463623571" fill="#2165a7"/>
-<text x="1280" y="820" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">TCP5432</text>
-<rect x="1020" y="880" width="450" height="155" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
+<polyline points="1245,755 1245,880" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="1245,880 1238.0405514542203,865.5928463623571 1251.9594485457797,865.5928463623571" fill="#16745b"/>
+<text x="1280" y="820" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">TCP5432</text>
+<rect x="1020" y="880" width="450" height="155" rx="18" fill="#f1f7f3" stroke="#16745b" stroke-width="2"/>
 <text x="1245" y="893" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
 <text x="1245" y="932" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">DBサーバー</text>
-<text x="1245" y="983" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">内部IP  10.20.2.20</text>
-<text x="45" y="1129" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">公開IPは説明用の例。青い公開IPと緑の内部IPは、同じEC2 Webサーバーに対応する。</text>
+<text x="1245" y="983" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">内部IP  10.20.2.20</text>
+<text x="45" y="1129" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">青：公開IPで外部から接続　　緑：VPC内で内部IPを使って接続</text>
 </svg>
