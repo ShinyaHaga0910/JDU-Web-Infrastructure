@@ -14,7 +14,7 @@ AWS Academyで対象のLearner Labを開始し、米国東部（バージニア�
 
 ```bash
 setup=$(mktemp)
-curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/main/development/setup-classroom.sh -o "$setup" &&
+curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/refs/heads/main/development/setup-classroom.sh -o "$setup" &&
   bash "$setup" teacher
 ```
 

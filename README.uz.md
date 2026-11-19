@@ -14,7 +14,7 @@ AWS Academy’da o‘zingizga tegishli Learner Lab’ni ishga tushiring va quyid
 
 ```bash
 setup=$(mktemp)
-curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/main/development/setup-classroom.sh -o "$setup" &&
+curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/refs/heads/main/development/setup-classroom.sh -o "$setup" &&
   bash "$setup" teacher
 ```
 
