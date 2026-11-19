@@ -132,13 +132,13 @@ SESSION_TOOL = {
     'uz': 'AWS Session Manager plaginini tayyorlash',
 }
 PROGRESS_TEXT = {
-    'en': ('Total stages: {total}', 'This may take several minutes. Keep this terminal open.',
+    'en': ('Total stages: {total}', 'This takes about {minutes} minutes. Keep this terminal open.',
            'Waiting for AWS · elapsed {elapsed}'),
-    'ja': ('全{total}工程', '数分かかることがあります。この画面を開いたままお待ちください。',
+    'ja': ('全{total}工程', '{minutes}分程度かかります。この画面を開いたままお待ちください。',
            'AWSで処理中です · 経過 {elapsed}'),
-    'ru': ('Всего этапов: {total}', 'Это может занять несколько минут. Оставьте терминал открытым.',
+    'ru': ('Всего этапов: {total}', 'Это займёт около {minutes} минут. Оставьте терминал открытым.',
            'Ожидание AWS · прошло {elapsed}'),
-    'uz': ('Jami {total} bosqich', 'Bu bir necha daqiqa olishi mumkin. Terminalni ochiq qoldiring.',
+    'uz': ('Jami {total} bosqich', 'Bu taxminan {minutes} daqiqa davom etadi. Terminalni ochiq qoldiring.',
            'AWS jarayoni davom etmoqda · o‘tgan vaqt {elapsed}'),
 }
 RESET_LABELS = ('reset-rdp', 'reset_target', 'reset_choice', 'reset_password', 'reset_done', 'reset_error')
@@ -176,7 +176,9 @@ class Screen:
         self.text['session_tool'] = SESSION_TOOL[language]
         self.stages = STAGES[role]
         self.total = len(self.stages)
-        total_label, self.wait_hint, self.wait_update = PROGRESS_TEXT[language]
+        total_label, wait_hint, self.wait_update = PROGRESS_TEXT[language]
+        self.wait_hint = wait_hint.format(minutes=5)
+        self.transfer_hint = wait_hint.format(minutes=15)
         self.servers = dict(zip(ROLES, SERVER_NAMES[language]))
         print('\n' + '═' * 56 + f'\n  JDU WEB INFRASTRUCTURE  /  {self.text[role]}\n'
               f'  {total_label.format(total=self.total)}\n' + '═' * 56)
@@ -190,7 +192,7 @@ class Screen:
 
     @contextmanager
     def aws_wait(self, total=None):
-        self.record(self.wait_hint)
+        self.record(self.wait_hint if total is None else self.transfer_hint)
         started = time.monotonic()
         finished = Event()
         completed = 0
