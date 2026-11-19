@@ -53,10 +53,11 @@ STAGES = {
 }
 
 # UI messages follow the same order for all four languages.
-LABELS = ('teacher', 'student', 'invite', 'share_code', 'password', 'aws', 'stack', 'waiting',
+LABELS = ('teacher', 'student', 'invite', 'share_code', 'paste_code', 'password', 'aws', 'stack', 'waiting',
           'invites', 'assets', 'repo', 'nodes', 'ssh', 'lessons', 'grading', 'done', 'stopped', 'tty', 'input_error', 'notice')
 TEXT = {
     'en': ('Teacher setup', 'Student setup', 'Course enrollment code', 'Share this code with your students.',
+           'Copy and paste the code you received from your teacher.',
            'RDP password (12–128 characters)', 'Checking the AWS account and prerequisites',
            'Deploying with CloudFormation', 'Waiting for the AWS resources', 'Preparing the shared course enrollment code',
            'Verifying and transferring dependencies', 'Building the signed internal package repository',
@@ -64,6 +65,7 @@ TEXT = {
            'Foundation setup complete', 'Setup stopped at stage', 'Use an interactive CloudShell terminal.',
            'Check the values entered and the current AWS account.', 'Google login and browser grading require separate setup.'),
     'ja': ('教師側の構築', '学生側の構築', '授業の共通登録コード', 'このコードを学生に伝えてください。',
+           '教師から教えられたコードをコピー＆ペーストで入力してください。',
            'RDPパスワード（12〜128文字）', 'AWSアカウントと前提条件を確認',
            'CloudFormationで構築', 'AWSリソースの準備を待機', '授業の共通登録コードを準備',
            '依存パッケージを検証・転送', '署名付きの内部パッケージ配布先を構築',
@@ -71,6 +73,7 @@ TEXT = {
            '停止した工程', '対話型のCloudShellで実行してください。', '入力内容と現在のAWSアカウントを確認してください。',
            'Googleログインとブラウザ採点には別途設定が必要です。'),
     'ru': ('Настройка преподавателя', 'Настройка студента', 'Код регистрации на курс', 'Передайте этот код студентам.',
+           'Скопируйте и вставьте код, который вам дал преподаватель.',
            'Пароль RDP (12–128 символов)', 'Проверка аккаунта AWS и требований',
            'Развёртывание через CloudFormation', 'Ожидание ресурсов AWS', 'Подготовка общего кода регистрации на курс',
            'Проверка и передача зависимостей', 'Создание подписанного внутреннего репозитория пакетов',
@@ -78,6 +81,7 @@ TEXT = {
            'Базовая настройка завершена', 'Настройка остановлена на этапе', 'Используйте интерактивный терминал CloudShell.',
            'Проверьте введённые данные и текущий аккаунт AWS.', 'Вход через Google и проверку в браузере нужно настроить отдельно.'),
     'uz': ('O‘qituvchi muhiti', 'Talaba muhiti', 'Kursga ro‘yxatdan o‘tish kodi', 'Ushbu kodni talabalarga bering.',
+           'O‘qituvchi bergan kodni nusxalab, kiritish maydoniga joylang.',
            'RDP paroli (12–128 belgi)', 'AWS hisobi va talablarni tekshirish',
            'CloudFormation orqali yaratish', 'AWS resurslarini kutish', 'Kurs uchun umumiy ro‘yxatdan o‘tish kodini tayyorlash',
            'Bog‘liqliklarni tekshirish va uzatish', 'Imzolangan ichki paket repozitoriysini yaratish',
@@ -603,6 +607,7 @@ def student_credentials(invite, parent):
 def student_run(args, screen, session, account, parent):
     import install_teacher
 
+    screen.record(screen.text['paste_code'])
     invite = parse_invitation(screen.prompt('invite', secret=True).strip(), account)
     if not shutil.which('aws'):
         raise ValueError('SSM_CLIENT')
