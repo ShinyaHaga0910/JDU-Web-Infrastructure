@@ -156,12 +156,23 @@ RESET_TEXT = {
            'Yangi parolni tanlang', 'RDP paroli qayta o‘rnatildi',
            'Lab muhitini sozlagan CloudShell’ni oching. Oraliq server ishlayotganini va Systems Manager’ga ulanganini tekshiring.'),
 }
+STUDENT_WAIT_TEXT = {
+    'en': ('CloudFormation finished. Waiting for all five servers to connect to Systems Manager.',
+           'All five servers are connected. Installing the setup helpers.'),
+    'ja': ('CloudFormationの構築が完了しました。5台のサーバーがSystems Managerに接続するのを待っています。',
+           '5台すべてが接続しました。サーバーにセットアップ用のファイルを配置しています。'),
+    'ru': ('CloudFormation завершил развёртывание. Ожидается подключение всех пяти серверов к Systems Manager.',
+           'Все пять серверов подключены. Размещаются файлы для настройки.'),
+    'uz': ('CloudFormation muhitni yaratdi. Beshta serverning Systems Manager’ga ulanishi kutilmoqda.',
+           'Beshta serverning barchasi ulandi. Sozlash fayllari joylanmoqda.'),
+}
 
 
 class Screen:
     def __init__(self, language, role):
         self.text = dict(zip(LABELS, TEXT[language]))
         self.text.update(zip(RESET_LABELS, RESET_TEXT[language]))
+        self.text.update(zip(('wait_for_ssm', 'deploy_helpers'), STUDENT_WAIT_TEXT[language]))
         self.text['session_tool'] = SESSION_TOOL[language]
         self.stages = STAGES[role]
         self.total = len(self.stages)
@@ -474,12 +485,7 @@ def stack_setup(cfn, ec2, account, invite, work, ref, screen):
         raise ValueError('STACK_REPLACED')
     if not receipt.exists():
         write(receipt, encoded({'id': stack_id}))
-    screen.step('waiting')
-    with screen.aws_wait():
-        cfn.get_waiter('stack_create_complete').wait(StackName=stack_id)
-    result = cfn.describe_stacks(StackName=stack_id)['Stacks'][0]
-    output = {x['OutputKey']: x['OutputValue'] for x in result['Outputs']}
-    return state, {r: output[n+'InstanceId'] for r, n in ROLES.items()}, output
+    return state, stack_id
 
 
 def wait_online(ssm, nodes):
@@ -738,11 +744,20 @@ def setup_student(args, screen, session, account, config, work):
     ref = install_teacher.read_private(intent)['ref'] if intent.exists() else args.ref
     if not re.fullmatch('[a-f0-9]{40}', ref):
         raise ValueError('SOURCE_REVISION')
+    cfn = session.client('cloudformation')
     ssm = session.client('ssm')
     index, versions, roles, definitions, requirements = assets(ref)
-    state, nodes, output = stack_setup(session.client('cloudformation'), session.client('ec2'), account, config, work, ref, screen)
-    wait_online(ssm, nodes)
-    deploy_guest(ref, ssm, nodes)
+    state, stack_id = stack_setup(cfn, session.client('ec2'), account, config, work, ref, screen)
+    screen.step('waiting')
+    with screen.aws_wait():
+        cfn.get_waiter('stack_create_complete').wait(StackName=stack_id)
+        result = cfn.describe_stacks(StackName=stack_id)['Stacks'][0]
+        output = {x['OutputKey']: x['OutputValue'] for x in result['Outputs']}
+        nodes = {role: output[label + 'InstanceId'] for role, label in ROLES.items()}
+        screen.record(screen.text['wait_for_ssm'])
+        wait_online(ssm, nodes)
+        screen.record(screen.text['deploy_helpers'])
+        deploy_guest(ref, ssm, nodes)
     common = dict(lab_id=config['lab_id'], deployment_id=state['deployment_id'], release_id=RELEASE,
                   student_public_key=state['public_key'], grading_api_url=config['api_base_url'],
                   grading_ipv4=config['fixed_ingress_ipv4'], instances=nodes)
