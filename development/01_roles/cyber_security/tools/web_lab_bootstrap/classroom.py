@@ -3,6 +3,7 @@
 
 import argparse
 import base64
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from contextlib import contextmanager, suppress
 import fcntl
 import hashlib
@@ -46,6 +47,7 @@ RELEASE = 'web-2026-10-r1'
 GUEST_ROOT = '/var/lib/jdu-web-classroom'
 PORT = 18974
 MAX_ASSET = 200 * 1024 * 1024
+ASSET_DOWNLOAD_WORKERS = 8
 AWS_PROGRESS_INTERVAL = 30
 STAGES = {
     'teacher': ('aws', 'stack', 'invites', 'done'),
@@ -636,6 +638,61 @@ def exchange(port, method, name, digest, path=None):
         conn.close()
 
 
+def download_asset(name, url, expected, path):
+    digest = hashlib.sha256()
+    size = 0
+    with urlopen(url, timeout=45) as response, path.open('wb') as stream:
+        while chunk := response.read(1024 * 1024):
+            size += len(chunk)
+            if size > MAX_ASSET:
+                raise ValueError(f'ASSET_SIZE {name}')
+            digest.update(chunk)
+            stream.write(chunk)
+    if digest.hexdigest() != expected:
+        raise ValueError(f'ASSET_VERIFICATION {name}')
+
+
+def transfer_assets(port, index, directory, screen, update_count):
+    total = len(index)
+    completed = 0
+    pending = {}
+
+    def record_completed():
+        nonlocal completed
+        completed += 1
+        update_count(completed)
+        if completed % 50 == 0 or completed == total:
+            screen.record(f'{completed}/{total}')
+
+    def send_verified_downloads():
+        ready, _ = wait(pending, return_when=FIRST_COMPLETED)
+        for download in ready:
+            name, expected, path = pending.pop(download)
+            download.result()
+            if exchange(port, 'PUT', name, expected, path) != 201:
+                raise ValueError(f'ASSET_VERIFICATION {name}')
+            path.unlink()
+            record_completed()
+
+    with ThreadPoolExecutor(max_workers=ASSET_DOWNLOAD_WORKERS) as executor:
+        try:
+            for number, (name, (url, expected)) in enumerate(index.items(), 1):
+                if exchange(port, 'HEAD', name, expected) == 200:
+                    record_completed()
+                    continue
+                path = directory / f'asset-{number}'
+                download = executor.submit(download_asset, name, url, expected, path)
+                pending[download] = (name, expected, path)
+                # Bound the temporary files and keep the SSM requests on this thread.
+                if len(pending) >= ASSET_DOWNLOAD_WORKERS:
+                    send_verified_downloads()
+            while pending:
+                send_verified_downloads()
+        finally:
+            for download in pending:
+                download.cancel()
+
+
 def transfer(ssm, node, index, recipe, screen, update_count):
     command(ssm, node, 'systemctl stop jdu-classroom-receiver.service 2>/dev/null || true; '
             f'systemd-run --unit=jdu-classroom-receiver --property=RuntimeMaxSec=3600 python3 -B {GUEST_ROOT}/classroom_guest.py receive')
@@ -659,24 +716,9 @@ def transfer(ssm, node, index, recipe, screen, update_count):
         else:
             raise ValueError('SSM_PORT_FORWARD_TIMEOUT')
         with tempfile.TemporaryDirectory() as scratch:
-            temp = Path(scratch) / 'asset'
-            for number, (name, (url, expected)) in enumerate(index.items(), 1):
-                if exchange(port, 'HEAD', name, expected) != 200:
-                    digest = hashlib.sha256()
-                    size = 0
-                    with urlopen(url, timeout=45) as response, temp.open('wb') as stream:
-                        while chunk := response.read(1024 * 1024):
-                            size += len(chunk)
-                            if size > MAX_ASSET:
-                                raise ValueError(f'ASSET_SIZE {name}')
-                            digest.update(chunk)
-                            stream.write(chunk)
-                    if digest.hexdigest() != expected or exchange(port, 'PUT', name, expected, temp) != 201:
-                        raise ValueError(f'ASSET_VERIFICATION {name}')
-                    temp.unlink()
-                update_count(number)
-                if number % 50 == 0 or number == len(index):
-                    screen.record(f'{number}/{len(index)}')
+            directory = Path(scratch)
+            transfer_assets(port, index, directory, screen, update_count)
+            temp = directory / 'recipe.json'
             temp.write_bytes(encoded(recipe))
             expected = summary(temp)
             if exchange(port, 'PUT', 'recipe.json', expected, temp) != 201:

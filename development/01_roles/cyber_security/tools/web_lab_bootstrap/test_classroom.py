@@ -200,6 +200,43 @@ class ClassroomTests(unittest.TestCase):
                     assets.assert_called_once_with(expected)
                 (work / 'deployment.json').touch()
 
+    def test_transfer_downloads_in_parallel_and_reuses_verified_files(self):
+        contents = {f'package-{i}.deb': f'fixture-{i}'.encode() for i in range(9)}
+        index = {name: (name, hashlib.sha256(raw).hexdigest()) for name, raw in contents.items()}
+        cached = 'package-0.deb'
+        workers = threading.Barrier(8)
+
+        def open_package(url, *, timeout):
+            self.assertNotEqual(url, cached)
+            workers.wait(timeout=5)
+            return io.BytesIO(contents[url])
+
+        def exchange(port, method, name, digest, path=None):
+            if method == 'HEAD':
+                return 200 if name == cached else 404
+            self.assertEqual(method, 'PUT')
+            self.assertEqual(path.read_bytes(), contents[name])
+            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), digest)
+            return 201
+
+        with tempfile.TemporaryDirectory() as scratch, patch.object(classroom, 'urlopen', side_effect=open_package), \
+                patch.object(classroom, 'exchange', side_effect=exchange) as requests:
+            progress = []
+            classroom.transfer_assets(1234, index, Path(scratch), Mock(), progress.append)
+            self.assertEqual(list(Path(scratch).iterdir()), [])
+        uploaded = {request.args[2] for request in requests.call_args_list if request.args[1] == 'PUT'}
+        self.assertEqual(uploaded, set(index) - {cached})
+        self.assertEqual(progress, list(range(1, len(index) + 1)))
+
+    def test_transfer_does_not_upload_a_corrupt_download(self):
+        with tempfile.TemporaryDirectory() as scratch, patch.object(classroom, 'urlopen', return_value=io.BytesIO(b'wrong')), \
+                patch.object(classroom, 'exchange', return_value=404) as requests:
+            progress = Mock()
+            with self.assertRaisesRegex(ValueError, 'ASSET_VERIFICATION package.deb'):
+                classroom.transfer_assets(1234, {'package.deb': ('url', '0' * 64)}, Path(scratch), Mock(), progress)
+        requests.assert_called_once_with(1234, 'HEAD', 'package.deb', '0' * 64)
+        progress.assert_not_called()
+
     def test_receiver_rejects_wrong_hash_and_reuses_verified_asset(self):
         with tempfile.TemporaryDirectory() as temp, patch.object(classroom_guest, 'ROOT', Path(temp)):
             assets = Path(temp, 'assets')
