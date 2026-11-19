@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1340" viewBox="0 0 1600 1340" role="img">
 <title>AWS内のInternet Gatewayと5台の配置、閲覧と管理の独立した経路</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="14" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図1-1  システムの全体構成</text>
+<text x="40" y="14" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図1-1  今回のシステムの完成図</text>
 <rect x="60" y="75" width="380" height="125" rx="18" fill="#f5f7fa" stroke="#a9b8c7" stroke-width="2"/>
 <text x="250" y="94" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">利用者PC</text>
 <text x="250" y="142" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">ブラウザ / RDP</text>
@@ -56,6 +56,6 @@
 <polyline points="1210,800 1210,870 800,870 800,990" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="800,990 793.0405514542203,975.5928463623571 806.9594485457797,975.5928463623571" fill="#2165a7"/>
 <text x="850" y="840" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="23" dominant-baseline="text-before-edge" text-anchor="start">アプリ → DB / TCP5432</text>
 <text x="100" y="1182" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">各EC2の上でUbuntuが動き、EBSへファイルとデータを保存する。</text>
-<text x="100" y="1241" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">名前解決・配布・管理画面・SSMの経路は本文の通信表を参照。</text>
+<text x="100" y="1241" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">名前解決・配布・管理画面は1.7の通信表、Session Managerは1.8を参照。</text>
 <text x="60" y="1295" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="23" dominant-baseline="text-before-edge" text-anchor="start">青い実線：一般利用・DB要求　　緑の破線：管理接続　　矢印：要求方向（応答は逆向き）</text>
 </svg>

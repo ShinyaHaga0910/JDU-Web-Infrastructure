@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="680" viewBox="0 0 1600 680" role="img">
-<title>Web内のNginx・Gunicorn・アプリと別EC2のDB</title>
+<title>Webサーバー内のNginx・Gunicorn・アプリと別EC2のDB</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="16" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図1-3  Webの内部とDBの関係</text>
+<text x="40" y="16" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図1-3  Webサーバーの内部とDBの関係</text>
 <rect x="290" y="110" width="940" height="400" rx="18" fill="#edf5fc" stroke="#9ebed8" stroke-width="2"/>
 <text x="760" y="126" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
 <text x="760" y="169" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">Webサーバー</text>
@@ -25,7 +25,7 @@
 <polyline points="1175,315 1280,315" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1280,315 1265.5928463623572,321.9594485457797 1265.5928463623572,308.0405514542203" fill="#2165a7"/>
 <text x="1205" y="195" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">5432</text>
 <text x="340" y="425" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">Nginx → 127.0.0.1:8000（同じホスト内）</text>
-<text x="340" y="466" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">DB名はWeb側が内部DNSで解決する。</text>
+<text x="340" y="466" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">DB名はWebサーバーが内部DNSで解決する。</text>
 <text x="50" y="552" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">要求：ブラウザ → Nginx → アプリ → DB　　結果：同じ経路を逆向きに返す。</text>
 <text x="50" y="603" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">数値はTCPのポート。IGW等の経路、DNS、管理8080、静的資源は省略。</text>
 </svg>

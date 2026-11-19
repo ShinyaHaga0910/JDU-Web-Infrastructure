@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="620" viewBox="0 0 1600 620" role="img">
 <title>EC2 Webサーバーで静的ファイルを配信する構成</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図1-5  練習・課題1で構築するサービス</text>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図1-6  練習・課題1で構築するサービス</text>
 <rect x="40" y="165" width="330" height="155" rx="18" fill="#f5f7fa" stroke="#a9b8c7" stroke-width="2"/>
 <text x="205" y="188" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">HTTPクライアント</text>
 <text x="205" y="239" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">IP指定でファイルを要求</text>
@@ -13,12 +13,12 @@
 <text x="755" y="287" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="middle">静的ファイルを配信</text>
 <rect x="1090" y="215" width="405" height="140" rx="18" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
 <text x="1292" y="236" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">保存したテキスト</text>
-<text x="1292" y="287" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="middle">Web内の指定ファイル</text>
+<text x="1292" y="287" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="middle">Webサーバー内の指定ファイル</text>
 <polyline points="370,245 610,245" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="610,245 595.5928463623571,251.95944854577968 595.5928463623571,238.04055145422032" fill="#2165a7"/>
 <text x="393" y="195" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">HTTP / TCP80</text>
 <polyline points="900,285 1090,285" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1090,285 1075.5928463623572,291.9594485457797 1075.5928463623572,278.0405514542203" fill="#2165a7"/>
 <text x="926" y="237" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">読み取り</text>
-<text x="610" y="385" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">要求に対応するアクセスログもWeb内へ残る。</text>
+<text x="610" y="385" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">要求に対応するアクセスログもWebサーバー内へ残る。</text>
 <text x="55" y="493" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">Nginxが保存したファイルを読み取り、HTTPの応答として内容を返す。</text>
 <text x="55" y="548" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">この図は静的配信の例。DBの値から画面を作る構成は図1-3を参照。</text>
 </svg>

@@ -37,7 +37,7 @@
 <polyline points="1210,190 1490,190 1490,495 1070,495" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1070,495 1084.4071536376428,488.0405514542203 1084.4071536376428,501.9594485457797" fill="#2165a7"/>
 <text x="1230" y="250" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="23" dominant-baseline="text-before-edge" text-anchor="start">HTTP / TCP80</text>
 <polyline points="920,570 920,640 1220,640 1220,730" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1220,730 1213.0405514542203,715.5928463623571 1226.9594485457797,715.5928463623571" fill="#2165a7"/>
-<text x="940" y="605" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="23" dominant-baseline="text-before-edge" text-anchor="start">SG-DB：WebからのTCP5432を許可</text>
+<text x="940" y="605" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="23" dominant-baseline="text-before-edge" text-anchor="start">SG-DB：WebサーバーからのTCP5432を許可</text>
 <polyline points="810,935 1070,935" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1070,935 1055.5928463623572,941.9594485457797 1055.5928463623572,928.0405514542203" fill="#2165a7"/>
 <text x="825" y="882" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="23" dominant-baseline="text-before-edge" text-anchor="start">SG-Repoで許可</text>
 <text x="850" y="970" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="23" dominant-baseline="text-before-edge" text-anchor="start">TCP80</text>

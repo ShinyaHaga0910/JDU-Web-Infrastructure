@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="990" viewBox="0 0 1600 990" role="img">
-<title>RDPで踏み台のデスクトップを開き、その端末からSSHでWebへ接続する</title>
+<title>RDPで踏み台のデスクトップを開き、その端末からSSHでWebサーバーへ接続する</title>
 <rect width="100%" height="100%" fill="white"/>
 <text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図3-3  踏み台を経由した管理接続</text>
 <rect x="25" y="170" width="325" height="275" rx="18" fill="#f5f7fa" stroke="#a9b8c7" stroke-width="2"/>
@@ -31,8 +31,8 @@
 <text x="975" y="605" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">TCP</text>
 <text x="975" y="724" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="23" dominant-baseline="text-before-edge" text-anchor="middle">ポート番号22</text>
 <text x="460" y="797" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">デスクトップの端末で</text>
-<text x="460" y="837" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">WebへのSSH接続を開始</text>
+<text x="460" y="837" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">WebサーバーへのSSH接続を開始</text>
 <text x="1080" y="797" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">SSH接続後のコマンドは</text>
-<text x="1080" y="837" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">Webで実行される</text>
+<text x="1080" y="837" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">Webサーバーで実行される</text>
 <text x="40" y="930" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">手元のPCで入力していても、接続後は相手のコンピューターで処理される。</text>
 </svg>
