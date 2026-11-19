@@ -13,28 +13,27 @@
 
 P3/M3は2026-11-13に削除したため欠番です。DNSからDBへ進みます。現行の成績は5課題・合計59点で集計します。
 
-## 学習の進め方
+## 教科書と演習を進める順番
 
-1. 教師から受け取った[初回構築の手順](INITIAL-WORKFLOW.md)で、自分の5台と本人登録を準備します。
-2. 上の「準備と操作」を読み、Pの操作例で仕組みと設定方法を学びます。
-3. Mの完成要件に合わせて、自分でサーバーの設定を変更します。
-4. [Web Portal](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws)で課題を選び、結果と保存済み成績を確認します。
+環境構築の案内に従って、自分の演習環境を用意します。共通登録コードを使う場合は[学生用スクリプト](../../README.md#学生側のコマンド)、署名付き配布を使う場合は[初回構築の手順](INITIAL-WORKFLOW.md)を参照してください。
 
-P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6
+表を上から順に進めます。各行で教科書を先に読み、その行のP・Mに取り組みます。点数のあるMは、授業の課題画面で表の点数に達したことを確認してから次に進みます。
 
-P5の前にM2、練習用から本課題用へ切り替える前にP6を終えます。
-Pは成績外、M0は0点です。M1・M2・M4・M5・M6は合計**59素点**で、科目の25点への換算は教師が行います。
-
-## 課題を開く（日本語）
-
-| テーマ | 詳しい練習 | 自力課題 | Mの素点 |
+| 学ぶテーマ | 先に読む教科書 | 次に取り組む演習 | 課題画面で確認する点数 |
 | --- | --- | --- | --- |
-| 環境と操作場所の確認 | [P0](docs/ja/p0.md) | [M0](docs/ja/m0.md) | 0 |
-| HTTPでファイルを配信する | [P1](docs/ja/p1.md) | [M1](docs/ja/m1.md) | 8 |
-| DNSで名前を解決する | [P2](docs/ja/p2.md) | [M2](docs/ja/m2.md) | 13 |
-| PostgreSQLの接続と認証 | [P4](docs/ja/p4.md) | [M4](docs/ja/m4.md) | 9 |
-| 教師提供アプリをDBへ接続する | [P5](docs/ja/p5.md) | [M5](docs/ja/m5.md) | 13 |
-| 最小権限と公開範囲を仕上げる | [P6](docs/ja/p6.md) | [M6](docs/ja/m6.md) | 16 |
+| システムの全体像と接続 | [第1章 Webシステムの構成](../textbook/docs/ja/01-web-system.md)<br>[第2章 AWSのネットワークと通信経路](../textbook/docs/ja/02-network-paths.md)<br>[第3章 サーバーへの接続と作業場所](../textbook/docs/ja/03-connecting-and-working.md) | [P0 環境と実行場所](docs/ja/p0.md) → [M0 環境と実行場所](docs/ja/m0.md) | M0は0点 |
+| HTTPでファイルを配信する | [第4章 HTTPの仕組み](../textbook/docs/ja/04-http-requests-and-responses.md)<br>[第5章 Nginxで静的ファイルを配信](../textbook/docs/ja/05-nginx-static-files.md) | [P1](docs/ja/p1.md) → [M1](docs/ja/m1.md) | 8/8 |
+| DNSで名前を解決する | [第6章 DNSによる名前解決](../textbook/docs/ja/06-dns-name-resolution.md)<br>[第7章 内部DNSの設定と動作確認](../textbook/docs/ja/07-internal-dns-configuration.md) | [P2](docs/ja/p2.md) → [M2](docs/ja/m2.md) | 13/13 |
+| PostgreSQLの接続と認証 | [第8章 リレーショナルDBとSQL](../textbook/docs/ja/08-databases-and-sql.md)<br>[第9章 PostgreSQLの接続と認証](../textbook/docs/ja/09-postgresql-connections.md) | [P4](docs/ja/p4.md) → [M4](docs/ja/m4.md) | 9/9 |
+| 提供アプリを練習用DBへ接続する | [第10章 Web・アプリ・DBの連携](../textbook/docs/ja/10-web-app-and-database.md)<br>[第11章 提供アプリの配置と初期設定](../textbook/docs/ja/11-application-deployment.md) | [P5](docs/ja/p5.md) | — |
+| 練習環境の公開範囲と権限を整える | [第12章 公開範囲と最小権限](../textbook/docs/ja/12-access-and-least-privilege.md) | [P6](docs/ja/p6.md) | — |
+| 提供アプリを自力課題用DBへ接続する | 必要な箇所を第10・11章で読み返す | [M5](docs/ja/m5.md) | 13/13 |
+| 自力課題の公開範囲と権限を仕上げる | 必要な箇所を第12章で読み返す | [M6](docs/ja/m6.md) | 16/16 |
+| 運用・保守と障害への対応 | [第13章 運用・保守と障害への対応](../textbook/docs/ja/13-observation-and-recovery.md) | M6の後に読みます。演習中にエラーが出たときも参照できます。 | — |
+
+共通登録コードで環境構築を済ませた場合は、P0で操作する端末と接続先を確認します。P0の冒頭にある署名付き配布版の確認は、署名付き配布を使うときの手順です。
+
+P5で使った練習環境をP6で整理してから、M5の自力課題用環境へ切り替えます。Pは成績外です。M1・M2・M4・M5・M6は合計**59素点**で、科目の25点への換算は教師が行います。
 
 各Pでは、実行場所・目的・操作・設定の意味・期待結果・困ったときの確認先を順に読みます。
 Mには完成要件と採点条件を載せています。

@@ -85,6 +85,7 @@ script=$(mktemp) &&
 
 - [この単元だけで学ぶ目的と前提](course/learning-outcomes.md)
 - [教材の順序と到達状態](course/roadmap.md)
+- [教科書・練習P・課題Mを進める順番](course/labs/README.md#教科書と演習を進める順番)
 - [後半教科書の学習順序と必要知識](course/textbook-plan.md)
 - [教科書全13章の章立てと各節の説明内容](course/textbook-outline.md)
 - [教科書本文と章・課題の対応表（全13章）](course/textbook/README.md)
