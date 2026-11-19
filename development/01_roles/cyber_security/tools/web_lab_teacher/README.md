@@ -7,11 +7,13 @@ AWS Academyで対象クラスの**教師用Learner Lab**を開始し、米国東
 ```bash
 work=$(mktemp -d "$HOME/web-teacher-download.XXXXXX")
 cd "$work"
-url='https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/main/development/01_roles/cyber_security/tools/web_lab_teacher/install_teacher.py'
+url='https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/8b080f940957fe3898e65d5a31978f581aa86dd0/development/01_roles/cyber_security/tools/web_lab_teacher/install_teacher.py'
 curl -fSs "$url" -o install_teacher.py && python3 -B install_teacher.py
 ```
 
 ログイン中のCloudShellからAWSアカウントを取得し、そのアカウントに構築します。Class IDやアカウント番号の入力は不要です。実行前に対象の教師用Learner Labを開いてください。
+
+取得URLは、入力を省いた版のコミットを指定しています。Class IDの入力待ちが表示された場合は `Ctrl+C` で中断し、上のコマンドで取り直します。
 
 スクリプトは、教師専用のVPC、EC2 1台と固定IPv4、採点API、採点結果用DynamoDB、非公開の教材用S3をCloudFormationで作成します。対応するAZ、CanonicalのUbuntu AMI、LabRole、EC2台数、テンプレートを作成前に確認します。構築後は固定IPv4経由のHTTPS、認証なしの教師画面へのアクセス拒否、DynamoDB、S3の公開ブロックと暗号化を確認します。教師用設定は表示された専用ディレクトリ内に保存されます。
 
