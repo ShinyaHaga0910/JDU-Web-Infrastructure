@@ -2,7 +2,7 @@
 
 ## 採点を変更したときのビルド
 
-配布物を更新するときは、GitHubの **Actions → Classroom build → Run workflow** で `main` を選び、手動で実行します。採点と課題画面のテストに通ると、同じコミットの構築スクリプト・教師用CloudFormation・教師／学生共通の課題確認Lambda・成績サービス・課題画面がまとまります。内包した採点コードを元のファイルと照合し、含まれていないファイルや異なる内容を検出するとビルドを停止します。`manifest.json` に元のコミットと各ファイルのSHA-256を記録します。
+`development/`、`course/curriculum.json`、またはビルド設定の変更を `main` に反映すると、GitHub Actionsがビルドを実行します。手動で実行する場合は **Actions → Classroom build → Run workflow** で `main` を選びます。採点と課題画面のテストに通ると、同じコミットの構築スクリプト・教師用CloudFormation・教師／学生共通の課題確認Lambda・成績サービス・課題画面がまとまります。内包した採点コードを元のファイルと照合し、含まれていないファイルや異なる内容を検出するとビルドを停止します。`manifest.json` に元のコミットと各ファイルのSHA-256を記録します。
 
 GitHubのActionsで該当の実行を開き、Artifactsから `classroom-<コミットID>` を取得します。ローカルで再現する場合は、構築・採点ソースをコミットし、次をリポジトリのルートで実行します。出力先には新しいディレクトリを指定します。
 
