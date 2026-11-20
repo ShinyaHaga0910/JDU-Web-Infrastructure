@@ -181,6 +181,9 @@ def repository(config):
     (public / 'artifacts/python/requirements.lock').write_text(config['requirements'])
     key = signed_index(public / 'apt', home)
     (public / 'archive.gpg').write_bytes(key)
+    manifest = public / 'manifests/release.json'
+    manifest.parent.mkdir(parents=True, exist_ok=True)
+    manifest.write_text(json.dumps({'release_id': RELEASE}) + '\n', encoding='utf-8')
     (ROOT / 'archive.gpg').write_bytes(key)
     apt((public / 'apt').as_uri(), ROOT / 'archive.gpg', config['packages'])
     sites = Path('/etc/nginx/sites-enabled')

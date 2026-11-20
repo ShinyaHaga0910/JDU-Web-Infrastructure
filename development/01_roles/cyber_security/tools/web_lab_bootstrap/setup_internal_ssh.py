@@ -44,12 +44,15 @@ def save_new(path, value):
 def current_nodes(ec2, cfn, state, baseline):
     stack = cfn.describe_stacks(StackName=state['stack_id'])['Stacks'][0]
     params = {x['ParameterKey']: x['ParameterValue'] for x in stack['Parameters']}
-    if (stack['StackStatus'] != 'UPDATE_COMPLETE' or params['DeploymentPhase'] != 'teaching'
+    classroom = state.get('foundation') == 'classroom'
+    expected_statuses = ('CREATE_COMPLETE', 'UPDATE_COMPLETE') if classroom else ('UPDATE_COMPLETE',)
+    if (stack['StackStatus'] not in expected_statuses or (not classroom and params.get('DeploymentPhase') != 'teaching')
             or any(params[x] != state[y] for x, y in [('LabId', 'lab_id'), ('DeploymentId', 'deployment_id')])):
         raise ValueError('Accepted teaching deployment required')
     template=cfn.get_template(StackName=state['stack_id'],TemplateStage='Original')['TemplateBody']
     if isinstance(template,str):template=json.loads(template)
-    canonical=(json.dumps(template,separators=(',',':'))+'\n').encode()
+    canonical = (json.dumps(template, sort_keys=classroom, separators=(',', ':'))
+                 + ('' if classroom else '\n')).encode()
     if hashlib.sha256(canonical).hexdigest()!=baseline['proposed_sha256']:
         raise ValueError('Live template differs from approved SSM configuration')
     resources = []

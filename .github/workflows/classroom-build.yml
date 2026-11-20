@@ -28,6 +28,9 @@ jobs:
       - name: Test scoring and compatibility
         working-directory: development/01_roles/cyber_security/tools/web_lab_assessment
         run: python -B -m unittest -q test_assessment
+      - name: Test classroom setup
+        working-directory: development/01_roles/cyber_security/tools/web_lab_bootstrap
+        run: python -B -m unittest -q test_classroom test_classroom_checker
       - name: Install portal dependencies and test
         working-directory: development/web_portal_poc/web
         run: |

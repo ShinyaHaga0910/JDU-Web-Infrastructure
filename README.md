@@ -46,7 +46,7 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
 
 新規スタックは、教師側が `jdu-web-infrastructure-teacher`、学生側が `jdu-web-infrastructure-student-<Lab ID>` です。
 
-新手順のLearner Labでの通し確認は未完了です。学校Googleアカウントでのログインと、Web Portalからの各課題の採点は別途設定が必要です。
+学生側のスクリプトは、CloudFormationで課題確認Lambdaと結果保存先も作成します。初期化後に同じ版の採点コードをLambdaへ転送し、5台への接続状態をLambdaから検査します。教師側では、学校Googleアカウントでログインする課題画面と学生Labの連携を準備します。学生は教師から案内された課題画面をP0から使います。新手順のLearner Labでの通し確認は未完了です。
 
 #### RDPパスワードを忘れたとき
 

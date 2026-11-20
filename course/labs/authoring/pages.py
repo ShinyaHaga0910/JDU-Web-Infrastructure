@@ -7,9 +7,9 @@ from content import T
 
 def browser_check(task, lang):
     out = T(
-        f'1. 教師から案内された課題画面に学校のGoogleアカウントでログインし、自分のLabと **{task}** を選ぶ。',
-        f'1. Откройте страницу заданий по ссылке преподавателя, войдите через учебный аккаунт Google и выберите свой Lab и **{task}**.',
-        f'1. O‘qituvchi bergan havola orqali topshiriqlar sahifasini oching, ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda **{task}** ni tanlang.')[lang]
+        f'1. P0で使った課題画面に学校のGoogleアカウントでログインし、自分のLabと **{task}** を選ぶ。',
+        f'1. Откройте страницу заданий, которую использовали в P0. Войдите через учебный аккаунт Google и выберите свой Lab и **{task}**.',
+        f'1. P0 da ishlatgan topshiriqlar sahifasiga ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda **{task}** ni tanlang.')[lang]
     if task[1:] == '3':
         out += '\n' + T(
             '2. 「停止前の状態を記録する」→保存成功→AWSで同じWebをStop→stopped→「停止完了を確認する」→記録成功→AWSで同じWebをStart→running/SSM Online→「再開後の保持を確認する」の順で進める。P3とは別にM3を記録する。',

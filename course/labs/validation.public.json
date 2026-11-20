@@ -25,32 +25,32 @@
   "pdfs": {
     "web_lab_missions_ja.pdf": {
       "pages": 14,
-      "bytes": 1555590
+      "bytes": 1555509
     },
     "web_lab_missions_ru.pdf": {
       "pages": 15,
-      "bytes": 1392372
+      "bytes": 1392404
     },
     "web_lab_missions_uz.pdf": {
       "pages": 14,
-      "bytes": 1372964
+      "bytes": 1372831
     },
     "web_lab_practice_ja.pdf": {
       "pages": 41,
-      "bytes": 1741219
+      "bytes": 1741414
     },
     "web_lab_practice_ru.pdf": {
       "pages": 42,
-      "bytes": 1555992
+      "bytes": 1556120
     },
     "web_lab_practice_uz.pdf": {
       "pages": 40,
-      "bytes": 1523978
+      "bytes": 1524112
     }
   },
   "distribution_id": "web-course-class193548-20261103-r3",
   "registry_sha256": "3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33",
-  "package_sha256": "cd893be3444a7ae2f81227720161e3cfe2625d3d65b7dde63073f198832ae902",
+  "package_sha256": "bbb04fde977f683a97d1e949ed9984889110cac616a5cff09a2a71043ac361db",
   "new_material_AWS_walkthrough": false,
   "native_language_review": false,
   "teacher_visual_review": false,

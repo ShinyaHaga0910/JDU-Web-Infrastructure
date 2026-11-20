@@ -80,7 +80,7 @@ TEXT = {
            'Foundation setup complete', 'Use an interactive CloudShell terminal.',
            'Check the values entered and the current AWS account.',
            'The course enrollment code is incorrect. Please restart the setup.',
-           'Google login and browser grading require separate setup.'),
+           'Use the assignment portal provided by your teacher to sign in with Google and submit your work.'),
     'ja': ('教師側の構築', '学生側の構築', '授業の共通登録コード', 'このコードを学生に伝えてください。',
            '教師から教えられたコードをコピー＆ペーストで入力してください。',
            '自分でパスワードを決めてください。後で、演習用の踏み台サーバーのデスクトップを開くとき（RDP接続）に使います。',
@@ -94,7 +94,7 @@ TEXT = {
            'サーバー5台を準備・確認', '内部SSHを確認', '授業用ファイルを配置', '採点登録と試験送信', '基盤の構築・確認が完了',
            '対話型のCloudShellで実行してください。', '入力内容と現在のAWSアカウントを確認してください。',
            '共通登録コードが違います。最初からやり直してください。',
-           'Googleログインとブラウザ採点には別途設定が必要です。'),
+           '課題を提出するときは、教師から案内された課題画面に学校のGoogleアカウントでログインしてください。'),
     'ru': ('Настройка преподавателя', 'Настройка студента', 'Код регистрации на курс', 'Передайте этот код студентам.',
            'Скопируйте и вставьте код, который вам дал преподаватель.',
            'Придумайте свой пароль. Позже он понадобится, чтобы открыть рабочий стол учебного сервера доступа (RDP).',
@@ -109,7 +109,7 @@ TEXT = {
            'Базовая настройка завершена', 'Используйте интерактивный терминал CloudShell.',
            'Проверьте введённые данные и текущий аккаунт AWS.',
            'Неверный код регистрации на курс. Запустите настройку заново.',
-           'Вход через Google и проверку в браузере нужно настроить отдельно.'),
+           'Для сдачи заданий откройте страницу, указанную преподавателем, и войдите через учебный аккаунт Google.'),
     'uz': ('O‘qituvchi muhiti', 'Talaba muhiti', 'Kursga ro‘yxatdan o‘tish kodi', 'Ushbu kodni talabalarga bering.',
            'O‘qituvchi bergan kodni nusxalab, kiritish maydoniga joylang.',
            'Parolni o‘zingiz tanlang. Keyin undan amaliyotdagi oraliq serverning ish stolini ochishda (RDP) foydalanasiz.',
@@ -124,7 +124,7 @@ TEXT = {
            'Asosiy muhit tayyor', 'Interaktiv CloudShell terminalidan foydalaning.',
            'Kiritilgan ma’lumotlar va joriy AWS hisobini tekshiring.',
            'Kursga ro‘yxatdan o‘tish kodi noto‘g‘ri. Sozlashni boshidan boshlang.',
-           'Google orqali kirish va brauzerda tekshirish alohida sozlanadi.'),
+           'Topshiriqni topshirish uchun o‘qituvchi bergan sahifaga ta’lim muassasasining Google hisobi bilan kiring.'),
 }
 SERVER_NAMES = {
     'en': ('Bastion server', 'Web server', 'DNS server', 'Database server', 'Package server'),
@@ -921,10 +921,10 @@ def student_run(args, screen, session, account, parent):
             write(credential_path, encoded(config))
         elif install_teacher.read_private(credential_path) != config:
             raise ValueError('OLD_STUDENT_CREDENTIAL_DIFFERS')
-        return setup_student(args, screen, session, account, config, work)
+        return setup_student(args, screen, session, account, config, work, invite['teacher_account'])
 
 
-def setup_student(args, screen, session, account, config, work):
+def setup_student(args, screen, session, account, config, work, teacher_account):
     import install_teacher
 
     intent = work / 'deployment.json'
@@ -1034,6 +1034,12 @@ def setup_student(args, screen, session, account, config, work):
     stage_lessons(ref, ssm, nodes, common)
 
     screen.step('grading')
+    from classroom_checker import provision
+    checker_state = dict(account=account, lab_id=config['lab_id'], deployment_id=state['deployment_id'],
+                         release_id=RELEASE, stack_id=stack_id, foundation='classroom')
+    with screen.aws_wait():
+        provision(session, install_teacher.find_stack, lambda path: remote_source(args.ref, path),
+                  checker_state, nodes, local_key, teacher_account)
     register_bastion(ref, ssm, bastion, config, state['deployment_id'])
     request_path = work / 'foundation-request.json'
     if not request_path.exists():
@@ -1223,6 +1229,8 @@ def run_cli():
                 Path(temp, name).write_bytes(remote_source(args.ref, TEACHER + '/' + name))
             if args.role == 'teacher':
                 Path(temp, 'build_teacher.py').write_bytes(remote_source(args.ref, ASSESSMENT + '/build_teacher.py'))
+            elif args.role == 'student':
+                Path(temp, 'classroom_checker.py').write_bytes(remote_source(args.ref, BOOT + '/classroom_checker.py'))
             import boto3
             session = boto3.Session(region_name=REGION)
             account = session.client('sts').get_caller_identity()['Account']

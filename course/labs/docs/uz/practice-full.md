@@ -175,7 +175,7 @@ Login failed bo‘lsa user nomi va klaviatura tartibini tekshiring. Parolni chat
 
 ### Tekshirish va topshirish
 
-RDP mashqi tugagach, o‘qituvchi ko‘rsatgan topshiriqlar sahifasida P0 ni tanlab tekshiruvni boshlang. Web serverdagi uy katalogingizdagi tekshiruv faylida bitta `web` satri bo‘lsa, 1 ball beriladi.
+Dastlabki sozlash skripti AWS da topshiriqlarni tekshirish xizmatini (Lambda) yaratadi. RDP mashqidan so‘ng o‘qituvchi ko‘rsatgan sahifaga ta’lim muassasasining Google hisobi bilan kiring, o‘z Lab muhitingizni va P0 ni tanlang, so‘ng tekshiruvni boshlang. Web serverdagi uy katalogingizdagi faylda bitta `web` satri bo‘lsa, 1 ball beriladi. Ball saqlanganini tekshiring.
 
 ### Tushunishni tekshirish (ballsiz)
 

@@ -129,6 +129,16 @@ def runtime():
 
 def handler(event, context):
     try:
-        return runtime().serve(event)
+        checker = runtime()
+        if event == {'operation': 'installation-check'}:
+            state = checker.config['state']
+            if state.get('foundation') != 'classroom':
+                return {'status': 'unavailable'}
+            spec = {key: state[key] for key in ('account', 'lab_id', 'deployment_id', 'release_id')}
+            spec['instances'] = {role: node['instance_id']
+                                 for role, node in checker.config['baseline']['nodes'].items()}
+            snapshot = checker.snapshot(spec)
+            return {'status': 'ready'} if snapshot['network_baseline'] else {'status': 'unavailable'}
+        return checker.serve(event)
     except Exception:
         return {'status': 'unavailable'}

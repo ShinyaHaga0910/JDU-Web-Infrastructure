@@ -214,9 +214,9 @@ def make_markdown(reg, lang, kind):
                     out += ['**' + L['trouble'][lang] + ':** ' + s['trouble'][lang], '']
             if m['id']=='P0':
                 out += ['### '+T('確認・提出','Проверка и сдача','Tekshirish va topshirish')[lang], '', T(
-                    'RDPの練習が終わったら、教師から案内された課題画面でP0を選び、「この課題を確認する」を押す。Webサーバーの自分のホームディレクトリに確認用ファイルがあり、内容が `web` の1行なら1点になる。',
-                    'После упражнения с RDP выберите P0 на странице заданий, которую указал преподаватель, и запустите проверку. Верный файл из одной строки `web` в вашем домашнем каталоге на Web-сервере даёт 1 балл.',
-                    'RDP mashqi tugagach, o‘qituvchi ko‘rsatgan topshiriqlar sahifasida P0 ni tanlab tekshiruvni boshlang. Web serverdagi uy katalogingizdagi tekshiruv faylida bitta `web` satri bo‘lsa, 1 ball beriladi.')[lang], '']
+                    '学生用の初回構築スクリプトが、課題を確認するAWSサービス（Lambda）を準備する。RDPの練習が終わったら、教師から案内された課題画面に学校のGoogleアカウントでログインし、自分のLabとP0を選んで「この課題を確認する」を押す。Webサーバーの自分のホームディレクトリに確認用ファイルがあり、内容が `web` の1行なら1点になる。「保存済み成績を見る」で1点が保存されたことを確認する。',
+                    'Скрипт начальной настройки создаёт в AWS сервис проверки заданий (Lambda). После упражнения с RDP войдите на указанную преподавателем страницу через учебный аккаунт Google, выберите свой Lab и P0 и запустите проверку. Верный файл из одной строки `web` в вашем домашнем каталоге на Web-сервере даёт 1 балл. Проверьте, что балл сохранён.',
+                    'Dastlabki sozlash skripti AWS da topshiriqlarni tekshirish xizmatini (Lambda) yaratadi. RDP mashqidan so‘ng o‘qituvchi ko‘rsatgan sahifaga ta’lim muassasasining Google hisobi bilan kiring, o‘z Lab muhitingizni va P0 ni tanlang, so‘ng tekshiruvni boshlang. Web serverdagi uy katalogingizdagi faylda bitta `web` satri bo‘lsa, 1 ball beriladi. Ball saqlanganini tekshiring.')[lang], '']
             if m['id'] in OUTPUT_EXAMPLES:
                 example,reading=OUTPUT_EXAMPLES[m['id']]
                 out += ['### ' + LABELS['output'][lang], '', '```text', example, '```', '', reading[lang], '']

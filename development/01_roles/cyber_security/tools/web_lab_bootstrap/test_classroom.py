@@ -220,7 +220,7 @@ class ClassroomTests(unittest.TestCase):
             for expected in (latest, saved):
                 with patch.object(classroom, 'assets', side_effect=ValueError('STOP_BEFORE_DEPLOY')) as assets:
                     with self.assertRaisesRegex(ValueError, 'STOP_BEFORE_DEPLOY'):
-                        classroom.setup_student(Mock(ref=latest), Mock(), Mock(), '012345678901', {}, work)
+                        classroom.setup_student(Mock(ref=latest), Mock(), Mock(), '012345678901', {}, work, '123456789012')
                     assets.assert_called_once_with(expected)
                 (work / 'deployment.json').touch()
 
@@ -436,12 +436,14 @@ class ClassroomTests(unittest.TestCase):
         config = dict(lab_id='lab-1', api_base_url='https://example.com', fixed_ingress_ipv4='192.0.2.1')
         installer = Mock(read_private=lambda path: json.loads(path.read_bytes()))
         with tempfile.TemporaryDirectory() as scratch, patch.dict(sys.modules, install_teacher=installer), \
+                patch('classroom_checker.provision') as checker, \
                 patch.multiple(classroom, assets=Mock(return_value=dependencies),
                                stack_setup=Mock(return_value=({'deployment_id': 'deployment', 'public_key': 'key'}, 'stack')),
                                wait_online=Mock(), deploy_guest=Mock(), download_packages=Mock(),
                                build_archives=Mock(return_value={}), transfer=Mock(), guest=guest, command=command,
                                stage_lessons=Mock(), register_bastion=Mock()):
-            ip = classroom.setup_student(Mock(ref='a' * 40), screen, session, '012345678901', config, Path(scratch))
+            ip = classroom.setup_student(Mock(ref='a' * 40), screen, session, '012345678901', config, Path(scratch), '123456789012')
+            self.assertEqual(checker.call_args.args[-1], '123456789012')
         self.assertEqual(ip, '192.0.2.20')
         session.client.return_value.describe_instances.assert_called_once_with(InstanceIds=[nodes['bastion']])
 

@@ -11,7 +11,7 @@ npm --prefix development/web_portal_poc/web ci --omit=dev
 python3 -B development/build_classroom.py --output /tmp/jdu-classroom-build
 ```
 
-READMEの通常のCloudShellコマンドは実行時にmainを取得します。ビルドに同梱した `setup-classroom.sh` は、その成果物を生成したコミットを使用します。成果物の生成までが自動化の対象です。ブラウザ採点を利用する環境では、同じビルドの `checker.zip`、`portal-services.zip`、`portal-web.zip` を使ってAWS側へ配備します。
+READMEの通常のCloudShellコマンドは実行時にmainを取得します。ビルドに同梱した `setup-classroom.sh` は、その成果物を生成したコミットを使用します。学生用構築ではEC2のスタックに続けて課題確認Lambda用のスタックを作成し、同じビルダーで組み立てたZIPをLambdaへ転送します。転送にS3は使いません。教師側の課題画面と保存サービスは、同じビルドの `checker.zip`、`portal-services.zip`、`portal-web.zip` を使います。
 
 
 ## 2026-11-13の現行方針
