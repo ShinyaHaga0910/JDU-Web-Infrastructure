@@ -1348,7 +1348,7 @@ catalog sudo guruhida emas, shell /usr/sbin/nologin. Bu labuser yoki ssm-user da
 
 Ruxsat xatosini chmod -R 777 yoki catalog ga sudo berish bilan hal qilmang. Aniq katalog va egasini solishtiring.
 
-#### P5.4 Runtime sozlamasini yashirin kiritish bilan yaratish
+#### P5.4 Runtime sozlamasini yaratish va faollashtirish
 
 **Bajarish joyi:**
 
@@ -1356,7 +1356,7 @@ Web serverning SSM terminali: ssm-user
 
 **Maqsad va amallar:**
 
-EC2 dagi hozirgi Web public IPv4 ni kiriting. Runtime yordamchisiga P4 dagi mavjud catalog_practice_app parolini ikki marta kiriting. Django secret shaxsiy Lab uchun yaratiladi. Root-only app.env va practice profile yaratiladi; mazmun ko‘rsatilmaydi.
+EC2 dagi hozirgi Web public IPv4 ni kiriting. Runtime yordamchisiga P4 dagi mavjud catalog_practice_app parolini ikki marta kiriting. Django secret shaxsiy Lab uchun yaratiladi. Runtime sozlamasini yarating, so‘ng ilovani ishga tushirishdan oldin activate buyrug‘i bilan practice profilini tanlang. Tekshiruvdan keyin P5.5 da vaqtinchalik setup sozlamasini yarating.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
@@ -1366,23 +1366,25 @@ PUBLIC_WEB_IPV4='YOUR-CURRENT-WEB-PUBLIC-IP'
 # 2. Mavjud DB parolini yashirin kiritib, practice runtime config yaratish.
 sudo python3 -B /opt/jdu-catalog/app/configuration.py create-runtime --profile \
   practice --public-web-ipv4 "$PUBLIC_WEB_IPV4"
-# 3. Maxfiy qiymatlarni chiqarmay runtime config ni tekshirish.
+# 3. Keyingi ishga tushirish uchun saqlangan mashq profilini tanlash.
+sudo python3 -B /opt/jdu-catalog/app/configuration.py activate --profile practice
+# 4. Maxfiy qiymatlarni chiqarmay runtime config ni tekshirish.
 sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
-# 4. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
+# 5. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
 ```
 
 **Buyruq va sozlamalar ma’nosi:**
 
-Runtime config odatiy DB ulanishi va ruxsatli public host ni saqlaydi. Stop/start dan keyingi joriy PUBLIC_WEB_IPV4 ni ishlating. Check qiymatni, stat owner va permission ni tekshiradi. Maxfiy qiymatni ko‘rish uchun app.env ni to‘liq chiqarmang.
+Runtime config odatiy DB ulanishi va ruxsatli public host ni saqlaydi. Joriy PUBLIC_WEB_IPV4 ni ishlating. Create-runtime sozlamani saqlaydi, activate uni ilova uchun tanlaydi, check sozlamani, stat esa egasi va huquqlarini tekshiradi.
 
 **Kutilgan natija va ma’nosi:**
 
-CATALOG_ENV_CREATED=practice, VALID, root:root 600. Mashq DB va mashq app role tanlanadi.
+CATALOG_ENV_CREATED=practice, CATALOG_PROFILE_ACTIVATED=practice, VALID, root:root 600. Mashq DB va mashq app role tanlanadi.
 
 **Ishlamasa:**
 
-RDP yoki app admin parolini kiritmang. Mavjud faylni o‘chirib qayta yaratmang; yaratilgan bo‘lsa check ni bajaring.
+RDP yoki app admin parolini kiritmang. Davom ettirishda bajarilmagan birinchi amaldan boshlang. Activate xato bersa, keyingi qadamdan oldin ilova ishlayotganini va vaqtinchalik setup sozlamalari qolganini tekshiring.
 
 #### P5.5 Vaqtinchalik setup bilan jadval va admin yaratish
 

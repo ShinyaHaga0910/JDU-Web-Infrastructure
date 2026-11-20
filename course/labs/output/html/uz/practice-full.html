@@ -931,28 +931,30 @@ getent passwd catalog
 <p>catalog sudo guruhida emas, shell /usr/sbin/nologin. Bu labuser yoki ssm-user dan boshqa user.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Ruxsat xatosini chmod -R 777 yoki catalog ga sudo berish bilan hal qilmang. Aniq katalog va egasini solishtiring.</p>
-<h4>P5.4 Runtime sozlamasini yashirin kiritish bilan yaratish</h4>
+<h4>P5.4 Runtime sozlamasini yaratish va faollashtirish</h4>
 <p><strong>Bajarish joyi:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>EC2 dagi hozirgi Web public IPv4 ni kiriting. Runtime yordamchisiga P4 dagi mavjud catalog_practice_app parolini ikki marta kiriting. Django secret shaxsiy Lab uchun yaratiladi. Root-only app.env va practice profile yaratiladi; mazmun ko‘rsatilmaydi.</p>
+<p>EC2 dagi hozirgi Web public IPv4 ni kiriting. Runtime yordamchisiga P4 dagi mavjud catalog_practice_app parolini ikki marta kiriting. Django secret shaxsiy Lab uchun yaratiladi. Runtime sozlamasini yarating, so‘ng ilovani ishga tushirishdan oldin activate buyrug‘i bilan practice profilini tanlang. Tekshiruvdan keyin P5.5 da vaqtinchalik setup sozlamasini yarating.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. AWS Console dagi joriy Web public IPv4 ni belgilash.
 PUBLIC_WEB_IPV4='YOUR-CURRENT-WEB-PUBLIC-IP'
 # 2. Mavjud DB parolini yashirin kiritib, practice runtime config yaratish.
 sudo python3 -B /opt/jdu-catalog/app/configuration.py create-runtime --profile \
   practice --public-web-ipv4 &quot;$PUBLIC_WEB_IPV4&quot;
-# 3. Maxfiy qiymatlarni chiqarmay runtime config ni tekshirish.
+# 3. Keyingi ishga tushirish uchun saqlangan mashq profilini tanlash.
+sudo python3 -B /opt/jdu-catalog/app/configuration.py activate --profile practice
+# 4. Maxfiy qiymatlarni chiqarmay runtime config ni tekshirish.
 sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
-# 4. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
+# 5. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Runtime config odatiy DB ulanishi va ruxsatli public host ni saqlaydi. Stop/start dan keyingi joriy PUBLIC_WEB_IPV4 ni ishlating. Check qiymatni, stat owner va permission ni tekshiradi. Maxfiy qiymatni ko‘rish uchun app.env ni to‘liq chiqarmang.</p>
+<p>Runtime config odatiy DB ulanishi va ruxsatli public host ni saqlaydi. Joriy PUBLIC_WEB_IPV4 ni ishlating. Create-runtime sozlamani saqlaydi, activate uni ilova uchun tanlaydi, check sozlamani, stat esa egasi va huquqlarini tekshiradi.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>CATALOG_ENV_CREATED=practice, VALID, root:root 600. Mashq DB va mashq app role tanlanadi.</p>
+<p>CATALOG_ENV_CREATED=practice, CATALOG_PROFILE_ACTIVATED=practice, VALID, root:root 600. Mashq DB va mashq app role tanlanadi.</p>
 <p><strong>Ishlamasa:</strong></p>
-<p>RDP yoki app admin parolini kiritmang. Mavjud faylni o‘chirib qayta yaratmang; yaratilgan bo‘lsa check ni bajaring.</p>
+<p>RDP yoki app admin parolini kiritmang. Davom ettirishda bajarilmagan birinchi amaldan boshlang. Activate xato bersa, keyingi qadamdan oldin ilova ishlayotganini va vaqtinchalik setup sozlamalari qolganini tekshiring.</p>
 <h4>P5.5 Vaqtinchalik setup bilan jadval va admin yaratish</h4>
 <p><strong>Bajarish joyi:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>

@@ -11,7 +11,7 @@
   "practice_steps": 43,
   "task_pages": 36,
   "task_diagrams": 36,
-  "numbered_command_comments_per_language": 140,
+  "numbered_command_comments_per_language": 141,
   "executable_source_preserved": true,
   "explained_steps": 43,
   "module_understanding_questions": 6,
@@ -25,32 +25,32 @@
   "pdfs": {
     "web_lab_missions_ja.pdf": {
       "pages": 14,
-      "bytes": 1555412
+      "bytes": 1555358
     },
     "web_lab_missions_ru.pdf": {
       "pages": 15,
-      "bytes": 1392333
+      "bytes": 1392339
     },
     "web_lab_missions_uz.pdf": {
       "pages": 14,
-      "bytes": 1372956
+      "bytes": 1372940
     },
     "web_lab_practice_ja.pdf": {
-      "pages": 41,
-      "bytes": 1640787
+      "pages": 42,
+      "bytes": 1641751
     },
     "web_lab_practice_ru.pdf": {
       "pages": 43,
-      "bytes": 1459193
+      "bytes": 1459450
     },
     "web_lab_practice_uz.pdf": {
       "pages": 41,
-      "bytes": 1427060
+      "bytes": 1427121
     }
   },
   "distribution_id": "web-course-class193548-20261103-r3",
   "registry_sha256": "3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33",
-  "package_sha256": "de00ddfc8bd142cb72c2e100222cdddcb0462ae0e12164f35666cafde82870dd",
+  "package_sha256": "0401a5c1d5afe6716a56e72086b5977e4c08941c85249d729886954760db9a89",
   "new_material_AWS_walkthrough": false,
   "native_language_review": false,
   "teacher_visual_review": false,
