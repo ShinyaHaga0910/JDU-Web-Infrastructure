@@ -170,7 +170,9 @@ web
 <p><strong>Среда выполнения:</strong></p>
 <p>CloudShell в личном AWS-аккаунте студента</p>
 <p><strong>Цель и действия:</strong></p>
-<p>На этом шаге на Web- и DB-серверы в /var/lib/jdu-web/lesson-resources-r1 помещаются архив приложения учёта оборудования с SQL для настройки БД и вспомогательная программа скрытого ввода пароля. При установке по общему коду файлы уже размещены скриптом: переходите к P0.4. Для подписанного комплекта загрузите учебный ZIP через CloudShell → Actions → Upload file и выполните unzip web-lab-pm-r1.zip в домашнем каталоге. Замените YOUR-INSTALLATION-DIRECTORY путём к каталогу с activate.sh из начальной установки.</p>
+<p>Для следующих упражнений на Web- и DB-серверах в каталог <code>/var/lib/jdu-web/lesson-resources-r1</code> помещают архив <code>catalog-app.tar.gz</code> с кодом приложения учёта оборудования и SQL для настройки БД. В тот же каталог помещают программу для ввода пароля подключения к БД без отображения символов на экране.</p>
+<p>Если среда создана по общему коду регистрации, переходите к P0.4.</p>
+<p>При ручном размещении файлов загрузите учебный ZIP через CloudShell → Actions → Upload file и выполните <code>unzip web-lab-pm-r1.zip</code> в домашнем каталоге. Замените <code>YOUR-INSTALLATION-DIRECTORY</code> путём к каталогу с файлом <code>activate.sh</code> из начальной установки.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Перейти в рабочий каталог $HOME/web-lab-pm-r1/resources.
 cd &quot;$HOME/web-lab-pm-r1/resources&quot;

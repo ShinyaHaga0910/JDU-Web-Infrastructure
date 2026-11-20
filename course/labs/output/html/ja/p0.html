@@ -61,7 +61,9 @@ web
 <p><strong>実行環境:</strong></p>
 <p>CloudShell（学生本人のAWS）</p>
 <p><strong>目的と操作:</strong></p>
-<p>この手順では、後の演習で使う備品管理アプリの圧縮ファイル、そこに含まれるDB設定用のSQL、DB接続パスワードを画面に出さず入力する補助プログラムを、WebサーバーとDBサーバーの/var/lib/jdu-web/lesson-resources-r1に置く。共通登録コード方式で環境を作った場合は、構築スクリプトが配置を済ませているのでP0.4へ進む。署名付き配布方式の場合は、教材ZIPをCloudShellのActions → Upload fileでアップロードし、ホームディレクトリでunzip web-lab-pm-r1.zipを実行する。下のコマンドのYOUR-INSTALLATION-DIRECTORYは、初回構築で使ったactivate.shがあるディレクトリのパスに置き換える。</p>
+<p>後の演習に備え、備品管理アプリの本体とDB設定用のSQLが入ったアーカイブ <code>catalog-app.tar.gz</code> を、WebサーバーとDBサーバーの <code>/var/lib/jdu-web/lesson-resources-r1</code> に置く。DB接続パスワードを画面に表示せずに入力するための補助プログラムも同じ場所に置く。</p>
+<p>共通登録コードで環境を構築した場合は、P0.4へ進む。</p>
+<p>ファイルを手動で配置する場合は、教材ZIPをCloudShellのActions → Upload fileでアップロードし、ホームディレクトリで <code>unzip web-lab-pm-r1.zip</code> を実行する。下のコマンドの <code>YOUR-INSTALLATION-DIRECTORY</code> は、初回構築で使った <code>activate.sh</code> があるディレクトリのパスに置き換える。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. 作業場所を $HOME/web-lab-pm-r1/resources へ移す。
 cd &quot;$HOME/web-lab-pm-r1/resources&quot;
