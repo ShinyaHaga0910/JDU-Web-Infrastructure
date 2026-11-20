@@ -1,17 +1,6 @@
 name: Classroom build
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'development/**'
-      - 'course/curriculum.json'
-      - '.github/workflows/classroom-build.yml'
-  pull_request:
-    paths:
-      - 'development/**'
-      - 'course/curriculum.json'
-      - '.github/workflows/classroom-build.yml'
   workflow_dispatch:
 
 permissions:

@@ -22,7 +22,7 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
 
 新規構築には起動時のGitHub最新版を使います。学生側の構築を再開するときは、開始時の版から必要なファイルを取得します。
 
-採点コードを変更すると、GitHub Actionsが構築スクリプトとブラウザ採点用の配布物を同じ版で作ります。[ビルドと成果物の取得方法](development/README.md#採点を変更したときのビルド)
+配布物を更新するときは、GitHub Actionsで手動ビルドを実行します。構築スクリプトとブラウザ採点用の配布物を同じ版で作ります。[ビルドと成果物の取得方法](development/README.md#採点を変更したときのビルド)
 
 **教師用Learner Lab** では上記のまま実行します。言語を選ぶと構築と確認が自動で進みます。完了画面の最後に表示される共通登録コードを、受講者だけが閲覧できる場所で共有します。
 
