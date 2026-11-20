@@ -142,6 +142,8 @@ CloudShell（学生本人のAWS）
 
 後の演習に備え、備品管理アプリの本体とDB設定用のSQLが入ったアーカイブ `catalog-app.tar.gz` を、WebサーバーとDBサーバーの `/var/lib/jdu-web/lesson-resources-r1` に置く。DB接続パスワードを画面に表示せずに入力するための補助プログラムも同じ場所に置く。
 
+セキュリティのため、Webサーバーからインターネット上のサイトへのHTTPS接続は制限されている。共通登録コードで環境を構築するときは、外部に接続できるCloudShellがGitHubから教材ファイルをHTTPSで取得し、AWS Systems Manager（SSM）を通じてWebサーバーとDBサーバーにコピーする。
+
 共通登録コードで環境を構築した場合は、P0.4へ進む。
 
 ファイルを手動で配置する場合は、教材ZIPをCloudShellのActions → Upload fileでアップロードし、ホームディレクトリで `unzip web-lab-pm-r1.zip` を実行する。下のコマンドの `YOUR-INSTALLATION-DIRECTORY` は、初回構築で使った `activate.sh` があるディレクトリのパスに置き換える。
