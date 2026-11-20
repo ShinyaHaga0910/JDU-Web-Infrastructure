@@ -5,8 +5,6 @@ import re
 
 from content import T
 
-PORTAL = 'https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws'
-
 def expiry_text(lang):
     return T('配布版の有効期限：2027年1月31日末（UZT）。',
         'Комплект действителен до конца 31 января 2027 года (UZT).',
@@ -14,9 +12,9 @@ def expiry_text(lang):
 
 def browser_check(task, lang):
     out = T(
-        f'1. PCの[Web Portal]({PORTAL})へ学校Googleでログインし、本人のLabと **{task}** を選ぶ。初回の連携・画面の説明は[ブラウザ確認手順](portal.md)を参照する。',
-        f'1. Войдите через школьный Google в [Web Portal]({PORTAL}) на PC, выберите свой Lab и **{task}**. Привязка и экраны описаны в [инструкции браузера](portal.md).',
-        f'1. PC da maktab Google orqali [Web Portal]({PORTAL}) ga kiring, o‘z Lab va **{task}** ni tanlang. Hisobni bog‘lash va ekranlar: [brauzer yo‘riqnomasi](portal.md).')[lang]
+        f'1. 教師から案内された課題画面に学校のGoogleアカウントでログインし、自分のLabと **{task}** を選ぶ。',
+        f'1. Откройте страницу заданий по ссылке преподавателя, войдите через учебный аккаунт Google и выберите свой Lab и **{task}**.',
+        f'1. O‘qituvchi bergan havola orqali topshiriqlar sahifasini oching, ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda **{task}** ni tanlang.')[lang]
     if task[1:] == '3':
         out += '\n' + T(
             '2. 「停止前の状態を記録する」→保存成功→AWSで同じWebをStop→stopped→「停止完了を確認する」→記録成功→AWSで同じWebをStart→running/SSM Online→「再開後の保持を確認する」の順で進める。P3とは別にM3を記録する。',
@@ -37,14 +35,11 @@ def browser_check(task, lang):
     return out
 
 WORDS = {
- 'start': T('はじめに：接続・操作の約束', 'Сначала: подключение и правила', 'Avval: ulanish va qoidalar'),
- 'browser': T('ブラウザで確認する', 'Проверка в браузере', 'Brauzerda tekshirish'),
  'practice': T('練習 P0〜P6', 'Практика P0–P6', 'Mashqlar P0–P6'),
  'missions': T('課題 M0〜M6', 'Задания M0–M6', 'Topshiriqlar M0–M6'),
  'full': T('一冊で読む・印刷する', 'Полная версия и печать', 'To‘liq o‘qish va chop etish'),
  'topic': T('テーマ', 'Тема', 'Mavzu'),
  'points': T('素点', 'Баллы', 'Xom ball'),
- 'before': T('始める前に', 'Перед началом', 'Boshlashdan oldin'),
  'previous': T('前の課題', 'Предыдущее', 'Oldingi'),
  'next': T('次の課題', 'Следующее', 'Keyingi'),
 }
@@ -53,7 +48,7 @@ ORDER = list(ACTIVE_ORDER)
 
 def nav(lang):
     return ' · '.join(f'[{WORDS[key][lang]}]({name}.md)' for key,name in
-        [('start','start'),('practice','practice'),('missions','missions'),('browser','portal')])
+        [('practice','practice'),('missions','missions')])
 
 def translations(name):
     return ' · '.join(f'[{label}](../{lang}/{name}.md)' for lang,label in
@@ -69,12 +64,6 @@ def write_pages(root, lang, registry, revision, distribution_id, render_html, la
         text = text.rstrip()+'\n'
         (docs/(name+'.md')).write_text(text,encoding='utf-8',newline='\n')
         (output/(name+'.html')).write_text(render_html(text,lang,name),encoding='utf-8',newline='\n')
-
-    # The detailed shared preparation is read once, rather than repeated on all 14 pages.
-    full = complete['practice']
-    common = full[full.index('## '+labels['intro'][lang]):full.index('\n## P0 ')]
-    end = full[full.index('## '+labels['resume'][lang]):]
-    write('start',f'# {WORDS["start"][lang]}\n\n{nav(lang)}\n\n{translations("start")}\n\n{common}{end}')
 
     for kind,prefix in [('practice','P'),('missions','M')]:
         value = complete[kind]
@@ -104,13 +93,13 @@ def write_pages(root, lang, registry, revision, distribution_id, render_html, la
             assert match, task
             body = re.sub(r'^(#{3,4}) ',lambda m:m[1][1:]+' ',match[2],flags=re.M)
             counterpart = ('M' if prefix=='P' else 'P')+str(n)
-            preparation = T(
-                f'[共通の接続・操作](start.md)を確認する。対応する{("自力課題" if prefix=="P" else "詳しい練習")}は[{counterpart}]({counterpart.lower()}.md)。課題の判定方法は[ブラウザ確認手順](portal.md)を使う。',
-                f'Проверьте [подключение и правила](start.md). Связанное задание: [{counterpart}]({counterpart.lower()}.md). Проверка описана в [инструкции браузера](portal.md).',
-                f'[Ulanish va qoidalar](start.md) bilan tanishing. Mos topshiriq: [{counterpart}]({counterpart.lower()}.md). Tekshiruv: [brauzer yo‘riqnomasi](portal.md).')[lang]
+            related = T(
+                f'対応する{("自力課題" if prefix=="P" else "詳しい練習")}は[{counterpart}]({counterpart.lower()}.md)。',
+                f'Связанное задание: [{counterpart}]({counterpart.lower()}.md).',
+                f'Mos topshiriq: [{counterpart}]({counterpart.lower()}.md).')[lang]
             position=ORDER.index(task)
             neighbors=[]
             if position:neighbors.append(f'[{WORDS["previous"][lang]}: {ORDER[position-1]}]({ORDER[position-1].lower()}.md)')
             if position+1<len(ORDER):neighbors.append(f'[{WORDS["next"][lang]}: {ORDER[position+1]}]({ORDER[position+1].lower()}.md)')
-            text=f'# {task} {match[1]}\n\n{nav(lang)}\n\n{translations(task.lower())}\n\n2026-11-13 · D12 P/M {revision}\n\n{expiry_text(lang)}\n\n## {WORDS["before"][lang]}\n\n{preparation}\n\n{body.rstrip()}\n\n---\n\n'+ ' · '.join(neighbors)+'\n'
+            text=f'# {task} {match[1]}\n\n{nav(lang)}\n\n{translations(task.lower())}\n\n2026-11-13 · D12 P/M {revision}\n\n{expiry_text(lang)}\n\n{related}\n\n{body.rstrip()}\n\n---\n\n'+ ' · '.join(neighbors)+'\n'
             write(task.lower(),text)

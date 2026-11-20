@@ -11,7 +11,7 @@
 
 **2026-10-30：ブラウザ確認結果の成績原本への自動保存をAWSで受入完了。** 承認済み候補ce896adと保存計画を再照合し、学生checker→教師checker→同じWebを更新した。新M1は実SSMで8/8、完了POSTで追加の保存操作なしに原本へ反映。既存M1/M5の元reportも再実行なしで保存し、M5 9/13＋未確認4では選択済み13点・合計62/62を保持した。原本75行→78行、追加REQUEST3件と期待する最新/選択/META以外の旧行・登録情報は不変。旧requestの再送は最初の受付を返し、新M1の成績を巻き戻さない。元4件のSSMは各1回、JA/RU/UZ・停止後の保存表示を確認。元学生5台/暗号化root96GiB/認証/常設SSMを保持し、5台と教師EC2は停止済み。新資源・IAM・鍵は追加していない。[今回の実受入](verification/2026-10-30-canonical-submission-accepted.public.json)、[完成条件](CANONICAL-SUBMISSION-ACCEPTANCE.md)。
 
-利用：[学生ポータル](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws)→学校Google→「課題の確認」。新しい確認は完了時に原本へ自動保存し、保存日時を表示する。保存応答が不明な場合は結果を再読込みし、未保存なら同じ結果だけを再送する。元の確認を実行し直す必要はない。保存成績はEC2停止中も閲覧できるが、教師Labは開始しておく。M3停止前後/M5M6の秘密入力、新規5台のブラウザ準備、教師一覧、一般配布は別残件で、全Issueの完成ではない。今回の範囲で区切り、次の機能へ自動着手しない。
+利用：教師が案内した課題画面→学校Google→「課題の確認」。新しい確認は完了時に原本へ自動保存し、保存日時を表示する。保存応答が不明な場合は結果を再読込みし、未保存なら同じ結果だけを再送する。元の確認を実行し直す必要はない。保存成績はEC2停止中も閲覧できるが、教師Labは開始しておく。M3停止前後/M5M6の秘密入力、新規5台のブラウザ準備、教師一覧、一般配布は別残件で、全Issueの完成ではない。今回の範囲で区切り、次の機能へ自動着手しない。
 
 以下の未適用・停止記述は10/29以前の履歴。
 
@@ -21,7 +21,7 @@
 
 **最新：今回のブラウザ課題確認はAWS実受入完了（2026-10-29）**。実Google→課題選択→SSM→保存結果表示をM1 8/8、M2 13/13、M5 9/13＋未確認4で確認。M2の同じ結果をJA/RU/UZで表示し、map順序の不具合を修正して再送なしで回収、3件すべてSSM各1回を照合した。元5台停止後の新しい読取りでもM2 13/13、停止中の新M1は受付せず0点/jobなし、元保存成績62/62と全partition不変。現在は学生5台・教師EC2停止、教師Lab開始が閲覧条件。コード/実結果をGitHubへ反映する。
 
-利用：[ポータル](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws)→学校Googleログイン→「課題の確認」。実行時には本人の既存5台とSSMが利用可能であることが必要。結果取得の一時的失敗は「結果を更新する」で同じjobへ戻る。短期sessionが切れた場合は通常ログイン後に結果URLへ戻る。現在の結果は専用DBに保存し、元成績を上書きしない。M3停止前後/M5M6秘密入力、正規採点原本への自動提出、新規5台準備・教師一覧・一般配布は別残件。全Issueの完成ではない。[実受入記録](verification/2026-10-29-browser-checks-accepted.public.json)、[今回の範囲](CHECKS-ACCEPTANCE.md)。以下は各時点の履歴。
+利用：教師が案内した課題画面→学校Googleログイン→「課題の確認」。実行時には本人の既存5台とSSMが利用可能であることが必要。結果取得の一時的失敗は「結果を更新する」で同じjobへ戻る。短期sessionが切れた場合は通常ログイン後に結果URLへ戻る。現在の結果は専用DBに保存し、元成績を上書きしない。M3停止前後/M5M6秘密入力、正規採点原本への自動提出、新規5台準備・教師一覧・一般配布は別残件。全Issueの完成ではない。[実受入記録](verification/2026-10-29-browser-checks-accepted.public.json)、[今回の範囲](CHECKS-ACCEPTANCE.md)。以下は各時点の履歴。
 
 **実配備後の確認（10/29）**：承認済みの学生4資源・教師2資源・既存Web更新が完了。実GoogleでM1を開始し8/8を表示、同じ結果を専用DBに保存した。M2も実SSMはSuccess（約3秒）だが、DDB mapの戻り順で同じsourceのcommand再生成bytesが変わり、結果回収を止める不具合を特定。snapshotを正規化し、AWSが受付済みのcommand IDを持つ段階では再compileせずその結果だけ読むよう修正した。追加2試験込み37件・Node49件合格。既存M2を再送せず回収するCodeだけの修正を適用準備中。言語切替/一時中断も同じjobへ戻す。権限/元5台/元成績の変更はない。
 
@@ -214,8 +214,8 @@ LabのStartはAcademy側が既存EC2を自動起動する場合がある。画�
 
 Google側のAudienceは既存のInternalを確認。専用clientのWeb application・名前 `JDU Web Infrastructure Student 2026`・下記callbackを準備後、本人がCreateを実行した。JavaScript originsは空欄。既存2 clientやGoogle課金設定は変更していない。本人からsecretの適切な配置指示を受け、教師AWS Secrets Managerの専用保管先へ既存値を非表示入力で収録し、同一作成versionのreadback・AWSCURRENT一致を確認済み。[秘密を含まない保管・準備記録](verification/2026-10-29-google-secret-storage.public.json)。secretの再発行・rotationはしていない。
 
-- 登録対象のorigin：`https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws`
-- 現コードのcallback：`https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws/auth/callback`
+- 登録対象のorigin：その環境の課題画面のURL
+- 現コードのcallback：そのURLに `/auth/callback` を付けたURL
 - 現コードの要求scope：`openid email`、許可対象：検証済み `jdu.uz` identity。AWS AcademyのログインメールとGoogle本人IDは別々に検証する。
 - 本人成績と学生環境の操作はGoogle client設定だけで開放しない。内部成績reader、subject鍵、session store、教師承認済みLab/account/subject登録がそろってから、本人・未登録・別人・失効・ログアウト・教師側取得不可と再開を実ブラウザで受入する。認証だけのsmoke試験では成績readerをdisabledにしてログイン/ログアウトを先行する。
 - secretや署名要求を会話、Git、URL、共有Windowsへ保存しない。新しい認証情報の設定は、具体的な計画を用意してから本人操作で行う。

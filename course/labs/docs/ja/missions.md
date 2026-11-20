@@ -2,7 +2,7 @@
 
 2026-11-13 · D12 P/M r1.5
 
-[はじめに：接続・操作の約束](start.md) · [練習 P0〜P6](practice.md) · [課題 M0〜M6](missions.md) · [ブラウザで確認する](portal.md)
+[練習 P0〜P6](practice.md) · [課題 M0〜M6](missions.md)
 
 [日本語](../ja/missions.md) · [Русский](../ru/missions.md) · [O‘zbekcha](../uz/missions.md)
 

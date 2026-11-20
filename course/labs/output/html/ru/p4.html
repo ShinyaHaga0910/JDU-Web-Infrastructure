@@ -13,18 +13,17 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Что изучаем</a> · <a href="#section-3">Задание</a> · <a href="#section-4">Схема задания</a> · <a href="#section-5">Как это работает</a> · <a href="#section-6">Пример решения: выполняйте по одному шагу</a> · <a href="#section-7">Пример чтения вывода (не вводить)</a> · <a href="#section-8">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P4 Подключение к PostgreSQL с аутентификацией</h1>
-<p><a href="start.html">Сначала: подключение и правила</a> · <a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a> · <a href="portal.html">Проверка в браузере</a></p>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Пример чтения вывода (не вводить)</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P4 Подключение к PostgreSQL с аутентификацией</h1>
+<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
 <p><a href="../ja/p4.html">日本語</a> · <a href="../ru/p4.html">Русский</a> · <a href="../uz/p4.html">O‘zbekcha</a></p>
 <p>2026-11-13 · D12 P/M r1.5</p>
 <p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
-<h2 id="section-1">Перед началом</h2>
-<p>Проверьте <a href="start.html">подключение и правила</a>. Связанное задание: <a href="m4.html">M4</a>. Проверка описана в <a href="portal.html">инструкции браузера</a>.</p>
-<h2 id="section-2">Что изучаем</h2>
+<p>Связанное задание: <a href="m4.html">M4</a>.</p>
+<h2 id="section-1">Что изучаем</h2>
 <p>Различать database, role и schema; выполнять SQL с Web по установленному паролю.</p>
-<h2 id="section-3">Задание</h2>
+<h2 id="section-2">Задание</h2>
 <p>Создайте jdu_catalog_practice, catalog_practice_setup и catalog_practice_app. Разрешите SCRAM только с Web 10.20.1.20/32. Таблицы приложения на этапе P4 не нужны.</p>
-<h2 id="section-4">Схема задания</h2>
+<h2 id="section-3">Схема задания</h2>
 <p><img src="../../../assets/ru/p4.png" alt="P4: Подготовить доступ Web к БД → Настроить БД, роли и вход → Разрешённый SELECT успешен。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Стрелка SSM означает подключение через AWS, а не открытие входящего 443 на EC2." width="1040" height="680" loading="lazy"></p>
 <p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Стрелка SSM означает подключение через AWS, а не открытие входящего 443 на EC2.</p>
 <p><a href="../../../assets/ru/p4.png">Открыть крупно</a> · <a href="../../../assets/ru/p4.svg">SVG</a></p>
@@ -34,13 +33,13 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <li>Setup role: catalog_practice_setup</li>
 <li>Runtime role: catalog_practice_app</li>
 </ul>
-<h2 id="section-5">Как это работает</h2>
+<h2 id="section-4">Как это работает</h2>
 <p><strong>Состояние перед началом:</strong></p>
 <p>На DB есть учебные файлы; используется разрешённый путь Web → DB.</p>
 <p><strong>Что изменится в этом P:</strong></p>
 <p>Созданы учебная БД и роли setup/runtime; SQL с Web проходит с паролем.</p>
 <p>Нужны сетевой доступ, прослушивание DB, разрешение HBA, пароль и SQL-права. ssm-user - пользователь ОС, catalog_practice_app - роль БД. В HBA применяется первая совпавшая строка. Возможность подключиться не означает право создавать таблицы. <a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBA</a> и <a href="https://www.postgresql.org/docs/16/sql-grant.html">права SQL</a>.</p>
-<h2 id="section-6">Пример решения: выполняйте по одному шагу</h2>
+<h2 id="section-5">Пример решения: выполняйте по одному шагу</h2>
 <h3>P4.1 Установить PostgreSQL и распаковать учебный SQL</h3>
 <p><strong>Место выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
@@ -209,12 +208,12 @@ exit
 <p>Вывод D11_EXISTING_DB_PASSWORD_STORED_LOCALLY и девять учебных проверок. Неверный пароль и запрещённые DB/admin-role проверяются вместе с успешным контрольным подключением.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Если файл уже есть, не создавайте заново. В P5 тот же пароль вводится в настройку приложения. M4 использует отдельные БД/роли mission.</p>
-<h2 id="section-7">Пример чтения вывода (не вводить)</h2>
+<h2 id="section-6">Пример чтения вывода (не вводить)</h2>
 <pre><code class="language-text">current_database    | current_user         | value
 jdu_catalog_practice | catalog_practice_app | 1
 </code></pre>
 <p>Пример чтения SELECT; ширина столбцов может отличаться. Сверьте БД, роль и value=1. Это не доказательство права менять таблицы.</p>
-<h2 id="section-8">Проверка понимания (без баллов)</h2>
+<h2 id="section-7">Проверка понимания (без баллов)</h2>
 <p>Пароль принят, но CREATE TABLE запрещён. Обязательно ли неверен пароль?</p>
 <p><strong>Объяснение:</strong></p>
 <p>Аутентификация и SQL-права различны. Для runtime отказ в setup-операции может быть правильным.</p>

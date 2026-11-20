@@ -13,18 +13,17 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Boshlashdan oldin</a> · <a href="#section-2">Nimani o‘rganamiz</a> · <a href="#section-3">Topshiriq</a> · <a href="#section-4">Topshiriq diagrammasi</a> · <a href="#section-5">Bu qanday ishlaydi</a> · <a href="#section-6">Yechim namunasi: bittadan bajaring</a> · <a href="#section-7">Natijani o‘qish namunasi (kiritmang)</a> · <a href="#section-8">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P1 HTTP orqali statik faylni qaytarish</h1>
-<p><a href="start.html">Avval: ulanish va qoidalar</a> · <a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a> · <a href="portal.html">Brauzerda tekshirish</a></p>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Nimani o‘rganamiz</a> · <a href="#section-2">Topshiriq</a> · <a href="#section-3">Topshiriq diagrammasi</a> · <a href="#section-4">Bu qanday ishlaydi</a> · <a href="#section-5">Yechim namunasi: bittadan bajaring</a> · <a href="#section-6">Natijani o‘qish namunasi (kiritmang)</a> · <a href="#section-7">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P1 HTTP orqali statik faylni qaytarish</h1>
+<p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a></p>
 <p><a href="../ja/p1.html">日本語</a> · <a href="../ru/p1.html">Русский</a> · <a href="../uz/p1.html">O‘zbekcha</a></p>
 <p>2026-11-13 · D12 P/M r1.5</p>
 <p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
-<h2 id="section-1">Boshlashdan oldin</h2>
-<p><a href="start.html">Ulanish va qoidalar</a> bilan tanishing. Mos topshiriq: <a href="m1.html">M1</a>. Tekshiruv: <a href="portal.html">brauzer yo‘riqnomasi</a>.</p>
-<h2 id="section-2">Nimani o‘rganamiz</h2>
+<p>Mos topshiriq: <a href="m1.html">M1</a>.</p>
+<h2 id="section-1">Nimani o‘rganamiz</h2>
 <p>Nginx, fayl joyi, tinglash porti, HTTP javobi va access log ni bog‘lash.</p>
-<h2 id="section-3">Topshiriq</h2>
+<h2 id="section-2">Topshiriq</h2>
 <p>Web dagi /var/www/html/practice.txt belgilangan matnni HTTP 200 bilan qaytarsin: Web ichidan, bastiondan va tashqaridan tekshiring.</p>
-<h2 id="section-4">Topshiriq diagrammasi</h2>
+<h2 id="section-3">Topshiriq diagrammasi</h2>
 <p><img src="../../../assets/uz/p1.png" alt="P1: HTTP topshirig‘i hali tayyor emas → Web ichida tarqatishni sozlash → Javob va log ni solishtirish。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida." width="1040" height="680" loading="lazy"></p>
 <p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida.</p>
 <p><a href="../../../assets/uz/p1.png">Kattalashtirish</a> · <a href="../../../assets/uz/p1.svg">SVG</a></p>
@@ -34,13 +33,13 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </ul>
 <pre><code class="language-text">JDU WEB-02 practice: HTTP response verified.
 </code></pre>
-<h2 id="section-5">Bu qanday ishlaydi</h2>
+<h2 id="section-4">Bu qanday ishlaydi</h2>
 <p><strong>Boshlashdan oldingi holat:</strong></p>
 <p>Web yaratilgan, ammo mashq fayli hali qaytarilmayapti.</p>
 <p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
 <p>Nginx 80 portda practice.txt qaytarib, request ni log ga yozadi.</p>
 <p>URL dagi /practice.txt Web ichidagi /var/www/html/practice.txt ga mos. 127.0.0.1 orqali muvaffaqiyat faqat Web ichini tekshiradi. Ayni matnni bastion va Windows dan o‘qish yo‘lning boshqa qismlarini tekshiradi. <a href="https://nginx.org/en/docs/beginners_guide.html">Nginx hujjati</a>.</p>
-<h2 id="section-6">Yechim namunasi: bittadan bajaring</h2>
+<h2 id="section-5">Yechim namunasi: bittadan bajaring</h2>
 <h3>P1.1 Ichki APT dan Nginx o‘rnatish</h3>
 <p><strong>Bajarish joyi:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
@@ -162,13 +161,13 @@ exit
 <p>Sakkizta mashq va tayyorlik tekshiruvi natijalari ko‘rinib saqlanadi. P1 bahoga ball qo‘shmaydi; M1 boshqa fayl va matn bilan bajariladi.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Ishlov davom etsa natijani yangilang. Saqlash xatosida sababni o‘qing. Checker kutgan matnni o‘zgartirmang.</p>
-<h2 id="section-7">Natijani o‘qish namunasi (kiritmang)</h2>
+<h2 id="section-6">Natijani o‘qish namunasi (kiritmang)</h2>
 <pre><code class="language-text">HTTP/1.1 200 OK
 
 JDU WEB-02 practice: HTTP response verified.
 </code></pre>
 <p>Faqat kerakli qatorlar ko‘rsatilgan; haqiqiy javobda boshqa header lar ham bor. 200, matn va access log dagi path/status ni tekshiring.</p>
-<h2 id="section-8">Tushunishni tekshirish (ballsiz)</h2>
+<h2 id="section-7">Tushunishni tekshirish (ballsiz)</h2>
 <p>Web ichida 200, bastiondan ulanish ishlamaydi. Faylni qayta yozishdan oldin nimani tekshirasiz?</p>
 <p><strong>Izoh:</strong></p>
 <p>Manzil IP, listen address/port va bastion → Web ruxsatini tekshiring. Fayl mazmuni va yetib borish alohida tekshiruvdir.</p>

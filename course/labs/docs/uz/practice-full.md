@@ -10,7 +10,7 @@ Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga 
 
 [日本語](../ja/practice-full.md) · [Русский](../ru/practice-full.md) · [O‘zbekcha](../uz/practice-full.md)
 
-[Avval: ulanish va qoidalar](start.md) · [Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M6](missions.md) · [Brauzerda tekshirish](portal.md)
+[Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M6](missions.md)
 
 ## Qo‘llanmadan foydalanish
 
@@ -196,7 +196,7 @@ Shaxsiy PC brauzeri: Web Portal
 
 **Maqsad va amallar:**
 
-[Brauzer yo‘riqnomasi](portal.md) orqali Web Portal ni oching. Maktab Google orqali kirib, o‘z AWS hisobingizni bog‘lang. P0 ni tanlab tekshiruvni boshlang; ishlov davom etsa natijani yangilang. M0 ni ham shu tarzda tekshiring. P0/M0 tayyorlikni tekshiradi, bahoga ball qo‘shmaydi.
+O‘qituvchi bergan havola orqali topshiriqlar sahifasini oching. Maktab Google orqali kirib, o‘z AWS hisobingizni bog‘lang. P0 ni tanlab tekshiruvni boshlang; ishlov davom etsa natijani yangilang. M0 ni ham shu tarzda tekshiring. P0/M0 tayyorlikni tekshiradi, bahoga ball qo‘shmaydi.
 
 **Buyruq va sozlamalar ma’nosi:**
 
@@ -1868,7 +1868,7 @@ Keyingi safar o‘z Lab va ayni besh serverni ishga tushirib, running/SSM Online
 
 Natijalar avtomatik saqlanadi. Ishlov paytida natijani yangilang; baholarni saqlangan baholar bo‘limidan ko‘ring. Topshiriq, vaqt va saqlash holatini solishtiring. UNKNOWN o‘lchab bo‘lmagan holat, muvaffaqiyat yoki tasdiqlangan nol emas. Tekshirilmagan M ning tasdiqlangan ballari saqlanadi. Oxirgi baholanadigan natija olinadi; turli urinish PASS lari qo‘shilmaydi, maksimum avtomatik tanlanmaydi.
 
-Ekran amallari: [brauzer yo‘riqnomasi](portal.md). Parol/token/cookie/maxfiy kalit/env ni hisobot yoki chat ga yubormang.
+Parol/token/cookie/maxfiy kalit/env ni hisobot yoki chat ga yubormang.
 
 ## Manbalar va versiya
 

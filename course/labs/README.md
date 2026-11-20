@@ -5,11 +5,11 @@
 
 ## 言語を選ぶ
 
-| 言語 | はじめに・接続方法 | 練習P0〜P6 | 自力課題M0〜M6 | ブラウザで確認 |
-| --- | --- | --- | --- | --- |
-| 日本語 | [準備と操作](docs/ja/start.md) | [練習の一覧](docs/ja/practice.md) | [課題の一覧](docs/ja/missions.md) | [確認手順](docs/ja/portal.md) |
-| Русский | [Подготовка](docs/ru/start.md) | [Практика P](docs/ru/practice.md) | [Задания M](docs/ru/missions.md) | [Проверка](docs/ru/portal.md) |
-| O‘zbekcha | [Tayyorgarlik](docs/uz/start.md) | [P mashqlar](docs/uz/practice.md) | [M topshiriqlar](docs/uz/missions.md) | [Tekshirish](docs/uz/portal.md) |
+| 言語 | 練習P0〜P6 | 自力課題M0〜M6 |
+| --- | --- | --- |
+| 日本語 | [練習の一覧](docs/ja/practice.md) | [課題の一覧](docs/ja/missions.md) |
+| Русский | [Практика P](docs/ru/practice.md) | [Задания M](docs/ru/missions.md) |
+| O‘zbekcha | [P mashqlar](docs/uz/practice.md) | [M topshiriqlar](docs/uz/missions.md) |
 
 P3/M3は2026-11-13に削除したため欠番です。DNSからDBへ進みます。現行の成績は5課題・合計59点で集計します。
 
@@ -73,7 +73,7 @@ GitHub上では上のMarkdownリンクを使ってください。HTMLファイ�
 ## 使用版・教師用情報
 
 2026-11-13更新、教材改訂 **r1.5**。署名配布版 `web-course-class193548-20261103-r3` は**2027年1月31日末（UZT）まで有効**です。
-Web Portalは教師Lab開始中に使います。学生Labの停止中は、新しい実機確認を実行できません。
+課題の確認には、教師がそのクラスに案内した課題画面を使います。学生Labの停止中は、新しい実機確認を実行できません。
 
 - [教師の事前準備・原稿と生成方法](TEACHER-NOTES.md)
 - [確認済みの範囲と残件](VALIDATION.md)

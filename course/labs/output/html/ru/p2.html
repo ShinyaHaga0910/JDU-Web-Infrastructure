@@ -13,18 +13,17 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Что изучаем</a> · <a href="#section-3">Задание</a> · <a href="#section-4">Схема задания</a> · <a href="#section-5">Как это работает</a> · <a href="#section-6">Пример решения: выполняйте по одному шагу</a> · <a href="#section-7">Пример чтения вывода (не вводить)</a> · <a href="#section-8">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P2 Внутренний DNS и системное разрешение имён</h1>
-<p><a href="start.html">Сначала: подключение и правила</a> · <a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a> · <a href="portal.html">Проверка в браузере</a></p>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Пример чтения вывода (не вводить)</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P2 Внутренний DNS и системное разрешение имён</h1>
+<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
 <p><a href="../ja/p2.html">日本語</a> · <a href="../ru/p2.html">Русский</a> · <a href="../uz/p2.html">O‘zbekcha</a></p>
 <p>2026-11-13 · D12 P/M r1.5</p>
 <p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
-<h2 id="section-1">Перед началом</h2>
-<p>Проверьте <a href="start.html">подключение и правила</a>. Связанное задание: <a href="m2.html">M2</a>. Проверка описана в <a href="portal.html">инструкции браузера</a>.</p>
-<h2 id="section-2">Что изучаем</h2>
+<p>Связанное задание: <a href="m2.html">M2</a>.</p>
+<h2 id="section-1">Что изучаем</h2>
 <p>Последовательно настроить zone, A-записи, ACL BIND и resolver клиентов.</p>
-<h2 id="section-3">Задание</h2>
+<h2 id="section-2">Задание</h2>
 <p>Настройте guide.lab.test → 10.20.1.20 и practice-db.lab.test → 10.20.2.20; откройте HTTP из P1 по имени. Фиксированные IP не меняются.</p>
-<h2 id="section-4">Схема задания</h2>
+<h2 id="section-3">Схема задания</h2>
 <p><img src="../../../assets/ru/p2.png" alt="P2: HTTP по IP уже работает → Настроить DNS и resolver → Имя ведёт к тому же Web。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер." width="1040" height="680" loading="lazy"></p>
 <p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер.</p>
 <p><a href="../../../assets/ru/p2.png">Открыть крупно</a> · <a href="../../../assets/ru/p2.svg">SVG</a></p>
@@ -46,13 +45,13 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tr>
 </tbody>
 </table>
-<h2 id="section-5">Как это работает</h2>
+<h2 id="section-4">Как это работает</h2>
 <p><strong>Состояние перед началом:</strong></p>
 <p>HTTP из P1 работает по IP; DNS ещё предстоит настроить.</p>
 <p><strong>Что изменится в этом P:</strong></p>
 <p>Учебные имена BIND доступны обычному резолверу бастиона и Web.</p>
 <p>DNS отвечает на запрос имени, а не выдаёт Web-страницу. BIND ведёт зону lab.test; A-запись возвращает IPv4. Различайте dig с явным сервером и getent/браузер с настройками ОС. После DNS выполняется отдельное HTTP-соединение. <a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">Документация BIND</a>.</p>
-<h2 id="section-6">Пример решения: выполняйте по одному шагу</h2>
+<h2 id="section-5">Пример решения: выполняйте по одному шагу</h2>
 <h3>P2.1 Установить BIND и сохранить исходные настройки</h3>
 <p><strong>Место выполнения:</strong></p>
 <p>SSM-терминал DNS-сервера: ssm-user</p>
@@ -238,12 +237,12 @@ curl --noproxy '*' -i http://guide.lab.test/practice.txt
 <p>13 учебных проверок; текущий P1 тоже должен работать. Перед DB/app добавьте шесть основных имён в M2.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Не считайте любую ошибку имени остановкой HTTP: сравните IP → dig → getent → HTTP.</p>
-<h2 id="section-7">Пример чтения вывода (не вводить)</h2>
+<h2 id="section-6">Пример чтения вывода (не вводить)</h2>
 <pre><code class="language-text">status: NOERROR
 guide.lab.test.  300  IN  A  10.20.1.20
 </code></pre>
 <p>Сокращённый пример dig: после A стоит IPv4, 300 - TTL. Отдельно проверьте, что SERVER запроса - 10.20.2.10.</p>
-<h2 id="section-8">Проверка понимания (без баллов)</h2>
+<h2 id="section-7">Проверка понимания (без баллов)</h2>
 <p>dig @10.20.2.10 работает, а getent - нет. Обязательно ли ошибка в зоне?</p>
 <p><strong>Объяснение:</strong></p>
 <p>Нет. Явно выбранный DNS и обычный резолвер ОС могут различаться. Проверьте применённые настройки Netplan и resolvectl.</p>

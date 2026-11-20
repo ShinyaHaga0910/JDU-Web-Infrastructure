@@ -13,18 +13,17 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">学ぶこと</a> · <a href="#section-3">課題</a> · <a href="#section-4">今回の見取り図</a> · <a href="#section-5">仕組みを理解する</a> · <a href="#section-6">操作例：一つずつ実行する</a> · <a href="#section-7">出力の読み取り例（入力しない）</a> · <a href="#section-8">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P4 PostgreSQLへの認証接続</h1>
-<p><a href="start.html">はじめに：接続・操作の約束</a> · <a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a> · <a href="portal.html">ブラウザで確認する</a></p>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">今回の見取り図</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">操作例：一つずつ実行する</a> · <a href="#section-6">出力の読み取り例（入力しない）</a> · <a href="#section-7">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P4 PostgreSQLへの認証接続</h1>
+<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
 <p><a href="../ja/p4.html">日本語</a> · <a href="../ru/p4.html">Русский</a> · <a href="../uz/p4.html">O‘zbekcha</a></p>
 <p>2026-11-13 · D12 P/M r1.5</p>
 <p>配布版の有効期限：2027年1月31日末（UZT）。</p>
-<h2 id="section-1">始める前に</h2>
-<p><a href="start.html">共通の接続・操作</a>を確認する。対応する自力課題は<a href="m4.html">M4</a>。課題の判定方法は<a href="portal.html">ブラウザ確認手順</a>を使う。</p>
-<h2 id="section-2">学ぶこと</h2>
+<p>対応する自力課題は<a href="m4.html">M4</a>。</p>
+<h2 id="section-1">学ぶこと</h2>
 <p>DB・role・schemaの違いを理解し、Webだけから既存パスワードでSQLを実行する。</p>
-<h2 id="section-3">課題</h2>
+<h2 id="section-2">課題</h2>
 <p>jdu_catalog_practice、catalog_practice_setup、catalog_practice_appを作る。Webの10.20.1.20/32だけからSCRAMで接続させる。P4時点ではappのtableは不要。</p>
-<h2 id="section-4">今回の見取り図</h2>
+<h2 id="section-3">今回の見取り図</h2>
 <p><img src="../../../assets/ja/p4.png" alt="P4: WebからDB接続を準備 → DB・role・認証を設定 → 許可したSELECTだけ成功。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。" width="1040" height="680" loading="lazy"></p>
 <p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。</p>
 <p><a href="../../../assets/ja/p4.png">図を拡大する</a> · <a href="../../../assets/ja/p4.svg">SVG</a></p>
@@ -34,13 +33,13 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <li>Setup role: catalog_practice_setup</li>
 <li>Runtime role: catalog_practice_app</li>
 </ul>
-<h2 id="section-5">仕組みを理解する</h2>
+<h2 id="section-4">仕組みを理解する</h2>
 <p><strong>始める前の状態:</strong></p>
 <p>DBに教材資源があり、WebからDBへ許可された経路を使う。</p>
 <p><strong>このPで変えること:</strong></p>
 <p>練習DBとsetup/runtime roleを作り、Webから認証付きSQLを実行する。</p>
 <p>接続には、通信の到達、DBの待受、HBAの許可、password、SQL権限がそれぞれ必要。ssm-userはOS userで、catalog_practice_appはDB roleである。HBAは上から最初に一致した行を使う。SQLへ接続できることと、tableを作成できることも別の権限である。<a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBA</a>・<a href="https://www.postgresql.org/docs/16/sql-grant.html">SQL権限</a>。</p>
-<h2 id="section-6">操作例：一つずつ実行する</h2>
+<h2 id="section-5">操作例：一つずつ実行する</h2>
 <h3>P4.1 DBを導入し教材SQLを展開する</h3>
 <p><strong>実行場所:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
@@ -209,12 +208,12 @@ exit
 <p>D11_EXISTING_DB_PASSWORD_STORED_LOCALLYと練習9項目。誤password・他DB/管理roleの拒否も正常接続との対照で確認される。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>既存fileありなら再生成しない。P5では同じDB passwordをapp設定にも入力する。M4はmission用の別DB/roleで構築する。</p>
-<h2 id="section-7">出力の読み取り例（入力しない）</h2>
+<h2 id="section-6">出力の読み取り例（入力しない）</h2>
 <pre><code class="language-text">current_database    | current_user         | value
 jdu_catalog_practice | catalog_practice_app | 1
 </code></pre>
 <p>SELECT結果の読み方の例。列の幅や罫線は実際と異なってよい。DB名・role名・value=1を確認する。table編集の許可を証明する結果ではない。</p>
-<h2 id="section-8">理解の確認（採点外）</h2>
+<h2 id="section-7">理解の確認（採点外）</h2>
 <p>psqlがpasswordを受け付けたのにtable作成が拒否される。必ずpasswordの誤りか？</p>
 <p><strong>考え方:</strong></p>
 <p>認証とSQL権限は別。runtime roleの役割に合った拒否なら正常で、setup用の操作をruntimeへ追加しない。</p>

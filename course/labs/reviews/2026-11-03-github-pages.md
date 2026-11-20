@@ -11,9 +11,8 @@
 ### 1. GitHubで読む案内がHTMLのソース表示へ進む
 
 - 対象：[教材入口5〜10行](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/blob/d8d11267f1d96bbb577134058028ec58d57f5314/course/labs/README.md#L5)。
-- 「まず日本語の確認手順」「Русский」「O‘zbekcha」が`output/html/*/portal.html`へ、「閲覧入口：3言語HTML」が`output/html/index.html`へ進む。
-- GitHubの通常のファイル画面ではHTMLはソース表示となり、読書用ページとして表示されない。実際に日本語portal.htmlで`Code`とHTML本文を確認した。[画面記録](2026-11-03-github-html-code.png)。ファイル自体の欠落ではない。
-- GitHub上の読者は`docs/ja/portal.md`・`docs/ru/portal.md`・`docs/uz/portal.md`へ案内し、HTMLは教材ZIPを展開した後の閲覧用として区別する。
+- 当時の確認手順と閲覧入口はHTMLへ進む。
+- GitHubの通常のファイル画面ではHTMLはソース表示となり、読書用ページとして表示されない。実際に当時の日本語の確認手順で`Code`とHTML本文を確認した。[画面記録](2026-11-03-github-html-code.png)。ファイル自体の欠落ではない。
 
 ### 2. r3本文の冒頭と末尾で有効期限が矛盾する
 
@@ -25,7 +24,7 @@
 ### 3. P/M本文だけでは現在のブラウザ採点手順へ辿れない
 
 - 対象：JA/RU/UZのpractice.md・missions.md、計6ファイル。
-- 各課題の「確認・提出」には`jdu-web-check`、`--no-submit`、`--functional`、本人用URLの案内があり、現在のブラウザ用`portal.md`やWeb Portalへの直接リンクがない。
+- 各課題の「確認・提出」には`jdu-web-check`、`--no-submit`、`--functional`、本人用URLの案内があり、ブラウザでの確認方法が案内されていない。
 - 教材入口にはブラウザ追補で置き換える旨があるが、P/M本文の直接リンクで読む学生には伝わらない。CLIが利用不能という判定ではなく、「初期設定後はブラウザから課題確認」という現在の案内が本文だけでは完結しない点である。
 - 本文冒頭から同じ言語のブラウザ手順へ直接案内し、各課題の確認方法と、P3/M3の停止前後・P5/M5/P6/M6の秘密入力の扱いを揃える必要がある。
 

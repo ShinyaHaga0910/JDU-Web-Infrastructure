@@ -2,7 +2,7 @@
 
 2026-11-13 · D12 P/M r1.5
 
-[Сначала: подключение и правила](start.md) · [Практика P0–P6](practice.md) · [Задания M0–M6](missions.md) · [Проверка в браузере](portal.md)
+[Практика P0–P6](practice.md) · [Задания M0–M6](missions.md)
 
 [日本語](../ja/practice.md) · [Русский](../ru/practice.md) · [O‘zbekcha](../uz/practice.md)
 

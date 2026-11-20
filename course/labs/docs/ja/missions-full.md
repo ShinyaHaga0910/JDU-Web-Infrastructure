@@ -10,9 +10,7 @@
 
 [日本語](../ja/missions-full.md) · [Русский](../ru/missions-full.md) · [O‘zbekcha](../uz/missions-full.md)
 
-[はじめに：接続・操作の約束](start.md) · [練習 P0〜P6](practice.md) · [課題 M0〜M6](missions.md) · [ブラウザで確認する](portal.md)
-
-[はじめに：接続・操作の約束](start.md) · [練習 P0〜P6](practice.md) · [課題 M0〜M6](missions.md) · [ブラウザで確認する](portal.md)
+[練習 P0〜P6](practice.md) · [課題 M0〜M6](missions.md)
 
 ## 使い方と共通の約束
 
@@ -90,7 +88,7 @@ bash枠は表示された実行場所の端末へ入力する。text枠は設定
 
 ### 確認・提出
 
-1. PCの[Web Portal](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws)へ学校Googleでログインし、本人のLabと **M0** を選ぶ。初回の連携・画面の説明は[ブラウザ確認手順](portal.md)を参照する。
+1. 教師から案内された課題画面に学校のGoogleアカウントでログインし、自分のLabと **M0** を選ぶ。
 2. 「この課題を確認する」を押す。
 3. 処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。
 
@@ -132,7 +130,7 @@ JDU WEB-02 mission: independent HTTP delivery.
 
 ### 確認・提出
 
-1. PCの[Web Portal](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws)へ学校Googleでログインし、本人のLabと **M1** を選ぶ。初回の連携・画面の説明は[ブラウザ確認手順](portal.md)を参照する。
+1. 教師から案内された課題画面に学校のGoogleアカウントでログインし、自分のLabと **M1** を選ぶ。
 2. 「この課題を確認する」を押す。
 3. 処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。
 
@@ -183,7 +181,7 @@ JDU WEB-02 mission: independent HTTP delivery.
 
 ### 確認・提出
 
-1. PCの[Web Portal](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws)へ学校Googleでログインし、本人のLabと **M2** を選ぶ。初回の連携・画面の説明は[ブラウザ確認手順](portal.md)を参照する。
+1. 教師から案内された課題画面に学校のGoogleアカウントでログインし、自分のLabと **M2** を選ぶ。
 2. 「この課題を確認する」を押す。
 3. 処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。
 
@@ -225,7 +223,7 @@ JDU WEB-02 mission: independent HTTP delivery.
 
 ### 確認・提出
 
-1. PCの[Web Portal](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws)へ学校Googleでログインし、本人のLabと **M4** を選ぶ。初回の連携・画面の説明は[ブラウザ確認手順](portal.md)を参照する。
+1. 教師から案内された課題画面に学校のGoogleアカウントでログインし、自分のLabと **M4** を選ぶ。
 2. 「この課題を確認する」を押す。
 3. 処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。
 
@@ -278,7 +276,7 @@ JDU WEB-02 mission: independent HTTP delivery.
 
 ### 確認・提出
 
-1. PCの[Web Portal](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws)へ学校Googleでログインし、本人のLabと **M5** を選ぶ。初回の連携・画面の説明は[ブラウザ確認手順](portal.md)を参照する。
+1. 教師から案内された課題画面に学校のGoogleアカウントでログインし、自分のLabと **M5** を選ぶ。
 2. 「機能・権限を含めて確認する」を選び、lab_admin の既存パスワードを「アプリ管理者の既存パスワード」に非表示入力して「このパスワードで確認する」を押す。RDP用とは別。設定だけの確認では機能の合格を確定しない。
 3. 処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。
 
@@ -334,7 +332,7 @@ mission側の最小権限を完成する。catalog_setupはNOLOGIN/password NULL
 
 ### 確認・提出
 
-1. PCの[Web Portal](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws)へ学校Googleでログインし、本人のLabと **M6** を選ぶ。初回の連携・画面の説明は[ブラウザ確認手順](portal.md)を参照する。
+1. 教師から案内された課題画面に学校のGoogleアカウントでログインし、自分のLabと **M6** を選ぶ。
 2. 「機能・権限を含めて確認する」を選び、lab_admin の既存パスワードを「アプリ管理者の既存パスワード」に非表示入力して「このパスワードで確認する」を押す。RDP用とは別。設定だけの確認では機能の合格を確定しない。
 3. 処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。
 
@@ -344,7 +342,7 @@ mission側の最小権限を完成する。catalog_setupはNOLOGIN/password NULL
 
 結果は自動保存される。処理中は「結果を更新する」、成績確認は「保存済み成績を見る」を使う。確認対象の課題・時刻と保存状態を読む。UNKNOWNは観測不能で、合格や0点を確定した意味ではない。未確認Mの確定済み点数は保持される。最新の評価可能な結果を使い、異なる回のPASSを合算したり自動で最高点を選んだりしない。
 
-詳しい画面操作は[ブラウザ確認手順](portal.md)へ。password/token/cookie/秘密鍵/env本文を提出物や会話へ送らない。
+password/token/cookie/秘密鍵/env本文を提出物や会話へ送らない。
 
 ## 根拠と使用版
 

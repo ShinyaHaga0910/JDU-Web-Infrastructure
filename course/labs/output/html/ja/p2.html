@@ -13,18 +13,17 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">学ぶこと</a> · <a href="#section-3">課題</a> · <a href="#section-4">今回の見取り図</a> · <a href="#section-5">仕組みを理解する</a> · <a href="#section-6">操作例：一つずつ実行する</a> · <a href="#section-7">出力の読み取り例（入力しない）</a> · <a href="#section-8">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P2 内部DNSと通常の名前解決</h1>
-<p><a href="start.html">はじめに：接続・操作の約束</a> · <a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a> · <a href="portal.html">ブラウザで確認する</a></p>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">今回の見取り図</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">操作例：一つずつ実行する</a> · <a href="#section-6">出力の読み取り例（入力しない）</a> · <a href="#section-7">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P2 内部DNSと通常の名前解決</h1>
+<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
 <p><a href="../ja/p2.html">日本語</a> · <a href="../ru/p2.html">Русский</a> · <a href="../uz/p2.html">O‘zbekcha</a></p>
 <p>2026-11-13 · D12 P/M r1.5</p>
 <p>配布版の有効期限：2027年1月31日末（UZT）。</p>
-<h2 id="section-1">始める前に</h2>
-<p><a href="start.html">共通の接続・操作</a>を確認する。対応する自力課題は<a href="m2.html">M2</a>。課題の判定方法は<a href="portal.html">ブラウザ確認手順</a>を使う。</p>
-<h2 id="section-2">学ぶこと</h2>
+<p>対応する自力課題は<a href="m2.html">M2</a>。</p>
+<h2 id="section-1">学ぶこと</h2>
 <p>BINDのzone・A record・問い合わせ制限と、client側resolverを順に構築する。</p>
-<h2 id="section-3">課題</h2>
+<h2 id="section-2">課題</h2>
 <p>guide.lab.test→10.20.1.20、practice-db.lab.test→10.20.2.20を設定する。P1のHTTPを名前で利用する。基盤の固定IPは変えない。</p>
-<h2 id="section-4">今回の見取り図</h2>
+<h2 id="section-3">今回の見取り図</h2>
 <p><img src="../../../assets/ja/p2.png" alt="P2: IP指定のHTTPが使える → DNSとresolverを設定する → 名前でも同じWebへ届く。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。" width="1040" height="680" loading="lazy"></p>
 <p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。</p>
 <p><a href="../../../assets/ja/p2.png">図を拡大する</a> · <a href="../../../assets/ja/p2.svg">SVG</a></p>
@@ -46,13 +45,13 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tr>
 </tbody>
 </table>
-<h2 id="section-5">仕組みを理解する</h2>
+<h2 id="section-4">仕組みを理解する</h2>
 <p><strong>始める前の状態:</strong></p>
 <p>P1のHTTPがIP指定で使える。DNSはこれから設定する。</p>
 <p><strong>このPで変えること:</strong></p>
 <p>BINDの練習名を、踏み台とWebの通常resolverから使える。</p>
 <p>DNSの仕事は名前への回答で、HTTP本文の配信ではない。lab.testのzoneはBINDが管理し、A recordはIPv4を返す。digで問い合わせ先を明示した確認と、getentやbrowserがOSの設定を使う確認を分ける。名前解決後のHTTP接続は別の通信である。<a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BINDの一次資料</a>。</p>
-<h2 id="section-6">操作例：一つずつ実行する</h2>
+<h2 id="section-5">操作例：一つずつ実行する</h2>
 <h3>P2.1 BINDを導入し元設定を残す</h3>
 <p><strong>実行場所:</strong></p>
 <p>DNSサーバーのSSM端末：ssm-user</p>
@@ -238,12 +237,12 @@ curl --noproxy '*' -i http://guide.lab.test/practice.txt
 <p>13項目の練習確認。P1の現在機能も必要。次のM2で正式名6件を追加してからDB/appへ進む。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>名前が開かない原因をHTTP停止と決めつけず、IP指定→dig→getent→HTTPの順で比べる。</p>
-<h2 id="section-7">出力の読み取り例（入力しない）</h2>
+<h2 id="section-6">出力の読み取り例（入力しない）</h2>
 <pre><code class="language-text">status: NOERROR
 guide.lab.test.  300  IN  A  10.20.1.20
 </code></pre>
 <p>dig出力の説明用抜粋。Aの右が回答IPv4、300がTTL。回答が出ても、問い合わせ先SERVERが10.20.2.10かを別に確認する。</p>
-<h2 id="section-8">理解の確認（採点外）</h2>
+<h2 id="section-7">理解の確認（採点外）</h2>
 <p>dig @10.20.2.10は成功し、getentは失敗する。DNSのzoneだけが原因と言えるか？</p>
 <p><strong>考え方:</strong></p>
 <p>言えない。明示したDNSへの回答と、OSが通常選ぶresolverは別なので、Netplanとresolvectlの実効設定を確認する。</p>

@@ -15,7 +15,6 @@ sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = Path(os.environ.get('JDU_WEB_PROJECT_ROOT', str(Path(__file__).resolve().parents[3] / 'development')))
 from markdown_it import MarkdownIt
-from portal_guide import write_guides
 from pages import write_pages, browser_check, expiry_text
 from command_notes import annotated_blocks
 from diagrams import diagram_markdown, write_diagrams
@@ -103,9 +102,9 @@ def emit_end(lang):
       '結果は自動保存される。処理中は「結果を更新する」、成績確認は「保存済み成績を見る」を使う。確認対象の課題・時刻と保存状態を読む。UNKNOWNは観測不能で、合格や0点を確定した意味ではない。未確認Mの確定済み点数は保持される。最新の評価可能な結果を使い、異なる回のPASSを合算したり自動で最高点を選んだりしない。',
       'Результаты сохраняются автоматически. Во время обработки обновляйте результат; оценки смотрите в разделе сохранённых оценок. Сверяйте задание, время и сохранение. UNKNOWN означает невозможность измерения, а не успех или подтверждённый ноль. Подтверждённые баллы непроверенных M сохраняются. Используется последний оцениваемый результат, без объединения PASS разных запусков и автоматического выбора максимума.',
       'Natijalar avtomatik saqlanadi. Ishlov paytida natijani yangilang; baholarni saqlangan baholar bo‘limidan ko‘ring. Topshiriq, vaqt va saqlash holatini solishtiring. UNKNOWN o‘lchab bo‘lmagan holat, muvaffaqiyat yoki tasdiqlangan nol emas. Tekshirilmagan M ning tasdiqlangan ballari saqlanadi. Oxirgi baholanadigan natija olinadi; turli urinish PASS lari qo‘shilmaydi, maksimum avtomatik tanlanmaydi.')[lang], '',
-      T('詳しい画面操作は[ブラウザ確認手順](portal.md)へ。password/token/cookie/秘密鍵/env本文を提出物や会話へ送らない。',
-        'Подробные действия: [проверка в браузере](portal.md). Не отправляйте пароль/token/cookie/приватный ключ/env в отчёт или чат.',
-        'Ekran amallari: [brauzer yo‘riqnomasi](portal.md). Parol/token/cookie/maxfiy kalit/env ni hisobot yoki chat ga yubormang.')[lang], '',
+      T('password/token/cookie/秘密鍵/env本文を提出物や会話へ送らない。',
+        'Не отправляйте пароль/token/cookie/приватный ключ/env в отчёт или чат.',
+        'Parol/token/cookie/maxfiy kalit/env ni hisobot yoki chat ga yubormang.')[lang], '',
       '## ' + L['sources'][lang], '',
       T('採点条件は各Mの表と同梱の固定registryを参照する。', 'Критерии: таблицы M и фиксированный registry комплекта.', 'Baholash shartlari: M jadvallari va tarqatmadagi belgilangan registry.')[lang], '',
       DIST_ID + '; web-d11-2026-10-r1; registry SHA256 `' + EXPECTED_REGISTRY + '`.', '', expiry_text(lang), '',
@@ -416,11 +415,10 @@ def main():
     }
     for name,source in public_assets.items():
         (ROOT/'distribution'/name).write_bytes(source.read_bytes())
-    write_guides(ROOT,CSS)
     links=[]
     for lang in LANGS:
         label={'ja':'日本語','ru':'Русский','uz':'O‘zbekcha'}[lang]
-        links.append(f'<article><h2>{label}</h2><p><a href="{lang}/portal.html">ブラウザ確認 / Проверка в браузере / Brauzerda tekshirish</a></p><p><a href="{lang}/practice.html">P0–P6</a> · <a href="{lang}/missions.html">M0–M6</a></p><p><a href="../pdf/web_lab_practice_{lang}.pdf">P PDF</a> · <a href="../pdf/web_lab_missions_{lang}.pdf">M PDF</a></p></article>')
+        links.append(f'<article><h2>{label}</h2><p><a href="{lang}/practice.html">P0–P6</a> · <a href="{lang}/missions.html">M0–M6</a></p><p><a href="../pdf/web_lab_practice_{lang}.pdf">P PDF</a> · <a href="../pdf/web_lab_missions_{lang}.pdf">M PDF</a></p></article>')
     (ROOT/'output/html/index.html').write_text('<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JDU Web P/M 教材</title><style>'+CSS+'</style></head><body><main><h1>Web Infrastructure · P / M</h1><p>手順付き練習と自力課題 / Практика и задания / Mashqlar va topshiriqlar</p><p>2026-11-03 · D12 P/M '+MATERIAL_REVISION+'</p>'+''.join(links)+'<p>同梱署名版：2027-01-31末（UZT）まで有効。初回は教師の個別登録も必要です / Комплект действителен до 31.01.2027 (UZT); нужна личная регистрация / Tarqatma 31.01.2027 (UZT) gacha amal qiladi; shaxsiy ro‘yxat ham kerak.</p></main></body></html>',encoding='utf-8',newline='\n')
     package=ROOT/'output/web-lab-pm-r1.zip'
     members=[p for folder in ('docs','assets','resources','distribution','output/html','output/pdf') for p in (ROOT/folder).rglob('*') if p.is_file()]

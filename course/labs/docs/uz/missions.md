@@ -2,7 +2,7 @@
 
 2026-11-13 · D12 P/M r1.5
 
-[Avval: ulanish va qoidalar](start.md) · [Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M6](missions.md) · [Brauzerda tekshirish](portal.md)
+[Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M6](missions.md)
 
 [日本語](../ja/missions.md) · [Русский](../ru/missions.md) · [O‘zbekcha](../uz/missions.md)
 

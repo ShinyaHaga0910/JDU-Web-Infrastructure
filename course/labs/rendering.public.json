@@ -1,10 +1,10 @@
 {
   "scope": "D12_P_M_all_page_render_and_bounds_not_visual_approval",
-  "checked_on": "2026-11-19",
+  "checked_on": "2026-11-20",
   "pdfs": [
     {
       "file": "web_lab_missions_ja.pdf",
-      "sha256": "83d07829cac5de69fbb9d2b5e9a72bb089c5dfbb3b06a878edd22668c3ff71e2",
+      "sha256": "3d18a611c3de70b3dd9c615bd503397480af5e3335e8e6b33fe551703e41aa3f",
       "pages": 14,
       "rendered_pages": 14,
       "out_of_bounds_words": 0,
@@ -12,7 +12,7 @@
     },
     {
       "file": "web_lab_missions_ru.pdf",
-      "sha256": "dc86ca77760c5102a2d7e7ee4be336ce9a56914676112f9e0222c988414d0341",
+      "sha256": "c27a2af7cd12f9212aea8f03a660327094170322276b8c5e0d2e44c152fb1cde",
       "pages": 15,
       "rendered_pages": 15,
       "out_of_bounds_words": 0,
@@ -20,7 +20,7 @@
     },
     {
       "file": "web_lab_missions_uz.pdf",
-      "sha256": "ecc2367057ce433f0707171dd683526f50db033116ca1e4a66eca0fb0ce53bd3",
+      "sha256": "f229db59b9d0827e6d3e99ea47741a0b49b1f427b9591e30c97e9901d062be3e",
       "pages": 15,
       "rendered_pages": 15,
       "out_of_bounds_words": 0,
@@ -28,7 +28,7 @@
     },
     {
       "file": "web_lab_practice_ja.pdf",
-      "sha256": "e8075fafa33ecc3a3804ad18f47a5a12af669e0aee1a910bdbd081c0d4abf7f9",
+      "sha256": "f8ef5ba8ae0938f04a17598de5b5ce7e4a5d8397219765499837c075cd294b73",
       "pages": 41,
       "rendered_pages": 41,
       "out_of_bounds_words": 0,
@@ -36,7 +36,7 @@
     },
     {
       "file": "web_lab_practice_ru.pdf",
-      "sha256": "27b6cc9b214bd1b22d6fe0e5599ad161937c2d6da3d7956488963221ce25f459",
+      "sha256": "1b6fa89960299f500bfc3514b4544f753781b6fb3720b5f8c9f9abb94309c84b",
       "pages": 42,
       "rendered_pages": 42,
       "out_of_bounds_words": 0,
@@ -44,7 +44,7 @@
     },
     {
       "file": "web_lab_practice_uz.pdf",
-      "sha256": "1a97705cea6affa0446085e111a98cc094b5c375010ccfac430eadfe2effc8b6",
+      "sha256": "5570612681c769d2afb1946d25fdf0760f3258ad7ce8a1bf251e1c8f545c96bf",
       "pages": 42,
       "rendered_pages": 42,
       "out_of_bounds_words": 0,

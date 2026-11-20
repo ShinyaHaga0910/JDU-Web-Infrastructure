@@ -13,16 +13,15 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">完成要件</a> · <a href="#section-3">今回の見取り図</a> · <a href="#section-4">合格条件：採点check各1素点</a> · <a href="#section-5">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M2 内部DNSと通常の名前解決 (13)</h1>
-<p><a href="start.html">はじめに：接続・操作の約束</a> · <a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a> · <a href="portal.html">ブラウザで確認する</a></p>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">完成要件</a> · <a href="#section-2">今回の見取り図</a> · <a href="#section-3">合格条件：採点check各1素点</a> · <a href="#section-4">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M2 内部DNSと通常の名前解決 (13)</h1>
+<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
 <p><a href="../ja/m2.html">日本語</a> · <a href="../ru/m2.html">Русский</a> · <a href="../uz/m2.html">O‘zbekcha</a></p>
 <p>2026-11-13 · D12 P/M r1.5</p>
 <p>配布版の有効期限：2027年1月31日末（UZT）。</p>
-<h2 id="section-1">始める前に</h2>
-<p><a href="start.html">共通の接続・操作</a>を確認する。対応する詳しい練習は<a href="p2.html">P2</a>。課題の判定方法は<a href="portal.html">ブラウザ確認手順</a>を使う。</p>
-<h2 id="section-2">完成要件</h2>
+<p>対応する詳しい練習は<a href="p2.html">P2</a>。</p>
+<h2 id="section-1">完成要件</h2>
 <p>同じlab.test zoneへ正式6名を設定する。P2のguide/practice-dbは保持してよい。踏み台/Webの通常resolver、名前によるM1 HTTP、DB名、UDP/TCP、外部forward、NXDOMAIN、ACL、AXFR拒否まで確認する。</p>
-<h2 id="section-3">今回の見取り図</h2>
+<h2 id="section-2">今回の見取り図</h2>
 <p><img src="../../../assets/ja/m2.png" alt="M2: IP指定のHTTPが使える → DNSとresolverを設定する → 名前でも同じWebへ届く。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 図を参考に完成要件から設定値を自分で決めます。" width="1040" height="680" loading="lazy"></p>
 <p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 図を参考に完成要件から設定値を自分で決めます。</p>
 <p><a href="../../../assets/ja/m2.png">図を拡大する</a> · <a href="../../../assets/ja/m2.svg">SVG</a></p>
@@ -63,7 +62,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <ul>
 <li>現在必要な前提: M1</li>
 </ul>
-<h2 id="section-4">合格条件：採点check各1素点</h2>
+<h2 id="section-3">合格条件：採点check各1素点</h2>
 <table>
 <thead>
 <tr>
@@ -127,9 +126,9 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tbody>
 </table>
 <p>本人確認・管理・配布元・通信基盤・依存前提等の準備checkは上表の素点に加えない。必要前提が未完了なら、点が一部あっても次段階の準備完了ではない。</p>
-<h2 id="section-5">確認・提出</h2>
+<h2 id="section-4">確認・提出</h2>
 <ol>
-<li>PCの<a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a>へ学校Googleでログインし、本人のLabと <strong>M2</strong> を選ぶ。初回の連携・画面の説明は<a href="portal.html">ブラウザ確認手順</a>を参照する。</li>
+<li>教師から案内された課題画面に学校のGoogleアカウントでログインし、自分のLabと <strong>M2</strong> を選ぶ。</li>
 <li>「この課題を確認する」を押す。</li>
 <li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。</li>
 </ol>

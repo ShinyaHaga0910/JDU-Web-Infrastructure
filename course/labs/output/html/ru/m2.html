@@ -13,16 +13,15 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Требуемый результат</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Условия: 1 исходный балл за проверку</a> · <a href="#section-5">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M2 Внутренний DNS и системное разрешение имён (13)</h1>
-<p><a href="start.html">Сначала: подключение и правила</a> · <a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a> · <a href="portal.html">Проверка в браузере</a></p>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Требуемый результат</a> · <a href="#section-2">Схема задания</a> · <a href="#section-3">Условия: 1 исходный балл за проверку</a> · <a href="#section-4">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M2 Внутренний DNS и системное разрешение имён (13)</h1>
+<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
 <p><a href="../ja/m2.html">日本語</a> · <a href="../ru/m2.html">Русский</a> · <a href="../uz/m2.html">O‘zbekcha</a></p>
 <p>2026-11-13 · D12 P/M r1.5</p>
 <p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
-<h2 id="section-1">Перед началом</h2>
-<p>Проверьте <a href="start.html">подключение и правила</a>. Связанное задание: <a href="p2.html">P2</a>. Проверка описана в <a href="portal.html">инструкции браузера</a>.</p>
-<h2 id="section-2">Требуемый результат</h2>
+<p>Связанное задание: <a href="p2.html">P2</a>.</p>
+<h2 id="section-1">Требуемый результат</h2>
 <p>Добавьте шесть основных имён в ту же zone lab.test. guide/practice-db можно сохранить. Нужны обычный resolver бастиона/Web, HTTP M1 по имени, имя DB, UDP/TCP, forwarding, NXDOMAIN, ACL и запрет AXFR.</p>
-<h2 id="section-3">Схема задания</h2>
+<h2 id="section-2">Схема задания</h2>
 <p><img src="../../../assets/ru/m2.png" alt="M2: HTTP по IP уже работает → Настроить DNS и resolver → Имя ведёт к тому же Web。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. По схеме самостоятельно выберите настройки из требований." width="1040" height="680" loading="lazy"></p>
 <p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. По схеме самостоятельно выберите настройки из требований.</p>
 <p><a href="../../../assets/ru/m2.png">Открыть крупно</a> · <a href="../../../assets/ru/m2.svg">SVG</a></p>
@@ -63,7 +62,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <ul>
 <li>Текущие предпосылки: M1</li>
 </ul>
-<h2 id="section-4">Условия: 1 исходный балл за проверку</h2>
+<h2 id="section-3">Условия: 1 исходный балл за проверку</h2>
 <table>
 <thead>
 <tr>
@@ -127,9 +126,9 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tbody>
 </table>
 <p>Проверки identity/управления/repo/сети/зависимостей не добавляют баллов. Частичные баллы не означают готовность следующего этапа при неисправных предпосылках.</p>
-<h2 id="section-5">Проверка и отправка</h2>
+<h2 id="section-4">Проверка и отправка</h2>
 <ol>
-<li>Войдите через школьный Google в <a href="https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws">Web Portal</a> на PC, выберите свой Lab и <strong>M2</strong>. Привязка и экраны описаны в <a href="portal.html">инструкции браузера</a>.</li>
+<li>Откройте страницу заданий по ссылке преподавателя, войдите через учебный аккаунт Google и выберите свой Lab и <strong>M2</strong>.</li>
 <li>Запустите проверку выбранного задания.</li>
 <li>Во время обработки обновляйте результат. Сверьте ID задания, время, каждый check и сохранение. Результат сохраняется автоматически; оценки M доступны в разделе сохранённых оценок. P и M0 не оцениваются.</li>
 </ol>

@@ -13,18 +13,17 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Boshlashdan oldin</a> · <a href="#section-2">Nimani o‘rganamiz</a> · <a href="#section-3">Topshiriq</a> · <a href="#section-4">Topshiriq diagrammasi</a> · <a href="#section-5">Bu qanday ishlaydi</a> · <a href="#section-6">Yechim namunasi: bittadan bajaring</a> · <a href="#section-7">Natijani o‘qish namunasi (kiritmang)</a> · <a href="#section-8">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P2 Ichki DNS va odatiy nom yechimi</h1>
-<p><a href="start.html">Avval: ulanish va qoidalar</a> · <a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a> · <a href="portal.html">Brauzerda tekshirish</a></p>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Nimani o‘rganamiz</a> · <a href="#section-2">Topshiriq</a> · <a href="#section-3">Topshiriq diagrammasi</a> · <a href="#section-4">Bu qanday ishlaydi</a> · <a href="#section-5">Yechim namunasi: bittadan bajaring</a> · <a href="#section-6">Natijani o‘qish namunasi (kiritmang)</a> · <a href="#section-7">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P2 Ichki DNS va odatiy nom yechimi</h1>
+<p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a></p>
 <p><a href="../ja/p2.html">日本語</a> · <a href="../ru/p2.html">Русский</a> · <a href="../uz/p2.html">O‘zbekcha</a></p>
 <p>2026-11-13 · D12 P/M r1.5</p>
 <p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
-<h2 id="section-1">Boshlashdan oldin</h2>
-<p><a href="start.html">Ulanish va qoidalar</a> bilan tanishing. Mos topshiriq: <a href="m2.html">M2</a>. Tekshiruv: <a href="portal.html">brauzer yo‘riqnomasi</a>.</p>
-<h2 id="section-2">Nimani o‘rganamiz</h2>
+<p>Mos topshiriq: <a href="m2.html">M2</a>.</p>
+<h2 id="section-1">Nimani o‘rganamiz</h2>
 <p>BIND zone, A record, ACL va client resolver ni ketma-ket sozlash.</p>
-<h2 id="section-3">Topshiriq</h2>
+<h2 id="section-2">Topshiriq</h2>
 <p>guide.lab.test → 10.20.1.20 va practice-db.lab.test → 10.20.2.20 ni sozlang; P1 HTTP ni nom orqali oching. Asosiy IP lar o‘zgarmaydi.</p>
-<h2 id="section-4">Topshiriq diagrammasi</h2>
+<h2 id="section-3">Topshiriq diagrammasi</h2>
 <p><img src="../../../assets/uz/p2.png" alt="P2: IP orqali HTTP ishlaydi → DNS va resolver ni sozlash → Nom ham ayni Web ga olib boradi。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz." width="1040" height="680" loading="lazy"></p>
 <p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz.</p>
 <p><a href="../../../assets/uz/p2.png">Kattalashtirish</a> · <a href="../../../assets/uz/p2.svg">SVG</a></p>
@@ -46,13 +45,13 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tr>
 </tbody>
 </table>
-<h2 id="section-5">Bu qanday ishlaydi</h2>
+<h2 id="section-4">Bu qanday ishlaydi</h2>
 <p><strong>Boshlashdan oldingi holat:</strong></p>
 <p>P1 HTTP IP orqali ishlaydi; DNS endi sozlanadi.</p>
 <p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
 <p>BIND mashq nomlari bastion va Web ning oddiy resolver idan ishlaydi.</p>
 <p>DNS nom so‘roviga javob beradi, Web sahifani qaytarmaydi. BIND lab.test zone ni boshqaradi; A record IPv4 qaytaradi. Aniq DNS server bilan dig va OS sozlamalaridan foydalanuvchi getent/browser ni farqlang. DNS dan keyin alohida HTTP ulanish bo‘ladi. <a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BIND hujjati</a>.</p>
-<h2 id="section-6">Yechim namunasi: bittadan bajaring</h2>
+<h2 id="section-5">Yechim namunasi: bittadan bajaring</h2>
 <h3>P2.1 BIND o‘rnatish va asl sozlamani saqlash</h3>
 <p><strong>Bajarish joyi:</strong></p>
 <p>DNS serverning SSM terminali: ssm-user</p>
@@ -238,12 +237,12 @@ curl --noproxy '*' -i http://guide.lab.test/practice.txt
 <p>13 ta mashq tekshiruvi; P1 ning joriy ishlashi ham kerak. DB/app dan oldin M2 da oltita asosiy nomni qo‘shing.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Nom ochilmasa darhol HTTP to‘xtagan demang: IP → dig → getent → HTTP tartibida solishtiring.</p>
-<h2 id="section-7">Natijani o‘qish namunasi (kiritmang)</h2>
+<h2 id="section-6">Natijani o‘qish namunasi (kiritmang)</h2>
 <pre><code class="language-text">status: NOERROR
 guide.lab.test.  300  IN  A  10.20.1.20
 </code></pre>
 <p>Dig ning qisqa namunasi: A dan keyin IPv4, 300 esa TTL. So‘rov SERVER i 10.20.2.10 ekanini alohida tekshiring.</p>
-<h2 id="section-8">Tushunishni tekshirish (ballsiz)</h2>
+<h2 id="section-7">Tushunishni tekshirish (ballsiz)</h2>
 <p>dig @10.20.2.10 ishlaydi, getent ishlamaydi. Muammo albatta zone dami?</p>
 <p><strong>Izoh:</strong></p>
 <p>Yo‘q. Aniq tanlangan DNS bilan OS ning oddiy resolver i farq qilishi mumkin. Netplan va resolvectl ning amaldagi sozlamalarini tekshiring.</p>

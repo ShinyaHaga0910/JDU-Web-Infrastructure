@@ -95,7 +95,7 @@ Avvalgi 8-bob olib tashlangan va darslik boblari 1 dan 13 gacha ketma-ket raqaml
 
 ## P mashqlari va M mustaqil topshiriqlari
 
-2026-yil 13-noyabrda [mashqlar va mustaqil topshiriqlar](course/labs/README.md) P3/M3 chiqarilgan holda alohida sahifalarga joylandi. Yapon, rus va o‘zbek tillarida misollar bilan 44 qadam va 59 ballik baholash mezonlari mavjud. Dastlabki sozlashdan so‘ng [topshiriqlarni tekshirish va natijalarni ko‘rish uchun veb-portaldan foydalaning](course/labs/docs/uz/portal.md). Materiallarning ZIP arxiviga A4 formatdagi PDF va internetsiz ko‘rish uchun HTML ham kiritilgan.
+2026-yil 13-noyabrda [mashqlar va mustaqil topshiriqlar](course/labs/README.md) P3/M3 chiqarilgan holda alohida sahifalarga joylandi. Yapon, rus va o‘zbek tillarida misollar bilan 44 qadam va 59 ballik baholash mezonlari mavjud. Materiallarning ZIP arxiviga A4 formatdagi PDF va internetsiz ko‘rish uchun HTML ham kiritilgan.
 
 r1.1 tahririda avvalgi 49 qadamdagi buyruq va sozlamalarning izohlari, har bir P mashqining ishlash tamoyillari, o‘zini tekshirish savollari, tarmoq yo‘nalishlari va buyruq natijalarini o‘qish misollari qo‘shilgan. M topshiriqlarida ishni va tekshirish usullarini mustaqil rejalash bo‘yicha ko‘rsatmalar berilgan.
 

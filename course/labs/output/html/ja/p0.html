@@ -13,28 +13,27 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">始める前に</a> · <a href="#section-2">学ぶこと</a> · <a href="#section-3">課題</a> · <a href="#section-4">今回の見取り図</a> · <a href="#section-5">仕組みを理解する</a> · <a href="#section-6">操作例：一つずつ実行する</a> · <a href="#section-7">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P0 自分の環境と実行場所</h1>
-<p><a href="start.html">はじめに：接続・操作の約束</a> · <a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a> · <a href="portal.html">ブラウザで確認する</a></p>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">今回の見取り図</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">操作例：一つずつ実行する</a> · <a href="#section-6">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P0 自分の環境と実行場所</h1>
+<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
 <p><a href="../ja/p0.html">日本語</a> · <a href="../ru/p0.html">Русский</a> · <a href="../uz/p0.html">O‘zbekcha</a></p>
 <p>2026-11-13 · D12 P/M r1.5</p>
 <p>配布版の有効期限：2027年1月31日末（UZT）。</p>
-<h2 id="section-1">始める前に</h2>
-<p><a href="start.html">共通の接続・操作</a>を確認する。対応する自力課題は<a href="m0.html">M0</a>。課題の判定方法は<a href="portal.html">ブラウザ確認手順</a>を使う。</p>
-<h2 id="section-2">学ぶこと</h2>
+<p>対応する自力課題は<a href="m0.html">M0</a>。</p>
+<h2 id="section-1">学ぶこと</h2>
 <p>CloudShell、Windows、5台のUbuntuを区別し、正しいサーバーへSSMで入り、採点を自己確認できる。</p>
-<h2 id="section-3">課題</h2>
+<h2 id="section-2">課題</h2>
 <p>構築済みの自分の環境で、5台のインスタンスIDと役割を確認し、接続先と操作ユーザーを確かめる。P0は成績に加算しない。</p>
-<h2 id="section-4">今回の見取り図</h2>
+<h2 id="section-3">今回の見取り図</h2>
 <p><img src="../../../assets/ja/p0.png" alt="P0: 5台は初期配備済み → 本人・接続先を確かめる → 正しい役割へSSMで入る。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。" width="1040" height="680" loading="lazy"></p>
 <p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。</p>
 <p><a href="../../../assets/ja/p0.png">図を拡大する</a> · <a href="../../../assets/ja/p0.svg">SVG</a></p>
-<h2 id="section-5">仕組みを理解する</h2>
+<h2 id="section-4">仕組みを理解する</h2>
 <p><strong>始める前の状態:</strong></p>
 <p>教師が初期配布と個別登録を終えた、本人の5台を使う。</p>
 <p><strong>このPで変えること:</strong></p>
 <p>対象account・役割・実行場所を見分け、公開教材資源を準備する。</p>
 <p>AWSコンソールはAWS資源を管理する画面、CloudShellはAWS CLIを使う自分の端末、SSMは選んだEC2のOS内へ入る接続である。SSMへ入っても5台が一つのOSになるわけではない。Webの/var/wwwとDBの/var/wwwは別の保存先である。サーバーの役割と、そこで操作するOS userを別々に確認する。</p>
-<h2 id="section-6">操作例：一つずつ実行する</h2>
+<h2 id="section-5">操作例：一つずつ実行する</h2>
 <h3>P0.1 5台のinstance IDを記録する</h3>
 <p><strong>実行場所:</strong></p>
 <p>学生本人のAWSコンソール</p>
@@ -92,7 +91,7 @@ python3 -B stage_resources.py --installation 'YOUR-INSTALLATION-DIRECTORY'
 <p><strong>実行場所:</strong></p>
 <p>自分のPCのブラウザ：Web Portal</p>
 <p><strong>目的と操作:</strong></p>
-<p><a href="portal.html">ブラウザ確認手順</a>からWeb Portalを開く。学校Googleでログインし、本人AWSとの連携を済ませ、P0を選んで「この課題を確認する」を押す。結果が処理中なら「結果を更新する」を押す。M0も同じ方法で確認する。P0/M0は準備確認で成績に加算しない。</p>
+<p>教師から案内された課題画面を開く。学校Googleでログインし、本人AWSとの連携を済ませ、P0を選んで「この課題を確認する」を押す。結果が処理中なら「結果を更新する」を押す。M0も同じ方法で確認する。P0/M0は準備確認で成績に加算しない。</p>
 <p><strong>コマンド・設定値の意味:</strong></p>
 <p>ブラウザの確認結果は自動保存される。結果のPASS/FAIL/UNKNOWNと、処理・保存の状態を分けて読む。PとM0は保存されても成績に加算しない。</p>
 <p><strong>期待する結果と読み方:</strong></p>
@@ -114,7 +113,7 @@ mstsc /prompt
 <p>UbuntuのXfceデスクトップとFirefoxが開く。これは踏み台内のbrowserであり、Windows側のbrowserとは別。RDPのlabuserにはsudo管理権限がないため、構築はCloudShellからSSM/ssm-userで行う。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>Login failedならuser名と日本語/英語等のkeyboard配列を確認する。passwordを会話へ送らない。到達しない場合は現在のIPと許可された接続元CIDRを教師と確認し、3389を全公開しない。終了時はRDP内の自分の作業を保存し、接続を閉じる。</p>
-<h2 id="section-7">理解の確認（採点外）</h2>
+<h2 id="section-6">理解の確認（採点外）</h2>
 <p>WebへSSM接続したままDBの手順を入力すると、どのサーバーが変わるか？</p>
 <p><strong>考え方:</strong></p>
 <p>現在接続中のWebが変わる。exitでCloudShellへ戻り、DBのinstance IDへ接続し直す。</p>

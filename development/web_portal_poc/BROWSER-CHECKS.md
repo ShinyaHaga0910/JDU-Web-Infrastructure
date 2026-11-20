@@ -1,6 +1,6 @@
 # CloudFormationの初期設定後に使う課題画面
 
-[学生用の入口](https://d9r6gn83y8wkl4xl.gpb.lambda-web.us-east-1.on.aws)
+課題画面のURLはクラスごとに教師が案内します。
 
 教師はLabを開始した状態で使用します。学生の構築・登録は、教師が渡す既存CloudFormationと初期接続・採点登録手順で完了します。その後、学生は学校Googleでログインし、本人AWSとの連携を一度済ませます。共有Windowsへ秘密鍵を保存しません。
 

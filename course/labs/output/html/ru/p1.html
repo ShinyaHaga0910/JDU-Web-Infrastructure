@@ -13,18 +13,17 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Что изучаем</a> · <a href="#section-3">Задание</a> · <a href="#section-4">Схема задания</a> · <a href="#section-5">Как это работает</a> · <a href="#section-6">Пример решения: выполняйте по одному шагу</a> · <a href="#section-7">Пример чтения вывода (не вводить)</a> · <a href="#section-8">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P1 Выдача статического файла по HTTP</h1>
-<p><a href="start.html">Сначала: подключение и правила</a> · <a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a> · <a href="portal.html">Проверка в браузере</a></p>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Пример чтения вывода (не вводить)</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P1 Выдача статического файла по HTTP</h1>
+<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
 <p><a href="../ja/p1.html">日本語</a> · <a href="../ru/p1.html">Русский</a> · <a href="../uz/p1.html">O‘zbekcha</a></p>
 <p>2026-11-13 · D12 P/M r1.5</p>
 <p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
-<h2 id="section-1">Перед началом</h2>
-<p>Проверьте <a href="start.html">подключение и правила</a>. Связанное задание: <a href="m1.html">M1</a>. Проверка описана в <a href="portal.html">инструкции браузера</a>.</p>
-<h2 id="section-2">Что изучаем</h2>
+<p>Связанное задание: <a href="m1.html">M1</a>.</p>
+<h2 id="section-1">Что изучаем</h2>
 <p>Связать Nginx, файл, прослушивание порта, HTTP-ответ и access log.</p>
-<h2 id="section-3">Задание</h2>
+<h2 id="section-2">Задание</h2>
 <p>Файл /var/www/html/practice.txt на Web должен возвращать заданный текст с HTTP 200: локально, с бастиона и извне.</p>
-<h2 id="section-4">Схема задания</h2>
+<h2 id="section-3">Схема задания</h2>
 <p><img src="../../../assets/ru/p1.png" alt="P1: HTTP-задание ещё не готово → Настроить выдачу на Web → Сверить ответ и журнал。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Слева Интернет, справа VPC в AWS. IGW стоит на границе VPC; все EC2, включая бастион, находятся в AWS." width="1040" height="680" loading="lazy"></p>
 <p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Слева Интернет, справа VPC в AWS. IGW стоит на границе VPC; все EC2, включая бастион, находятся в AWS.</p>
 <p><a href="../../../assets/ru/p1.png">Открыть крупно</a> · <a href="../../../assets/ru/p1.svg">SVG</a></p>
@@ -34,13 +33,13 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </ul>
 <pre><code class="language-text">JDU WEB-02 practice: HTTP response verified.
 </code></pre>
-<h2 id="section-5">Как это работает</h2>
+<h2 id="section-4">Как это работает</h2>
 <p><strong>Состояние перед началом:</strong></p>
 <p>Web уже создан, но учебный файл ещё не выдаётся.</p>
 <p><strong>Что изменится в этом P:</strong></p>
 <p>Nginx выдаёт practice.txt на порту 80 и записывает запрос в журнал.</p>
 <p>Путь URL /practice.txt соответствует файлу /var/www/html/practice.txt на Web. Успех через 127.0.0.1 проверяет только сам Web. Чтение того же текста с бастиона и Windows проверяет другие участки пути. См. <a href="https://nginx.org/en/docs/beginners_guide.html">документацию Nginx</a>.</p>
-<h2 id="section-6">Пример решения: выполняйте по одному шагу</h2>
+<h2 id="section-5">Пример решения: выполняйте по одному шагу</h2>
 <h3>P1.1 Установить Nginx из внутреннего APT</h3>
 <p><strong>Место выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
@@ -162,13 +161,13 @@ exit
 <p>Результаты восьми учебных проверок и готовности показаны и сохранены. P1 не даёт оценочных баллов; M1 требует другого файла и текста.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Если идёт обработка, обновите результат. При ошибке сохранения прочитайте причину. Не меняйте ожидаемый текст checker.</p>
-<h2 id="section-7">Пример чтения вывода (не вводить)</h2>
+<h2 id="section-6">Пример чтения вывода (не вводить)</h2>
 <pre><code class="language-text">HTTP/1.1 200 OK
 
 JDU WEB-02 practice: HTTP response verified.
 </code></pre>
 <p>Показаны только нужные строки; реальный ответ содержит и другие заголовки. Проверьте 200, текст и путь/статус в access log.</p>
-<h2 id="section-8">Проверка понимания (без баллов)</h2>
+<h2 id="section-7">Проверка понимания (без баллов)</h2>
 <p>На Web ответ 200, а с бастиона соединение не проходит. Что проверить до изменения файла?</p>
 <p><strong>Объяснение:</strong></p>
 <p>Адрес назначения, адрес/порт прослушивания и разрешение пути bastion → Web. Содержимое файла и доступность - разные проверки.</p>

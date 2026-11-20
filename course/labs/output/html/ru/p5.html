@@ -13,18 +13,17 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Перед началом</a> · <a href="#section-2">Что изучаем</a> · <a href="#section-3">Задание</a> · <a href="#section-4">Схема задания</a> · <a href="#section-5">Как это работает</a> · <a href="#section-6">Пример решения: выполняйте по одному шагу</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P5 Соединить предоставленное приложение с Web и DB</h1>
-<p><a href="start.html">Сначала: подключение и правила</a> · <a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a> · <a href="portal.html">Проверка в браузере</a></p>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P5 Соединить предоставленное приложение с Web и DB</h1>
+<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
 <p><a href="../ja/p5.html">日本語</a> · <a href="../ru/p5.html">Русский</a> · <a href="../uz/p5.html">O‘zbekcha</a></p>
 <p>2026-11-13 · D12 P/M r1.5</p>
 <p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
-<h2 id="section-1">Перед началом</h2>
-<p>Проверьте <a href="start.html">подключение и правила</a>. Связанное задание: <a href="m5.html">M5</a>. Проверка описана в <a href="portal.html">инструкции браузера</a>.</p>
-<h2 id="section-2">Что изучаем</h2>
+<p>Связанное задание: <a href="m5.html">M5</a>.</p>
+<h2 id="section-1">Что изучаем</h2>
 <p>Без программирования связать offline-зависимости, сервисного пользователя, инициализацию БД, Nginx/systemd и реальный HTTP.</p>
-<h2 id="section-3">Задание</h2>
+<h2 id="section-2">Задание</h2>
 <p>Постройте каталог в profile practice. Нужны действующие DNS из M2 и P4. БД/администраторы P и M различны, но приложение и порты на том же Web общие.</p>
-<h2 id="section-4">Схема задания</h2>
+<h2 id="section-3">Схема задания</h2>
 <p><img src="../../../assets/ru/p5.png" alt="P5: DNS и БД уже готовы → Подключить и запустить app → Изменения видны в БД и Web。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. 8000 доступен только внутри Web; 8080 используется для управления с бастиона. Слева Интернет, справа VPC в AWS. IGW стоит на границе VPC; все EC2, включая бастион, находятся в AWS." width="1040" height="680" loading="lazy"></p>
 <p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. 8000 доступен только внутри Web; 8080 используется для управления с бастиона. Слева Интернет, справа VPC в AWS. IGW стоит на границе VPC; все EC2, включая бастион, находятся в AWS.</p>
 <p><a href="../../../assets/ru/p5.png">Открыть крупно</a> · <a href="../../../assets/ru/p5.svg">SVG</a></p>
@@ -62,13 +61,13 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tr>
 </tbody>
 </table>
-<h2 id="section-5">Как это работает</h2>
+<h2 id="section-4">Как это работает</h2>
 <p><strong>Состояние перед началом:</strong></p>
 <p>Сейчас работают DNS из M2 и учебная БД из P4.</p>
 <p><strong>Что изменится в этом P:</strong></p>
 <p>Предоставленное приложение на Web связывает каталог и управление с БД.</p>
 <p>Nginx принимает HTTP, Gunicorn исполняет Python-приложение, PostgreSQL хранит данные. В отличие от статического P1, каталог получает содержимое из БД. Venv отделяет Python-среду приложения, unit systemd описывает запуск. Размещайте предоставленный код, переписывать программу не требуется.</p>
-<h2 id="section-6">Пример решения: выполняйте по одному шагу</h2>
+<h2 id="section-5">Пример решения: выполняйте по одному шагу</h2>
 <h3>P5.1 Проверить DNS и получить открытые ресурсы</h3>
 <p><strong>Место выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
@@ -317,7 +316,7 @@ psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &qu
 <p>Показаны 13 учебных пунктов и статус сохранения. Различайте проверку конфигурации и функций. P не влияет на оценку.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>При неверном пароле повторите с правильным существующим. Для просмотра текущего запуска обновите результат. Каждый новый функциональный запуск добавляет одну запись CK.</p>
-<h2 id="section-7">Проверка понимания (без баллов)</h2>
+<h2 id="section-6">Проверка понимания (без баллов)</h2>
 <p>Можно ли считать ответ 200 правильным, если каталог показывает непубличную запись?</p>
 <p><strong>Объяснение:</strong></p>
 <p>Нет. Проверяйте доступность HTTP, значения БД и фильтрацию по is_public отдельно.</p>

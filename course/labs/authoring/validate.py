@@ -64,7 +64,7 @@ def main():
             tokens=parser.parse(value)
             ok(f'{lang}_{kind}_current_revision','D12 P/M '+MATERIAL_REVISION in value)
             ok(f'{lang}_{kind}_current_expiry',value.count(expiry_text(lang))==2 and '2026-10-27' not in value)
-            ok(f'{lang}_{kind}_browser_grading','portal.md' in value and not any(x in value for x in
+            ok(f'{lang}_{kind}_browser_grading',not any(x in value for x in
                 ('jdu-web-check','jdu-web-my-progress','--functional','--no-submit','--retry','--prepare-stop','--observe-stopped')))
             ok(f'{lang}_{kind}_working_guide',all(p[lang] in value for p in READING))
             ok(f'{lang}_{kind}_routes',all(purpose[lang] in value for _,_,_,purpose in ROUTES))
@@ -103,7 +103,7 @@ def main():
             for number in ACTIVE_NUMBERS:
                 name=prefix+str(number)
                 value=(ROOT/'docs'/lang/(name.lower()+'.md')).read_text(encoding='utf-8')
-                ok(f'{lang}_{name}_page',value.startswith('# '+name+' ') and 'start.md' in value and 'portal.md' in value and expiry_text(lang) in value)
+                ok(f'{lang}_{name}_page',value.startswith('# '+name+' ') and expiry_text(lang) in value)
                 if prefix=='P':
                     for step in range(1,len(MODULES_BY_NUMBER[number]['steps'])+1):
                         ok(f'{lang}_{name}_{step}_page_step',f'### {name}.{step} ' in value and STEP_NOTES[f'{name}.{step}'][lang] in value)
@@ -116,6 +116,9 @@ def main():
             for child in token.children or []:
                 if child.type not in ('link_open','image'):continue
                 href=child.attrGet('src' if child.type=='image' else 'href');uri=urlparse(href)
+                ok('retired_markdown_link_'+str(len(checks)),
+                    Path(unquote(uri.path)).name not in ('start.md','portal.md')
+                    and not (uri.hostname or '').endswith('.gpb.lambda-web.us-east-1.on.aws'))
                 if uri.scheme:continue
                 target=path.parent/unquote(uri.path) if uri.path else path
                 ok('markdown_link_'+str(len(checks)),target.exists())
@@ -162,6 +165,9 @@ def main():
         ok('html_structure_'+path.parent.name+'_'+path.stem,page.lang in LANGS and page.main==1 and page.bad_th==0)
         for href in page.links:
             uri=urlparse(href)
+            ok('retired_html_link_'+str(len(checks)),
+                Path(unquote(uri.path)).name not in ('start.html','portal.html')
+                and not (uri.hostname or '').endswith('.gpb.lambda-web.us-east-1.on.aws'))
             if uri.scheme:continue
             target=(path.parent/unquote(uri.path)) if uri.path else path
             ok('html_link_'+str(len(checks))+' '+str(path.relative_to(ROOT))+' -> '+href,target.exists())
@@ -219,7 +225,7 @@ def main():
         hashes=json.loads(z.read('web-lab-pm-r1/TEACHING-FILE-HASHES.json'))
         ok('zip_exact_inventory',set(z.namelist())=={'web-lab-pm-r1/'+p for p in hashes}|{'web-lab-pm-r1/TEACHING-FILE-HASHES.json'})
         ok('zip_all_hashes',all(hashlib.sha256(z.read('web-lab-pm-r1/'+p)).hexdigest()==v for p,v in hashes.items()))
-    result=dict(scope='D12_P_M_materials_local_checks_not_AWS_walkthrough',checked_on=date.today().isoformat(),browser_guide_revision='2026-11-03',
+    result=dict(scope='D12_P_M_materials_local_checks_not_AWS_walkthrough',checked_on=date.today().isoformat(),
         languages=list(LANGS),material_revision=MATERIAL_REVISION,practice_tasks=6,practice_steps=43,
         task_pages=36,task_diagrams=36,numbered_command_comments_per_language=annotations,executable_source_preserved=True,
         explained_steps=sum(len(m["steps"]) for m in MODULES),module_understanding_questions=len(MODULES),communication_routes=len(ROUTES),

@@ -31,7 +31,7 @@
 
 ## これまでの検証記録
 
-> 2026-10-30追補：初期CloudFormation後のブラウザ確認をJA/RU/UZのportal.md / portal.htmlへ追加。元のP/M本文・PDFと初期署名物は参照版として保持し、採点CLI/URLコピーを追補の手順へ置き換えます。指定環境のM3/M5/M6・原本保存・本人/教師表示は[実受入](../../development/web_portal_poc/verification/2026-10-30-browser-special-checks-accepted.public.json)を参照。教材全手順の新規学生通し試験・母語校閲・教員目視確認を完了済みとはしません。
+> 2026-10-30追補：初期CloudFormation後にブラウザで確認する手順を日本語・ロシア語・ウズベク語で追加。元のP/M本文・PDFと初期署名物は参照版として保持し、採点CLI/URLコピーを追補の手順へ置き換えます。指定環境のM3/M5/M6・原本保存・本人/教師表示は[実受入](../../development/web_portal_poc/verification/2026-10-30-browser-special-checks-accepted.public.json)を参照。教材全手順の新規学生通し試験・母語校閲・教員目視確認を完了済みとはしません。
 
 
 ## 2026-11-03：期限更新と教材配置の実受入
