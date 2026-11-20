@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1030" viewBox="0 0 1600 1030" role="img">
 <title>CloudShellからSession Managerを使ってWebサーバーへ接続する操作の流れ</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図3-4  CloudShellからSSM接続したときの操作先</text>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図3-5  CloudShellからSSM接続したときの操作先</text>
 <rect x="25" y="200" width="300" height="200" rx="18" fill="#f5f7fa" stroke="#a9b8c7" stroke-width="2"/>
 <text x="175" y="225" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">利用者PC</text>
 <text x="175" y="282" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">ブラウザで</text>

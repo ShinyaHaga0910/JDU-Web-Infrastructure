@@ -72,9 +72,23 @@ SSH接続によって操作先が変わるのは、接続に使った端末で�
 
 今回の構築手順では、主にCloudShellから**AWS Systems ManagerのSession Manager**を使って各EC2へ接続する。Session Managerは、対象サーバーへの接続を提供するAWSの管理機能である。本書では、この機能を利用した接続を**SSM接続**と呼ぶ。SSMで対象サーバーへ接続すると、そのOS上でコマンドを実行できる。[AWS CloudShell](https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html)
 
-### 接続先をインスタンスIDで指定する
+### EC2の管理画面でインスタンスIDを確認する
 
-SSM接続では、接続先を**インスタンスID**で指定する。これは`i-`で始まる、EC2を識別するIDである。本人のAWSコンソールで演習用のリージョン`us-east-1`を選び、EC2一覧で本人の環境と役割を照合して、Webサーバーに対応するIDを選ぶ。CloudShellも同じリージョンで使う。
+AWSはEC2を作成すると、1台ずつ **インスタンスID** を割り当てる。インスタンスIDは `i-` で始まる。SSM接続では、このIDを指定して操作するサーバーを選ぶ。
+
+1. 自分の演習用AWSコンソールにログインする。右上のリージョン選択で、演習環境を作成したリージョン（この授業では `us-east-1`、バージニア北部）を選ぶ。
+
+2. EC2の管理画面を開き、左のメニューで「インスタンス（Instances）」を選ぶ。
+
+3. 一覧の「名前（Name）」列で自分のWebサーバーを探す。演習のWebサーバーは名前の末尾が `-web` になっている。同じ行の「インスタンス ID（Instance ID）」列から、`i-` を含めてID全体をコピーする。IDのリンクを開くと、詳細画面でも同じIDを確認できる。
+
+![EC2一覧の画面ガイド。①リージョンを確認し、②インスタンス一覧を開く。③名前の末尾が-webの行で同じ行のInstance IDを確認する。](../../assets/figures/ch03-fig04-ec2-instance-id.png)
+
+**図3-4 EC2一覧でインスタンスIDを確認する場所。** 演習用の架空の名前とIDを使った画面ガイド。実際のコンソールでは、自分の演習環境の行を選ぶ。[AWS公式の確認手順](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/tutorial-launch-my-first-ec2-instance.html) · [AWS公式資料のスクリーンショット](https://docs.aws.amazon.com/res/latest/ug/res-troubleshooting-general.html#res-troubleshooting-ec2-console-infra)
+
+### コピーしたインスタンスIDで接続する
+
+CloudShellを演習環境と同じリージョンで開く。EC2の画面でコピーしたIDを、次のコマンドの `--target` の後ろに貼り付ける。
 
 **実行場所：本人のCloudShell。IDは自分のWebサーバーのインスタンスIDへ置き換える。**
 
@@ -84,9 +98,9 @@ aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
 
 `aws`はAWSをコマンドで操作するプログラム、`ssm start-session`は接続の開始、`--target`は接続対象の指定である。接続が完了するまではCloudShellの操作、接続後は選んだWebサーバーのOS上での操作になる。
 
-![利用者PCのブラウザでCloudShellを開き、AWSのSession Managerを使ってWebサーバーのOSへ接続する。](../../assets/figures/ch03-fig04-ssm.png)
+![利用者PCのブラウザでCloudShellを開き、AWSのSession Managerを使ってWebサーバーのOSへ接続する。](../../assets/figures/ch03-fig05-ssm.png)
 
-**図3-4 CloudShellからSSM接続するときの操作先。** 図は接続を開始する操作の流れを示す。CloudShellでWebサーバーのインスタンスIDを指定し、接続後のコマンドはWebサーバーで実行する。丸で示したCloudShellはコマンドの作業環境、四角で示したEC2は今回構築するサーバーである。Session Managerは接続を提供する機能として、矢印のそばに枠なしで示している。
+**図3-5 CloudShellからSSM接続するときの操作先。** 図は接続を開始する操作の流れを示す。CloudShellでWebサーバーのインスタンスIDを指定し、接続後のコマンドはWebサーバーで実行する。丸で示したCloudShellはコマンドの作業環境、四角で示したEC2は今回構築するサーバーである。Session Managerは接続を提供する機能として、矢印のそばに枠なしで示している。
 
 SSMはAWS側の管理機能とEC2内のSSM Agentを通じて接続する。今回使うSSMのシェル接続のために、CloudShellからEC2のSSH用のポート番号22へ直接接続するわけではない。Webサーバーだけでなく、踏み台サーバー・DNSサーバー・DBサーバー・配布サーバーにも、それぞれのインスタンスIDを選んで接続する。[AWS Session Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html)、[セッションの開始](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-sessions-start.html)
 
@@ -108,9 +122,9 @@ SSMはAWS側の管理機能とEC2内のSSM Agentを通じて接続する。今�
 
 後半で構築するアプリの管理画面は、この踏み台サーバー上のブラウザから`http://admin.lab.test:8080/admin/`を開く。内部DNSが名前をWebサーバーの内部IPへ解決し、ブラウザがWebサーバーの8080番ポートへ接続する。
 
-![利用者PCのブラウザはIGW経由でWebサーバーの公開IPを指定して80番ポートへ接続する。踏み台サーバーのブラウザはWebサーバーの内部IPを指定して8080番ポートへ接続する。](../../assets/figures/ch03-fig05-browsers.png)
+![利用者PCのブラウザはIGW経由でWebサーバーの公開IPを指定して80番ポートへ接続する。踏み台サーバーのブラウザはWebサーバーの内部IPを指定して8080番ポートへ接続する。](../../assets/figures/ch03-fig06-browsers.png)
 
-**図3-5 ブラウザを動かす場所と接続する入口。** 青は利用者PCからの一般閲覧、緑は踏み台サーバーからのアプリ管理を示す。RDPで踏み台サーバーを操作していても、その中のブラウザが送るHTTP要求の送信元は踏み台サーバーになる。
+**図3-6 ブラウザを動かす場所と接続する入口。** 青は利用者PCからの一般閲覧、緑は踏み台サーバーからのアプリ管理を示す。RDPで踏み台サーバーを操作していても、その中のブラウザが送るHTTP要求の送信元は踏み台サーバーになる。
 
 利用者PCのブラウザと、RDPのウィンドウ内に見える踏み台サーバーのブラウザは、別のコンピューター上で動いている。同じ人が同じ画面を見て操作していても、ネットワーク上での接続元は同じにはならない。Webサーバーの管理用の8080番ポートは、踏み台サーバーからの接続だけを許可する。
 
