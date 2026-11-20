@@ -87,6 +87,8 @@ def explanation(command, lang):
         verb=args[1];target=args[-1]
         return {
          'enable':a(f'{target} を今すぐ起動し、次回起動時も自動起動させる。',f'Запустить {target} сейчас и включить автозапуск.',f'{target} ni hozir yoqish va avtomatik start ni yoqish.'),
+         'stop':a(f'{target} を停止してから使用する設定を選ぶ。',f'Остановить {target} перед выбором настроек.',f'Sozlamani tanlashdan oldin {target} ni to‘xtatish.'),
+         'start':a(f'選んだ設定で {target} を起動する。',f'Запустить {target} с выбранными настройками.',f'{target} ni tanlangan sozlama bilan ishga tushirish.'),
          'restart':a(f'{target} を再起動して設定を読み直す。',f'Перезапустить {target} с обновлённой настройкой.',f'{target} ni yangi sozlama bilan qayta ishga tushirish.'),
          'reload':a(f'{target} を止めずに設定を再読込する。',f'Перечитать настройки {target} без остановки.',f'{target} ni to‘xtatmay sozlamani qayta o‘qish.'),
          'is-active':a(f'{target} の現在の起動状態を読む。',f'Прочитать текущее состояние {target}.',f'{target} joriy ish holatini o‘qish.'),
@@ -131,6 +133,7 @@ def explanation(command, lang):
             return a('固定lock/hashと内部wheelだけでPython依存を導入する。','Установить зависимости только из локальных wheel с lock/hash.','Python bog‘liqliklarini faqat ichki wheel va lock/hash bilan o‘rnatish.')
         if 'configuration.py' in command:
             if 'create-runtime' in args:return a('既存DBパスワードを非表示入力し、練習用runtime設定を作る。','Скрыто ввести существующий пароль БД и создать runtime practice.','Mavjud DB parolini yashirin kiritib, practice runtime config yaratish.')
+            if 'activate' in args:return a('保存済みの練習用設定を、アプリが次に起動するときに使う設定として選ぶ。','Выбрать сохранённый учебный профиль для следующего запуска приложения.','Keyingi ishga tushirish uchun saqlangan mashq profilini tanlash.')
             if 'create-setup' in args:return a('既存構築用パスワードを非表示入力し、一時setup設定を作る。','Скрыто ввести существующий пароль setup и создать временную настройку.','Mavjud setup parolini yashirin kiritib, vaqtinchalik config yaratish.')
             return a('秘密の値を表示せずruntime設定の妥当性を検査する。','Проверить runtime-конфигурацию без вывода секретов.','Maxfiy qiymatlarni chiqarmay runtime config ni tekshirish.')
         if 'manage_secure.py' in command:

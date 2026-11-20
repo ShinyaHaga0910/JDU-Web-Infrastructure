@@ -173,20 +173,25 @@ sudo -u postgres psql -X -d postgres
 <p><strong>実行場所:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
-<p>DBのSSMをexitしCloudShellへ戻り、WebのSSMへ入る。psqlの-hは接続先、-UはDB role、-dはDB名、-Wはpassword入力を要求する。P4はDNS前提を増やさずprivate IPで接続する。</p>
+<p>DBのSSMをexitしCloudShellへ戻り、WebのSSMへ入る。psqlの-hは接続先、-UはDB role、-dはDB名、-Wはpassword入力を要求する。まず内部IPで接続する。続けて、P2で登録した練習用のDB名で同じSELECTを実行する。両方で同じDB名・ロール・結果が返ることを確かめる。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. 内部repoから postgresql-client-16 を推奨追加なしで導入する。
 sudo apt-get install --no-install-recommends postgresql-client-16
 # 2. Webから指定DBへ既存パスワードで接続し、SELECT結果を読む。
 psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
   'SELECT current_database(),current_user,1 AS value;'
+# 3. 通常のresolverで practice-db.lab.test のIPv4を調べる。
+getent ahostsv4 practice-db.lab.test
+# 4. Webから指定DBへ既存パスワードで接続し、SELECT結果を読む。
+psql -X -h practice-db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c \
+  'SELECT current_database(),current_user,1 AS value;'
 </code></pre>
 <p><strong>コマンド・設定値の意味:</strong></p>
-<p>psqlの-hは接続先、-UはDB role、-dはDB名、-Wはpasswordの入力要求、-cは実行するSQL。これはWeb側から実行する。SELECT結果のDB名とuser名で、意図した練習環境へ入ったことを確認する。</p>
+<p>psqlの-hは接続先、-UはDB role、-dはDB名、-Wはpasswordの入力要求、-cは実行するSQL。これはWeb側から実行する。SELECT結果のDB名とuser名で、意図した練習環境へ入ったことを確認する。名前で接続するときは、通常のDNSで得たIPへ同じ方法で接続する。</p>
 <p><strong>期待する結果と読み方:</strong></p>
 <p>jdu_catalog_practice / catalog_practice_app / 1。portが開くだけ、pg_isreadyが成功するだけではこの認証SQLの代わりにならない。</p>
 <p><strong>うまくいかないとき:</strong></p>
-<p>拒否なら接続元/DB/role/passwordを分けて確認する。DBをInternetへ公開して試さない。</p>
+<p>内部IPで成功し、名前で失敗する場合は、P2で設定した通常の名前解決と練習用のDB名を確認する。認証が拒否される場合は接続元・DB・ロール・パスワードを確認する。DBをInternetへ公開して試さない。</p>
 <h3>P4.8 checkerが使う既存passwordをWeb内だけに保存する</h3>
 <p><strong>実行場所:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>

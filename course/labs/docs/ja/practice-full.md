@@ -14,7 +14,7 @@
 
 P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6
 
-P5にもM2のDNSが必要。P4はIP指定だが、アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。
+P5にもM2のDNSが必要。P4ではIPと名前を使ったDB接続を練習する。アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。
 
 M1=8、M2=13、M4=9、M5=13、M6=16（この5課題の自動採点は計59素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。
 
@@ -1112,7 +1112,7 @@ WebサーバーのSSM端末：ssm-user
 
 **目的と操作:**
 
-DBのSSMをexitしCloudShellへ戻り、WebのSSMへ入る。psqlの-hは接続先、-UはDB role、-dはDB名、-Wはpassword入力を要求する。P4はDNS前提を増やさずprivate IPで接続する。
+DBのSSMをexitしCloudShellへ戻り、WebのSSMへ入る。psqlの-hは接続先、-UはDB role、-dはDB名、-Wはpassword入力を要求する。まず内部IPで接続する。続けて、P2で登録した練習用のDB名で同じSELECTを実行する。両方で同じDB名・ロール・結果が返ることを確かめる。
 
 入力するコマンド（番号はこの手順内の順番）
 
@@ -1122,11 +1122,16 @@ sudo apt-get install --no-install-recommends postgresql-client-16
 # 2. Webから指定DBへ既存パスワードで接続し、SELECT結果を読む。
 psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
   'SELECT current_database(),current_user,1 AS value;'
+# 3. 通常のresolverで practice-db.lab.test のIPv4を調べる。
+getent ahostsv4 practice-db.lab.test
+# 4. Webから指定DBへ既存パスワードで接続し、SELECT結果を読む。
+psql -X -h practice-db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c \
+  'SELECT current_database(),current_user,1 AS value;'
 ```
 
 **コマンド・設定値の意味:**
 
-psqlの-hは接続先、-UはDB role、-dはDB名、-Wはpasswordの入力要求、-cは実行するSQL。これはWeb側から実行する。SELECT結果のDB名とuser名で、意図した練習環境へ入ったことを確認する。
+psqlの-hは接続先、-UはDB role、-dはDB名、-Wはpasswordの入力要求、-cは実行するSQL。これはWeb側から実行する。SELECT結果のDB名とuser名で、意図した練習環境へ入ったことを確認する。名前で接続するときは、通常のDNSで得たIPへ同じ方法で接続する。
 
 **期待する結果と読み方:**
 
@@ -1134,7 +1139,7 @@ jdu_catalog_practice / catalog_practice_app / 1。portが開くだけ、pg_isrea
 
 **うまくいかないとき:**
 
-拒否なら接続元/DB/role/passwordを分けて確認する。DBをInternetへ公開して試さない。
+内部IPで成功し、名前で失敗する場合は、P2で設定した通常の名前解決と練習用のDB名を確認する。認証が拒否される場合は接続元・DB・ロール・パスワードを確認する。DBをInternetへ公開して試さない。
 
 #### P4.8 checkerが使う既存passwordをWeb内だけに保存する
 
@@ -1748,7 +1753,7 @@ ALTER ROLE成功。通常catalog_practice_appの動作を止めない。
 
 この後setupをLOGINへ戻して常用しない。M5は別のmission setup roleで初期化する。
 
-#### P6.3 一時秘密設定だけを削除する
+#### P6.3 一時設定を片付け、通常接続の設定を選び直す
 
 **実行場所:**
 
@@ -1756,7 +1761,7 @@ WebサーバーのSSM端末：ssm-user
 
 **目的と操作:**
 
-Webで対象のmetadataだけを確認する。rmの対象は練習setupの2fileに限定する。app.env、practice.app.env、DB runtime file、元command-state、SSH鍵、採点認証は残す。root専用fileの内容をcatする必要はない。
+Webで対象のmetadataだけを確認する。rmの対象は練習setupの2fileに限定する。app.env、practice.app.env、DB runtime file、元command-state、SSH鍵、採点認証は残す。対象を片付けたらアプリを停止し、既存のpractice設定を明示的に選び直してから起動する。この順番を練習しておくと、M5でmissionを選ぶときにも使える。
 
 入力するコマンド（番号はこの手順内の順番）
 
@@ -1769,21 +1774,29 @@ sudo rm -- /etc/jdu-catalog/setup.env /etc/jdu-catalog/profiles/practice.setup.e
 # 3. 指定ファイルの所有者・グループ・権限・名前を読む。
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env \
   /etc/jdu-catalog/profiles/practice.app.env /etc/jdu-web/db-practice.runtime.env
-# 4. 秘密の値を表示せずruntime設定の妥当性を検査する。
+# 4. jdu-catalog を停止してから使用する設定を選ぶ。
+sudo systemctl stop jdu-catalog
+# 5. 保存済みの練習用設定を、アプリが次に起動するときに使う設定として選ぶ。
+sudo python3 -B /opt/jdu-catalog/app/configuration.py activate --profile practice
+# 6. 秘密の値を表示せずruntime設定の妥当性を検査する。
 sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
+# 7. 選んだ設定で jdu-catalog を起動する。
+sudo systemctl start jdu-catalog
+# 8. jdu-catalog の現在の起動状態を読む。
+systemctl is-active jdu-catalog
 ```
 
 **コマンド・設定値の意味:**
 
-setup.envとpractice.setup.envは一時構築用で、app.envとruntime用DB設定は運用に必要。rmの対象は示した2ファイルだけ。削除後は秘密本文を表示せず、残すファイルの権限とruntime設定のcheckで確認する。
+setup.envとpractice.setup.envは一時構築用で、app.envとruntime用DB設定は運用に必要。rmの対象は示した2ファイルだけ。activateは指定した保存済み設定を次回の起動に適用する。アプリが動作中、または一時setup設定が残っている間は切り替えられない。
 
 **期待する結果と読み方:**
 
-通常fileはroot:root 600、runtime check成功。再開時setup fileが既に無ければ削除を繰り返さず次へ進む。
+通常用ファイルはroot:root 600。CATALOG_PROFILE_ACTIVATED=practice、設定チェック成功、最後にactiveと表示される。次の手順で一覧を開き、練習用DBの備品が表示されることを確かめる。
 
 **うまくいかないとき:**
 
-違うprofileのsetup fileがあるなら止める。ワイルドカードやrm -rで秘密directory全体を消さない。
+練習用以外の設定が有効なら、ここで止める。既に削除済みのファイルは削除し直さない。停止・設定の選択・設定チェックが失敗したら、原因を確認してからアプリを起動する。
 
 #### P6.4 公開80から管理画面と秘密が見えないか確認する
 

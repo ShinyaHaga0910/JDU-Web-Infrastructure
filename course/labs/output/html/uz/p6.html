@@ -108,11 +108,11 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 <p>ALTER ROLE muvaffaqiyatli; catalog_practice_app ishlashi saqlanadi.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Keyin setup ni odatiy ish uchun LOGIN ga qaytarmang. M5 alohida mission setup role bilan tayyorlanadi.</p>
-<h3>P6.3 Faqat vaqtinchalik setup sozlamasini olib tashlash</h3>
+<h3>P6.3 Vaqtinchalik sozlamani olib tashlab, runtime ni qayta tanlash</h3>
 <p><strong>Bajarish joyi:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>Web da faqat metadata ni tekshiring. Faqat ikkita practice setup faylini o‘chiring. app.env, practice.app.env, DB runtime, command-state, SSH kalit va baholash ma’lumoti qoladi. Maxfiy fayl mazmunini cat qilish kerak emas.</p>
+<p>Web da faqat metadata ni tekshiring. Faqat ikkita practice setup faylini o‘chiring. app.env, practice.app.env, DB runtime, command-state, SSH kalit va baholash ma’lumoti qoladi. So‘ng ilovani to‘xtating, mavjud practice profilini aniq tanlab, ilovani ishga tushiring. Shu tartib M5 da mission ni tanlashda kerak bo‘ladi.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
@@ -122,15 +122,23 @@ sudo rm -- /etc/jdu-catalog/setup.env /etc/jdu-catalog/profiles/practice.setup.e
 # 3. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env \
   /etc/jdu-catalog/profiles/practice.app.env /etc/jdu-web/db-practice.runtime.env
-# 4. Maxfiy qiymatlarni chiqarmay runtime config ni tekshirish.
+# 4. Sozlamani tanlashdan oldin jdu-catalog ni to‘xtatish.
+sudo systemctl stop jdu-catalog
+# 5. Keyingi ishga tushirish uchun saqlangan mashq profilini tanlash.
+sudo python3 -B /opt/jdu-catalog/app/configuration.py activate --profile practice
+# 6. Maxfiy qiymatlarni chiqarmay runtime config ni tekshirish.
 sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
+# 7. jdu-catalog ni tanlangan sozlama bilan ishga tushirish.
+sudo systemctl start jdu-catalog
+# 8. jdu-catalog joriy ish holatini o‘qish.
+systemctl is-active jdu-catalog
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Setup.env va practice.setup.env vaqtinchalik; app.env va runtime DB config ishlash uchun kerak. Rm faqat ko‘rsatilgan ikki faylga tegishli. O‘chirgach maxfiy mazmunni chiqarmay, qolgan fayl permission i va runtime check ni tekshiring.</p>
+<p>Setup.env va practice.setup.env vaqtinchalik; app.env va runtime DB config ishlash uchun kerak. Rm faqat ko‘rsatilgan ikki faylga tegishli. Activate keyingi ishga tushirish uchun saqlangan profilni tanlaydi. Ilova ishlab turganda yoki vaqtinchalik setup sozlamasi qolganda profilni almashtirib bo‘lmaydi.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>Runtime fayllari root:root 600, check muvaffaqiyatli. Setup fayllari oldin o‘chirilgan bo‘lsa, o‘chirishni takrorlamang.</p>
+<p>Runtime fayllari root:root 600. CATALOG_PROFILE_ACTIVATED=practice, tekshiruv muvaffaqiyati va active holatini kuting. Keyingi qadamda ro‘yxatdagi mashq DB yozuvlarini tekshiring.</p>
 <p><strong>Ishlamasa:</strong></p>
-<p>Setup boshqa profile ga tegishli bo‘lsa to‘xtang. Wildcard yoki rm -r bilan butun katalogni o‘chirmang.</p>
+<p>Boshqa profil faol bo‘lsa, to‘xtang. O‘chirilgan fayllarni qayta o‘chirmang. To‘xtatish, profilni tanlash yoki tekshirishda xato bo‘lsa, ilovani ishga tushirishdan oldin sababini aniqlang.</p>
 <h3>P6.4 Ochiq 80 da admin va maxfiy fayl ko‘rinmasligini tekshirish</h3>
 <p><strong>Bajarish joyi:</strong></p>
 <p>Bastionning SSM terminali: ssm-user</p>

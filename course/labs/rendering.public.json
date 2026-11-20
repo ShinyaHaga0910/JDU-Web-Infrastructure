@@ -4,7 +4,7 @@
   "pdfs": [
     {
       "file": "web_lab_missions_ja.pdf",
-      "sha256": "2eeb46c382faabe3d65937a5b2eb3bcd4d57419297748ef02a436cce64830174",
+      "sha256": "0baee4cc0b3a83986955e6f1a5d6c5e99b50dd4312ba9ca40bfd61460edf2770",
       "pages": 14,
       "rendered_pages": 14,
       "out_of_bounds_words": 0,
@@ -12,7 +12,7 @@
     },
     {
       "file": "web_lab_missions_ru.pdf",
-      "sha256": "91955966fd947af81aad415eda22aec4f381ecc5a76739d7894a1696f0f6377c",
+      "sha256": "9f42fc393c79c72d559cac78c2fbc22a9e9ea57c6d4108bd7c23f5de3d48bf18",
       "pages": 15,
       "rendered_pages": 15,
       "out_of_bounds_words": 0,
@@ -20,7 +20,7 @@
     },
     {
       "file": "web_lab_missions_uz.pdf",
-      "sha256": "3e7621ece1b78e7a938864b4dc74148de7ed5f9e7742d42163663cea51148d6e",
+      "sha256": "ec145bb0de52cf767ba90b3f2a4878cdaa793bedaedcae92d4fa958762d93d0a",
       "pages": 14,
       "rendered_pages": 14,
       "out_of_bounds_words": 0,
@@ -28,7 +28,7 @@
     },
     {
       "file": "web_lab_practice_ja.pdf",
-      "sha256": "078e2150c2c594af16d13bf8d8997f916155966ea711a6cadfc32847e1df27d4",
+      "sha256": "8b67b04ccdd3cae257f134f1dc5d68cf69994baed8237393beb2a8cbc5a226c9",
       "pages": 41,
       "rendered_pages": 41,
       "out_of_bounds_words": 0,
@@ -36,7 +36,7 @@
     },
     {
       "file": "web_lab_practice_ru.pdf",
-      "sha256": "3b8dd146118b26b3e598c2375d6ed733a3648c2f731e6cf540f3e937cb24d0d7",
+      "sha256": "eaaf6c92cc8909f72e57d2f244cb00da15c3a95dfcf873ddca48db2609d1109d",
       "pages": 43,
       "rendered_pages": 43,
       "out_of_bounds_words": 0,
@@ -44,7 +44,7 @@
     },
     {
       "file": "web_lab_practice_uz.pdf",
-      "sha256": "5e0581e45247319bd027027defb5abac7dc30b77fd6a1322ecc63881a7de25ac",
+      "sha256": "5fa99711954b3031dcfec41d48c7b55a43211a6202e7675e50a51d8e792febab",
       "pages": 41,
       "rendered_pages": 41,
       "out_of_bounds_words": 0,

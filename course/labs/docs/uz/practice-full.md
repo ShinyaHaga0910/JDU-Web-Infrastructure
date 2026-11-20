@@ -14,7 +14,7 @@ Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam
 
 P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6
 
-P5 uchun ham M2 DNS kerak. P4 IP bilan ulanadi, app esa db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating.
+P5 uchun ham M2 DNS kerak. P4 da DB ga IP va nom orqali ulanishni mashq qiling. Ilova db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating.
 
 M1=8, M2=13, M4=9, M5=13, M6=16: bu beshta topshiriqning avtomatik tekshiruvlari jami 59 xom ball. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.
 
@@ -1112,7 +1112,7 @@ Web serverning SSM terminali: ssm-user
 
 **Maqsad va amallar:**
 
-DB SSM dan exit qilib CloudShell ga qayting, Web SSM ni oching. psql da -h manzil, -U role, -d DB nomi, -W parol so‘rovi. P4 qo‘shimcha DNS bog‘liqligisiz private IP dan foydalanadi.
+DB SSM dan exit qilib CloudShell ga qayting, Web SSM ni oching. psql da -h manzil, -U role, -d DB nomi, -W parol so‘rovi. Avval ichki IP orqali ulaning, keyin P2 da ro‘yxatga olingan mashq DB nomi orqali shu SELECT ni bajaring. DB nomi, rol va natijani solishtiring.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
@@ -1122,11 +1122,16 @@ sudo apt-get install --no-install-recommends postgresql-client-16
 # 2. Web dan kerakli DB ga mavjud parol bilan ulanib SELECT natijasini o‘qish.
 psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
   'SELECT current_database(),current_user,1 AS value;'
+# 3. Odatiy resolver orqali practice-db.lab.test IPv4 sini olish.
+getent ahostsv4 practice-db.lab.test
+# 4. Web dan kerakli DB ga mavjud parol bilan ulanib SELECT natijasini o‘qish.
+psql -X -h practice-db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c \
+  'SELECT current_database(),current_user,1 AS value;'
 ```
 
 **Buyruq va sozlamalar ma’nosi:**
 
-Psql da -h serverni, -U DB role ni, -d DB nomini, -W parol so‘rashni, -c SQL ni belgilaydi. Web da bajaring. Natijadagi DB va user nomlari mashq profile ga ulanganini tasdiqlaydi.
+Psql da -h serverni, -U DB role ni, -d DB nomini, -W parol so‘rashni, -c SQL ni belgilaydi. Web da bajaring. Natijadagi DB va user nomlari mashq profile ga ulanganini tasdiqlaydi. Nom bilan ulanganda IP tizim DNS idan olinadi.
 
 **Kutilgan natija va ma’nosi:**
 
@@ -1134,7 +1139,7 @@ jdu_catalog_practice / catalog_practice_app / 1. Port ochiqligi yoki pg_isready 
 
 **Ishlamasa:**
 
-Rad etilsa manba, DB, role va parolni alohida tekshiring. Sinash uchun DB ni Internet ga ochmang.
+IP orqali ulanish ishlasa, nom orqali esa ishlamasa, P2 dagi tizim DNS i va mashq DB nomini tekshiring. Autentifikatsiya rad etilsa, manba, DB, rol va parolni tekshiring. Sinash uchun DB ni Internet ga ochmang.
 
 #### P4.8 Checker uchun mavjud parolni faqat Web da saqlash
 
@@ -1748,7 +1753,7 @@ ALTER ROLE muvaffaqiyatli; catalog_practice_app ishlashi saqlanadi.
 
 Keyin setup ni odatiy ish uchun LOGIN ga qaytarmang. M5 alohida mission setup role bilan tayyorlanadi.
 
-#### P6.3 Faqat vaqtinchalik setup sozlamasini olib tashlash
+#### P6.3 Vaqtinchalik sozlamani olib tashlab, runtime ni qayta tanlash
 
 **Bajarish joyi:**
 
@@ -1756,7 +1761,7 @@ Web serverning SSM terminali: ssm-user
 
 **Maqsad va amallar:**
 
-Web da faqat metadata ni tekshiring. Faqat ikkita practice setup faylini o‘chiring. app.env, practice.app.env, DB runtime, command-state, SSH kalit va baholash ma’lumoti qoladi. Maxfiy fayl mazmunini cat qilish kerak emas.
+Web da faqat metadata ni tekshiring. Faqat ikkita practice setup faylini o‘chiring. app.env, practice.app.env, DB runtime, command-state, SSH kalit va baholash ma’lumoti qoladi. So‘ng ilovani to‘xtating, mavjud practice profilini aniq tanlab, ilovani ishga tushiring. Shu tartib M5 da mission ni tanlashda kerak bo‘ladi.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
@@ -1769,21 +1774,29 @@ sudo rm -- /etc/jdu-catalog/setup.env /etc/jdu-catalog/profiles/practice.setup.e
 # 3. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env \
   /etc/jdu-catalog/profiles/practice.app.env /etc/jdu-web/db-practice.runtime.env
-# 4. Maxfiy qiymatlarni chiqarmay runtime config ni tekshirish.
+# 4. Sozlamani tanlashdan oldin jdu-catalog ni to‘xtatish.
+sudo systemctl stop jdu-catalog
+# 5. Keyingi ishga tushirish uchun saqlangan mashq profilini tanlash.
+sudo python3 -B /opt/jdu-catalog/app/configuration.py activate --profile practice
+# 6. Maxfiy qiymatlarni chiqarmay runtime config ni tekshirish.
 sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
+# 7. jdu-catalog ni tanlangan sozlama bilan ishga tushirish.
+sudo systemctl start jdu-catalog
+# 8. jdu-catalog joriy ish holatini o‘qish.
+systemctl is-active jdu-catalog
 ```
 
 **Buyruq va sozlamalar ma’nosi:**
 
-Setup.env va practice.setup.env vaqtinchalik; app.env va runtime DB config ishlash uchun kerak. Rm faqat ko‘rsatilgan ikki faylga tegishli. O‘chirgach maxfiy mazmunni chiqarmay, qolgan fayl permission i va runtime check ni tekshiring.
+Setup.env va practice.setup.env vaqtinchalik; app.env va runtime DB config ishlash uchun kerak. Rm faqat ko‘rsatilgan ikki faylga tegishli. Activate keyingi ishga tushirish uchun saqlangan profilni tanlaydi. Ilova ishlab turganda yoki vaqtinchalik setup sozlamasi qolganda profilni almashtirib bo‘lmaydi.
 
 **Kutilgan natija va ma’nosi:**
 
-Runtime fayllari root:root 600, check muvaffaqiyatli. Setup fayllari oldin o‘chirilgan bo‘lsa, o‘chirishni takrorlamang.
+Runtime fayllari root:root 600. CATALOG_PROFILE_ACTIVATED=practice, tekshiruv muvaffaqiyati va active holatini kuting. Keyingi qadamda ro‘yxatdagi mashq DB yozuvlarini tekshiring.
 
 **Ishlamasa:**
 
-Setup boshqa profile ga tegishli bo‘lsa to‘xtang. Wildcard yoki rm -r bilan butun katalogni o‘chirmang.
+Boshqa profil faol bo‘lsa, to‘xtang. O‘chirilgan fayllarni qayta o‘chirmang. To‘xtatish, profilni tanlash yoki tekshirishda xato bo‘lsa, ilovani ishga tushirishdan oldin sababini aniqlang.
 
 #### P6.4 Ochiq 80 da admin va maxfiy fayl ko‘rinmasligini tekshirish
 

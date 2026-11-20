@@ -173,20 +173,25 @@ sudo -u postgres psql -X -d postgres
 <p><strong>Место выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
-<p>Закройте SSM DB через exit, вернитесь в CloudShell и откройте Web. У psql -h задаёт узел, -U - роль, -d - БД, -W запрашивает пароль. P4 использует private IP, чтобы не добавлять зависимость от DNS.</p>
+<p>Закройте SSM DB через exit, вернитесь в CloudShell и откройте Web. У psql -h задаёт узел, -U - роль, -d - БД, -W запрашивает пароль. Сначала подключитесь по внутреннему IP, затем выполните тот же SELECT по учебному имени DB из P2. Сверьте имя БД, роль и результат.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Установить postgresql-client-16 из внутреннего repo без рекомендуемых дополнений.
 sudo apt-get install --no-install-recommends postgresql-client-16
 # 2. Подключиться с Web к нужной БД с существующим паролем и выполнить SELECT.
 psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
   'SELECT current_database(),current_user,1 AS value;'
+# 3. Получить IPv4 practice-db.lab.test через системный resolver.
+getent ahostsv4 practice-db.lab.test
+# 4. Подключиться с Web к нужной БД с существующим паролем и выполнить SELECT.
+psql -X -h practice-db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c \
+  'SELECT current_database(),current_user,1 AS value;'
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
-<p>В psql -h задаёт сервер, -U - роль БД, -d - БД, -W запрашивает пароль, -c задаёт SQL. Выполняйте на Web. Имена БД и пользователя в результате подтверждают подключение к учебному профилю.</p>
+<p>В psql -h задаёт сервер, -U - роль БД, -d - БД, -W запрашивает пароль, -c задаёт SQL. Выполняйте на Web. Имена БД и пользователя в результате подтверждают подключение к учебному профилю. При подключении по имени IP берётся из системного DNS.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p>Результат jdu_catalog_practice / catalog_practice_app / 1. Открытый порт или успех pg_isready не заменяют этот SQL с аутентификацией.</p>
 <p><strong>Если не получилось:</strong></p>
-<p>При отказе раздельно проверьте источник, БД, роль и пароль. Не публикуйте DB в Internet для диагностики.</p>
+<p>Если по IP подключение работает, а по имени нет, проверьте системный DNS и учебное имя DB из P2. При отказе аутентификации проверьте источник, БД, роль и пароль. Не публикуйте DB в Internet для диагностики.</p>
 <h3>P4.8 Сохранить существующий пароль для checker только на Web</h3>
 <p><strong>Место выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>

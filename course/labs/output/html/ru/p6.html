@@ -108,11 +108,11 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 <p>ALTER ROLE успешен, работа catalog_practice_app сохраняется.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Не включайте setup обратно для обычной работы. M5 инициализируется отдельной setup-role mission.</p>
-<h3>P6.3 Удалить только временную конфигурацию setup</h3>
+<h3>P6.3 Убрать временные настройки и заново выбрать runtime</h3>
 <p><strong>Место выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
-<p>На Web проверьте только metadata. Удалите ровно два файла setup practice. app.env, practice.app.env, DB runtime, command-state, SSH-ключи и данные оценивания сохраняются. Содержимое секретных файлов через cat не выводится.</p>
+<p>На Web проверьте только metadata. Удалите ровно два файла setup practice. app.env, practice.app.env, DB runtime, command-state, SSH-ключи и данные оценивания сохраняются. Затем остановите приложение, явно выберите существующий профиль practice и запустите приложение. Тот же порядок пригодится в M5 при выборе mission.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Прочитать владельца, группу, права и имя указанных файлов.
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
@@ -122,15 +122,23 @@ sudo rm -- /etc/jdu-catalog/setup.env /etc/jdu-catalog/profiles/practice.setup.e
 # 3. Прочитать владельца, группу, права и имя указанных файлов.
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env \
   /etc/jdu-catalog/profiles/practice.app.env /etc/jdu-web/db-practice.runtime.env
-# 4. Проверить runtime-конфигурацию без вывода секретов.
+# 4. Остановить jdu-catalog перед выбором настроек.
+sudo systemctl stop jdu-catalog
+# 5. Выбрать сохранённый учебный профиль для следующего запуска приложения.
+sudo python3 -B /opt/jdu-catalog/app/configuration.py activate --profile practice
+# 6. Проверить runtime-конфигурацию без вывода секретов.
 sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
+# 7. Запустить jdu-catalog с выбранными настройками.
+sudo systemctl start jdu-catalog
+# 8. Прочитать текущее состояние jdu-catalog.
+systemctl is-active jdu-catalog
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
-<p>Setup.env и practice.setup.env временные; app.env и runtime-настройка DB нужны для работы. Rm относится только к двум указанным файлам. После удаления проверьте права оставшихся файлов и runtime check без вывода секретного содержимого.</p>
+<p>Setup.env и practice.setup.env временные; app.env и runtime-настройка DB нужны для работы. Rm относится только к двум указанным файлам. Activate выбирает сохранённый профиль для следующего запуска. Смена недоступна при работающем приложении или оставшихся временных настройках setup.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Runtime-файлы root:root 600, check успешен. Если setup-файлы уже удалены, пропустите удаление.</p>
+<p>Файлы runtime имеют root:root 600. Ожидаются CATALOG_PROFILE_ACTIVATED=practice, успешная проверка и статус active. В следующем шаге проверьте записи учебной БД в списке.</p>
 <p><strong>Если не получилось:</strong></p>
-<p>Если setup относится к другому profile, остановитесь. Не используйте wildcard или rm -r для всего каталога.</p>
+<p>Если активен другой профиль, остановитесь. Не повторяйте удаление отсутствующих файлов. При ошибке остановки, выбора профиля или проверки выясните причину до запуска приложения.</p>
 <h3>P6.4 Проверить запрет admin и секретов на публичном 80</h3>
 <p><strong>Место выполнения:</strong></p>
 <p>SSM-терминал бастиона: ssm-user</p>
