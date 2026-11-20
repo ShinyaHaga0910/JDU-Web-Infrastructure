@@ -4,12 +4,12 @@
 <p>本章では、データベースが管理する仕事を、備品の表から考える。表、行、列、主キーを理解した後、SQLでデータを読む意味と書き換える意味を学ぶ。SQLの例は説明用の表を使い、アプリのプログラムを書く作業とは分けて扱う。</p>
 <h2 id="81-備品の情報を、まとまりとして管理する">8.1 備品の情報を、まとまりとして管理する</h2>
 <p>備品を少数だけ記録するなら、テキストファイルや表計算でも一覧を作れる。しかし複数の担当者が同時に変更し、コードの重複を防ぎ、必要な行だけを探すとなると、保存する文章だけでなく、変更の順序や値の整合性を管理する必要がある。</p>
-<p><strong>データベース（DB）</strong>は、関連するデータを整理して管理するまとまりである。<strong>リレーショナルデータベース</strong>では、データを表として扱い、必要に応じて複数の表を関連付ける。</p>
+<p><strong>データベース</strong>（DB）は、関連するデータを整理して管理するまとまりである。<strong>リレーショナルデータベース</strong>では、データを表として扱い、必要に応じて複数の表を関連付ける。</p>
 <p>例えば、数量を数値として管理すれば、6個ある備品だけを探したり、数量を増減したりできる。備品コードに重複を許さない制約を設ければ、同じコードの別の備品を登録しようとしたときに拒否できる。DBは値を保存するだけでなく、許された操作と整合性を管理する。</p>
 <h2 id="82-dbを管理する側と使う側">8.2 DBを管理する側と使う側</h2>
-<p><strong>DBMS（Database Management System）</strong>は、DBを管理するソフトウェアである。今回のDBサーバー上では、<strong>PostgreSQL（ポストグレスキューエル）</strong>を使う。PostgreSQLはクライアントから接続を受け、データを読む・書く処理を実行する。</p>
+<p><strong>DBMS</strong>（Database Management System）は、DBを管理するソフトウェアである。今回のDBサーバー上では、<strong>PostgreSQL</strong>（ポストグレスキューエル）を使う。PostgreSQLはクライアントから接続を受け、データを読む・書く処理を実行する。</p>
 <p>一つのPostgreSQLで、練習用と本課題用など複数のデータベースを管理できる。接続時には、どのデータベースを使うかも指定する。コンピューターとしてのDBサーバー、管理ソフトウェアとしてのPostgreSQL、その中の個別のデータベースを区別しよう。</p>
-<p><strong>psql（ピー・エス・キュー・エル）</strong>は、端末からPostgreSQLへ接続し、SQLを入力して結果を見るためのソフトウェアである。起動すると、実行したコンピューター上でプロセスとして動く。<a href="https://www.postgresql.org/docs/16/app-psql.html">psql</a></p>
+<p><strong>psql</strong>（ピー・エス・キュー・エル）は、端末からPostgreSQLへ接続し、SQLを入力して結果を見るためのソフトウェアである。起動すると、実行したコンピューター上でプロセスとして動く。<a href="https://www.postgresql.org/docs/16/app-psql.html">psql</a></p>
 <p>今回の演習では、Webサーバーの端末でpsqlを起動する。するとWebサーバー上にpsqlのプロセスが動き、別のDBサーバー上で動くPostgreSQLへ接続する。psqlの画面へ入力したSQLはPostgreSQLへ送られ、DBサーバー側でデータの取得や変更が実行される。その結果がpsqlへ返り、Webサーバーの端末に表示される。</p>
 <p>このように、相手のサービスへ接続して利用する側のソフトウェアを<strong>クライアント</strong>という。psqlはDBを利用する側、PostgreSQLはDBを管理してSQLを処理する側である。Webサーバー上の備品管理アプリも、PostgreSQLへSQLを送るときはDBのクライアントになる。</p>
 <figure><img src="../../assets/figures/ch08-fig01-dbms.png" alt="Web側のpsqlやアプリが、DBサーバー上のPostgreSQL内の対象データベースを使う関係。" width="1800" height="1120"></figure>
@@ -27,7 +27,7 @@
 <p>複数の表を関連付ける場合には、別の表のキーを参照する<strong>外部キー</strong>を使える。例えば保管場所を別の表で管理し、備品側でその場所のidを参照すれば、存在しない場所への関連付けを防げる。</p>
 <p>また、番号を自動で割り当てるために<strong>シーケンス</strong>という仕組みを使う場合がある。表へ行を追加する権限と、シーケンスから番号を取得する権限は別である。自動の番号には欠番が生じる場合もあり、番号を行数の代わりとして扱わない。<a href="https://www.postgresql.org/docs/16/functions-sequence.html">シーケンス</a></p>
 <h2 id="85-sqlで、必要な列と行を取り出す">8.5 SQLで、必要な列と行を取り出す</h2>
-<p><strong>SQL（Structured Query Language）</strong>は、DBへデータの取得や変更などを伝える言語である。データを読む基本の文が<strong>SELECT</strong>である。</p>
+<p><strong>SQL</strong>（Structured Query Language）は、DBへデータの取得や変更などを伝える言語である。データを読む基本の文が<strong>SELECT</strong>である。</p>
 <p><strong>説明用SQL：公開する備品の名前と数量を取り出す。入力場所はpsql内である。</strong></p>
 <pre><code>SELECT name, quantity
 FROM lesson_item

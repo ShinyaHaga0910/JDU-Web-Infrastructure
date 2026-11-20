@@ -7,7 +7,7 @@
 <p>その管理単位の中に複数の<strong>データベース</strong>を置ける。さらに、データベース内の<strong>スキーマ</strong>は、表などの名前を整理するまとまりである。例えば<code>public.catalog_item</code>は、publicスキーマ内のcatalog_item表を表す。</p>
 <p><code>pg_lsclusters</code>ではバージョン、クラスター名、ポート、稼働状態、保存先などを読む。今回、実際の処理を行うサービスは<code>postgresql@16-main</code>であり、まとめ役のサービスの表示だけで個別クラスターの状態を判断しない。</p>
 <h2 id="92-osユーザーとdbロールを区別する">9.2 OSユーザーとDBロールを区別する</h2>
-<p><strong>ロール（role）</strong>は、PostgreSQL内で権限を管理する単位である。ログインできるロール、他のロールへ権限をまとめて与えるロールなどとして利用できる。ロールはクラスター内で管理され、個別のデータベースだけに属するOSユーザーではない。<a href="https://www.postgresql.org/docs/16/database-roles.html">DBロール</a></p>
+<p><strong>ロール</strong>（role）は、PostgreSQL内で権限を管理する単位である。ログインできるロール、他のロールへ権限をまとめて与えるロールなどとして利用できる。ロールはクラスター内で管理され、個別のデータベースだけに属するOSユーザーではない。<a href="https://www.postgresql.org/docs/16/database-roles.html">DBロール</a></p>
 <p>今回のDBサーバーには、OSユーザーとしての<code>postgres</code>と、DBの管理ロールとしての<code>postgres</code>がある。同じ名前でも管理する場所が違う。OSのroot権限やsudoが、そのまま別サーバーのDBへの接続資格になるわけではない。</p>
 <div class="table-wrap"><table><thead><tr><th scope="col">種類</th><th scope="col">主な仕事</th></tr></thead><tbody><tr><td>OSの管理用ユーザー</td><td>PostgreSQLの設定ファイル、サービス、ログなどを管理する</td></tr><tr><td>DBの管理ロール</td><td>データベースやロールを作成し、権限を管理する</td></tr><tr><td>構築用ロール</td><td>アプリ用の表や初期データなどを準備する</td></tr><tr><td>通常アプリ用ロール</td><td>一覧の取得や管理画面の保存に必要なSQLを実行する</td></tr></tbody></table></div>
 <p><strong>LOGIN</strong>は、そのロールとして直接接続できる属性である。<strong>SUPERUSER</strong>はDB内の広い管理権限を持つ属性であり、LOGINと同じ意味ではない。通常アプリのために管理ロールの権限を使い続けず、用途を分ける。</p>

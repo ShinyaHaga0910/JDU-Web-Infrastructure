@@ -14,7 +14,7 @@
 <p>通信を始める側が<strong>送信元</strong>、その通信が向かう相手が<strong>宛先</strong>である。WebサーバーからDBへ接続する場面なら、送信元はWebサーバー、宛先はDBになる。DBから結果が返るときは、データが流れる方向が逆になる。</p>
 <p>アドレスを見るときは、どこで動くプログラムが、どの相手に接続するのかを一緒に読む。例えば、ブラウザがWebサーバーへ接続することと、Webサーバー上のアプリがDBへ接続することは、別の通信である。</p>
 <h2 id="22-vpcとサブネットのアドレスを読む">2.2 VPCとサブネットのアドレスを読む</h2>
-<p><strong>VPC（Virtual Private Cloud）</strong>はAWSの中に用意するネットワークであり、<strong>サブネット</strong>はその中をIPアドレスの範囲で分けたものである。今回のVPCは<code>10.20.0.0/16</code>、公開サブネットは<code>10.20.1.0/24</code>、非公開サブネットは<code>10.20.2.0/24</code>を使う。</p>
+<p><strong>VPC</strong>（Virtual Private Cloud）はAWSの中に用意するネットワークであり、<strong>サブネット</strong>はその中をIPアドレスの範囲で分けたものである。今回のVPCは<code>10.20.0.0/16</code>、公開サブネットは<code>10.20.1.0/24</code>、非公開サブネットは<code>10.20.2.0/24</code>を使う。</p>
 <p>スラッシュを付けたこの書き方を<strong>CIDR（Classless Inter-Domain Routing）表記</strong>という。<code>10.20.1.20</code>は一つのアドレスだが、<code>10.20.1.0/24</code>はアドレスの範囲を表す。</p>
 <p>IPv4の<code>/24</code>は、先頭の三つの数値を固定する。この授業の公開サブネットは<code>10.20.1.x</code>、非公開サブネットは<code>10.20.2.x</code>と書ける。<code>x</code>はアドレスによって変わる部分を表す。<code>/16</code>は先頭の二つを固定するので、VPCは<code>10.20.x.x</code>と書ける。二つのサブネットは、どちらもこのVPCの範囲に含まれる。</p>
 <figure><img src="../../assets/figures/ch02-fig01-subnets.png" alt="VPC 10.20.0.0/16の中に公開サブネット10.20.1.0/24と非公開サブネット10.20.2.0/24を配置し、5台の内部IPを示す。" width="1600" height="1000"></figure>
@@ -23,15 +23,15 @@
 <p>表の右端は、サブネットのCIDRに含まれるアドレスの範囲である。今回の二つのサブネットでは、末尾が<code>.0</code>のアドレスも範囲に含まれる。このアドレスはサブネット自体を表すネットワークアドレスである。AWSは今回の各サブネットの先頭4個と最後の1個を予約しているため、EC2に割り当てられるのは末尾が<code>.4</code>から<code>.254</code>までである。<a href="https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html#subnet-sizing-ipv4">AWSのサブネットのアドレス範囲と予約アドレス</a></p>
 <h2 id="23-インターネットからの接続とvpc内の接続">2.3 インターネットからの接続とVPC内の接続</h2>
 <h3 id="内部ipを使う場面">内部IPを使う場面</h3>
-<p><strong>内部IP（プライベートIP）</strong>は、今回のVPC内のサーバー同士で使うアドレスである。踏み台からWebサーバーへSSH接続するときや、WebサーバーからDBへ接続するときは、相手の内部IPを使う。</p>
+<p><strong>内部IP</strong>（プライベートIP）は、今回のVPC内のサーバー同士で使うアドレスである。踏み台からWebサーバーへSSH接続するときや、WebサーバーからDBへ接続するときは、相手の内部IPを使う。</p>
 <p>内部IPは、インターネット上の端末からそのまま接続できる公開の宛先ではない。例えば、携帯電話回線につないだPCから<code>10.20.2.20</code>を指定しても、今回のDBへ直接接続することはできない。</p>
 <h3 id="公開ipを使う場面">公開IPを使う場面</h3>
-<p><strong>公開IP（パブリックIP）</strong>は、インターネット側から接続するために使うアドレスである。今回は公開サブネットのWebサーバーと踏み台に公開IPを割り当てる。利用者PCから一般画面を見るときはWebサーバーの公開IP、RDPで管理用デスクトップを開くときは踏み台の公開IPを使う。</p>
+<p><strong>公開IP</strong>（パブリックIP）は、インターネット側から接続するために使うアドレスである。今回は公開サブネットのWebサーバーと踏み台に公開IPを割り当てる。利用者PCから一般画面を見るときはWebサーバーの公開IP、RDPで管理用デスクトップを開くときは踏み台の公開IPを使う。</p>
 <p>Webサーバーは公開IPだけでなく、内部IP<code>10.20.1.20</code>も持つ。同じWebサーバーに対して、利用者PCは公開側から接続し、踏み台はVPC内の内部IPへ接続する。使うアドレスが異なっても、今回の構成では同じEC2 Webサーバーへの接続である。</p>
 <figure><img src="../../assets/figures/ch02-fig02-public-private.png" alt="利用者PCはInternet Gatewayを経由してWebサーバーの公開IPへ接続する。踏み台は同じWebサーバーの内部IPへ接続し、WebサーバーはDBの内部IPへ接続する。" width="1600" height="1180"></figure>
 <p><strong>図2-2 同じWebサーバーの公開IPと内部IP。</strong> 青色は利用者PCが公開IPを指定して入る経路、緑色はVPC内のサーバー同士が内部IPを使う経路を表す。WebサーバーからDBサーバーへの接続も緑で示している。AWSのInternet Gatewayで宛先が公開IPから内部IPへ変換され、同じWebサーバーへ届く。<code>203.0.113.20</code>は説明用の例であり、実際には対象環境で割り当てられた公開IPを使う。<a href="https://www.rfc-editor.org/rfc/rfc5737.html">文書用IPアドレスの規定</a></p>
 <h3 id="公開範囲とinternet-gateway">公開範囲とInternet Gateway</h3>
-<p><strong>ゲートウェイ</strong>は、異なるネットワークをつなぐ出入口を表す一般的な用語である。本書で<strong>Internet Gateway（IGW）</strong>と呼ぶものは、AWSがVPCとインターネットの接続のために提供する機能を指す。図2-2のIGWもAWS側にあり、利用者PCからWebサーバーへ向かう通信はここを経由する。</p>
+<p><strong>ゲートウェイ</strong>は、異なるネットワークをつなぐ出入口を表す一般的な用語である。本書で<strong>Internet Gateway</strong>（IGW）と呼ぶものは、AWSがVPCとインターネットの接続のために提供する機能を指す。図2-2のIGWもAWS側にあり、利用者PCからWebサーバーへ向かう通信はここを経由する。</p>
 <p>今回のIPv4通信では、AWSのIGWがWebサーバーの公開IPと内部IPの対応を処理する。利用者PCが公開IP宛てに送った通信は、IGWで宛先をWebサーバーの内部IPへ変換してからVPC内へ届けられる。返答では、インターネット側へ送るときに送信元がWebサーバーの公開IPへ変換される。これが、公開IPと内部IPのどちらを使っても同じWebサーバーへ届く仕組みである。<a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html">AWS Internet Gatewayのアドレス変換</a></p>
 <p>非公開サブネットのDNS、DB、配布サーバーには公開IPを割り当てない。インターネットから直接接続する入口は用意せず、VPC内の必要なサーバーから利用する。例えば、公開サブネットのWebサーバーから非公開サブネットのDBへ接続し、非公開サブネットのDNSから配布サーバーへ必要な資源を取得する。</p>
 <p>公開・非公開は、インターネットとの接続の扱いである。VPC内の接続をどこまで許可するかは、後述するSGの条件で決める。公開IPを持つWebサーバーでも、公開するのは一般閲覧などに必要な入口である。<a href="https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html">AWSの公開・非公開サブネット</a>、<a href="https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html">Internet Gateway</a></p>
@@ -48,10 +48,10 @@
 <p>待受の表示で使う<code>0.0.0.0:80</code>は、そのホストのすべてのIPv4ローカルアドレスで80番を受け付ける指定である。VPC内やインターネットから実際に接続できるかどうかは、通信経路とSGの許可も必要になる。<a href="https://man7.org/linux/man-pages/man7/ip.7.html">LinuxのIPアドレスとソケット</a></p>
 <h2 id="25-security-groupで通信する相手を制限する">2.5 Security Groupで通信する相手を制限する</h2>
 <h3 id="入ってくる通信と出ていく通信">入ってくる通信と出ていく通信</h3>
-<p><strong>Security Group（SG）</strong>は、AWSでサーバーに出入りする通信を制御する仕組みである。SGをEC2に関連付けると、そのEC2の通信にSGのルールが適用される。正確には、EC2が通信に使うネットワークインターフェイスにSGを関連付ける。この演習では、サーバーの役割に応じたSGを関連付けている。<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-security-groups.html">EC2のSecurity Group</a></p>
+<p><strong>Security Group</strong>（SG）は、AWSでサーバーに出入りする通信を制御する仕組みである。SGをEC2に関連付けると、そのEC2の通信にSGのルールが適用される。正確には、EC2が通信に使うネットワークインターフェイスにSGを関連付ける。この演習では、サーバーの役割に応じたSGを関連付けている。<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-security-groups.html">EC2のSecurity Group</a></p>
 <figure><img src="../../assets/figures/ch02-fig03-security-groups.png" alt="VPC内のWebサーバーをSG-Webの枠で囲み、DBサーバーをSG-DBの枠で囲む。WebサーバーからDBサーバーへの内部通信を矢印で示す。" width="1600" height="480"></figure>
 <p><strong>図2-3 EC2とSGの対応。</strong> 外側のオレンジ色の枠は、内側に描いたEC2に適用するSGを表す。WebサーバーにはSG-Web、DBサーバーにはSG-DBを関連付ける。</p>
-<p>サーバーへ入る通信の条件を<strong>インバウンドルール（受信規則）</strong>、サーバーから出る通信の条件を<strong>アウトバウンドルール（送信規則）</strong>という。WebサーバーがDBに接続を始めるときは、Webサーバーから出る通信と、DBサーバーに入る通信の両方に許可が必要になる。</p>
+<p>サーバーへ入る通信の条件を<strong>インバウンドルール（受信規則）</strong>、サーバーから出る通信の条件を<strong>アウトバウンドルール</strong>（送信規則）という。WebサーバーがDBに接続を始めるときは、Webサーバーから出る通信と、DBサーバーに入る通信の両方に許可が必要になる。</p>
 <figure><img src="../../assets/figures/ch02-fig04-sg-rule-checks.png" alt="WebサーバーからDBサーバーへのTCP接続が、SG-Webの送信規則とSG-DBの受信規則の両方で許可される流れ。" width="1600" height="485"></figure>
 <p><strong>図2-4 DBへ接続するときのSGの判定。</strong> ① SG-WebはDB宛ての送信を、② SG-DBはWebサーバーからの受信を許可する。両方のルールがTCPの宛先ポート5432を許可するため、通信はDBサーバーに届く。DBへのログインは、その先でPostgreSQLが認証する。</p>
 <h3 id="許可条件を読む">許可条件を読む</h3>

@@ -1,7 +1,7 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第4章 HTTPでページをリクエストする仕組み</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第4章-httpでページをリクエストする仕組み">第4章 HTTPでページをリクエストする仕組み</h1>
 <h2 id="この章で分かること">この章で分かること</h2>
 <p>学校の備品管理システムで備品一覧を開くと、ブラウザには備品名や数量が表示される。このときブラウザは、自分だけで一覧を作っているのではない。Webサーバーへ「このページを送ってほしい」とリクエストし、返ってきたデータを画面に表示している。</p>
-<p>ブラウザとWebサーバーの間で、リクエストやレスポンスをどのような形式でやり取りするかを定めるのが<strong>HTTP（Hypertext Transfer Protocol）</strong>である。ブラウザから送るものを<strong>リクエスト</strong>、Webサーバーから返すものを<strong>レスポンス</strong>という。</p>
+<p>ブラウザとWebサーバーの間で、リクエストやレスポンスをどのような形式でやり取りするかを定めるのが<strong>HTTP</strong>（Hypertext Transfer Protocol）である。ブラウザから送るものを<strong>リクエスト</strong>、Webサーバーから返すものを<strong>レスポンス</strong>という。</p>
 <p>本章では、仕組みを読み取りやすくするために、Webサーバーへ置いた説明用の<code>example.txt</code>から短い文章を取得する場面を使う。HTTPの書き方はHTTP/1.1を例にする。備品管理アプリの画面でも、ブラウザからリクエストし、Webサーバーからレスポンスを受け取るという関係は同じである。</p>
 <p class="bullet">・ URLは、接続先とリクエストするものをどのように指定するのか。</p>
 <p class="bullet">・ 接続することと、HTTPでリクエストすることはどう違うのか。</p>
@@ -9,7 +9,7 @@
 <p class="bullet">・ 404というレスポンスと、レスポンスがない状態では何が違うのか。</p>
 <p class="bullet">・ ブラウザの画面とcurlの出力は、それぞれ何を見せているのか。</p>
 <h2 id="41-urlで接続先とリクエストするものを指定する">4.1 URLで接続先とリクエストするものを指定する</h2>
-<p>ブラウザのアドレス欄へ入力する<code>http://...</code>という文字列を<strong>URL（Uniform Resource Locator）</strong>という。URLには、使う通信方式、接続先、ポート番号、リクエストする対象などを指定する。</p>
+<p>ブラウザのアドレス欄へ入力する<code>http://...</code>という文字列を<strong>URL</strong>（Uniform Resource Locator）という。URLには、使う通信方式、接続先、ポート番号、リクエストする対象などを指定する。</p>
 <p>例えば、利用者PCからWebサーバーの公開IPを指定して、説明用のファイルをリクエストするURLを考える。</p>
 <p><strong>URLの例：公開IPは説明用の値である。</strong></p>
 <pre><code>http://203.0.113.20:80/example.txt</code></pre>

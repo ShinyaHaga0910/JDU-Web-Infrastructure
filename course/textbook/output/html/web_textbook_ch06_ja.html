@@ -1,7 +1,7 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第6章 DNSによる名前解決の仕組み</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第6章-dnsによる名前解決の仕組み">第6章 DNSによる名前解決の仕組み</h1>
 <h2 id="この章で分かること">この章で分かること</h2>
 <p>前章では、WebサーバーのIPアドレスを指定してファイルを取得した。例えば、踏み台サーバーのブラウザで<code>http://10.20.1.20/example.txt</code>を開くと、Webサーバーへ接続できる。しかし、サーバーが増えるたびにIPアドレスを覚えたり、接続先を変更するたびに利用者へ新しい番号を知らせたりするのは大変である。</p>
-<p>そこで、<code>web.lab.test</code>のような名前から、接続先のIPアドレスを調べる仕組みを使う。この仕組みを支えるのが<strong>DNS（Domain Name System）</strong>である。本章では、名前を入力してからIPアドレスを受け取り、Webサーバーへ接続するまでを順に説明する。今回構築するのは、学校の備品管理システムの内部で使うDNSである。</p>
+<p>そこで、<code>web.lab.test</code>のような名前から、接続先のIPアドレスを調べる仕組みを使う。この仕組みを支えるのが<strong>DNS</strong>（Domain Name System）である。本章では、名前を入力してからIPアドレスを受け取り、Webサーバーへ接続するまでを順に説明する。今回構築するのは、学校の備品管理システムの内部で使うDNSである。</p>
 <h2 id="61-名前から接続先のipアドレスを調べる">6.1 名前から接続先のIPアドレスを調べる</h2>
 <h3 id="名前は人が接続先を指定する手掛かりになる">名前は人が接続先を指定する手掛かりになる</h3>
 <p>例えば、<code>web.lab.test</code>という名前と<code>10.20.1.20</code>というIPアドレスを対応付ける。利用者は名前を使ってWebサーバーを指定し、コンピューターは調べたIPアドレスを使って通信する。このように、名前に対応するIPアドレスなどの情報を調べることを<strong>名前解決</strong>という。</p>
@@ -19,7 +19,7 @@
 <h2 id="62-今回使う名前の範囲を理解する">6.2 今回使う名前の範囲を理解する</h2>
 <h3 id="ドメイン名は階層を持つ">ドメイン名は階層を持つ</h3>
 <p><code>web.lab.test</code>のような名前を<strong>ドメイン名</strong>という。ドットで区切られた一つずつの部分は<strong>ラベル</strong>である。名前の階層は右側から読むと分かりやすい。<code>test</code>という範囲の中に<code>lab.test</code>があり、その中に<code>web.lab.test</code>という名前がある。</p>
-<p>DNSの名前の階層は、最上位の<strong>ルート</strong>から始まる。ルートは<code>.</code>で表される。ルートまで省略せずに書いた名前が<strong>FQDN（Fully Qualified Domain Name）</strong>であり、設定ファイルでは<code>web.lab.test.</code>のように末尾のドットまで書くことで、その名前が完結していると示せる。ブラウザのURLでは、通常は末尾のドットを省いて入力する。<a href="https://www.rfc-editor.org/rfc/rfc9499.html">DNSの名前とFQDN</a></p>
+<p>DNSの名前の階層は、最上位の<strong>ルート</strong>から始まる。ルートは<code>.</code>で表される。ルートまで省略せずに書いた名前が<strong>FQDN</strong>（Fully Qualified Domain Name）であり、設定ファイルでは<code>web.lab.test.</code>のように末尾のドットまで書くことで、その名前が完結していると示せる。ブラウザのURLでは、通常は末尾のドットを省いて入力する。<a href="https://www.rfc-editor.org/rfc/rfc9499.html">DNSの名前とFQDN</a></p>
 <figure><img src="../../assets/figures/ch06-fig02-names-and-zone.png" alt="ルート、test、lab.test、web.lab.testの階層と、今回管理するlab.testゾーンの範囲を示す。" width="1600" height="1030"></figure>
 <p><strong>図6-2 名前の階層と、担当するゾーン。</strong> 図は名前の関係を示している。今回のDNSサーバーは、色の付いた<code>lab.test</code>の範囲を担当する。枠は名前の管理範囲を表し、コンピューターの配置を表すものではない。</p>
 <p>DNSサーバーが情報を管理するひとまとまりの範囲を<strong>ゾーン</strong>という。今回は<code>lab.test</code>ゾーンに、Webサーバーなどの名前とIPアドレスを登録する。名前の階層の一部を別のDNSへ任せる場合もあるが、今回の<code>lab.test</code>は一つのゾーンとして管理する。</p>
@@ -41,7 +41,7 @@
 <p>ルートDNSは、すべてのWebサーバーのIPアドレスを返すのではなく、次にどの範囲のDNSへ尋ねればよいかを案内する。<code>.com</code>のDNSは、<code>example.com</code>を担当するDNSを案内する。その案内をたどって、リゾルバーが必要な情報を調べ、依頼した側へ結果を返す。</p>
 <figure><img src="../../assets/figures/ch06-fig04-public-resolution.png" alt="リゾルバーがルートDNSから対象ドメインを担当するDNSまで問い合わせ先をたどる基本の流れ。" width="1600" height="1220"></figure>
 <p><strong>図6-4 インターネットのDNSが情報を分担する。</strong> 左は名前解決を取りまとめるリゾルバー、右は名前の階層を担当する各DNSである。必要な案内や回答が保存されていない場合の基本の流れを示す。</p>
-<p>問い合わせを取りまとめる役割を<strong>再帰リゾルバー</strong>という。次の問い合わせ先を自分でたどる方法に加え、他のリゾルバーへ調査を依頼する方法もある。後者の依頼先が<strong>フォワーダー（転送先DNS）</strong>である。<a href="https://www.rfc-editor.org/rfc/rfc1034.html#section-4.3.1">DNSの問い合わせ処理</a></p>
+<p>問い合わせを取りまとめる役割を<strong>再帰リゾルバー</strong>という。次の問い合わせ先を自分でたどる方法に加え、他のリゾルバーへ調査を依頼する方法もある。後者の依頼先が<strong>フォワーダー</strong>（転送先DNS）である。<a href="https://www.rfc-editor.org/rfc/rfc1034.html#section-4.3.1">DNSの問い合わせ処理</a></p>
 <h3 id="今回の内部dnsで使うbind">今回の内部DNSで使うBIND</h3>
 <p>今回のDNSサーバーでは、<strong>BIND 9</strong>というDNSソフトウェアをUbuntu OS上で動かす。BINDは、<code>lab.test</code>については自分が持つゾーン情報から回答する。それ以外の名前については、許可された問い合わせ元からの依頼を受け、転送先DNSを使って名前解決を取りまとめる。</p>
 <p>自分が持つ情報から答える場合と、転送先を使う場合の具体的な関係は、6.6で説明する。<a href="https://bind9.readthedocs.io/en/v9.18.39/chapter1.html">BINDによるDNSの構成</a></p>
@@ -67,14 +67,14 @@ dns IN A 10.20.2.10
 web IN A 10.20.1.20</code></pre>
 <p><code>$ORIGIN lab.test.</code>は、このファイルで使う名前の基準を指定する。<code>web</code>のように末尾のドットがない名前は、基準を補って<code>web.lab.test.</code>として読む。<code>@</code>は基準そのもの、ここでは<code>lab.test.</code>を表す。<code>$TTL 300</code>は、個別にTTLを指定していないレコードの既定値を300秒にする。<a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html#example-com-base-zone-file">BINDのゾーンファイル</a></p>
 <p>SOAの<code>dns.lab.test.</code>は主となるDNSサーバーの名前であり、<code>hostmaster.lab.test.</code>は管理者のメールアドレスを表す書式である。この例では<code>hostmaster@lab.test</code>を意味する。</p>
-<p>SOAの括弧の中の先頭にある<code>2026110301</code>は、ゾーンの更新番号である<strong>serial（シリアル）</strong>を表す。レコードを変更するときは、この番号も増やす。続く値は順に、別のDNSサーバーが更新を確かめる間隔、失敗したときの再試行間隔、更新できない状態で情報を保持する期限、名前が存在しないなどの否定回答をキャッシュするときに関わる時間である。ここでは、それぞれゾーン管理のための秒数と押さえておこう。</p>
+<p>SOAの括弧の中の先頭にある<code>2026110301</code>は、ゾーンの更新番号である<strong>serial</strong>（シリアル）を表す。レコードを変更するときは、この番号も増やす。続く値は順に、別のDNSサーバーが更新を確かめる間隔、失敗したときの再試行間隔、更新できない状態で情報を保持する期限、名前が存在しないなどの否定回答をキャッシュするときに関わる時間である。ここでは、それぞれゾーン管理のための秒数と押さえておこう。</p>
 <p>serialは「ゾーン情報の版」を区別する番号であり、次節のTTLは「受け取った情報をキャッシュで使える時間」を表す。serialを増やすことと、すでに保存されたキャッシュの期限が切れることは、別の働きである。</p>
 <h2 id="65-キャッシュとttlで、同じ問い合わせを減らす">6.5 キャッシュとTTLで、同じ問い合わせを減らす</h2>
 <h3 id="毎回すべてのdnsへ問い合わせるわけではない">毎回すべてのDNSへ問い合わせるわけではない</h3>
 <p><strong>キャッシュ</strong>とは、取得した情報を一時的に保存して再利用する仕組みである。名前解決では、OSやリゾルバーなどが、以前に取得したDNS情報を保存することがある。使える情報がキャッシュにあれば、その情報を使うことで問い合わせの回数と待ち時間を減らせる。</p>
 <p>例えば、踏み台サーバー側で<code>web.lab.test</code>のIPアドレスを保存していれば、同じ名前をもう一度使ったときに、その情報を再利用できる場合がある。ページを開くたびに、必ず内部DNSへ新しい問い合わせが届くとは限らない。</p>
 <h3 id="ttlは、情報を使える時間を制限する">TTLは、情報を使える時間を制限する</h3>
-<p><strong>TTL（Time to Live）</strong>は、受け取ったDNS情報をキャッシュとして使える時間の上限である。例えばTTLが300秒なら、取得した時点から通常は最大300秒まで、その情報を再利用できる。120秒後なら残りは180秒であり、使うたびに300秒へ戻るわけではない。</p>
+<p><strong>TTL</strong>（Time to Live）は、受け取ったDNS情報をキャッシュとして使える時間の上限である。例えばTTLが300秒なら、取得した時点から通常は最大300秒まで、その情報を再利用できる。120秒後なら残りは180秒であり、使うたびに300秒へ戻るわけではない。</p>
 <figure><img src="../../assets/figures/ch06-fig05-cache-ttl.png" alt="TTLが300秒の情報を取得し、120秒後には残り180秒となり、期限後の次の名前解決で新たに問い合わせる例。" width="1600" height="1090"></figure>
 <p><strong>図6-5 キャッシュの期限は、取得してからの経過時間で減る。</strong> 300秒のTTLを持つ情報をキャッシュする側の動きを示す。期限の後に同じ情報が必要になった場合は、通常、新たな問い合わせで取得する。図中の枠は保存した情報を表し、別のサーバーを表すものではない。</p>
 <p>DNSサーバーでIPアドレスの登録を変更しても、他の端末やリゾルバーが以前の情報をまだキャッシュしていれば、しばらく以前のIPアドレスを使うことがある。このため、DNSサーバー側の変更が、すべての端末へ同時に反映されるとは限らない。<a href="https://www.rfc-editor.org/rfc/rfc2181.html#section-8">DNSのTTLとキャッシュ</a></p>

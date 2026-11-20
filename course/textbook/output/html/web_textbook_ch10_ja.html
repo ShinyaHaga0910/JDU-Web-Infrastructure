@@ -8,9 +8,9 @@
 <div class="table-wrap"><table><thead><tr><th scope="col">対象</th><th scope="col">本文やデータの準備方法</th></tr></thead><tbody><tr><td>説明用のテキストファイル</td><td>保存したファイルの内容を配信する</td></tr><tr><td>備品一覧のHTML</td><td>アプリがDBの公開対象の備品を読み、その値から作る</td></tr><tr><td>CSSや画像</td><td>動的なページと一緒に使う場合も、静的ファイルとして配信できる</td></tr></tbody></table></div>
 <p>動的な一覧と静的なCSSは、一つのWebシステムで同時に使える。ページの内容を作る処理と、画面の見た目を指定するファイルの配信は、役割が違う。</p>
 <h2 id="102-nginx、gunicorn、djangoの分担">10.2 Nginx、Gunicorn、Djangoの分担</h2>
-<p>今回の備品管理アプリは、Pythonというプログラミング言語で作られている。その開発に使われているのが<strong>Django（ジャンゴ）</strong>である。Djangoは、URLに応じた処理、DBの読み書き、HTMLの生成、管理画面など、Webアプリでよく使う機能をまとめたフレームワークである。提供アプリは、その機能を使って備品の一覧表示や追加・変更を行う。</p>
-<p><strong>Gunicorn（グニコーン）</strong>は、そのPython製アプリを動かすためのソフトウェアである。起動時に提供アプリのPythonコードを読み込み、処理用のプロセスで実行する。NginxからHTTPリクエストを受け取ると、アプリの処理を呼び出し、アプリが作った結果をHTTPレスポンスとして返す。</p>
-<p>この呼び出しには、PythonのWebアプリと、それを動かすソフトウェアとの接続方法を定めた<strong>WSGI（Web Server Gateway Interface）</strong>という取り決めを使う。Djangoには、この方法で処理を受け付ける入口がある。Gunicornはその入口を呼び出すため、アプリをGunicorn専用の形式へビルドし直す必要はない。<a href="https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/gunicorn/">DjangoとGunicornの接続</a></p>
+<p>今回の備品管理アプリは、Pythonというプログラミング言語で作られている。その開発に使われているのが<strong>Django</strong>（ジャンゴ）である。Djangoは、URLに応じた処理、DBの読み書き、HTMLの生成、管理画面など、Webアプリでよく使う機能をまとめたフレームワークである。提供アプリは、その機能を使って備品の一覧表示や追加・変更を行う。</p>
+<p><strong>Gunicorn</strong>（グニコーン）は、そのPython製アプリを動かすためのソフトウェアである。起動時に提供アプリのPythonコードを読み込み、処理用のプロセスで実行する。NginxからHTTPリクエストを受け取ると、アプリの処理を呼び出し、アプリが作った結果をHTTPレスポンスとして返す。</p>
+<p>この呼び出しには、PythonのWebアプリと、それを動かすソフトウェアとの接続方法を定めた<strong>WSGI</strong>（Web Server Gateway Interface）という取り決めを使う。Djangoには、この方法で処理を受け付ける入口がある。Gunicornはその入口を呼び出すため、アプリをGunicorn専用の形式へビルドし直す必要はない。<a href="https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/gunicorn/">DjangoとGunicornの接続</a></p>
 <div class="table-wrap"><table><thead><tr><th scope="col">ソフトウェア</th><th scope="col">今回の役割</th></tr></thead><tbody><tr><td>Nginx</td><td>ブラウザからHTTP接続を受ける。静的ファイルを返し、アプリの処理が必要なリクエストをGunicornへ渡す</td></tr><tr><td>Gunicorn</td><td>HTTPリクエストをPythonのアプリの処理へつなぎ、その結果をHTTPレスポンスとして返す</td></tr><tr><td>Django</td><td>提供アプリが利用するフレームワーク。DBの利用、HTMLの生成、アプリ管理者の認証や管理画面などを支える</td></tr></tbody></table></div>
 <p>NginxとGunicornは、同じEC2 Webサーバー上で動く。Djangoを使った提供アプリの処理は、Gunicornの処理用プロセス内で実行される。PostgreSQLは別のEC2 DBサーバー上で動き、アプリから送られたSQLを処理する。</p>
 <figure><img src="../../assets/figures/ch10-fig01-components.png" alt="同じWebサーバー内のNginx、Gunicornの処理用プロセスとDjango製アプリ、別のDBサーバーの関係。" width="2000" height="1160"></figure>

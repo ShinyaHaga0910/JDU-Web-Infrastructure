@@ -22,11 +22,11 @@
 
 ## 10.2 Nginx、Gunicorn、Djangoの分担
 
-今回の備品管理アプリは、Pythonというプログラミング言語で作られている。その開発に使われているのが**Django（ジャンゴ）**である。Djangoは、URLに応じた処理、DBの読み書き、HTMLの生成、管理画面など、Webアプリでよく使う機能をまとめたフレームワークである。提供アプリは、その機能を使って備品の一覧表示や追加・変更を行う。
+今回の備品管理アプリは、Pythonというプログラミング言語で作られている。その開発に使われているのが**Django**（ジャンゴ）である。Djangoは、URLに応じた処理、DBの読み書き、HTMLの生成、管理画面など、Webアプリでよく使う機能をまとめたフレームワークである。提供アプリは、その機能を使って備品の一覧表示や追加・変更を行う。
 
-**Gunicorn（グニコーン）**は、そのPython製アプリを動かすためのソフトウェアである。起動時に提供アプリのPythonコードを読み込み、処理用のプロセスで実行する。NginxからHTTPリクエストを受け取ると、アプリの処理を呼び出し、アプリが作った結果をHTTPレスポンスとして返す。
+**Gunicorn**（グニコーン）は、そのPython製アプリを動かすためのソフトウェアである。起動時に提供アプリのPythonコードを読み込み、処理用のプロセスで実行する。NginxからHTTPリクエストを受け取ると、アプリの処理を呼び出し、アプリが作った結果をHTTPレスポンスとして返す。
 
-この呼び出しには、PythonのWebアプリと、それを動かすソフトウェアとの接続方法を定めた**WSGI（Web Server Gateway Interface）**という取り決めを使う。Djangoには、この方法で処理を受け付ける入口がある。Gunicornはその入口を呼び出すため、アプリをGunicorn専用の形式へビルドし直す必要はない。[DjangoとGunicornの接続](https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/gunicorn/)
+この呼び出しには、PythonのWebアプリと、それを動かすソフトウェアとの接続方法を定めた**WSGI**（Web Server Gateway Interface）という取り決めを使う。Djangoには、この方法で処理を受け付ける入口がある。Gunicornはその入口を呼び出すため、アプリをGunicorn専用の形式へビルドし直す必要はない。[DjangoとGunicornの接続](https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/gunicorn/)
 
 | ソフトウェア | 今回の役割 |
 | --- | --- |

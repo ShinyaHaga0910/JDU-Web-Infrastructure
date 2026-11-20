@@ -23,7 +23,7 @@
 <p>SOAのserialは、ゾーンの変更に合わせて増やす。ファイル名を<code>db.lab.test</code>にしただけではゾーン登録にはならず、ゾーン登録だけがあってもレコードの内容が正しいとは限らない。</p>
 <h2 id="73-問い合わせを許す相手と、転送先を決める">7.3 問い合わせを許す相手と、転送先を決める</h2>
 <h3 id="許可する送信元をまとめる">許可する送信元をまとめる</h3>
-<p><strong>ACL（Access Control List）</strong>は、許可する相手などをまとめるリストである。今回のBINDでは、DNSサーバー自身、踏み台サーバー、Webサーバーからの問い合わせを扱う。</p>
+<p><strong>ACL</strong>（Access Control List）は、許可する相手などをまとめるリストである。今回のBINDでは、DNSサーバー自身、踏み台サーバー、Webサーバーからの問い合わせを扱う。</p>
 <p><strong>設定の説明例：問い合わせ元のリストと、それを使う設定項目。</strong></p>
 <pre><code>acl &quot;internal_clients&quot; {
     127.0.0.1;
@@ -35,7 +35,7 @@
 <p>例えば、<code>allow-query { internal_clients; };</code>は、先ほどのACLに含まれる相手へ問い合わせを許す指定である。問い合わせを受けること、外部名を調べること、キャッシュを利用させることには、別々の設定がある。<a href="https://bind9.readthedocs.io/en/v9.18.39/reference.html">BINDのアクセス制御</a></p>
 <h3 id="外部名の解決と、ゾーン転送を区別する">外部名の解決と、ゾーン転送を区別する</h3>
 <p><code>forwarders</code>には外部名を調べる際の依頼先として<code>10.20.0.2</code>を指定し、<code>forward only</code>でその転送先を使う。これは、名前解決の問い合わせを他のDNSへ依頼する設定である。</p>
-<p>一方、<strong>ゾーン転送</strong>は、あるゾーンに登録したレコード一式を、別のDNSサーバーへコピーするための処理である。例えば、二台のDNSサーバーから同じ情報を回答したい場合、一台で管理する<code>lab.test</code>の登録情報をもう一台へ渡すために使う。そのゾーンの全レコードをまとめて転送する方式を<strong>AXFR（エー・エックス・エフ・アール）</strong>という。<a href="https://www.rfc-editor.org/rfc/rfc5936.html">ゾーン転送の仕様</a></p>
+<p>一方、<strong>ゾーン転送</strong>は、あるゾーンに登録したレコード一式を、別のDNSサーバーへコピーするための処理である。例えば、二台のDNSサーバーから同じ情報を回答したい場合、一台で管理する<code>lab.test</code>の登録情報をもう一台へ渡すために使う。そのゾーンの全レコードをまとめて転送する方式を<strong>AXFR</strong>（エー・エックス・エフ・アール）という。<a href="https://www.rfc-editor.org/rfc/rfc5936.html">ゾーン転送の仕様</a></p>
 <div class="table-wrap"><table><thead><tr><th scope="col">問い合わせ</th><th scope="col">求める情報の例</th><th scope="col">主な用途</th></tr></thead><tbody><tr><td>通常のAレコードの問い合わせ</td><td>「guide.lab.testのIPv4アドレスを教えてほしい」</td><td>ブラウザやアプリが接続先を調べる</td></tr><tr><td>ゾーン転送の問い合わせ（AXFR）</td><td>「lab.testゾーンに登録されたレコード一式を渡してほしい」</td><td>別のDNSサーバーにも同じ登録情報を持たせる</td></tr></tbody></table></div>
 <p>今回の構成では、内部DNSをもう一台に複製する作業は行わない。7.2の<code>allow-transfer { none; };</code>は、ゾーンの登録情報一式を渡す相手を許可しない設定である。これを設定しても、許可された相手からの通常のAレコードの問い合わせには回答できる。名前解決を他のDNSへ依頼する<code>forwarders</code>と、ゾーンの登録情報をコピーするAXFRは、用途が異なる。<a href="https://bind9.readthedocs.io/en/v9.18.39/reference.html#namedconf-statement-allow-transfer">BINDのゾーン転送の許可設定</a></p>
 <h3 id="ここから行う確認と、接続元の設定">ここから行う確認と、接続元の設定</h3>
@@ -55,7 +55,7 @@
 sudo named-checkzone lab.test /etc/bind/zones/db.lab.test</code></pre>
 <p><code>named-checkconf</code>はBINDの設定を検査し、<code>-z</code>ではprimaryゾーンの読み込みも検査する。<code>named-checkzone</code>は、指定したゾーン名とゾーンファイルを組み合わせて検査する。エラーがあれば、表示されたファイルや行を直してから再検査する。<a href="https://bind9.readthedocs.io/en/v9.18.39/manpages.html">BINDの検査コマンド</a></p>
 <p>検査後に設定をnamedサービスへ反映し、サービスの状態と、UDP・TCPそれぞれの53番ポートの待受を読む。ここまでの作業場所はDNSサーバーであり、踏み台サーバーやWebサーバーのOSのDNS設定はまだ変更しない。</p>
-<p>次に、<strong>dig（ディグ）</strong>で問い合わせを送る。digは、DNSへ「この名前のAレコードを教えてほしい」と尋ね、返された情報を端末へ表示する。設定ファイルの検査が成功することと、動いているDNSから回答を得られることを、分けて確かめるために使う。<a href="https://bind9.readthedocs.io/en/v9.18.39/manpages.html#dig-dns-lookup-utility">digの使い方</a></p>
+<p>次に、<strong>dig</strong>（ディグ）で問い合わせを送る。digは、DNSへ「この名前のAレコードを教えてほしい」と尋ね、返された情報を端末へ表示する。設定ファイルの検査が成功することと、動いているDNSから回答を得られることを、分けて確かめるために使う。<a href="https://bind9.readthedocs.io/en/v9.18.39/manpages.html#dig-dns-lookup-utility">digの使い方</a></p>
 <p><strong>実行場所：DNSサーバーの管理用端末。自分自身で動くBINDへ問い合わせる例。</strong></p>
 <pre><code>dig @127.0.0.1 guide.lab.test A</code></pre>
 <p><code>@</code>の後ろは問い合わせ先DNSのIPアドレス、次の<code>guide.lab.test</code>は調べる名前、最後の<code>A</code>はIPv4アドレスを調べる指定である。ここでの<code>127.0.0.1</code>は、コマンドを実行しているDNSサーバー自身を表す。</p>

@@ -3,7 +3,7 @@ from build_chapter01 import Scene, ROOT, BLUE, GREEN, AMBER, build
 
 
 def figures():
-    s=Scene(1600,1150,'手元のPCの画面内にRDPのデスクトップとSSH端末が入れ子で表示される')
+    s=Scene(1600,1100,'手元のPCの画面内にRDPのデスクトップとSSH端末が入れ子で表示される')
     s.text(40,18,'図3-1  手元のPCの中に見える、接続先の操作画面',35)
     s.rect(25,120,975,735,'#dce3eb','#60748a')
     s.rect(55,150,915,670,'#f5f7fa','#7991aa')
@@ -26,7 +26,6 @@ def figures():
     for row in range(2):
         for column in range(16):
             s.rect(80+column*54,966+row*25,44,18,'#ffffff','#a9b8c7',3)
-    s.text(75,1045,'机の上にあるディスプレイとキーボード',28)
     s.rect(1050,120,510,750,'#f8fafc','#7991aa')
     s.text(1075,144,'AWS上の別々のコンピューター',26)
     for y,role,detail,color in [(210,'踏み台サーバー','デスクトップが動く',GREEN),(555,'Webサーバー','コマンドを実行する',BLUE)]:
@@ -40,7 +39,7 @@ def figures():
     s.text(1015,366,'入力',25,GREEN,center=True)
     s.arrow([(905,560),(990,560),(990,680),(1090,680)],BLUE)
     s.text(1015,721,'SSH',26,BLUE,center=True)
-    s.text(45,1100,'入れ子になっているのは画面。踏み台とWebサーバーは、手元のPCの中で動いているのではない。',26)
+    s.text(45,1050,'入れ子になっているのは画面。踏み台とWebサーバーは、手元のPCの中で動いているのではない。',26)
     s.save('ch03-fig01-nested-screen')
 
     s=Scene(1600,990,'RDPで踏み台のデスクトップを開き、その端末からSSHでWebサーバーへ接続する')

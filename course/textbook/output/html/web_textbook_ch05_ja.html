@@ -1,6 +1,6 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="text-scale" content="scale"><title>第5章 Nginxによる静的ファイルの配信</title><style>body{margin:0;color:#193047;background:#f7f9fc;font-family:system-ui,"Noto Sans JP",sans-serif;line-height:1.9}main{max-width:52rem;margin:auto;padding:2rem 1.25rem 4rem;background:white}h1{font-size:2rem;line-height:1.5}h2{font-size:1.4rem;margin-block-start:2.25rem;border-block-end:1px solid #c5d3e0;padding-block-end:.4rem}h3{font-size:1.1rem;margin-block-start:1.75rem}p{overflow-wrap:anywhere}a{color:#165f9d}a:focus-visible{outline:3px solid #9d651a;outline-offset:3px}code{font-size:.9em;background:#edf2f7;padding:.1em .25em;overflow-wrap:anywhere}figure{margin:1.5rem 0}img{display:block;max-inline-size:100%;block-size:auto}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid #b8c5d2;padding:.65rem;text-align:start;vertical-align:top}th{background:#eaf1f8}.skip{display:block;padding:.5rem 1rem}@media print{@page{size:A4;margin:18mm}body{background:white;font-size:10.4pt}main{max-width:none;padding:0}h1,h2,h3{break-after:avoid}figure, tr{break-inside:avoid}#章末解答{break-before:page}.skip{display:none}}pre{white-space:pre-wrap;overflow-wrap:anywhere;padding:1rem;background:#edf2f7;font-size:.9rem;line-height:1.7}pre code{font-size:inherit;background:none;padding:0}</style></head><body><a class="skip" href="#main">本文へ</a><main id="main"><h1 id="第5章-nginxによる静的ファイルの配信">第5章 Nginxによる静的ファイルの配信</h1>
 <h2 id="この章で分かること">この章で分かること</h2>
-<p>学校の備品管理システムでは、ブラウザからのリクエストを受け取り、ページや画像などを返す入口が必要になる。今回は、Webサーバー上で動かす<strong>Nginx（エンジンエックス）</strong>というソフトウェアが、その入口を担当する。</p>
+<p>学校の備品管理システムでは、ブラウザからのリクエストを受け取り、ページや画像などを返す入口が必要になる。今回は、Webサーバー上で動かす<strong>Nginx</strong>（エンジンエックス）というソフトウェアが、その入口を担当する。</p>
 <p>まずは短い文章を保存したファイルを使い、Nginxがその内容をブラウザへ返す仕組みを理解しよう。これを<strong>静的ファイルの配信</strong>という。ファイルの保存先、Nginxの設定、読み取り権限がどう結び付くかを学び、サービスの状態やログから動作を確かめる。</p>
 <h2 id="51-保存したファイルをhttpで届ける">5.1 保存したファイルをHTTPで届ける</h2>
 <p>例えば、学校の備品管理システムの案内を<code>example.txt</code>というファイルへ保存したとする。ファイルに書かれている文章は、次の一行である。</p>
@@ -49,7 +49,7 @@
 <p>配信用ファイルには読み取りを許可する一方で、パスワードや秘密鍵などを同じ公開用ディレクトリへ置かない。<code>root</code>で指定した配信範囲には、利用者へ届けるファイルだけを配置する。</p>
 <h2 id="55-保存した設定をnginxへ反映する">5.5 保存した設定をNginxへ反映する</h2>
 <h3 id="構文を調べてから再読み込みする">構文を調べてから再読み込みする</h3>
-<p>設定ファイルを保存しても、起動中のNginxがすぐに新しい設定へ切り替わるわけではない。まず設定を検査し、その後に<strong>reload（再読み込み）</strong>で起動中のサービスへ反映する。設定を読む検査と、動作中のサービスへの反映を分けて考えよう。</p>
+<p>設定ファイルを保存しても、起動中のNginxがすぐに新しい設定へ切り替わるわけではない。まず設定を検査し、その後に<strong>reload</strong>（再読み込み）で起動中のサービスへ反映する。設定を読む検査と、動作中のサービスへの反映を分けて考えよう。</p>
 <p><strong>実行場所：Webサーバーの管理用端末。設定の検査と再読み込みに使うコマンドの例。</strong></p>
 <pre><code>sudo nginx -t
 sudo systemctl reload nginx</code></pre>
