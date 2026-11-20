@@ -72,9 +72,9 @@ Tayyor muhitingizda beshta serverning instance ID si va rolini tekshiring. Qaysi
 
 ### Serverlarga ulanish va kurs fayllari
 
-![O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda, imzolangan tarqatmada esa P0.3 da joylanadi.](../../assets/uz/p0-ssm.png)
+![Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar P0.3 da fayllarni nusxalashni ko‘rsatadi. Jihozlarni hisobga olish ilovasi va SQL arxivi Web hamda DB serverlariga joylanadi. Repo server Ubuntu paketlarini tarqatadi.](../../assets/uz/p0-ssm.png)
 
-O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda, imzolangan tarqatmada esa P0.3 da joylanadi.
+Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar P0.3 da fayllarni nusxalashni ko‘rsatadi. Jihozlarni hisobga olish ilovasi va SQL arxivi Web hamda DB serverlariga joylanadi. Repo server Ubuntu paketlarini tarqatadi.
 
 **Practice0 da bajariladigan ishlar**
 

@@ -106,7 +106,10 @@ def diagram_stem(task):
 
 def connection_diagram(s):
     lang=s.lang
-    s.text(25,15,T('CloudShellから各EC2に接続する','Подключение из CloudShell к EC2','CloudShell dan EC2 serverlariga ulanish')[lang],25)
+    practice=s.task=='P0'
+    title=T('Webサーバーへの接続と教材ファイルの配置','Подключение к Web и размещение файлов','Web serverga ulanish va o‘quv fayllarini joylash') if practice else T(
+        'CloudShellから各EC2に接続する','Подключение из CloudShell к EC2','CloudShell dan EC2 serverlariga ulanish')
+    s.text(25,15,title[lang],25)
     s.rect(224,65,790,575,fill='#f1f7fc',stroke='#7e9cb3',width=2)
     s.text(247,77,'AWS',20)
     s.rect(565,105,424,492,fill='white',stroke='#7e9cb3',width=2)
@@ -115,28 +118,51 @@ def connection_diagram(s):
     s.simple(248,302,'CloudShell',w=156,ellipse=True)
     browser=T('ブラウザ','Браузер','Brauzer')[lang]
     s.path([(185,335),(248,335)],browser,(217,279))
-    s.text(326,383,T('接続先をIDで指定','Выбор узла по ID','Server ID sini tanlash')[lang],17,center=True)
-    target = T('P0の練習先：Webサーバー','Практика P0: Web-сервер','P0 mashqi: Web server') if s.task=='P0' else T(
-        'M0の接続先：DBサーバー','Цель подключения M0: DB-сервер','M0 ulanish manzili: DB server')
-    s.text(393,485,target[lang],18,color=TEAL,center=True,max_width=322)
+    blue='#285da8'
+    if practice:
+        s.path([(398,318),(457,318),(457,258),(655,258)],'P0.2  SSM (Session Manager)',(497,223))
+        s.path([(398,350),(610,350),(610,290),(655,290)],color=blue)
+        copy_label=T('P0.3  教材ファイルをコピー','P0.3  Копирование файлов','P0.3  Fayllarni nusxalash')[lang]
+        s.path([(610,350),(610,437),(655,437)],copy_label,(489,373),color=blue)
+        s.text(498,399,T('SSMで2台に配置','Через SSM на два узла','SSM orqali ikki serverga')[lang],16,color=blue,center=True)
+    else:
+        s.text(326,383,T('接続先をIDで指定','Выбор узла по ID','Server ID sini tanlash')[lang],17,center=True)
+        target=T('M0の接続先：DBサーバー','Цель подключения M0: DB-сервер','M0 ulanish manzili: DB server')
+        s.text(393,485,target[lang],18,color=TEAL,center=True,max_width=322)
+        s.text(490,289,'SSM',22,color=TEAL,center=True)
+        s.text(490,370,'Session Manager',16,color=TEAL,center=True)
     roles=('bastion','web','dns','db','repo')
     for i,role in enumerate(roles):
         y=155+i*84
         middle=y+30
-        s.path([(404,335),(624,335),(624,middle),(655,middle)])
-        s.rect(655,y,309,71,fill='#e7f4f2' if role in ('web','db') else '#f4f7fa',stroke=TEAL if role in ('web','db') else GRAY,width=2)
-        s.text(670,y+6,'EC2 '+LABELS[role][lang],18)
+        if not practice:
+            s.path([(404,335),(624,335),(624,middle),(655,middle)])
+        receives_files=role in ('web','db')
+        fill=('#edf4ff' if practice else '#e7f4f2') if receives_files else '#f4f7fa'
+        stroke=(blue if practice else TEAL) if receives_files else GRAY
+        s.rect(655,y,309,71,fill=fill,stroke=stroke,width=2)
+        name=LABELS[role][lang]+('ー' if practice and lang=='ja' else '')
+        s.text(670,y+6,'EC2 '+name,18)
         s.text(900,y+8,IPS[role],15,color=MUTED,center=True)
-        if role in ('web','db'):
-            s.text(670,y+37,T('教材ファイルの配置先','Здесь размещаются файлы курса','Kurs fayllari shu yerga joylanadi')[lang],16,color=TEAL)
-    s.text(490,289,'SSM',22,color=TEAL,center=True)
-    s.text(490,370,'Session Manager',16,color=TEAL,center=True)
-    s.text(810,609,T('接続先のOSユーザー：ssm-user','Пользователь ОС: ssm-user','OS foydalanuvchisi: ssm-user')[lang],17,center=True)
+        if receives_files:
+            label=(T('catalog-app.tar.gz など','catalog-app.tar.gz и другие файлы','catalog-app.tar.gz va boshqa fayllar') if practice else
+                   T('教材ファイルの配置先','Здесь размещаются файлы курса','Kurs fayllari shu yerga joylanadi'))[lang]
+            s.text(670,y+37,label,16,color=stroke,max_width=280)
+        if practice and role=='repo':
+            s.text(670,y+37,T('Ubuntuなどのパッケージを配信','Раздача пакетов для Ubuntu','Ubuntu paketlarini tarqatish')[lang],16,color=MUTED)
+    user_label=T('接続先のOSユーザー：ssm-user','Пользователь ОС: ssm-user','OS foydalanuvchisi: ssm-user')[lang]
+    s.text(810,609,('P0.2  ' if practice else '')+user_label,17,center=True)
 
 
 def diagram_text(task,lang):
     n=int(task[1:])
     if n==0:
+        if task=='P0':
+            caption=T(
+                '緑の矢印はP0.2の端末接続。青の矢印はP0.3の教材ファイルのコピー。備品管理アプリとSQLが入ったアーカイブをWebサーバーとDBサーバーへ置く。配布サーバーはUbuntuなどのパッケージの配信を担当する。',
+                'Зелёная стрелка показывает подключение к терминалу в P0.2. Синие стрелки показывают копирование файлов в P0.3. Архив с приложением учёта оборудования и SQL помещают на Web- и DB-серверы. Repo-сервер раздаёт пакеты для Ubuntu.',
+                'Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar P0.3 da fayllarni nusxalashni ko‘rsatadi. Jihozlarni hisobga olish ilovasi va SQL arxivi Web hamda DB serverlariga joylanadi. Repo server Ubuntu paketlarini tarqatadi.')[lang]
+            return caption,caption
         caption=T(
             '利用者PCのブラウザでAWSのCloudShellを開き、SSMで対象のEC2へ接続する。教材ファイルの配置先はWebサーバーとDBサーバー。共通登録コード方式では初期構築時に配置され、署名付き配布方式ではP0.3で配置する。',
             'Откройте CloudShell в AWS из браузера на своём PC и подключитесь к нужному EC2 через SSM. Файлы курса размещаются на Web и DB. При установке по общему коду они размещаются во время создания среды, при подписанном комплекте — в P0.3.',
