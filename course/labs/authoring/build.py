@@ -62,16 +62,16 @@ def emit_intro(lang, kind):
               '[日本語](../ja/' + kind + '.md) · [Русский](../ru/' + kind + '.md) · [O‘zbekcha](../uz/' + kind + '.md)',
               '[日本語](../ja/' + kind + '.md) · [Русский](../ru/' + kind + '.md) · [O‘zbekcha](../uz/' + kind + '.md)')[lang], '']
     out += ['## ' + L['intro'][lang], '', T(
-      'まず各Pの課題文を読み、必要なら詳しい操作例を一段ずつ使う。Pは練習で成績に加算しない。Mは別の対象・値で自分で構築する。課題は授業回番号ではなく、自分の進度で進める。Pの完了はMの合格に置き換わらない。',
-      'Сначала прочитайте задание P; при необходимости проходите подробный пример по шагам. P — тренировка без оценочных баллов. В M самостоятельно используйте другие объекты/значения. Номера заданий не являются номерами занятий; идите в своём темпе. Выполнение P не означает выполнение M.',
-      'Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P — bahoga ball qo‘shmaydigan mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.')[lang], '',
+      'まず各Pの課題文を読み、必要なら詳しい操作例を一段ずつ使う。Pは手順付きの練習である。Mは別の対象・値で自分で構築する。課題は授業回番号ではなく、自分の進度で進める。Pの完了はMの合格に置き換わらない。',
+      'Сначала прочитайте задание P; при необходимости проходите подробный пример по шагам. P — тренировка с подробными шагами. В M самостоятельно используйте другие объекты/значения. Номера заданий не являются номерами занятий; идите в своём темпе. Выполнение P не означает выполнение M.',
+      'Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P — batafsil qadamli mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.')[lang], '',
       'P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6', '',
-      T('P5にもM2のDNSが必要。P4はIP指定だが、アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。Pは任意の練習で、採点は各Mの現在の前提を検査する。',
-        'P5 требует DNS из M2. P4 подключается по IP, а приложение — по db.lab.test. Перед переключением practice → mission завершите setup в P6. P — добровольная тренировка; checker оценивает текущие предпосылки M.',
-        'P5 uchun ham M2 DNS kerak. P4 IP bilan ulanadi, app esa db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating. P ixtiyoriy mashq; checker M ning joriy old shartlarini tekshiradi.')[lang], '',
-      T('M1=8、M2=13、M4=9、M5=13、M6=16、合計59素点。M0は0点。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。',
-        'M1=8, M2=13, M4=9, M5=13, M6=16: всего 59 исходных балла. M0=0. Нет личной демонстрации, backup/restore, дополнительных дисков и разработки приложения. Пересчёт в 25 баллов делает преподаватель отдельно. Повторные отправки возможны до объявленного срока. PASS разных попыток не объединяются; максимум автоматически не выбирается.',
-        'M1=8, M2=13, M4=9, M5=13, M6=16: jami 59 xom ball. M0=0. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.')[lang], '',
+      T('P5にもM2のDNSが必要。P4はIP指定だが、アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。',
+        'P5 требует DNS из M2. P4 подключается по IP, а приложение — по db.lab.test. Перед переключением practice → mission завершите setup в P6.',
+        'P5 uchun ham M2 DNS kerak. P4 IP bilan ulanadi, app esa db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating.')[lang], '',
+      T('M1=8、M2=13、M4=9、M5=13、M6=16（この5課題の自動採点は計59素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。',
+        'M1=8, M2=13, M4=9, M5=13, M6=16: автоматические проверки этих пяти заданий дают 59 исходных баллов. Нет личной демонстрации, backup/restore, дополнительных дисков и разработки приложения. Пересчёт в 25 баллов делает преподаватель отдельно. Повторные отправки возможны до объявленного срока. PASS разных попыток не объединяются; максимум автоматически не выбирается.',
+        'M1=8, M2=13, M4=9, M5=13, M6=16: bu beshta topshiriqning avtomatik tekshiruvlari jami 59 xom ball. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.')[lang], '',
       '## ' + L['targets'][lang], '',
       T('初期配布の署名確認、新規5台または既存環境へのinstall、内部SSHと個別採点登録までを先に完了する。初期配布の手順は教材zipのdistribution/STUDENT.mdを読む。秘密鍵を共有Windowsへ置かず、CloudShellは本人Academy accountの中で使う。教師は本人用の匿名Lab ID・署名fingerprint・有効期限を案内する。',
         'Сначала завершите проверку подписи начального комплекта, создание пяти узлов либо install в существующую среду, внутренний SSH и личную регистрацию. Инструкция — distribution/STUDENT.md в zip. Не храните приватные ключи в общем Windows; используйте CloudShell личного Academy account. Преподаватель выдаёт личный анонимный Lab ID, fingerprint и срок действия.',
@@ -160,6 +160,18 @@ def shell_lines(source):
         out.append(line)
     return '\n'.join(out)
 
+INSTANCE_ID_IMAGE = 'ec2-instance-id-c3.png'
+INSTANCE_ID_SOURCE = ROOT.parent / 'textbook/assets/figures/ch03-fig04-ec2-instance-id-highlighted.png'
+
+
+def instance_id_guide(lang):
+    caption = T(
+        'C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDをコピーする。',
+        'Рисунок 3-4 из главы C3. Откройте EC2 → Instances и скопируйте Instance ID из строки нужного сервера.',
+        'C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni nusxalang.')[lang]
+    return [f'![{caption}](../../assets/shared/{INSTANCE_ID_IMAGE})', '', caption, '']
+
+
 def make_markdown(reg, lang, kind):
     out = emit_intro(lang, kind)
     out += ['## ' + LABELS['read'][lang], '']
@@ -184,6 +196,8 @@ def make_markdown(reg, lang, kind):
             out += ['### ' + L['solution'][lang], '']
             for i, s in enumerate(m['steps'], 1):
                 out += [f"#### {m['id']}.{i} {s['title'][lang]}", '', '**' + L['place'][lang] + ':** ' + PLACES[s['place']][lang], '', '**' + L['why'][lang] + ':** ' + s['why'][lang], '']
+                if m['id']=='P0' and i==1:
+                    out += instance_id_guide(lang)
                 if s['code']:
                     for fence,source in annotated_blocks(m['id'],i,s['code'],lang):
                         label=T('設定・入力データ（端末で実行するコマンドではない）','Конфигурация или данные: не выполнять как команды','Sozlama yoki ma’lumot: terminal buyrug‘i emas')[lang] if fence=='text' else T('入力するコマンド（番号はこの手順内の順番）','Команды: нумерация внутри этого шага','Buyruqlar: raqamlar shu qadam ichidagi tartib')[lang]
@@ -202,8 +216,11 @@ def make_markdown(reg, lang, kind):
         for number in ACTIVE_NUMBERS:
             task = tasks['M' + str(number)]
             title = MODULES_BY_NUMBER[number]['title'][lang]
-            out += [f"## {task['id']} {title} ({task['raw_points_max']})", '', '### ' + L['requirements'][lang], '', MISSION_GUIDANCE[task['id']][lang], '']
+            points = f" ({task['raw_points_max']})" if number else ''
+            out += [f"## {task['id']} {title}{points}", '', '### ' + L['requirements'][lang], '', MISSION_GUIDANCE[task['id']][lang], '']
             out += diagram_markdown(task['id'],lang)
+            if number==0:
+                out += instance_id_guide(lang)
             out += task_spec(task, reg, lang)
             if task['requires_current']:
                 out += ['- ' + T('現在必要な前提', 'Текущие предпосылки', 'Joriy old shartlar')[lang] + ': ' + ', '.join(task['requires_current']), '']
@@ -246,7 +263,11 @@ def render_html(md, lang, kind):
     body = re.sub(r'href="([^"#]+)\.md(#[^"]*)?"', lambda m: 'href="' + m[1] + '.html' + (m[2] or '') + '"', body)
     body = body.replace('href="../../output/pdf/', 'href="../../pdf/')
     body = body.replace('src="../../assets/', 'src="../../../assets/').replace('href="../../assets/', 'href="../../../assets/')
-    body = re.sub(r'<img src="([^"]+)" alt="([^"]*)"\s*/?>', r'<img src="\1" alt="\2" width="1040" height="680" loading="lazy">',body)
+    def html_image(match):
+        source, alt = match.groups()
+        width, height = (1239, 404) if source.endswith(INSTANCE_ID_IMAGE) else (1040, 680)
+        return f'<img src="{source}" alt="{alt}" width="{width}" height="{height}" loading="lazy">'
+    body = re.sub(r'<img src="([^"]+)" alt="([^"]*)"\s*/?>', html_image, body)
     toc = []
     def heading(m):
         slug = 'section-' + str(len(toc) + 1)
@@ -255,7 +276,7 @@ def render_html(md, lang, kind):
     body = re.sub(r'<h2>(.*?)</h2>', heading, body)
     links = ' · '.join(f'<a href="#{slug}">{text}</a>' for slug, text in toc)
     title = html.escape(md.splitlines()[0].removeprefix('# '))
-    return f'<!doctype html><html lang="{lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><style>{CSS}</style></head><body><a class="skip" href="#content">{html.escape(L["intro"][lang])}</a><header><p>JDU · Web Infrastructure · D12 P/M {MATERIAL_REVISION}</p><nav aria-label="Contents">{links}</nav></header><main id="content" tabindex="-1">{body}</main><footer>{DIST_ID} · 59 raw points · 2026-11-13</footer></body></html>'
+    return f'<!doctype html><html lang="{lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><style>{CSS}</style></head><body><a class="skip" href="#content">{html.escape(L["intro"][lang])}</a><header><p>JDU · Web Infrastructure · D12 P/M {MATERIAL_REVISION}</p><nav aria-label="Contents">{links}</nav></header><main id="content" tabindex="-1">{body}</main><footer>{DIST_ID} · 2026-11-13</footer></body></html>'
 
 def make_pdf(md, lang, target):
     from reportlab.lib import colors
@@ -318,7 +339,10 @@ def make_pdf(md, lang, target):
             if images:
                 for img in images:
                     source=(ROOT/'docs'/lang/img.attrGet('src')).resolve()
-                    flow.extend([Image(str(source),width=width,height=width*680/1040),Spacer(1,8)])
+                    picture = Image(str(source))
+                    picture.drawWidth = width
+                    picture.drawHeight = width * picture.imageHeight / picture.imageWidth
+                    flow.extend([picture,Spacer(1,8)])
                 i+=3;continue
             value=inline(tokens[i+1])
             if list_depth:value='• '+value
@@ -371,6 +395,9 @@ def main():
     assert hashlib.sha256(reg_raw).hexdigest()==EXPECTED_REGISTRY
     reg=active_registry(json.loads(reg_raw))
     write_diagrams(ROOT)
+    shared_image = ROOT / 'assets/shared' / INSTANCE_ID_IMAGE
+    shared_image.parent.mkdir(parents=True, exist_ok=True)
+    shared_image.write_bytes(INSTANCE_ID_SOURCE.read_bytes())
     assert set(CHECKS)=={c for t in reg['tasks'] if t['category']=='automated_mission' for c in t['progress_scored_checks']}
     assert set(STEP_NOTES)=={f"{module['id']}.{i}" for module in MODULES for i in range(1,len(module['steps'])+1)}
     for m in MODULES:

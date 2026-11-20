@@ -36,7 +36,7 @@
 
 ## 2026-11-03：期限更新と教材配置の実受入
 
-同日の追加受入：本人承認の元5台置換後、新5台/96GiB・全SSM・内部SSH・RDP/Firefox・採点登録・新course/公開資源配置を確認。Google/AWS登録からブラウザの5台状態、P1全項目、M1設定前3/8→実ssm-userでの設定後8/8、M0全3項目の成績外保存、本人8/62・教師表示まで合格。原本4report/receipt/hashとLATEST/GRADE一致、旧成績84行/62点byte不変、元暗号化96GiB保持を独立照合した。[初回受入](../../development/web_portal_poc/verification/2026-11-03-fresh-initial-workflow.accepted.public.json)。同じ承認済みGoogleを学生役に使用し、全49手順や新規P2〜P6/M2〜M6、独立学生の試読まで完了したとはしない。
+同日の追加受入：本人承認の元5台置換後、新5台/96GiB・全SSM・内部SSH・RDP/Firefox・採点登録・新course/公開資源配置を確認。Google/AWS登録からブラウザの5台状態、P1全項目、M1設定前3/8→実ssm-userでの設定後8/8、M0全3項目の結果保存、本人8/62・教師表示まで合格。原本4report/receipt/hashとLATEST/GRADE一致、旧成績84行/62点byte不変、元暗号化96GiB保持を独立照合した。[初回受入](../../development/web_portal_poc/verification/2026-11-03-fresh-initial-workflow.accepted.public.json)。同じ承認済みGoogleを学生役に使用し、全49手順や新規P2〜P6/M2〜M6、独立学生の試読まで完了したとはしない。
 
 正式配布r3は2027-01-31末（UZT）まで有効。同じ受入済みcore実行物/template/payloadとassessmentの全byteを保ち、期限と配布wrapperを正規署名で更新した。署名済みRENEWAL.jsonが元manifestと新manifestを対応付けるため、新courseの導入・教材配置に元stateをそのまま使える。旧state/command-state/SSH情報の4file不変を実確認。古いcoreの期限検証そのものを無効にするものではない。
 

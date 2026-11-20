@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M0 自分の環境と実行場所 (0)</title><style>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M0 自分の環境と実行場所</title><style>
 :root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
 *{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
 header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
@@ -13,24 +13,25 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">完成要件</a> · <a href="#section-2">今回の見取り図</a> · <a href="#section-3">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M0 自分の環境と実行場所 (0)</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">完成要件</a> · <a href="#section-2">操作するサーバーと教材の配置先</a> · <a href="#section-3">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M0 自分の環境と実行場所</h1>
 <p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
 <p><a href="../ja/m0.html">日本語</a> · <a href="../ru/m0.html">Русский</a> · <a href="../uz/m0.html">O‘zbekcha</a></p>
 <p>2026-11-13 · D12 P/M r1.5</p>
 <p>配布版の有効期限：2027年1月31日末（UZT）。</p>
 <p>対応する詳しい練習は<a href="p0.html">P0</a>。</p>
 <h2 id="section-1">完成要件</h2>
-<p>自分の5役割・元instance・SSM/内部SSH・本人登録の対応を確認する。構築点は0。P0を参照し、提供済み基盤を再作成しない。</p>
-<h2 id="section-2">今回の見取り図</h2>
-<p><img src="../../../assets/ja/m0.png" alt="M0: 5台は初期配備済み → 本人・接続先を確かめる → 正しい役割へSSMで入る。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。 図を参考に完成要件から設定値を自分で決めます。" width="1040" height="680" loading="lazy"></p>
-<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。 図を参考に完成要件から設定値を自分で決めます。</p>
-<p><a href="../../../assets/ja/m0.png">図を拡大する</a> · <a href="../../../assets/ja/m0.svg">SVG</a></p>
+<p>P0ではWebサーバーを例に接続を練習した。M0ではEC2の一覧から自分のDBサーバーを選び、そのインスタンスIDを使ってCloudShellからSSMで接続する。接続先がDBサーバー（役割はdb）、操作ユーザーがssm-userであることを自分で確かめる。その後、課題画面でM0を選び、自分の環境の準備結果を確認する。</p>
+<h2 id="section-2">操作するサーバーと教材の配置先</h2>
+<p><img src="../../../assets/ja/m0-ssm.png" alt="利用者PCのブラウザでAWSのCloudShellを開き、SSMで対象のEC2へ接続する。教材ファイルの配置先はWebサーバーとDBサーバー。共通登録コード方式では初期構築時に配置され、署名付き配布方式ではP0.3で配置する。" width="1040" height="680" loading="lazy"></p>
+<p>利用者PCのブラウザでAWSのCloudShellを開き、SSMで対象のEC2へ接続する。教材ファイルの配置先はWebサーバーとDBサーバー。共通登録コード方式では初期構築時に配置され、署名付き配布方式ではP0.3で配置する。</p>
+<p><img src="../../../assets/shared/ec2-instance-id-c3.png" alt="C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDをコピーする。" width="1239" height="404" loading="lazy"></p>
+<p>C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDをコピーする。</p>
 <h2 id="section-3">確認・提出</h2>
 <ol>
 <li>教師から案内された課題画面に学校のGoogleアカウントでログインし、自分のLabと <strong>M0</strong> を選ぶ。</li>
 <li>「この課題を確認する」を押す。</li>
-<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。</li>
+<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。</li>
 </ol>
 <hr />
 <p><a href="p0.html">前の課題: P0</a> · <a href="p1.html">次の課題: P1</a></p>
-</main><footer>web-course-class193548-20261103-r3 · 59 raw points · 2026-11-13</footer></body></html>
+</main><footer>web-course-class193548-20261103-r3 · 2026-11-13</footer></body></html>

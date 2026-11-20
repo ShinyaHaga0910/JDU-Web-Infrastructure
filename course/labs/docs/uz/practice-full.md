@@ -14,13 +14,13 @@ Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga 
 
 ## Qo‘llanmadan foydalanish
 
-Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P - bahoga ball qo‘shmaydigan mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.
+Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P - batafsil qadamli mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.
 
 P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6
 
-P5 uchun ham M2 DNS kerak. P4 IP bilan ulanadi, app esa db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating. P ixtiyoriy mashq; checker M ning joriy old shartlarini tekshiradi.
+P5 uchun ham M2 DNS kerak. P4 IP bilan ulanadi, app esa db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating.
 
-M1=8, M2=13, M4=9, M5=13, M6=16: jami 59 xom ball. M0=0. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.
+M1=8, M2=13, M4=9, M5=13, M6=16: bu beshta topshiriqning avtomatik tekshiruvlari jami 59 xom ball. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.
 
 ## Muhit va tayyorgarlik
 
@@ -72,15 +72,13 @@ CloudShell, Windows va beshta Ubuntu serverni farqlash; kerakli serverga SSM orq
 
 ### Topshiriq
 
-Tayyor muhitingizda beshta serverning instance ID si va rolini tekshiring. Qaysi serverga va qaysi foydalanuvchi sifatida ulanganingizni aniqlang. P0 bahoga ball qo‘shmaydi.
+Tayyor muhitingizda beshta serverning instance ID si va rolini tekshiring. Qaysi serverga va qaysi foydalanuvchi sifatida ulanganingizni aniqlang.
 
-### Topshiriq diagrammasi
+### Serverlarga ulanish va kurs fayllari
 
-![P0: Besh server oldin yaratilgan → Hisob va serverni tekshirish → To‘g‘ri serverga SSM bilan kirish。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. SSM strelkasi AWS orqali ulanishdir; EC2 kiruvchi 443 portini ochish ko‘rsatmasi emas.](../../assets/uz/p0.png)
+![O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda, imzolangan tarqatmada esa P0.3 da joylanadi.](../../assets/uz/p0-ssm.png)
 
-Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. SSM strelkasi AWS orqali ulanishdir; EC2 kiruvchi 443 portini ochish ko‘rsatmasi emas.
-
-[Kattalashtirish](../../assets/uz/p0.png) · [SVG](../../assets/uz/p0.svg)
+O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda, imzolangan tarqatmada esa P0.3 da joylanadi.
 
 ### Bu qanday ishlaydi
 
@@ -104,7 +102,11 @@ Talabaning shaxsiy AWS Console oynasi
 
 **Maqsad va amallar:**
 
-EC2 → Instances ro‘yxatida LabId va DeploymentId teglarini solishtiring. bastion/web/dns/db/repo uchun instance ID ni ish jadvaliga yozing. Faqat nomiga qarab tanlamang. Public IPv4 bastion va web da mavjud. SSM uchun public IP emas, instance ID kerak.
+EC2 → Instances ro‘yxatini oching. Name ustunida o‘z Lab serveringizni toping va shu qatordagi Instance ID ustunidan i- bilan boshlangan to‘liq ID ni oling. LabId va DeploymentId teglarini solishtiring. bastion/web/dns/db/repo uchun instance ID ni ish jadvaliga yozing. Faqat nomiga qarab tanlamang. Public IPv4 bastion va web da mavjud. SSM uchun public IP emas, instance ID kerak.
+
+![C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni nusxalang.](../../assets/shared/ec2-instance-id-c3.png)
+
+C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni nusxalang.
 
 **Buyruq va sozlamalar ma’nosi:**
 
@@ -196,11 +198,11 @@ Shaxsiy PC brauzeri: Web Portal
 
 **Maqsad va amallar:**
 
-O‘qituvchi bergan havola orqali topshiriqlar sahifasini oching. Maktab Google orqali kirib, o‘z AWS hisobingizni bog‘lang. P0 ni tanlab tekshiruvni boshlang; ishlov davom etsa natijani yangilang. M0 ni ham shu tarzda tekshiring. P0/M0 tayyorlikni tekshiradi, bahoga ball qo‘shmaydi.
+O‘qituvchi bergan havola orqali topshiriqlar sahifasini oching. Maktab Google orqali kirib, o‘z AWS hisobingizni bog‘lang. P0 ni tanlab tekshiruvni boshlang; ishlov davom etsa natijani yangilang.
 
 **Buyruq va sozlamalar ma’nosi:**
 
-Brauzer natijani avtomatik saqlaydi. PASS/FAIL/UNKNOWN va ishlov/saqlash holatini farqlang. P va M0 saqlansa ham bahoga ball qo‘shmaydi.
+Brauzer natijani avtomatik saqlaydi. PASS/FAIL/UNKNOWN va ishlov/saqlash holatini farqlang.
 
 **Kutilgan natija va ma’nosi:**
 
@@ -262,8 +264,6 @@ Web dagi /var/www/html/practice.txt belgilangan matnni HTTP 200 bilan qaytarsin:
 ![P1: HTTP topshirig‘i hali tayyor emas → Web ichida tarqatishni sozlash → Javob va log ni solishtirish。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida.](../../assets/uz/p1.png)
 
 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida.
-
-[Kattalashtirish](../../assets/uz/p1.png) · [SVG](../../assets/uz/p1.svg)
 
 - File: /var/www/html/practice.txt
 - URL path: /practice.txt
@@ -524,8 +524,6 @@ guide.lab.test → 10.20.1.20 va practice-db.lab.test → 10.20.2.20 ni sozlang;
 ![P2: IP orqali HTTP ishlaydi → DNS va resolver ni sozlash → Nom ham ayni Web ga olib boradi。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz.](../../assets/uz/p2.png)
 
 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz.
-
-[Kattalashtirish](../../assets/uz/p2.png) · [SVG](../../assets/uz/p2.svg)
 
 | DNS name | A / IPv4 |
 | --- | --- |
@@ -869,11 +867,9 @@ jdu_catalog_practice, catalog_practice_setup va catalog_practice_app ni yarating
 
 ### Topshiriq diagrammasi
 
-![P4: Web dan DB ulanishini tayyorlash → DB, role va auth ni sozlash → Ruxsatli SELECT muvaffaqiyatli。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. SSM strelkasi AWS orqali ulanishdir; EC2 kiruvchi 443 portini ochish ko‘rsatmasi emas.](../../assets/uz/p4.png)
+![P4: Web dan DB ulanishini tayyorlash → DB, role va auth ni sozlash → Ruxsatli SELECT muvaffaqiyatli。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. CloudShell dan DB serverga SSM orqali ulanib, sozlang.](../../assets/uz/p4.png)
 
-Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. SSM strelkasi AWS orqali ulanishdir; EC2 kiruvchi 443 portini ochish ko‘rsatmasi emas.
-
-[Kattalashtirish](../../assets/uz/p4.png) · [SVG](../../assets/uz/p4.svg)
+Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. CloudShell dan DB serverga SSM orqali ulanib, sozlang.
 
 - Profile: practice
 - Database: jdu_catalog_practice
@@ -1208,8 +1204,6 @@ practice profile da katalogni quring. M2 asosiy DNS va P4 hozir ham ishlashi ker
 ![P5: DNS va DB tayyor → Tayyor app ni ulash va yoqish → Amal natijasi DB va Web da。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida.](../../assets/uz/p5.png)
 
 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida.
-
-[Kattalashtirish](../../assets/uz/p5.png) · [SVG](../../assets/uz/p5.svg)
 
 - Profile: practice
 - Database: jdu_catalog_practice
@@ -1629,7 +1623,7 @@ Funksional tekshiruv faqat config faylini emas, HTTP amallari va DB yangilanishi
 
 **Kutilgan natija va ma’nosi:**
 
-13 ta mashq bandi va saqlash holati ko‘rinadi. Faqat sozlama tekshiruvi bilan funksional tekshiruvni farqlang. P bahoga qo‘shilmaydi.
+13 ta mashq bandi va saqlash holati ko‘rinadi. Faqat sozlama tekshiruvi bilan funksional tekshiruvni farqlang.
 
 **Ishlamasa:**
 
@@ -1658,8 +1652,6 @@ P5 practice profile dan foydalaning. Setup role ni o‘chiring, vaqtinchalik soz
 ![P6: App allaqachon ishlaydi → Ortiqcha huquq va yo‘lni yopish → Ruxsat ishlaydi, taqiq rad etadi。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida.](../../assets/uz/p6.png)
 
 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida.
-
-[Kattalashtirish](../../assets/uz/p6.png) · [SVG](../../assets/uz/p6.svg)
 
 - Profile: practice
 - Database: jdu_catalog_practice
@@ -1848,7 +1840,7 @@ To‘g‘ri admin amalini xato parol, setup va keraksiz yo‘l rad etilishi bila
 
 **Kutilgan natija va ma’nosi:**
 
-16 ta mashq bandi va saqlash holatini o‘qing. P bahoga qo‘shilmaydi; M6 mission profile da alohida tekshiriladi. Saqlangan baholar bo‘limida M asl bahosini ko‘rish mumkin.
+16 ta mashq bandi va saqlash holatini o‘qing. M6 mission profile da alohida tekshiriladi. Saqlangan baholar bo‘limida M asl bahosini ko‘rish mumkin.
 
 **Ishlamasa:**
 

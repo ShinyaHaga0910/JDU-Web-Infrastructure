@@ -22,9 +22,8 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-1">完成要件</h2>
 <p>本課題用DB/roleを自分で構築する。M2のdb.lab.testを通常解決し、Webのruntime roleで認証SELECTを成功させる。HBAはWeb/32・正しいDB/roleだけ。既存passwordをWeb内のmission用helperへ保存し、practiceと混ぜない。app tableはまだ不要。</p>
 <h2 id="section-2">今回の見取り図</h2>
-<p><img src="../../../assets/ja/m4.png" alt="M4: WebからDB接続を準備 → DB・role・認証を設定 → 許可したSELECTだけ成功。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。 図を参考に完成要件から設定値を自分で決めます。" width="1040" height="680" loading="lazy"></p>
-<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。 図を参考に完成要件から設定値を自分で決めます。</p>
-<p><a href="../../../assets/ja/m4.png">図を拡大する</a> · <a href="../../../assets/ja/m4.svg">SVG</a></p>
+<p><img src="../../../assets/ja/m4.png" alt="M4: WebからDB接続を準備 → DB・role・認証を設定 → 許可したSELECTだけ成功。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 CloudShellからSSMでDBサーバーに接続して設定します。 図を参考に完成要件から設定値を自分で決めます。" width="1040" height="680" loading="lazy"></p>
+<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 CloudShellからSSMでDBサーバーに接続して設定します。 図を参考に完成要件から設定値を自分で決めます。</p>
 <ul>
 <li>Profile: mission</li>
 <li>Database: jdu_catalog</li>
@@ -84,8 +83,8 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <ol>
 <li>教師から案内された課題画面に学校のGoogleアカウントでログインし、自分のLabと <strong>M4</strong> を選ぶ。</li>
 <li>「この課題を確認する」を押す。</li>
-<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。</li>
+<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。</li>
 </ol>
 <hr />
 <p><a href="p4.html">前の課題: P4</a> · <a href="p5.html">次の課題: P5</a></p>
-</main><footer>web-course-class193548-20261103-r3 · 59 raw points · 2026-11-13</footer></body></html>
+</main><footer>web-course-class193548-20261103-r3 · 2026-11-13</footer></body></html>

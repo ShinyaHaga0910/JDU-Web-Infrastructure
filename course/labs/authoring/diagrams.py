@@ -10,7 +10,7 @@ from content import T, LANGS
 W,H,SCALE=1040,680,2
 INK='#18354c';TEAL='#126e70';MUTED='#587083';RED='#ad3737';GRAY='#d8e1e8'
 STAGES=[
- (T('5台は初期配備済み','Пять узлов уже созданы','Besh server oldin yaratilgan'),T('本人・接続先を確かめる','Сверить аккаунт и сервер','Hisob va serverni tekshirish'),T('正しい役割へSSMで入る','Войти по SSM в нужную роль','To‘g‘ri serverga SSM bilan kirish')),
+ None,
  (T('Webの練習配信は未完成','HTTP-задание ещё не готово','HTTP topshirig‘i hali tayyor emas'),T('Web内の配信を設定する','Настроить выдачу на Web','Web ichida tarqatishni sozlash'),T('本文とログを照合する','Сверить ответ и журнал','Javob va log ni solishtirish')),
  (T('IP指定のHTTPが使える','HTTP по IP уже работает','IP orqali HTTP ishlaydi'),T('DNSとresolverを設定する','Настроить DNS и resolver','DNS va resolver ni sozlash'),T('名前でも同じWebへ届く','Имя ведёт к тому же Web','Nom ham ayni Web ga olib boradi')),
  (T('同じWebの元ディスク','Исходный диск того же Web','Ayni Web ning asl diski'),T('記録 → Stop → Start','Запись → Stop → Start','Qayd → Stop → Start'),T('内容保持と新boot ID','Данные сохранены, boot ID новый','Mazmun saqlangan, boot ID yangi')),
@@ -100,12 +100,53 @@ class Scene:
         self.image.save(target.with_suffix('.png'),optimize=True)
         return len(self.text_bounds)
 
+def diagram_stem(task):
+    return task.lower()+'-ssm' if task.endswith('0') else task.lower()
+
+
+def connection_diagram(s):
+    lang=s.lang
+    s.text(25,15,T('CloudShellから各EC2に接続する','Подключение из CloudShell к EC2','CloudShell dan EC2 serverlariga ulanish')[lang],25)
+    s.rect(224,65,790,575,fill='#f1f7fc',stroke='#7e9cb3',width=2)
+    s.text(247,77,'AWS',20)
+    s.rect(565,105,424,492,fill='white',stroke='#7e9cb3',width=2)
+    s.text(588,116,'VPC  10.20.0.0/16',19)
+    s.simple(35,302,LABELS['pc'][lang],w=150)
+    s.simple(248,302,'CloudShell',w=156,ellipse=True)
+    browser=T('ブラウザ','Браузер','Brauzer')[lang]
+    s.path([(185,335),(248,335)],browser,(217,279))
+    s.text(326,383,T('接続先をIDで指定','Выбор узла по ID','Server ID sini tanlash')[lang],17,center=True)
+    target = T('P0の練習先：Webサーバー','Практика P0: Web-сервер','P0 mashqi: Web server') if s.task=='P0' else T(
+        'M0の接続先：DBサーバー','Цель подключения M0: DB-сервер','M0 ulanish manzili: DB server')
+    s.text(393,485,target[lang],18,color=TEAL,center=True,max_width=322)
+    roles=('bastion','web','dns','db','repo')
+    for i,role in enumerate(roles):
+        y=155+i*84
+        middle=y+30
+        s.path([(404,335),(624,335),(624,middle),(655,middle)])
+        s.rect(655,y,309,71,fill='#e7f4f2' if role in ('web','db') else '#f4f7fa',stroke=TEAL if role in ('web','db') else GRAY,width=2)
+        s.text(670,y+6,'EC2 '+LABELS[role][lang],18)
+        s.text(900,y+8,IPS[role],15,color=MUTED,center=True)
+        if role in ('web','db'):
+            s.text(670,y+37,T('教材ファイルの配置先','Здесь размещаются файлы курса','Kurs fayllari shu yerga joylanadi')[lang],16,color=TEAL)
+    s.text(490,289,'SSM',22,color=TEAL,center=True)
+    s.text(490,370,'Session Manager',16,color=TEAL,center=True)
+    s.text(810,609,T('接続先のOSユーザー：ssm-user','Пользователь ОС: ssm-user','OS foydalanuvchisi: ssm-user')[lang],17,center=True)
+
+
 def diagram_text(task,lang):
-    n=int(task[1:]);before,action,result=STAGES[n]
+    n=int(task[1:])
+    if n==0:
+        caption=T(
+            '利用者PCのブラウザでAWSのCloudShellを開き、SSMで対象のEC2へ接続する。教材ファイルの配置先はWebサーバーとDBサーバー。共通登録コード方式では初期構築時に配置され、署名付き配布方式ではP0.3で配置する。',
+            'Откройте CloudShell в AWS из браузера на своём PC и подключитесь к нужному EC2 через SSM. Файлы курса размещаются на Web и DB. При установке по общему коду они размещаются во время создания среды, при подписанном комплекте — в P0.3.',
+            'O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda, imzolangan tarqatmada esa P0.3 da joylanadi.')[lang]
+        return caption,caption
+    before,action,result=STAGES[n]
     caption=T('図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。','Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки.','Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir.')[lang]
     caption+=' '+T('SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。','Разрешения SG заданы начальным комплектом; здесь настраивается сервер.','SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz.')[lang]
-    if n in (0,4):
-        caption+=' '+T('SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。','Стрелка SSM означает подключение через AWS, а не открытие входящего 443 на EC2.','SSM strelkasi AWS orqali ulanishdir; EC2 kiruvchi 443 portini ochish ko‘rsatmasi emas.')[lang]
+    if n==4:
+        caption+=' '+T('CloudShellからSSMでDBサーバーに接続して設定します。','Подключитесь из CloudShell к DB через SSM и настройте сервер.','CloudShell dan DB serverga SSM orqali ulanib, sozlang.')[lang]
     if n==3:
         caption+=' '+T('Stop/StartはAWS APIによる管理操作で、Webの受信443番を開く操作ではありません。','Stop/Start выполняется через AWS API, а не через входящий 443 Web.','Stop/Start AWS API boshqaruvidir; Web kiruvchi 443 portini ochish emas.')[lang]
     if n in (5,6):
@@ -123,6 +164,11 @@ def write_diagrams(root):
         for prefix in ('P','M'):
             for n in ACTIVE_NUMBERS:
                 task=prefix+str(n);s=Scene(lang,task)
+                if n==0:
+                    connection_diagram(s)
+                    alt,_=diagram_text(task,lang)
+                    counts[f'{lang}/{task}']=s.finish(root/'assets'/lang/diagram_stem(task),alt)
+                    continue
                 s.text(24,12,f'{task} · '+T('いま何をしているか','Что мы сейчас делаем','Hozir nima qilamiz')[lang],24)
                 for i,(label,value) in enumerate(zip(('before','now','result'),STAGES[n])):
                     x=24+i*338;s.rect(x,60,316,112,fill='#e7f4f2' if i==1 else '#f4f7fa',stroke=TEAL if i==1 else GRAY)
@@ -131,16 +177,7 @@ def write_diagrams(root):
                         s.text(x+12,96+j*28,line,20,max_width=288)
                 s.rect(24,194,992,426,stroke=GRAY)
                 s.text(44,204,LABELS['legend'][lang],18,color=MUTED)
-                if n==0:
-                    s.simple(56,264,LABELS['pc'][lang]);s.simple(430,264,'CloudShell',ellipse=True)
-                    s.path([(246,296),(430,296)],'HTTPS 443',(338,260))
-                    s.path([(525,329),(525,423)],'SSM / HTTPS 443',(525,360))
-                    for i,role in enumerate(('bastion','web','dns','db','repo')):
-                        x=44+i*196
-                        s.path([(525,423),(x+82,423),(x+82,480)])
-                        s.node(role,x,480,True,w=164)
-                    s.text(525,589,'ssm-user',20,color=TEAL,center=True)
-                elif n==1:
+                if n==1:
                     s.internet_boundary(440)
                     s.simple(56,270,LABELS['pc'][lang]);s.simple(380,270,'IGW',w=120)
                     s.node('web',770,270,True);s.node('bastion',500,472);s.node('repo',770,482)
@@ -171,7 +208,7 @@ def write_diagrams(root):
                     s.path([(256,320),(770,320)],'PostgreSQL / TCP 5432',(510,280))
                     s.text(520,389,'SELECT / SCRAM',21,center=True,color=TEAL)
                     s.simple(66,488,'CloudShell',ellipse=True)
-                    s.path([(256,520),(660,520),(660,348),(770,348)],'SSM / HTTPS 443',(507,488))
+                    s.path([(256,520),(660,520),(660,348),(770,348)],'SSM',(507,488))
                     s.text(520,570,T('Web /32・正しいDB・正しいroleだけ許可','Разрешить только Web /32 и нужные DB/role','Faqat Web /32 va to‘g‘ri DB/role ga ruxsat')[lang],18,center=True)
                 else:
                     s.internet_boundary(325)
@@ -194,12 +231,11 @@ def write_diagrams(root):
                 next_task=ORDER[pos+1] if pos+1<len(ORDER) else T('M成績の確認','Проверка оценок M','M baholarini ko‘rish')[lang]
                 s.text(26,638,T('次に進む先：','Далее: ','Keyingi: ')[lang]+next_task,20,color=TEAL)
                 alt,_=diagram_text(task,lang)
-                counts[f'{lang}/{task}']=s.finish(root/'assets'/lang/task.lower(),alt)
+                counts[f'{lang}/{task}']=s.finish(root/'assets'/lang/diagram_stem(task),alt)
     return counts
 
 def diagram_markdown(task,lang):
     alt,caption=diagram_text(task,lang)
-    name=f'../../assets/{lang}/{task.lower()}'
-    title=T('今回の見取り図','Схема задания','Topshiriq diagrammasi')[lang]
-    zoom=T('図を拡大する','Открыть крупно','Kattalashtirish')[lang]
-    return ['### '+title,'',f'![{alt}]({name}.png)','',caption,'',f'[{zoom}]({name}.png) · [SVG]({name}.svg)','']
+    name=f'../../assets/{lang}/{diagram_stem(task)}'
+    title=T('操作するサーバーと教材の配置先','Подключение к серверам и файлы курса','Serverlarga ulanish va kurs fayllari')[lang] if task.endswith('0') else T('今回の見取り図','Схема задания','Topshiriq diagrammasi')[lang]
+    return ['### '+title,'',f'![{alt}]({name}.png)','',caption,'']

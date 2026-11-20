@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Qo‘llanmadan foydalanish</a> · <a href="#section-2">Muhit va tayyorgarlik</a> · <a href="#section-3">Qadamlarni qanday o‘qish kerak</a> · <a href="#section-4">Tayyor tizim va ulanish yo‘llari</a> · <a href="#section-5">Mustaqil topshiriqdan oldin</a> · <a href="#section-6">M0 Shaxsiy muhit va buyruqlarni bajarish joyi (0)</a> · <a href="#section-7">M1 HTTP orqali statik faylni qaytarish (8)</a> · <a href="#section-8">M2 Ichki DNS va odatiy nom yechimi (13)</a> · <a href="#section-9">M4 PostgreSQL ga autentifikatsiya bilan ulanish (9)</a> · <a href="#section-10">M5 Berilgan app ni Web va DB bilan bog‘lash (13)</a> · <a href="#section-11">M6 Eng kam huquq va ochiq kirish chegarasi (16)</a> · <a href="#section-12">Davom ettirish va natijalar</a> · <a href="#section-13">Manbalar va versiya</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: M0-M6 mustaqil topshiriqlar</h1>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Qo‘llanmadan foydalanish</a> · <a href="#section-2">Muhit va tayyorgarlik</a> · <a href="#section-3">Qadamlarni qanday o‘qish kerak</a> · <a href="#section-4">Tayyor tizim va ulanish yo‘llari</a> · <a href="#section-5">Mustaqil topshiriqdan oldin</a> · <a href="#section-6">M0 Shaxsiy muhit va buyruqlarni bajarish joyi</a> · <a href="#section-7">M1 HTTP orqali statik faylni qaytarish (8)</a> · <a href="#section-8">M2 Ichki DNS va odatiy nom yechimi (13)</a> · <a href="#section-9">M4 PostgreSQL ga autentifikatsiya bilan ulanish (9)</a> · <a href="#section-10">M5 Berilgan app ni Web va DB bilan bog‘lash (13)</a> · <a href="#section-11">M6 Eng kam huquq va ochiq kirish chegarasi (16)</a> · <a href="#section-12">Davom ettirish va natijalar</a> · <a href="#section-13">Manbalar va versiya</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: M0-M6 mustaqil topshiriqlar</h1>
 <p>2026-11-13 | D12 P/M r1.5 | web-course-class193548-20261103-r3</p>
 <p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
 <p>O‘qituvchi tekshiruvi uchun birinchi nashr. Talabaning qo‘llanma bo‘yicha boshidan oxirigacha o‘tishi hali tekshirilmagan.</p>
@@ -21,10 +21,10 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p><a href="../ja/missions-full.html">日本語</a> · <a href="../ru/missions-full.html">Русский</a> · <a href="../uz/missions-full.html">O‘zbekcha</a></p>
 <p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a></p>
 <h2 id="section-1">Qo‘llanmadan foydalanish</h2>
-<p>Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P - bahoga ball qo‘shmaydigan mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.</p>
+<p>Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P - batafsil qadamli mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.</p>
 <p>P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6</p>
-<p>P5 uchun ham M2 DNS kerak. P4 IP bilan ulanadi, app esa db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating. P ixtiyoriy mashq; checker M ning joriy old shartlarini tekshiradi.</p>
-<p>M1=8, M2=13, M4=9, M5=13, M6=16: jami 59 xom ball. M0=0. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.</p>
+<p>P5 uchun ham M2 DNS kerak. P4 IP bilan ulanadi, app esa db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating.</p>
+<p>M1=8, M2=13, M4=9, M5=13, M6=16: bu beshta topshiriqning avtomatik tekshiruvlari jami 59 xom ball. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.</p>
 <h2 id="section-2">Muhit va tayyorgarlik</h2>
 <p>Avval boshlang‘ich tarqatma imzosi, yangi beshta server yoki mavjud muhitga install, ichki SSH va shaxsiy ro‘yxatni tugating. Yo‘riqnoma zip dagi distribution/STUDENT.md da. Maxfiy kalitni umumiy Windows ga saqlamang; shaxsiy Academy hisobining CloudShell idan foydalaning. O‘qituvchi anonim Lab ID, fingerprint va muddatni beradi.</p>
 <p>Umumiy private IP quyida; public IPv4 doimiy emas. AWS region us-east-1, Ubuntu24.04/amd64. RDP: labuser; SSM: ssm-user; ichki SSH: ubuntu. User nomi va server rolini adashtirmang.</p>
@@ -131,18 +131,19 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>Talablardan qaysi serverdagi file, nom, DB yoki role o‘zgarishini ish jadvaliga yozing. P va M qiymatlarini solishtirib M obyektlarini tanlang. Tekshiruv jadvali command tartibi emas, kerakli tayyor holatni bildiradi.</p>
 <p>Keyin har talabni qayerdan va nima bilan tekshirishni belgilang. Faylni ko‘rish joyi bilan ulanishni sinash joyi bir xil bo‘lmasligi mumkin. Ruxsatli yo‘l muvaffaqiyati va taqiqlangan yo‘l rad etilishini alohida yozing.</p>
 <p>Brauzerda topshiriqni tanlab natija va saqlash holatini tekshiring. M5/M6 funksiyalari uchun app administratorining mavjud parolini yashirin kiriting. Baholar avtomatik saqlanadi. Tushunish savollari va qaydlar bahoga qo‘shimcha talab emas.</p>
-<h2 id="section-6">M0 Shaxsiy muhit va buyruqlarni bajarish joyi (0)</h2>
+<h2 id="section-6">M0 Shaxsiy muhit va buyruqlarni bajarish joyi</h2>
 <h3>Tayyor holat talablari</h3>
-<p>Beshta rol, asl instance, SSM/ichki SSH va shaxsiy ro‘yxat mosligini tekshiring. 0 ball. P0 ga qarang; asosni qayta yaratmang.</p>
-<h3>Topshiriq diagrammasi</h3>
-<p><img src="../../../assets/uz/m0.png" alt="M0: Besh server oldin yaratilgan → Hisob va serverni tekshirish → To‘g‘ri serverga SSM bilan kirish。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. SSM strelkasi AWS orqali ulanishdir; EC2 kiruvchi 443 portini ochish ko‘rsatmasi emas. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
-<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. SSM strelkasi AWS orqali ulanishdir; EC2 kiruvchi 443 portini ochish ko‘rsatmasi emas. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
-<p><a href="../../../assets/uz/m0.png">Kattalashtirish</a> · <a href="../../../assets/uz/m0.svg">SVG</a></p>
+<p>P0 da Web serverga ulanishni mashq qildingiz. M0 da EC2 ro‘yxatidan o‘z DB serveringizni toping va uning instance ID si orqali CloudShell dan SSM bilan ulaning. DB serverda (roli db) ssm-user foydalanuvchisi bilan ishlayotganingizni tekshiring. So‘ng topshiriqlar sahifasida M0 ni tanlab, muhitingiz tayyorligini tekshiring.</p>
+<h3>Serverlarga ulanish va kurs fayllari</h3>
+<p><img src="../../../assets/uz/m0-ssm.png" alt="O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda, imzolangan tarqatmada esa P0.3 da joylanadi." width="1040" height="680" loading="lazy"></p>
+<p>O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda, imzolangan tarqatmada esa P0.3 da joylanadi.</p>
+<p><img src="../../../assets/shared/ec2-instance-id-c3.png" alt="C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni nusxalang." width="1239" height="404" loading="lazy"></p>
+<p>C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni nusxalang.</p>
 <h3>Tekshirish va yuborish</h3>
 <ol>
 <li>O‘qituvchi bergan havola orqali topshiriqlar sahifasini oching, ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda <strong>M0</strong> ni tanlang.</li>
 <li>Tanlangan topshiriq tekshiruvini boshlang.</li>
-<li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida. P va M0 bahoga qo‘shilmaydi.</li>
+<li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida.</li>
 </ol>
 <h2 id="section-7">M1 HTTP orqali statik faylni qaytarish (8)</h2>
 <h3>Tayyor holat talablari</h3>
@@ -150,7 +151,6 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h3>Topshiriq diagrammasi</h3>
 <p><img src="../../../assets/uz/m1.png" alt="M1: HTTP topshirig‘i hali tayyor emas → Web ichida tarqatishni sozlash → Javob va log ni solishtirish。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
 <p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
-<p><a href="../../../assets/uz/m1.png">Kattalashtirish</a> · <a href="../../../assets/uz/m1.svg">SVG</a></p>
 <ul>
 <li>File: /var/www/html/mission.txt</li>
 <li>URL path: /mission.txt</li>
@@ -205,7 +205,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <ol>
 <li>O‘qituvchi bergan havola orqali topshiriqlar sahifasini oching, ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda <strong>M1</strong> ni tanlang.</li>
 <li>Tanlangan topshiriq tekshiruvini boshlang.</li>
-<li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida. P va M0 bahoga qo‘shilmaydi.</li>
+<li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida.</li>
 </ol>
 <h2 id="section-8">M2 Ichki DNS va odatiy nom yechimi (13)</h2>
 <h3>Tayyor holat talablari</h3>
@@ -213,7 +213,6 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h3>Topshiriq diagrammasi</h3>
 <p><img src="../../../assets/uz/m2.png" alt="M2: IP orqali HTTP ishlaydi → DNS va resolver ni sozlash → Nom ham ayni Web ga olib boradi。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
 <p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
-<p><a href="../../../assets/uz/m2.png">Kattalashtirish</a> · <a href="../../../assets/uz/m2.svg">SVG</a></p>
 <table>
 <thead>
 <tr>
@@ -319,15 +318,14 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <ol>
 <li>O‘qituvchi bergan havola orqali topshiriqlar sahifasini oching, ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda <strong>M2</strong> ni tanlang.</li>
 <li>Tanlangan topshiriq tekshiruvini boshlang.</li>
-<li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida. P va M0 bahoga qo‘shilmaydi.</li>
+<li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida.</li>
 </ol>
 <h2 id="section-9">M4 PostgreSQL ga autentifikatsiya bilan ulanish (9)</h2>
 <h3>Tayyor holat talablari</h3>
 <p>Asosiy DB va rollarni mustaqil quring. M2 db.lab.test ni odatiy resolver bilan yechib Web runtime role orqali SELECT bajaring. HBA faqat Web/32 va to‘g‘ri DB/role juftiga ruxsat beradi. Mavjud parolni Web mission helper orqali practice dan alohida saqlang. App jadvallari hali kerak emas.</p>
 <h3>Topshiriq diagrammasi</h3>
-<p><img src="../../../assets/uz/m4.png" alt="M4: Web dan DB ulanishini tayyorlash → DB, role va auth ni sozlash → Ruxsatli SELECT muvaffaqiyatli。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. SSM strelkasi AWS orqali ulanishdir; EC2 kiruvchi 443 portini ochish ko‘rsatmasi emas. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
-<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. SSM strelkasi AWS orqali ulanishdir; EC2 kiruvchi 443 portini ochish ko‘rsatmasi emas. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
-<p><a href="../../../assets/uz/m4.png">Kattalashtirish</a> · <a href="../../../assets/uz/m4.svg">SVG</a></p>
+<p><img src="../../../assets/uz/m4.png" alt="M4: Web dan DB ulanishini tayyorlash → DB, role va auth ni sozlash → Ruxsatli SELECT muvaffaqiyatli。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. CloudShell dan DB serverga SSM orqali ulanib, sozlang. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
+<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. CloudShell dan DB serverga SSM orqali ulanib, sozlang. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
 <ul>
 <li>Profile: mission</li>
 <li>Database: jdu_catalog</li>
@@ -387,7 +385,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <ol>
 <li>O‘qituvchi bergan havola orqali topshiriqlar sahifasini oching, ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda <strong>M4</strong> ni tanlang.</li>
 <li>Tanlangan topshiriq tekshiruvini boshlang.</li>
-<li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida. P va M0 bahoga qo‘shilmaydi.</li>
+<li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida.</li>
 </ol>
 <h2 id="section-10">M5 Berilgan app ni Web va DB bilan bog‘lash (13)</h2>
 <h3>Tayyor holat talablari</h3>
@@ -395,7 +393,6 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h3>Topshiriq diagrammasi</h3>
 <p><img src="../../../assets/uz/m5.png" alt="M5: DNS va DB tayyor → Tayyor app ni ulash va yoqish → Amal natijasi DB va Web da。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
 <p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
-<p><a href="../../../assets/uz/m5.png">Kattalashtirish</a> · <a href="../../../assets/uz/m5.svg">SVG</a></p>
 <ul>
 <li>Profile: mission</li>
 <li>Database: jdu_catalog</li>
@@ -501,7 +498,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <ol>
 <li>O‘qituvchi bergan havola orqali topshiriqlar sahifasini oching, ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda <strong>M5</strong> ni tanlang.</li>
 <li>Funksiya/huquq tekshiruvini tanlang, lab_admin mavjud parolini app administratorining yashirin maydoniga kiritib, shu parol bilan tekshiring. Bu RDP paroli emas. Faqat sozlama tekshiruvi funksiyalarni tasdiqlamaydi.</li>
-<li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida. P va M0 bahoga qo‘shilmaydi.</li>
+<li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida.</li>
 </ol>
 <h2 id="section-11">M6 Eng kam huquq va ochiq kirish chegarasi (16)</h2>
 <h3>Tayyor holat talablari</h3>
@@ -509,7 +506,6 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h3>Topshiriq diagrammasi</h3>
 <p><img src="../../../assets/uz/m6.png" alt="M6: App allaqachon ishlaydi → Ortiqcha huquq va yo‘lni yopish → Ruxsat ishlaydi, taqiq rad etadi。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
 <p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
-<p><a href="../../../assets/uz/m6.png">Kattalashtirish</a> · <a href="../../../assets/uz/m6.svg">SVG</a></p>
 <ul>
 <li>Profile: mission</li>
 <li>Database: jdu_catalog</li>
@@ -627,7 +623,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <ol>
 <li>O‘qituvchi bergan havola orqali topshiriqlar sahifasini oching, ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda <strong>M6</strong> ni tanlang.</li>
 <li>Funksiya/huquq tekshiruvini tanlang, lab_admin mavjud parolini app administratorining yashirin maydoniga kiritib, shu parol bilan tekshiring. Bu RDP paroli emas. Faqat sozlama tekshiruvi funksiyalarni tasdiqlamaydi.</li>
-<li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida. P va M0 bahoga qo‘shilmaydi.</li>
+<li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida.</li>
 </ol>
 <h2 id="section-12">Davom ettirish va natijalar</h2>
 <p>Keyingi safar o‘z Lab va ayni besh serverni ishga tushirib, running/SSM Online va joriy public IP ni tekshiring. Web Portal ga maktab Google orqali kirib, M0 tayyorligidan boshlang. Yaratish, kalit va ro‘yxatni har safar takrorlamang. Muddat tugasa o‘qituvchidan yangilashni so‘rang.</p>
@@ -644,4 +640,4 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <li><a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">PostgreSQL 16: pg_hba.conf</a></li>
 <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html">EC2 instance states</a></li>
 </ul>
-</main><footer>web-course-class193548-20261103-r3 · 59 raw points · 2026-11-13</footer></body></html>
+</main><footer>web-course-class193548-20261103-r3 · 2026-11-13</footer></body></html>

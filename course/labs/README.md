@@ -11,7 +11,7 @@
 | Русский | [Практика P](docs/ru/practice.md) | [Задания M](docs/ru/missions.md) |
 | O‘zbekcha | [P mashqlar](docs/uz/practice.md) | [M topshiriqlar](docs/uz/missions.md) |
 
-P3/M3は2026-11-13に削除したため欠番です。DNSからDBへ進みます。現行の成績は5課題・合計59点で集計します。
+P3/M3は2026-11-13に削除したため欠番です。DNSからDBへ進みます。
 
 ## 教科書と演習を進める順番
 
@@ -21,7 +21,7 @@ P3/M3は2026-11-13に削除したため欠番です。DNSからDBへ進みます
 
 | 学ぶテーマ | 先に読む教科書 | 次に取り組む演習 | 課題画面で確認する点数 |
 | --- | --- | --- | --- |
-| システムの全体像と接続 | [C1 Webシステムの構成](../textbook/docs/ja/01-web-system.md)<br>[C2 AWSのネットワークと通信経路](../textbook/docs/ja/02-network-paths.md)<br>[C3 サーバーへの接続と作業場所](../textbook/docs/ja/03-connecting-and-working.md) | [P0 環境と実行場所](#p0-共通登録コード方式で接続を練習する) → [M0 環境と実行場所](docs/ja/m0.md) | M0は0点 |
+| システムの全体像と接続 | [C1 Webシステムの構成](../textbook/docs/ja/01-web-system.md)<br>[C2 AWSのネットワークと通信経路](../textbook/docs/ja/02-network-paths.md)<br>[C3 サーバーへの接続と作業場所](../textbook/docs/ja/03-connecting-and-working.md) | [P0 環境と実行場所](#p0-共通登録コード方式で接続を練習する) → [M0 環境と実行場所](docs/ja/m0.md) | 授業で案内 |
 | HTTPでファイルを配信する | [C4 HTTPの仕組み](../textbook/docs/ja/04-http-requests-and-responses.md)<br>[C5 Nginxで静的ファイルを配信](../textbook/docs/ja/05-nginx-static-files.md) | [P1](docs/ja/p1.md) → [M1](docs/ja/m1.md) | 8/8 |
 | DNSで名前を解決する | [C6 DNSによる名前解決](../textbook/docs/ja/06-dns-name-resolution.md)<br>[C7 内部DNSの設定と動作確認](../textbook/docs/ja/07-internal-dns-configuration.md) | [P2](docs/ja/p2.md) → [M2](docs/ja/m2.md) | 13/13 |
 | PostgreSQLの接続と認証 | [C8 リレーショナルDBとSQL](../textbook/docs/ja/08-databases-and-sql.md)<br>[C9 PostgreSQLの接続と認証](../textbook/docs/ja/09-postgresql-connections.md) | [P4](docs/ja/p4.md) → [M4](docs/ja/m4.md) | 9/9 |
@@ -31,7 +31,7 @@ P3/M3は2026-11-13に削除したため欠番です。DNSからDBへ進みます
 | 自力課題の公開範囲と権限を仕上げる | 必要な箇所をC12で読み返す | [M6](docs/ja/m6.md) | 16/16 |
 | 運用・保守と障害への対応 | [C13 運用・保守と障害への対応](../textbook/docs/ja/13-observation-and-recovery.md) | M6の後に読みます。演習中にエラーが出たときも参照できます。 | — |
 
-P5で使った練習環境をP6で整理してから、M5の自力課題用環境へ切り替えます。Pは成績外です。M1・M2・M4・M5・M6は合計**59素点**で、科目の25点への換算は教師が行います。
+P5で使った練習環境をP6で整理してから、M5の自力課題用環境へ切り替えます。M1・M2・M4・M5・M6の自動採点は計**59素点**です。授業の配点は教師の案内に従ってください。
 
 ### C1 → C2 → C3 → P0 → M0の進め方
 
@@ -46,16 +46,16 @@ C1では備品管理システムの全体像と5台の役割をつかみます�
 3. 踏み台のデスクトップ内で端末を開き、`lab-ssh web` を実行します。接続後の `id -un` は `ubuntu`、`hostname -I` にはWebの内部IP `10.20.1.20` が表示されます。
 4. [P0.2](docs/ja/p0.md#p02-ssmで入り戻る)に沿って、学生用CloudShellからWebへSSM接続します。ユーザー `ssm-user` とサーバーの役割 `web` を確認します。P1の設定作業でもこの経路を使います。
 
-[M0](docs/ja/m0.md)では、自分の環境で操作先とユーザーを選べることを確かめます。教師が課題画面を案内したら、P0.4とM0を画面でも確認します。共通登録コード方式のウォークスルーで課題画面の接続設定がこれからの場合は、P0の接続確認を済ませてC4・C5へ進み、P1の設定作業に入れます。
+[M0](docs/ja/m0.md)では、P0で練習したWebサーバーへの接続を応用します。EC2の一覧から自分のDBサーバーを選び、SSMで接続して、役割が db、操作ユーザーが ssm-user であることを確認します。教師が課題画面を案内したら、P0.4とM0を画面でも確認します。共通登録コード方式のウォークスルーで課題画面の接続設定がこれからの場合は、P0の接続確認を済ませてC4・C5へ進み、P1の設定作業に入れます。
 
-[署名付き配布方式のP0](docs/ja/p0.md)を使う場合は、P0.3で教材を配置します。
+[署名付き配布方式のP0](docs/ja/p0.md)を使う場合は、P0.3で後の演習に使う教材ファイルをWebサーバーとDBサーバーに配置します。共通登録コード方式では、環境構築時にその2台へ配置されます。
 
 各Pでは、実行場所・目的・操作・設定の意味・期待結果・困ったときの確認先を順に読みます。
 Mには完成要件と採点条件を載せています。
 
 コマンドの直前には、`# 1. …` のように操作の目的と番号を付けています。
 番号はP1.2などの各手順内で振り直します。psql内では`-- 1. …`を使い、設定ファイルに書く本文とは区別しています。
-各P/Mの図は「開始時点 → 今回の操作 → 確認する結果」と、設定・通信の対象を示します。図は拡大して読めます。
+各P/Mの図は、設定対象と通信経路を示します。
 
 **SGはCloudFormationで初期設定済みです。現行P/Mの採点対象はサーバー内の設定で、SGを学生が変更する採点課題は含みません。**
 

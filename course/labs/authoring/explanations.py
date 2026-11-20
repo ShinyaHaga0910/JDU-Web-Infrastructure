@@ -132,9 +132,9 @@ note('P0.3',
  'Открытые учебные файлы - материалы приложения и SQL, а не готовая служба. Stage_resources.py запускается в CloudShell и переносит их на Web/DB. Сохранение zip в Windows само по себе не создаёт файлов в EC2.',
  'Ochiq resurslar app va SQL materiallaridir, tayyor service emas. Stage_resources.py CloudShell da ishga tushib ularni Web/DB ga joylaydi. Zip ni Windows ga saqlashning o‘zi EC2 da fayl yaratmaydi.')
 note('P0.4',
- 'ブラウザの確認結果は自動保存される。結果のPASS/FAIL/UNKNOWNと、処理・保存の状態を分けて読む。PとM0は保存されても成績に加算しない。',
- 'Браузер сохраняет результат автоматически. Различайте PASS/FAIL/UNKNOWN и статус обработки/сохранения. P и M0 не добавляют баллов даже после сохранения.',
- 'Brauzer natijani avtomatik saqlaydi. PASS/FAIL/UNKNOWN va ishlov/saqlash holatini farqlang. P va M0 saqlansa ham bahoga ball qo‘shmaydi.')
+ 'ブラウザの確認結果は自動保存される。結果のPASS/FAIL/UNKNOWNと、処理・保存の状態を分けて読む。',
+ 'Браузер сохраняет результат автоматически. Различайте PASS/FAIL/UNKNOWN и статус обработки/сохранения.',
+ 'Brauzer natijani avtomatik saqlaydi. PASS/FAIL/UNKNOWN va ishlov/saqlash holatini farqlang.')
 note('P0.5',
  'RDPは踏み台の画面と入力を運ぶ。踏み台内Firefoxからの通信の送信元はWindowsではなく踏み台になる。日本語/英語などのキー配列はpasswordの記号入力にも影響するため、表示言語と配列を区別する。',
  'RDP передаёт экран и ввод бастиона. Запрос Firefox внутри RDP идёт от бастиона, а не Windows. Раскладка клавиатуры влияет на символы пароля; язык интерфейса и раскладка - разные настройки.',

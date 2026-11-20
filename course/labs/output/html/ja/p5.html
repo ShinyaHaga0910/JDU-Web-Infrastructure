@@ -26,7 +26,6 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-3">今回の見取り図</h2>
 <p><img src="../../../assets/ja/p5.png" alt="P5: DNSとDBは準備済み → 提供アプリを接続・起動 → 操作結果がDBと画面へ。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 8000番はWeb内部だけ、8080番は踏み台からの管理用です。 左はインターネット側、右の枠はAWSのVPCです。IGWはVPCの境界に置き、踏み台を含む全EC2はAWS側にあります。" width="1040" height="680" loading="lazy"></p>
 <p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 8000番はWeb内部だけ、8080番は踏み台からの管理用です。 左はインターネット側、右の枠はAWSのVPCです。IGWはVPCの境界に置き、踏み台を含む全EC2はAWS側にあります。</p>
-<p><a href="../../../assets/ja/p5.png">図を拡大する</a> · <a href="../../../assets/ja/p5.svg">SVG</a></p>
 <ul>
 <li>Profile: practice</li>
 <li>Database: jdu_catalog_practice</li>
@@ -313,7 +312,7 @@ psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &qu
 <p><strong>コマンド・設定値の意味:</strong></p>
 <p>機能確認は設定ファイルの存在だけでなく、実際のHTTP操作とDB更新を確かめる。パスワード欄はアプリ管理者の既存値用で、RDPの値ではない。確認結果と保存状態を両方読む。</p>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>練習13項目と保存状態が表示される。設定だけの確認と機能確認を区別する。Pは成績外。</p>
+<p>練習13項目と保存状態が表示される。設定だけの確認と機能確認を区別する。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>誤パスワードなら既存の正しい値でやり直す。結果の更新だけなら「結果を更新する」を使う。新しい機能確認は確認用CKレコードを1件追加する。</p>
 <h2 id="section-6">理解の確認（採点外）</h2>
@@ -322,4 +321,4 @@ psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &qu
 <p>言えない。HTTPの到達、DBの値、is_publicによる表示の分離をそれぞれ確認する。</p>
 <hr />
 <p><a href="m4.html">前の課題: M4</a> · <a href="p6.html">次の課題: P6</a></p>
-</main><footer>web-course-class193548-20261103-r3 · 59 raw points · 2026-11-13</footer></body></html>
+</main><footer>web-course-class193548-20261103-r3 · 2026-11-13</footer></body></html>

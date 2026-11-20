@@ -26,8 +26,9 @@ from content import MODULES,LANGS
 from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, active_registry
 MODULES_BY_NUMBER = {int(m["id"][1:]): m for m in MODULES}
 MODULES = [MODULES_BY_NUMBER[n] for n in ACTIVE_NUMBERS]
-from build import KIT,EXPECTED_REGISTRY,MATERIAL_REVISION
+from build import KIT,EXPECTED_REGISTRY,MATERIAL_REVISION,INSTANCE_ID_IMAGE,INSTANCE_ID_SOURCE
 from pages import expiry_text
+from diagrams import diagram_stem
 from command_notes import annotated_blocks,command_groups,executable_only,explanation,CONFIG_STEPS
 from PIL import Image
 import xml.etree.ElementTree as ET
@@ -88,7 +89,7 @@ def main():
             ok(f'{lang}_{kind}_pdf_A4',all(abs(float(p.mediabox.width)-595.276)<1 and abs(float(p.mediabox.height)-841.890)<1 for p in pdf.pages))
             ok(f'{lang}_{kind}_pdf_text',len(text)>5000 and all(prefix+str(n) in text for n in ACTIVE_NUMBERS for prefix in [('P' if kind=='practice' else 'M')]) and '\ufffd' not in text and '\x00' not in text)
             images=sum(sum(obj.get_object().get('/Subtype')=='/Image' for obj in p.get('/Resources',{}).get('/XObject',{}).values()) for p in pdf.pages)
-            ok(f'{lang}_{kind}_pdf_figures',images==6)
+            ok(f'{lang}_{kind}_pdf_figures',images==7)
             if kind=='practice':
                 expected=sum(sum(active for active,_ in command_groups(s['code'])) for m in MODULES for i,s in enumerate(m['steps'],1) if s['code'] and (m['id'],i) not in CONFIG_STEPS)
                 ok(f'{lang}_pdf_numbered_comments',len(re.findall(r'(?:#|--) \d+\.',text))==expected)
@@ -110,6 +111,12 @@ def main():
                 else:
                     task=next(t for t in reg['tasks'] if t['id']==name)
                     ok(f'{lang}_{name}_page_checks',all(value.count(cid)==1 for cid in task['progress_scored_checks']))
+    screenshot=ROOT/'assets/shared'/INSTANCE_ID_IMAGE
+    ok('c3_instance_id_screenshot_matches', screenshot.read_bytes()==INSTANCE_ID_SOURCE.read_bytes())
+    for lang in LANGS:
+        for task in ('p0','m0'):
+            text=(ROOT/'docs'/lang/(task+'.md')).read_text(encoding='utf-8')
+            ok(f'{lang}_{task}_c3_instance_id_screenshot',text.count(INSTANCE_ID_IMAGE)==1)
     # Check Markdown paths too: GitHub is the primary reading entrance.
     for path in [ROOT/'README.md',ROOT/'TEACHER-NOTES.md',*(ROOT/'docs').rglob('*.md')]:
         for token in parser.parse(path.read_text(encoding='utf-8')):
@@ -143,8 +150,8 @@ def main():
                 task=prefix+str(number)
                 md=(ROOT/'docs'/lang/(task.lower()+'.md')).read_text(encoding='utf-8')
                 images=[c for t in parser.parse(md) for c in t.children or [] if c.type=='image']
-                ok(f'{lang}_{task}_diagram_in_page',len(images)==1 and len(images[0].content)>60)
-                image_path=ROOT/'assets'/lang/(task.lower()+'.png')
+                ok(f'{lang}_{task}_diagram_in_page',len(images)==(1 if number else 2) and len(images[0].content)>60)
+                image_path=ROOT/'assets'/lang/(diagram_stem(task)+'.png')
                 with Image.open(image_path) as img:ok(f'{lang}_{task}_diagram_size',img.size==(2080,1360))
                 svg=ET.parse(image_path.with_suffix('.svg')).getroot()
                 ok(f'{lang}_{task}_editable_svg',svg.attrib['viewBox']=='0 0 1040 680' and len(list(svg.iter('{http://www.w3.org/2000/svg}text')))>15)

@@ -29,9 +29,9 @@ def browser_check(task, lang):
     else:
         out += '\n' + T('2. 「この課題を確認する」を押す。', '2. Запустите проверку выбранного задания.', '2. Tanlangan topshiriq tekshiruvini boshlang.')[lang]
     out += '\n' + T(
-        '3. 処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。PとM0は成績外。',
-        '3. Во время обработки обновляйте результат. Сверьте ID задания, время, каждый check и сохранение. Результат сохраняется автоматически; оценки M доступны в разделе сохранённых оценок. P и M0 не оцениваются.',
-        '3. Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida. P va M0 bahoga qo‘shilmaydi.')[lang]
+        '3. 処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。',
+        '3. Во время обработки обновляйте результат. Сверьте ID задания, время, каждый check и сохранение. Результат сохраняется автоматически; оценки M доступны в разделе сохранённых оценок.',
+        '3. Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida.')[lang]
     return out
 
 WORDS = {
@@ -75,12 +75,13 @@ def write_pages(root, lang, registry, revision, distribution_id, render_html, la
             '| '+T('練習', 'Практика', 'Mashq')[lang]+' | '+T('自力課題', 'Задание', 'Topshiriq')[lang]+' | '+WORDS['topic'][lang]+' | '+WORDS['points'][lang]+' |', '| --- | --- | --- | --- |']
         for module in modules:
             n = int(module['id'][1:])
-            index.append(f'| [P{n}](p{n}.md) | [M{n}](m{n}.md) | {module["title"][lang]} | {tasks["M"+str(n)]["raw_points_max"]} |')
+            points = tasks[f'M{n}']['raw_points_max'] if n else T('授業で案内','По указанию преподавателя','O‘qituvchi e’lon qiladi')[lang]
+            index.append(f'| [P{n}](p{n}.md) | [M{n}](m{n}.md) | {module["title"][lang]} | {points} |')
         index += ['', T('おすすめの順序', 'Рекомендуемый порядок', 'Tavsiya etilgan tartib')[lang]+':', '',
             ' → '.join(f'[{task}]({task.lower()}.md)' for task in ORDER), '',
-            T('P5の前にM2、練習から本課題へ切り替える前にP6を終える。Pは成績外、M0は0点、M1〜M6の合計は59素点。',
-              'Завершите M2 до P5 и P6 перед переключением practice → mission. P не оценивается, M0=0; M1–M6 дают 59 исходных балла.',
-              'P5 dan oldin M2 ni, practice → mission almashishdan oldin P6 ni tugating. P bahoga qo‘shilmaydi, M0=0; M1–M6 jami 59 xom ball.')[lang], '',
+            T('P5の前にM2、練習から本課題へ切り替える前にP6を終える。',
+              'Завершите M2 до P5 и P6 перед переключением practice → mission.',
+              'P5 dan oldin M2 ni, practice → mission almashishdan oldin P6 ni tugating.')[lang], '',
             '## '+WORDS['full'][lang], '', f'- [Markdown]({kind}-full.md)', f'- [PDF](../../output/pdf/web_lab_{kind}_{lang}.pdf)', '']
         write(kind,'\n'.join(index))
         # Cross-language links in the complete handbook must keep the reader in that format.

@@ -228,10 +228,10 @@ bash core/jdu-web-lab ssm --state "$STATE" --role web
 | GUI | 本人が新踏み台へRDP接続しデスクトップ・Firefoxの起動を確認。preflightも合格 |
 | 教材 | 新course導入、Web/DBの公開教材資源配置。完成アプリやDBを自動構築しない |
 | Google/AWS登録 | 同じ承認済み検証用Googleを新Labへ対応付け、ブラウザから本人確認用CFN3資源を作成→登録完了 |
-| P1実操作 | 実CloudShell→SSM→ssm-userで内部APTからNginxを導入し練習ページを配置。ブラウザ全10項目合格、成績外保存 |
+| P1実操作 | 実CloudShell→SSM→ssm-userで内部APTからNginxを導入し練習ページを配置。ブラウザ全10項目合格、結果を保存 |
 | M1設定前→後 | P1だけなら3/8。Web内でM1の指定ファイルを作成後は8/8、11:59:44 UZTに原本へ自動保存 |
 | 本人/教師 | 新Lab8/62、M2〜M6記録なし。教師一覧には旧Lab62/62も別行で保持 |
-| M0 | ブラウザで全3項目合格、成績外保存 |
+| M0 | ブラウザで全3項目合格、結果を保存 |
 | 原本・ディスク | 新Labの4件のreport/receipt/hashとLATEST/GRADEを独立照合。旧成績84行はbyte不変、元暗号化96GiB保持、新暗号化96GiB |
 
 [全体記録](../../development/web_portal_poc/verification/2026-11-03-fresh-initial-workflow.accepted.public.json)、[原本照合](../../development/web_portal_poc/verification/2026-11-03-fresh-canonical.accepted.public.json)。確認したのは指定検証環境の初回開始からP1/M1までです。独立した学生Google・母語校閲・教師目視・全49手順の通し試読は別に残り、全授業CLASS_READYはfalseのままです。教師Labを開始して利用します。
@@ -249,7 +249,7 @@ bash core/jdu-web-lab ssm --state "$STATE" --role web
 | CloudShellからWebへ | `aws ssm start-session`で接続し、`whoami`がssm-user、`hostname`がip-10-20-1-20 |
 | Webサービス/課題ファイル | Nginx active、practice.txt/mission.txtあり |
 | P0の新しい教材資源 | `/var/lib/jdu-web/lesson-resources-r1`なし。教材helperの配置工程は実施済みと扱えない |
-| ブラウザM0 | 3項目合格、04:43:00 UTCに成績外の原本記録を自動保存 |
+| ブラウザM0 | 3項目合格、04:43:00 UTCに結果を自動保存 |
 | ブラウザM1 | 8/8、04:44:46 UTCに自動保存。学生保存成績62/62・教師一覧の同時刻反映 |
 | 原本の独立照合 | 82→84行、M0/M1のREQUESTのみ2行追加。本文hash/receipt一致、元受付・登録metadata・無関係な行は保持 |
 | 旧正式配布を実verify | 実Linux/GPG経路で期限切れ拒否。時計変更や検証の無効化なし |

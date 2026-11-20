@@ -32,7 +32,7 @@ EC2台数、instance type、private環境のpackage取得、接続経路、予�
 
 **2026-10-23更新**：本人の最新決定と受入済み実装は、踏み台/Web/DNS/DB/専用repoの5台、公開subnetに2台・privateに3台、各roleのSG、元root計96GiBです。repoは事前保存した署名資源を配り、授業中の外部APT/pipへfallbackしません。全5台のSSMを保持し、CloudShellからssm-userで管理できます。共有Windowsへ秘密鍵を出しません。通常Web利用は学生PC→公開HTTP80→Web app→private DB、管理はRDP3389（確認済み50 CIDR＋password）→踏み台→内部SSH。private8080のアプリ管理は踏み台だけ、Gunicorn8000はloopbackだけです。下の4台/未検証記述は9月時点の履歴で、この更新を優先します。
 
-教材は本人の指示により、まず[P/M課題教材](course/labs/README.md)を日本語原稿＋ロシア語/ウズベク語学生版で整えます。Pは課題文→詳細操作例、Mは異なる対象の要件を示します。Pは成績外、M0は準備0点、M1-M6は62素点。backup/restore・追加disk・本人実演・アプリ開発は課しません。科目25点への換算は教師が別に行います。母語校閲と今回の詳細手順の学生通し試験は未実施です。
+教材は本人の指示により、まず[P/M課題教材](course/labs/README.md)を日本語原稿＋ロシア語/ウズベク語学生版で整えます。Pは課題文→詳細操作例、Mは異なる対象の要件を示します。当時のM1-M6の自動採点は計62素点。backup/restore・追加disk・本人実演・アプリ開発は課しません。科目25点への換算は教師が別に行います。母語校閲と今回の詳細手順の学生通し試験は未実施です。
 
 一つのVPCの単一AZに、踏み台・Webを置く一つの公開サブネットと、DNS・DBを置く一つのプライベートサブネットを配置します。四つのEC2には別々のSG-Bastion、SG-Web、SG-DNS、SG-DBを関連付けます。学生PCのブラウザから公開WebへHTTPで接続し、Webの教員提供アプリが内部DNSでdb.lab.testを解決してDBへ接続します。管理者はRDPでUbuntu＋軽量デスクトップ＋xrdpの踏み台へ接続し、そこからWeb・DNS・DBをSSHで管理します。踏み台は学生PCからの通常のWeb閲覧経路に挟みません。DNS演習では踏み台からDNSサーバへ問い合わせ、Webのprivate IPを返すweb.lab.testを設定し、踏み台上のブラウザでIP指定からドメイン指定へ切り替えて同じWeb表示を確認します。踏み台からのHTTP80はこの演習用の通信としてSG-Webで許可し、SSH22の管理通信とは区別します。学生PCからのHTTPとRDPはどちらもInternet Gatewayを経由します。
 

@@ -24,9 +24,8 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-2">課題</h2>
 <p>jdu_catalog_practice、catalog_practice_setup、catalog_practice_appを作る。Webの10.20.1.20/32だけからSCRAMで接続させる。P4時点ではappのtableは不要。</p>
 <h2 id="section-3">今回の見取り図</h2>
-<p><img src="../../../assets/ja/p4.png" alt="P4: WebからDB接続を準備 → DB・role・認証を設定 → 許可したSELECTだけ成功。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。" width="1040" height="680" loading="lazy"></p>
-<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 SSMの矢印はAWSの接続管理を使う経路で、EC2の443番受信を開く指示ではありません。</p>
-<p><a href="../../../assets/ja/p4.png">図を拡大する</a> · <a href="../../../assets/ja/p4.svg">SVG</a></p>
+<p><img src="../../../assets/ja/p4.png" alt="P4: WebからDB接続を準備 → DB・role・認証を設定 → 許可したSELECTだけ成功。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 CloudShellからSSMでDBサーバーに接続して設定します。" width="1040" height="680" loading="lazy"></p>
+<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 CloudShellからSSMでDBサーバーに接続して設定します。</p>
 <ul>
 <li>Profile: practice</li>
 <li>Database: jdu_catalog_practice</li>
@@ -219,4 +218,4 @@ jdu_catalog_practice | catalog_practice_app | 1
 <p>認証とSQL権限は別。runtime roleの役割に合った拒否なら正常で、setup用の操作をruntimeへ追加しない。</p>
 <hr />
 <p><a href="m2.html">前の課題: M2</a> · <a href="m4.html">次の課題: M4</a></p>
-</main><footer>web-course-class193548-20261103-r3 · 59 raw points · 2026-11-13</footer></body></html>
+</main><footer>web-course-class193548-20261103-r3 · 2026-11-13</footer></body></html>

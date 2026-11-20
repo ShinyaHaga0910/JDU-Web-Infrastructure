@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P0 Своя среда и место выполнения команд</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Подключение к серверам и файлы курса</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P0 Своя среда и место выполнения команд</h1>
 <p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
 <p><a href="../ja/p0.html">日本語</a> · <a href="../ru/p0.html">Русский</a> · <a href="../uz/p0.html">O‘zbekcha</a></p>
 <p>2026-11-13 · D12 P/M r1.5</p>
@@ -22,11 +22,10 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-1">Что изучаем</h2>
 <p>Различать CloudShell, Windows и пять Ubuntu-серверов; подключаться через SSM к нужному узлу и запускать самопроверку.</p>
 <h2 id="section-2">Задание</h2>
-<p>В своей готовой среде проверьте идентификаторы и роли пяти серверов, затем проверьте, к какому серверу и под каким пользователем вы подключились. За P0 баллы не начисляются.</p>
-<h2 id="section-3">Схема задания</h2>
-<p><img src="../../../assets/ru/p0.png" alt="P0: Пять узлов уже созданы → Сверить аккаунт и сервер → Войти по SSM в нужную роль。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Стрелка SSM означает подключение через AWS, а не открытие входящего 443 на EC2." width="1040" height="680" loading="lazy"></p>
-<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Стрелка SSM означает подключение через AWS, а не открытие входящего 443 на EC2.</p>
-<p><a href="../../../assets/ru/p0.png">Открыть крупно</a> · <a href="../../../assets/ru/p0.svg">SVG</a></p>
+<p>В своей готовой среде проверьте идентификаторы и роли пяти серверов, затем проверьте, к какому серверу и под каким пользователем вы подключились.</p>
+<h2 id="section-3">Подключение к серверам и файлы курса</h2>
+<p><img src="../../../assets/ru/p0-ssm.png" alt="Откройте CloudShell в AWS из браузера на своём PC и подключитесь к нужному EC2 через SSM. Файлы курса размещаются на Web и DB. При установке по общему коду они размещаются во время создания среды, при подписанном комплекте - в P0.3." width="1040" height="680" loading="lazy"></p>
+<p>Откройте CloudShell в AWS из браузера на своём PC и подключитесь к нужному EC2 через SSM. Файлы курса размещаются на Web и DB. При установке по общему коду они размещаются во время создания среды, при подписанном комплекте - в P0.3.</p>
 <h2 id="section-4">Как это работает</h2>
 <p><strong>Состояние перед началом:</strong></p>
 <p>Используются ваши пять узлов после начальной установки и регистрации.</p>
@@ -38,7 +37,9 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p><strong>Место выполнения:</strong></p>
 <p>AWS Console своего студенческого аккаунта</p>
 <p><strong>Цель и действия:</strong></p>
-<p>В EC2 → Instances сверяйте теги LabId и DeploymentId. Запишите instance ID ролей bastion/web/dns/db/repo в рабочую таблицу. Не выбирайте только по имени. Public IPv4 есть у bastion и web. Для SSM нужен instance ID, а не публичный IP.</p>
+<p>Откройте EC2 → Instances. В столбце Name найдите сервер своего Lab и скопируйте полный ID с i- из столбца Instance ID той же строки. Сверьте теги LabId и DeploymentId. Запишите instance ID ролей bastion/web/dns/db/repo в рабочую таблицу. Не выбирайте только по имени. Public IPv4 есть у bastion и web. Для SSM нужен instance ID, а не публичный IP.</p>
+<p><img src="../../../assets/shared/ec2-instance-id-c3.png" alt="Рисунок 3-4 из главы C3. Откройте EC2 → Instances и скопируйте Instance ID из строки нужного сервера." width="1239" height="404" loading="lazy"></p>
+<p>Рисунок 3-4 из главы C3. Откройте EC2 → Instances и скопируйте Instance ID из строки нужного сервера.</p>
 <p><strong>Смысл команд и настроек:</strong></p>
 <p>Instance ID идентифицирует EC2, роль обозначает его задачу, public IP служит внешним адресом. Изменение public IP не означает замену instance ID. В рабочей таблице свяжите каждую из пяти ролей с её ID.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
@@ -91,9 +92,9 @@ python3 -B stage_resources.py --installation 'YOUR-INSTALLATION-DIRECTORY'
 <p><strong>Место выполнения:</strong></p>
 <p>Браузер на своём PC: Web Portal</p>
 <p><strong>Цель и действия:</strong></p>
-<p>Откройте страницу заданий по ссылке преподавателя. Войдите через школьный Google, завершите привязку своего AWS, выберите P0 и запустите проверку. Если обработка продолжается, обновите результат. Так же проверьте M0. P0/M0 проверяют готовность и не добавляют оценочных баллов.</p>
+<p>Откройте страницу заданий по ссылке преподавателя. Войдите через школьный Google, завершите привязку своего AWS, выберите P0 и запустите проверку. Если обработка продолжается, обновите результат.</p>
 <p><strong>Смысл команд и настроек:</strong></p>
-<p>Браузер сохраняет результат автоматически. Различайте PASS/FAIL/UNKNOWN и статус обработки/сохранения. P и M0 не добавляют баллов даже после сохранения.</p>
+<p>Браузер сохраняет результат автоматически. Различайте PASS/FAIL/UNKNOWN и статус обработки/сохранения.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p>Проверьте свой Lab, ID задания и время. Прочитайте результаты check и статус сохранения; дождитесь завершения и сохранения. UNKNOWN означает невозможность измерения, а не успех.</p>
 <p><strong>Если не получилось:</strong></p>
@@ -119,4 +120,4 @@ mstsc /prompt
 <p>Изменится Web. Вернитесь через exit в CloudShell и подключитесь к instance ID DB.</p>
 <hr />
 <p><a href="m0.html">Следующее: M0</a></p>
-</main><footer>web-course-class193548-20261103-r3 · 59 raw points · 2026-11-13</footer></body></html>
+</main><footer>web-course-class193548-20261103-r3 · 2026-11-13</footer></body></html>
