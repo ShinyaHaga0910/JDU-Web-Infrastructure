@@ -80,7 +80,7 @@ AWSマネジメントコンソールで演習環境を作成したリージョ�
 
 「名前（Name）」列で対象のサーバーを探し、同じ行の「インスタンス ID（Instance ID）」列から `i-` を含めてID全体をコピーする。例えば、演習のWebサーバーは名前の末尾が `-web` になっている。IDのリンクを開くと、詳細画面でも同じIDを確認できる。
 
-![EC2のインスタンス一覧の実画面。左メニューのInstancesと、一覧のInstance ID列全体をそれぞれオレンジ色の枠で囲んでいる。5台がRunningになっている。](../../assets/figures/ch03-fig04-ec2-instance-id.png)
+![EC2のインスタンス一覧の実画面。左メニューのInstancesと、一覧のInstance ID列全体をそれぞれオレンジ色の枠で囲んでいる。5台がRunningになっている。](../../assets/figures/ch03-fig04-ec2-instance-id-highlighted.png)
 
 **図3-4 EC2管理画面のインスタンス一覧。** 実際の演習環境の画面例。左の枠はクリックする「Instances」、一覧の枠はインスタンスIDを確認する列を示す。接続するときは、自分の環境に表示されているIDを使う。[AWS公式の確認手順](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/tutorial-launch-my-first-ec2-instance.html)
 
