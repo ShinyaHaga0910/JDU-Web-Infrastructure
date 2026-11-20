@@ -75,39 +75,6 @@ def figures():
     s.text(40,930,'手元のPCで入力していても、接続後は相手のコンピューターで処理される。',28)
     s.save('ch03-fig03-rdp-ssh')
 
-    s=Scene(1600,620,'EC2一覧の画面ガイド。リージョンを選び、Webサーバーの名前と同じ行のインスタンスIDを見る')
-    s.text(40,18,'図3-4  EC2一覧でインスタンスIDを確認する場所',36)
-    s.rect(40,92,1520,100,'#edf5fc','#7991aa')
-    s.text(70,116,'EC2の管理画面',32)
-    s.text(1170,119,'① リージョン：バージニア北部（us-east-1）',29,BLUE,center=True)
-
-    s.rect(40,222,330,285,'#f8fafc','#7991aa')
-    s.text(70,249,'EC2メニュー',29)
-    s.rect(65,312,280,126,'#edf5fc',BLUE)
-    s.text(205,327,'② インスタンス',31,BLUE,center=True)
-    s.text(205,380,'Instances',27,BLUE,center=True)
-    s.arrow([(370,372),(418,372)],BLUE)
-
-    s.rect(425,222,1135,327,'#ffffff','#7991aa')
-    s.text(450,242,'インスタンス一覧',31)
-    s.text(1450,247,'（説明用の例）',24,BLUE,center=True)
-    s.rect(452,307,1080,53,'#edf5fc','#9ebed8',radius=5)
-    for x,label in [(482,'名前（Name）'),(910,'インスタンス ID（Instance ID）')]:
-        s.text(x,314,label,29)
-    rows = [
-        (374,'example-lab-bastion','i-00000000000000001'),
-        (427,'example-lab-web','i-00000000000000002'),
-        (480,'example-lab-db','i-00000000000000003'),
-    ]
-    for y,name,instance_id in rows:
-        if name.endswith('-web'):
-            s.rect(452,y-5,1080,48,'#fff3df',AMBER,radius=5)
-            s.text(460,y,'③',25,AMBER)
-        s.text(502,y,name,29)
-        s.text(930,y,instance_id,29,BLUE)
-    s.text(450,573,'③ 名前の末尾でWebサーバーを探し、同じ行の i- から始まるIDをコピーする。',27,AMBER)
-    s.save('ch03-fig04-ec2-instance-id')
-
     s=Scene(1600,1030,'CloudShellからSession Managerを使ってWebサーバーへ接続する操作の流れ')
     s.text(40,18,'図3-5  CloudShellからSSM接続したときの操作先',35)
     s.rect(25,200,300,200,'#f5f7fa')

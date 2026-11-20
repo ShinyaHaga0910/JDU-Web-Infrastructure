@@ -36,11 +36,10 @@
 <p>今回の構築手順では、主にCloudShellから<strong>AWS Systems ManagerのSession Manager</strong>を使って各EC2へ接続する。Session Managerは、対象サーバーへの接続を提供するAWSの管理機能である。本書では、この機能を利用した接続を<strong>SSM接続</strong>と呼ぶ。SSMで対象サーバーへ接続すると、そのOS上でコマンドを実行できる。<a href="https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html">AWS CloudShell</a></p>
 <h3 id="ec2の管理画面でインスタンスidを確認する">EC2の管理画面でインスタンスIDを確認する</h3>
 <p>AWSはEC2を作成すると、1台ずつ <strong>インスタンスID</strong> を割り当てる。インスタンスIDは <code>i-</code> で始まる。SSM接続では、このIDを指定して操作するサーバーを選ぶ。</p>
-<p>1. 自分の演習用AWSコンソールにログインする。右上のリージョン選択で、演習環境を作成したリージョン（この授業では <code>us-east-1</code>、バージニア北部）を選ぶ。</p>
-<p>2. EC2の管理画面を開き、左のメニューで「インスタンス（Instances）」を選ぶ。</p>
-<p>3. 一覧の「名前（Name）」列で自分のWebサーバーを探す。演習のWebサーバーは名前の末尾が <code>-web</code> になっている。同じ行の「インスタンス ID（Instance ID）」列から、<code>i-</code> を含めてID全体をコピーする。IDのリンクを開くと、詳細画面でも同じIDを確認できる。</p>
-<figure><img src="../../assets/figures/ch03-fig04-ec2-instance-id.png" alt="EC2一覧の画面ガイド。①リージョンを確認し、②インスタンス一覧を開く。③名前の末尾が-webの行で同じ行のInstance IDを確認する。" width="1600" height="620"></figure>
-<p><strong>図3-4 EC2一覧でインスタンスIDを確認する場所。</strong> 演習用の架空の名前とIDを使った画面ガイド。実際のコンソールでは、自分の演習環境の行を選ぶ。<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/tutorial-launch-my-first-ec2-instance.html">AWS公式の確認手順</a> · <a href="https://docs.aws.amazon.com/res/latest/ug/res-troubleshooting-general.html#res-troubleshooting-ec2-console-infra">AWS公式資料のスクリーンショット</a></p>
+<p>AWSマネジメントコンソールで演習環境を作成したリージョン（この授業では <code>us-east-1</code>、バージニア北部）を選ぶ。<strong>EC2 → インスタンス</strong>（Instances）の順に開くと、サーバーの一覧が表示される。「インスタンスの状態（Instance state）」が「実行中（Running）」の行で、稼働中のサーバーを確認できる。</p>
+<p>「名前（Name）」列で対象のサーバーを探し、同じ行の「インスタンス ID（Instance ID）」列から <code>i-</code> を含めてID全体をコピーする。例えば、演習のWebサーバーは名前の末尾が <code>-web</code> になっている。IDのリンクを開くと、詳細画面でも同じIDを確認できる。</p>
+<figure><img src="../../assets/figures/ch03-fig04-ec2-instance-id.png" alt="EC2のインスタンス一覧の実画面。左メニューのInstancesをオレンジ色の枠で囲んでいる。一覧にName、Instance ID、Instance stateの列があり、5台がRunningになっている。" width="1239" height="404"></figure>
+<p><strong>図3-4 EC2管理画面のインスタンス一覧。</strong> 実際の演習環境の画面例。左メニューでオレンジ色の枠が付いた「Instances」を選ぶ。自分が接続するときは、自分の環境に表示されているインスタンスIDを使う。<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/tutorial-launch-my-first-ec2-instance.html">AWS公式の確認手順</a></p>
 <h3 id="コピーしたインスタンスidで接続する">コピーしたインスタンスIDで接続する</h3>
 <p>CloudShellを演習環境と同じリージョンで開く。EC2の画面でコピーしたIDを、次のコマンドの <code>--target</code> の後ろに貼り付ける。</p>
 <p><strong>実行場所：本人のCloudShell。IDは自分のWebサーバーのインスタンスIDへ置き換える。</strong></p>

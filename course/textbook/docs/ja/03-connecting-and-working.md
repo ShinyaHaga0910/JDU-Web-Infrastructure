@@ -76,15 +76,13 @@ SSH接続によって操作先が変わるのは、接続に使った端末で�
 
 AWSはEC2を作成すると、1台ずつ **インスタンスID** を割り当てる。インスタンスIDは `i-` で始まる。SSM接続では、このIDを指定して操作するサーバーを選ぶ。
 
-1. 自分の演習用AWSコンソールにログインする。右上のリージョン選択で、演習環境を作成したリージョン（この授業では `us-east-1`、バージニア北部）を選ぶ。
+AWSマネジメントコンソールで演習環境を作成したリージョン（この授業では `us-east-1`、バージニア北部）を選ぶ。**EC2 → インスタンス**（Instances）の順に開くと、サーバーの一覧が表示される。「インスタンスの状態（Instance state）」が「実行中（Running）」の行で、稼働中のサーバーを確認できる。
 
-2. EC2の管理画面を開き、左のメニューで「インスタンス（Instances）」を選ぶ。
+「名前（Name）」列で対象のサーバーを探し、同じ行の「インスタンス ID（Instance ID）」列から `i-` を含めてID全体をコピーする。例えば、演習のWebサーバーは名前の末尾が `-web` になっている。IDのリンクを開くと、詳細画面でも同じIDを確認できる。
 
-3. 一覧の「名前（Name）」列で自分のWebサーバーを探す。演習のWebサーバーは名前の末尾が `-web` になっている。同じ行の「インスタンス ID（Instance ID）」列から、`i-` を含めてID全体をコピーする。IDのリンクを開くと、詳細画面でも同じIDを確認できる。
+![EC2のインスタンス一覧の実画面。左メニューのInstancesをオレンジ色の枠で囲んでいる。一覧にName、Instance ID、Instance stateの列があり、5台がRunningになっている。](../../assets/figures/ch03-fig04-ec2-instance-id.png)
 
-![EC2一覧の画面ガイド。①リージョンを確認し、②インスタンス一覧を開く。③名前の末尾が-webの行で同じ行のInstance IDを確認する。](../../assets/figures/ch03-fig04-ec2-instance-id.png)
-
-**図3-4 EC2一覧でインスタンスIDを確認する場所。** 演習用の架空の名前とIDを使った画面ガイド。実際のコンソールでは、自分の演習環境の行を選ぶ。[AWS公式の確認手順](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/tutorial-launch-my-first-ec2-instance.html) · [AWS公式資料のスクリーンショット](https://docs.aws.amazon.com/res/latest/ug/res-troubleshooting-general.html#res-troubleshooting-ec2-console-infra)
+**図3-4 EC2管理画面のインスタンス一覧。** 実際の演習環境の画面例。左メニューでオレンジ色の枠が付いた「Instances」を選ぶ。自分が接続するときは、自分の環境に表示されているインスタンスIDを使う。[AWS公式の確認手順](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/tutorial-launch-my-first-ec2-instance.html)
 
 ### コピーしたインスタンスIDで接続する
 
