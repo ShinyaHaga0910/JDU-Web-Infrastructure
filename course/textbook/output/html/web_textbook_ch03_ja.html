@@ -38,8 +38,8 @@
 <p>AWSはEC2を作成すると、1台ずつ <strong>インスタンスID</strong> を割り当てる。インスタンスIDは <code>i-</code> で始まる。SSM接続では、このIDを指定して操作するサーバーを選ぶ。</p>
 <p>AWSマネジメントコンソールで演習環境を作成したリージョン（この授業では <code>us-east-1</code>、バージニア北部）を選ぶ。<strong>EC2 → インスタンス</strong>（Instances）の順に開くと、サーバーの一覧が表示される。「インスタンスの状態（Instance state）」が「実行中（Running）」の行で、稼働中のサーバーを確認できる。</p>
 <p>「名前（Name）」列で対象のサーバーを探し、同じ行の「インスタンス ID（Instance ID）」列から <code>i-</code> を含めてID全体をコピーする。例えば、演習のWebサーバーは名前の末尾が <code>-web</code> になっている。IDのリンクを開くと、詳細画面でも同じIDを確認できる。</p>
-<figure><img src="../../assets/figures/ch03-fig04-ec2-instance-id.png" alt="EC2のインスタンス一覧の実画面。左メニューのInstancesをオレンジ色の枠で囲んでいる。一覧にName、Instance ID、Instance stateの列があり、5台がRunningになっている。" width="1239" height="404"></figure>
-<p><strong>図3-4 EC2管理画面のインスタンス一覧。</strong> 実際の演習環境の画面例。左メニューでオレンジ色の枠が付いた「Instances」を選ぶ。自分が接続するときは、自分の環境に表示されているインスタンスIDを使う。<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/tutorial-launch-my-first-ec2-instance.html">AWS公式の確認手順</a></p>
+<figure><img src="../../assets/figures/ch03-fig04-ec2-instance-id.png" alt="EC2のインスタンス一覧の実画面。左メニューのInstancesと、一覧のInstance ID列全体をそれぞれオレンジ色の枠で囲んでいる。5台がRunningになっている。" width="1239" height="404"></figure>
+<p><strong>図3-4 EC2管理画面のインスタンス一覧。</strong> 実際の演習環境の画面例。左の枠はクリックする「Instances」、一覧の枠はインスタンスIDを確認する列を示す。接続するときは、自分の環境に表示されているIDを使う。<a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/tutorial-launch-my-first-ec2-instance.html">AWS公式の確認手順</a></p>
 <h3 id="コピーしたインスタンスidで接続する">コピーしたインスタンスIDで接続する</h3>
 <p>CloudShellを演習環境と同じリージョンで開く。EC2の画面でコピーしたIDを、次のコマンドの <code>--target</code> の後ろに貼り付ける。</p>
 <p><strong>実行場所：本人のCloudShell。IDは自分のWebサーバーのインスタンスIDへ置き換える。</strong></p>
