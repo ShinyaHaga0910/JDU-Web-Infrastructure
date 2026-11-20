@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P6 Минимальные права и границы публикации</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения (порядок действий)</a> · <a href="#section-6">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P6 Минимальные права и границы публикации</h1>
 <p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
 <p><a href="../ja/p6.html">日本語</a> · <a href="../ru/p6.html">Русский</a> · <a href="../uz/p6.html">O‘zbekcha</a></p>
 <p>Связанное задание: <a href="m6.html">M6</a>.</p>
@@ -61,12 +61,12 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-4">Как это работает</h2>
 <p><strong>Состояние перед началом:</strong></p>
 <p>Учебное приложение P5 работает; временный setup-доступ ещё существует.</p>
-<p><strong>Что изменится в этом P:</strong></p>
+<p><strong>Что сделать в Practice6</strong></p>
 <p>Setup завершён; нормальная работа и отказы ненужного доступа проверены вместе.</p>
 <p>Разделите временные права setup и рабочие права runtime. После NOLOGIN и удаления временной настройки приложение должно работать через runtime. Публичный 80, административный 8080 и локальный 8000 - разные границы. Проверяйте успешную разрешённую операцию вместе с отказом конкретного ненужного доступа.</p>
-<h2 id="section-5">Пример решения: выполняйте по одному шагу</h2>
+<h2 id="section-5">Пример решения (порядок действий)</h2>
 <h3>P6.1 Прочитать роли и права таблиц</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>psql на DB-сервере от имени системного postgres</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Откройте psql как postgres на DB. \dp показывает права таблиц, \du - атрибуты ролей. Сверьте с SQL03: UPDATE auth_user только last_login/password, без DELETE catalog_item; lookup только чтение, django_migrations без прав. Не вызывайте nextval/setval ради проверки.</p>
@@ -89,7 +89,7 @@ sudo -u postgres psql -X -d jdu_catalog_practice
 <p><strong>Если не получилось:</strong></p>
 <p>При лишних правах пересмотрите SQL03 с сохранением guard. Не пробуйте отказ удалением реальных строк.</p>
 <h3>P6.2 Отключить вход setup-роли</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>После инициализации вход setup не нужен. SQL04 задаёт NOLOGIN/password NULL и закрывает оставшиеся setup-подключения profile. Владельцем DB/table остаётся setup; роль не удаляется и владение app не передаётся.</p>
@@ -109,7 +109,7 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 <p><strong>Если не получилось:</strong></p>
 <p>Не включайте setup обратно для обычной работы. M5 инициализируется отдельной setup-role mission.</p>
 <h3>P6.3 Убрать временные настройки и заново выбрать runtime</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>На Web проверьте только metadata. Удалите ровно два файла setup practice. app.env, practice.app.env, DB runtime, command-state, SSH-ключи и данные оценивания сохраняются. Затем остановите приложение, явно выберите существующий профиль practice и запустите приложение. Тот же порядок пригодится в M5 при выборе mission.</p>
@@ -140,7 +140,7 @@ systemctl is-active jdu-catalog
 <p><strong>Если не получилось:</strong></p>
 <p>Если активен другой профиль, остановитесь. Не повторяйте удаление отсутствующих файлов. При ошибке остановки, выбора профиля или проверки выясните причину до запуска приложения.</p>
 <h3>P6.4 Проверить запрет admin и секретов на публичном 80</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал бастиона: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>В SSM бастиона запросите обычный список на 80, затем /admin/ и env. Отдельно подтвердите штатный admin на 8080 в Firefox через RDP. Нужны нормальный ответ и явный отказ 404/403; таймаута недостаточно.</p>
@@ -161,7 +161,7 @@ curl --noproxy '*' -i http://web.lab.test/static/app.env
 <p><strong>Если не получилось:</strong></p>
 <p>Если виден текст env, не распространяйте его: сообщите преподавателю и исправьте публикацию.</p>
 <h3>P6.5 Отправить успешный вход и отказы в одной проверке</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>Браузер на своём PC: Web Portal</p>
 <p><strong>Цель и действия:</strong></p>
 <p>В Web Portal выберите P6, функциональную проверку с правами и скрыто введите существующий пароль practice_admin. Успешный login служит контролем: анонимные операции и неверный пароль должны отклоняться без изменения БД. Один CSRF-403 не доказывает авторизацию. Staff имеет только view/add/change оборудования, без delete и управления пользователями.</p>

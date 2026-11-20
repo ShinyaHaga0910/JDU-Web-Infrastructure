@@ -114,8 +114,8 @@ def explanation(command, lang):
     if program=='tail':return a('access log末尾20行を読み、直前のHTTP要求を探す。','Прочитать последние 20 строк access log и найти свой HTTP-запрос.','Access log oxirgi 20 qatoridan oldingi HTTP so‘rovini topish.')
     if program=='rm':return a('表示して確認した2つの一時setup秘密ファイルだけを削除する。','Удалить только два проверенных временных секретных файла setup.','Tekshirilgan ikkita vaqtinchalik setup maxfiy faylini o‘chirish.')
     if program.startswith(('python','/opt/jdu-catalog/venv/bin/python')):
-        if '-c' in args:return a('bootstrap情報のroleだけを読み、接続先の役割を確認する。','Прочитать только role из bootstrap, чтобы проверить выбранный сервер.','Bootstrap dan faqat role ni o‘qib, ulangan server vazifasini tekshirish.')
-        if 'stage_resources.py' in command:return a('署名版と本人の5台を照合し、公開教材をWeb/DBへ配置する。','Сверить подписанный комплект и свои пять узлов, разместить материалы на Web/DB.','Imzolangan tarqatma va o‘z besh serverini solishtirib, materialni Web/DB ga joylash.')
+        if '-c' in args:return a('設置済みのJSONファイルからサーバーのロールを読み出す。','Прочитать только role из bootstrap, чтобы проверить выбранный сервер.','Bootstrap dan faqat role ni o‘qib, ulangan server vazifasini tekshirish.')
+        if 'stage_resources.py' in command:return a('備品管理アプリなど、後の演習に使うファイルをWebサーバーとDBサーバーに配置する。','Сверить подписанный комплект и свои пять узлов, разместить материалы на Web/DB.','Imzolangan tarqatma va o‘z besh serverini solishtirib, materialni Web/DB ga joylash.')
         if 'offline_assets.py' in command:return a('署名・hashを確認してアプリと固定wheelを教材領域へ展開する。','Проверить подпись/hash, подготовить приложение и фиксированные wheel.','Imzo/hash ni tekshirib app va belgilangan wheel larni tayyorlash.') if '--wheels' in args else a('固定hashを照合して教員提供アプリ・SQL資源を展開する。','Сверить фиксированный hash и распаковать приложение/SQL преподавателя.','Belgilangan hash ni tekshirib o‘qituvchi app/SQL resurslarini ochish.')
         if 'profile_sql.py' in command:
             stage=args[args.index('--profile')+2]

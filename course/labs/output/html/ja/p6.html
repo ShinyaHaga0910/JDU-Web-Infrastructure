@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">今回の見取り図</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">操作例：一つずつ実行する</a> · <a href="#section-6">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P6 最小権限と公開範囲</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">今回の見取り図</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">解答例（操作手順）</a> · <a href="#section-6">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P6 最小権限と公開範囲</h1>
 <p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
 <p><a href="../ja/p6.html">日本語</a> · <a href="../ru/p6.html">Русский</a> · <a href="../uz/p6.html">O‘zbekcha</a></p>
 <p>対応する自力課題は<a href="m6.html">M6</a>。</p>
@@ -61,12 +61,12 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-4">仕組みを理解する</h2>
 <p><strong>始める前の状態:</strong></p>
 <p>P5の練習アプリが動作し、初期構築用のsetup接続が残る。</p>
-<p><strong>このPで変えること:</strong></p>
+<p><strong>このPractice6で作業すること</strong></p>
 <p>setupを終了し、通常アプリの成功と不要なアクセスの拒否を同時に確かめる。</p>
 <p>作成時だけ必要なsetup権限と、運用中に必要なruntime権限を分ける。setup roleをNOLOGINにし、一時setup設定を削除しても、通常アプリはruntime接続で動くことが目標。公開80番・管理8080番・loopback8000番も別の境界である。どこか一つを閉じれば全体が安全と決めず、正規操作の成功と対象を限定した拒否を組にする。</p>
-<h2 id="section-5">操作例：一つずつ実行する</h2>
+<h2 id="section-5">解答例（操作手順）</h2>
 <h3>P6.1 DB roleとtable権限を読む</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>DBサーバーのpsql：OS postgres</p>
 <p><strong>目的と操作:</strong></p>
 <p>DBでpostgresのpsqlへ入る。\dpはtable権限、\duはrole属性。auth_user全体のUPDATEではなくlast_login/password列だけ、catalog_itemにDELETEなし、lookupは読取りだけ、django_migrationsは権限なしをSQL03と比べる。sequenceのnextval/setvalは確認目的で呼ばない。</p>
@@ -89,7 +89,7 @@ sudo -u postgres psql -X -d jdu_catalog_practice
 <p><strong>うまくいかないとき:</strong></p>
 <p>想定外の権限があればSQL03のguardを維持して見直す。実データを削除して拒否を試さない。</p>
 <h3>P6.2 setup roleをNOLOGINにする</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>初期化に使ったsetup roleは完成後には不要。SQL04はNOLOGIN/password NULLにし、そのprofileの残存setup接続も閉じる。DB/tableの所有者はsetupのまま残す。削除やappへの所有権移転はしない。</p>
@@ -109,7 +109,7 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 <p><strong>うまくいかないとき:</strong></p>
 <p>この後setupをLOGINへ戻して常用しない。M5は別のmission setup roleで初期化する。</p>
 <h3>P6.3 一時設定を片付け、通常接続の設定を選び直す</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>Webで対象のmetadataだけを確認する。rmの対象は練習setupの2fileに限定する。app.env、practice.app.env、DB runtime file、元command-state、SSH鍵、採点認証は残す。対象を片付けたらアプリを停止し、既存のpractice設定を明示的に選び直してから起動する。この順番を練習しておくと、M5でmissionを選ぶときにも使える。</p>
@@ -140,7 +140,7 @@ systemctl is-active jdu-catalog
 <p><strong>うまくいかないとき:</strong></p>
 <p>練習用以外の設定が有効なら、ここで止める。既に削除済みのファイルは削除し直さない。停止・設定の選択・設定チェックが失敗したら、原因を確認してからアプリを起動する。</p>
 <h3>P6.4 公開80から管理画面と秘密が見えないか確認する</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>踏み台のSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>踏み台のSSMで公開用port80を使い、通常一覧の成功を対照に/admin/やenvを要求する。8080の管理成功はRDP内Firefoxで別に確認する。404/403等の明示拒否と通常成功を組にして読み、timeoutだけで安全としない。</p>
@@ -161,7 +161,7 @@ curl --noproxy '*' -i http://web.lab.test/static/app.env
 <p><strong>うまくいかないとき:</strong></p>
 <p>もしenv本文が見えたら共有せず、その場で教師へ知らせ公開設定を修正する。</p>
 <h3>P6.5 正規成功と拒否を同じ確認回で送る</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>自分のPCのブラウザ：Web Portal</p>
 <p><strong>目的と操作:</strong></p>
 <p>Web PortalでP6を選び、「機能・権限を含めて確認する」から既存practice_adminパスワードを非表示入力する。正規loginを対照に、匿名登録/編集や誤passwordがDBを変えず拒否されるかを確かめる。CSRF不足だけの403と認可制限を混同しない。通常userは備品のview/add/changeだけを持ち、deleteやuser管理は持たない。</p>

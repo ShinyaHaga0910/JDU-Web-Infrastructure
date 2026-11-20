@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">使い方と共通の約束</a> · <a href="#section-2">対象・前提・準備</a> · <a href="#section-3">操作例の読み方</a> · <a href="#section-4">完成像と通信経路</a> · <a href="#section-5">自力課題に取り組む前に</a> · <a href="#section-6">M0 自分の環境と実行場所</a> · <a href="#section-7">M1 HTTPで静的ファイルを返す (8)</a> · <a href="#section-8">M2 内部DNSと通常の名前解決 (13)</a> · <a href="#section-9">M4 PostgreSQLへの認証接続 (9)</a> · <a href="#section-10">M5 教員アプリをWeb・DBへ接続する (13)</a> · <a href="#section-11">M6 最小権限と公開範囲 (16)</a> · <a href="#section-12">次回の再開・結果の確認</a> · <a href="#section-13">参考資料</a></nav></header><main id="content" tabindex="-1"><h1>Web演習：自力課題M0〜M6</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">使い方と共通の約束</a> · <a href="#section-2">対象・前提・準備</a> · <a href="#section-3">操作例の読み方</a> · <a href="#section-4">完成像と通信経路</a> · <a href="#section-5">自力課題に取り組む前に</a> · <a href="#section-6">M0 サーバーの確認と接続</a> · <a href="#section-7">M1 HTTPで静的ファイルを返す (8)</a> · <a href="#section-8">M2 内部DNSと通常の名前解決 (13)</a> · <a href="#section-9">M4 PostgreSQLへの認証接続 (9)</a> · <a href="#section-10">M5 教員アプリをWeb・DBへ接続する (13)</a> · <a href="#section-11">M6 最小権限と公開範囲 (16)</a> · <a href="#section-12">次回の再開・結果の確認</a> · <a href="#section-13">参考資料</a></nav></header><main id="content" tabindex="-1"><h1>Web演習：自力課題M0〜M6</h1>
 <p>教材初版・教師確認用。学生の最初からの通し試読は未実施。</p>
 <p>ロシア語・ウズベク語は日本語原稿と同じ手順・条件の翻訳初稿。母語話者校閲は未実施。</p>
 <p><a href="../ja/missions-full.html">日本語</a> · <a href="../ru/missions-full.html">Русский</a> · <a href="../uz/missions-full.html">O‘zbekcha</a></p>
@@ -62,7 +62,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tr>
 </tbody>
 </table>
-<p>各Ubuntuへ入る操作：CloudShellで aws ssm start-session --target i-自分の対象ID。接続直後にid -unとbootstrap.jsonのroleを確認する。サーバーを替えるときはexitを1回でCloudShellへ戻り、次のIDでstart-sessionする。CloudShellの変数は接続先へ自動コピーされない。SSMのssm-userはsudo可能。RDPのlabuserはsudo管理者ではない。</p>
+<p>各Ubuntuへ入る操作：CloudShellで aws ssm start-session --target i-自分の対象ID。接続先の確認はP0.2の手順を使う。サーバーを替えるときはexitを1回でCloudShellへ戻り、次のIDでstart-sessionする。CloudShellの変数は接続先へ自動コピーされない。SSMのssm-userはsudo可能。RDPのlabuserはsudo管理者ではない。</p>
 <p>nanoの編集：file名を指定して開く→本文を入力→Ctrl+O→Enterで保存→Ctrl+Xで終了。設定fileの枠はshell commandではない。psqlに入るとpromptが変わる。SQL/\passwordはその中へ入力し、\qでUbuntuへ戻る。失敗したcommandの次へ進まず、期待結果を確認する。</p>
 <p>番号付きコメントは、その手順内の操作順と目的を示します。# はshell、-- はpsql内のコメントです。コメントは説明なので、書き換える必要はありません。接続・エディタ・パスワード入力の完了を待ち、一つずつ実行します。改行で続くコマンドは一つとして扱います。</p>
 <h2 id="section-3">操作例の読み方</h2>
@@ -129,14 +129,14 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>まず完成要件から「どのサーバーの、どのファイル・名前・DB・roleを変えるか」を自分の作業表へ整理する。練習と本課題の値を比較し、Mで必要な対象だけを選ぶ。採点表は完成状態の条件であり、実行順のコマンド一覧ではない。</p>
 <p>次に「どこから何を確認すれば、要件を満たしたと分かるか」を考える。ファイルを確認する場所と、接続を試す場所は同じとは限らない。許可経路の成功と、制限すべき経路の拒否を分けて記録する。</p>
 <p>ブラウザで課題を選んで確認し、結果と保存状態を読む。M5/M6の機能確認では既存アプリ管理者パスワードを非表示入力する。成績は自動保存される。理解の確認用メモやPの説明問題を、追加の成績要件にはしない。</p>
-<h2 id="section-6">M0 自分の環境と実行場所</h2>
+<h2 id="section-6">M0 サーバーの確認と接続</h2>
 <h3>完成要件</h3>
 <p>P0ではWebサーバーを例に接続を練習した。M0ではEC2の一覧から自分のDBサーバーを選び、そのインスタンスIDを使ってCloudShellからSSMで接続する。接続先がDBサーバー（役割はdb）、操作ユーザーがssm-userであることを自分で確かめる。その後、課題画面でM0を選び、自分の環境の準備結果を確認する。</p>
 <h3>操作するサーバーと教材の配置先</h3>
 <p><img src="../../../assets/ja/m0-ssm.png" alt="利用者PCのブラウザでAWSのCloudShellを開き、SSMで対象のEC2へ接続する。教材ファイルの配置先はWebサーバーとDBサーバー。共通登録コード方式では初期構築時に配置され、署名付き配布方式ではP0.3で配置する。" width="1040" height="680" loading="lazy"></p>
 <p>利用者PCのブラウザでAWSのCloudShellを開き、SSMで対象のEC2へ接続する。教材ファイルの配置先はWebサーバーとDBサーバー。共通登録コード方式では初期構築時に配置され、署名付き配布方式ではP0.3で配置する。</p>
-<p><img src="../../../assets/shared/ec2-instance-id-c3.png" alt="C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDをコピーする。" width="1239" height="404" loading="lazy"></p>
-<p>C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDをコピーする。</p>
+<p><img src="../../../assets/shared/ec2-instance-id-c3.png" alt="C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDを確認する。" width="1239" height="404" loading="lazy"></p>
+<p>C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDを確認する。</p>
 <h3>確認・提出</h3>
 <ol>
 <li>教師から案内された課題画面に学校のGoogleアカウントでログインし、自分のLabと <strong>M0</strong> を選ぶ。</li>

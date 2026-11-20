@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P5 Соединить предоставленное приложение с Web и DB</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения (порядок действий)</a> · <a href="#section-6">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P5 Соединить предоставленное приложение с Web и DB</h1>
 <p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
 <p><a href="../ja/p5.html">日本語</a> · <a href="../ru/p5.html">Русский</a> · <a href="../uz/p5.html">O‘zbekcha</a></p>
 <p>Связанное задание: <a href="m5.html">M5</a>.</p>
@@ -61,12 +61,12 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-4">Как это работает</h2>
 <p><strong>Состояние перед началом:</strong></p>
 <p>Сейчас работают DNS из M2 и учебная БД из P4.</p>
-<p><strong>Что изменится в этом P:</strong></p>
+<p><strong>Что сделать в Practice5</strong></p>
 <p>Предоставленное приложение на Web связывает каталог и управление с БД.</p>
 <p>Nginx принимает HTTP, Gunicorn исполняет Python-приложение, PostgreSQL хранит данные. В отличие от статического P1, каталог получает содержимое из БД. Venv отделяет Python-среду приложения, unit systemd описывает запуск. Размещайте предоставленный код, переписывать программу не требуется.</p>
-<h2 id="section-5">Пример решения: выполняйте по одному шагу</h2>
+<h2 id="section-5">Пример решения (порядок действий)</h2>
 <h3>P5.1 Проверить DNS и получить открытые ресурсы</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>На Web обычный resolver должен дать db.lab.test=10.20.2.20 и admin.lab.test=10.20.1.20. offline_assets получает семь wheel и lock из внутреннего repo, сверяя исходную подпись/hash. Он не запускает внешний pip и не настраивает DB/app.</p>
@@ -91,7 +91,7 @@ ls /var/lib/jdu-web/lesson-resources-r1/wheels
 <p><strong>Если не получилось:</strong></p>
 <p>Нужно и имя db.lab.test, не только practice-db. P5 зависит от M2, но не требует завершения основных заданий по каталогу.</p>
 <h3>P5.2 Разместить код и создать отдельный venv</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Код и venv контролирует root; пользователь catalog не должен их менять. Если app или venv уже существуют, не повторяйте создание - проверьте версию. cp переносит только проверенные открытые ресурсы. venv отделяет зависимости приложения от системного Python.</p>
@@ -117,7 +117,7 @@ sudo /opt/jdu-catalog/venv/bin/python -m pip check
 <p><strong>Если не получилось:</strong></p>
 <p>Недостающую зависимость решают через комплект преподавателя. Не обновляйте до latest через pip и не меняйте код приложения.</p>
 <h3>P5.3 Создать сервисного пользователя и каталог static</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>catalog предназначен для Gunicorn, не для входа человека. Создайте его с nologin и без sudo. Только каталог static принадлежит catalog для collectstatic; код/venv остаются root. Если catalog уже есть, проверьте id и shell вместо повторного useradd.</p>
@@ -141,7 +141,7 @@ getent passwd catalog
 <p><strong>Если не получилось:</strong></p>
 <p>Не исправляйте права через chmod -R 777 или добавление catalog в sudo. Проверьте конкретный каталог и владельца.</p>
 <h3>P5.4 Создать и активировать runtime-настройки</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Подставьте текущий public IPv4 Web из EC2. Runtime-инструмент дважды запрашивает существующий пароль catalog_practice_app из P4. Django secret генерируется для вашего Lab. Создайте runtime-настройки, затем выберите practice командой activate до запуска приложения. После успешной проверки создайте временные настройки setup в P5.5.</p>
@@ -165,7 +165,7 @@ sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
 <p><strong>Если не получилось:</strong></p>
 <p>Не вводите пароль RDP или администратора приложения. При продолжении начните с первого незавершённого действия. При ошибке activate проверьте, работает ли приложение и остались ли временные настройки setup, прежде чем идти дальше.</p>
 <h3>P5.5 Создать таблицы и администратора через временный setup</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>В create-setup введите пароль catalog_practice_setup из P4. migrate создаёт предоставленную структуру БД; seed однократно добавляет три вымышленных образца в пустой каталог. create_lab_admin создаёт practice_admin со скрытым вводом пароля. Обычное приложение не работает через setup.</p>
@@ -192,7 +192,7 @@ sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
 <p><strong>Если не получилось:</strong></p>
 <p>already exists при seed/admin защищает существующие данные. Не делайте reset; проверьте текущее состояние.</p>
 <h3>P5.6 Выдать runtime-роли необходимые SQL-права</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Выйдите из Web в CloudShell и откройте DB через SSM. Прочитайте SQL03: после проверки 11 таблиц и владельцев он выдаёт права по таблицам, столбцам и sequence. Владение и ALL PRIVILEGES роли app не даются.</p>
@@ -212,7 +212,7 @@ python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u pos
 <p><strong>Если не получилось:</strong></p>
 <p>Ошибка guard требует проверить migrations/owner. Не удаляйте защиту ради продолжения.</p>
 <h3>P5.7 Разместить static и unit systemd</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Вернитесь на Web. collectstatic собирает CSS и другие ресурсы для Nginx. Разместите unit и выполните daemon-reload. Прочитайте User=catalog, EnvironmentFile и bind 127.0.0.1:8000.</p>
@@ -241,7 +241,7 @@ sudo ss -lntp
 <p><strong>Если не получилось:</strong></p>
 <p>При ошибке смотрите journalctl -u jdu-catalog. Не копируйте env в журнал; формат проверяется configuration.py check.</p>
 <h3>P5.8 Разделить публичный и управляющий входы Nginx</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Прочитайте conf: 80 - список, private8080 - только /admin/, upstream - 8000. Сохраните ссылку начального default site под другим именем и отключите её. Если jdu-catalog уже включён, проверьте состояние вместо повторных переносов. Статические URL P1/M1 сохраняются.</p>
@@ -270,7 +270,7 @@ curl --noproxy '*' -i http://127.0.0.1/practice.txt
 <p><strong>Если не получилось:</strong></p>
 <p>При duplicate default server проверьте старый site. До reload исправьте -t. Управляющий port не должен слушать public IP.</p>
 <h3>P5.9 Добавить две учебные записи через admin</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>Firefox на рабочем столе бастиона через RDP</p>
 <p><strong>Цель и действия:</strong></p>
 <p>В Firefox бастиона откройте http://admin.lab.test:8080/admin/, войдите как practice_admin со своим паролем приложения. Через Add добавьте две строки ниже с точными code/name/quantity/location. Is public включите только у публичной записи. На http://web.lab.test/ должна быть только публичная строка.</p>
@@ -285,7 +285,7 @@ P5-PRIVATE-001 | Practice mouse | 2 | Training shelf B | is_public=false
 <p><strong>Если не получилось:</strong></p>
 <p>Открывайте admin.lab.test в Firefox внутри RDP, не на школьном PC. При CSRF проверьте host/port/proxy.</p>
 <h3>P5.10 Прочитать реальные строки БД и сравнить с экраном</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>На Web выполните SELECT учебной app-role. Так проверяется, что сохранение из admin действительно дошло до PostgreSQL. Для этой проверки не нужны UPDATE/DELETE.</p>
@@ -305,7 +305,7 @@ psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &qu
 <p><strong>Если не получилось:</strong></p>
 <p>При permission denied проверьте profile и database SQL03. Не заменяйте обычную роль на superuser.</p>
 <h3>P5.11 Запустить функциональную проверку и отправить</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>Браузер на своём PC: Web Portal</p>
 <p><strong>Цель и действия:</strong></p>
 <p>После exit с Web выберите P5 в Web Portal на PC и функциональную проверку с правами. В скрытое поле введите существующий пароль practice_admin и запустите проверку с этим паролем. Это не пароль RDP. Автоматика выполняет HTTP login, создаёт одну запись CK-P-, меняет количество, сверяет DB/страницу и выполняет logout. Две заданные записи не меняются; проверочная остаётся. Личная демонстрация не нужна.</p>

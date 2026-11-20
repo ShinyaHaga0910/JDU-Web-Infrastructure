@@ -36,8 +36,9 @@ L = {
  'missions': T('Web演習：自力課題M0〜M6', 'Web Infrastructure: самостоятельные задания M0–M6', 'Web Infrastructure: M0–M6 mustaqil topshiriqlar'),
  'goal': T('学ぶこと', 'Что изучаем', 'Nimani o‘rganamiz'),
  'problem': T('課題', 'Задание', 'Topshiriq'),
- 'solution': T('操作例：一つずつ実行する', 'Пример решения: выполняйте по одному шагу', 'Yechim namunasi: bittadan bajaring'),
- 'place': T('実行場所', 'Место выполнения', 'Bajarish joyi'),
+ 'solution': T('解答例（操作手順）', 'Пример решения (порядок действий)', 'Yechim namunasi (bajarish tartibi)'),
+ 'work': T('このPractice{number}で作業すること', 'Что сделать в Practice{number}', 'Practice{number} da bajariladigan ishlar'),
+ 'place': T('実行環境', 'Среда выполнения', 'Bajarish muhiti'),
  'why': T('目的と操作', 'Цель и действия', 'Maqsad va amallar'),
  'expect': T('期待する結果と読み方', 'Ожидаемый результат и его смысл', 'Kutilgan natija va ma’nosi'),
  'trouble': T('うまくいかないとき', 'Если не получилось', 'Ishlamasa'),
@@ -80,9 +81,9 @@ def emit_intro(lang, kind):
       '| Role | Private IPv4 | ' + T('用途', 'Назначение', 'Vazifa')[lang] + ' |', '| --- | --- | --- |',
       '| bastion | 10.20.1.10 | RDP3389 / Firefox / SSH |', '| web | 10.20.1.20 | HTTP80 / private8080 / loopback8000 |',
       '| dns | 10.20.2.10 | BIND UDP/TCP53 |', '| db | 10.20.2.20 | PostgreSQL5432 |', '| repo | 10.20.2.30 | ' + T('事前保存した署名資源のHTTP80', 'HTTP80 с заранее сохранёнными подписанными ресурсами', 'Oldindan saqlangan imzolangan resurslar HTTP80')[lang] + ' |', '',
-      T('各Ubuntuへ入る操作：CloudShellで aws ssm start-session --target i-自分の対象ID。接続直後にid -unとbootstrap.jsonのroleを確認する。サーバーを替えるときはexitを1回でCloudShellへ戻り、次のIDでstart-sessionする。CloudShellの変数は接続先へ自動コピーされない。SSMのssm-userはsudo可能。RDPのlabuserはsudo管理者ではない。',
-        'Для входа в каждый Ubuntu выполните в CloudShell aws ssm start-session --target i-СВОЙ-ID. Сразу проверяйте id -un и role из bootstrap.json. Для смены сервера один exit возвращает в CloudShell; затем подключайтесь к следующему ID. Переменные CloudShell не копируются на узел. ssm-user может sudo; RDP-пользователь labuser не администратор sudo.',
-        'Har Ubuntu ga kirish uchun CloudShell da aws ssm start-session --target i-OZ-ID bajaring. Darhol id -un va bootstrap.json dagi role ni tekshiring. Server almashtirishda bitta exit bilan CloudShell ga qaytib keyingi ID ga ulang. CloudShell o‘zgaruvchilari serverga avtomatik ko‘chmaydi. ssm-user sudo qila oladi; RDP labuser sudo admin emas.')[lang], '',
+      T('各Ubuntuへ入る操作：CloudShellで aws ssm start-session --target i-自分の対象ID。接続先の確認はP0.2の手順を使う。サーバーを替えるときはexitを1回でCloudShellへ戻り、次のIDでstart-sessionする。CloudShellの変数は接続先へ自動コピーされない。SSMのssm-userはsudo可能。RDPのlabuserはsudo管理者ではない。',
+        'Для входа в каждый Ubuntu выполните в CloudShell aws ssm start-session --target i-СВОЙ-ID. Проверьте подключение по шагу P0.2. Для смены сервера один exit возвращает в CloudShell; затем подключайтесь к следующему ID. Переменные CloudShell не копируются на узел. ssm-user может sudo; RDP-пользователь labuser не администратор sudo.',
+        'Har Ubuntu ga kirish uchun CloudShell da aws ssm start-session --target i-OZ-ID bajaring. Ulanishni P0.2 qadamiga muvofiq tekshiring. Server almashtirishda bitta exit bilan CloudShell ga qaytib keyingi ID ga ulang. CloudShell o‘zgaruvchilari serverga avtomatik ko‘chmaydi. ssm-user sudo qila oladi; RDP labuser sudo admin emas.')[lang], '',
       T('nanoの編集：file名を指定して開く→本文を入力→Ctrl+O→Enterで保存→Ctrl+Xで終了。設定fileの枠はshell commandではない。psqlに入るとpromptが変わる。SQL/\\passwordはその中へ入力し、\\qでUbuntuへ戻る。失敗したcommandの次へ進まず、期待結果を確認する。',
         'Редактор nano: открыть файл → ввести текст → Ctrl+O → Enter сохранить → Ctrl+X выйти. Блок конфигурации не выполняется как shell-команда. В psql меняется prompt; SQL/\\password вводятся внутри, \\q возвращает в Ubuntu. Не продолжайте после ошибки без проверки результата.',
         'Nano: faylni ochish → matn yozish → Ctrl+O → Enter bilan saqlash → Ctrl+X bilan chiqish. Sozlama bloki shell buyrug‘i emas. Psql ichida prompt o‘zgaradi; SQL/\\password shu yerga yoziladi, \\q Ubuntu ga qaytaradi. Xatodan keyin natijani tekshirmay davom etmang.')[lang], '']
@@ -159,9 +160,9 @@ INSTANCE_ID_SOURCE = ROOT.parent / 'textbook/assets/figures/ch03-fig04-ec2-insta
 
 def instance_id_guide(lang):
     caption = T(
-        'C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDをコピーする。',
-        'Рисунок 3-4 из главы C3. Откройте EC2 → Instances и скопируйте Instance ID из строки нужного сервера.',
-        'C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni nusxalang.')[lang]
+        'C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDを確認する。',
+        'Рисунок 3-4 из главы C3. Откройте EC2 → Instances и проверьте Instance ID в строке нужного сервера.',
+        'C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni tekshiring.')[lang]
     return [f'![{caption}](../../assets/shared/{INSTANCE_ID_IMAGE})', '', caption, '']
 
 
@@ -183,21 +184,32 @@ def make_markdown(reg, lang, kind):
             out += diagram_markdown(m['id'],lang)
             out += task_spec(tasks[m['id']], reg, lang)
             notes=MODULE_NOTES[m['id']]
-            out += ['### ' + LABELS['mechanism'][lang], '',
-                    '**' + LABELS['before'][lang] + ':** ' + notes['before'][lang], '',
-                    '**' + LABELS['after'][lang] + ':** ' + notes['after'][lang], '', notes['mechanism'][lang], '']
+            if 'before' in notes:
+                out += ['### ' + LABELS['mechanism'][lang], '',
+                        '**' + LABELS['before'][lang] + ':** ' + notes['before'][lang], '']
+            out += ['**' + L['work'][lang].format(number=m['id'][1:]) + '**', '', notes['after'][lang], '']
+            if 'mechanism' in notes:
+                out += [notes['mechanism'][lang], '']
             out += ['### ' + L['solution'][lang], '']
             for i, s in enumerate(m['steps'], 1):
-                out += [f"#### {m['id']}.{i} {s['title'][lang]}", '', '**' + L['place'][lang] + ':** ' + PLACES[s['place']][lang], '', '**' + L['why'][lang] + ':** ' + s['why'][lang], '']
-                if m['id']=='P0' and i==1:
+                step_id=f"{m['id']}.{i}"
+                out += [f"#### {step_id} {s['title'][lang]}", '', '**' + L['place'][lang] + ':** ' + PLACES[s['place']][lang], '', '**' + L['why'][lang] + ':** ' + s['why'][lang], '']
+                if step_id=='P0.1':
                     out += instance_id_guide(lang)
+                    continue
                 if s['code']:
                     for fence,source in annotated_blocks(m['id'],i,s['code'],lang):
                         label=T('設定・入力データ（端末で実行するコマンドではない）','Конфигурация или данные: не выполнять как команды','Sozlama yoki ma’lumot: terminal buyrug‘i emas')[lang] if fence=='text' else T('入力するコマンド（番号はこの手順内の順番）','Команды: нумерация внутри этого шага','Buyruqlar: raqamlar shu qadam ichidagi tartib')[lang]
                         if fence=='sql':label=T('ここからはpsql内で入力する','Далее вводить внутри psql','Bundan keyin psql ichida kiriting')[lang]
                         out += [label, '', '```' + fence, shell_lines(source) if fence=='bash' else source, '```', '']
-                out += ['**' + LABELS['meaning'][lang] + ':** ' + STEP_NOTES[f"{m['id']}.{i}"][lang], '']
-                out += ['**' + L['expect'][lang] + ':** ' + s['expect'][lang], '', '**' + L['trouble'][lang] + ':** ' + s['trouble'][lang], '']
+                if step_id in STEP_NOTES:
+                    out += ['**' + LABELS['meaning'][lang] + ':** ' + STEP_NOTES[step_id][lang], '']
+                out += ['**' + L['expect'][lang] + ':** ' + s['expect'][lang], '']
+                if step_id=='P0.2':
+                    out += [T('ターミナルの表示例（接続後）','Пример вывода терминала после подключения','Ulangandan keyingi terminal ko‘rinishi')[lang],
+                            '', '```text', '$ id -un', 'ssm-user', '$ python3 -c …', 'web', '```', '']
+                if s['trouble'] is not None:
+                    out += ['**' + L['trouble'][lang] + ':** ' + s['trouble'][lang], '']
             if m['id'] in OUTPUT_EXAMPLES:
                 example,reading=OUTPUT_EXAMPLES[m['id']]
                 out += ['### ' + LABELS['output'][lang], '', '```text', example, '```', '', reading[lang], '']
@@ -392,7 +404,7 @@ def main():
     shared_image.parent.mkdir(parents=True, exist_ok=True)
     shared_image.write_bytes(INSTANCE_ID_SOURCE.read_bytes())
     assert set(CHECKS)=={c for t in reg['tasks'] if t['category']=='automated_mission' for c in t['progress_scored_checks']}
-    assert set(STEP_NOTES)=={f"{module['id']}.{i}" for module in MODULES for i in range(1,len(module['steps'])+1)}
+    assert set(STEP_NOTES)=={f"{module['id']}.{i}" for module in MODULES for i in range(1,len(module['steps'])+1)} - {'P0.1', 'P0.2'}
     for m in MODULES:
         assert m['id'] in MODULE_NOTES
         assert all(set(p)==set(LANGS) and all(p.values()) for p in MODULE_NOTES[m['id']].values())
@@ -400,7 +412,8 @@ def main():
             assert set(m[field])==set(LANGS)
         for s in m['steps']:
             for field in ('title','why','expect','trouble'):
-                assert set(s[field])==set(LANGS) and all(s[field].values())
+                if s[field] is not None:
+                    assert set(s[field])==set(LANGS) and all(s[field].values())
     pins=dict(distribution_id=DIST_ID,registry_sha256=EXPECTED_REGISTRY,fingerprint='65EC6784750CCFA703BA7179519284E45155EC2A',
         import_pins={n:hashlib.sha256((KIT/n).read_bytes()).hexdigest() for n in ('student.py','release_tools.py')},
         resource_pins={'offline_assets.py':hashlib.sha256((ROOT/'resources/offline_assets.py').read_bytes()).hexdigest()})

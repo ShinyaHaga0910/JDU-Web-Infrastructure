@@ -62,7 +62,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tr>
 </tbody>
 </table>
-<p>Har Ubuntu ga kirish uchun CloudShell da aws ssm start-session --target i-OZ-ID bajaring. Darhol id -un va bootstrap.json dagi role ni tekshiring. Server almashtirishda bitta exit bilan CloudShell ga qaytib keyingi ID ga ulang. CloudShell o‘zgaruvchilari serverga avtomatik ko‘chmaydi. ssm-user sudo qila oladi; RDP labuser sudo admin emas.</p>
+<p>Har Ubuntu ga kirish uchun CloudShell da aws ssm start-session --target i-OZ-ID bajaring. Ulanishni P0.2 qadamiga muvofiq tekshiring. Server almashtirishda bitta exit bilan CloudShell ga qaytib keyingi ID ga ulang. CloudShell o‘zgaruvchilari serverga avtomatik ko‘chmaydi. ssm-user sudo qila oladi; RDP labuser sudo admin emas.</p>
 <p>Nano: faylni ochish → matn yozish → Ctrl+O → Enter bilan saqlash → Ctrl+X bilan chiqish. Sozlama bloki shell buyrug‘i emas. Psql ichida prompt o‘zgaradi; SQL/\password shu yerga yoziladi, \q Ubuntu ga qaytaradi. Xatodan keyin natijani tekshirmay davom etmang.</p>
 <p>Raqamli izohlar shu qadamdagi tartib va maqsadni bildiradi. # shell, -- psql ichidagi izohdir. Izohni o‘zgartirish shart emas. Ulanish, editor va parol kiritish tugashini kutib, bittadan bajaring. Qatorga bo‘lingan buyruq bitta buyruq bo‘lib qoladi.</p>
 <h2 id="section-3">Qadamlarni qanday o‘qish kerak</h2>
@@ -133,56 +133,44 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h3>Serverlarga ulanish va kurs fayllari</h3>
 <p><img src="../../../assets/uz/p0-ssm.png" alt="O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda, imzolangan tarqatmada esa P0.3 da joylanadi." width="1040" height="680" loading="lazy"></p>
 <p>O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda, imzolangan tarqatmada esa P0.3 da joylanadi.</p>
-<h3>Bu qanday ishlaydi</h3>
-<p><strong>Boshlashdan oldingi holat:</strong></p>
-<p>Boshlang‘ich tarqatma va ro‘yxat tugagan shaxsiy besh server ishlatiladi.</p>
-<p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
-<p>Account, role va ish joyini farqlaysiz; ochiq o‘quv resurslari tayyorlanadi.</p>
-<p>AWS Console resurslarni boshqaradi; CloudShell - AWS CLI bor shaxsiy terminal; SSM tanlangan EC2 OS ichida session ochadi. Besh server alohida OS bo‘lib qoladi: Web dagi /var/www DB dagi katalog bilan bir joy emas. Server role va OS user ni alohida tekshiring.</p>
-<h3>Yechim namunasi: bittadan bajaring</h3>
-<h4>P0.1 Beshta serverning instance ID qiymatini yozib olish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Practice0 da bajariladigan ishlar</strong></p>
+<p>O‘z AWS hisobingizni, har bir server rolini va buyruq bajariladigan muhitni tekshiring. Imzolangan tarqatma ishlatilsa, ilova va DB sozlash fayllarini Web hamda DB serverlariga joylang.</p>
+<h3>Yechim namunasi (bajarish tartibi)</h3>
+<h4>P0.1 Beshta serverning instance ID sini tekshirish</h4>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Talabaning shaxsiy AWS Console oynasi</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>EC2 → Instances ro‘yxatini oching. Name ustunida o‘z Lab serveringizni toping va shu qatordagi Instance ID ustunidan i- bilan boshlangan to‘liq ID ni oling. LabId va DeploymentId teglarini solishtiring. bastion/web/dns/db/repo uchun instance ID ni ish jadvaliga yozing. Faqat nomiga qarab tanlamang. Public IPv4 bastion va web da mavjud. SSM uchun public IP emas, instance ID kerak.</p>
-<p><img src="../../../assets/shared/ec2-instance-id-c3.png" alt="C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni nusxalang." width="1239" height="404" loading="lazy"></p>
-<p>C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni nusxalang.</p>
-<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Instance ID EC2 ni aniqlaydi; role vazifani, public IP tashqi manzilni bildiradi. Public IP o‘zgarishi instance ID almashganini anglatmaydi. Ish jadvalida besh role ni o‘z ID si bilan bog‘lang.</p>
-<p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>Beshala server running, SSM Online; private IP umumiy jadvalga mos. To‘xtatib ishga tushirganda public IPv4 o‘zgarishi mumkin.</p>
-<p><strong>Ishlamasa:</strong></p>
-<p>Boshqa Lab, hisob yoki noma’lum serverni o‘zgartirmang. To‘xtagan server uchun ishga tushirish yo‘riqnomasidan foydalaning. Reset yoki Terminate ni bosmang.</p>
-<h4>P0.2 SSM orqali kirish va qaytish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p>AWS Console tepasidagi Search maydoniga EC2 deb yozib, boshqaruv oynasini oching. EC2 → Instances ro‘yxatida Name ustunidan o‘z muhitingizdagi beshta serverni tekshiring. Shu qatordagi Instance ID ustunidan i- bilan boshlangan to‘liq ID ni ko‘ring.</p>
+<p><img src="../../../assets/shared/ec2-instance-id-c3.png" alt="C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni tekshiring." width="1239" height="404" loading="lazy"></p>
+<p>C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni tekshiring.</p>
+<h4>P0.2 CloudShell dan SSM orqali Web serverga ulanish</h4>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Talabaning shaxsiy AWS hisobidagi CloudShell</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>EC2 dagi Web instance ID ni kiriting. Ulanishdan keyin CloudShell emas, Ubuntu terminalida ishlaysiz. id -un SSM foydalanuvchisini, bootstrap.json dagi role server vazifasini ko‘rsatadi. Bitta exit CloudShell ga qaytaradi.</p>
+<p>Birinchi buyruqdagi i-YOUR-WEB-INSTANCE-ID o‘rniga P0.1 da tekshirilgan Web serverning Instance ID sini yozing va buyruqni CloudShell da bajaring. Ulangach, serverni dastlabki sozlashda joylangan /etc/jdu-web/bootstrap.json faylidan rolni o‘qing. role maydonida server vazifasi saqlanadi. web qiymati Web serverga ulanganligingizni tasdiqlaydi.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. CloudShell dan tanlangan EC2 ga SSM ochish; ulanishni kutish.
 aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
 # 2. Shu terminaldagi OS user nomini ko‘rsatish.
 id -un
-# 3. Ulangan server hostname ini ko‘rsatish.
-hostname
-# 4. Bootstrap dan faqat role ni o‘qib, ulangan server vazifasini tekshirish.
+# 3. Bootstrap dan faqat role ni o‘qib, ulangan server vazifasini tekshirish.
 python3 -c 'import json;print(json.load(open(&quot;/etc/jdu-web/bootstrap.json&quot;))[&quot;role&quot;])'
-# 5. Joriy ish katalogini ko‘rsatish.
-pwd
-# 6. Joriy server session ini yopib CloudShell ga qaytish.
+# 4. Joriy server session ini yopib CloudShell ga qaytish.
 exit
 </code></pre>
-<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Avval faqat start-session ni CloudShell da bajarib ulanishni kuting. So‘ng qolgan qatorlarni bittadan kiriting. Id -un user ni, hostname OS host nomini, role o‘quv vazifasini ko‘rsatadi. Exit session ning bir pog‘onasidan qaytaradi.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>ssm-user va web ko‘rinadi. Har safar serverni almashtirganda tekshiring. SSH orqali kirganda Ubuntu foydalanuvchisi ubuntu bo‘lishi mumkin.</p>
-<p><strong>Ishlamasa:</strong></p>
-<p>TargetNotConnected bo‘lsa, running, SSM Online va us-east-1 ni tekshiring. SG portlarini to‘liq ochmang, Windows ga kalit yuklamang.</p>
-<h4>P0.3 Faqat ochiq o‘quv fayllarini tayyorlash</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p>id -un natijasi ssm-user, fayldan o‘qilgan rol qiymati esa web bo‘ladi.</p>
+<p>Ulangandan keyingi terminal ko‘rinishi</p>
+<pre><code class="language-text">$ id -un
+ssm-user
+$ python3 -c …
+web
+</code></pre>
+<h4>P0.3 Ilova va SQL o‘quv fayllarini joylash</h4>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Talabaning shaxsiy AWS hisobidagi CloudShell</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>Bu qadam imzolangan tarqatma uchun. Umumiy kod orqali sozlanganda fayllar oldindan joylanadi. Ushbu qo‘llanma zip faylini CloudShell → Actions → Upload file orqali yuklang; unzip web-lab-pm-r1.zip bilan oching. resources katalogiga o‘ting va YOUR-INSTALLATION-DIRECTORY o‘rniga imzolangan tarqatmaning activate.sh fayli joylashgan katalog yo‘lini kiriting. Yordamchi shaxsiy imzolangan tarqatma va asl besh serverni tekshirib, Web/DB ga ochiq app, SQL va yashirin kiritish vositasini joylaydi. Service yoki DB qurmaydi, maxfiy qiymat yubormaydi.</p>
+<p>Bu qadamda Web va DB serverlaridagi /var/lib/jdu-web/lesson-resources-r1 katalogiga jihozlarni hisobga olish ilovasi arxivi, DB sozlash uchun undagi SQL hamda DB parolini yashirin kiritish vositasi joylanadi. Umumiy kod orqali o‘rnatishda skript fayllarni oldindan joylaydi: P0.4 ga o‘ting. Imzolangan tarqatma uchun ZIP faylini CloudShell → Actions → Upload file orqali yuklang va uy katalogida unzip web-lab-pm-r1.zip ni bajaring. YOUR-INSTALLATION-DIRECTORY o‘rniga dastlabki o‘rnatishdagi activate.sh joylashgan katalog yo‘lini yozing.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. Ish katalogini $HOME/web-lab-pm-r1/resources ga o‘zgartirish.
 cd &quot;$HOME/web-lab-pm-r1/resources&quot;
@@ -190,13 +178,13 @@ cd &quot;$HOME/web-lab-pm-r1/resources&quot;
 python3 -B stage_resources.py --installation 'YOUR-INSTALLATION-DIRECTORY'
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Ochiq resurslar app va SQL materiallaridir, tayyor service emas. Stage_resources.py CloudShell da ishga tushib ularni Web/DB ga joylaydi. Zip ni Windows ga saqlashning o‘zi EC2 da fayl yaratmaydi.</p>
+<p>Stage_resources.py yaratilgan muhitni tekshiradi va keyingi mashqlar uchun fayllarni kerakli ikki serverga nusxalaydi. Ilovani ishga tushirish va DB yaratish keyingi mashqlarda bajariladi.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>PUBLIC_LESSON_RESOURCES_READY=web va =db chiqadi. Ochiq fayllar /var/lib/jdu-web/lesson-resources-r1 da. Mavjud boshqa mazmunli fayl ustiga yozilmaydi.</p>
+<p>Joylash yakunlanganda PUBLIC_LESSON_RESOURCES_READY=web va PUBLIC_LESSON_RESOURCES_READY=db chiqadi.</p>
 <p><strong>Ishlamasa:</strong></p>
-<p>Boshlang‘ich o‘rnatish tugamagan, versiya boshqa yoki muddat o‘tgan bo‘lsa, to‘xtab o‘qituvchiga ayting. Tayyor yechim quradigan test fixture bilan almashtirmang.</p>
+<p>O‘rnatish katalogi topilmasa, activate.sh joylashgan katalog yo‘lini tekshiring. Tarqatma xatosi chiqsa, xabarni o‘qituvchiga ayting.</p>
 <h4>P0.4 Tayyorlikni brauzerda tekshirish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Shaxsiy PC brauzeri: Web Portal</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>O‘qituvchi bergan havola orqali topshiriqlar sahifasini oching. Maktab Google orqali kirib, o‘z AWS hisobingizni bog‘lang. P0 ni tanlab tekshiruvni boshlang; ishlov davom etsa natijani yangilang.</p>
@@ -207,7 +195,7 @@ python3 -B stage_resources.py --installation 'YOUR-INSTALLATION-DIRECTORY'
 <p><strong>Ishlamasa:</strong></p>
 <p>Yordam uchun check ID, vaqt va server rolini yozing. Token, parol va shaxsiy URL ni ulashmang.</p>
 <h4>P0.5 RDP orqali bastion ish stolini ochish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Talabaning Windows PC si (umumiy hisob)</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>EC2 dagi hozirgi bastion public IPv4 ni ishlating. Windows+R ni bosib mstsc /prompt kiriting va Enter bosing. Computer ga IP, user ga labuser, parolga boshlang‘ich o‘rnatishda belgilangan shaxsiy RDP parolini kiriting; Windows paroli emas. Credentials ni saqlashni tanlamang. Ko‘k xrdp login chiqsa Session=Xorg va labuser ni tekshiring.</p>
@@ -242,12 +230,12 @@ mstsc /prompt
 <h3>Bu qanday ishlaydi</h3>
 <p><strong>Boshlashdan oldingi holat:</strong></p>
 <p>Web yaratilgan, ammo mashq fayli hali qaytarilmayapti.</p>
-<p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
+<p><strong>Practice1 da bajariladigan ishlar</strong></p>
 <p>Nginx 80 portda practice.txt qaytarib, request ni log ga yozadi.</p>
 <p>URL dagi /practice.txt Web ichidagi /var/www/html/practice.txt ga mos. 127.0.0.1 orqali muvaffaqiyat faqat Web ichini tekshiradi. Ayni matnni bastion va Windows dan o‘qish yo‘lning boshqa qismlarini tekshiradi. <a href="https://nginx.org/en/docs/beginners_guide.html">Nginx hujjati</a>.</p>
-<h3>Yechim namunasi: bittadan bajaring</h3>
+<h3>Yechim namunasi (bajarish tartibi)</h3>
 <h4>P1.1 Ichki APT dan Nginx o‘rnatish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>P0 dagidek Web ga SSM orqali kiring va role=web ni tekshiring. APT source faqat 10.20.2.30 dagi imzolangan repo ekanini ko‘ring. update indeksni oladi, install paketni o‘rnatadi. Internet source qo‘shmang.</p>
@@ -266,7 +254,7 @@ sudo apt-get install --no-install-recommends nginx
 <p><strong>Ishlamasa:</strong></p>
 <p>Yuklash xatosida repo running/SSM va IP ni tekshiring. --allow-unauthenticated yoki tashqi pip bilan chetlab o‘tmang.</p>
 <h4>P1.2 Aniq matn yaratish va ruxsatlarni sozlash</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>nano da quyida ko‘rsatilgan bitta aniq qatorni yarating va oxiriga yangi qator qo‘ying. Ctrl+O → Enter saqlaydi, Ctrl+X yopadi. install faylni joylaydi; -o/-g egasi va guruhni, -m ruxsatni belgilaydi.</p>
@@ -296,7 +284,7 @@ cat /var/www/html/practice.txt
 <p><strong>Ishlamasa:</strong></p>
 <p>Hali nano ichida bo‘lsangiz, avval saqlab chiqing. Mavjud mission.txt ni o‘zgartirmang.</p>
 <h4>P1.3 Web root ni tekshirish va service ni ishga tushirish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Ubuntu boshlang‘ich sayti root sifatida /var/www/html dan foydalanadi. nginx -T da /etc/nginx/sites-enabled/default, root va listen 80 ni toping. Kerak bo‘lsa sudo nano bilan tahrirlang; tekshiruvdan keyin reload qiling. enable --now hozir ishga tushiradi va keyingi OS yuklanishiga yoqadi.</p>
@@ -321,7 +309,7 @@ sudo ss -lntp
 <p><strong>Ishlamasa:</strong></p>
 <p>Xatoda nginx -t ko‘rsatgan fayl va qatorni tuzating. SG ni o‘zgartirish sintaksis xatosini tuzatmaydi.</p>
 <h4>P1.4 Web ichidan javobni ko‘rish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>curl HTTP client; -i status, header va body ni ko‘rsatadi. 127.0.0.1 shu Web serverning o‘zi, public IP emas. Faqat buyruq tugaganini emas, javobni solishtiring.</p>
@@ -336,7 +324,7 @@ curl --noproxy '*' -i http://127.0.0.1/practice.txt
 <p><strong>Ishlamasa:</strong></p>
 <p>Welcome to nginx chiqsa, / emas, /practice.txt so‘ralganini tekshiring.</p>
 <h4>P1.5 Bastiondan va tashqaridan shu faylni tekshirish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Bastionning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web dan exit bilan chiqing, CloudShell dan bastion SSM terminalini ochib quyidagi URL ni so‘rang. Keyin exit bilan CloudShell ga qayting; EC2 dagi hozirgi Web public IPv4 orqali shu path ni curl -i bilan so‘rang. 10.20.1.20 private IP va public IPv4 ni adashtirmang.</p>
@@ -351,7 +339,7 @@ curl --noproxy '*' -i http://10.20.1.20/practice.txt
 <p><strong>Ishlamasa:</strong></p>
 <p>Ichki so‘rov o‘tib tashqi so‘rov o‘tmasa, public IP va Lab holatini tekshiring. Asosiy SG ni o‘zboshimchalik bilan kengaytirmang.</p>
 <h4>P1.6 So‘rovni log bilan bog‘lash va yuborish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web ga qayting. Access log da vaqt, client IP, path va statusni ko‘ring. Bu fayl borligidan tashqari so‘rov ishlanganining dalilidir. Exit bilan CloudShell ga qaytgach, PC dagi Web Portal da P1 ni tekshiring.</p>
@@ -406,12 +394,12 @@ JDU WEB-02 practice: HTTP response verified.
 <h3>Bu qanday ishlaydi</h3>
 <p><strong>Boshlashdan oldingi holat:</strong></p>
 <p>P1 HTTP IP orqali ishlaydi; DNS endi sozlanadi.</p>
-<p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
+<p><strong>Practice2 da bajariladigan ishlar</strong></p>
 <p>BIND mashq nomlari bastion va Web ning oddiy resolver idan ishlaydi.</p>
 <p>DNS nom so‘roviga javob beradi, Web sahifani qaytarmaydi. BIND lab.test zone ni boshqaradi; A record IPv4 qaytaradi. Aniq DNS server bilan dig va OS sozlamalaridan foydalanuvchi getent/browser ni farqlang. DNS dan keyin alohida HTTP ulanish bo‘ladi. <a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BIND hujjati</a>.</p>
-<h3>Yechim namunasi: bittadan bajaring</h3>
+<h3>Yechim namunasi (bajarish tartibi)</h3>
 <h4>P2.1 BIND o‘rnatish va asl sozlamani saqlash</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DNS serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>DNS ga kirib role=dns ni tekshiring. cp -a asl fayl atributlarini saqlaydi; -n eski nusxa ustiga yozmaydi. Bu tahrir xatosi uchun nusxa, DB backup/restore topshirig‘i emas.</p>
@@ -432,7 +420,7 @@ sudo cp -an /etc/bind/named.conf.local /etc/bind/named.conf.local.before-p2
 <p><strong>Ishlamasa:</strong></p>
 <p>Boshqa Lab named.conf faylini to‘liq ko‘chirmang. O‘zingizning zone mavjud bo‘lsa, avval o‘qing.</p>
 <h4>P2.2 Client lar va forwarder ni sozlash</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DNS serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>sudo nano /etc/bind/named.conf.options ni ochib quyidagi matnni saqlang. acl ruxsatli client larni, listen-on DNS tinglashini belgilaydi; forward only tashqi nomlarni AWS DNS ga uzatadi. Query va recursion uchta manbaga cheklanadi. dnssec-validation no yopiq o‘quv forwarding tuzilmasiga mos.</p>
@@ -459,7 +447,7 @@ options {
 <p><strong>Ishlamasa:</strong></p>
 <p>Nuqtali vergul va qavslar sintaksis qismidir. ACL ni any yoki 0.0.0.0/0 gacha kengaytirmang.</p>
 <h4>P2.3 Zone ni e’lon qilish va A record yozish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DNS serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>sudo nano /etc/bind/named.conf.local ga birinchi zone blokini yozing. sudo install -d -m 0755 /etc/bind/zones dan so‘ng sudo nano /etc/bind/zones/db.lab.test ga qolgan matnni yozing. SOA boshqaruv ma’lumoti, NS vakolatli DNS, A nom/IPv4 mosligi. Oxirgi nuqta to‘liq nomni bildiradi; har tahrirda serial ni oshiring.</p>
@@ -488,7 +476,7 @@ practice-db IN A 10.20.2.20
 <p><strong>Ishlamasa:</strong></p>
 <p>M2 allaqachon mavjud bo‘lsa, zone ni almashtirmay ikkita mashq yozuvini qo‘shing. Zone ni ikki marta e’lon qilmang.</p>
 <h4>P2.4 Sintaksis va DNS ichki javobini tekshirish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DNS serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Client ni nosoz DNS ga o‘tkazish nom yechimini to‘xtatadi. Avval named-checkconf va named-checkzone muvaffaqiyatli bo‘lsin, keyin UDP hamda TCP ni tekshiring.</p>
@@ -513,7 +501,7 @@ dig @127.0.0.1 guide.lab.test A +tcp
 <p><strong>Ishlamasa:</strong></p>
 <p>Xatoda sudo journalctl -u named -n 30 --no-pager ni o‘qing, sozlamani tuzatib yana tekshiring.</p>
 <h4>P2.5 Bastion va Web dan DNS ga bevosita so‘rov yuborish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Bastionning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Buyruqlarni bastionda ham, Web da ham bajaring. @10.20.2.10 faqat shu so‘rov uchun DNS ni belgilaydi. Bu browser va app odatda shu DNS ni ishlatishini hali isbotlamaydi.</p>
@@ -536,7 +524,7 @@ dig @10.20.2.10 lab.test AXFR
 <p><strong>Ishlamasa:</strong></p>
 <p>Ulanmasa, manba hamda UDP/TCP 53 ni ajratib tekshiring. Boshqa private serverlarni client ACL ga qo‘shmang.</p>
 <h4>P2.6 Odatiy resolver ni faqat BIND ga yo‘naltirish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Bastionning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Bastion va Web da bittadan bajaring. ip -br link orqali interface nomini, networkctl status NOM orqali Network File ni aniqlang. ls /etc/netplan bilan YAML ni topib sudo cp -an orqali nusxa saqlang. sudo nano da ayni interface ga dhcp4-overrides/use-dns:false va nameservers qo‘shing. Quyida tuzilma namunasi: interface nomi hamda mavjud match/set-name/renderer qiymatlarini saqlang.</p>
@@ -558,7 +546,7 @@ dig @10.20.2.10 lab.test AXFR
 <p><strong>Ishlamasa:</strong></p>
 <p>Bir interface bir necha YAML da bo‘lsa, qiymatlar birlashadi. resolvectl dns da AWS DNS qolsa, tegishli barcha YAML va amaldagi sozlamani tekshiring.</p>
 <h4>P2.7 Qo‘llagach odatiy resolver va HTTP ni tekshirish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Bastionning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Bastion va Web da avval sozlamani hosil qiling, keyin qo‘llang va tekshiring. Ikkinchi SSH/RDP oynasini ochiq tuting; uzilsa SSM orqali qaytib nusxa bilan solishtiring. Fayl tekshirilgach va generate muvaffaqiyatli tugagach apply qiling.</p>
@@ -585,7 +573,7 @@ curl --noproxy '*' -i http://guide.lab.test/practice.txt
 <p><strong>Ishlamasa:</strong></p>
 <p>dig o‘tib getent o‘tmasa, client resolver ini tekshiring. Firefox dagi DoH o‘chirilgan sozlamani saqlang.</p>
 <h4>P2.8 Browser da IP va nomni solishtirib yuborish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>RDP orqali bastiondagi Firefox</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>RDP orqali bastion Firefox ini oching. http://10.20.1.20/practice.txt va http://guide.lab.test/practice.txt bir xil matn berishini ko‘ring. lab.test maktab PC DNS ida emas, bastion ichki DNS ida ishlaydi. Keyin PC dagi Web Portal da P2 ni tekshiring.</p>
@@ -621,12 +609,12 @@ guide.lab.test.  300  IN  A  10.20.1.20
 <h3>Bu qanday ishlaydi</h3>
 <p><strong>Boshlashdan oldingi holat:</strong></p>
 <p>DB da o‘quv resurslari bor; Web → DB ruxsatli yo‘li ishlatiladi.</p>
-<p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
+<p><strong>Practice4 da bajariladigan ishlar</strong></p>
 <p>Mashq DB va setup/runtime role yaratiladi; Web dan parol bilan SQL bajariladi.</p>
 <p>Tarmoq yo‘li, DB listen, HBA ruxsati, parol va SQL privilege alohida kerak. ssm-user - OS user, catalog_practice_app - DB role. HBA birinchi mos qatorni ishlatadi. Ulanish huquqi table yaratish huquqini anglatmaydi. <a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBA</a> va <a href="https://www.postgresql.org/docs/16/sql-grant.html">SQL privilege</a>.</p>
-<h3>Yechim namunasi: bittadan bajaring</h3>
+<h3>Yechim namunasi (bajarish tartibi)</h3>
 <h4>P4.1 PostgreSQL o‘rnatish va o‘quv SQL ni ochish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>DB ga SSM bilan kirib role=db ni tekshiring. PostgreSQL 16 cluster - DB serverni boshqarish birligi. Yordamchi app ni tekshirib SQL ni ochadi; DB yoki role yaratmaydi.</p>
@@ -649,7 +637,7 @@ sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
 <p><strong>Ishlamasa:</strong></p>
 <p>Mavjud DB yoki role ni o‘chirmang. Oldin qurilgan bo‘lsa, holatni o‘qib faqat yetishmagan qadamlarni bajaring.</p>
 <h4>P4.2 DB tinglashi va SCRAM ni sozlash</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>postgresql.conf nusxasini sudo cp -an bilan saqlang. sudo nano /etc/postgresql/16/main/postgresql.conf da uch qiymatni sozlang. Parametr takrorlansa, amaldagi qiymatni SHOW bilan tekshiring. Faqat DB private IP va 5432 tinglanadi; password_encryption keyingi parollar saqlanish turini belgilaydi.</p>
@@ -665,7 +653,7 @@ password_encryption = 'scram-sha-256'
 <p><strong>Ishlamasa:</strong></p>
 <p>Bu SQL emas, postgresql.conf mazmuni. SG va OS tinglash manzili alohida nazoratdir.</p>
 <h4>P4.3 HBA da manba, database va role ni cheklash</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>pg_hba.conf nusxasini saqlab, sudo nano /etc/postgresql/16/main/pg_hba.conf ga quyidagi qoidalarni yozing. Birinchi mos qator ishlatiladi, shu sabab eski keng ruxsatlarni qoldirmang. OS postgres Unix socket/peer orqali boshqaradi. M4 rollari alohida ko‘rsatilgan; mashq roli asosiy DB ga kira olmaydi.</p>
@@ -686,7 +674,7 @@ host all all ::/0 reject
 <p><strong>Ishlamasa:</strong></p>
 <p>Autentifikatsiyani trust bilan chetlab o‘tmang. Asosiy SG ham DB 5432 ni faqat Web dan ruxsat qiladi.</p>
 <h4>P4.4 Qayta ishga tushirish va amaldagi qiymatni tekshirish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>restart sozlamani qayta o‘qiydi. SHOW va pg_hba_file_rules fayl matnini emas, ishlayotgan qiymatni tekshiradi. psql -X shaxsiy boshlang‘ich fayllarni o‘qimaydi.</p>
@@ -710,7 +698,7 @@ sudo -u postgres psql -X -d postgres -c \
 <p><strong>Ishlamasa:</strong></p>
 <p>postgresql.service active(exited) bo‘lishi cluster ishlashini isbotlamaydi. journalctl -u postgresql@16-main ni o‘qing.</p>
 <h4>P4.5 Mashq DB va ikkita role yaratish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>profile_sql.py faqat mashq nomlari bilan tayyor SQL ni chiqaradi. Avval matnni o‘qing, keyin ayni chiqishni psql ga uzating. setup DB/schema egasi va boshlang‘ich jadval yaratuvchi; app odatiy ulanish roli. App dasturlash talab qilinmagani uchun berilgan SQL dan foydalaning.</p>
@@ -733,7 +721,7 @@ python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u pos
 <p><strong>Ishlamasa:</strong></p>
 <p>already exists oldin bajarilganini anglatishi mumkin. DROP qilmang; \du va \l orqali solishtiring. Pipe o‘ngidagi psql SQL error bermaganini tekshiring.</p>
 <h4>P4.6 Ikki DB parolini yashirin kiritish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverda OS postgres nomidan psql</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Birinchi qator DB shell ida bajarilib postgres=# psql ni ochadi. \password buyruqlarini psql ichida kiriting. setup/app uchun kamida 16 belgili turli parollarni har birini ikki marta yashirin kiriting. Qiymatni buyruq yoki hisobotga yozmang. \q DB shell iga qaytaradi.</p>
@@ -758,7 +746,7 @@ sudo -u postgres psql -X -d postgres
 <p><strong>Ishlamasa:</strong></p>
 <p>Klaviatura tartibiga e’tibor bering. Tekshirish uchun parolni chat yoki editorga yozmang. Unutilsa o‘qituvchi bilan shaxsiy tiklash tartibini bajaring.</p>
 <h4>P4.7 Web dan parol bilan SELECT bajarish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>DB SSM dan exit qilib CloudShell ga qayting, Web SSM ni oching. psql da -h manzil, -U role, -d DB nomi, -W parol so‘rovi. Avval ichki IP orqali ulaning, keyin P2 da ro‘yxatga olingan mashq DB nomi orqali shu SELECT ni bajaring. DB nomi, rol va natijani solishtiring.</p>
@@ -781,7 +769,7 @@ psql -X -h practice-db.lab.test -U catalog_practice_app -d jdu_catalog_practice 
 <p><strong>Ishlamasa:</strong></p>
 <p>IP orqali ulanish ishlasa, nom orqali esa ishlamasa, P2 dagi tizim DNS i va mashq DB nomini tekshiring. Autentifikatsiya rad etilsa, manba, DB, rol va parolni tekshiring. Sinash uchun DB ni Internet ga ochmang.</p>
 <h4>P4.8 Checker uchun mavjud parolni faqat Web da saqlash</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Yordamchi mavjud catalog_practice_app parolini ikki marta yashirin so‘rab, Web dagi root-only 0600 faylga saqlaydi. DB parolini o‘zgartirmaydi. Env ni cat bilan ko‘rsatmang va source qilmang. Exit dan keyin PC dagi Web Portal da P4 ni tekshiring.</p>
@@ -852,12 +840,12 @@ jdu_catalog_practice | catalog_practice_app | 1
 <h3>Bu qanday ishlaydi</h3>
 <p><strong>Boshlashdan oldingi holat:</strong></p>
 <p>M2 DNS va P4 mashq DB hozir ishlaydi.</p>
-<p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
+<p><strong>Practice5 da bajariladigan ishlar</strong></p>
 <p>Tayyor app Web ichida ishlaydi; ochiq ro‘yxat va bastion admin oynasi DB ga ulanadi.</p>
 <p>Nginx HTTP ni qabul qiladi, Gunicorn Python app ni ishlatadi, PostgreSQL ma’lumot saqlaydi. Statik P1 dan farqli ravishda ro‘yxat mazmuni DB dan olinadi. Venv app Python muhitini ajratadi; systemd unit ishga tushishni belgilaydi. Tayyor kodni joylaysiz, dasturni qayta yozish shart emas.</p>
-<h3>Yechim namunasi: bittadan bajaring</h3>
+<h3>Yechim namunasi (bajarish tartibi)</h3>
 <h4>P5.1 Kerakli DNS va ochiq resurslarni tekshirish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web odatiy resolver db.lab.test=10.20.2.20 va admin.lab.test=10.20.1.20 qaytarsin. offline_assets ichki repo dan asl imzo/hash bo‘yicha yettita wheel va lock oladi. Tashqi pip ishlatmaydi, DB/app sozlamaydi.</p>
@@ -882,7 +870,7 @@ ls /var/lib/jdu-web/lesson-resources-r1/wheels
 <p><strong>Ishlamasa:</strong></p>
 <p>Faqat practice-db emas, db.lab.test ham kerak. P5 M2 ga bog‘liq, ammo asosiy katalog topshirig‘ini tugatish shart emas.</p>
 <h4>P5.2 Kod joylash va alohida venv yaratish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>App va venv ni root boshqaradi; catalog ularni o‘zgartira olmaydi. app yoki venv mavjud bo‘lsa, qayta yaratmay versiyani tekshiring. cp faqat tekshirilgan ochiq resursni joylaydi. venv app bog‘liqliklarini system Python dan ajratadi.</p>
@@ -908,7 +896,7 @@ sudo /opt/jdu-catalog/venv/bin/python -m pip check
 <p><strong>Ishlamasa:</strong></p>
 <p>Bog‘liqlik yetishmasa o‘qituvchi tarqatmasini tekshiring. Pip orqali latest ga yangilamang, app kodini o‘zgartirmang.</p>
 <h4>P5.3 Service user va static katalogini yaratish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>catalog inson login i uchun emas, Gunicorn service user idir. nologin va sudo siz yarating. collectstatic yozishi uchun faqat static katalogini catalog egasi qiling; kod/venv root da qoladi. catalog mavjud bo‘lsa useradd ni takrorlamay id va shell ni tekshiring.</p>
@@ -932,7 +920,7 @@ getent passwd catalog
 <p><strong>Ishlamasa:</strong></p>
 <p>Ruxsat xatosini chmod -R 777 yoki catalog ga sudo berish bilan hal qilmang. Aniq katalog va egasini solishtiring.</p>
 <h4>P5.4 Runtime sozlamasini yaratish va faollashtirish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>EC2 dagi hozirgi Web public IPv4 ni kiriting. Runtime yordamchisiga P4 dagi mavjud catalog_practice_app parolini ikki marta kiriting. Django secret shaxsiy Lab uchun yaratiladi. Runtime sozlamasini yarating, so‘ng ilovani ishga tushirishdan oldin activate buyrug‘i bilan practice profilini tanlang. Tekshiruvdan keyin P5.5 da vaqtinchalik setup sozlamasini yarating.</p>
@@ -956,7 +944,7 @@ sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
 <p><strong>Ishlamasa:</strong></p>
 <p>RDP yoki app admin parolini kiritmang. Davom ettirishda bajarilmagan birinchi amaldan boshlang. Activate xato bersa, keyingi qadamdan oldin ilova ishlayotganini va vaqtinchalik setup sozlamalari qolganini tekshiring.</p>
 <h4>P5.5 Vaqtinchalik setup bilan jadval va admin yaratish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>create-setup ga P4 dagi catalog_practice_setup parolini kiriting. migrate berilgan DB tuzilmasini yaratadi; seed bo‘sh katalogga bir marta uchta xayoliy namuna kiritadi. create_lab_admin yashirin parol bilan practice_admin yaratadi. Oddiy app setup orqali ishlamaydi.</p>
@@ -983,7 +971,7 @@ sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
 <p><strong>Ishlamasa:</strong></p>
 <p>Seed/admin already exists mavjud ma’lumotni himoya qiladi. Reset qilmay joriy holatni tekshiring.</p>
 <h4>P5.6 Runtime role ga kerakli SQL huquqini berish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web dan CloudShell ga chiqib DB SSM ni oching. Avval SQL03 ni o‘qing: u 11 jadval va egalarni tekshirib jadval, ustun va sequence bo‘yicha huquq beradi. App ga egalik yoki ALL PRIVILEGES berilmaydi.</p>
@@ -1003,7 +991,7 @@ python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u pos
 <p><strong>Ishlamasa:</strong></p>
 <p>Guard xatosi migration/owner ni tekshirish kerakligini bildiradi. O‘tish uchun himoyani o‘chirmang.</p>
 <h4>P5.7 Static va systemd unit ni joylash</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web ga qayting. collectstatic CSS va boshqa fayllarni Nginx o‘qiydigan katalogga yig‘adi. Unit ni joylab daemon-reload bajaring. User=catalog, EnvironmentFile va 127.0.0.1:8000 ni toping.</p>
@@ -1032,7 +1020,7 @@ sudo ss -lntp
 <p><strong>Ishlamasa:</strong></p>
 <p>Xatoda journalctl -u jdu-catalog ni o‘qing. Env mazmunini log ga qo‘ymang; formatni configuration.py check bilan tekshiring.</p>
 <h4>P5.8 Nginx ochiq va boshqaruv kirishlarini ajratish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Conf ni o‘qing: 80 - ochiq ro‘yxat, private8080 - faqat /admin/, upstream - 8000. Boshlang‘ich default site symlink ini boshqa nom bilan saqlab o‘chiring. jdu-catalog allaqachon yoqilgan bo‘lsa qayta ko‘chirmay tekshiring. P1/M1 statik URL lari saqlanadi.</p>
@@ -1061,7 +1049,7 @@ curl --noproxy '*' -i http://127.0.0.1/practice.txt
 <p><strong>Ishlamasa:</strong></p>
 <p>duplicate default server bo‘lsa eski site ni tekshiring. Reload dan oldin -t xatosini tuzating. Admin port public IP da tinglamasin.</p>
 <h4>P5.9 Admin orqali ikkita mashq yozuvini kiritish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>RDP orqali bastiondagi Firefox</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Bastion Firefox da http://admin.lab.test:8080/admin/ ni ochib practice_admin va o‘z app admin parolingiz bilan kiring. Add orqali quyidagi ikki qatorni code/name/quantity/location qiymatlari bilan aniq kiriting. Is public ni faqat ochiq yozuvda yoqing. http://web.lab.test/ da faqat ochiq qator ko‘rinsin.</p>
@@ -1076,7 +1064,7 @@ P5-PRIVATE-001 | Practice mouse | 2 | Training shelf B | is_public=false
 <p><strong>Ishlamasa:</strong></p>
 <p>admin.lab.test ni maktab PC da emas, RDP ichidagi Firefox da oching. CSRF xatosida host/port/proxy ni tekshiring.</p>
 <h4>P5.10 DB haqiqiy qatorlarini o‘qish va ekran bilan solishtirish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web da mashq app role bilan SELECT bajaring. Bu admin dagi saqlash haqiqatan PostgreSQL ga yetganini tekshiradi. Ushbu tekshiruvda UPDATE/DELETE ishlatmang.</p>
@@ -1096,7 +1084,7 @@ psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &qu
 <p><strong>Ishlamasa:</strong></p>
 <p>permission denied bo‘lsa SQL03 profile va database ni tekshiring. Oddiy role o‘rniga superuser ishlatmang.</p>
 <h4>P5.11 Funksional tekshiruvni ishga tushirish va yuborish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Shaxsiy PC brauzeri: Web Portal</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web dan exit qilib PC dagi Web Portal da P5 va funksiya/huquq tekshiruvini tanlang. Yashirin maydonga practice_admin mavjud parolini kiritib, shu parol bilan tekshiring. Bu RDP paroli emas. Avtomatika HTTP login, bitta CK-P- yozuv yaratish, miqdor tahriri, DB/ochiq sahifani solishtirish va logout ni bajaradi. Belgilangan ikkita yozuv o‘zgarmaydi; tekshiruv yozuvi qoladi. Shaxsiy namoyish kerak emas.</p>
@@ -1155,12 +1143,12 @@ psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &qu
 <h3>Bu qanday ishlaydi</h3>
 <p><strong>Boshlashdan oldingi holat:</strong></p>
 <p>P5 mashq app ishlaydi; vaqtinchalik setup ulanish hali mavjud.</p>
-<p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
+<p><strong>Practice6 da bajariladigan ishlar</strong></p>
 <p>Setup tugatiladi; odatiy app muvaffaqiyati va keraksiz kirish rad etilishi birga tekshiriladi.</p>
 <p>Vaqtinchalik setup privilege va ish paytidagi runtime privilege ni ajrating. NOLOGIN va vaqtinchalik sozlama o‘chirilgach app runtime bilan ishlashi kerak. Ochiq 80, admin 8080 va loopback 8000 alohida chegara. Ruxsatli amal muvaffaqiyati bilan aniq keraksiz kirish rad etilishini birga tekshiring.</p>
-<h3>Yechim namunasi: bittadan bajaring</h3>
+<h3>Yechim namunasi (bajarish tartibi)</h3>
 <h4>P6.1 DB role va jadval huquqlarini o‘qish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverda OS postgres nomidan psql</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>DB da postgres psql ni oching. \dp jadval huquqini, \du role atributini ko‘rsatadi. SQL03 bilan solishtiring: auth_user UPDATE faqat last_login/password, catalog_item DELETE yo‘q; lookup faqat o‘qish, django_migrations huquqsiz. Tekshirish uchun nextval/setval chaqirmang.</p>
@@ -1183,7 +1171,7 @@ sudo -u postgres psql -X -d jdu_catalog_practice
 <p><strong>Ishlamasa:</strong></p>
 <p>Ortiqcha huquqda SQL03 guard ini saqlab tekshiring. Haqiqiy qatorni o‘chirib rad etishni sinamang.</p>
 <h4>P6.2 Setup role login ini o‘chirish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Tayyorlashdan keyin setup login kerak emas. SQL04 NOLOGIN/password NULL qiladi va shu profile setup ulanishlarini yopadi. DB/table egasi setup bo‘lib qoladi; role o‘chirilmaydi, egalik app ga o‘tmaydi.</p>
@@ -1203,7 +1191,7 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 <p><strong>Ishlamasa:</strong></p>
 <p>Keyin setup ni odatiy ish uchun LOGIN ga qaytarmang. M5 alohida mission setup role bilan tayyorlanadi.</p>
 <h4>P6.3 Vaqtinchalik sozlamani olib tashlab, runtime ni qayta tanlash</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web da faqat metadata ni tekshiring. Faqat ikkita practice setup faylini o‘chiring. app.env, practice.app.env, DB runtime, command-state, SSH kalit va baholash ma’lumoti qoladi. So‘ng ilovani to‘xtating, mavjud practice profilini aniq tanlab, ilovani ishga tushiring. Shu tartib M5 da mission ni tanlashda kerak bo‘ladi.</p>
@@ -1234,7 +1222,7 @@ systemctl is-active jdu-catalog
 <p><strong>Ishlamasa:</strong></p>
 <p>Boshqa profil faol bo‘lsa, to‘xtang. O‘chirilgan fayllarni qayta o‘chirmang. To‘xtatish, profilni tanlash yoki tekshirishda xato bo‘lsa, ilovani ishga tushirishdan oldin sababini aniqlang.</p>
 <h4>P6.4 Ochiq 80 da admin va maxfiy fayl ko‘rinmasligini tekshirish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Bastionning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Bastion SSM da 80 orqali avval oddiy ro‘yxatni, keyin /admin/ va env ni so‘rang. 8080 dagi to‘g‘ri admin kirishni RDP Firefox da alohida tekshiring. Oddiy muvaffaqiyat va aniq 404/403 rad etish kerak; timeout yetarli emas.</p>
@@ -1255,7 +1243,7 @@ curl --noproxy '*' -i http://web.lab.test/static/app.env
 <p><strong>Ishlamasa:</strong></p>
 <p>Env matni ko‘rinsa uni ulashmang; o‘qituvchiga aytib ochiq sozlamani tuzating.</p>
 <h4>P6.5 Bir tekshiruvda to‘g‘ri kirish va rad etishlarni yuborish</h4>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Shaxsiy PC brauzeri: Web Portal</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web Portal da P6 va funksiya/huquq tekshiruvini tanlab, practice_admin mavjud parolini yashirin kiriting. To‘g‘ri login nazorat bo‘lib, anonim amallar va xato parol DB ni o‘zgartirmasdan rad etilishini tekshiradi. Faqat CSRF-403 avtorizatsiya isboti emas. Staff faqat jihoz view/add/change huquqiga ega, delete va user boshqaruvi yo‘q.</p>

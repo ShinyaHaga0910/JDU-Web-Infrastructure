@@ -32,7 +32,7 @@ M1=8、M2=13、M4=9、M5=13、M6=16（この5課題の自動採点は計59素点
 | db | 10.20.2.20 | PostgreSQL5432 |
 | repo | 10.20.2.30 | 事前保存した署名資源のHTTP80 |
 
-各Ubuntuへ入る操作：CloudShellで aws ssm start-session --target i-自分の対象ID。接続直後にid -unとbootstrap.jsonのroleを確認する。サーバーを替えるときはexitを1回でCloudShellへ戻り、次のIDでstart-sessionする。CloudShellの変数は接続先へ自動コピーされない。SSMのssm-userはsudo可能。RDPのlabuserはsudo管理者ではない。
+各Ubuntuへ入る操作：CloudShellで aws ssm start-session --target i-自分の対象ID。接続先の確認はP0.2の手順を使う。サーバーを替えるときはexitを1回でCloudShellへ戻り、次のIDでstart-sessionする。CloudShellの変数は接続先へ自動コピーされない。SSMのssm-userはsudo可能。RDPのlabuserはsudo管理者ではない。
 
 nanoの編集：file名を指定して開く→本文を入力→Ctrl+O→Enterで保存→Ctrl+Xで終了。設定fileの枠はshell commandではない。psqlに入るとpromptが変わる。SQL/\passwordはその中へ入力し、\qでUbuntuへ戻る。失敗したcommandの次へ進まず、期待結果を確認する。
 
@@ -68,7 +68,7 @@ bash枠は表示された実行場所の端末へ入力する。text枠は設定
 
 ブラウザで課題を選んで確認し、結果と保存状態を読む。M5/M6の機能確認では既存アプリ管理者パスワードを非表示入力する。成績は自動保存される。理解の確認用メモやPの説明問題を、追加の成績要件にはしない。
 
-## M0 自分の環境と実行場所
+## M0 サーバーの確認と接続
 
 ### 完成要件
 
@@ -80,9 +80,9 @@ P0ではWebサーバーを例に接続を練習した。M0ではEC2の一覧か�
 
 利用者PCのブラウザでAWSのCloudShellを開き、SSMで対象のEC2へ接続する。教材ファイルの配置先はWebサーバーとDBサーバー。共通登録コード方式では初期構築時に配置され、署名付き配布方式ではP0.3で配置する。
 
-![C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDをコピーする。](../../assets/shared/ec2-instance-id-c3.png)
+![C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDを確認する。](../../assets/shared/ec2-instance-id-c3.png)
 
-C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDをコピーする。
+C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDを確認する。
 
 ### 確認・提出
 

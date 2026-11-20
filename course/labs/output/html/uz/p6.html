@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Nimani o‘rganamiz</a> · <a href="#section-2">Topshiriq</a> · <a href="#section-3">Topshiriq diagrammasi</a> · <a href="#section-4">Bu qanday ishlaydi</a> · <a href="#section-5">Yechim namunasi: bittadan bajaring</a> · <a href="#section-6">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P6 Eng kam huquq va ochiq kirish chegarasi</h1>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Nimani o‘rganamiz</a> · <a href="#section-2">Topshiriq</a> · <a href="#section-3">Topshiriq diagrammasi</a> · <a href="#section-4">Bu qanday ishlaydi</a> · <a href="#section-5">Yechim namunasi (bajarish tartibi)</a> · <a href="#section-6">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P6 Eng kam huquq va ochiq kirish chegarasi</h1>
 <p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a></p>
 <p><a href="../ja/p6.html">日本語</a> · <a href="../ru/p6.html">Русский</a> · <a href="../uz/p6.html">O‘zbekcha</a></p>
 <p>Mos topshiriq: <a href="m6.html">M6</a>.</p>
@@ -61,12 +61,12 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-4">Bu qanday ishlaydi</h2>
 <p><strong>Boshlashdan oldingi holat:</strong></p>
 <p>P5 mashq app ishlaydi; vaqtinchalik setup ulanish hali mavjud.</p>
-<p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
+<p><strong>Practice6 da bajariladigan ishlar</strong></p>
 <p>Setup tugatiladi; odatiy app muvaffaqiyati va keraksiz kirish rad etilishi birga tekshiriladi.</p>
 <p>Vaqtinchalik setup privilege va ish paytidagi runtime privilege ni ajrating. NOLOGIN va vaqtinchalik sozlama o‘chirilgach app runtime bilan ishlashi kerak. Ochiq 80, admin 8080 va loopback 8000 alohida chegara. Ruxsatli amal muvaffaqiyati bilan aniq keraksiz kirish rad etilishini birga tekshiring.</p>
-<h2 id="section-5">Yechim namunasi: bittadan bajaring</h2>
+<h2 id="section-5">Yechim namunasi (bajarish tartibi)</h2>
 <h3>P6.1 DB role va jadval huquqlarini o‘qish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverda OS postgres nomidan psql</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>DB da postgres psql ni oching. \dp jadval huquqini, \du role atributini ko‘rsatadi. SQL03 bilan solishtiring: auth_user UPDATE faqat last_login/password, catalog_item DELETE yo‘q; lookup faqat o‘qish, django_migrations huquqsiz. Tekshirish uchun nextval/setval chaqirmang.</p>
@@ -89,7 +89,7 @@ sudo -u postgres psql -X -d jdu_catalog_practice
 <p><strong>Ishlamasa:</strong></p>
 <p>Ortiqcha huquqda SQL03 guard ini saqlab tekshiring. Haqiqiy qatorni o‘chirib rad etishni sinamang.</p>
 <h3>P6.2 Setup role login ini o‘chirish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Tayyorlashdan keyin setup login kerak emas. SQL04 NOLOGIN/password NULL qiladi va shu profile setup ulanishlarini yopadi. DB/table egasi setup bo‘lib qoladi; role o‘chirilmaydi, egalik app ga o‘tmaydi.</p>
@@ -109,7 +109,7 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 <p><strong>Ishlamasa:</strong></p>
 <p>Keyin setup ni odatiy ish uchun LOGIN ga qaytarmang. M5 alohida mission setup role bilan tayyorlanadi.</p>
 <h3>P6.3 Vaqtinchalik sozlamani olib tashlab, runtime ni qayta tanlash</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web da faqat metadata ni tekshiring. Faqat ikkita practice setup faylini o‘chiring. app.env, practice.app.env, DB runtime, command-state, SSH kalit va baholash ma’lumoti qoladi. So‘ng ilovani to‘xtating, mavjud practice profilini aniq tanlab, ilovani ishga tushiring. Shu tartib M5 da mission ni tanlashda kerak bo‘ladi.</p>
@@ -140,7 +140,7 @@ systemctl is-active jdu-catalog
 <p><strong>Ishlamasa:</strong></p>
 <p>Boshqa profil faol bo‘lsa, to‘xtang. O‘chirilgan fayllarni qayta o‘chirmang. To‘xtatish, profilni tanlash yoki tekshirishda xato bo‘lsa, ilovani ishga tushirishdan oldin sababini aniqlang.</p>
 <h3>P6.4 Ochiq 80 da admin va maxfiy fayl ko‘rinmasligini tekshirish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Bastionning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Bastion SSM da 80 orqali avval oddiy ro‘yxatni, keyin /admin/ va env ni so‘rang. 8080 dagi to‘g‘ri admin kirishni RDP Firefox da alohida tekshiring. Oddiy muvaffaqiyat va aniq 404/403 rad etish kerak; timeout yetarli emas.</p>
@@ -161,7 +161,7 @@ curl --noproxy '*' -i http://web.lab.test/static/app.env
 <p><strong>Ishlamasa:</strong></p>
 <p>Env matni ko‘rinsa uni ulashmang; o‘qituvchiga aytib ochiq sozlamani tuzating.</p>
 <h3>P6.5 Bir tekshiruvda to‘g‘ri kirish va rad etishlarni yuborish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Shaxsiy PC brauzeri: Web Portal</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web Portal da P6 va funksiya/huquq tekshiruvini tanlab, practice_admin mavjud parolini yashirin kiriting. To‘g‘ri login nazorat bo‘lib, anonim amallar va xato parol DB ni o‘zgartirmasdan rad etilishini tekshiradi. Faqat CSRF-403 avtorizatsiya isboti emas. Staff faqat jihoz view/add/change huquqiga ega, delete va user boshqaruvi yo‘q.</p>

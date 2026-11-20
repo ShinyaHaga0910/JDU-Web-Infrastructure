@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>P0 自分の環境と実行場所</title><style>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>P0 サーバーの確認と接続</title><style>
 :root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
 *{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
 header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
@@ -13,81 +13,69 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">操作するサーバーと教材の配置先</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">操作例：一つずつ実行する</a> · <a href="#section-6">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P0 自分の環境と実行場所</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">操作するサーバーと教材の配置先</a> · <a href="#section-4">解答例（操作手順）</a> · <a href="#section-5">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P0 サーバーの確認と接続</h1>
 <p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
 <p><a href="../ja/p0.html">日本語</a> · <a href="../ru/p0.html">Русский</a> · <a href="../uz/p0.html">O‘zbekcha</a></p>
 <p>対応する自力課題は<a href="m0.html">M0</a>。</p>
 <h2 id="section-1">学ぶこと</h2>
 <p>CloudShell、Windows、5台のUbuntuを区別し、正しいサーバーへSSMで入り、採点を自己確認できる。</p>
 <h2 id="section-2">課題</h2>
-<p>構築済みの自分の環境で、5台のインスタンスIDと役割を確認し、接続先と操作ユーザーを確かめる。</p>
+<p>構築済みの自分の環境で、5台のインスタンスIDとロールを確認し、接続先と操作ユーザーを確かめる。</p>
 <h2 id="section-3">操作するサーバーと教材の配置先</h2>
 <p><img src="../../../assets/ja/p0-ssm.png" alt="利用者PCのブラウザでAWSのCloudShellを開き、SSMで対象のEC2へ接続する。教材ファイルの配置先はWebサーバーとDBサーバー。共通登録コード方式では初期構築時に配置され、署名付き配布方式ではP0.3で配置する。" width="1040" height="680" loading="lazy"></p>
 <p>利用者PCのブラウザでAWSのCloudShellを開き、SSMで対象のEC2へ接続する。教材ファイルの配置先はWebサーバーとDBサーバー。共通登録コード方式では初期構築時に配置され、署名付き配布方式ではP0.3で配置する。</p>
-<h2 id="section-4">仕組みを理解する</h2>
-<p><strong>始める前の状態:</strong></p>
-<p>教師が初期配布と個別登録を終えた、本人の5台を使う。</p>
-<p><strong>このPで変えること:</strong></p>
-<p>対象account・役割・実行場所を見分け、公開教材資源を準備する。</p>
-<p>AWSコンソールはAWS資源を管理する画面、CloudShellはAWS CLIを使う自分の端末、SSMは選んだEC2のOS内へ入る接続である。SSMへ入っても5台が一つのOSになるわけではない。Webの/var/wwwとDBの/var/wwwは別の保存先である。サーバーの役割と、そこで操作するOS userを別々に確認する。</p>
-<h2 id="section-5">操作例：一つずつ実行する</h2>
-<h3>P0.1 5台のinstance IDを記録する</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>このPractice0で作業すること</strong></p>
+<p>自分のAWSアカウント、各サーバーのロール、コマンドを実行する環境を確認する。署名付き配布方式を使う場合は、備品管理アプリやDBの構築に使うファイルをWebサーバーとDBサーバーに配置する。</p>
+<h2 id="section-4">解答例（操作手順）</h2>
+<h3>P0.1 5台のinstance IDを確認する</h3>
+<p><strong>実行環境:</strong></p>
 <p>学生本人のAWSコンソール</p>
 <p><strong>目的と操作:</strong></p>
-<p>EC2 → Instancesを開き、Name列で自分の演習環境のサーバーを探す。同じ行のInstance ID列からi-を含めてIDを控える。環境を識別するためにLabIdとDeploymentIdのタグを照合し、bastion/web/dns/db/repoのinstance IDを手元の作業表へ記入する。名前だけで選ばない。公開IPv4はbastionとwebだけにある。SSM接続は公開IPではなくinstance IDを使う。</p>
-<p><img src="../../../assets/shared/ec2-instance-id-c3.png" alt="C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDをコピーする。" width="1239" height="404" loading="lazy"></p>
-<p>C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDをコピーする。</p>
-<p><strong>コマンド・設定値の意味:</strong></p>
-<p>instance IDはEC2を識別する値、roleは授業内の担当、公開IPは外から接続する宛先である。公開IPが変わっても同じinstance IDなら同じEC2として追跡できる。作業表には5役割とIDの組を記録する。</p>
-<p><strong>期待する結果と読み方:</strong></p>
-<p>5台ともrunning、SSM Online。private IPは本書の共通表と一致する。公開IPv4は停止・起動後に変わることがある。</p>
-<p><strong>うまくいかないとき:</strong></p>
-<p>別Lab・別account・不明な台を操作しない。停止中は教師の起動案内に従う。ResetやTerminateで開始状態を作り直さない。</p>
-<h3>P0.2 SSMで入り、戻る</h3>
-<p><strong>実行場所:</strong></p>
+<p>AWSマネジメントコンソール上部のSearch欄にEC2と入力し、EC2の管理画面を開く。EC2 → Instancesを開き、Name列で自分の演習環境の5台のサーバーを確認する。同じ行のInstance ID列からi-を含めてIDを確認する。</p>
+<p><img src="../../../assets/shared/ec2-instance-id-c3.png" alt="C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDを確認する。" width="1239" height="404" loading="lazy"></p>
+<p>C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDを確認する。</p>
+<h3>P0.2 CloudShellからSSMでWebサーバーに接続する</h3>
+<p><strong>実行環境:</strong></p>
 <p>CloudShell（学生本人のAWS）</p>
 <p><strong>目的と操作:</strong></p>
-<p>EC2で確認したWebのIDに置き換えて実行する。接続後はCloudShellではなくUbuntuの端末になる。id -unはSSM管理userを、bootstrap.jsonのroleはサーバー役割を示す。最後のexitを1回実行するとCloudShellへ戻る。</p>
+<p>次のコマンドのi-YOUR-WEB-INSTANCE-IDを、P0.1で確認したWebサーバーのInstance IDに置き換えて、CloudShellで実行する。接続が完了したら、サーバーの初期構築時に置かれた/etc/jdu-web/bootstrap.jsonからロールを読み出す。このファイルのroleには、サーバーが担当する機能が記録されている。表示がwebなら、接続先はWebサーバーと確認できる。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. CloudShellから指定EC2へSSM接続する。接続完了後に次へ進む。
 aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
 # 2. この端末で操作しているOSユーザー名を表示する。
 id -un
-# 3. 接続中のサーバーのホスト名を表示する。
-hostname
-# 4. bootstrap情報のroleだけを読み、接続先の役割を確認する。
+# 3. 設置済みのJSONファイルからサーバーのロールを読み出す。
 python3 -c 'import json;print(json.load(open(&quot;/etc/jdu-web/bootstrap.json&quot;))[&quot;role&quot;])'
-# 5. 現在の作業ディレクトリを表示する。
-pwd
-# 6. 現在のサーバーへの接続を閉じ、CloudShellへ戻る。
+# 4. 現在のサーバーへの接続を閉じ、CloudShellへ戻る。
 exit
 </code></pre>
-<p><strong>コマンド・設定値の意味:</strong></p>
-<p>最初のstart-sessionだけをCloudShellで実行し、接続完了を待ってから残りを1行ずつ入力する。id -unはuser、hostnameはOSのhost名、roleは教材上の役割を読む。exitは現在の接続を1段だけ戻す。</p>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>userはssm-user、roleはweb。以降もサーバーを替えるたびに確認する。SSHで入ったUbuntuのuserはubuntuになる場合がある。</p>
-<p><strong>うまくいかないとき:</strong></p>
-<p>TargetNotConnectedならrunning/SSM Online/region us-east-1を確認する。SGを全面開放したりWindowsへ鍵をダウンロードしない。</p>
-<h3>P0.3 公開教材資源だけを準備する</h3>
-<p><strong>実行場所:</strong></p>
+<p>id -unはssm-user、ファイルから読み出したロールはwebと表示される。</p>
+<p>ターミナルの表示例（接続後）</p>
+<pre><code class="language-text">$ id -un
+ssm-user
+$ python3 -c …
+web
+</code></pre>
+<h3>P0.3 備品管理アプリとSQLの教材ファイルを配置する</h3>
+<p><strong>実行環境:</strong></p>
 <p>CloudShell（学生本人のAWS）</p>
 <p><strong>目的と操作:</strong></p>
-<p>署名付き配布を使う場合の手順です。共通登録コード方式では構築時に配置済みです。本教材zipをCloudShellのActions→Upload fileでアップロードし、unzip web-lab-pm-r1.zipで展開する。resourcesへ移動し、YOUR-INSTALLATION-DIRECTORYを署名付き配布の導入先に置き換える。導入先は、初回に表示されたactivate.shがあるディレクトリ。補助処理は本人の署名版と元5台を照合し、Web/DBへアプリ資源・SQL・秘密の非表示入力helperを置くだけ。サービスやDBは構築しない。秘密は送らない。</p>
+<p>この手順では、後の演習で使う備品管理アプリの圧縮ファイル、そこに含まれるDB設定用のSQL、DB接続パスワードを画面に出さず入力する補助プログラムを、WebサーバーとDBサーバーの/var/lib/jdu-web/lesson-resources-r1に置く。共通登録コード方式で環境を作った場合は、構築スクリプトが配置を済ませているのでP0.4へ進む。署名付き配布方式の場合は、教材ZIPをCloudShellのActions → Upload fileでアップロードし、ホームディレクトリでunzip web-lab-pm-r1.zipを実行する。下のコマンドのYOUR-INSTALLATION-DIRECTORYは、初回構築で使ったactivate.shがあるディレクトリのパスに置き換える。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. 作業場所を $HOME/web-lab-pm-r1/resources へ移す。
 cd &quot;$HOME/web-lab-pm-r1/resources&quot;
-# 2. 署名版と本人の5台を照合し、公開教材をWeb/DBへ配置する。
+# 2. 備品管理アプリなど、後の演習に使うファイルをWebサーバーとDBサーバーに配置する。
 python3 -B stage_resources.py --installation 'YOUR-INSTALLATION-DIRECTORY'
 </code></pre>
 <p><strong>コマンド・設定値の意味:</strong></p>
-<p>公開教材資源はアプリやSQLの材料であり、完成済みのサービスではない。stage_resources.pyをCloudShellで実行して初めてWeb/DBへ配置される。Windowsへzipを保存しただけではEC2内のファイルは増えない。</p>
+<p>stage_resources.pyは、初回に構築した環境を確認し、後の演習で使うファイルを指定の2台にコピーする。アプリの起動やDBの作成は、後の演習で行う。</p>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>PUBLIC_LESSON_RESOURCES_READY=web と =db。各台の/var/lib/jdu-web/lesson-resources-r1に公開ファイルがある。既存の異なるファイルは上書きしない。</p>
+<p>配置が済むと、PUBLIC_LESSON_RESOURCES_READY=webとPUBLIC_LESSON_RESOURCES_READY=dbが表示される。</p>
 <p><strong>うまくいかないとき:</strong></p>
-<p>初期化未完・版違い・期限切れならここで止めて教師へ状況を知らせる。検証用fixtureや完成アプリの自動適用ツールで代用しない。</p>
+<p>導入先が見つからない場合は、activate.shがあるディレクトリのパスを確認する。配布版のエラーが出たら教師に表示内容を伝える。</p>
 <h3>P0.4 ブラウザで準備を確認する</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>自分のPCのブラウザ：Web Portal</p>
 <p><strong>目的と操作:</strong></p>
 <p>教師から案内された課題画面を開く。学校Googleでログインし、本人AWSとの連携を済ませ、P0を選んで「この課題を確認する」を押す。結果が処理中なら「結果を更新する」を押す。</p>
@@ -98,7 +86,7 @@ python3 -B stage_resources.py --installation 'YOUR-INSTALLATION-DIRECTORY'
 <p><strong>うまくいかないとき:</strong></p>
 <p>失敗行のcheck ID・実行時刻・対象roleだけを相談に使う。token・password・本人用URLを共有しない。</p>
 <h3>P0.5 RDPで踏み台のデスクトップを開く</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>学生のWindows PC（共有アカウント）</p>
 <p><strong>目的と操作:</strong></p>
 <p>EC2で確認した現在の踏み台の公開IPv4を使う。Windowsキー＋Rを押し、mstsc /promptを入力してEnter。ComputerへそのIPを指定し、userはlabuser、passwordは本人が初期配備で設定したRDP用を使う。Windowsアカウントのpasswordではない。「資格情報を記憶する」は選ばない。青いxrdp loginが出たらSession=Xorgを確認し、labuserで入る。</p>
@@ -112,7 +100,7 @@ mstsc /prompt
 <p>UbuntuのXfceデスクトップとFirefoxが開く。これは踏み台内のbrowserであり、Windows側のbrowserとは別。RDPのlabuserにはsudo管理権限がないため、構築はCloudShellからSSM/ssm-userで行う。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>Login failedならuser名と日本語/英語等のkeyboard配列を確認する。passwordを会話へ送らない。到達しない場合は現在のIPと許可された接続元CIDRを教師と確認し、3389を全公開しない。終了時はRDP内の自分の作業を保存し、接続を閉じる。</p>
-<h2 id="section-6">理解の確認（採点外）</h2>
+<h2 id="section-5">理解の確認（採点外）</h2>
 <p>WebへSSM接続したままDBの手順を入力すると、どのサーバーが変わるか？</p>
 <p><strong>考え方:</strong></p>
 <p>現在接続中のWebが変わる。exitでCloudShellへ戻り、DBのinstance IDへ接続し直す。</p>

@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">今回の見取り図</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">操作例：一つずつ実行する</a> · <a href="#section-6">出力の読み取り例（入力しない）</a> · <a href="#section-7">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P1 HTTPで静的ファイルを返す</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">今回の見取り図</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">解答例（操作手順）</a> · <a href="#section-6">出力の読み取り例（入力しない）</a> · <a href="#section-7">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P1 HTTPで静的ファイルを返す</h1>
 <p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
 <p><a href="../ja/p1.html">日本語</a> · <a href="../ru/p1.html">Русский</a> · <a href="../uz/p1.html">O‘zbekcha</a></p>
 <p>対応する自力課題は<a href="m1.html">M1</a>。</p>
@@ -33,12 +33,12 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-4">仕組みを理解する</h2>
 <p><strong>始める前の状態:</strong></p>
 <p>Webは提供済みだが、練習用ファイルはまだ配信していない。</p>
-<p><strong>このPで変えること:</strong></p>
+<p><strong>このPractice1で作業すること</strong></p>
 <p>Nginxが公開80番でpractice.txtを返し、要求をlogへ残す。</p>
 <p>この練習では、URLの/practice.txtをWeb内の/var/www/html/practice.txtへ対応させる。最初の127.0.0.1での成功はWeb内部の確認で、踏み台やWindowsから届く証明にはならない。同じ本文を三つの位置から読み、どの経路まで正常かを切り分ける。<a href="https://nginx.org/en/docs/beginners_guide.html">Nginxの一次資料</a>も参照。</p>
-<h2 id="section-5">操作例：一つずつ実行する</h2>
+<h2 id="section-5">解答例（操作手順）</h2>
 <h3>P1.1 内部APTからNginxを導入する</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>P0と同じ方法でWebへSSM接続し、role=webを確認する。APTのsourceを読み、10.20.2.30の署名済みrepoだけを使う。updateは一覧を取得し、installはpackageを導入する。Internet用sourceを追加しない。</p>
@@ -57,7 +57,7 @@ sudo apt-get install --no-install-recommends nginx
 <p><strong>うまくいかないとき:</strong></p>
 <p>取得失敗ならrepoのrunning/SSMとIPを確認。--allow-unauthenticatedや外部pipで回避しない。</p>
 <h3>P1.2 正しい本文を作り、所有者と権限を揃える</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>まずnanoで練習本文を編集する。表示する1行は下の指定どおりで、最後に改行を入れる。Ctrl+O→Enterで保存、Ctrl+Xで終了する。installはファイルを配置し、-o/-gは所有者、-mは権限を指定する。</p>
@@ -87,7 +87,7 @@ cat /var/www/html/practice.txt
 <p><strong>うまくいかないとき:</strong></p>
 <p>空白画面ならまだnano内。保存して終了してから次のcommandを実行する。既存のmission.txtは変更しない。</p>
 <h3>P1.3 Web rootとportを確認して起動する</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>Ubuntuの初期siteは/var/www/htmlをrootにする。nginx -Tで実効設定を読み、/etc/nginx/sites-enabled/defaultが有効でrootとlisten 80があることを確認する。変更が必要ならsudo nanoで編集し、構文検査に成功してからreloadする。enable --nowは今起動し、次のOS起動時も起動させる。</p>
@@ -112,7 +112,7 @@ sudo ss -lntp
 <p><strong>うまくいかないとき:</strong></p>
 <p>失敗時はnginx -tのfile名・行番号を確認し、そのfileを直す。SGを変更しても構文エラーは直らない。</p>
 <h3>P1.4 Web自身から応答を見る</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>curlはHTTP client。-iはstatus/headerと本文を表示する。127.0.0.1は今のWeb自身で、public IPではない。表示を読み、端末のcommandが成功しただけで合格としない。</p>
@@ -127,7 +127,7 @@ curl --noproxy '*' -i http://127.0.0.1/practice.txt
 <p><strong>うまくいかないとき:</strong></p>
 <p>Welcome to nginxが出るなら/ではなく/practice.txtを要求したか確認する。</p>
 <h3>P1.5 踏み台と外部から同じファイルを見る</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>踏み台のSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>Web端末をexitで閉じ、CloudShellから踏み台へSSM接続して下のURLを要求する。その後exitでCloudShellへ戻り、EC2に表示された現在のWeb公開IPv4を使って同じpathをcurl -iで要求する。内部の10.20.1.20と公開IPv4を混同しない。</p>
@@ -142,7 +142,7 @@ curl --noproxy '*' -i http://10.20.1.20/practice.txt
 <p><strong>うまくいかないとき:</strong></p>
 <p>内部成功/外部失敗なら現在のpublic IPとLab稼働を確認する。教師の基盤SGを無断で緩めない。</p>
 <h3>P1.6 要求とlogを結び付けて提出する</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>Webへ戻り、access logの時刻・client IP・path・statusを見る。logは実際に要求を処理した証拠で、fileがある証拠とは別。exitでCloudShellへ戻ったら、PCのWeb PortalでP1を選び「この課題を確認する」を押す。</p>

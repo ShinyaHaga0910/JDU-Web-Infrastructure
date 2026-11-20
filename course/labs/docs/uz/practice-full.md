@@ -32,7 +32,7 @@ Umumiy private IP quyida; public IPv4 doimiy emas. AWS region us-east-1, Ubuntu2
 | db | 10.20.2.20 | PostgreSQL5432 |
 | repo | 10.20.2.30 | Oldindan saqlangan imzolangan resurslar HTTP80 |
 
-Har Ubuntu ga kirish uchun CloudShell da aws ssm start-session --target i-OZ-ID bajaring. Darhol id -un va bootstrap.json dagi role ni tekshiring. Server almashtirishda bitta exit bilan CloudShell ga qaytib keyingi ID ga ulang. CloudShell o‘zgaruvchilari serverga avtomatik ko‘chmaydi. ssm-user sudo qila oladi; RDP labuser sudo admin emas.
+Har Ubuntu ga kirish uchun CloudShell da aws ssm start-session --target i-OZ-ID bajaring. Ulanishni P0.2 qadamiga muvofiq tekshiring. Server almashtirishda bitta exit bilan CloudShell ga qaytib keyingi ID ga ulang. CloudShell o‘zgaruvchilari serverga avtomatik ko‘chmaydi. ssm-user sudo qila oladi; RDP labuser sudo admin emas.
 
 Nano: faylni ochish → matn yozish → Ctrl+O → Enter bilan saqlash → Ctrl+X bilan chiqish. Sozlama bloki shell buyrug‘i emas. Psql ichida prompt o‘zgaradi; SQL/\password shu yerga yoziladi, \q Ubuntu ga qaytaradi. Xatodan keyin natijani tekshirmay davom etmang.
 
@@ -76,55 +76,35 @@ Tayyor muhitingizda beshta serverning instance ID si va rolini tekshiring. Qaysi
 
 O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda, imzolangan tarqatmada esa P0.3 da joylanadi.
 
-### Bu qanday ishlaydi
+**Practice0 da bajariladigan ishlar**
 
-**Boshlashdan oldingi holat:**
+O‘z AWS hisobingizni, har bir server rolini va buyruq bajariladigan muhitni tekshiring. Imzolangan tarqatma ishlatilsa, ilova va DB sozlash fayllarini Web hamda DB serverlariga joylang.
 
-Boshlang‘ich tarqatma va ro‘yxat tugagan shaxsiy besh server ishlatiladi.
+### Yechim namunasi (bajarish tartibi)
 
-**Ushbu P da nima o‘zgaradi:**
+#### P0.1 Beshta serverning instance ID sini tekshirish
 
-Account, role va ish joyini farqlaysiz; ochiq o‘quv resurslari tayyorlanadi.
-
-AWS Console resurslarni boshqaradi; CloudShell - AWS CLI bor shaxsiy terminal; SSM tanlangan EC2 OS ichida session ochadi. Besh server alohida OS bo‘lib qoladi: Web dagi /var/www DB dagi katalog bilan bir joy emas. Server role va OS user ni alohida tekshiring.
-
-### Yechim namunasi: bittadan bajaring
-
-#### P0.1 Beshta serverning instance ID qiymatini yozib olish
-
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Talabaning shaxsiy AWS Console oynasi
 
 **Maqsad va amallar:**
 
-EC2 → Instances ro‘yxatini oching. Name ustunida o‘z Lab serveringizni toping va shu qatordagi Instance ID ustunidan i- bilan boshlangan to‘liq ID ni oling. LabId va DeploymentId teglarini solishtiring. bastion/web/dns/db/repo uchun instance ID ni ish jadvaliga yozing. Faqat nomiga qarab tanlamang. Public IPv4 bastion va web da mavjud. SSM uchun public IP emas, instance ID kerak.
+AWS Console tepasidagi Search maydoniga EC2 deb yozib, boshqaruv oynasini oching. EC2 → Instances ro‘yxatida Name ustunidan o‘z muhitingizdagi beshta serverni tekshiring. Shu qatordagi Instance ID ustunidan i- bilan boshlangan to‘liq ID ni ko‘ring.
 
-![C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni nusxalang.](../../assets/shared/ec2-instance-id-c3.png)
+![C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni tekshiring.](../../assets/shared/ec2-instance-id-c3.png)
 
-C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni nusxalang.
+C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni tekshiring.
 
-**Buyruq va sozlamalar ma’nosi:**
+#### P0.2 CloudShell dan SSM orqali Web serverga ulanish
 
-Instance ID EC2 ni aniqlaydi; role vazifani, public IP tashqi manzilni bildiradi. Public IP o‘zgarishi instance ID almashganini anglatmaydi. Ish jadvalida besh role ni o‘z ID si bilan bog‘lang.
-
-**Kutilgan natija va ma’nosi:**
-
-Beshala server running, SSM Online; private IP umumiy jadvalga mos. To‘xtatib ishga tushirganda public IPv4 o‘zgarishi mumkin.
-
-**Ishlamasa:**
-
-Boshqa Lab, hisob yoki noma’lum serverni o‘zgartirmang. To‘xtagan server uchun ishga tushirish yo‘riqnomasidan foydalaning. Reset yoki Terminate ni bosmang.
-
-#### P0.2 SSM orqali kirish va qaytish
-
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Talabaning shaxsiy AWS hisobidagi CloudShell
 
 **Maqsad va amallar:**
 
-EC2 dagi Web instance ID ni kiriting. Ulanishdan keyin CloudShell emas, Ubuntu terminalida ishlaysiz. id -un SSM foydalanuvchisini, bootstrap.json dagi role server vazifasini ko‘rsatadi. Bitta exit CloudShell ga qaytaradi.
+Birinchi buyruqdagi i-YOUR-WEB-INSTANCE-ID o‘rniga P0.1 da tekshirilgan Web serverning Instance ID sini yozing va buyruqni CloudShell da bajaring. Ulangach, serverni dastlabki sozlashda joylangan /etc/jdu-web/bootstrap.json faylidan rolni o‘qing. role maydonida server vazifasi saqlanadi. web qiymati Web serverga ulanganligingizni tasdiqlaydi.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
@@ -133,37 +113,34 @@ Buyruqlar: raqamlar shu qadam ichidagi tartib
 aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
 # 2. Shu terminaldagi OS user nomini ko‘rsatish.
 id -un
-# 3. Ulangan server hostname ini ko‘rsatish.
-hostname
-# 4. Bootstrap dan faqat role ni o‘qib, ulangan server vazifasini tekshirish.
+# 3. Bootstrap dan faqat role ni o‘qib, ulangan server vazifasini tekshirish.
 python3 -c 'import json;print(json.load(open("/etc/jdu-web/bootstrap.json"))["role"])'
-# 5. Joriy ish katalogini ko‘rsatish.
-pwd
-# 6. Joriy server session ini yopib CloudShell ga qaytish.
+# 4. Joriy server session ini yopib CloudShell ga qaytish.
 exit
 ```
 
-**Buyruq va sozlamalar ma’nosi:**
-
-Avval faqat start-session ni CloudShell da bajarib ulanishni kuting. So‘ng qolgan qatorlarni bittadan kiriting. Id -un user ni, hostname OS host nomini, role o‘quv vazifasini ko‘rsatadi. Exit session ning bir pog‘onasidan qaytaradi.
-
 **Kutilgan natija va ma’nosi:**
 
-ssm-user va web ko‘rinadi. Har safar serverni almashtirganda tekshiring. SSH orqali kirganda Ubuntu foydalanuvchisi ubuntu bo‘lishi mumkin.
+id -un natijasi ssm-user, fayldan o‘qilgan rol qiymati esa web bo‘ladi.
 
-**Ishlamasa:**
+Ulangandan keyingi terminal ko‘rinishi
 
-TargetNotConnected bo‘lsa, running, SSM Online va us-east-1 ni tekshiring. SG portlarini to‘liq ochmang, Windows ga kalit yuklamang.
+```text
+$ id -un
+ssm-user
+$ python3 -c …
+web
+```
 
-#### P0.3 Faqat ochiq o‘quv fayllarini tayyorlash
+#### P0.3 Ilova va SQL o‘quv fayllarini joylash
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Talabaning shaxsiy AWS hisobidagi CloudShell
 
 **Maqsad va amallar:**
 
-Bu qadam imzolangan tarqatma uchun. Umumiy kod orqali sozlanganda fayllar oldindan joylanadi. Ushbu qo‘llanma zip faylini CloudShell → Actions → Upload file orqali yuklang; unzip web-lab-pm-r1.zip bilan oching. resources katalogiga o‘ting va YOUR-INSTALLATION-DIRECTORY o‘rniga imzolangan tarqatmaning activate.sh fayli joylashgan katalog yo‘lini kiriting. Yordamchi shaxsiy imzolangan tarqatma va asl besh serverni tekshirib, Web/DB ga ochiq app, SQL va yashirin kiritish vositasini joylaydi. Service yoki DB qurmaydi, maxfiy qiymat yubormaydi.
+Bu qadamda Web va DB serverlaridagi /var/lib/jdu-web/lesson-resources-r1 katalogiga jihozlarni hisobga olish ilovasi arxivi, DB sozlash uchun undagi SQL hamda DB parolini yashirin kiritish vositasi joylanadi. Umumiy kod orqali o‘rnatishda skript fayllarni oldindan joylaydi: P0.4 ga o‘ting. Imzolangan tarqatma uchun ZIP faylini CloudShell → Actions → Upload file orqali yuklang va uy katalogida unzip web-lab-pm-r1.zip ni bajaring. YOUR-INSTALLATION-DIRECTORY o‘rniga dastlabki o‘rnatishdagi activate.sh joylashgan katalog yo‘lini yozing.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
@@ -176,19 +153,19 @@ python3 -B stage_resources.py --installation 'YOUR-INSTALLATION-DIRECTORY'
 
 **Buyruq va sozlamalar ma’nosi:**
 
-Ochiq resurslar app va SQL materiallaridir, tayyor service emas. Stage_resources.py CloudShell da ishga tushib ularni Web/DB ga joylaydi. Zip ni Windows ga saqlashning o‘zi EC2 da fayl yaratmaydi.
+Stage_resources.py yaratilgan muhitni tekshiradi va keyingi mashqlar uchun fayllarni kerakli ikki serverga nusxalaydi. Ilovani ishga tushirish va DB yaratish keyingi mashqlarda bajariladi.
 
 **Kutilgan natija va ma’nosi:**
 
-PUBLIC_LESSON_RESOURCES_READY=web va =db chiqadi. Ochiq fayllar /var/lib/jdu-web/lesson-resources-r1 da. Mavjud boshqa mazmunli fayl ustiga yozilmaydi.
+Joylash yakunlanganda PUBLIC_LESSON_RESOURCES_READY=web va PUBLIC_LESSON_RESOURCES_READY=db chiqadi.
 
 **Ishlamasa:**
 
-Boshlang‘ich o‘rnatish tugamagan, versiya boshqa yoki muddat o‘tgan bo‘lsa, to‘xtab o‘qituvchiga ayting. Tayyor yechim quradigan test fixture bilan almashtirmang.
+O‘rnatish katalogi topilmasa, activate.sh joylashgan katalog yo‘lini tekshiring. Tarqatma xatosi chiqsa, xabarni o‘qituvchiga ayting.
 
 #### P0.4 Tayyorlikni brauzerda tekshirish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Shaxsiy PC brauzeri: Web Portal
 
@@ -210,7 +187,7 @@ Yordam uchun check ID, vaqt va server rolini yozing. Token, parol va shaxsiy URL
 
 #### P0.5 RDP orqali bastion ish stolini ochish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Talabaning Windows PC si (umumiy hisob)
 
@@ -274,17 +251,17 @@ JDU WEB-02 practice: HTTP response verified.
 
 Web yaratilgan, ammo mashq fayli hali qaytarilmayapti.
 
-**Ushbu P da nima o‘zgaradi:**
+**Practice1 da bajariladigan ishlar**
 
 Nginx 80 portda practice.txt qaytarib, request ni log ga yozadi.
 
 URL dagi /practice.txt Web ichidagi /var/www/html/practice.txt ga mos. 127.0.0.1 orqali muvaffaqiyat faqat Web ichini tekshiradi. Ayni matnni bastion va Windows dan o‘qish yo‘lning boshqa qismlarini tekshiradi. [Nginx hujjati](https://nginx.org/en/docs/beginners_guide.html).
 
-### Yechim namunasi: bittadan bajaring
+### Yechim namunasi (bajarish tartibi)
 
 #### P1.1 Ichki APT dan Nginx o‘rnatish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
@@ -317,7 +294,7 @@ Yuklash xatosida repo running/SSM va IP ni tekshiring. --allow-unauthenticated y
 
 #### P1.2 Aniq matn yaratish va ruxsatlarni sozlash
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
@@ -361,7 +338,7 @@ Hali nano ichida bo‘lsangiz, avval saqlab chiqing. Mavjud mission.txt ni o‘z
 
 #### P1.3 Web root ni tekshirish va service ni ishga tushirish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
@@ -400,7 +377,7 @@ Xatoda nginx -t ko‘rsatgan fayl va qatorni tuzating. SG ni o‘zgartirish sint
 
 #### P1.4 Web ichidan javobni ko‘rish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
@@ -429,7 +406,7 @@ Welcome to nginx chiqsa, / emas, /practice.txt so‘ralganini tekshiring.
 
 #### P1.5 Bastiondan va tashqaridan shu faylni tekshirish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Bastionning SSM terminali: ssm-user
 
@@ -458,7 +435,7 @@ Ichki so‘rov o‘tib tashqi so‘rov o‘tmasa, public IP va Lab holatini teks
 
 #### P1.6 So‘rovni log bilan bog‘lash va yuborish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
@@ -532,17 +509,17 @@ Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelka
 
 P1 HTTP IP orqali ishlaydi; DNS endi sozlanadi.
 
-**Ushbu P da nima o‘zgaradi:**
+**Practice2 da bajariladigan ishlar**
 
 BIND mashq nomlari bastion va Web ning oddiy resolver idan ishlaydi.
 
 DNS nom so‘roviga javob beradi, Web sahifani qaytarmaydi. BIND lab.test zone ni boshqaradi; A record IPv4 qaytaradi. Aniq DNS server bilan dig va OS sozlamalaridan foydalanuvchi getent/browser ni farqlang. DNS dan keyin alohida HTTP ulanish bo‘ladi. [BIND hujjati](https://bind9.readthedocs.io/en/v9.18.39/chapter3.html).
 
-### Yechim namunasi: bittadan bajaring
+### Yechim namunasi (bajarish tartibi)
 
 #### P2.1 BIND o‘rnatish va asl sozlamani saqlash
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 DNS serverning SSM terminali: ssm-user
 
@@ -577,7 +554,7 @@ Boshqa Lab named.conf faylini to‘liq ko‘chirmang. O‘zingizning zone mavjud
 
 #### P2.2 Client lar va forwarder ni sozlash
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 DNS serverning SSM terminali: ssm-user
 
@@ -618,7 +595,7 @@ Nuqtali vergul va qavslar sintaksis qismidir. ACL ni any yoki 0.0.0.0/0 gacha ke
 
 #### P2.3 Zone ni e’lon qilish va A record yozish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 DNS serverning SSM terminali: ssm-user
 
@@ -661,7 +638,7 @@ M2 allaqachon mavjud bo‘lsa, zone ni almashtirmay ikkita mashq yozuvini qo‘s
 
 #### P2.4 Sintaksis va DNS ichki javobini tekshirish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 DNS serverning SSM terminali: ssm-user
 
@@ -700,7 +677,7 @@ Xatoda sudo journalctl -u named -n 30 --no-pager ni o‘qing, sozlamani tuzatib 
 
 #### P2.5 Bastion va Web dan DNS ga bevosita so‘rov yuborish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Bastionning SSM terminali: ssm-user
 
@@ -737,7 +714,7 @@ Ulanmasa, manba hamda UDP/TCP 53 ni ajratib tekshiring. Boshqa private serverlar
 
 #### P2.6 Odatiy resolver ni faqat BIND ga yo‘naltirish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Bastionning SSM terminali: ssm-user
 
@@ -773,7 +750,7 @@ Bir interface bir necha YAML da bo‘lsa, qiymatlar birlashadi. resolvectl dns d
 
 #### P2.7 Qo‘llagach odatiy resolver va HTTP ni tekshirish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Bastionning SSM terminali: ssm-user
 
@@ -814,7 +791,7 @@ dig o‘tib getent o‘tmasa, client resolver ini tekshiring. Firefox dagi DoH o
 
 #### P2.8 Browser da IP va nomni solishtirib yuborish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 RDP orqali bastiondagi Firefox
 
@@ -877,17 +854,17 @@ Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelka
 
 DB da o‘quv resurslari bor; Web → DB ruxsatli yo‘li ishlatiladi.
 
-**Ushbu P da nima o‘zgaradi:**
+**Practice4 da bajariladigan ishlar**
 
 Mashq DB va setup/runtime role yaratiladi; Web dan parol bilan SQL bajariladi.
 
 Tarmoq yo‘li, DB listen, HBA ruxsati, parol va SQL privilege alohida kerak. ssm-user - OS user, catalog_practice_app - DB role. HBA birinchi mos qatorni ishlatadi. Ulanish huquqi table yaratish huquqini anglatmaydi. [HBA](https://www.postgresql.org/docs/16/auth-pg-hba-conf.html) va [SQL privilege](https://www.postgresql.org/docs/16/sql-grant.html).
 
-### Yechim namunasi: bittadan bajaring
+### Yechim namunasi (bajarish tartibi)
 
 #### P4.1 PostgreSQL o‘rnatish va o‘quv SQL ni ochish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 DB serverning SSM terminali: ssm-user
 
@@ -924,7 +901,7 @@ Mavjud DB yoki role ni o‘chirmang. Oldin qurilgan bo‘lsa, holatni o‘qib fa
 
 #### P4.2 DB tinglashi va SCRAM ni sozlash
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 DB serverning SSM terminali: ssm-user
 
@@ -954,7 +931,7 @@ Bu SQL emas, postgresql.conf mazmuni. SG va OS tinglash manzili alohida nazoratd
 
 #### P4.3 HBA da manba, database va role ni cheklash
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 DB serverning SSM terminali: ssm-user
 
@@ -989,7 +966,7 @@ Autentifikatsiyani trust bilan chetlab o‘tmang. Asosiy SG ham DB 5432 ni faqat
 
 #### P4.4 Qayta ishga tushirish va amaldagi qiymatni tekshirish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 DB serverning SSM terminali: ssm-user
 
@@ -1027,7 +1004,7 @@ postgresql.service active(exited) bo‘lishi cluster ishlashini isbotlamaydi. jo
 
 #### P4.5 Mashq DB va ikkita role yaratish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 DB serverning SSM terminali: ssm-user
 
@@ -1064,7 +1041,7 @@ already exists oldin bajarilganini anglatishi mumkin. DROP qilmang; \du va \l or
 
 #### P4.6 Ikki DB parolini yashirin kiritish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 DB serverda OS postgres nomidan psql
 
@@ -1106,7 +1083,7 @@ Klaviatura tartibiga e’tibor bering. Tekshirish uchun parolni chat yoki editor
 
 #### P4.7 Web dan parol bilan SELECT bajarish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
@@ -1143,7 +1120,7 @@ IP orqali ulanish ishlasa, nom orqali esa ishlamasa, P2 dagi tizim DNS i va mash
 
 #### P4.8 Checker uchun mavjud parolni faqat Web da saqlash
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
@@ -1223,17 +1200,17 @@ Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelka
 
 M2 DNS va P4 mashq DB hozir ishlaydi.
 
-**Ushbu P da nima o‘zgaradi:**
+**Practice5 da bajariladigan ishlar**
 
 Tayyor app Web ichida ishlaydi; ochiq ro‘yxat va bastion admin oynasi DB ga ulanadi.
 
 Nginx HTTP ni qabul qiladi, Gunicorn Python app ni ishlatadi, PostgreSQL ma’lumot saqlaydi. Statik P1 dan farqli ravishda ro‘yxat mazmuni DB dan olinadi. Venv app Python muhitini ajratadi; systemd unit ishga tushishni belgilaydi. Tayyor kodni joylaysiz, dasturni qayta yozish shart emas.
 
-### Yechim namunasi: bittadan bajaring
+### Yechim namunasi (bajarish tartibi)
 
 #### P5.1 Kerakli DNS va ochiq resurslarni tekshirish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
@@ -1272,7 +1249,7 @@ Faqat practice-db emas, db.lab.test ham kerak. P5 M2 ga bog‘liq, ammo asosiy k
 
 #### P5.2 Kod joylash va alohida venv yaratish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
@@ -1312,7 +1289,7 @@ Bog‘liqlik yetishmasa o‘qituvchi tarqatmasini tekshiring. Pip orqali latest 
 
 #### P5.3 Service user va static katalogini yaratish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
@@ -1350,7 +1327,7 @@ Ruxsat xatosini chmod -R 777 yoki catalog ga sudo berish bilan hal qilmang. Aniq
 
 #### P5.4 Runtime sozlamasini yaratish va faollashtirish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
@@ -1388,7 +1365,7 @@ RDP yoki app admin parolini kiritmang. Davom ettirishda bajarilmagan birinchi am
 
 #### P5.5 Vaqtinchalik setup bilan jadval va admin yaratish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
@@ -1429,7 +1406,7 @@ Seed/admin already exists mavjud ma’lumotni himoya qiladi. Reset qilmay joriy 
 
 #### P5.6 Runtime role ga kerakli SQL huquqini berish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 DB serverning SSM terminali: ssm-user
 
@@ -1463,7 +1440,7 @@ Guard xatosi migration/owner ni tekshirish kerakligini bildiradi. O‘tish uchun
 
 #### P5.7 Static va systemd unit ni joylash
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
@@ -1506,7 +1483,7 @@ Xatoda journalctl -u jdu-catalog ni o‘qing. Env mazmunini log ga qo‘ymang; f
 
 #### P5.8 Nginx ochiq va boshqaruv kirishlarini ajratish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
@@ -1549,7 +1526,7 @@ duplicate default server bo‘lsa eski site ni tekshiring. Reload dan oldin -t x
 
 #### P5.9 Admin orqali ikkita mashq yozuvini kiritish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 RDP orqali bastiondagi Firefox
 
@@ -1578,7 +1555,7 @@ admin.lab.test ni maktab PC da emas, RDP ichidagi Firefox da oching. CSRF xatosi
 
 #### P5.10 DB haqiqiy qatorlarini o‘qish va ekran bilan solishtirish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
@@ -1612,7 +1589,7 @@ permission denied bo‘lsa SQL03 profile va database ni tekshiring. Oddiy role o
 
 #### P5.11 Funksional tekshiruvni ishga tushirish va yuborish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Shaxsiy PC brauzeri: Web Portal
 
@@ -1673,17 +1650,17 @@ Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelka
 
 P5 mashq app ishlaydi; vaqtinchalik setup ulanish hali mavjud.
 
-**Ushbu P da nima o‘zgaradi:**
+**Practice6 da bajariladigan ishlar**
 
 Setup tugatiladi; odatiy app muvaffaqiyati va keraksiz kirish rad etilishi birga tekshiriladi.
 
 Vaqtinchalik setup privilege va ish paytidagi runtime privilege ni ajrating. NOLOGIN va vaqtinchalik sozlama o‘chirilgach app runtime bilan ishlashi kerak. Ochiq 80, admin 8080 va loopback 8000 alohida chegara. Ruxsatli amal muvaffaqiyati bilan aniq keraksiz kirish rad etilishini birga tekshiring.
 
-### Yechim namunasi: bittadan bajaring
+### Yechim namunasi (bajarish tartibi)
 
 #### P6.1 DB role va jadval huquqlarini o‘qish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 DB serverda OS postgres nomidan psql
 
@@ -1723,7 +1700,7 @@ Ortiqcha huquqda SQL03 guard ini saqlab tekshiring. Haqiqiy qatorni o‘chirib r
 
 #### P6.2 Setup role login ini o‘chirish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 DB serverning SSM terminali: ssm-user
 
@@ -1757,7 +1734,7 @@ Keyin setup ni odatiy ish uchun LOGIN ga qaytarmang. M5 alohida mission setup ro
 
 #### P6.3 Vaqtinchalik sozlamani olib tashlab, runtime ni qayta tanlash
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
@@ -1802,7 +1779,7 @@ Boshqa profil faol bo‘lsa, to‘xtang. O‘chirilgan fayllarni qayta o‘chirm
 
 #### P6.4 Ochiq 80 da admin va maxfiy fayl ko‘rinmasligini tekshirish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Bastionning SSM terminali: ssm-user
 
@@ -1837,7 +1814,7 @@ Env matni ko‘rinsa uni ulashmang; o‘qituvchiga aytib ochiq sozlamani tuzatin
 
 #### P6.5 Bir tekshiruvda to‘g‘ri kirish va rad etishlarni yuborish
 
-**Bajarish joyi:**
+**Bajarish muhiti:**
 
 Shaxsiy PC brauzeri: Web Portal
 

@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Пример чтения вывода (не вводить)</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P4 Подключение к PostgreSQL с аутентификацией</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения (порядок действий)</a> · <a href="#section-6">Пример чтения вывода (не вводить)</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P4 Подключение к PostgreSQL с аутентификацией</h1>
 <p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
 <p><a href="../ja/p4.html">日本語</a> · <a href="../ru/p4.html">Русский</a> · <a href="../uz/p4.html">O‘zbekcha</a></p>
 <p>Связанное задание: <a href="m4.html">M4</a>.</p>
@@ -33,12 +33,12 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-4">Как это работает</h2>
 <p><strong>Состояние перед началом:</strong></p>
 <p>На DB есть учебные файлы; используется разрешённый путь Web → DB.</p>
-<p><strong>Что изменится в этом P:</strong></p>
+<p><strong>Что сделать в Practice4</strong></p>
 <p>Созданы учебная БД и роли setup/runtime; SQL с Web проходит с паролем.</p>
 <p>Нужны сетевой доступ, прослушивание DB, разрешение HBA, пароль и SQL-права. ssm-user - пользователь ОС, catalog_practice_app - роль БД. В HBA применяется первая совпавшая строка. Возможность подключиться не означает право создавать таблицы. <a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBA</a> и <a href="https://www.postgresql.org/docs/16/sql-grant.html">права SQL</a>.</p>
-<h2 id="section-5">Пример решения: выполняйте по одному шагу</h2>
+<h2 id="section-5">Пример решения (порядок действий)</h2>
 <h3>P4.1 Установить PostgreSQL и распаковать учебный SQL</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Подключитесь к DB по SSM, проверьте role=db. Cluster PostgreSQL 16 - единица работы сервера БД. Инструмент распаковки проверяет приложение и извлекает SQL; сам он не создаёт БД или роли.</p>
@@ -61,7 +61,7 @@ sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
 <p><strong>Если не получилось:</strong></p>
 <p>Не удаляйте существующие БД и роли. Если уже настроено, изучите состояние и выполняйте только недостающие шаги.</p>
 <h3>P4.2 Настроить прослушивание и SCRAM</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Сохраните postgresql.conf через sudo cp -an. В sudo nano /etc/postgresql/16/main/postgresql.conf задайте три значения ниже. Если параметр встречается несколько раз, проверьте действующее значение через SHOW. Слушать нужно только private IP БД на 5432; password_encryption определяет хранение новых паролей.</p>
@@ -77,7 +77,7 @@ password_encryption = 'scram-sha-256'
 <p><strong>Если не получилось:</strong></p>
 <p>Это текст postgresql.conf, не SQL. SG и адрес прослушивания ОС - разные средства контроля.</p>
 <h3>P4.3 Ограничить источник, database и role в HBA</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Сохраните pg_hba.conf, затем в sudo nano /etc/postgresql/16/main/pg_hba.conf запишите правила ниже. Действует первая совпавшая строка, поэтому прежние широкие разрешения не оставляйте. Системный postgres управляет через Unix socket/peer. Роли будущего M4 перечислены отдельно; учебной роли доступ к основной БД не даётся.</p>
@@ -98,7 +98,7 @@ host all all ::/0 reject
 <p><strong>Если не получилось:</strong></p>
 <p>Не заменяйте метод на trust. Базовый SG также разрешает DB 5432 только с Web.</p>
 <h3>P4.4 Перезапустить и проверить действующие значения</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>restart перечитывает настройки. SHOW и pg_hba_file_rules проверяют действующие значения, а не только текст файла. Параметр psql -X отключает личные startup-файлы.</p>
@@ -122,7 +122,7 @@ sudo -u postgres psql -X -d postgres -c \
 <p><strong>Если не получилось:</strong></p>
 <p>active(exited) у postgresql.service не доказывает работу cluster. Изучайте journalctl -u postgresql@16-main.</p>
 <h3>P4.5 Создать учебную БД и две роли</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>profile_sql.py только выводит фиксированный SQL с учебными именами. Сначала прочитайте вывод, затем передайте тот же текст psql. setup владеет БД/schema и создаёт таблицы; app используется приложением. Используйте предоставленный SQL: программировать приложение не требуется.</p>
@@ -145,7 +145,7 @@ python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u pos
 <p><strong>Если не получилось:</strong></p>
 <p>При already exists возможен повторный запуск. Не используйте DROP; проверьте роли и БД через \du и \l. Убедитесь, что psql справа от pipe не сообщил SQL error.</p>
 <h3>P4.6 Задать два пароля БД скрытым вводом</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>psql на DB-сервере от имени системного postgres</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Первая строка запускается в shell DB и открывает psql с postgres=#. Команды \password вводятся внутри psql. Для setup/app задайте разные пароли длиной от 16 символов, каждый дважды скрытым вводом. Не пишите значения в команду или отчёт. \q возвращает в shell DB.</p>
@@ -170,7 +170,7 @@ sudo -u postgres psql -X -d postgres
 <p><strong>Если не получилось:</strong></p>
 <p>Учитывайте раскладку клавиатуры. Не записывайте пароль в чат или редактор для проверки. При потере используйте личную процедуру восстановления с преподавателем.</p>
 <h3>P4.7 Выполнить SELECT с Web по паролю</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Закройте SSM DB через exit, вернитесь в CloudShell и откройте Web. У psql -h задаёт узел, -U - роль, -d - БД, -W запрашивает пароль. Сначала подключитесь по внутреннему IP, затем выполните тот же SELECT по учебному имени DB из P2. Сверьте имя БД, роль и результат.</p>
@@ -193,7 +193,7 @@ psql -X -h practice-db.lab.test -U catalog_practice_app -d jdu_catalog_practice 
 <p><strong>Если не получилось:</strong></p>
 <p>Если по IP подключение работает, а по имени нет, проверьте системный DNS и учебное имя DB из P2. При отказе аутентификации проверьте источник, БД, роль и пароль. Не публикуйте DB в Internet для диагностики.</p>
 <h3>P4.8 Сохранить существующий пароль для checker только на Web</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Инструмент дважды скрыто запрашивает существующий пароль catalog_practice_app и сохраняет его только на Web в root-файл 0600. Пароль БД не меняется. Не выводите env через cat и не выполняйте source. После exit проверьте P4 в Web Portal на PC.</p>

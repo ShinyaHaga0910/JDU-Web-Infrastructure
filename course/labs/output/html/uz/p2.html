@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Nimani o‘rganamiz</a> · <a href="#section-2">Topshiriq</a> · <a href="#section-3">Topshiriq diagrammasi</a> · <a href="#section-4">Bu qanday ishlaydi</a> · <a href="#section-5">Yechim namunasi: bittadan bajaring</a> · <a href="#section-6">Natijani o‘qish namunasi (kiritmang)</a> · <a href="#section-7">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P2 Ichki DNS va odatiy nom yechimi</h1>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Nimani o‘rganamiz</a> · <a href="#section-2">Topshiriq</a> · <a href="#section-3">Topshiriq diagrammasi</a> · <a href="#section-4">Bu qanday ishlaydi</a> · <a href="#section-5">Yechim namunasi (bajarish tartibi)</a> · <a href="#section-6">Natijani o‘qish namunasi (kiritmang)</a> · <a href="#section-7">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P2 Ichki DNS va odatiy nom yechimi</h1>
 <p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a></p>
 <p><a href="../ja/p2.html">日本語</a> · <a href="../ru/p2.html">Русский</a> · <a href="../uz/p2.html">O‘zbekcha</a></p>
 <p>Mos topshiriq: <a href="m2.html">M2</a>.</p>
@@ -45,12 +45,12 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-4">Bu qanday ishlaydi</h2>
 <p><strong>Boshlashdan oldingi holat:</strong></p>
 <p>P1 HTTP IP orqali ishlaydi; DNS endi sozlanadi.</p>
-<p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
+<p><strong>Practice2 da bajariladigan ishlar</strong></p>
 <p>BIND mashq nomlari bastion va Web ning oddiy resolver idan ishlaydi.</p>
 <p>DNS nom so‘roviga javob beradi, Web sahifani qaytarmaydi. BIND lab.test zone ni boshqaradi; A record IPv4 qaytaradi. Aniq DNS server bilan dig va OS sozlamalaridan foydalanuvchi getent/browser ni farqlang. DNS dan keyin alohida HTTP ulanish bo‘ladi. <a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BIND hujjati</a>.</p>
-<h2 id="section-5">Yechim namunasi: bittadan bajaring</h2>
+<h2 id="section-5">Yechim namunasi (bajarish tartibi)</h2>
 <h3>P2.1 BIND o‘rnatish va asl sozlamani saqlash</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DNS serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>DNS ga kirib role=dns ni tekshiring. cp -a asl fayl atributlarini saqlaydi; -n eski nusxa ustiga yozmaydi. Bu tahrir xatosi uchun nusxa, DB backup/restore topshirig‘i emas.</p>
@@ -71,7 +71,7 @@ sudo cp -an /etc/bind/named.conf.local /etc/bind/named.conf.local.before-p2
 <p><strong>Ishlamasa:</strong></p>
 <p>Boshqa Lab named.conf faylini to‘liq ko‘chirmang. O‘zingizning zone mavjud bo‘lsa, avval o‘qing.</p>
 <h3>P2.2 Client lar va forwarder ni sozlash</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DNS serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>sudo nano /etc/bind/named.conf.options ni ochib quyidagi matnni saqlang. acl ruxsatli client larni, listen-on DNS tinglashini belgilaydi; forward only tashqi nomlarni AWS DNS ga uzatadi. Query va recursion uchta manbaga cheklanadi. dnssec-validation no yopiq o‘quv forwarding tuzilmasiga mos.</p>
@@ -98,7 +98,7 @@ options {
 <p><strong>Ishlamasa:</strong></p>
 <p>Nuqtali vergul va qavslar sintaksis qismidir. ACL ni any yoki 0.0.0.0/0 gacha kengaytirmang.</p>
 <h3>P2.3 Zone ni e’lon qilish va A record yozish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DNS serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>sudo nano /etc/bind/named.conf.local ga birinchi zone blokini yozing. sudo install -d -m 0755 /etc/bind/zones dan so‘ng sudo nano /etc/bind/zones/db.lab.test ga qolgan matnni yozing. SOA boshqaruv ma’lumoti, NS vakolatli DNS, A nom/IPv4 mosligi. Oxirgi nuqta to‘liq nomni bildiradi; har tahrirda serial ni oshiring.</p>
@@ -127,7 +127,7 @@ practice-db IN A 10.20.2.20
 <p><strong>Ishlamasa:</strong></p>
 <p>M2 allaqachon mavjud bo‘lsa, zone ni almashtirmay ikkita mashq yozuvini qo‘shing. Zone ni ikki marta e’lon qilmang.</p>
 <h3>P2.4 Sintaksis va DNS ichki javobini tekshirish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>DNS serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Client ni nosoz DNS ga o‘tkazish nom yechimini to‘xtatadi. Avval named-checkconf va named-checkzone muvaffaqiyatli bo‘lsin, keyin UDP hamda TCP ni tekshiring.</p>
@@ -152,7 +152,7 @@ dig @127.0.0.1 guide.lab.test A +tcp
 <p><strong>Ishlamasa:</strong></p>
 <p>Xatoda sudo journalctl -u named -n 30 --no-pager ni o‘qing, sozlamani tuzatib yana tekshiring.</p>
 <h3>P2.5 Bastion va Web dan DNS ga bevosita so‘rov yuborish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Bastionning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Buyruqlarni bastionda ham, Web da ham bajaring. @10.20.2.10 faqat shu so‘rov uchun DNS ni belgilaydi. Bu browser va app odatda shu DNS ni ishlatishini hali isbotlamaydi.</p>
@@ -175,7 +175,7 @@ dig @10.20.2.10 lab.test AXFR
 <p><strong>Ishlamasa:</strong></p>
 <p>Ulanmasa, manba hamda UDP/TCP 53 ni ajratib tekshiring. Boshqa private serverlarni client ACL ga qo‘shmang.</p>
 <h3>P2.6 Odatiy resolver ni faqat BIND ga yo‘naltirish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Bastionning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Bastion va Web da bittadan bajaring. ip -br link orqali interface nomini, networkctl status NOM orqali Network File ni aniqlang. ls /etc/netplan bilan YAML ni topib sudo cp -an orqali nusxa saqlang. sudo nano da ayni interface ga dhcp4-overrides/use-dns:false va nameservers qo‘shing. Quyida tuzilma namunasi: interface nomi hamda mavjud match/set-name/renderer qiymatlarini saqlang.</p>
@@ -197,7 +197,7 @@ dig @10.20.2.10 lab.test AXFR
 <p><strong>Ishlamasa:</strong></p>
 <p>Bir interface bir necha YAML da bo‘lsa, qiymatlar birlashadi. resolvectl dns da AWS DNS qolsa, tegishli barcha YAML va amaldagi sozlamani tekshiring.</p>
 <h3>P2.7 Qo‘llagach odatiy resolver va HTTP ni tekshirish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Bastionning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Bastion va Web da avval sozlamani hosil qiling, keyin qo‘llang va tekshiring. Ikkinchi SSH/RDP oynasini ochiq tuting; uzilsa SSM orqali qaytib nusxa bilan solishtiring. Fayl tekshirilgach va generate muvaffaqiyatli tugagach apply qiling.</p>
@@ -224,7 +224,7 @@ curl --noproxy '*' -i http://guide.lab.test/practice.txt
 <p><strong>Ishlamasa:</strong></p>
 <p>dig o‘tib getent o‘tmasa, client resolver ini tekshiring. Firefox dagi DoH o‘chirilgan sozlamani saqlang.</p>
 <h3>P2.8 Browser da IP va nomni solishtirib yuborish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>RDP orqali bastiondagi Firefox</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>RDP orqali bastion Firefox ini oching. http://10.20.1.20/practice.txt va http://guide.lab.test/practice.txt bir xil matn berishini ko‘ring. lab.test maktab PC DNS ida emas, bastion ichki DNS ida ishlaydi. Keyin PC dagi Web Portal da P2 ni tekshiring.</p>

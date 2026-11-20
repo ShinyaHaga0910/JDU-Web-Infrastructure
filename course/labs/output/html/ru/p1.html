@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Пример чтения вывода (не вводить)</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P1 Выдача статического файла по HTTP</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения (порядок действий)</a> · <a href="#section-6">Пример чтения вывода (не вводить)</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P1 Выдача статического файла по HTTP</h1>
 <p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
 <p><a href="../ja/p1.html">日本語</a> · <a href="../ru/p1.html">Русский</a> · <a href="../uz/p1.html">O‘zbekcha</a></p>
 <p>Связанное задание: <a href="m1.html">M1</a>.</p>
@@ -33,12 +33,12 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-4">Как это работает</h2>
 <p><strong>Состояние перед началом:</strong></p>
 <p>Web уже создан, но учебный файл ещё не выдаётся.</p>
-<p><strong>Что изменится в этом P:</strong></p>
+<p><strong>Что сделать в Practice1</strong></p>
 <p>Nginx выдаёт practice.txt на порту 80 и записывает запрос в журнал.</p>
 <p>Путь URL /practice.txt соответствует файлу /var/www/html/practice.txt на Web. Успех через 127.0.0.1 проверяет только сам Web. Чтение того же текста с бастиона и Windows проверяет другие участки пути. См. <a href="https://nginx.org/en/docs/beginners_guide.html">документацию Nginx</a>.</p>
-<h2 id="section-5">Пример решения: выполняйте по одному шагу</h2>
+<h2 id="section-5">Пример решения (порядок действий)</h2>
 <h3>P1.1 Установить Nginx из внутреннего APT</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Подключитесь по SSM к Web как в P0 и проверьте role=web. Проверьте APT source: используется только подписанный repo 10.20.2.30. update получает индекс, install устанавливает пакет. Не добавляйте внешние источники.</p>
@@ -57,7 +57,7 @@ sudo apt-get install --no-install-recommends nginx
 <p><strong>Если не получилось:</strong></p>
 <p>При ошибке получения проверьте repo, его running/SSM и IP. Не обходите подпись через --allow-unauthenticated или внешний pip.</p>
 <h3>P1.2 Создать точный текст и права файла</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Создайте текст через nano: одна точная строка, указанная ниже, с переводом строки в конце. Ctrl+O → Enter сохраняет, Ctrl+X закрывает редактор. install копирует файл; -o/-g задают владельца и группу, -m - права.</p>
@@ -87,7 +87,7 @@ cat /var/www/html/practice.txt
 <p><strong>Если не получилось:</strong></p>
 <p>Если вы ещё в nano, сначала сохраните и выйдите. Не меняйте существующий mission.txt.</p>
 <h3>P1.3 Проверить Web root и запустить сервис</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Начальный сайт Ubuntu использует root /var/www/html. Через nginx -T найдите включённый /etc/nginx/sites-enabled/default, root и listen 80. При необходимости редактируйте sudo nano; reload выполняйте после успешной проверки. enable --now запускает сейчас и включает автозапуск.</p>
@@ -112,7 +112,7 @@ sudo ss -lntp
 <p><strong>Если не получилось:</strong></p>
 <p>При ошибке используйте имя файла и строку из nginx -t. Изменение SG не исправит синтаксис.</p>
 <h3>P1.4 Посмотреть ответ на самом Web</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>curl - HTTP-клиент; -i показывает статус, заголовки и тело. 127.0.0.1 означает этот Web-сервер, не его public IP. Сравните ответ, а не только код завершения команды.</p>
@@ -127,7 +127,7 @@ curl --noproxy '*' -i http://127.0.0.1/practice.txt
 <p><strong>Если не получилось:</strong></p>
 <p>При Welcome to nginx проверьте, что запросили /practice.txt, а не /.</p>
 <h3>P1.5 Проверить тот же файл с бастиона и извне</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал бастиона: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Выйдите из Web через exit, откройте SSM бастиона из CloudShell и запросите URL ниже. Затем exit возвращает в CloudShell; там запросите тот же путь командой curl -i по текущему public IPv4 Web из EC2. Не путайте private 10.20.1.20 с public IPv4.</p>
@@ -142,7 +142,7 @@ curl --noproxy '*' -i http://10.20.1.20/practice.txt
 <p><strong>Если не получилось:</strong></p>
 <p>Если внутренний запрос успешен, а внешний нет, проверьте текущий public IP и Lab. Не ослабляйте базовые SG.</p>
 <h3>P1.6 Связать запрос с журналом и отправить</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Вернитесь на Web. В access log найдите время, IP клиента, путь и статус. Это доказательство обработки запроса, не только наличия файла. После exit в CloudShell выберите P1 в Web Portal на PC и запустите проверку.</p>

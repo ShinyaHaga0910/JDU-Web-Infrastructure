@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Nimani o‘rganamiz</a> · <a href="#section-2">Topshiriq</a> · <a href="#section-3">Topshiriq diagrammasi</a> · <a href="#section-4">Bu qanday ishlaydi</a> · <a href="#section-5">Yechim namunasi: bittadan bajaring</a> · <a href="#section-6">Natijani o‘qish namunasi (kiritmang)</a> · <a href="#section-7">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P1 HTTP orqali statik faylni qaytarish</h1>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Nimani o‘rganamiz</a> · <a href="#section-2">Topshiriq</a> · <a href="#section-3">Topshiriq diagrammasi</a> · <a href="#section-4">Bu qanday ishlaydi</a> · <a href="#section-5">Yechim namunasi (bajarish tartibi)</a> · <a href="#section-6">Natijani o‘qish namunasi (kiritmang)</a> · <a href="#section-7">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P1 HTTP orqali statik faylni qaytarish</h1>
 <p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a></p>
 <p><a href="../ja/p1.html">日本語</a> · <a href="../ru/p1.html">Русский</a> · <a href="../uz/p1.html">O‘zbekcha</a></p>
 <p>Mos topshiriq: <a href="m1.html">M1</a>.</p>
@@ -33,12 +33,12 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-4">Bu qanday ishlaydi</h2>
 <p><strong>Boshlashdan oldingi holat:</strong></p>
 <p>Web yaratilgan, ammo mashq fayli hali qaytarilmayapti.</p>
-<p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
+<p><strong>Practice1 da bajariladigan ishlar</strong></p>
 <p>Nginx 80 portda practice.txt qaytarib, request ni log ga yozadi.</p>
 <p>URL dagi /practice.txt Web ichidagi /var/www/html/practice.txt ga mos. 127.0.0.1 orqali muvaffaqiyat faqat Web ichini tekshiradi. Ayni matnni bastion va Windows dan o‘qish yo‘lning boshqa qismlarini tekshiradi. <a href="https://nginx.org/en/docs/beginners_guide.html">Nginx hujjati</a>.</p>
-<h2 id="section-5">Yechim namunasi: bittadan bajaring</h2>
+<h2 id="section-5">Yechim namunasi (bajarish tartibi)</h2>
 <h3>P1.1 Ichki APT dan Nginx o‘rnatish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>P0 dagidek Web ga SSM orqali kiring va role=web ni tekshiring. APT source faqat 10.20.2.30 dagi imzolangan repo ekanini ko‘ring. update indeksni oladi, install paketni o‘rnatadi. Internet source qo‘shmang.</p>
@@ -57,7 +57,7 @@ sudo apt-get install --no-install-recommends nginx
 <p><strong>Ishlamasa:</strong></p>
 <p>Yuklash xatosida repo running/SSM va IP ni tekshiring. --allow-unauthenticated yoki tashqi pip bilan chetlab o‘tmang.</p>
 <h3>P1.2 Aniq matn yaratish va ruxsatlarni sozlash</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>nano da quyida ko‘rsatilgan bitta aniq qatorni yarating va oxiriga yangi qator qo‘ying. Ctrl+O → Enter saqlaydi, Ctrl+X yopadi. install faylni joylaydi; -o/-g egasi va guruhni, -m ruxsatni belgilaydi.</p>
@@ -87,7 +87,7 @@ cat /var/www/html/practice.txt
 <p><strong>Ishlamasa:</strong></p>
 <p>Hali nano ichida bo‘lsangiz, avval saqlab chiqing. Mavjud mission.txt ni o‘zgartirmang.</p>
 <h3>P1.3 Web root ni tekshirish va service ni ishga tushirish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Ubuntu boshlang‘ich sayti root sifatida /var/www/html dan foydalanadi. nginx -T da /etc/nginx/sites-enabled/default, root va listen 80 ni toping. Kerak bo‘lsa sudo nano bilan tahrirlang; tekshiruvdan keyin reload qiling. enable --now hozir ishga tushiradi va keyingi OS yuklanishiga yoqadi.</p>
@@ -112,7 +112,7 @@ sudo ss -lntp
 <p><strong>Ishlamasa:</strong></p>
 <p>Xatoda nginx -t ko‘rsatgan fayl va qatorni tuzating. SG ni o‘zgartirish sintaksis xatosini tuzatmaydi.</p>
 <h3>P1.4 Web ichidan javobni ko‘rish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>curl HTTP client; -i status, header va body ni ko‘rsatadi. 127.0.0.1 shu Web serverning o‘zi, public IP emas. Faqat buyruq tugaganini emas, javobni solishtiring.</p>
@@ -127,7 +127,7 @@ curl --noproxy '*' -i http://127.0.0.1/practice.txt
 <p><strong>Ishlamasa:</strong></p>
 <p>Welcome to nginx chiqsa, / emas, /practice.txt so‘ralganini tekshiring.</p>
 <h3>P1.5 Bastiondan va tashqaridan shu faylni tekshirish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Bastionning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web dan exit bilan chiqing, CloudShell dan bastion SSM terminalini ochib quyidagi URL ni so‘rang. Keyin exit bilan CloudShell ga qayting; EC2 dagi hozirgi Web public IPv4 orqali shu path ni curl -i bilan so‘rang. 10.20.1.20 private IP va public IPv4 ni adashtirmang.</p>
@@ -142,7 +142,7 @@ curl --noproxy '*' -i http://10.20.1.20/practice.txt
 <p><strong>Ishlamasa:</strong></p>
 <p>Ichki so‘rov o‘tib tashqi so‘rov o‘tmasa, public IP va Lab holatini tekshiring. Asosiy SG ni o‘zboshimchalik bilan kengaytirmang.</p>
 <h3>P1.6 So‘rovni log bilan bog‘lash va yuborish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>Web ga qayting. Access log da vaqt, client IP, path va statusni ko‘ring. Bu fayl borligidan tashqari so‘rov ishlanganining dalilidir. Exit bilan CloudShell ga qaytgach, PC dagi Web Portal da P1 ni tekshiring.</p>

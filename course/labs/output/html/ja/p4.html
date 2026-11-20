@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">今回の見取り図</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">操作例：一つずつ実行する</a> · <a href="#section-6">出力の読み取り例（入力しない）</a> · <a href="#section-7">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P4 PostgreSQLへの認証接続</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">今回の見取り図</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">解答例（操作手順）</a> · <a href="#section-6">出力の読み取り例（入力しない）</a> · <a href="#section-7">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P4 PostgreSQLへの認証接続</h1>
 <p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
 <p><a href="../ja/p4.html">日本語</a> · <a href="../ru/p4.html">Русский</a> · <a href="../uz/p4.html">O‘zbekcha</a></p>
 <p>対応する自力課題は<a href="m4.html">M4</a>。</p>
@@ -33,12 +33,12 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-4">仕組みを理解する</h2>
 <p><strong>始める前の状態:</strong></p>
 <p>DBに教材資源があり、WebからDBへ許可された経路を使う。</p>
-<p><strong>このPで変えること:</strong></p>
+<p><strong>このPractice4で作業すること</strong></p>
 <p>練習DBとsetup/runtime roleを作り、Webから認証付きSQLを実行する。</p>
 <p>接続には、通信の到達、DBの待受、HBAの許可、password、SQL権限がそれぞれ必要。ssm-userはOS userで、catalog_practice_appはDB roleである。HBAは上から最初に一致した行を使う。SQLへ接続できることと、tableを作成できることも別の権限である。<a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBA</a>・<a href="https://www.postgresql.org/docs/16/sql-grant.html">SQL権限</a>。</p>
-<h2 id="section-5">操作例：一つずつ実行する</h2>
+<h2 id="section-5">解答例（操作手順）</h2>
 <h3>P4.1 DBを導入し教材SQLを展開する</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>DBへSSM接続しrole=dbを確認する。PostgreSQL16のclusterはDBをまとめて動かす単位。公開資源の展開補助は署名版のappを検査し、SQLを取り出すだけでroleやDBを作らない。</p>
@@ -61,7 +61,7 @@ sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
 <p><strong>うまくいかないとき:</strong></p>
 <p>既存DBやroleは削除しない。すでに構築した場合は現在の状態を読み、未実施の手順だけ進める。</p>
 <h3>P4.2 DBの待受とSCRAMを設定する</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>sudo cp -anでpostgresql.confの控えを作り、sudo nano /etc/postgresql/16/main/postgresql.confで次の3値を設定する。同じ項目が複数ある場合は有効値を後でSHOWで確認。listen_addressesはDBのprivate IPだけ、portは5432。password_encryptionはこの後設定するpasswordの保存方式。</p>
@@ -77,7 +77,7 @@ password_encryption = 'scram-sha-256'
 <p><strong>うまくいかないとき:</strong></p>
 <p>これは設定内容。psqlではなくpostgresql.confへ書く。SGとOSのlistenは別の制御である。</p>
 <h3>P4.3 接続元・DB・roleをHBAで限定する</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>sudo cp -anでpg_hba.confを控え、sudo nano /etc/postgresql/16/main/pg_hba.confで以下を保存。最初に一致する行が使われるため、既存の広い許可行は残さない。OS postgresだけはUnix socketのpeerで管理できる。M4で作る別profileも明示列挙し、練習roleが本課題DBへ入る組合せは許さない。</p>
@@ -98,7 +98,7 @@ host all all ::/0 reject
 <p><strong>うまくいかないとき:</strong></p>
 <p>trustへ変えて認証を省略しない。DB5432は基盤SGでもWebだけから許可される。</p>
 <h3>P4.4 起動して設定の実効値を読む</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>restartは設定を読み直す。SQLのSHOWとpg_hba_file_rulesで、編集したつもりの値ではなく動作中の値を確認する。psqlの-Xは個人設定fileを読み込ませない指定。</p>
@@ -122,7 +122,7 @@ sudo -u postgres psql -X -d postgres -c \
 <p><strong>うまくいかないとき:</strong></p>
 <p>postgresql.serviceのactive(exited)だけでcluster稼働を判断しない。journalctl -u postgresql@16-mainで調べる。</p>
 <h3>P4.5 練習DBと2種類のroleを作る</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>profile_sql.pyは固定SQLの練習名を出力するだけ。最初のcommandで内容を読み、その後同じ出力をpsqlへ渡す。setupはDB/schemaを所有し初期tableを作るrole、appは通常接続するrole。コードを作る授業ではないので配布SQLを使う。</p>
@@ -145,7 +145,7 @@ python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u pos
 <p><strong>うまくいかないとき:</strong></p>
 <p>already existsなら成功済みの可能性。DROPで消さず\duと\lで対応を確認する。パイプ右側psqlにSQL errorがないことを確認する。</p>
 <h3>P4.6 2つのDBパスワードを非表示で設定する</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>DBサーバーのpsql：OS postgres</p>
 <p><strong>目的と操作:</strong></p>
 <p>DBのshellで最初の行を実行するとpostgres=#のpsqlに入る。\passwordはその中で入力する。16文字以上の異なるpasswordをsetup/appへそれぞれ2回入力。値は画面にも履歴にも書かない。最後の\qでDBのshellへ戻る。</p>
@@ -170,7 +170,7 @@ sudo -u postgres psql -X -d postgres
 <p><strong>うまくいかないとき:</strong></p>
 <p>keyboard配列に注意。値を確認するために会話やエディタへ書き出さない。忘れた場合は教師と本人用復旧を行う。</p>
 <h3>P4.7 Webからpassword付きSELECTを行う</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>DBのSSMをexitしCloudShellへ戻り、WebのSSMへ入る。psqlの-hは接続先、-UはDB role、-dはDB名、-Wはpassword入力を要求する。まず内部IPで接続する。続けて、P2で登録した練習用のDB名で同じSELECTを実行する。両方で同じDB名・ロール・結果が返ることを確かめる。</p>
@@ -193,7 +193,7 @@ psql -X -h practice-db.lab.test -U catalog_practice_app -d jdu_catalog_practice 
 <p><strong>うまくいかないとき:</strong></p>
 <p>内部IPで成功し、名前で失敗する場合は、P2で設定した通常の名前解決と練習用のDB名を確認する。認証が拒否される場合は接続元・DB・ロール・パスワードを確認する。DBをInternetへ公開して試さない。</p>
 <h3>P4.8 checkerが使う既存passwordをWeb内だけに保存する</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>helperは既存のcatalog_practice_app passwordを2回非表示入力し、Webのroot専用0600 fileへ保存する。DBのpasswordは変えない。envをcatしたりshellでsourceしない。exitでCloudShellへ戻ったら、PCのWeb PortalでP4を確認する。</p>

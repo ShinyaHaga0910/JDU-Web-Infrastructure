@@ -32,7 +32,7 @@ M1=8、M2=13、M4=9、M5=13、M6=16（この5課題の自動採点は計59素点
 | db | 10.20.2.20 | PostgreSQL5432 |
 | repo | 10.20.2.30 | 事前保存した署名資源のHTTP80 |
 
-各Ubuntuへ入る操作：CloudShellで aws ssm start-session --target i-自分の対象ID。接続直後にid -unとbootstrap.jsonのroleを確認する。サーバーを替えるときはexitを1回でCloudShellへ戻り、次のIDでstart-sessionする。CloudShellの変数は接続先へ自動コピーされない。SSMのssm-userはsudo可能。RDPのlabuserはsudo管理者ではない。
+各Ubuntuへ入る操作：CloudShellで aws ssm start-session --target i-自分の対象ID。接続先の確認はP0.2の手順を使う。サーバーを替えるときはexitを1回でCloudShellへ戻り、次のIDでstart-sessionする。CloudShellの変数は接続先へ自動コピーされない。SSMのssm-userはsudo可能。RDPのlabuserはsudo管理者ではない。
 
 nanoの編集：file名を指定して開く→本文を入力→Ctrl+O→Enterで保存→Ctrl+Xで終了。設定fileの枠はshell commandではない。psqlに入るとpromptが変わる。SQL/\passwordはその中へ入力し、\qでUbuntuへ戻る。失敗したcommandの次へ進まず、期待結果を確認する。
 
@@ -60,7 +60,7 @@ bash枠は表示された実行場所の端末へ入力する。text枠は設定
 
 初期環境で提供されたSSMは、CloudShellから各EC2へ入る管理経路。上のWeb利用経路とは別に使う。表の内部IP/portはこのLabの仕様で、一般のWebシステム全てに同じ値を要求するものではない。
 
-## P0 自分の環境と実行場所
+## P0 サーバーの確認と接続
 
 ### 学ぶこと
 
@@ -68,7 +68,7 @@ CloudShell、Windows、5台のUbuntuを区別し、正しいサーバーへSSM�
 
 ### 課題
 
-構築済みの自分の環境で、5台のインスタンスIDと役割を確認し、接続先と操作ユーザーを確かめる。
+構築済みの自分の環境で、5台のインスタンスIDとロールを確認し、接続先と操作ユーザーを確かめる。
 
 ### 操作するサーバーと教材の配置先
 
@@ -76,55 +76,35 @@ CloudShell、Windows、5台のUbuntuを区別し、正しいサーバーへSSM�
 
 利用者PCのブラウザでAWSのCloudShellを開き、SSMで対象のEC2へ接続する。教材ファイルの配置先はWebサーバーとDBサーバー。共通登録コード方式では初期構築時に配置され、署名付き配布方式ではP0.3で配置する。
 
-### 仕組みを理解する
+**このPractice0で作業すること**
 
-**始める前の状態:**
+自分のAWSアカウント、各サーバーのロール、コマンドを実行する環境を確認する。署名付き配布方式を使う場合は、備品管理アプリやDBの構築に使うファイルをWebサーバーとDBサーバーに配置する。
 
-教師が初期配布と個別登録を終えた、本人の5台を使う。
+### 解答例（操作手順）
 
-**このPで変えること:**
+#### P0.1 5台のinstance IDを確認する
 
-対象account・役割・実行場所を見分け、公開教材資源を準備する。
-
-AWSコンソールはAWS資源を管理する画面、CloudShellはAWS CLIを使う自分の端末、SSMは選んだEC2のOS内へ入る接続である。SSMへ入っても5台が一つのOSになるわけではない。Webの/var/wwwとDBの/var/wwwは別の保存先である。サーバーの役割と、そこで操作するOS userを別々に確認する。
-
-### 操作例：一つずつ実行する
-
-#### P0.1 5台のinstance IDを記録する
-
-**実行場所:**
+**実行環境:**
 
 学生本人のAWSコンソール
 
 **目的と操作:**
 
-EC2 → Instancesを開き、Name列で自分の演習環境のサーバーを探す。同じ行のInstance ID列からi-を含めてIDを控える。環境を識別するためにLabIdとDeploymentIdのタグを照合し、bastion/web/dns/db/repoのinstance IDを手元の作業表へ記入する。名前だけで選ばない。公開IPv4はbastionとwebだけにある。SSM接続は公開IPではなくinstance IDを使う。
+AWSマネジメントコンソール上部のSearch欄にEC2と入力し、EC2の管理画面を開く。EC2 → Instancesを開き、Name列で自分の演習環境の5台のサーバーを確認する。同じ行のInstance ID列からi-を含めてIDを確認する。
 
-![C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDをコピーする。](../../assets/shared/ec2-instance-id-c3.png)
+![C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDを確認する。](../../assets/shared/ec2-instance-id-c3.png)
 
-C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDをコピーする。
+C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDを確認する。
 
-**コマンド・設定値の意味:**
+#### P0.2 CloudShellからSSMでWebサーバーに接続する
 
-instance IDはEC2を識別する値、roleは授業内の担当、公開IPは外から接続する宛先である。公開IPが変わっても同じinstance IDなら同じEC2として追跡できる。作業表には5役割とIDの組を記録する。
-
-**期待する結果と読み方:**
-
-5台ともrunning、SSM Online。private IPは本書の共通表と一致する。公開IPv4は停止・起動後に変わることがある。
-
-**うまくいかないとき:**
-
-別Lab・別account・不明な台を操作しない。停止中は教師の起動案内に従う。ResetやTerminateで開始状態を作り直さない。
-
-#### P0.2 SSMで入り、戻る
-
-**実行場所:**
+**実行環境:**
 
 CloudShell（学生本人のAWS）
 
 **目的と操作:**
 
-EC2で確認したWebのIDに置き換えて実行する。接続後はCloudShellではなくUbuntuの端末になる。id -unはSSM管理userを、bootstrap.jsonのroleはサーバー役割を示す。最後のexitを1回実行するとCloudShellへ戻る。
+次のコマンドのi-YOUR-WEB-INSTANCE-IDを、P0.1で確認したWebサーバーのInstance IDに置き換えて、CloudShellで実行する。接続が完了したら、サーバーの初期構築時に置かれた/etc/jdu-web/bootstrap.jsonからロールを読み出す。このファイルのroleには、サーバーが担当する機能が記録されている。表示がwebなら、接続先はWebサーバーと確認できる。
 
 入力するコマンド（番号はこの手順内の順番）
 
@@ -133,62 +113,59 @@ EC2で確認したWebのIDに置き換えて実行する。接続後はCloudShel
 aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
 # 2. この端末で操作しているOSユーザー名を表示する。
 id -un
-# 3. 接続中のサーバーのホスト名を表示する。
-hostname
-# 4. bootstrap情報のroleだけを読み、接続先の役割を確認する。
+# 3. 設置済みのJSONファイルからサーバーのロールを読み出す。
 python3 -c 'import json;print(json.load(open("/etc/jdu-web/bootstrap.json"))["role"])'
-# 5. 現在の作業ディレクトリを表示する。
-pwd
-# 6. 現在のサーバーへの接続を閉じ、CloudShellへ戻る。
+# 4. 現在のサーバーへの接続を閉じ、CloudShellへ戻る。
 exit
 ```
 
-**コマンド・設定値の意味:**
-
-最初のstart-sessionだけをCloudShellで実行し、接続完了を待ってから残りを1行ずつ入力する。id -unはuser、hostnameはOSのhost名、roleは教材上の役割を読む。exitは現在の接続を1段だけ戻す。
-
 **期待する結果と読み方:**
 
-userはssm-user、roleはweb。以降もサーバーを替えるたびに確認する。SSHで入ったUbuntuのuserはubuntuになる場合がある。
+id -unはssm-user、ファイルから読み出したロールはwebと表示される。
 
-**うまくいかないとき:**
+ターミナルの表示例（接続後）
 
-TargetNotConnectedならrunning/SSM Online/region us-east-1を確認する。SGを全面開放したりWindowsへ鍵をダウンロードしない。
+```text
+$ id -un
+ssm-user
+$ python3 -c …
+web
+```
 
-#### P0.3 公開教材資源だけを準備する
+#### P0.3 備品管理アプリとSQLの教材ファイルを配置する
 
-**実行場所:**
+**実行環境:**
 
 CloudShell（学生本人のAWS）
 
 **目的と操作:**
 
-署名付き配布を使う場合の手順です。共通登録コード方式では構築時に配置済みです。本教材zipをCloudShellのActions→Upload fileでアップロードし、unzip web-lab-pm-r1.zipで展開する。resourcesへ移動し、YOUR-INSTALLATION-DIRECTORYを署名付き配布の導入先に置き換える。導入先は、初回に表示されたactivate.shがあるディレクトリ。補助処理は本人の署名版と元5台を照合し、Web/DBへアプリ資源・SQL・秘密の非表示入力helperを置くだけ。サービスやDBは構築しない。秘密は送らない。
+この手順では、後の演習で使う備品管理アプリの圧縮ファイル、そこに含まれるDB設定用のSQL、DB接続パスワードを画面に出さず入力する補助プログラムを、WebサーバーとDBサーバーの/var/lib/jdu-web/lesson-resources-r1に置く。共通登録コード方式で環境を作った場合は、構築スクリプトが配置を済ませているのでP0.4へ進む。署名付き配布方式の場合は、教材ZIPをCloudShellのActions → Upload fileでアップロードし、ホームディレクトリでunzip web-lab-pm-r1.zipを実行する。下のコマンドのYOUR-INSTALLATION-DIRECTORYは、初回構築で使ったactivate.shがあるディレクトリのパスに置き換える。
 
 入力するコマンド（番号はこの手順内の順番）
 
 ```bash
 # 1. 作業場所を $HOME/web-lab-pm-r1/resources へ移す。
 cd "$HOME/web-lab-pm-r1/resources"
-# 2. 署名版と本人の5台を照合し、公開教材をWeb/DBへ配置する。
+# 2. 備品管理アプリなど、後の演習に使うファイルをWebサーバーとDBサーバーに配置する。
 python3 -B stage_resources.py --installation 'YOUR-INSTALLATION-DIRECTORY'
 ```
 
 **コマンド・設定値の意味:**
 
-公開教材資源はアプリやSQLの材料であり、完成済みのサービスではない。stage_resources.pyをCloudShellで実行して初めてWeb/DBへ配置される。Windowsへzipを保存しただけではEC2内のファイルは増えない。
+stage_resources.pyは、初回に構築した環境を確認し、後の演習で使うファイルを指定の2台にコピーする。アプリの起動やDBの作成は、後の演習で行う。
 
 **期待する結果と読み方:**
 
-PUBLIC_LESSON_RESOURCES_READY=web と =db。各台の/var/lib/jdu-web/lesson-resources-r1に公開ファイルがある。既存の異なるファイルは上書きしない。
+配置が済むと、PUBLIC_LESSON_RESOURCES_READY=webとPUBLIC_LESSON_RESOURCES_READY=dbが表示される。
 
 **うまくいかないとき:**
 
-初期化未完・版違い・期限切れならここで止めて教師へ状況を知らせる。検証用fixtureや完成アプリの自動適用ツールで代用しない。
+導入先が見つからない場合は、activate.shがあるディレクトリのパスを確認する。配布版のエラーが出たら教師に表示内容を伝える。
 
 #### P0.4 ブラウザで準備を確認する
 
-**実行場所:**
+**実行環境:**
 
 自分のPCのブラウザ：Web Portal
 
@@ -210,7 +187,7 @@ PUBLIC_LESSON_RESOURCES_READY=web と =db。各台の/var/lib/jdu-web/lesson-res
 
 #### P0.5 RDPで踏み台のデスクトップを開く
 
-**実行場所:**
+**実行環境:**
 
 学生のWindows PC（共有アカウント）
 
@@ -274,17 +251,17 @@ JDU WEB-02 practice: HTTP response verified.
 
 Webは提供済みだが、練習用ファイルはまだ配信していない。
 
-**このPで変えること:**
+**このPractice1で作業すること**
 
 Nginxが公開80番でpractice.txtを返し、要求をlogへ残す。
 
 この練習では、URLの/practice.txtをWeb内の/var/www/html/practice.txtへ対応させる。最初の127.0.0.1での成功はWeb内部の確認で、踏み台やWindowsから届く証明にはならない。同じ本文を三つの位置から読み、どの経路まで正常かを切り分ける。[Nginxの一次資料](https://nginx.org/en/docs/beginners_guide.html)も参照。
 
-### 操作例：一つずつ実行する
+### 解答例（操作手順）
 
 #### P1.1 内部APTからNginxを導入する
 
-**実行場所:**
+**実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
@@ -317,7 +294,7 @@ sourceに内部IPとSigned-Byがあり、署名エラーなしで終了する。
 
 #### P1.2 正しい本文を作り、所有者と権限を揃える
 
-**実行場所:**
+**実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
@@ -361,7 +338,7 @@ root:root 644。本文は JDU WEB-02 practice: HTTP response verified. の1行�
 
 #### P1.3 Web rootとportを確認して起動する
 
-**実行場所:**
+**実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
@@ -400,7 +377,7 @@ syntax is ok/test is successful、active、0.0.0.0:80等の待受。127.0.0.1:80
 
 #### P1.4 Web自身から応答を見る
 
-**実行場所:**
+**実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
@@ -429,7 +406,7 @@ Welcome to nginxが出るなら/ではなく/practice.txtを要求したか確�
 
 #### P1.5 踏み台と外部から同じファイルを見る
 
-**実行場所:**
+**実行環境:**
 
 踏み台のSSM端末：ssm-user
 
@@ -458,7 +435,7 @@ curl --noproxy '*' -i http://10.20.1.20/practice.txt
 
 #### P1.6 要求とlogを結び付けて提出する
 
-**実行場所:**
+**実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
@@ -532,17 +509,17 @@ guide.lab.test→10.20.1.20、practice-db.lab.test→10.20.2.20を設定する�
 
 P1のHTTPがIP指定で使える。DNSはこれから設定する。
 
-**このPで変えること:**
+**このPractice2で作業すること**
 
 BINDの練習名を、踏み台とWebの通常resolverから使える。
 
 DNSの仕事は名前への回答で、HTTP本文の配信ではない。lab.testのzoneはBINDが管理し、A recordはIPv4を返す。digで問い合わせ先を明示した確認と、getentやbrowserがOSの設定を使う確認を分ける。名前解決後のHTTP接続は別の通信である。[BINDの一次資料](https://bind9.readthedocs.io/en/v9.18.39/chapter3.html)。
 
-### 操作例：一つずつ実行する
+### 解答例（操作手順）
 
 #### P2.1 BINDを導入し元設定を残す
 
-**実行場所:**
+**実行環境:**
 
 DNSサーバーのSSM端末：ssm-user
 
@@ -577,7 +554,7 @@ namedはBINDのservice名、named-checkconf等は設定を検査する道具で�
 
 #### P2.2 問い合わせ元とforwarderを設定する
 
-**実行場所:**
+**実行環境:**
 
 DNSサーバーのSSM端末：ssm-user
 
@@ -618,7 +595,7 @@ allow-queryは問い合わせを受ける相手、allow-recursionは外部名の
 
 #### P2.3 zoneを登録しA recordを書く
 
-**実行場所:**
+**実行環境:**
 
 DNSサーバーのSSM端末：ssm-user
 
@@ -661,7 +638,7 @@ zone宣言とzone本文は別ファイルへ保存する。guideはzone名を補
 
 #### P2.4 構文を検査してDNS自身から確認する
 
-**実行場所:**
+**実行環境:**
 
 DNSサーバーのSSM端末：ssm-user
 
@@ -700,7 +677,7 @@ zone loaded/OK、status NOERROR、flagsにaa、A=10.20.1.20。aaはこのzoneの
 
 #### P2.5 踏み台とWebからDNSを指定して問い合わせる
 
-**実行場所:**
+**実行環境:**
 
 踏み台のSSM端末：ssm-user
 
@@ -737,7 +714,7 @@ DNSへ届かない場合は送信元とport53のUDP/TCPを区別して調べる�
 
 #### P2.6 通常resolverをBINDだけへ向ける
 
-**実行場所:**
+**実行環境:**
 
 踏み台のSSM端末：ssm-user
 
@@ -773,7 +750,7 @@ IP/gatewayを手書きせずDHCPを保持。別DNSをfallbackに加えない。/
 
 #### P2.7 適用後に通常名前解決とHTTPを見る
 
-**実行場所:**
+**実行環境:**
 
 踏み台のSSM端末：ssm-user
 
@@ -814,7 +791,7 @@ dig成功/getent失敗ならclient resolverを調べる。FirefoxはDoH無効の
 
 #### P2.8 browserでIPと名前を比較して提出する
 
-**実行場所:**
+**実行環境:**
 
 RDP内のFirefox（踏み台）
 
@@ -877,17 +854,17 @@ jdu_catalog_practice、catalog_practice_setup、catalog_practice_appを作る。
 
 DBに教材資源があり、WebからDBへ許可された経路を使う。
 
-**このPで変えること:**
+**このPractice4で作業すること**
 
 練習DBとsetup/runtime roleを作り、Webから認証付きSQLを実行する。
 
 接続には、通信の到達、DBの待受、HBAの許可、password、SQL権限がそれぞれ必要。ssm-userはOS userで、catalog_practice_appはDB roleである。HBAは上から最初に一致した行を使う。SQLへ接続できることと、tableを作成できることも別の権限である。[HBA](https://www.postgresql.org/docs/16/auth-pg-hba-conf.html)・[SQL権限](https://www.postgresql.org/docs/16/sql-grant.html)。
 
-### 操作例：一つずつ実行する
+### 解答例（操作手順）
 
 #### P4.1 DBを導入し教材SQLを展開する
 
-**実行場所:**
+**実行環境:**
 
 DBサーバーのSSM端末：ssm-user
 
@@ -924,7 +901,7 @@ packageの導入と、DB内の教材データ作成は別の段階。pg_lscluste
 
 #### P4.2 DBの待受とSCRAMを設定する
 
-**実行場所:**
+**実行環境:**
 
 DBサーバーのSSM端末：ssm-user
 
@@ -954,7 +931,7 @@ listen_addressesはDBが接続を受ける自分側のIPで、接続元の許可
 
 #### P4.3 接続元・DB・roleをHBAで限定する
 
-**実行場所:**
+**実行環境:**
 
 DBサーバーのSSM端末：ssm-user
 
@@ -989,7 +966,7 @@ trustへ変えて認証を省略しない。DB5432は基盤SGでもWebだけか�
 
 #### P4.4 起動して設定の実効値を読む
 
-**実行場所:**
+**実行環境:**
 
 DBサーバーのSSM端末：ssm-user
 
@@ -1027,7 +1004,7 @@ postgresql.serviceのactive(exited)だけでcluster稼働を判断しない。jo
 
 #### P4.5 練習DBと2種類のroleを作る
 
-**実行場所:**
+**実行環境:**
 
 DBサーバーのSSM端末：ssm-user
 
@@ -1064,7 +1041,7 @@ already existsなら成功済みの可能性。DROPで消さず\duと\lで対応
 
 #### P4.6 2つのDBパスワードを非表示で設定する
 
-**実行場所:**
+**実行環境:**
 
 DBサーバーのpsql：OS postgres
 
@@ -1106,7 +1083,7 @@ keyboard配列に注意。値を確認するために会話やエディタへ書
 
 #### P4.7 Webからpassword付きSELECTを行う
 
-**実行場所:**
+**実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
@@ -1143,7 +1120,7 @@ jdu_catalog_practice / catalog_practice_app / 1。portが開くだけ、pg_isrea
 
 #### P4.8 checkerが使う既存passwordをWeb内だけに保存する
 
-**実行場所:**
+**実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
@@ -1223,17 +1200,17 @@ practice profileで備品カタログを構築する。M2の正式DNSとP4が現
 
 M2のDNSとP4の練習DBが現在動作する。
 
-**このPで変えること:**
+**このPractice5で作業すること**
 
 提供アプリをWeb内で動かし、公開一覧と踏み台限定の管理画面をDBへ接続する。
 
 NginxがHTTPの入口、GunicornがPythonアプリを実行するプロセス、PostgreSQLがデータの保存先となる。静的ファイルのP1と異なり、一覧の内容はDBから取得する。venvはアプリ用Python環境、systemd unitは起動方法の定義である。ここでは提供コードを読みながら配置し、プログラムを書き直す必要はない。
 
-### 操作例：一つずつ実行する
+### 解答例（操作手順）
 
 #### P5.1 必要なDNSと公開資源を確認する
 
-**実行場所:**
+**実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
@@ -1272,7 +1249,7 @@ practice-dbでなくdb.lab.testも必要。P5はM2へ依存する。Mの備品�
 
 #### P5.2 コードを配置し専用venvを作る
 
-**実行場所:**
+**実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
@@ -1312,7 +1289,7 @@ sudo /opt/jdu-catalog/venv/bin/python -m pip check
 
 #### P5.3 service userとstatic保存先を作る
 
-**実行場所:**
+**実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
@@ -1350,7 +1327,7 @@ catalogはsudo groupになくshellは/usr/sbin/nologin。labuserやssm-userと�
 
 #### P5.4 通常接続の設定を作って有効にする
 
-**実行場所:**
+**実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
@@ -1388,7 +1365,7 @@ RDPや管理者用passwordを入力しない。再開時はすでに成功した
 
 #### P5.5 一時setup接続でtableと管理者を作る
 
-**実行場所:**
+**実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
@@ -1429,7 +1406,7 @@ seedや管理者のalready existsは既存データ保護。初期化/resetせ�
 
 #### P5.6 通常roleへ必要なSQL権限を付ける
 
-**実行場所:**
+**実行環境:**
 
 DBサーバーのSSM端末：ssm-user
 
@@ -1463,7 +1440,7 @@ guard errorはmigration/ownerを確認する合図。制約を削除して通さ
 
 #### P5.7 staticとsystemd unitを配置する
 
-**実行場所:**
+**実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
@@ -1506,7 +1483,7 @@ activeで、アプリ8000は127.0.0.1だけ。0.0.0.0:8000へ直接公開しな�
 
 #### P5.8 Nginxの公開入口と管理入口を分ける
 
-**実行場所:**
+**実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
@@ -1549,7 +1526,7 @@ duplicate default serverなら旧siteを確認。reload前に-t失敗を直す�
 
 #### P5.9 管理画面で練習用2件を登録する
 
-**実行場所:**
+**実行環境:**
 
 RDP内のFirefox（踏み台）
 
@@ -1578,7 +1555,7 @@ school PCでadmin.lab.testを開かず、RDP内Firefoxを使う。CSRFエラー�
 
 #### P5.10 DBの実データを読み、画面と照合する
 
-**実行場所:**
+**実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
@@ -1612,7 +1589,7 @@ permission deniedならSQL03のprofile/対象DBを確認。superuserで通常接
 
 #### P5.11 自動機能確認を起動して提出する
 
-**実行場所:**
+**実行環境:**
 
 自分のPCのブラウザ：Web Portal
 
@@ -1673,17 +1650,17 @@ P5のpractice profileを使う。setup roleを無効化し、一時設定を片�
 
 P5の練習アプリが動作し、初期構築用のsetup接続が残る。
 
-**このPで変えること:**
+**このPractice6で作業すること**
 
 setupを終了し、通常アプリの成功と不要なアクセスの拒否を同時に確かめる。
 
 作成時だけ必要なsetup権限と、運用中に必要なruntime権限を分ける。setup roleをNOLOGINにし、一時setup設定を削除しても、通常アプリはruntime接続で動くことが目標。公開80番・管理8080番・loopback8000番も別の境界である。どこか一つを閉じれば全体が安全と決めず、正規操作の成功と対象を限定した拒否を組にする。
 
-### 操作例：一つずつ実行する
+### 解答例（操作手順）
 
 #### P6.1 DB roleとtable権限を読む
 
-**実行場所:**
+**実行環境:**
 
 DBサーバーのpsql：OS postgres
 
@@ -1723,7 +1700,7 @@ runtimeはowner/superuserではない。Django sessionには必要なDELETEが�
 
 #### P6.2 setup roleをNOLOGINにする
 
-**実行場所:**
+**実行環境:**
 
 DBサーバーのSSM端末：ssm-user
 
@@ -1757,7 +1734,7 @@ ALTER ROLE成功。通常catalog_practice_appの動作を止めない。
 
 #### P6.3 一時設定を片付け、通常接続の設定を選び直す
 
-**実行場所:**
+**実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
@@ -1802,7 +1779,7 @@ setup.envとpractice.setup.envは一時構築用で、app.envとruntime用DB設�
 
 #### P6.4 公開80から管理画面と秘密が見えないか確認する
 
-**実行場所:**
+**実行環境:**
 
 踏み台のSSM端末：ssm-user
 
@@ -1837,7 +1814,7 @@ curl --noproxy '*' -i http://web.lab.test/static/app.env
 
 #### P6.5 正規成功と拒否を同じ確認回で送る
 
-**実行場所:**
+**実行環境:**
 
 自分のPCのブラウザ：Web Portal
 

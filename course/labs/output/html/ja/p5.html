@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">今回の見取り図</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">操作例：一つずつ実行する</a> · <a href="#section-6">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P5 教員アプリをWeb・DBへ接続する</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">今回の見取り図</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">解答例（操作手順）</a> · <a href="#section-6">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P5 教員アプリをWeb・DBへ接続する</h1>
 <p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
 <p><a href="../ja/p5.html">日本語</a> · <a href="../ru/p5.html">Русский</a> · <a href="../uz/p5.html">O‘zbekcha</a></p>
 <p>対応する自力課題は<a href="m5.html">M5</a>。</p>
@@ -61,12 +61,12 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-4">仕組みを理解する</h2>
 <p><strong>始める前の状態:</strong></p>
 <p>M2のDNSとP4の練習DBが現在動作する。</p>
-<p><strong>このPで変えること:</strong></p>
+<p><strong>このPractice5で作業すること</strong></p>
 <p>提供アプリをWeb内で動かし、公開一覧と踏み台限定の管理画面をDBへ接続する。</p>
 <p>NginxがHTTPの入口、GunicornがPythonアプリを実行するプロセス、PostgreSQLがデータの保存先となる。静的ファイルのP1と異なり、一覧の内容はDBから取得する。venvはアプリ用Python環境、systemd unitは起動方法の定義である。ここでは提供コードを読みながら配置し、プログラムを書き直す必要はない。</p>
-<h2 id="section-5">操作例：一つずつ実行する</h2>
+<h2 id="section-5">解答例（操作手順）</h2>
 <h3>P5.1 必要なDNSと公開資源を確認する</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>Webで通常resolverのdb.lab.testが10.20.2.20、admin.lab.testが10.20.1.20になることを確認。offline_assetsは元署名にある7 wheelとlockを内部repoから取得しhashを検査する。pipの外部取得やDB/appの設定は行わない。</p>
@@ -91,7 +91,7 @@ ls /var/lib/jdu-web/lesson-resources-r1/wheels
 <p><strong>うまくいかないとき:</strong></p>
 <p>practice-dbでなくdb.lab.testも必要。P5はM2へ依存する。Mの備品課題を終えていなくてもM2のDNSは使う。</p>
 <h3>P5.2 コードを配置し専用venvを作る</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>appとvenvはrootが管理し、実行user catalogには書換えさせない。/opt/jdu-catalog/appまたはvenvが既にある場合は新規配置を中止し、現在の版を確認する。cpは検査済み公開資源だけを配置する。venvはシステムPythonと依存を分離する。</p>
@@ -117,7 +117,7 @@ sudo /opt/jdu-catalog/venv/bin/python -m pip check
 <p><strong>うまくいかないとき:</strong></p>
 <p>依存不足は教員の収録資源へ戻す。pip installで最新版へ更新しない。appコードは変更しない。</p>
 <h3>P5.3 service userとstatic保存先を作る</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>catalogは人のlogin用ではなくGunicornの専用user。nologin、sudoなしで作る。staticの配置先だけはcollectstaticが書けるようcatalog所有にする。root管理のコード/venvとは役割が違う。既にcatalogがある場合はidとshellを確認し、useraddを繰り返さない。</p>
@@ -141,7 +141,7 @@ getent passwd catalog
 <p><strong>うまくいかないとき:</strong></p>
 <p>権限errorをchmod -R 777やcatalogのsudo追加で解決しない。対象directoryとownerを照合する。</p>
 <h3>P5.4 通常接続の設定を作って有効にする</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>PUBLIC_WEB_IPV4はEC2に表示された現在のWeb公開IPv4へ置き換える。runtime helperへP4で設定したcatalog_practice_appの既存passwordを2回入力する。Django secretは本人Labで生成される。通常接続の設定を作ったら、activateでpracticeをアプリが使う設定として選ぶ。アプリを起動する前に行い、設定チェックが成功したらP5.5で一時構築用の設定を作る。</p>
@@ -165,7 +165,7 @@ sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
 <p><strong>うまくいかないとき:</strong></p>
 <p>RDPや管理者用passwordを入力しない。再開時はすでに成功した操作を繰り返さず、最初に未完了の操作から進む。activateが失敗した場合は、アプリの稼働状態と一時構築用の設定が残っていないかを確認してから次へ進む。</p>
 <h3>P5.5 一時setup接続でtableと管理者を作る</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>create-setupにはP4のcatalog_practice_setup passwordを入力する。migrateは配布済みDB構造を作り、seedは空DBへ架空サンプル3件を一度だけ入れる。create_lab_adminはpractice_adminを非表示password入力で作る。通常アプリはこのsetup roleでは動かさない。</p>
@@ -192,7 +192,7 @@ sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
 <p><strong>うまくいかないとき:</strong></p>
 <p>seedや管理者のalready existsは既存データ保護。初期化/resetせず次の状態確認へ進む。</p>
 <h3>P5.6 通常roleへ必要なSQL権限を付ける</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>WebをexitしてCloudShellへ戻りDBへSSM接続する。SQL03を先に読み、11table/所有者を検査してからtable・列・sequence単位に必要権限を付ける。appに所有権やALL PRIVILEGESを与える方法ではない。</p>
@@ -212,7 +212,7 @@ python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u pos
 <p><strong>うまくいかないとき:</strong></p>
 <p>guard errorはmigration/ownerを確認する合図。制約を削除して通さない。</p>
 <h3>P5.7 staticとsystemd unitを配置する</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>Webへ戻る。collectstaticは配布CSS等をNginxが読むdirectoryへ集める。unitを/etc/systemd/systemへ置きdaemon-reloadでsystemdに認識させる。unit内容を読み、User=catalog、EnvironmentFile、127.0.0.1:8000を見つける。</p>
@@ -241,7 +241,7 @@ sudo ss -lntp
 <p><strong>うまくいかないとき:</strong></p>
 <p>起動errorはjournalctl -u jdu-catalogを見る。秘密設定本文をlogへ貼らず、configuration.py checkで形式を確認する。</p>
 <h3>P5.8 Nginxの公開入口と管理入口を分ける</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>配布confをcatで読み、80→公開一覧、private8080→/admin/だけ、転送先8000を確認。初期default siteのsymlinkは別名で保存して無効化する。既にjdu-catalogが有効なら再移動せず現在設定を確認する。P1/M1の静的URLを保持したconfを使う。</p>
@@ -270,7 +270,7 @@ curl --noproxy '*' -i http://127.0.0.1/practice.txt
 <p><strong>うまくいかないとき:</strong></p>
 <p>duplicate default serverなら旧siteを確認。reload前に-t失敗を直す。管理portをpublic IPでlistenさせない。</p>
 <h3>P5.9 管理画面で練習用2件を登録する</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>RDP内のFirefox（踏み台）</p>
 <p><strong>目的と操作:</strong></p>
 <p>踏み台のFirefoxでhttp://admin.lab.test:8080/admin/を開き、practice_adminと自分のアプリ管理者passwordでログイン。備品のAddから下の2行を登録する。code/name/quantity/locationを正確に入力し、公開行だけIs publicを有効にする。保存後にhttp://web.lab.test/で公開行だけ出るか見る。</p>
@@ -285,7 +285,7 @@ P5-PRIVATE-001 | Practice mouse | 2 | Training shelf B | is_public=false
 <p><strong>うまくいかないとき:</strong></p>
 <p>school PCでadmin.lab.testを開かず、RDP内Firefoxを使う。CSRFエラーはhost/port/正しいproxy設定を調べる。</p>
 <h3>P5.10 DBの実データを読み、画面と照合する</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
 <p>Webのpsqlで練習app roleを使って読取りSQLを実行する。管理画面の保存が本当にPostgreSQLへ届いたかを確認する。SELECTは読み取りで、UPDATE/DELETEはこの確認では使わない。</p>
@@ -305,7 +305,7 @@ psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &qu
 <p><strong>うまくいかないとき:</strong></p>
 <p>permission deniedならSQL03のprofile/対象DBを確認。superuserで通常接続を代用しない。</p>
 <h3>P5.11 自動機能確認を起動して提出する</h3>
-<p><strong>実行場所:</strong></p>
+<p><strong>実行環境:</strong></p>
 <p>自分のPCのブラウザ：Web Portal</p>
 <p><strong>目的と操作:</strong></p>
 <p>WebをexitしてPCのWeb PortalでP5を選び、「機能・権限を含めて確認する」を選ぶ。既存practice_adminのパスワードを「アプリ管理者の既存パスワード」へ非表示入力し「このパスワードで確認する」を押す。RDP用とは別。自動処理はHTTPでloginし、自分専用CK-P-備品1件の登録・数量編集、DB/公開画面の照合、logoutを行う。指定2件は変えず、確認用1件は残る。本人実演・教師立会いは不要。</p>

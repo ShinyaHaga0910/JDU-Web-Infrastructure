@@ -5,7 +5,6 @@ LABELS = {
  'routes': T('完成像と通信経路', 'Система и пути соединений', 'Tayyor tizim va ulanish yo‘llari'),
  'read': T('操作例の読み方', 'Как читать шаги', 'Qadamlarni qanday o‘qish kerak'),
  'before': T('始める前の状態', 'Состояние перед началом', 'Boshlashdan oldingi holat'),
- 'after': T('このPで変えること', 'Что изменится в этом P', 'Ushbu P da nima o‘zgaradi'),
  'mechanism': T('仕組みを理解する', 'Как это работает', 'Bu qanday ishlaydi'),
  'meaning': T('コマンド・設定値の意味', 'Смысл команд и настроек', 'Buyruq va sozlamalar ma’nosi'),
  'reflect': T('理解の確認（採点外）', 'Проверка понимания (без баллов)', 'Tushunishni tekshirish (ballsiz)'),
@@ -57,11 +56,10 @@ MISSION_PLAN = [
 
 MODULE_NOTES = {
  'P0': dict(
-  before=T('教師が初期配布と個別登録を終えた、本人の5台を使う。', 'Используются ваши пять узлов после начальной установки и регистрации.', 'Boshlang‘ich tarqatma va ro‘yxat tugagan shaxsiy besh server ishlatiladi.'),
-  after=T('対象account・役割・実行場所を見分け、公開教材資源を準備する。', 'Вы различаете аккаунт, роль и место работы; учебные файлы подготовлены.', 'Account, role va ish joyini farqlaysiz; ochiq o‘quv resurslari tayyorlanadi.'),
-  mechanism=T('AWSコンソールはAWS資源を管理する画面、CloudShellはAWS CLIを使う自分の端末、SSMは選んだEC2のOS内へ入る接続である。SSMへ入っても5台が一つのOSになるわけではない。Webの/var/wwwとDBの/var/wwwは別の保存先である。サーバーの役割と、そこで操作するOS userを別々に確認する。',
-   'AWS Console управляет ресурсами, CloudShell - ваш терминал с AWS CLI, SSM открывает сеанс внутри выбранного EC2. Пять серверов остаются разными ОС: путь /var/www на Web не является тем же каталогом на DB. Проверяйте отдельно роль сервера и пользователя ОС.',
-   'AWS Console resurslarni boshqaradi; CloudShell - AWS CLI bor shaxsiy terminal; SSM tanlangan EC2 OS ichida session ochadi. Besh server alohida OS bo‘lib qoladi: Web dagi /var/www DB dagi katalog bilan bir joy emas. Server role va OS user ni alohida tekshiring.'),
+  after=T(
+   '自分のAWSアカウント、各サーバーのロール、コマンドを実行する環境を確認する。署名付き配布方式を使う場合は、備品管理アプリやDBの構築に使うファイルをWebサーバーとDBサーバーに配置する。',
+   'Проверьте свой AWS-аккаунт, роль каждого сервера и среду выполнения команд. При использовании подписанного комплекта разместите файлы приложения и настройки БД на Web- и DB-серверах.',
+   'O‘z AWS hisobingizni, har bir server rolini va buyruq bajariladigan muhitni tekshiring. Imzolangan tarqatma ishlatilsa, ilova va DB sozlash fayllarini Web hamda DB serverlariga joylang.'),
   question=T('WebへSSM接続したままDBの手順を入力すると、どのサーバーが変わるか？', 'Какой узел изменится, если выполнить шаги DB в открытом SSM-сеансе Web?', 'Web SSM session ichida DB qadamlarini kiritsangiz, qaysi server o‘zgaradi?'),
   answer=T('現在接続中のWebが変わる。exitでCloudShellへ戻り、DBのinstance IDへ接続し直す。', 'Изменится Web. Вернитесь через exit в CloudShell и подключитесь к instance ID DB.', 'Joriy Web o‘zgaradi. Exit bilan CloudShell ga qaytib DB instance ID ga qayta ulaning.')),
  'P1': dict(
@@ -119,18 +117,10 @@ STEP_NOTES = {}
 def note(id, ja, ru, uz):
     STEP_NOTES[id] = T(ja, ru, uz)
 
-note('P0.1',
- 'instance IDはEC2を識別する値、roleは授業内の担当、公開IPは外から接続する宛先である。公開IPが変わっても同じinstance IDなら同じEC2として追跡できる。作業表には5役割とIDの組を記録する。',
- 'Instance ID идентифицирует EC2, роль обозначает его задачу, public IP служит внешним адресом. Изменение public IP не означает замену instance ID. В рабочей таблице свяжите каждую из пяти ролей с её ID.',
- 'Instance ID EC2 ni aniqlaydi; role vazifani, public IP tashqi manzilni bildiradi. Public IP o‘zgarishi instance ID almashganini anglatmaydi. Ish jadvalida besh role ni o‘z ID si bilan bog‘lang.')
-note('P0.2',
- '最初のstart-sessionだけをCloudShellで実行し、接続完了を待ってから残りを1行ずつ入力する。id -unはuser、hostnameはOSのhost名、roleは教材上の役割を読む。exitは現在の接続を1段だけ戻す。',
- 'Сначала выполните только start-session в CloudShell и дождитесь подключения. Затем вводите остальные строки по одной. Id -un показывает пользователя, hostname - имя ОС, role - учебную роль. Exit закрывает один уровень сеанса.',
- 'Avval faqat start-session ni CloudShell da bajarib ulanishni kuting. So‘ng qolgan qatorlarni bittadan kiriting. Id -un user ni, hostname OS host nomini, role o‘quv vazifasini ko‘rsatadi. Exit session ning bir pog‘onasidan qaytaradi.')
 note('P0.3',
- '公開教材資源はアプリやSQLの材料であり、完成済みのサービスではない。stage_resources.pyをCloudShellで実行して初めてWeb/DBへ配置される。Windowsへzipを保存しただけではEC2内のファイルは増えない。',
- 'Открытые учебные файлы - материалы приложения и SQL, а не готовая служба. Stage_resources.py запускается в CloudShell и переносит их на Web/DB. Сохранение zip в Windows само по себе не создаёт файлов в EC2.',
- 'Ochiq resurslar app va SQL materiallaridir, tayyor service emas. Stage_resources.py CloudShell da ishga tushib ularni Web/DB ga joylaydi. Zip ni Windows ga saqlashning o‘zi EC2 da fayl yaratmaydi.')
+ 'stage_resources.pyは、初回に構築した環境を確認し、後の演習で使うファイルを指定の2台にコピーする。アプリの起動やDBの作成は、後の演習で行う。',
+ 'Stage_resources.py проверяет развёрнутую среду и копирует файлы для следующих упражнений на два нужных сервера. Приложение запускают и БД создают в следующих упражнениях.',
+ 'Stage_resources.py yaratilgan muhitni tekshiradi va keyingi mashqlar uchun fayllarni kerakli ikki serverga nusxalaydi. Ilovani ishga tushirish va DB yaratish keyingi mashqlarda bajariladi.')
 note('P0.4',
  'ブラウザの確認結果は自動保存される。結果のPASS/FAIL/UNKNOWNと、処理・保存の状態を分けて読む。',
  'Браузер сохраняет результат автоматически. Различайте PASS/FAIL/UNKNOWN и статус обработки/сохранения.',

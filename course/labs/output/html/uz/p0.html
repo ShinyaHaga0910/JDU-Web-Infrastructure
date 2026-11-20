@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Nimani o‘rganamiz</a> · <a href="#section-2">Topshiriq</a> · <a href="#section-3">Serverlarga ulanish va kurs fayllari</a> · <a href="#section-4">Bu qanday ishlaydi</a> · <a href="#section-5">Yechim namunasi: bittadan bajaring</a> · <a href="#section-6">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P0 Shaxsiy muhit va buyruqlarni bajarish joyi</h1>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Nimani o‘rganamiz</a> · <a href="#section-2">Topshiriq</a> · <a href="#section-3">Serverlarga ulanish va kurs fayllari</a> · <a href="#section-4">Yechim namunasi (bajarish tartibi)</a> · <a href="#section-5">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P0 Shaxsiy muhit va buyruqlarni bajarish joyi</h1>
 <p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a></p>
 <p><a href="../ja/p0.html">日本語</a> · <a href="../ru/p0.html">Русский</a> · <a href="../uz/p0.html">O‘zbekcha</a></p>
 <p>Mos topshiriq: <a href="m0.html">M0</a>.</p>
@@ -24,56 +24,44 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-3">Serverlarga ulanish va kurs fayllari</h2>
 <p><img src="../../../assets/uz/p0-ssm.png" alt="O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda, imzolangan tarqatmada esa P0.3 da joylanadi." width="1040" height="680" loading="lazy"></p>
 <p>O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda, imzolangan tarqatmada esa P0.3 da joylanadi.</p>
-<h2 id="section-4">Bu qanday ishlaydi</h2>
-<p><strong>Boshlashdan oldingi holat:</strong></p>
-<p>Boshlang‘ich tarqatma va ro‘yxat tugagan shaxsiy besh server ishlatiladi.</p>
-<p><strong>Ushbu P da nima o‘zgaradi:</strong></p>
-<p>Account, role va ish joyini farqlaysiz; ochiq o‘quv resurslari tayyorlanadi.</p>
-<p>AWS Console resurslarni boshqaradi; CloudShell - AWS CLI bor shaxsiy terminal; SSM tanlangan EC2 OS ichida session ochadi. Besh server alohida OS bo‘lib qoladi: Web dagi /var/www DB dagi katalog bilan bir joy emas. Server role va OS user ni alohida tekshiring.</p>
-<h2 id="section-5">Yechim namunasi: bittadan bajaring</h2>
-<h3>P0.1 Beshta serverning instance ID qiymatini yozib olish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Practice0 da bajariladigan ishlar</strong></p>
+<p>O‘z AWS hisobingizni, har bir server rolini va buyruq bajariladigan muhitni tekshiring. Imzolangan tarqatma ishlatilsa, ilova va DB sozlash fayllarini Web hamda DB serverlariga joylang.</p>
+<h2 id="section-4">Yechim namunasi (bajarish tartibi)</h2>
+<h3>P0.1 Beshta serverning instance ID sini tekshirish</h3>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Talabaning shaxsiy AWS Console oynasi</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>EC2 → Instances ro‘yxatini oching. Name ustunida o‘z Lab serveringizni toping va shu qatordagi Instance ID ustunidan i- bilan boshlangan to‘liq ID ni oling. LabId va DeploymentId teglarini solishtiring. bastion/web/dns/db/repo uchun instance ID ni ish jadvaliga yozing. Faqat nomiga qarab tanlamang. Public IPv4 bastion va web da mavjud. SSM uchun public IP emas, instance ID kerak.</p>
-<p><img src="../../../assets/shared/ec2-instance-id-c3.png" alt="C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni nusxalang." width="1239" height="404" loading="lazy"></p>
-<p>C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni nusxalang.</p>
-<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Instance ID EC2 ni aniqlaydi; role vazifani, public IP tashqi manzilni bildiradi. Public IP o‘zgarishi instance ID almashganini anglatmaydi. Ish jadvalida besh role ni o‘z ID si bilan bog‘lang.</p>
-<p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>Beshala server running, SSM Online; private IP umumiy jadvalga mos. To‘xtatib ishga tushirganda public IPv4 o‘zgarishi mumkin.</p>
-<p><strong>Ishlamasa:</strong></p>
-<p>Boshqa Lab, hisob yoki noma’lum serverni o‘zgartirmang. To‘xtagan server uchun ishga tushirish yo‘riqnomasidan foydalaning. Reset yoki Terminate ni bosmang.</p>
-<h3>P0.2 SSM orqali kirish va qaytish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p>AWS Console tepasidagi Search maydoniga EC2 deb yozib, boshqaruv oynasini oching. EC2 → Instances ro‘yxatida Name ustunidan o‘z muhitingizdagi beshta serverni tekshiring. Shu qatordagi Instance ID ustunidan i- bilan boshlangan to‘liq ID ni ko‘ring.</p>
+<p><img src="../../../assets/shared/ec2-instance-id-c3.png" alt="C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni tekshiring." width="1239" height="404" loading="lazy"></p>
+<p>C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni tekshiring.</p>
+<h3>P0.2 CloudShell dan SSM orqali Web serverga ulanish</h3>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Talabaning shaxsiy AWS hisobidagi CloudShell</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>EC2 dagi Web instance ID ni kiriting. Ulanishdan keyin CloudShell emas, Ubuntu terminalida ishlaysiz. id -un SSM foydalanuvchisini, bootstrap.json dagi role server vazifasini ko‘rsatadi. Bitta exit CloudShell ga qaytaradi.</p>
+<p>Birinchi buyruqdagi i-YOUR-WEB-INSTANCE-ID o‘rniga P0.1 da tekshirilgan Web serverning Instance ID sini yozing va buyruqni CloudShell da bajaring. Ulangach, serverni dastlabki sozlashda joylangan /etc/jdu-web/bootstrap.json faylidan rolni o‘qing. role maydonida server vazifasi saqlanadi. web qiymati Web serverga ulanganligingizni tasdiqlaydi.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. CloudShell dan tanlangan EC2 ga SSM ochish; ulanishni kutish.
 aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
 # 2. Shu terminaldagi OS user nomini ko‘rsatish.
 id -un
-# 3. Ulangan server hostname ini ko‘rsatish.
-hostname
-# 4. Bootstrap dan faqat role ni o‘qib, ulangan server vazifasini tekshirish.
+# 3. Bootstrap dan faqat role ni o‘qib, ulangan server vazifasini tekshirish.
 python3 -c 'import json;print(json.load(open(&quot;/etc/jdu-web/bootstrap.json&quot;))[&quot;role&quot;])'
-# 5. Joriy ish katalogini ko‘rsatish.
-pwd
-# 6. Joriy server session ini yopib CloudShell ga qaytish.
+# 4. Joriy server session ini yopib CloudShell ga qaytish.
 exit
 </code></pre>
-<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Avval faqat start-session ni CloudShell da bajarib ulanishni kuting. So‘ng qolgan qatorlarni bittadan kiriting. Id -un user ni, hostname OS host nomini, role o‘quv vazifasini ko‘rsatadi. Exit session ning bir pog‘onasidan qaytaradi.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>ssm-user va web ko‘rinadi. Har safar serverni almashtirganda tekshiring. SSH orqali kirganda Ubuntu foydalanuvchisi ubuntu bo‘lishi mumkin.</p>
-<p><strong>Ishlamasa:</strong></p>
-<p>TargetNotConnected bo‘lsa, running, SSM Online va us-east-1 ni tekshiring. SG portlarini to‘liq ochmang, Windows ga kalit yuklamang.</p>
-<h3>P0.3 Faqat ochiq o‘quv fayllarini tayyorlash</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p>id -un natijasi ssm-user, fayldan o‘qilgan rol qiymati esa web bo‘ladi.</p>
+<p>Ulangandan keyingi terminal ko‘rinishi</p>
+<pre><code class="language-text">$ id -un
+ssm-user
+$ python3 -c …
+web
+</code></pre>
+<h3>P0.3 Ilova va SQL o‘quv fayllarini joylash</h3>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Talabaning shaxsiy AWS hisobidagi CloudShell</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>Bu qadam imzolangan tarqatma uchun. Umumiy kod orqali sozlanganda fayllar oldindan joylanadi. Ushbu qo‘llanma zip faylini CloudShell → Actions → Upload file orqali yuklang; unzip web-lab-pm-r1.zip bilan oching. resources katalogiga o‘ting va YOUR-INSTALLATION-DIRECTORY o‘rniga imzolangan tarqatmaning activate.sh fayli joylashgan katalog yo‘lini kiriting. Yordamchi shaxsiy imzolangan tarqatma va asl besh serverni tekshirib, Web/DB ga ochiq app, SQL va yashirin kiritish vositasini joylaydi. Service yoki DB qurmaydi, maxfiy qiymat yubormaydi.</p>
+<p>Bu qadamda Web va DB serverlaridagi /var/lib/jdu-web/lesson-resources-r1 katalogiga jihozlarni hisobga olish ilovasi arxivi, DB sozlash uchun undagi SQL hamda DB parolini yashirin kiritish vositasi joylanadi. Umumiy kod orqali o‘rnatishda skript fayllarni oldindan joylaydi: P0.4 ga o‘ting. Imzolangan tarqatma uchun ZIP faylini CloudShell → Actions → Upload file orqali yuklang va uy katalogida unzip web-lab-pm-r1.zip ni bajaring. YOUR-INSTALLATION-DIRECTORY o‘rniga dastlabki o‘rnatishdagi activate.sh joylashgan katalog yo‘lini yozing.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. Ish katalogini $HOME/web-lab-pm-r1/resources ga o‘zgartirish.
 cd &quot;$HOME/web-lab-pm-r1/resources&quot;
@@ -81,13 +69,13 @@ cd &quot;$HOME/web-lab-pm-r1/resources&quot;
 python3 -B stage_resources.py --installation 'YOUR-INSTALLATION-DIRECTORY'
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Ochiq resurslar app va SQL materiallaridir, tayyor service emas. Stage_resources.py CloudShell da ishga tushib ularni Web/DB ga joylaydi. Zip ni Windows ga saqlashning o‘zi EC2 da fayl yaratmaydi.</p>
+<p>Stage_resources.py yaratilgan muhitni tekshiradi va keyingi mashqlar uchun fayllarni kerakli ikki serverga nusxalaydi. Ilovani ishga tushirish va DB yaratish keyingi mashqlarda bajariladi.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>PUBLIC_LESSON_RESOURCES_READY=web va =db chiqadi. Ochiq fayllar /var/lib/jdu-web/lesson-resources-r1 da. Mavjud boshqa mazmunli fayl ustiga yozilmaydi.</p>
+<p>Joylash yakunlanganda PUBLIC_LESSON_RESOURCES_READY=web va PUBLIC_LESSON_RESOURCES_READY=db chiqadi.</p>
 <p><strong>Ishlamasa:</strong></p>
-<p>Boshlang‘ich o‘rnatish tugamagan, versiya boshqa yoki muddat o‘tgan bo‘lsa, to‘xtab o‘qituvchiga ayting. Tayyor yechim quradigan test fixture bilan almashtirmang.</p>
+<p>O‘rnatish katalogi topilmasa, activate.sh joylashgan katalog yo‘lini tekshiring. Tarqatma xatosi chiqsa, xabarni o‘qituvchiga ayting.</p>
 <h3>P0.4 Tayyorlikni brauzerda tekshirish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Shaxsiy PC brauzeri: Web Portal</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>O‘qituvchi bergan havola orqali topshiriqlar sahifasini oching. Maktab Google orqali kirib, o‘z AWS hisobingizni bog‘lang. P0 ni tanlab tekshiruvni boshlang; ishlov davom etsa natijani yangilang.</p>
@@ -98,7 +86,7 @@ python3 -B stage_resources.py --installation 'YOUR-INSTALLATION-DIRECTORY'
 <p><strong>Ishlamasa:</strong></p>
 <p>Yordam uchun check ID, vaqt va server rolini yozing. Token, parol va shaxsiy URL ni ulashmang.</p>
 <h3>P0.5 RDP orqali bastion ish stolini ochish</h3>
-<p><strong>Bajarish joyi:</strong></p>
+<p><strong>Bajarish muhiti:</strong></p>
 <p>Talabaning Windows PC si (umumiy hisob)</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>EC2 dagi hozirgi bastion public IPv4 ni ishlating. Windows+R ni bosib mstsc /prompt kiriting va Enter bosing. Computer ga IP, user ga labuser, parolga boshlang‘ich o‘rnatishda belgilangan shaxsiy RDP parolini kiriting; Windows paroli emas. Credentials ni saqlashni tanlamang. Ko‘k xrdp login chiqsa Session=Xorg va labuser ni tekshiring.</p>
@@ -112,7 +100,7 @@ mstsc /prompt
 <p>Ubuntu bastion ichida Xfce va Firefox ochiladi; bu Windows browser idan boshqa. labuser da sudo yo‘q: qurishni CloudShell → SSM/ssm-user orqali bajaring.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Login failed bo‘lsa user nomi va klaviatura tartibini tekshiring. Parolni chat ga yubormang. Ulanmasa joriy IP va ruxsatli CIDR ni o‘qituvchi bilan tekshiring; 3389 ni hammaga ochmang. RDP ni yopishdan oldin ishni saqlang.</p>
-<h2 id="section-6">Tushunishni tekshirish (ballsiz)</h2>
+<h2 id="section-5">Tushunishni tekshirish (ballsiz)</h2>
 <p>Web SSM session ichida DB qadamlarini kiritsangiz, qaysi server o‘zgaradi?</p>
 <p><strong>Izoh:</strong></p>
 <p>Joriy Web o‘zgaradi. Exit bilan CloudShell ga qaytib DB instance ID ga qayta ulaning.</p>

@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения: выполняйте по одному шагу</a> · <a href="#section-6">Пример чтения вывода (не вводить)</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P2 Внутренний DNS и системное разрешение имён</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения (порядок действий)</a> · <a href="#section-6">Пример чтения вывода (не вводить)</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P2 Внутренний DNS и системное разрешение имён</h1>
 <p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
 <p><a href="../ja/p2.html">日本語</a> · <a href="../ru/p2.html">Русский</a> · <a href="../uz/p2.html">O‘zbekcha</a></p>
 <p>Связанное задание: <a href="m2.html">M2</a>.</p>
@@ -45,12 +45,12 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-4">Как это работает</h2>
 <p><strong>Состояние перед началом:</strong></p>
 <p>HTTP из P1 работает по IP; DNS ещё предстоит настроить.</p>
-<p><strong>Что изменится в этом P:</strong></p>
+<p><strong>Что сделать в Practice2</strong></p>
 <p>Учебные имена BIND доступны обычному резолверу бастиона и Web.</p>
 <p>DNS отвечает на запрос имени, а не выдаёт Web-страницу. BIND ведёт зону lab.test; A-запись возвращает IPv4. Различайте dig с явным сервером и getent/браузер с настройками ОС. После DNS выполняется отдельное HTTP-соединение. <a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">Документация BIND</a>.</p>
-<h2 id="section-5">Пример решения: выполняйте по одному шагу</h2>
+<h2 id="section-5">Пример решения (порядок действий)</h2>
 <h3>P2.1 Установить BIND и сохранить исходные настройки</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DNS-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Подключитесь к DNS, проверьте role=dns. cp -a сохраняет атрибуты исходного файла, -n не заменяет прежнюю копию. Это страховка при редактировании, не задание по backup/restore БД.</p>
@@ -71,7 +71,7 @@ sudo cp -an /etc/bind/named.conf.local /etc/bind/named.conf.local.before-p2
 <p><strong>Если не получилось:</strong></p>
 <p>Не копируйте целиком named.conf из чужого Lab. Если своя zone уже есть, сначала изучите её.</p>
 <h3>P2.2 Настроить клиентов и forwarder</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DNS-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Откройте sudo nano /etc/bind/named.conf.options, введите и сохраните текст ниже. acl задаёт разрешённых клиентов; listen-on - адреса DNS; forward only передаёт внешние имена AWS DNS. И query, и recursion ограничены тремя источниками. dnssec-validation no соответствует изолированной учебной схеме forwarding.</p>
@@ -98,7 +98,7 @@ options {
 <p><strong>Если не получилось:</strong></p>
 <p>Точки с запятой и фигурные скобки обязательны. Не расширяйте ACL до any или 0.0.0.0/0.</p>
 <h3>P2.3 Объявить zone и создать A-записи</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DNS-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>В sudo nano /etc/bind/named.conf.local запишите первый блок zone. Создайте каталог командой sudo install -d -m 0755 /etc/bind/zones, затем откройте sudo nano /etc/bind/zones/db.lab.test и запишите остальной текст. SOA - служебные данные, NS - авторитетный DNS, A - имя/IPv4. Точка в конце обозначает полное имя; увеличивайте serial при изменениях.</p>
@@ -127,7 +127,7 @@ practice-db IN A 10.20.2.20
 <p><strong>Если не получилось:</strong></p>
 <p>Если M2 уже настроен, добавьте две учебные записи, не заменяя zone. Не объявляйте zone дважды.</p>
 <h3>P2.4 Проверить синтаксис и локальный DNS-ответ</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DNS-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Переключение клиентов на неисправный DNS нарушит разрешение имён. Сначала добейтесь успешных named-checkconf и named-checkzone, затем проверьте UDP и TCP.</p>
@@ -152,7 +152,7 @@ dig @127.0.0.1 guide.lab.test A +tcp
 <p><strong>Если не получилось:</strong></p>
 <p>При ошибке изучите sudo journalctl -u named -n 30 --no-pager, исправьте конфигурацию и проверьте снова.</p>
 <h3>P2.5 Запросить DNS с бастиона и Web</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал бастиона: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Выполните команды и на бастионе, и на Web. @10.20.2.10 задаёт DNS только для данного запроса. Это ещё не доказывает, что браузер и приложение используют его по умолчанию.</p>
@@ -175,7 +175,7 @@ dig @10.20.2.10 lab.test AXFR
 <p><strong>Если не получилось:</strong></p>
 <p>При недоступности различайте источник, UDP и TCP 53. Не добавляйте остальные private-узлы в ACL клиентов.</p>
 <h3>P2.6 Переключить системный resolver только на BIND</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал бастиона: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>На бастионе и Web по одному узлу выполните ip -br link, затем networkctl status ИМЯ для определения интерфейса и Network File. Найдите его YAML через ls /etc/netplan и сохраните копию sudo cp -an. Через sudo nano добавьте к тому же интерфейсу dhcp4-overrides/use-dns:false и nameservers. Ниже схема: имя интерфейса и имеющиеся match/set-name/renderer сохраняйте из своего файла.</p>
@@ -197,7 +197,7 @@ dig @10.20.2.10 lab.test AXFR
 <p><strong>Если не получилось:</strong></p>
 <p>Несколько YAML одного интерфейса объединяются. Если resolvectl dns показывает ещё AWS DNS, проверьте все соответствующие YAML и действующую конфигурацию.</p>
 <h3>P2.7 После применения проверить обычный resolver и HTTP</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал бастиона: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
 <p>На бастионе и Web сначала создайте конфигурацию, затем примените и проверьте. Оставьте второе окно SSH/RDP; при разрыве вернитесь по SSM и сравните с сохранённой копией. Применяйте apply только после проверки файла и успешного generate.</p>
@@ -224,7 +224,7 @@ curl --noproxy '*' -i http://guide.lab.test/practice.txt
 <p><strong>Если не получилось:</strong></p>
 <p>Если dig успешен, а getent нет, проверяйте resolver клиента. Сохраняйте настройку Firefox с отключённым DoH.</p>
 <h3>P2.8 Сравнить IP и имя в браузере, затем отправить</h3>
-<p><strong>Место выполнения:</strong></p>
+<p><strong>Среда выполнения:</strong></p>
 <p>Firefox на рабочем столе бастиона через RDP</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Откройте Firefox на бастионе через RDP. Сравните http://10.20.1.20/practice.txt и http://guide.lab.test/practice.txt. lab.test разрешается внутренним DNS бастиона, а не DNS школьного PC. Затем выберите P2 в Web Portal на PC и проверьте результат.</p>

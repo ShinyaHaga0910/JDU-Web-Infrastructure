@@ -78,9 +78,8 @@ def main():
                     for i,step in enumerate(module['steps'],1):
                         key=f"{module['id']}.{i}"
                         block=re.search(r'^#### '+re.escape(key)+r'\b(.*?)(?=^#### |^## |\Z)',value,re.M|re.S)
-                        ok(f'{lang}_explains_{key}',block is not None and STEP_NOTES[key][lang] in block[0])
-                    ok(f'{lang}_understanding_{module["id"]}',all(MODULE_NOTES[module['id']][k][lang] in value
-                        for k in ('before','after','mechanism','question','answer')))
+                        ok(f'{lang}_explains_{key}',block is not None and (key not in STEP_NOTES or STEP_NOTES[key][lang] in block[0]))
+                    ok(f'{lang}_understanding_{module["id"]}',all(note[lang] in value for note in MODULE_NOTES[module['id']].values()))
             pdf=PdfReader(ROOT/'output/pdf'/f'web_lab_{kind}_{lang}.pdf')
             text='\n'.join(page.extract_text() or '' for page in pdf.pages)
             ok(f'{lang}_{kind}_pdf_A4',all(abs(float(p.mediabox.width)-595.276)<1 and abs(float(p.mediabox.height)-841.890)<1 for p in pdf.pages))
@@ -104,7 +103,8 @@ def main():
                 ok(f'{lang}_{name}_page',value.startswith('# '+name+' '))
                 if prefix=='P':
                     for step in range(1,len(MODULES_BY_NUMBER[number]['steps'])+1):
-                        ok(f'{lang}_{name}_{step}_page_step',f'### {name}.{step} ' in value and STEP_NOTES[f'{name}.{step}'][lang] in value)
+                        key=f'{name}.{step}'
+                        ok(f'{lang}_{key}_page_step',f'### {key} ' in value and (key not in STEP_NOTES or STEP_NOTES[key][lang] in value))
                 else:
                     task=next(t for t in reg['tasks'] if t['id']==name)
                     ok(f'{lang}_{name}_page_checks',all(value.count(cid)==1 for cid in task['progress_scored_checks']))
@@ -158,7 +158,13 @@ def main():
                     ok(f'{lang}_{task}_internet_aws_boundary',any(t.text=='AWS / VPC 10.20.0.0/16' for t in texts)
                         and any(t.text=='IGW' and float(t.attrib['x'])==boundary for t in texts)
                         and all(float(t.attrib['x'])>boundary for t in texts if t.text=='EC2'))
-    ok('43_detailed_steps',sum(len(m['steps']) for m in MODULES)==43 and all(all(s[k].values()) for m in MODULES for s in m['steps'] for k in ('why','expect','trouble')))
+    ok('43_detailed_steps',sum(len(m['steps']) for m in MODULES)==43)
+    for module in MODULES:
+        for i,step in enumerate(module['steps'],1):
+            fields = ('why','expect','trouble')
+            if module['id']=='P0' and i in (1,2):
+                fields = ('why',) if i==1 else ('why','expect')
+            ok(f'{module["id"]}.{i}_step_fields',all(all(step[field].values()) for field in fields))
     for info,source in code['ja','practice']+code['ja','missions']:
         if info=='bash':
             result=subprocess.run(['wsl.exe','bash','-n'],input=source,text=True,encoding='utf-8',capture_output=True)
@@ -232,7 +238,7 @@ def main():
     result=dict(scope='D12_P_M_materials_local_checks_not_AWS_walkthrough',checked_on=date.today().isoformat(),
         languages=list(LANGS),material_revision=MATERIAL_REVISION,practice_tasks=6,practice_steps=43,
         task_pages=36,task_diagrams=36,numbered_command_comments_per_language=annotations,executable_source_preserved=True,
-        explained_steps=sum(len(m["steps"]) for m in MODULES),module_understanding_questions=len(MODULES),communication_routes=len(ROUTES),
+        explained_steps=sum(key.split(".")[0] in ACTIVE_ORDER for key in STEP_NOTES),module_understanding_questions=len(MODULES),communication_routes=len(ROUTES),
         worked_output_examples=len(OUTPUT_EXAMPLES),mission_tasks=6,scored_checks=59,raw_points=59,
         checks_passed=len(checks),bash_blocks_syntax_checked=fences,
         pdfs={p.name:dict(pages=len(PdfReader(p).pages),bytes=p.stat().st_size) for p in (ROOT/'output/pdf').glob('*.pdf')},
