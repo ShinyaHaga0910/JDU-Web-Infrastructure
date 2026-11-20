@@ -194,7 +194,7 @@ bash core/jdu-web-lab ssm --state "$STATE" --role web
 
 ここは初期配備の外にある重要な工程です。
 
-- P0の`stage_resources.py --installation ...`で、Web/DBへ公開アプリ・SQL/helperを配置します。サービス・DB・パスワード・完成解答は作りません。r3用release-mapへ更新し、実学生での配置・同一再実行を確認済みです。
+- 旧署名付き配布では、教材ZIPをCloudShellの **Actions → Upload file** でアップロードし、ホームディレクトリで `unzip web-lab-pm-r1.zip` を実行します。`$HOME/web-lab-pm-r1/resources` に移動し、`python3 -B stage_resources.py --installation 'YOUR-INSTALLATION-DIRECTORY'` を実行します。`YOUR-INSTALLATION-DIRECTORY` には初回に使った `activate.sh` があるディレクトリのパスを指定し、、Web/DBへ公開アプリ・SQL/helperを配置します。サービス・DB・パスワード・完成解答は作りません。r3用release-mapへ更新し、実学生での配置・同一再実行を確認済みです。
 - 学生AWSには、その学生Labの状態取得・課題確認用Lambda/結果保存先と、指定教師からの呼出し許可が必要です。既存の検証学生では配備済みです。`prepare_checker.py`等の配備補助には検証アカウント固定値があるため、任意学生向けの共通1コマンドとして配りません。
 - 教師は学校Googleメール・学生AWS・登録済みLabを対応付けます。既存の`approve_portal_student.py`は教師CloudShellで実行し、学校メールは非表示入力です。秘密鍵保管先ARNやtable名は教師の実配備から取得し、秘密値そのものを渡しません。
 - 学生は学校Googleでポータルへログインし「本人AWSとの連携」から指定学生AWSのCloudFormation確認画面を開きます。これは本人確認用3資源で、5台作成とは別です。完了後に元のポータルへ戻ります。

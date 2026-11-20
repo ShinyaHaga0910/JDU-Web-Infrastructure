@@ -122,7 +122,7 @@ def connection_diagram(s):
     if practice:
         s.path([(398,318),(457,318),(457,258),(655,258)],'P0.2  SSM (Session Manager)',(497,223))
         s.path([(398,350),(610,350),(610,290),(655,290)],color=blue)
-        copy_label=T('P0.3  教材ファイルをコピー','P0.3  Копирование файлов','P0.3  Fayllarni nusxalash')[lang]
+        copy_label=T('初期構築で教材を配置','Файлы при развёртывании','Sozlashda fayllarni joylash')[lang]
         s.path([(610,350),(610,437),(655,437)],copy_label,(489,373),color=blue)
         s.text(498,399,T('SSMで2台に配置','Через SSM на два узла','SSM orqali ikki serverga')[lang],16,color=blue,center=True)
     else:
@@ -159,14 +159,14 @@ def diagram_text(task,lang):
     if n==0:
         if task=='P0':
             caption=T(
-                '緑の矢印はP0.2の端末接続。青の矢印はP0.3の教材ファイルのコピー。備品管理アプリとSQLが入ったアーカイブをWebサーバーとDBサーバーへ置く。配布サーバーはUbuntuなどのパッケージの配信を担当する。',
-                'Зелёная стрелка показывает подключение к терминалу в P0.2. Синие стрелки показывают копирование файлов в P0.3. Архив с приложением учёта оборудования и SQL помещают на Web- и DB-серверы. Repo-сервер раздаёт пакеты для Ubuntu.',
-                'Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar P0.3 da fayllarni nusxalashni ko‘rsatadi. Jihozlarni hisobga olish ilovasi va SQL arxivi Web hamda DB serverlariga joylanadi. Repo server Ubuntu paketlarini tarqatadi.')[lang]
+                '緑の矢印はP0.2の端末接続。青の矢印は初期構築時の教材ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。',
+                'Зелёная стрелка показывает подключение к терминалу в P0.2. Синие стрелки показывают размещение файлов при создании среды. Repo-сервер раздаёт пакеты для Ubuntu.',
+                'Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlabki sozlashda fayllarni joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi.')[lang]
             return caption,caption
         caption=T(
-            '利用者PCのブラウザでAWSのCloudShellを開き、SSMで対象のEC2へ接続する。教材ファイルの配置先はWebサーバーとDBサーバー。共通登録コード方式では初期構築時に配置され、署名付き配布方式ではP0.3で配置する。',
-            'Откройте CloudShell в AWS из браузера на своём PC и подключитесь к нужному EC2 через SSM. Файлы курса размещаются на Web и DB. При установке по общему коду они размещаются во время создания среды, при подписанном комплекте — в P0.3.',
-            'O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda, imzolangan tarqatmada esa P0.3 da joylanadi.')[lang]
+            '利用者PCのブラウザでAWSのCloudShellを開き、SSMで対象のEC2へ接続する。教材ファイルの配置先はWebサーバーとDBサーバー。共通登録コード方式では初期構築時に配置される。',
+            'Откройте CloudShell в AWS из браузера на своём PC и подключитесь к нужному EC2 через SSM. Файлы курса размещаются на Web и DB. При установке по общему коду они размещаются во время создания среды.',
+            'O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda joylanadi.')[lang]
         return caption,caption
     before,action,result=STAGES[n]
     caption=T('図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。','Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки.','Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir.')[lang]
@@ -216,8 +216,13 @@ def lesson_files_diagram(s):
 
 
 def lesson_files_markdown(lang):
+    title=T('初期構築で配置される教材ファイル','Учебные файлы, размещённые при создании среды','Dastlabki sozlashda joylanadigan o‘quv fayllari')[lang]
+    intro=T(
+        '共通登録コードで初期構築を完了すると、備品管理アプリとDB設定用のSQLが入った `catalog-app.tar.gz` は、WebサーバーとDBサーバーの `/var/lib/jdu-web/lesson-resources-r1` に配置済みです。WebサーバーからインターネットへのHTTPS接続はセキュリティのために制限されているので、構築スクリプトが下の経路で教材を届けます。',
+        'После создания среды по общему коду архив `catalog-app.tar.gz` с приложением и SQL для настройки БД уже находится в `/var/lib/jdu-web/lesson-resources-r1` на Web- и DB-серверах. В целях безопасности исходящие HTTPS-подключения с Web-сервера к интернету ограничены, поэтому скрипт доставляет файлы по показанному маршруту.',
+        'Muhit umumiy kod bilan yaratilgach, ilova va DB uchun SQL fayllari bor `catalog-app.tar.gz` arxivi Web va DB serverlaridagi `/var/lib/jdu-web/lesson-resources-r1` katalogiga joylangan bo‘ladi. Xavfsizlik uchun Web serverdan internetga chiquvchi HTTPS ulanishlari cheklangan, shuning uchun skript fayllarni quyidagi yo‘l orqali yetkazadi.')[lang]
     caption=RESOURCE_CAPTION[lang]
-    return [f'![{caption}](../../assets/{lang}/{RESOURCE_DIAGRAM}.png)', '', caption, '']
+    return ['### '+title, '', intro, '', f'![{caption}](../../assets/{lang}/{RESOURCE_DIAGRAM}.png)', '', caption, '']
 
 
 def write_diagrams(root):

@@ -151,8 +151,8 @@ def main():
                 ok(f'{lang}_{task}_diagram_in_page',len(images)==expected_images and len(images[0].content)>60)
                 if task=='P0':
                     resource_link=f'../../assets/{lang}/{RESOURCE_DIAGRAM}.png'
-                    ok(f'{lang}_P0_resource_diagram_in_step',re.search(
-                        rf'^### P0\.3 .*?{re.escape(resource_link)}.*?^### P0\.4 ',md,re.M|re.S) is not None)
+                    ok(f'{lang}_P0_resource_diagram_before_steps',md.index(resource_link)<md.index('### P0.1 '))
+                    ok(f'{lang}_P0_resources_already_staged','stage_resources.py' not in md and 'YOUR-INSTALLATION-DIRECTORY' not in md)
                 image_path=ROOT/'assets'/lang/(diagram_stem(task)+'.png')
                 with Image.open(image_path) as img:ok(f'{lang}_{task}_diagram_size',img.size==(2080,1360))
                 svg=ET.parse(image_path.with_suffix('.svg')).getroot()
@@ -163,7 +163,7 @@ def main():
                     ok(f'{lang}_{task}_internet_aws_boundary',any(t.text=='AWS / VPC 10.20.0.0/16' for t in texts)
                         and any(t.text=='IGW' and float(t.attrib['x'])==boundary for t in texts)
                         and all(float(t.attrib['x'])>boundary for t in texts if t.text=='EC2'))
-    ok('43_detailed_steps',sum(len(m['steps']) for m in MODULES)==43)
+    ok('42_detailed_steps',sum(len(m['steps']) for m in MODULES)==42)
     for module in MODULES:
         for i,step in enumerate(module['steps'],1):
             fields = ('why','expect','trouble')
@@ -241,7 +241,7 @@ def main():
         ok('zip_exact_inventory',set(z.namelist())=={'web-lab-pm-r1/'+p for p in hashes}|{'web-lab-pm-r1/TEACHING-FILE-HASHES.json'})
         ok('zip_all_hashes',all(hashlib.sha256(z.read('web-lab-pm-r1/'+p)).hexdigest()==v for p,v in hashes.items()))
     result=dict(scope='D12_P_M_materials_local_checks_not_AWS_walkthrough',checked_on=date.today().isoformat(),
-        languages=list(LANGS),material_revision=MATERIAL_REVISION,practice_tasks=6,practice_steps=43,
+        languages=list(LANGS),material_revision=MATERIAL_REVISION,practice_tasks=6,practice_steps=42,
         task_pages=36,task_diagrams=36,numbered_command_comments_per_language=annotations,executable_source_preserved=True,
         explained_steps=sum(key.split(".")[0] in ACTIVE_ORDER for key in STEP_NOTES),module_understanding_questions=len(MODULES),communication_routes=len(ROUTES),
         worked_output_examples=len(OUTPUT_EXAMPLES),mission_tasks=6,scored_checks=59,raw_points=59,

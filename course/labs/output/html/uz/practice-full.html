@@ -131,10 +131,14 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h3>Topshiriq</h3>
 <p>Tayyor muhitingizda beshta serverning instance ID si va rolini tekshiring. Qaysi serverga va qaysi foydalanuvchi sifatida ulanganingizni aniqlang.</p>
 <h3>Serverlarga ulanish va kurs fayllari</h3>
-<p><img src="../../../assets/uz/p0-ssm.png" alt="Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar P0.3 da fayllarni nusxalashni ko‘rsatadi. Jihozlarni hisobga olish ilovasi va SQL arxivi Web hamda DB serverlariga joylanadi. Repo server Ubuntu paketlarini tarqatadi." width="1040" height="680" loading="lazy"></p>
-<p>Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar P0.3 da fayllarni nusxalashni ko‘rsatadi. Jihozlarni hisobga olish ilovasi va SQL arxivi Web hamda DB serverlariga joylanadi. Repo server Ubuntu paketlarini tarqatadi.</p>
+<p><img src="../../../assets/uz/p0-ssm.png" alt="Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlabki sozlashda fayllarni joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi." width="1040" height="680" loading="lazy"></p>
+<p>Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlabki sozlashda fayllarni joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi.</p>
 <p><strong>Practice0 da bajariladigan ishlar</strong></p>
-<p>O‘z AWS hisobingizni, har bir server rolini va buyruq bajariladigan muhitni tekshiring. Imzolangan tarqatma ishlatilsa, ilova va DB sozlash fayllarini Web hamda DB serverlariga joylang.</p>
+<p>O‘z AWS hisobingizni, har bir server rolini va buyruq bajariladigan muhitni tekshiring.</p>
+<h3>Dastlabki sozlashda joylanadigan o‘quv fayllari</h3>
+<p>Muhit umumiy kod bilan yaratilgach, ilova va DB uchun SQL fayllari bor <code>catalog-app.tar.gz</code> arxivi Web va DB serverlaridagi <code>/var/lib/jdu-web/lesson-resources-r1</code> katalogiga joylangan bo‘ladi. Xavfsizlik uchun Web serverdan internetga chiquvchi HTTPS ulanishlari cheklangan, shuning uchun skript fayllarni quyidagi yo‘l orqali yetkazadi.</p>
+<p><img src="../../../assets/uz/p0-lesson-files.png" alt="Muhit umumiy kod orqali yaratilganda, CloudShell o‘quv fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi." width="1040" height="680" loading="lazy"></p>
+<p>Muhit umumiy kod orqali yaratilganda, CloudShell o‘quv fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi.</p>
 <h3>Yechim namunasi (bajarish tartibi)</h3>
 <h4>P0.1 Beshta serverning instance ID sini tekshirish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
@@ -166,29 +170,7 @@ ssm-user
 $ python3 -c …
 web
 </code></pre>
-<h4>P0.3 Ilova va SQL o‘quv fayllarini joylash</h4>
-<p><strong>Bajarish muhiti:</strong></p>
-<p>Talabaning shaxsiy AWS hisobidagi CloudShell</p>
-<p><strong>Maqsad va amallar:</strong></p>
-<p>Keyingi mashqlar uchun jihozlarni hisobga olish ilovasi kodi va DB sozlash uchun SQL fayllari bor <code>catalog-app.tar.gz</code> arxivini Web va DB serverlaridagi <code>/var/lib/jdu-web/lesson-resources-r1</code> katalogiga joylang. DB ulanish parolini ekranda ko‘rsatmasdan kiritish dasturini ham shu katalogga joylang.</p>
-<p>Xavfsizlik uchun Web serverdan internetdagi saytlarga chiquvchi HTTPS ulanishlari cheklangan. Muhit umumiy ro‘yxatdan o‘tish kodi orqali yaratilganda, CloudShell o‘quv fayllarini GitHub dan HTTPS orqali yuklab oladi va AWS Systems Manager (SSM) orqali Web va DB serverlariga nusxalaydi.</p>
-<p>Muhit umumiy ro‘yxatdan o‘tish kodi orqali yaratilgan bo‘lsa, P0.4 bosqichiga o‘ting.</p>
-<p>Fayllarni qo‘lda joylash uchun o‘quv ZIP faylini CloudShell → Actions → Upload file orqali yuklang va uy katalogida <code>unzip web-lab-pm-r1.zip</code> buyrug‘ini bajaring. Quyidagi buyruqda <code>YOUR-INSTALLATION-DIRECTORY</code> o‘rniga dastlabki o‘rnatishdagi <code>activate.sh</code> fayli joylashgan katalog yo‘lini yozing.</p>
-<p><img src="../../../assets/uz/p0-lesson-files.png" alt="Muhit umumiy kod orqali yaratilganda, CloudShell o‘quv fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi." width="1040" height="680" loading="lazy"></p>
-<p>Muhit umumiy kod orqali yaratilganda, CloudShell o‘quv fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi.</p>
-<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
-<pre><code class="language-bash"># 1. Ish katalogini $HOME/web-lab-pm-r1/resources ga o‘zgartirish.
-cd &quot;$HOME/web-lab-pm-r1/resources&quot;
-# 2. Imzolangan tarqatma va o‘z besh serverini solishtirib, materialni Web/DB ga joylash.
-python3 -B stage_resources.py --installation 'YOUR-INSTALLATION-DIRECTORY'
-</code></pre>
-<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Stage_resources.py yaratilgan muhitni tekshiradi va keyingi mashqlar uchun fayllarni kerakli ikki serverga nusxalaydi. Ilovani ishga tushirish va DB yaratish keyingi mashqlarda bajariladi.</p>
-<p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>Joylash yakunlanganda PUBLIC_LESSON_RESOURCES_READY=web va PUBLIC_LESSON_RESOURCES_READY=db chiqadi.</p>
-<p><strong>Ishlamasa:</strong></p>
-<p>O‘rnatish katalogi topilmasa, activate.sh joylashgan katalog yo‘lini tekshiring. Tarqatma xatosi chiqsa, xabarni o‘qituvchiga ayting.</p>
-<h4>P0.4 Tayyorlikni brauzerda tekshirish</h4>
+<h4>P0.3 Tayyorlikni brauzerda tekshirish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Shaxsiy PC brauzeri: Web Portal</p>
 <p><strong>Maqsad va amallar:</strong></p>
@@ -199,13 +181,13 @@ python3 -B stage_resources.py --installation 'YOUR-INSTALLATION-DIRECTORY'
 <p>O‘z Lab, topshiriq ID va vaqtni tekshiring. Check natijalari va saqlash holatini o‘qing; tugashi va saqlanishini kuting. UNKNOWN o‘lchab bo‘lmagan holat, muvaffaqiyat emas.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Yordam uchun check ID, vaqt va server rolini yozing. Token, parol va shaxsiy URL ni ulashmang.</p>
-<h4>P0.5 RDP orqali bastion ish stolini ochish</h4>
+<h4>P0.4 RDP orqali bastion ish stolini ochish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Talabaning Windows PC si (umumiy hisob)</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>EC2 dagi hozirgi bastion public IPv4 ni ishlating. Windows+R ni bosib mstsc /prompt kiriting va Enter bosing. Computer ga IP, user ga labuser, parolga boshlang‘ich o‘rnatishda belgilangan shaxsiy RDP parolini kiriting; Windows paroli emas. Credentials ni saqlashni tanlamang. Ko‘k xrdp login chiqsa Session=Xorg va labuser ni tekshiring.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
-<pre><code class="language-powershell"># 1. Windows RDP ni hisob ma’lumotlarini so‘rash bilan ochish.
+<pre><code class="language-bash"># 1. Windows RDP ni hisob ma’lumotlarini so‘rash bilan ochish.
 mstsc /prompt
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>

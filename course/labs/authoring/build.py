@@ -190,6 +190,8 @@ def make_markdown(reg, lang, kind):
             out += ['**' + L['work'][lang].format(number=m['id'][1:]) + '**', '', notes['after'][lang], '']
             if 'mechanism' in notes:
                 out += [notes['mechanism'][lang], '']
+            if m['id']=='P0':
+                out += lesson_files_markdown(lang)
             out += ['### ' + L['solution'][lang], '']
             for i, s in enumerate(m['steps'], 1):
                 step_id=f"{m['id']}.{i}"
@@ -197,8 +199,6 @@ def make_markdown(reg, lang, kind):
                 if step_id=='P0.1':
                     out += instance_id_guide(lang)
                     continue
-                if step_id=='P0.3':
-                    out += lesson_files_markdown(lang)
                 if s['code']:
                     for fence,source in annotated_blocks(m['id'],i,s['code'],lang):
                         label=T('設定・入力データ（端末で実行するコマンドではない）','Конфигурация или данные: не выполнять как команды','Sozlama yoki ma’lumot: terminal buyrug‘i emas')[lang] if fence=='text' else T('入力するコマンド（番号はこの手順内の順番）','Команды: нумерация внутри этого шага','Buyruqlar: raqamlar shu qadam ichidagi tartib')[lang]

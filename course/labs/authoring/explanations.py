@@ -57,9 +57,9 @@ MISSION_PLAN = [
 MODULE_NOTES = {
  'P0': dict(
   after=T(
-   '自分のAWSアカウント、各サーバーのロール、コマンドを実行する環境を確認する。署名付き配布方式を使う場合は、備品管理アプリやDBの構築に使うファイルをWebサーバーとDBサーバーに配置する。',
-   'Проверьте свой AWS-аккаунт, роль каждого сервера и среду выполнения команд. При использовании подписанного комплекта разместите файлы приложения и настройки БД на Web- и DB-серверах.',
-   'O‘z AWS hisobingizni, har bir server rolini va buyruq bajariladigan muhitni tekshiring. Imzolangan tarqatma ishlatilsa, ilova va DB sozlash fayllarini Web hamda DB serverlariga joylang.'),
+   '自分のAWSアカウント、各サーバーのロール、コマンドを実行する環境を確認する。',
+   'Проверьте свой AWS-аккаунт, роль каждого сервера и среду выполнения команд.',
+   'O‘z AWS hisobingizni, har bir server rolini va buyruq bajariladigan muhitni tekshiring.'),
   question=T('WebへSSM接続したままDBの手順を入力すると、どのサーバーが変わるか？', 'Какой узел изменится, если выполнить шаги DB в открытом SSM-сеансе Web?', 'Web SSM session ichida DB qadamlarini kiritsangiz, qaysi server o‘zgaradi?'),
   answer=T('現在接続中のWebが変わる。exitでCloudShellへ戻り、DBのinstance IDへ接続し直す。', 'Изменится Web. Вернитесь через exit в CloudShell и подключитесь к instance ID DB.', 'Joriy Web o‘zgaradi. Exit bilan CloudShell ga qaytib DB instance ID ga qayta ulaning.')),
  'P1': dict(
@@ -118,14 +118,10 @@ def note(id, ja, ru, uz):
     STEP_NOTES[id] = T(ja, ru, uz)
 
 note('P0.3',
- 'stage_resources.pyは、初回に構築した環境を確認し、後の演習で使うファイルを指定の2台にコピーする。アプリの起動やDBの作成は、後の演習で行う。',
- 'Stage_resources.py проверяет развёрнутую среду и копирует файлы для следующих упражнений на два нужных сервера. Приложение запускают и БД создают в следующих упражнениях.',
- 'Stage_resources.py yaratilgan muhitni tekshiradi va keyingi mashqlar uchun fayllarni kerakli ikki serverga nusxalaydi. Ilovani ishga tushirish va DB yaratish keyingi mashqlarda bajariladi.')
-note('P0.4',
  'ブラウザの確認結果は自動保存される。結果のPASS/FAIL/UNKNOWNと、処理・保存の状態を分けて読む。',
  'Браузер сохраняет результат автоматически. Различайте PASS/FAIL/UNKNOWN и статус обработки/сохранения.',
  'Brauzer natijani avtomatik saqlaydi. PASS/FAIL/UNKNOWN va ishlov/saqlash holatini farqlang.')
-note('P0.5',
+note('P0.4',
  'RDPは踏み台の画面と入力を運ぶ。踏み台内Firefoxからの通信の送信元はWindowsではなく踏み台になる。日本語/英語などのキー配列はpasswordの記号入力にも影響するため、表示言語と配列を区別する。',
  'RDP передаёт экран и ввод бастиона. Запрос Firefox внутри RDP идёт от бастиона, а не Windows. Раскладка клавиатуры влияет на символы пароля; язык интерфейса и раскладка - разные настройки.',
  'RDP bastion ekrani va kiritishni uzatadi. RDP ichidagi Firefox request i Windows emas, bastiondan chiqadi. Klaviatura tartibi paroldagi belgilarga ta’sir qiladi; interfeys tili va keyboard layout alohida sozlamadir.')
