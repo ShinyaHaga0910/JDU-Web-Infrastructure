@@ -1,0 +1,50 @@
+name: Classroom build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'development/**'
+      - 'course/curriculum.json'
+      - '.github/workflows/classroom-build.yml'
+  pull_request:
+    paths:
+      - 'development/**'
+      - 'course/curriculum.json'
+      - '.github/workflows/classroom-build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+      - name: Test scoring and compatibility
+        working-directory: development/01_roles/cyber_security/tools/web_lab_assessment
+        run: python -B -m unittest -q test_assessment
+      - name: Install portal dependencies and test
+        working-directory: development/web_portal_poc/web
+        run: |
+          npm ci --omit=dev
+          npm test
+      - name: Assemble and verify classroom packages
+        run: |
+          python -B development/build_classroom.py --output "${RUNNER_TEMP}/classroom"
+          bash -n "${RUNNER_TEMP}/classroom/setup-classroom.sh"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        if: github.ref == 'refs/heads/main'
+        with:
+          name: classroom-${{ github.sha }}
+          path: ${{ runner.temp }}/classroom/
+          if-no-files-found: error

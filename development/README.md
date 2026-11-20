@@ -1,5 +1,18 @@
 # Web演習の構築・採点・配布コード
 
+## 採点を変更したときのビルド
+
+`development/` の採点コードを変更してGitHubに反映すると、[Classroom build](../.github/workflows/classroom-build.yml) が採点と課題画面のテストを実行します。mainで成功した実行から、同じコミットの構築スクリプト・教師用CloudFormation・教師／学生共通の課題確認Lambda・成績サービス・課題画面をまとめて取得できます。内包した採点コードを元のファイルと照合し、含まれていないファイルや異なる内容を検出するとビルドを停止します。`manifest.json` に元のコミットと各ファイルのSHA-256を記録します。
+
+GitHubのActionsで該当の実行を開き、Artifactsから `classroom-<コミットID>` を取得します。ローカルで再現する場合は、構築・採点ソースをコミットし、次をリポジトリのルートで実行します。出力先には新しいディレクトリを指定します。
+
+```bash
+npm --prefix development/web_portal_poc/web ci --omit=dev
+python3 -B development/build_classroom.py --output /tmp/jdu-classroom-build
+```
+
+READMEの通常のCloudShellコマンドは実行時にmainを取得します。ビルドに同梱した `setup-classroom.sh` は、その成果物を生成したコミットを使用します。成果物の生成までが自動化の対象です。ブラウザ採点を利用する環境では、同じビルドの `checker.zip`、`portal-services.zip`、`portal-web.zip` を使ってAWS側へ配備します。
+
 
 ## 2026-11-13の現行方針
 
