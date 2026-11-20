@@ -1,45 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="740" viewBox="0 0 1600 740" role="img">
-<title>踏み台経由とSession Managerで同じWebサーバーの端末を開く</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="715" viewBox="0 0 1600 715" role="img">
+<title>AWSコンソールから演習の5台のうち1台を選んで端末を開く</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図1-5  Webサーバーの端末を開く二つの経路</text>
-<rect x="350" y="95" width="1215" height="555" rx="18" fill="#f8fafc" stroke="#7991aa" stroke-width="2"/>
-<text x="373" y="109" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">AWS</text>
-<rect x="815" y="155" width="720" height="465" rx="18" fill="#ffffff" stroke="#7991aa" stroke-width="2"/>
-<text x="835" y="168" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">VPC</text>
-<rect x="35" y="190" width="265" height="152" rx="18" fill="#f1f7f3" stroke="#a7c2af" stroke-width="2"/>
-<text x="167" y="208" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">利用者PC</text>
-<text x="167" y="258" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="middle">リモートデスクトップ</text>
-<rect x="467" y="225" width="215" height="90" rx="18" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
-<text x="574" y="250" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">Internet Gateway</text>
-<rect x="850" y="215" width="238" height="115" rx="18" fill="#edf8f3" stroke="#a7c2af" stroke-width="2"/>
-<text x="969" y="232" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">踏み台サーバー</text>
-<text x="969" y="274" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="22" dominant-baseline="text-before-edge" text-anchor="middle">公開IPで接続</text>
-<polyline points="300,270 467,270" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="467,270 452.5928463623572,276.9594485457797 452.5928463623572,263.0405514542203" fill="#16745b"/>
-<polyline points="682,270 850,270" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="850,270 835.5928463623571,276.9594485457797 835.5928463623571,263.0405514542203" fill="#16745b"/>
-<text x="399" y="202" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">RDP</text>
-<text x="748" y="237" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="22" dominant-baseline="text-before-edge" text-anchor="middle">TCP 3389</text>
-<rect x="1260" y="222" width="245" height="365" rx="18" fill="#edf5fc" stroke="#9ebed8" stroke-width="2"/>
-<text x="1382" y="234" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">EC2 Webサーバー</text>
-<rect x="1280" y="283" width="205" height="76" rx="18" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
-<text x="1382" y="306" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">OSの端末</text>
-<polyline points="1088,272 1195,272 1195,320 1280,320" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="1280,320 1265.5928463623572,326.9594485457797 1265.5928463623572,313.0405514542203" fill="#16745b"/>
-<text x="1150" y="229" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="23" dominant-baseline="text-before-edge" text-anchor="middle">SSH</text>
-<text x="1110" y="324" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="22" dominant-baseline="text-before-edge" text-anchor="start">TCP 22</text>
-<rect x="35" y="433" width="265" height="143" rx="18" fill="#edf5fc" stroke="#9ebed8" stroke-width="2"/>
-<text x="167" y="448" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">利用者PC</text>
-<text x="167" y="496" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">AWSコンソール</text>
-<text x="167" y="532" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="22" dominant-baseline="text-before-edge" text-anchor="middle">ログインして開始</text>
-<text x="585" y="456" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">Session Manager</text>
-<text x="585" y="511" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">利用者の権限を確認</text>
-<polyline points="300,505 430,505" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="430,505 415.5928463623572,511.9594485457797 415.5928463623572,498.0405514542203" fill="#2165a7"/>
-<rect x="840" y="460" width="250" height="96" rx="18" fill="#ffffff" stroke="#9ebed8" stroke-width="2"/>
-<text x="965" y="486" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="middle">VPCエンドポイント</text>
-<rect x="1280" y="460" width="205" height="96" rx="18" fill="#ffffff" stroke="#a9b8c7" stroke-width="2"/>
-<text x="1382" y="486" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">SSM Agent</text>
-<polyline points="1280,505 1090,505" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1090,505 1104.4071536376428,498.0405514542203 1104.4071536376428,511.9594485457797" fill="#2165a7"/>
-<polyline points="840,505 740,505" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="740,505 754.4071536376429,498.0405514542203 754.4071536376429,511.9594485457797" fill="#2165a7"/>
-<text x="1175" y="461" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="20" dominant-baseline="text-before-edge" text-anchor="middle">HTTPS / TCP 443</text>
-<polyline points="1382,460 1382,359" fill="none" stroke="#2165a7" stroke-width="4" stroke-dasharray="13 9"/><polygon points="1382,359 1388.9594485457797,373.4071536376428 1375.0405514542203,373.4071536376428" fill="#2165a7"/>
-<text x="1397" y="391" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="20" dominant-baseline="text-before-edge" text-anchor="start">端末を開く</text>
-<text x="40" y="674" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">緑：踏み台経由　　青：Session Manager　　矢印：接続を始める方向</text>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図1-5  AWSコンソールから開くサーバーの端末</text>
+<rect x="525" y="88" width="1035" height="580" rx="18" fill="#f8fafc" stroke="#7991aa" stroke-width="2"/>
+<text x="550" y="104" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">AWS</text>
+<rect x="955" y="142" width="570" height="490" rx="18" fill="#ffffff" stroke="#7991aa" stroke-width="2"/>
+<text x="980" y="156" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">VPC内の接続対象（5台）</text>
+<rect x="40" y="220" width="365" height="288" rx="18" fill="#edf5fc" stroke="#9ebed8" stroke-width="2"/>
+<text x="222" y="238" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">利用者PC</text>
+<rect x="65" y="299" width="315" height="179" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
+<text x="222" y="309" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">ブラウザで端末を表示</text>
+<rect x="85" y="365" width="275" height="84" rx="10" fill="#193047" stroke="#193047" stroke-width="2"/>
+<text x="106" y="384" fill="#ffffff" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">ssm-user $</text>
+<rect x="570" y="254" width="320" height="178" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
+<text x="730" y="270" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">AWSコンソール</text>
+<text x="730" y="321" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">操作するEC2を選ぶ</text>
+<text x="730" y="374" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">AWSが接続権限を確認</text>
+<polyline points="405,342 570,342" fill="none" stroke="#2165a7" stroke-width="5"/><polygon points="570,342 555.5928463623571,348.9594485457797 555.5928463623571,335.0405514542203" fill="#2165a7"/>
+<text x="486" y="294" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">ログイン</text>
+<rect x="1045" y="214" width="435" height="54" rx="10" fill="#edf5fc" stroke="#9ebed8" stroke-width="2"/>
+<text x="1070" y="223" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">EC2</text>
+<text x="1152" y="221" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">踏み台サーバー</text>
+<polyline points="890,342 995,342 995,241 1045,241" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1045,241 1030.5928463623572,247.95944854577968 1030.5928463623572,234.04055145422032" fill="#2165a7"/>
+<rect x="1045" y="287" width="435" height="54" rx="10" fill="#edf5fc" stroke="#9ebed8" stroke-width="2"/>
+<text x="1070" y="296" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">EC2</text>
+<text x="1152" y="294" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">Webサーバー</text>
+<polyline points="890,342 995,342 995,314 1045,314" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1045,314 1030.5928463623572,320.9594485457797 1030.5928463623572,307.0405514542203" fill="#2165a7"/>
+<rect x="1045" y="360" width="435" height="54" rx="10" fill="#edf5fc" stroke="#9ebed8" stroke-width="2"/>
+<text x="1070" y="369" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">EC2</text>
+<text x="1152" y="367" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">DNSサーバー</text>
+<polyline points="890,342 995,342 995,387 1045,387" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1045,387 1030.5928463623572,393.9594485457797 1030.5928463623572,380.0405514542203" fill="#2165a7"/>
+<rect x="1045" y="433" width="435" height="54" rx="10" fill="#edf5fc" stroke="#9ebed8" stroke-width="2"/>
+<text x="1070" y="442" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">EC2</text>
+<text x="1152" y="440" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">DBサーバー</text>
+<polyline points="890,342 995,342 995,460 1045,460" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1045,460 1030.5928463623572,466.9594485457797 1030.5928463623572,453.0405514542203" fill="#2165a7"/>
+<rect x="1045" y="506" width="435" height="54" rx="10" fill="#edf5fc" stroke="#9ebed8" stroke-width="2"/>
+<text x="1070" y="515" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">EC2</text>
+<text x="1152" y="513" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">配布サーバー</text>
+<polyline points="890,342 995,342 995,533 1045,533" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1045,533 1030.5928463623572,539.9594485457797 1030.5928463623572,526.0405514542203" fill="#2165a7"/>
+<text x="1240" y="588" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">接続先のOSユーザー：ssm-user</text>
+<text x="40" y="682" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">矢印は操作の流れ。端末で入力したコマンドは、選んだサーバー上で実行される。</text>
 </svg>

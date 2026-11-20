@@ -206,13 +206,19 @@ SSHでリモートの端末へ接続すると、コマンドを入力する**CLI
 
 ## 1.8 AWSコンソールからサーバーの端末を開く
 
-**Session Manager**は、AWS Systems Manager（SSM）が提供する機能である。AWSコンソールにログインし、操作したいEC2を選んで、権限があればブラウザでそのサーバーの端末を開ける。今回は5台すべてが対象である。端末を開いた後は、SSHで接続したときと同じように、選んだサーバー上でLinuxのコマンドを実行できる。
+**Session Manager**は、AWS Systems Manager（SSM）が提供する管理機能である。AWSコンソールにログインし、操作したいEC2を選ぶ。接続権限があれば、ブラウザの中にそのサーバーの端末が開く。SSHで端末を開いたときと同じように、入力したLinuxコマンドは選んだサーバー上で実行される。[AWSのSession Managerの説明](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html)
 
-![上側は利用者PCからRDPで踏み台へ入り、SSHでWebサーバーの端末へ接続する経路。下側は利用者PCからAWSコンソールでSession Managerを開始し、Webサーバー内のSSM AgentがVPCエンドポイントを通ってAWS側のサービスにつなぐ経路。](../../assets/figures/fig06-session-manager.png)
+![利用者PCのブラウザからAWSコンソールにログインし、踏み台・Web・DNS・DB・配布の5台からEC2を1台選ぶ。ブラウザで開いた端末から、選んだサーバーをssm-userとして操作する。](../../assets/figures/fig06-session-manager.png)
 
-**図1-5 踏み台経由とSession Managerで同じWebサーバーの端末を開く。** 上の経路では、踏み台サーバーからWebサーバーのSSH用ポートへ接続する。下の経路では、AWSがログインした利用者の権限を確かめ、サーバー内で動く**SSM Agent**というソフトウェアがAWSへ張った接続を使って端末を開く。図の下側にある矢印は、利用者とエージェントがそれぞれ接続を始める方向を示す。
+**図1-5 AWSコンソールから開くサーバーの端末。** 矢印は利用者が操作を進める向きを示す。この演習では、踏み台・Web・DNS・DB・配布の5台が接続対象である。接続には、対象のEC2側の事前設定と、利用者のAWS上の接続権限が必要になる。
 
-Session Managerを使うときは、サーバーのSSH用ポートを外部に公開する必要がない。今回の環境では、各EC2のSSM AgentがVPC内の**VPCエンドポイント**を経由し、HTTPSでAWSのサービスへつなぐ。VPCエンドポイントは、VPC内からAWSのサービスへ接続するための入口である。この通信もSecurity Groupの許可が必要で、誰が端末を開けるかはAWSの権限で決まる。CloudShellからSession Managerを使う操作は第3章で扱う。[AWSのSession Manager説明](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html)、[VPCエンドポイントを使う設定](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-getting-started-privatelink.html)
+開いた端末では、選んだサーバーのOSユーザー **ssm-user** として操作する。サーバーに導入された **SSM Agent** は、この接続を支えるソフトウェアである。[AWSのssm-userの説明](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-getting-started-ssm-user-permissions.html)
+
+### 踏み台が使えないときと、接続権限の管理
+
+例えば、SSHの設定を変更した後に踏み台サーバーからWebサーバーへ接続できなくなったとする。AWSコンソールから端末を開ければ、Webサーバー上で設定を調べて修正できる。
+
+一方、端末を開く権限を持つAWSアカウントが乗っ取られると、第三者もその権限でサーバーを操作できる。OS側の権限によっては、設定を書き換えたり、サービスを停止させたりできる。そのため、AWSへのログインは多要素認証などで保護し、端末を開く権限は必要な人とサーバーに絞る。CloudShellから接続する方法は第3章で扱う。
 
 ## 1.9 練習・課題1にて構築するサービス
 

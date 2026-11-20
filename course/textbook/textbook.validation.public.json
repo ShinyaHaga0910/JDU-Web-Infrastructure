@@ -1,16 +1,16 @@
 {
-  "date": "2026-11-19",
+  "date": "2026-11-20",
   "chapters": [
     {
       "chapter": 1,
       "title": "第1章 Webシステムを構成するもの",
       "source": "docs/ja/01-web-system.md",
-      "source_sha256": "f259523a9f0299c57787795f7624c46b889a96880c461d6e2754328852b66d53",
+      "source_sha256": "e6ca3ab439607b1bfaadd86ba4b59f61dfe45e67d17d07b2adb9919bf5cef04c",
       "pdf": "output/pdf/web_textbook_ch01_ja.pdf",
-      "pdf_sha256": "5fb826f2a50c99e5a47532fcc01bf2df3fff96531e1c24260756b3bdc996800f",
-      "pages": 14,
+      "pdf_sha256": "1700f743a11633d9037ebcc75de3e52b1f673cd57b73790e5d5d85eeac5b0642",
+      "pages": 15,
       "start_page": 3,
-      "end_page": 16,
+      "end_page": 17,
       "figures": [
         {
           "path": "assets/figures/fig01-system-overview.png",
@@ -30,14 +30,14 @@
         },
         {
           "path": "assets/figures/fig06-session-manager.png",
-          "sha256": "d1b2208961ad984aa875d1f0e515328171a93417f5a3e1ee9a7ab2c84efb81f8"
+          "sha256": "14e079e8bbc3187087533ab9564c4a7bcb1471fb78589e18087d244e4c3bd395"
         },
         {
           "path": "assets/figures/fig03-first-mission.png",
           "sha256": "c03c814bbe012b8ac421e709e6329561dd33ef88ade42b361aeba4b63bf919d4"
         }
       ],
-      "text_blocks": 183
+      "text_blocks": 186
     },
     {
       "chapter": 2,
@@ -45,10 +45,10 @@
       "source": "docs/ja/02-network-paths.md",
       "source_sha256": "5cbd50434190f72bdefc3489e14bd8bce41d0c0a4270f35d362063a7820897fc",
       "pdf": "output/pdf/web_textbook_ch02_ja.pdf",
-      "pdf_sha256": "652fa3164dd9c692fd1d820917503408ae4c4114ea2d6fc7bfa8d3d8de948fa7",
+      "pdf_sha256": "b6031a22c4c77a7806a38c9223b212071bfdfba82c8248d7c7510ff31a17efb7",
       "pages": 12,
-      "start_page": 17,
-      "end_page": 28,
+      "start_page": 18,
+      "end_page": 29,
       "figures": [
         {
           "path": "assets/figures/ch02-fig01-subnets.png",
@@ -79,10 +79,10 @@
       "source": "docs/ja/03-connecting-and-working.md",
       "source_sha256": "47f290b4ce4c973181ce30c9debbb8b7ed3e155428f6d9dc964dd5c6e05aca83",
       "pdf": "output/pdf/web_textbook_ch03_ja.pdf",
-      "pdf_sha256": "d7d62ab615fbe004d78b91e0c0c8d8e7f5027a58131437c3dc4f903ce680919f",
+      "pdf_sha256": "fc34ba665b8699bcbacb34e8e034bde85793e11f84449e601c91343587170181",
       "pages": 12,
-      "start_page": 29,
-      "end_page": 40,
+      "start_page": 30,
+      "end_page": 41,
       "figures": [
         {
           "path": "assets/figures/ch03-fig01-nested-screen.png",
@@ -113,10 +113,10 @@
       "source": "docs/ja/04-http-requests-and-responses.md",
       "source_sha256": "b72b7ffe21ae7f369c8b265b95f69d677f9896a4fcba532c8c1d38c14b234c57",
       "pdf": "output/pdf/web_textbook_ch04_ja.pdf",
-      "pdf_sha256": "2a4a0984c697f2faa12c3ecb0c410bbf8cdbc55853c470cb483ba3609cd7ad52",
+      "pdf_sha256": "9be909d8d14da9a371d2b84141d36f3662b067808bcbfa58a10a6040f3bd44fc",
       "pages": 11,
-      "start_page": 41,
-      "end_page": 51,
+      "start_page": 42,
+      "end_page": 52,
       "figures": [
         {
           "path": "assets/figures/ch04-fig01-url.png",
@@ -139,10 +139,10 @@
       "source": "docs/ja/05-nginx-static-files.md",
       "source_sha256": "0af885d42237622f9335e077fabf738ddf059c5b6870c66a054a2eacda093181",
       "pdf": "output/pdf/web_textbook_ch05_ja.pdf",
-      "pdf_sha256": "ed59950fc06c84fc24f479d7f71bceef8ca3288bbd3772e3e675581edb5e7c51",
+      "pdf_sha256": "11c70686e50a3b29314ab78470c890b8e2a253644f2a4a94fc62843418e015dd",
       "pages": 11,
-      "start_page": 52,
-      "end_page": 62,
+      "start_page": 53,
+      "end_page": 63,
       "figures": [
         {
           "path": "assets/figures/ch05-fig01-static-flow.png",
@@ -169,10 +169,10 @@
       "source": "docs/ja/06-dns-name-resolution.md",
       "source_sha256": "8118805de209c12edab391877305679bfa7b74d93270ab16d798fdd4131a5c69",
       "pdf": "output/pdf/web_textbook_ch06_ja.pdf",
-      "pdf_sha256": "7f6e1f3e0def5cf27acf30a2737e62687bc24deeebf3ebb08ed3dd35de1e633e",
+      "pdf_sha256": "465e093a96c3faca93cf73f809a96fa37ab625b6425216cf66d814c148c48988",
       "pages": 16,
-      "start_page": 63,
-      "end_page": 78,
+      "start_page": 64,
+      "end_page": 79,
       "figures": [
         {
           "path": "assets/figures/ch06-fig01-dns-then-http.png",
@@ -207,10 +207,10 @@
       "source": "docs/ja/07-internal-dns-configuration.md",
       "source_sha256": "e64942bfbcdcb1203d9143312bafc586e31625cbb9f9b3b927066734cc6b404f",
       "pdf": "output/pdf/web_textbook_ch07_ja.pdf",
-      "pdf_sha256": "3131cac97e22204b5b7b528b461ab43aa1ce43f42c267a7bfb917898dafe9352",
+      "pdf_sha256": "54ce8d03f361c4ea586414336655f968ccb80488aa7bbd59d42ae37780ee4868",
       "pages": 12,
-      "start_page": 79,
-      "end_page": 90,
+      "start_page": 80,
+      "end_page": 91,
       "figures": [
         {
           "path": "assets/figures/ch07-fig01-configuration.png",
@@ -233,10 +233,10 @@
       "source": "docs/ja/08-databases-and-sql.md",
       "source_sha256": "5d9101a877ae1858835c76525b7594aa9d3bd41e5e76c9c01b5e4c04ce7e4618",
       "pdf": "output/pdf/web_textbook_ch08_ja.pdf",
-      "pdf_sha256": "d111cdb55bc71345b57dacdfc85c25a7d371cbfb4e16663e25f1fdd77cb53409",
+      "pdf_sha256": "6926b9ce29f97d700ff31f4cf0b766cbe5252c86a94bf87a43afb3063db60de1",
       "pages": 9,
-      "start_page": 91,
-      "end_page": 99,
+      "start_page": 92,
+      "end_page": 100,
       "figures": [
         {
           "path": "assets/figures/ch08-fig01-dbms.png",
@@ -259,10 +259,10 @@
       "source": "docs/ja/09-postgresql-connections.md",
       "source_sha256": "42928cc565aa53b800c9bbeb2b1db3b696e8c8090188df8b69b8169204f802ea",
       "pdf": "output/pdf/web_textbook_ch09_ja.pdf",
-      "pdf_sha256": "b4c5a6447c1dce50407479aa21b28f90f1336ab4f848b73181c6db560b9792e4",
+      "pdf_sha256": "076127ea217c0e1803e7c9f69b3279458994b0388ad7c804e0486d84ec06bc38",
       "pages": 7,
-      "start_page": 100,
-      "end_page": 106,
+      "start_page": 101,
+      "end_page": 107,
       "figures": [
         {
           "path": "assets/figures/ch09-fig01-connection.png",
@@ -277,10 +277,10 @@
       "source": "docs/ja/10-web-app-and-database.md",
       "source_sha256": "2b571afa254edb070f1fef56e49310cf264a60ca779b31e033007c07a5dd1696",
       "pdf": "output/pdf/web_textbook_ch10_ja.pdf",
-      "pdf_sha256": "9d0d3dcd81904624cfe22f5385173b1f3baaf84b9bb14189add78995c0bd2ad5",
+      "pdf_sha256": "4e6879286817a194a4d009c76d6d89748d355d02b3a26180a5188c0125a91231",
       "pages": 11,
-      "start_page": 107,
-      "end_page": 117,
+      "start_page": 108,
+      "end_page": 118,
       "figures": [
         {
           "path": "assets/figures/ch10-fig01-components.png",
@@ -307,10 +307,10 @@
       "source": "docs/ja/11-application-deployment.md",
       "source_sha256": "0074c7a10135ecdad8b7c4264083b29ed98c7c08d93f554ae7afe90d026c5487",
       "pdf": "output/pdf/web_textbook_ch11_ja.pdf",
-      "pdf_sha256": "1c3de088039c83f7861e6f0437dfe7d3098431085575d362feded76ec1b203c4",
+      "pdf_sha256": "ab1ee0389604ba26f34420a50fb51856cf26214425fabf38e0cda79254c556bc",
       "pages": 10,
-      "start_page": 118,
-      "end_page": 127,
+      "start_page": 119,
+      "end_page": 128,
       "figures": [
         {
           "path": "assets/figures/ch11-fig01-phases.png",
@@ -329,10 +329,10 @@
       "source": "docs/ja/12-access-and-least-privilege.md",
       "source_sha256": "0cc6af3ea0ae6f07302411a24de8acb5c129c176b5cf0a2b889a437df1eedd38",
       "pdf": "output/pdf/web_textbook_ch12_ja.pdf",
-      "pdf_sha256": "8aa14572f75044df4256f28a443db562fc1ae56fd0a7b799fd2ffd1fb938c733",
+      "pdf_sha256": "726ff3a7842640f29d03621348e9baa3f2dfe57cb904abb9923c5d3457712136",
       "pages": 9,
-      "start_page": 128,
-      "end_page": 136,
+      "start_page": 129,
+      "end_page": 137,
       "figures": [
         {
           "path": "assets/figures/ch12-fig01-boundaries.png",
@@ -351,20 +351,20 @@
       "source": "docs/ja/13-observation-and-recovery.md",
       "source_sha256": "2f0dd17fde1a7d09b9c99e1eb992bf4fd2b86297ab68478b0c38c882ed86a76e",
       "pdf": "output/pdf/web_textbook_ch13_ja.pdf",
-      "pdf_sha256": "ce0dd68487c3cb97d656f41c27a6b8b4b766583215c313ae7ac131b86b25a5c0",
+      "pdf_sha256": "40fdffca4de4c5b65b8e26b7c8bcf7fd9b643cb6a921dedf30f1e0d4ac420c33",
       "pages": 9,
-      "start_page": 137,
-      "end_page": 145,
+      "start_page": 138,
+      "end_page": 146,
       "figures": [],
       "text_blocks": 130
     }
   ],
-  "total_pages": 145,
+  "total_pages": 146,
   "front_matter_pages": 2,
   "chapter_count": 13,
   "contents_links": 13,
   "input_snapshot": {
-    "build\\build_chapter01.py": "8c6ea352ad8603003d65443f22dd2f1cc3d77d7f1588927a354b7c60d3b1cad8",
+    "build\\build_chapter01.py": "e596d83dd7941a390baea8fefc158020dc639ccadad03060f0196f9e04f84769",
     "build\\build_chapter02.py": "ef08d5ad93504c85a3961ddfc90137827c03cfcf11d745c905babe1c48ce1282",
     "build\\build_chapter03.py": "0a17ecfcccb6413718c9a0dbacb77c649c4fbe935b4f8d09f81315a3a69fc298",
     "build\\build_chapter04.py": "613d2468bc41ae28a7cf2f4b52d5720a215c02a9e9eb1c9dae8033840bfba499",
@@ -379,7 +379,7 @@
     "build\\build_chapter13.py": "4ee8642e0cca71017f3dabe87a2a3ef9c00ad3b60b64987b4d6a44f5459e13a5",
     "build\\build_textbook.py": "b75904a5cc997702901330475c6592884043447f6ef5a4fbfcfdeff8ff95ef06",
     "build\\chapter_figures_07_13.py": "27f7a731770ea89c496ce69676faa96dc8f46e399917b5e75c50e2ef4cca8cc5",
-    "docs\\ja\\01-web-system.md": "f259523a9f0299c57787795f7624c46b889a96880c461d6e2754328852b66d53",
+    "docs\\ja\\01-web-system.md": "e6ca3ab439607b1bfaadd86ba4b59f61dfe45e67d17d07b2adb9919bf5cef04c",
     "docs\\ja\\02-network-paths.md": "5cbd50434190f72bdefc3489e14bd8bce41d0c0a4270f35d362063a7820897fc",
     "docs\\ja\\03-connecting-and-working.md": "47f290b4ce4c973181ce30c9debbb8b7ed3e155428f6d9dc964dd5c6e05aca83",
     "docs\\ja\\04-http-requests-and-responses.md": "b72b7ffe21ae7f369c8b265b95f69d677f9896a4fcba532c8c1d38c14b234c57",
@@ -397,7 +397,7 @@
     "C:\\Windows\\Fonts\\NotoSansJP-VF.ttf": "5113756f8a3b5d01b2211025e267c50121e3b36f465b7bbaf3cdaf4c3430bfd0",
     "C:\\Windows\\Fonts\\NotoSerifJP-VF.ttf": "b7e0d299a21bd2009eff27aca5e9508c75ab494de222f96bd0bbe355a8d8ced5"
   },
-  "sha256": "a309fc39effeffefd181a6f0757ba74ebe48c0f8342ea8f93502da5381c2ae87",
+  "sha256": "893d6cfd975bbcd0b8cdb581e70c392c3ddc936fc1f00033c1de9ee69ea6b246",
   "all_chapters_rebuilt": true,
   "source_inputs_unchanged_during_build": true,
   "chapter_text_preserved": true,
