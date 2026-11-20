@@ -17,7 +17,7 @@ PROJECT = Path(os.environ.get('JDU_WEB_PROJECT_ROOT', str(Path(__file__).resolve
 from markdown_it import MarkdownIt
 from pages import write_pages, browser_check
 from command_notes import annotated_blocks
-from diagrams import diagram_markdown, write_diagrams
+from diagrams import diagram_markdown, lesson_files_markdown, write_diagrams
 from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE
 from checks import CHECKS
 from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, RAW_MAXIMUM, active_registry
@@ -197,6 +197,8 @@ def make_markdown(reg, lang, kind):
                 if step_id=='P0.1':
                     out += instance_id_guide(lang)
                     continue
+                if step_id=='P0.3':
+                    out += lesson_files_markdown(lang)
                 if s['code']:
                     for fence,source in annotated_blocks(m['id'],i,s['code'],lang):
                         label=T('設定・入力データ（端末で実行するコマンドではない）','Конфигурация или данные: не выполнять как команды','Sozlama yoki ma’lumot: terminal buyrug‘i emas')[lang] if fence=='text' else T('入力するコマンド（番号はこの手順内の順番）','Команды: нумерация внутри этого шага','Buyruqlar: raqamlar shu qadam ichidagi tartib')[lang]

@@ -184,9 +184,48 @@ def diagram_text(task,lang):
     alt=f'{task}: {before[lang]} → {action[lang]} → {result[lang]}。 '+caption
     return alt,caption
 
+RESOURCE_DIAGRAM = 'p0-lesson-files'
+RESOURCE_CAPTION = T(
+    '共通登録コードで環境を構築すると、CloudShellはGitHubから教材ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。',
+    'При создании среды по общему коду CloudShell загружает учебные файлы с GitHub и размещает их на Web- и DB-серверах через SSM.',
+    'Muhit umumiy kod orqali yaratilganda, CloudShell o‘quv fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi.')
+
+
+def lesson_files_diagram(s):
+    lang=s.lang
+    s.text(25,20,T('教材ファイルを取得して配置する','Загрузка и размещение учебных файлов','O‘quv fayllarini yuklab olish va joylash')[lang],26)
+    s.rect(292,92,720,488,fill='#f1f7fc',stroke='#7e9cb3',width=2)
+    s.text(314,104,'AWS',20)
+    s.rect(626,152,358,390,stroke='#7e9cb3',width=2)
+    s.text(648,165,'VPC  10.20.0.0/16',19)
+    s.simple(35,298,'GitHub',w=150)
+    s.simple(322,298,'CloudShell',w=158,ellipse=True)
+    download=T('① ダウンロード','① Загрузка','① Yuklab olish')[lang]
+    s.path([(185,330),(322,330)],download,(253,262))
+    s.text(253,291,'HTTPS',16,color=TEAL,center=True)
+    blue='#285da8'
+    placement=T('② 配置','② Размещение','② Joylash')[lang]
+    s.path([(480,330),(554,330),(554,262),(650,262)],placement,(554,210),color=blue)
+    s.path([(554,330),(554,432),(650,432)],color=blue)
+    s.text(590,337,'SSM',18,color=blue,center=True)
+    for role, y in (('web',212),('db',382)):
+        s.rect(650,y,308,100,fill='#edf4ff',stroke=blue,width=2)
+        name=LABELS[role][lang]+('ー' if lang=='ja' else '')
+        s.text(670,y+13,'EC2 '+name,21)
+        s.text(670,y+59,'catalog-app.tar.gz',18,color=blue)
+
+
+def lesson_files_markdown(lang):
+    caption=RESOURCE_CAPTION[lang]
+    return [f'![{caption}](../../assets/{lang}/{RESOURCE_DIAGRAM}.png)', '', caption, '']
+
+
 def write_diagrams(root):
     counts={}
     for lang in LANGS:
+        resources=Scene(lang,RESOURCE_DIAGRAM)
+        lesson_files_diagram(resources)
+        counts[f'{lang}/{RESOURCE_DIAGRAM}']=resources.finish(root/'assets'/lang/RESOURCE_DIAGRAM,RESOURCE_CAPTION[lang])
         for prefix in ('P','M'):
             for n in ACTIVE_NUMBERS:
                 task=prefix+str(n);s=Scene(lang,task)

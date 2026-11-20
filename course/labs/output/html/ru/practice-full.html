@@ -174,6 +174,8 @@ web
 <p>В целях безопасности исходящие HTTPS-подключения с Web-сервера к сайтам в интернете ограничены. При создании среды по общему коду регистрации CloudShell загружает учебные файлы с GitHub по HTTPS и копирует их на Web-сервер и сервер базы данных через AWS Systems Manager (SSM).</p>
 <p>Если среда создана по общему коду регистрации, переходите к P0.4.</p>
 <p>При ручном размещении файлов загрузите учебный ZIP через CloudShell → Actions → Upload file и выполните <code>unzip web-lab-pm-r1.zip</code> в домашнем каталоге. Замените <code>YOUR-INSTALLATION-DIRECTORY</code> путём к каталогу с файлом <code>activate.sh</code> из начальной установки.</p>
+<p><img src="../../../assets/ru/p0-lesson-files.png" alt="При создании среды по общему коду CloudShell загружает учебные файлы с GitHub и размещает их на Web- и DB-серверах через SSM." width="1040" height="680" loading="lazy"></p>
+<p>При создании среды по общему коду CloudShell загружает учебные файлы с GitHub и размещает их на Web- и DB-серверах через SSM.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Перейти в рабочий каталог $HOME/web-lab-pm-r1/resources.
 cd &quot;$HOME/web-lab-pm-r1/resources&quot;

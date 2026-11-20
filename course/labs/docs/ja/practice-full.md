@@ -148,6 +148,10 @@ CloudShell（学生本人のAWS）
 
 ファイルを手動で配置する場合は、教材ZIPをCloudShellのActions → Upload fileでアップロードし、ホームディレクトリで `unzip web-lab-pm-r1.zip` を実行する。下のコマンドの `YOUR-INSTALLATION-DIRECTORY` は、初回構築で使った `activate.sh` があるディレクトリのパスに置き換える。
 
+![共通登録コードで環境を構築すると、CloudShellはGitHubから教材ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。](../../assets/ja/p0-lesson-files.png)
+
+共通登録コードで環境を構築すると、CloudShellはGitHubから教材ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。
+
 入力するコマンド（番号はこの手順内の順番）
 
 ```bash
