@@ -2,10 +2,14 @@ import copy
 from datetime import datetime, timezone
 from decimal import Decimal
 import json
+import os
 from pathlib import Path
 import secrets
 import sys
+import tempfile
+from types import SimpleNamespace
 import unittest
+from unittest.mock import patch
 import uuid
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'web_lab_teacher'))
@@ -13,7 +17,31 @@ import progress_api as legacy
 from test_progress_api import MemoryStore
 from grading import export_labs, grade_key, current_key, project_lab
 from progress_api_v2 import AssessmentService
-from registry import build_report, canonical_checks, score, TASKS, CONTRACT_ID, CONTRACT_SHA256
+from registry import build_report, canonical_checks, score, TASKS, CONTRACT_ID, CONTRACT_SHA256, INTRO_MARKERS
+
+
+@unittest.skipUnless(os.name == 'posix', 'Linux filesystem observation')
+class MarkerTest(unittest.TestCase):
+    def test_only_the_expected_student_file_counts(self):
+        from system_observer import connection_marker
+
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            user = SimpleNamespace(pw_dir=str(home), pw_uid=os.getuid())
+            with patch('system_observer.pwd.getpwnam', return_value=user):
+                for _, role, filename in INTRO_MARKERS.values():
+                    marker = home / filename
+                    self.assertIs(connection_marker(role, filename), False)
+                    wrong_role = 'db' if role == 'web' else 'web'
+                    marker.write_text(wrong_role + '\n')
+                    self.assertIs(connection_marker(role, filename), False)
+                    marker.write_text(role + '\nextra\n')
+                    self.assertIs(connection_marker(role, filename), False)
+                    marker.write_text(role + '\n')
+                    self.assertIs(connection_marker(role, filename), True)
+                    marker.rename(home / (role + '.txt'))
+                    marker.symlink_to(home / (role + '.txt'))
+                    self.assertIs(connection_marker(role, filename), False)
 
 
 class Store(MemoryStore):
@@ -26,11 +54,11 @@ class Store(MemoryStore):
                 raise legacy.ApiError(409, 'conflict')
             return old['receipt']
         self.rows[attempt['pk'], attempt['sk']] = copy.deepcopy(attempt)
-        latest = dict(copy.deepcopy(summary), pk=meta['pk'], sk=current_key(attempt['report']['mission_id']),
+        latest = dict(copy.deepcopy(summary), pk=meta['pk'], sk=current_key(attempt['report']['mission_id'], summary['contract_sha256']),
                       checks=copy.deepcopy(attempt['report']['checks']))
         self.rows[latest['pk'], latest['sk']] = latest
         if summary.get('evaluable') and summary.get('counts_toward_assessment'):
-            selected = dict(summary, pk=meta['pk'], sk=grade_key(attempt['report']['mission_id']), checks=attempt['report']['checks'])
+            selected = dict(summary, pk=meta['pk'], sk=grade_key(attempt['report']['mission_id'], summary['contract_sha256']), checks=attempt['report']['checks'])
             self.rows[selected['pk'], selected['sk']] = copy.deepcopy(selected)
         return attempt['receipt']
 
@@ -58,11 +86,11 @@ class AssessmentTests(unittest.TestCase):
     def call(self, route, body, token=None):
         return self.app.handle(dict(routeKey=route, body=json.dumps(body), headers={'authorization': 'Bearer ' + (token or self.token)}))
 
-    def report(self, task='M1', changes=None, mode='functional'):
-        observations = {c: True for c in canonical_checks(task)}
+    def report(self, task='M1', changes=None, mode='functional', intro=False):
+        observations = {c: True for c in canonical_checks(task, intro=intro)}
         observations.update(changes or {})
         return build_report(task, self.identity, observations, str(uuid.uuid4()), mode=mode,
-                            checked_at=datetime.now(timezone.utc).isoformat())
+                            checked_at=datetime.now(timezone.utc).isoformat(), intro=intro)
 
     def submit(self, report):
         result = self.call('POST /api/web/submit', report)
@@ -82,17 +110,26 @@ class AssessmentTests(unittest.TestCase):
         self.assertEqual(self.call('POST /api/web/submit', self.report(), shared)['statusCode'], 401)
         for task in ('M1', 'M2', 'M4', 'M5', 'M6'):
             self.submit(self.report(task))
+        for task, (marker, _, _) in INTRO_MARKERS.items():
+            missing = self.report(task, {marker: False}, mode='read_only', intro=True)
+            self.assertEqual(score(missing)['raw_earned'], 0)
+            self.assertFalse(score(missing)['complete'])
+            self.submit(missing)
+            self.submit(self.report(task, mode='read_only', intro=True))
+            self.submit(self.report(task, mode='read_only'))  # An old observer cannot replace the new grade.
         classification = {key: self.identity[key] for key in ('lab_id', 'deployment_id')}
         classification.update(context='course', contract_id=CONTRACT_ID)
         self.assertEqual(self.call('POST /api/web/admin/assessment-context', classification, self.admin)['statusCode'], 200)
         export = json.loads(self.call('POST /api/web/admin/grades', {}, self.admin)['body'])
         row = export['students'][0]
-        self.assertEqual((row['lab_id'], row['raw_earned'], export['raw_maximum']), ('new-student', 59, 59))
+        self.assertEqual((row['lab_id'], row['raw_earned'], export['raw_maximum']), ('new-student', 61, 61))
+        for task in INTRO_MARKERS:
+            self.assertEqual(row['missions'][task]['selected']['raw_earned'], 1)
         self.assertNotIn('M3', row['missions'])
         student_session = self.call('POST /api/web/student/session', {'lab_id': 'new-student'})
         url = json.loads(student_session['body'])['url']
         dashboard = self.app.handle({'routeKey': 'GET /dashboard', 'queryStringParameters': {'session': url.split('session=')[1]}})
-        self.assertIn('59 / 59', dashboard['body'])
+        self.assertIn('61 / 61', dashboard['body'])
         self.assertNotIn('M3 /', dashboard['body'])
 
     def test_all_missions_exactly_62_and_preparation_zero(self):

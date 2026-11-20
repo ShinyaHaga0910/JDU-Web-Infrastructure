@@ -16,7 +16,7 @@ P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6
 
 P5 uchun ham M2 DNS kerak. P4 da DB ga IP va nom orqali ulanishni mashq qiling. Ilova db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating.
 
-M1=8, M2=13, M4=9, M5=13, M6=16: bu beshta topshiriqning avtomatik tekshiruvlari jami 59 xom ball. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.
+P0=1, M0=1, M1=8, M2=13, M4=9, M5=13, M6=16: jami 61 xom ball. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.
 
 ## Muhit va tayyorgarlik
 
@@ -112,7 +112,7 @@ Talabaning shaxsiy AWS hisobidagi CloudShell
 
 **Maqsad va amallar:**
 
-Birinchi buyruqdagi i-YOUR-WEB-INSTANCE-ID o‘rniga P0.1 da tekshirilgan Web serverning Instance ID sini yozing va buyruqni CloudShell da bajaring. Ulangach, serverni dastlabki sozlashda joylangan /etc/jdu-web/bootstrap.json faylidan rolni o‘qing. role maydonida server vazifasi saqlanadi. web qiymati Web serverga ulanganligingizni tasdiqlaydi.
+Birinchi buyruqdagi i-YOUR-WEB-INSTANCE-ID o‘rniga P0.1 da tekshirilgan Web serverning Instance ID sini yozing va buyruqni CloudShell da bajaring. Ulangach, serverni dastlabki sozlashda joylangan /etc/jdu-web/bootstrap.json faylidan rolni o‘qing. role maydonida server vazifasi saqlanadi. web qiymati Web serverga ulanganligingizni tasdiqlaydi. Shu terminalda uy katalogingizga bitta web satri bor p0-connection.txt faylini yarating.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
@@ -123,7 +123,11 @@ aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
 id -un
 # 3. Bootstrap dan faqat role ni o‘qib, ulangan server vazifasini tekshirish.
 python3 -c 'import json;print(json.load(open("/etc/jdu-web/bootstrap.json"))["role"])'
-# 4. Joriy server session ini yopib CloudShell ga qaytish.
+# 4. Uy katalogidagi tekshiruv fayliga bitta web satrini yozish.
+printf '%s\n' web > "$HOME/p0-connection.txt"
+# 5. $HOME/p0-connection.txt mazmunini o‘zgartirmay o‘qish.
+cat "$HOME/p0-connection.txt"
+# 6. Joriy server session ini yopib CloudShell ga qaytish.
 exit
 ```
 
@@ -140,29 +144,7 @@ $ python3 -c …
 web
 ```
 
-#### P0.3 Tayyorlikni brauzerda tekshirish
-
-**Bajarish muhiti:**
-
-Shaxsiy PC brauzeri: Web Portal
-
-**Maqsad va amallar:**
-
-O‘qituvchi bergan havola orqali topshiriqlar sahifasini oching. Maktab Google orqali kirib, o‘z AWS hisobingizni bog‘lang. P0 ni tanlab tekshiruvni boshlang; ishlov davom etsa natijani yangilang.
-
-**Buyruq va sozlamalar ma’nosi:**
-
-Brauzer natijani avtomatik saqlaydi. PASS/FAIL/UNKNOWN va ishlov/saqlash holatini farqlang.
-
-**Kutilgan natija va ma’nosi:**
-
-O‘z Lab, topshiriq ID va vaqtni tekshiring. Check natijalari va saqlash holatini o‘qing; tugashi va saqlanishini kuting. UNKNOWN o‘lchab bo‘lmagan holat, muvaffaqiyat emas.
-
-**Ishlamasa:**
-
-Yordam uchun check ID, vaqt va server rolini yozing. Token, parol va shaxsiy URL ni ulashmang.
-
-#### P0.4 RDP orqali bastion ish stolini ochish
+#### P0.3 RDP orqali bastion ish stolini ochish
 
 **Bajarish muhiti:**
 
@@ -190,6 +172,10 @@ Ubuntu bastion ichida Xfce va Firefox ochiladi; bu Windows browser idan boshqa. 
 **Ishlamasa:**
 
 Login failed bo‘lsa user nomi va klaviatura tartibini tekshiring. Parolni chat ga yubormang. Ulanmasa joriy IP va ruxsatli CIDR ni o‘qituvchi bilan tekshiring; 3389 ni hammaga ochmang. RDP ni yopishdan oldin ishni saqlang.
+
+### Tekshirish va topshirish
+
+RDP mashqi tugagach, o‘qituvchi ko‘rsatgan topshiriqlar sahifasida P0 ni tanlab tekshiruvni boshlang. Web serverdagi uy katalogingizdagi tekshiruv faylida bitta `web` satri bo‘lsa, 1 ball beriladi.
 
 ### Tushunishni tekshirish (ballsiz)
 

@@ -68,9 +68,9 @@ def emit_intro(lang, kind):
       T('P5にもM2のDNSが必要。P4ではIPと名前を使ったDB接続を練習する。アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。',
         'P5 требует DNS из M2. В P4 потренируйтесь подключаться к БД по IP и имени. Приложение использует db.lab.test. Перед переключением practice → mission завершите setup в P6.',
         'P5 uchun ham M2 DNS kerak. P4 da DB ga IP va nom orqali ulanishni mashq qiling. Ilova db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating.')[lang], '',
-      T('M1=8、M2=13、M4=9、M5=13、M6=16（この5課題の自動採点は計59素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。',
-        'M1=8, M2=13, M4=9, M5=13, M6=16: автоматические проверки этих пяти заданий дают 59 исходных баллов. Нет личной демонстрации, backup/restore, дополнительных дисков и разработки приложения. Пересчёт в 25 баллов делает преподаватель отдельно. Повторные отправки возможны до объявленного срока. PASS разных попыток не объединяются; максимум автоматически не выбирается.',
-        'M1=8, M2=13, M4=9, M5=13, M6=16: bu beshta topshiriqning avtomatik tekshiruvlari jami 59 xom ball. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.')[lang], '',
+      T('P0=1、M0=1、M1=8、M2=13、M4=9、M5=13、M6=16（計61素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。',
+        'P0=1, M0=1, M1=8, M2=13, M4=9, M5=13, M6=16: всего 61 балл. Нет личной демонстрации, backup/restore, дополнительных дисков и разработки приложения. Пересчёт в 25 баллов делает преподаватель отдельно. Повторные отправки возможны до объявленного срока. PASS разных попыток не объединяются; максимум автоматически не выбирается.',
+        'P0=1, M0=1, M1=8, M2=13, M4=9, M5=13, M6=16: jami 61 xom ball. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.')[lang], '',
       '## ' + L['targets'][lang], '',
       T('初期配布の署名確認、新規5台または既存環境へのinstall、内部SSHと個別採点登録までを先に完了する。初期配布の手順は教材zipのdistribution/STUDENT.mdを読む。秘密鍵を共有Windowsへ置かず、CloudShellは本人Academy accountの中で使う。教師は本人用の匿名Lab ID・署名fingerprint・有効期限を案内する。',
         'Сначала завершите проверку подписи начального комплекта, создание пяти узлов либо install в существующую среду, внутренний SSH и личную регистрацию. Инструкция — distribution/STUDENT.md в zip. Не храните приватные ключи в общем Windows; используйте CloudShell личного Academy account. Преподаватель выдаёт личный анонимный Lab ID, fingerprint и срок действия.',
@@ -212,6 +212,11 @@ def make_markdown(reg, lang, kind):
                             '', '```text', '$ id -un', 'ssm-user', '$ python3 -c …', 'web', '```', '']
                 if s['trouble'] is not None:
                     out += ['**' + L['trouble'][lang] + ':** ' + s['trouble'][lang], '']
+            if m['id']=='P0':
+                out += ['### '+T('確認・提出','Проверка и сдача','Tekshirish va topshirish')[lang], '', T(
+                    'RDPの練習が終わったら、教師から案内された課題画面でP0を選び、「この課題を確認する」を押す。Webサーバーの自分のホームディレクトリに確認用ファイルがあり、内容が `web` の1行なら1点になる。',
+                    'После упражнения с RDP выберите P0 на странице заданий, которую указал преподаватель, и запустите проверку. Верный файл из одной строки `web` в вашем домашнем каталоге на Web-сервере даёт 1 балл.',
+                    'RDP mashqi tugagach, o‘qituvchi ko‘rsatgan topshiriqlar sahifasida P0 ni tanlab tekshiruvni boshlang. Web serverdagi uy katalogingizdagi tekshiruv faylida bitta `web` satri bo‘lsa, 1 ball beriladi.')[lang], '']
             if m['id'] in OUTPUT_EXAMPLES:
                 example,reading=OUTPUT_EXAMPLES[m['id']]
                 out += ['### ' + LABELS['output'][lang], '', '```text', example, '```', '', reading[lang], '']
@@ -223,7 +228,7 @@ def make_markdown(reg, lang, kind):
         for number in ACTIVE_NUMBERS:
             task = tasks['M' + str(number)]
             title = MODULES_BY_NUMBER[number]['title'][lang]
-            points = f" ({task['raw_points_max']})" if number else ''
+            points = f" ({task['raw_points_max']})"
             out += [f"## {task['id']} {title}{points}", '', '### ' + L['requirements'][lang], '', MISSION_GUIDANCE[task['id']][lang], '']
             out += diagram_markdown(task['id'],lang)
             if number==0:

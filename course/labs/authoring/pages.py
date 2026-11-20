@@ -70,7 +70,7 @@ def write_pages(root, lang, registry, render_html, labels, modules):
             '| '+T('練習', 'Практика', 'Mashq')[lang]+' | '+T('自力課題', 'Задание', 'Topshiriq')[lang]+' | '+WORDS['topic'][lang]+' | '+WORDS['points'][lang]+' |', '| --- | --- | --- | --- |']
         for module in modules:
             n = int(module['id'][1:])
-            points = tasks[f'M{n}']['raw_points_max'] if n else T('授業で案内','По указанию преподавателя','O‘qituvchi e’lon qiladi')[lang]
+            points = tasks[f'M{n}']['raw_points_max']
             index.append(f'| [P{n}](p{n}.md) | [M{n}](m{n}.md) | {module["title"][lang]} | {points} |')
         index += ['', T('おすすめの順序', 'Рекомендуемый порядок', 'Tavsiya etilgan tartib')[lang]+':', '',
             ' → '.join(f'[{task}]({task.lower()}.md)' for task in ORDER), '',

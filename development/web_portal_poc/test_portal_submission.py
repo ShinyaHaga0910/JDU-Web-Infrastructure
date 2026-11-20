@@ -11,8 +11,8 @@ import progress_api as legacy
 from progress_api_v2 import AssessmentStore, assessment_attempt
 from portal_submission import PortalSubmissions
 from portal_checker_handler import serve
-from registry import build_report, canonical_checks
-from grading import grade_key, current_key, project_lab
+from registry import build_report, canonical_checks, INTRO_MARKERS
+from grading import grade_key, current_key, project_lab, project_course_lab
 
 
 class SubmissionTest(unittest.TestCase):
@@ -39,15 +39,15 @@ class SubmissionTest(unittest.TestCase):
             self.grades.submit(self.meta, attempt, summary)
         self.original = self.rows()
 
-    def report(self, task='M1', functional=False, observations=None):
-        values = {c: True for c in canonical_checks(task)}
+    def report(self, task='M1', functional=False, observations=None, *, intro=False):
+        values = {c: True for c in canonical_checks(task, intro=intro)}
         if not functional:
             for c in ('WEB06_PASSWORD_LOGIN','WEB06_CREATE_REFLECT','WEB06_EDIT_REFLECT','WEB06_LOGOUT',
                       'WEB07_ANONYMOUS_DENIED','WEB07_BAD_PASSWORD_DENIED'):
                 if c in values: values[c] = None
         values.update(observations or {})
         return build_report(task, self.meta, values, self.spec['run_id'],
-            mode='functional' if functional else 'read_only', checked_at=datetime.now(timezone.utc).isoformat())
+            mode='functional' if functional else 'read_only', checked_at=datetime.now(timezone.utc).isoformat(), intro=intro)
 
     def rows(self):
         values = self.db.query(TableName='grades',KeyConditionExpression='pk=:p',
@@ -103,6 +103,22 @@ class SubmissionTest(unittest.TestCase):
             self.assertFalse(receipt['counts_toward_assessment'])
             self.assertIsNone(self.grades.get(self.meta['pk'],grade_key(task)))
         self.assertEqual(project_lab(self.grades.labs(self.meta['lab_id'])[0])['raw_earned'],62)
+
+    def test_connection_grades_use_student_evidence_and_preserve_legacy_scores(self):
+        for task, (marker, _, _) in INTRO_MARKERS.items():
+            self.spec = self.new_spec(task)
+            missing = self.report(task, observations={marker: False}, intro=True)
+            self.assertTrue(self.save(missing)['counts_toward_assessment'])
+            self.assertEqual(self.grades.get(self.meta['pk'], grade_key(task, missing['contract_sha256']))['raw_earned'], 0)
+            self.spec = self.new_spec(task)
+            report = self.report(task, intro=True)
+            first = self.save(report)
+            self.assertEqual(self.save(report), first)
+            self.spec = self.new_spec(task)
+            self.assertFalse(self.save(self.report(task))['counts_toward_assessment'])
+        lab = self.grades.labs(self.meta['lab_id'])[0]
+        self.assertEqual(project_course_lab(lab)['raw_earned'], 61)
+        self.assertEqual(project_lab(lab)['raw_earned'], 62)
 
     def test_retry_returns_first_receipt_without_reordering_a_newer_lower_grade(self):
         first = self.report()

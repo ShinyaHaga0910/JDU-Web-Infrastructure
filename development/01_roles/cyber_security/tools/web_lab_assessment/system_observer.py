@@ -1,4 +1,5 @@
 """Per-host read-only state collectors. Output is booleans and bounded public evidence."""
+import errno
 import hashlib
 import json
 import os
@@ -9,7 +10,7 @@ import stat
 
 from db_observer import database_observations, read_runtime, web_database, admin_sql, literal, authenticated_sql
 from network_checks import active, command, dns_client, dns_server, normal_resolve, resolver_policy
-from registry import REGISTRY, TASKS
+from registry import INTRO_MARKERS, REGISTRY, TASKS
 
 
 def merge_all(values):
@@ -168,6 +169,30 @@ def application(profile):
     return out, aux
 
 
+def connection_marker(role, filename):
+    """Read a small, student-owned file without following links or changing it."""
+    try:
+        user = pwd.getpwnam('ssm-user')
+        home = Path(user.pw_dir)
+        if not home.is_absolute() or home.resolve() != home:
+            return False
+        flags = os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK
+        fd = os.open(home / filename, flags)
+        try:
+            info = os.fstat(fd)
+            expected = (role + '\n').encode()
+            return (stat.S_ISREG(info.st_mode) and info.st_uid == user.pw_uid
+                    and os.read(fd, len(expected) + 1) == expected)
+        finally:
+            os.close(fd)
+    except (FileNotFoundError, KeyError):
+        return False
+    except OSError as exc:
+        if exc.errno in (errno.ELOOP, errno.EISDIR):
+            return False
+        return None
+
+
 def observe(request):
     if os.geteuid() != 0:
         raise ValueError('Root observer required')
@@ -177,6 +202,9 @@ def observe(request):
     task = TASKS[request['task_id']]
     role, number = b['role'], int(request['task_id'][1:])
     out, aux = {}, {}
+    marker = INTRO_MARKERS.get(task['id'])
+    if marker and role == marker[1]:
+        out[marker[0]] = connection_marker(role, marker[2])
     profile = task.get('profile', 'mission')
     if number in (2, 4, 5, 6) and role in ('bastion', 'web'):
         dns_task = TASKS[('P' if request['task_id'].startswith('P') and number == 2 else 'M') + '2']

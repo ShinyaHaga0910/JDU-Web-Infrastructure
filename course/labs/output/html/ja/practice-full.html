@@ -22,7 +22,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>まず各Pの課題文を読み、必要なら詳しい操作例を一段ずつ使う。Pは手順付きの練習である。Mは別の対象・値で自分で構築する。課題は授業回番号ではなく、自分の進度で進める。Pの完了はMの合格に置き換わらない。</p>
 <p>P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6</p>
 <p>P5にもM2のDNSが必要。P4ではIPと名前を使ったDB接続を練習する。アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。</p>
-<p>M1=8、M2=13、M4=9、M5=13、M6=16（この5課題の自動採点は計59素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。</p>
+<p>P0=1、M0=1、M1=8、M2=13、M4=9、M5=13、M6=16（計61素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。</p>
 <h2 id="section-2">対象・前提・準備</h2>
 <p>初期配布の署名確認、新規5台または既存環境へのinstall、内部SSHと個別採点登録までを先に完了する。初期配布の手順は教材zipのdistribution/STUDENT.mdを読む。秘密鍵を共有Windowsへ置かず、CloudShellは本人Academy accountの中で使う。教師は本人用の匿名Lab ID・署名fingerprint・有効期限を案内する。</p>
 <p>共通IP表。public IPv4は固定しない。AWS regionはus-east-1、Ubuntu24.04/amd64。RDPはlabuser、SSMはssm-user、内部SSHはubuntu。user名とサーバー役割を混同しない。</p>
@@ -151,7 +151,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p><strong>実行環境:</strong></p>
 <p>CloudShell（学生本人のAWS）</p>
 <p><strong>目的と操作:</strong></p>
-<p>次のコマンドのi-YOUR-WEB-INSTANCE-IDを、P0.1で確認したWebサーバーのInstance IDに置き換えて、CloudShellで実行する。接続が完了したら、サーバーの初期構築時に置かれた/etc/jdu-web/bootstrap.jsonからロールを読み出す。このファイルのroleには、サーバーが担当する機能が記録されている。表示がwebなら、接続先はWebサーバーと確認できる。</p>
+<p>次のコマンドのi-YOUR-WEB-INSTANCE-IDを、P0.1で確認したWebサーバーのInstance IDに置き換えて、CloudShellで実行する。接続が完了したら、サーバーの初期構築時に置かれた/etc/jdu-web/bootstrap.jsonからロールを読み出す。このファイルのroleには、サーバーが担当する機能が記録されている。表示がwebなら、接続先はWebサーバーと確認できる。その端末で自分のホームディレクトリに p0-connection.txt を作り、1行目に web を記録する。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. CloudShellから指定EC2へSSM接続する。接続完了後に次へ進む。
 aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
@@ -159,7 +159,11 @@ aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
 id -un
 # 3. 設置済みのJSONファイルからサーバーのロールを読み出す。
 python3 -c 'import json;print(json.load(open(&quot;/etc/jdu-web/bootstrap.json&quot;))[&quot;role&quot;])'
-# 4. 現在のサーバーへの接続を閉じ、CloudShellへ戻る。
+# 4. ホームディレクトリの確認用ファイルに web と1行書く。
+printf '%s\n' web &gt; &quot;$HOME/p0-connection.txt&quot;
+# 5. $HOME/p0-connection.txt の内容を変更せずに読む。
+cat &quot;$HOME/p0-connection.txt&quot;
+# 6. 現在のサーバーへの接続を閉じ、CloudShellへ戻る。
 exit
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
@@ -170,18 +174,7 @@ ssm-user
 $ python3 -c …
 web
 </code></pre>
-<h4>P0.3 ブラウザで準備を確認する</h4>
-<p><strong>実行環境:</strong></p>
-<p>自分のPCのブラウザ：Web Portal</p>
-<p><strong>目的と操作:</strong></p>
-<p>教師から案内された課題画面を開く。学校Googleでログインし、本人AWSとの連携を済ませ、P0を選んで「この課題を確認する」を押す。結果が処理中なら「結果を更新する」を押す。</p>
-<p><strong>コマンド・設定値の意味:</strong></p>
-<p>ブラウザの確認結果は自動保存される。結果のPASS/FAIL/UNKNOWNと、処理・保存の状態を分けて読む。</p>
-<p><strong>期待する結果と読み方:</strong></p>
-<p>本人のLab・課題ID・確認時刻が正しい。各checkの結果と保存状態を読む。処理完了と保存を確認する。UNKNOWNは観測できなかった状態で、合格とは別。</p>
-<p><strong>うまくいかないとき:</strong></p>
-<p>失敗行のcheck ID・実行時刻・対象roleだけを相談に使う。token・password・本人用URLを共有しない。</p>
-<h4>P0.4 RDPで踏み台のデスクトップを開く</h4>
+<h4>P0.3 RDPで踏み台のデスクトップを開く</h4>
 <p><strong>実行環境:</strong></p>
 <p>学生のWindows PC（共有アカウント）</p>
 <p><strong>目的と操作:</strong></p>
@@ -196,6 +189,8 @@ mstsc /prompt
 <p>UbuntuのXfceデスクトップとFirefoxが開く。これは踏み台内のbrowserであり、Windows側のbrowserとは別。RDPのlabuserにはsudo管理権限がないため、構築はCloudShellからSSM/ssm-userで行う。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>Login failedならuser名と日本語/英語等のkeyboard配列を確認する。passwordを会話へ送らない。到達しない場合は現在のIPと許可された接続元CIDRを教師と確認し、3389を全公開しない。終了時はRDP内の自分の作業を保存し、接続を閉じる。</p>
+<h3>確認・提出</h3>
+<p>RDPの練習が終わったら、教師から案内された課題画面でP0を選び、「この課題を確認する」を押す。Webサーバーの自分のホームディレクトリに確認用ファイルがあり、内容が <code>web</code> の1行なら1点になる。</p>
 <h3>理解の確認（採点外）</h3>
 <p>WebへSSM接続したままDBの手順を入力すると、どのサーバーが変わるか？</p>
 <p><strong>考え方:</strong></p>

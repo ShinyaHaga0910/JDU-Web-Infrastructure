@@ -38,7 +38,8 @@ const text = {
     shared:'Umumiy kompyuterda ish tugagach, bu yerdan va Google hisobidan chiqing.', signedout:'Tizimdan chiqdingiz.' },
 };
 const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-export const MISSION_MAXIMA=Object.freeze({M1:8,M2:13,M4:9,M5:13,M6:16});
+const LEGACY_MAXIMA=Object.freeze({M1:8,M2:13,M4:9,M5:13,M6:16});
+export const MISSION_MAXIMA=Object.freeze({P0:1,M0:1,...LEGACY_MAXIMA});
 const stateText={
   ja:{running:'稼働中',stopped:'停止中',pending:'起動中',stopping:'停止処理中','shutting-down':'終了処理中',terminated:'終了済み',unknown:'確認できない',Online:'接続可',ConnectionLost:'接続なし',Inactive:'非アクティブ'},
   ru:{running:'Работает',stopped:'Остановлен',pending:'Запускается',stopping:'Останавливается','shutting-down':'Завершается',terminated:'Завершён',unknown:'Неизвестно',Online:'Доступно',ConnectionLost:'Нет связи',Inactive:'Неактивно'},
@@ -55,8 +56,9 @@ function page(lang, title, content, selection) {
 }
 
 export function checkedGrade(grade) {
-  if (!grade || !Number.isInteger(grade.raw_earned) || grade.raw_maximum !== 59 || grade.raw_earned < 0 || grade.raw_earned > 59 || !Array.isArray(grade.current_unresolved) || !Array.isArray(grade.missing_or_unresolved) || !grade.selected || typeof grade.selected !== 'object') throw new Error('Invalid grade');
-  if (Object.keys(grade.selected).some(id => !Object.hasOwn(MISSION_MAXIMA,id) || !Number.isInteger(grade.selected[id]?.raw_earned) || grade.selected[id].raw_earned < 0 || grade.selected[id].raw_earned > MISSION_MAXIMA[id]) || Object.values(grade.selected).reduce((sum,row)=>sum+row.raw_earned,0)!==grade.raw_earned) throw new Error('Invalid selected scores');
+  if (!grade || !Number.isInteger(grade.raw_earned) || ![59,61].includes(grade.raw_maximum) || grade.raw_earned < 0 || grade.raw_earned > grade.raw_maximum || !Array.isArray(grade.current_unresolved) || !Array.isArray(grade.missing_or_unresolved) || !grade.selected || typeof grade.selected !== 'object') throw new Error('Invalid grade');
+  const maxima=grade.raw_maximum===59?LEGACY_MAXIMA:MISSION_MAXIMA;
+  if (Object.keys(grade.selected).some(id => !Object.hasOwn(maxima,id) || !Number.isInteger(grade.selected[id]?.raw_earned) || grade.selected[id].raw_earned < 0 || grade.selected[id].raw_earned > maxima[id]) || Object.values(grade.selected).reduce((sum,row)=>sum+row.raw_earned,0)!==grade.raw_earned) throw new Error('Invalid selected scores');
   return grade;
 }
 
@@ -64,12 +66,12 @@ function gradeHtml(lang, grade) {
   const t=text[lang];
   checkedGrade(grade);
   const date = value => typeof value==='string' && value.length<=40 && Number.isFinite(Date.parse(value)) ? new Date(value).toISOString().slice(0,16).replace('T',' ')+' UTC' : t.noRecord;
-  const rows = ['M1','M2','M4','M5','M6'].map(id => {
+  const rows = Object.keys(grade.raw_maximum===59?LEGACY_MAXIMA:MISSION_MAXIMA).map(id => {
     const saved=grade.selected[id];
     const score=saved && Number.isInteger(saved.raw_earned) ? String(saved.raw_earned) : t.noRecord;
     return `<tr><th scope="row">${id}</th><td>${escape(score)}</td><td>${escape(grade.current_unresolved.includes(id) ? t.unknown : grade.current?.[id] ? t.currentOk : t.noRecord)}</td><td>${escape(date(grade.current?.[id]?.checked_at))}</td><td>${escape(date(saved?.received_at))}</td></tr>`;
   }).join('');
-  const total = Object.keys(grade.selected).length ? `${grade.raw_earned} / 59` : t.noRecord;
+  const total = Object.keys(grade.selected).length ? `${grade.raw_earned} / ${grade.raw_maximum}` : t.noRecord;
   const summary = grade.current_unresolved.length || grade.missing_or_unresolved.length ? t.unknown : t.currentOk;
   return `<section><h2>${escape(t.total)}</h2><p class="num">${escape(total)}</p><p>${escape(summary)}</p><div class="table-wrap"><table><thead><tr><th scope="col">${escape(t.mission)}</th><th scope="col">${escape(t.score)}</th><th scope="col">${escape(t.current)}</th><th scope="col">${escape(t.checked)}</th><th scope="col">${escape(t.received)}</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
 }

@@ -3,7 +3,7 @@ from html import escape
 from urllib.parse import urlencode
 
 from grading import project_course_lab, project_lab
-from registry import MAXIMUM, MISSIONS, TASKS, COURSE_MAXIMUM, COURSE_MISSIONS, COURSE_TASKS
+from registry import MAXIMUM, MISSIONS, TASKS, COURSE_MAXIMUM, COURSE_GRADED_TASKS, COURSE_TASKS
 
 TEXT = {
     'ja': dict(title='Web実習・素点と進捗', table='自力課題の素点', practice='練習の進捗',
@@ -42,8 +42,11 @@ def render(labs, role, token, language='ja', paused=False, *, current_curriculum
     language = language if language in TEXT else 'ja'
     t = TEXT[language]
     projector = project_course_lab if current_curriculum else project_lab
-    missions = COURSE_MISSIONS if current_curriculum else MISSIONS
-    practices = [task for task in (f'P{i}' for i in range(7)) if not current_curriculum or task in COURSE_TASKS]
+    missions = COURSE_GRADED_TASKS if current_curriculum else MISSIONS
+    practices = [task for task in (f'P{i}' for i in range(7))
+                 if not current_curriculum or task in COURSE_TASKS and task not in missions]
+    if not current_curriculum:
+        practices.append('M0')
     maximum = COURSE_MAXIMUM if current_curriculum else MAXIMUM
     note = t['note'].format(maximum=maximum)
     esc = lambda x: escape(str(x), quote=True)
@@ -76,8 +79,7 @@ def render(labs, role, token, language='ja', paused=False, *, current_curriculum
         row += '</td></tr>'
         mission_rows.append(row)
         practice_rows.append('<tr><th scope="row">' + label + '</th>'
-                             + ''.join(cell(view['current'].get(task)) for task in practices)
-                             + cell(view['current'].get('M0')) + '</tr>')
+                             + ''.join(cell(view['current'].get(task)) for task in practices) + '</tr>')
         old = [r for r in lab.get('results', []) if r['sk'].startswith('LATEST#') and 'contract_sha256' not in r]
         if old:
             historic.append('<li>' + esc(lab['lab_id']) + '<ul>' + ''.join(
@@ -113,6 +115,6 @@ def render(labs, role, token, language='ja', paused=False, *, current_curriculum
             + '</p><p>' + esc(t['status']) + '</p><h2>' + esc(t['table']) + '</h2>'
             + table(t['table'], [t['lab'], *[m + ' / ' + str(TASKS[m]['raw_points_max']) for m in missions], t['total']], mission_rows)
             + '<h2>' + esc(t['practice']) + '</h2>'
-            + table(t['practice'], [t['lab'], *practices, 'M0'], practice_rows)
+            + table(t['practice'], [t['lab'], *practices], practice_rows)
             + ('<details><summary>' + esc(t['legacy']) + '</summary><ul>' + ''.join(historic) + '</ul></details>' if historic else '')
             + '</main><footer>' + esc(note) + '</footer></body></html>')

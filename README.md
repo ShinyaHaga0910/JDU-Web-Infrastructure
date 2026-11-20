@@ -92,7 +92,7 @@ script=$(mktemp) &&
 - [WEB-00 完成像](modules/WEB-00-overview/README.md)
 - [WEB-02 HTTPとNginx](modules/WEB-02-http/README.md)
 
-旧第8章を削除し、教科書は第1〜13章の連番に整理しました。演習のP3/M3は欠番です。M1・M2・M4・M5・M6の自動採点は計59素点です。
+旧第8章を削除し、教科書は第1〜13章の連番に整理しました。演習のP3/M3は欠番です。P0・M0の接続確認は各1点で、M1・M2・M4・M5・M6と合わせて計61素点です。
 
 ## 現在のP/M課題教材
 
@@ -100,7 +100,7 @@ script=$(mktemp) &&
 
 教材改訂r1.1では、49段階すべてのコマンド/設定の意味、各Pの仕組みと理解確認、通信経路と出力の読み取り例を追加しています。Mには自分で作業と確認方法を整理する案内を付けています。
 
-正式配布r3は2027年1月31日末（UZT）まで有効です。11/03、新5台をCloudFormationで作成し、初期登録・教材配置・Google/AWS連携・実SSMからのP1/M1設定・ブラウザ確認・成績原本保存・教師表示まで受入済みです。[教師/学生の初回ワークフローとコマンド](course/labs/INITIAL-WORKFLOW.md)を参照してください。**全42手順の学生試読・母語校閲・教師の目視確認は未実施**で、[validation](course/labs/VALIDATION.md)と実機受入の範囲を分けています。全授業のCLASS_READYはfalseのままです。
+正式配布r3は2027年1月31日末（UZT）まで有効です。11/03、新5台をCloudFormationで作成し、初期登録・教材配置・Google/AWS連携・実SSMからのP1/M1設定・ブラウザ確認・成績原本保存・教師表示まで受入済みです。[教師/学生の初回ワークフローとコマンド](course/labs/INITIAL-WORKFLOW.md)を参照してください。**全41手順の学生試読・母語校閲・教師の目視確認は未実施**で、[validation](course/labs/VALIDATION.md)と実機受入の範囲を分けています。全授業のCLASS_READYはfalseのままです。
 
 ## 制作担当者
 

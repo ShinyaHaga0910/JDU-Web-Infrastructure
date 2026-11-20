@@ -17,17 +17,27 @@ assert MAXIMUM == 62 and len(MISSIONS) == 6
 
 # The signed D11 wire contract above is immutable. The current curriculum is a
 # teacher-owned subset; retired tasks never contribute to current course totals.
-COURSE_ID = 'web-2026-11-13-without-storage-cycle'
+COURSE_ID = 'web-2026-11-20-with-connection-checks'
 RETIRED_TASKS = frozenset({'P3', 'M3'})
 COURSE_TASKS = {tid: task for tid, task in TASKS.items() if tid not in RETIRED_TASKS}
 COURSE_MISSIONS = tuple(tid for tid in MISSIONS if tid in COURSE_TASKS)
-COURSE_MAXIMUM = sum(TASKS[tid]['raw_points_max'] for tid in COURSE_MISSIONS)
-assert COURSE_MAXIMUM == 59 and len(COURSE_MISSIONS) == 5
+INTRO_MARKERS = {'P0': ('WEB01_WEB_MARKER', 'web', 'p0-connection.txt'),
+                 'M0': ('WEB01_DB_MARKER', 'db', 'm0-connection.txt')}
+INTRO_CONTRACT_ID = CONTRACT_ID + '-connection-v1'
+INTRO_CONTRACT_SHA256 = hashlib.sha256(json.dumps(
+    [CONTRACT_SHA256, INTRO_CONTRACT_ID, INTRO_MARKERS], sort_keys=True).encode()).hexdigest()
+COURSE_POINTS = dict.fromkeys(INTRO_MARKERS, 1) | {tid: TASKS[tid]['raw_points_max'] for tid in COURSE_MISSIONS}
+COURSE_GRADED_TASKS = tuple(COURSE_POINTS)
+COURSE_MAXIMUM = sum(COURSE_POINTS.values())
 STATUSES = {'PASS', 'FAIL', 'UNKNOWN', 'NOT_APPLICABLE'}
 
 
-def canonical_checks(task_id):
-    return {cid: CHECKS[cid]['role'] for cid in TASKS[task_id]['required_report_checks']}
+def canonical_checks(task_id, *, intro=False):
+    checks = {cid: CHECKS[cid]['role'] for cid in TASKS[task_id]['required_report_checks']}
+    if intro:
+        cid, role, _ = INTRO_MARKERS[task_id]
+        checks[cid] = role
+    return checks
 
 
 def validate_report(report, instances):
@@ -35,9 +45,12 @@ def validate_report(report, instances):
               'mission_id', 'checks', 'contract_id', 'contract_sha256', 'run_id', 'checked_at', 'mode'}
     if (type(report) is not dict or set(report) != fields or type(report['schema_version']) is not int
             or report['schema_version'] != 2 or report['kind'] != 'assessment'
-            or report['contract_id'] != CONTRACT_ID or report['contract_sha256'] != CONTRACT_SHA256
             or report['mission_id'] not in TASKS or report['mode'] not in ('read_only', 'functional')):
         raise ValueError('Unsupported assessment contract or fields')
+    contract = report['contract_id'], report['contract_sha256']
+    intro = contract == (INTRO_CONTRACT_ID, INTRO_CONTRACT_SHA256) and report['mission_id'] in INTRO_MARKERS
+    if not intro and contract != (CONTRACT_ID, CONTRACT_SHA256):
+        raise ValueError('Unsupported assessment contract')
     for name in ('request_id', 'run_id', 'deployment_id'):
         parsed = uuid.UUID(report[name])
         if parsed.version != 4 or str(parsed) != report[name]:
@@ -45,7 +58,7 @@ def validate_report(report, instances):
     stamp = datetime.fromisoformat(report['checked_at'])
     if stamp.tzinfo is None or stamp.utcoffset().total_seconds() != 0:
         raise ValueError('UTC observation time required')
-    wanted = canonical_checks(report['mission_id'])
+    wanted = canonical_checks(report['mission_id'], intro=intro)
     checks = report['checks']
     if type(checks) is not list or not 1 <= len(checks) <= 100 or len(checks) != len(wanted):
         raise ValueError('Complete canonical check set required')
@@ -72,22 +85,26 @@ def score(report):
     task = TASKS[report['mission_id']]
     observed = {c['id']: c['status'] for c in report['checks']}
     scored, ready = task['progress_scored_checks'], task['readiness_checks']
+    intro = report['contract_sha256'] == INTRO_CONTRACT_SHA256
+    if intro:
+        scored = [INTRO_MARKERS[task['id']][0]]
     unresolved = sum(observed[c] not in ('PASS', 'FAIL') for c in scored)
     ready_ok = all(observed[c] == 'PASS' for c in ready)
     passed = sum(observed[c] == 'PASS' for c in scored)
     return dict(raw_earned=passed, raw_maximum=len(scored), unresolved=unresolved,
                 readiness_ok=ready_ok, evaluable=ready_ok and unresolved == 0,
                 complete=ready_ok and unresolved == 0 and passed == len(scored),
-                counts_toward_assessment=task['category'] == 'automated_mission')
+                counts_toward_assessment=intro or task['category'] == 'automated_mission')
 
 
-def build_report(task_id, identity, observations, run_id, *, mode='read_only', checked_at):
+def build_report(task_id, identity, observations, run_id, *, mode='read_only', checked_at, intro=False):
     report = {k: identity[k] for k in ('lab_id', 'release_id', 'deployment_id')}
     report.update(schema_version=2, kind='assessment', mission_id=task_id,
-                  contract_id=CONTRACT_ID, contract_sha256=CONTRACT_SHA256,
+                  contract_id=INTRO_CONTRACT_ID if intro else CONTRACT_ID,
+                  contract_sha256=INTRO_CONTRACT_SHA256 if intro else CONTRACT_SHA256,
                   request_id=str(uuid.uuid4()), run_id=run_id, checked_at=checked_at, mode=mode)
     report['checks'] = []
-    for cid, role in canonical_checks(task_id).items():
+    for cid, role in canonical_checks(task_id, intro=intro).items():
         value = observations.get(cid)
         if value is not None and type(value) is not bool:
             raise ValueError('Observer results must be boolean or unknown')

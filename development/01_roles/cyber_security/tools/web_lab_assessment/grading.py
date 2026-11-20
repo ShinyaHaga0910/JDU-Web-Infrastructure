@@ -1,14 +1,14 @@
 """Fixed-denominator views; latest evaluable attempt is separate from current health."""
-from registry import (CONTRACT_ID, CONTRACT_SHA256, MAXIMUM, MISSIONS, TASKS,
-                      COURSE_ID, COURSE_TASKS, COURSE_MISSIONS, COURSE_MAXIMUM)
+from registry import (CONTRACT_ID, CONTRACT_SHA256, INTRO_CONTRACT_SHA256, INTRO_MARKERS, MAXIMUM, MISSIONS, TASKS,
+                      COURSE_ID, COURSE_TASKS, COURSE_GRADED_TASKS, COURSE_MAXIMUM, COURSE_POINTS)
 
 
-def grade_key(mission_id):
-    return 'GRADE#' + CONTRACT_SHA256 + '#' + mission_id
+def grade_key(mission_id, contract=CONTRACT_SHA256):
+    return 'GRADE#' + contract + '#' + mission_id
 
 
-def current_key(task_id):
-    return 'LATEST#D11#' + CONTRACT_SHA256 + '#' + task_id
+def current_key(task_id, contract=CONTRACT_SHA256):
+    return 'LATEST#D11#' + contract + '#' + task_id
 
 
 def project_lab(lab):
@@ -35,28 +35,33 @@ def project_lab(lab):
 
 
 def project_course_lab(lab):
-    """Project preserved D11 reports onto the current 59-point curriculum.
-
-    Historical M3 rows are retained, but neither their points nor missing or
-    unresolved status can affect current course completion.
-    """
+    """Project the current curriculum without altering signed or historical rows."""
     view = project_lab(lab)
-    current = {key: row for key, row in view['current'].items() if key in COURSE_TASKS}
-    selected = {key: row for key, row in view['selected'].items() if key in COURSE_MISSIONS}
-    pending = [mid for mid in COURSE_MISSIONS if mid not in selected]
-    uncertain = [mid for mid in COURSE_MISSIONS if mid in current and not current[mid].get('evaluable')]
+    current = {key: row for key, row in view['current'].items() if key in COURSE_TASKS and key not in INTRO_MARKERS}
+    selected = {key: row for key, row in view['selected'].items() if key in COURSE_GRADED_TASKS}
+    intro_rows = {r['sk']: r for r in lab.get('results', []) if r.get('contract_sha256') == INTRO_CONTRACT_SHA256
+                  and r.get('deployment_id') == lab.get('deployment_id')}
+    for task in INTRO_MARKERS:
+        latest = intro_rows.get(current_key(task, INTRO_CONTRACT_SHA256))
+        grade = intro_rows.get(grade_key(task, INTRO_CONTRACT_SHA256))
+        if latest:
+            current[task] = latest
+        if grade:
+            selected[task] = grade
+    pending = [mid for mid in COURSE_GRADED_TASKS if mid not in selected]
+    uncertain = [mid for mid in COURSE_GRADED_TASKS if mid in current and not current[mid].get('evaluable')]
     return {**view, 'curriculum_id': COURSE_ID, 'raw_maximum': COURSE_MAXIMUM,
-            'raw_earned': sum(int(selected[mid]['raw_earned']) for mid in COURSE_MISSIONS if mid in selected),
+            'raw_earned': sum(int(selected[mid]['raw_earned']) for mid in COURSE_GRADED_TASKS if mid in selected),
             'current': current, 'selected': selected, 'missing_or_unresolved': pending,
             'current_unresolved': uncertain, 'fully_evaluated': not pending and not uncertain,
-            'complete': not pending and all(current.get(mid, {}).get('complete') for mid in COURSE_MISSIONS)}
+            'complete': not pending and all(current.get(mid, {}).get('complete') for mid in COURSE_GRADED_TASKS)}
 
 
 def export_labs(labs, after='', limit=25, *, current_curriculum=False):
     """No email, secret, normalized 25-point grade, or fixture grade enters this export."""
     exported = []
     projector = project_course_lab if current_curriculum else project_lab
-    missions = COURSE_MISSIONS if current_curriculum else MISSIONS
+    missions = COURSE_GRADED_TASKS if current_curriculum else MISSIONS
     maximum = COURSE_MAXIMUM if current_curriculum else MAXIMUM
     candidates = sorted(labs, key=lambda r: r['lab_id'])
     for lab in candidates:
@@ -72,7 +77,7 @@ def export_labs(labs, after='', limit=25, *, current_curriculum=False):
             return {k: int(v) if k in numeric else v for k, v in row.items() if k in (*numeric, 'readiness_ok',
                 'evaluable', 'complete', 'received_at', 'checked_at', 'request_id', 'deployment_id')}
         exported.append({k: v for k, v in view.items() if k not in ('current', 'selected')} | {
-            'missions': {m: dict(raw_maximum=TASKS[m]['raw_points_max'],
+            'missions': {m: dict(raw_maximum=COURSE_POINTS[m] if current_curriculum else TASKS[m]['raw_points_max'],
                                 selected=compact(view['selected'].get(m)), current=compact(view['current'].get(m)))
                              for m in missions}})
     last = exported[-1]['lab_id'] if exported else after

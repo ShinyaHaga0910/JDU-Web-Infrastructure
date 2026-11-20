@@ -97,7 +97,7 @@ class TeacherProgressTest(unittest.TestCase):
         row = self.call()['students'][0]
         self.assertEqual(row['status'], 'ok')
         self.assertEqual(row['grade']['selected'], {})
-        self.assertEqual(len(row['grade']['missing_or_unresolved']), 5)
+        self.assertEqual(row['grade']['missing_or_unresolved'], ['P0', 'M0', 'M1', 'M2', 'M4', 'M5', 'M6'])
 
     def test_pagination_is_fixed_to_permitted_labs(self):
         template = self.grades.rows['course-student']

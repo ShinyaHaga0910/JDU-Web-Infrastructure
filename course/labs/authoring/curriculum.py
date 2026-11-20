@@ -13,5 +13,8 @@ def active_registry(baseline):
     value['tasks'] = [t for t in value['tasks'] if t['id'] in ACTIVE_ORDER]
     value['recommended_order'] = list(ACTIVE_ORDER)
     value['raw_points_by_mission'] = POLICY['mission_points']
+    for task in value['tasks']:
+        if task['id'] in POLICY['intro_points']:
+            task['raw_points_max'] = POLICY['intro_points'][task['id']]
     value['raw_points_max'] = RAW_MAXIMUM
     return value

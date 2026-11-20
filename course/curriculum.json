@@ -1,6 +1,6 @@
 {
-  "curriculum_id": "web-2026-11-13-without-storage-cycle",
-  "effective_date": "2026-11-13",
+  "curriculum_id": "web-2026-11-20-with-connection-checks",
+  "effective_date": "2026-11-20",
   "retired_tasks": [
     "P3",
     "M3"
@@ -26,7 +26,11 @@
     "M5": 13,
     "M6": 16
   },
-  "raw_maximum": 59,
+  "intro_points": {
+    "P0": 1,
+    "M0": 1
+  },
+  "raw_maximum": 61,
   "active_textbook_chapters": [
     1,
     2,

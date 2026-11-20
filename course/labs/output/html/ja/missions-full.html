@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">使い方と共通の約束</a> · <a href="#section-2">対象・前提・準備</a> · <a href="#section-3">操作例の読み方</a> · <a href="#section-4">完成像と通信経路</a> · <a href="#section-5">自力課題に取り組む前に</a> · <a href="#section-6">M0 サーバーの確認と接続</a> · <a href="#section-7">M1 HTTPで静的ファイルを返す (8)</a> · <a href="#section-8">M2 内部DNSと通常の名前解決 (13)</a> · <a href="#section-9">M4 PostgreSQLへの認証接続 (9)</a> · <a href="#section-10">M5 教員アプリをWeb・DBへ接続する (13)</a> · <a href="#section-11">M6 最小権限と公開範囲 (16)</a> · <a href="#section-12">次回の再開・結果の確認</a> · <a href="#section-13">参考資料</a></nav></header><main id="content" tabindex="-1"><h1>Web演習：自力課題M0〜M6</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">使い方と共通の約束</a> · <a href="#section-2">対象・前提・準備</a> · <a href="#section-3">操作例の読み方</a> · <a href="#section-4">完成像と通信経路</a> · <a href="#section-5">自力課題に取り組む前に</a> · <a href="#section-6">M0 サーバーの確認と接続 (1)</a> · <a href="#section-7">M1 HTTPで静的ファイルを返す (8)</a> · <a href="#section-8">M2 内部DNSと通常の名前解決 (13)</a> · <a href="#section-9">M4 PostgreSQLへの認証接続 (9)</a> · <a href="#section-10">M5 教員アプリをWeb・DBへ接続する (13)</a> · <a href="#section-11">M6 最小権限と公開範囲 (16)</a> · <a href="#section-12">次回の再開・結果の確認</a> · <a href="#section-13">参考資料</a></nav></header><main id="content" tabindex="-1"><h1>Web演習：自力課題M0〜M6</h1>
 <p>教材初版・教師確認用。学生の最初からの通し試読は未実施。</p>
 <p>ロシア語・ウズベク語は日本語原稿と同じ手順・条件の翻訳初稿。母語話者校閲は未実施。</p>
 <p><a href="../ja/missions-full.html">日本語</a> · <a href="../ru/missions-full.html">Русский</a> · <a href="../uz/missions-full.html">O‘zbekcha</a></p>
@@ -22,7 +22,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>まず各Pの課題文を読み、必要なら詳しい操作例を一段ずつ使う。Pは手順付きの練習である。Mは別の対象・値で自分で構築する。課題は授業回番号ではなく、自分の進度で進める。Pの完了はMの合格に置き換わらない。</p>
 <p>P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6</p>
 <p>P5にもM2のDNSが必要。P4ではIPと名前を使ったDB接続を練習する。アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。</p>
-<p>M1=8、M2=13、M4=9、M5=13、M6=16（この5課題の自動採点は計59素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。</p>
+<p>P0=1、M0=1、M1=8、M2=13、M4=9、M5=13、M6=16（計61素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。</p>
 <h2 id="section-2">対象・前提・準備</h2>
 <p>初期配布の署名確認、新規5台または既存環境へのinstall、内部SSHと個別採点登録までを先に完了する。初期配布の手順は教材zipのdistribution/STUDENT.mdを読む。秘密鍵を共有Windowsへ置かず、CloudShellは本人Academy accountの中で使う。教師は本人用の匿名Lab ID・署名fingerprint・有効期限を案内する。</p>
 <p>共通IP表。public IPv4は固定しない。AWS regionはus-east-1、Ubuntu24.04/amd64。RDPはlabuser、SSMはssm-user、内部SSHはubuntu。user名とサーバー役割を混同しない。</p>
@@ -129,9 +129,9 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>まず完成要件から「どのサーバーの、どのファイル・名前・DB・roleを変えるか」を自分の作業表へ整理する。練習と本課題の値を比較し、Mで必要な対象だけを選ぶ。採点表は完成状態の条件であり、実行順のコマンド一覧ではない。</p>
 <p>次に「どこから何を確認すれば、要件を満たしたと分かるか」を考える。ファイルを確認する場所と、接続を試す場所は同じとは限らない。許可経路の成功と、制限すべき経路の拒否を分けて記録する。</p>
 <p>ブラウザで課題を選んで確認し、結果と保存状態を読む。M5/M6の機能確認では既存アプリ管理者パスワードを非表示入力する。成績は自動保存される。理解の確認用メモやPの説明問題を、追加の成績要件にはしない。</p>
-<h2 id="section-6">M0 サーバーの確認と接続</h2>
+<h2 id="section-6">M0 サーバーの確認と接続 (1)</h2>
 <h3>完成要件</h3>
-<p>P0ではWebサーバーを例に接続を練習した。M0ではEC2の一覧から自分のDBサーバーを選び、そのインスタンスIDを使ってCloudShellからSSMで接続する。接続先がDBサーバー（役割はdb）、操作ユーザーがssm-userであることを自分で確かめる。その後、課題画面でM0を選び、自分の環境の準備結果を確認する。</p>
+<p>P0ではWebサーバーを例に接続を練習した。M0ではEC2の一覧から自分のDBサーバーを選び、そのインスタンスIDを使ってCloudShellからSSMで接続する。接続先がDBサーバー（役割はdb）、操作ユーザーがssm-userであることを確かめる。DBサーバー上の自分のホームディレクトリに <code>m0-connection.txt</code> を作り、<code>db</code> だけを1行に記録する。課題画面でM0を選び、記録が確認されると1点になる。</p>
 <h3>操作するサーバーと教材の配置先</h3>
 <p><img src="../../../assets/ja/m0-ssm.png" alt="利用者PCのブラウザでAWSのCloudShellを開き、SSMで対象のEC2へ接続する。教材ファイルの配置先はWebサーバーとDBサーバー。共通登録コード方式では初期構築時に配置される。" width="1040" height="680" loading="lazy"></p>
 <p>利用者PCのブラウザでAWSのCloudShellを開き、SSMで対象のEC2へ接続する。教材ファイルの配置先はWebサーバーとDBサーバー。共通登録コード方式では初期構築時に配置される。</p>

@@ -5,13 +5,14 @@ import time
 import progress_api as legacy
 from dashboard import render
 from grading import export_labs, grade_key, current_key
-from registry import CONTRACT_ID, CONTRACT_SHA256, score, validate_report
+from registry import CONTRACT_ID, score, validate_report
 
 
 class AssessmentStore(legacy.DynamoStore):
     def submission_writes(self, meta, attempt, summary):
         """Canonical v2 writes, also used by the private portal authorizer."""
-        latest = dict(summary, pk=meta['pk'], sk=current_key(attempt['report']['mission_id']),
+        contract = summary['contract_sha256']
+        latest = dict(summary, pk=meta['pk'], sk=current_key(attempt['report']['mission_id'], contract),
                       checks=attempt['report']['checks'])
         writes = [
             {'Put': {'TableName': self.table, 'Item': self.pack(attempt), 'ConditionExpression': 'attribute_not_exists(pk)'}},
@@ -25,7 +26,7 @@ class AssessmentStore(legacy.DynamoStore):
                         'ExpressionAttributeValues': self.pack({':summary': summary, ':now': attempt['received_at'],
                             ':token': meta['token_hash'], ':deployment': meta['deployment_id'], ':active': True})}}]
         if summary['counts_toward_assessment'] and summary['evaluable']:
-            grade = dict(latest, sk=grade_key(attempt['report']['mission_id']))
+            grade = dict(latest, sk=grade_key(attempt['report']['mission_id'], contract))
             writes.append({'Put': {'TableName': self.table, 'Item': self.pack(grade),
                                    'ConditionExpression': 'attribute_not_exists(received_at) OR received_at<=:now',
                                    'ExpressionAttributeValues': self.pack({':now': attempt['received_at']})}})
@@ -58,7 +59,7 @@ class AssessmentStore(legacy.DynamoStore):
             cursor = None
             while True:
                 args = dict(TableName=self.table, KeyConditionExpression='pk=:pk AND begins_with(sk,:prefix)',
-                            ExpressionAttributeValues=self.pack({':pk': lab['pk'], ':prefix': 'GRADE#' + CONTRACT_SHA256}),
+                            ExpressionAttributeValues=self.pack({':pk': lab['pk'], ':prefix': 'GRADE#'}),
                             ConsistentRead=True)
                 if cursor:
                     args['ExclusiveStartKey'] = cursor
@@ -86,12 +87,12 @@ def assessment_attempt(row, body):
     stamp = legacy.now_iso()
     summary = dict(kind='assessment', mission_id=body['mission_id'], request_id=body['request_id'],
                        deployment_id=body['deployment_id'], received_at=stamp, checked_at=body['checked_at'],
-                       contract_id=CONTRACT_ID, contract_sha256=CONTRACT_SHA256,
+                       contract_id=body['contract_id'], contract_sha256=body['contract_sha256'],
                        passed=sum(c['status'] == 'PASS' for c in body['checks']), total=len(body['checks']),
                        unknown=sum(c['status'] not in ('PASS', 'FAIL') for c in body['checks']), **score(body))
     receipt = dict(ok=True, stored=True, lab_id=row['lab_id'], deployment_id=body['deployment_id'],
                        release_id=row['release_id'], request_id=body['request_id'], received_at=stamp,
-                       kind='assessment', contract_id=CONTRACT_ID, contract_sha256=CONTRACT_SHA256)
+                       kind='assessment', contract_id=body['contract_id'], contract_sha256=body['contract_sha256'])
     attempt = dict(pk=row['pk'], sk='REQUEST#' + body['request_id'], report=body, receipt=receipt,
                        received_at=stamp, body_sha256=legacy.digest(legacy.encoded(body)))
     return attempt, summary

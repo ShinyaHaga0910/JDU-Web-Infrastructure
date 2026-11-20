@@ -13,7 +13,7 @@ import sys
 from app_probe import probe, public_match
 from db_observer import admin_sql, literal
 from network_checks import http, inventory, normal_resolve
-from registry import TASKS, REGISTRY, canonical_checks, build_report, validate_report
+from registry import INTRO_MARKERS, TASKS, REGISTRY, canonical_checks, build_report, validate_report
 from system_observer import observe, merge_all
 
 
@@ -69,7 +69,9 @@ def collect(request, *, password=None):
                 results[role] = future.result()
             except (ValueError, OSError, subprocess.SubprocessError):
                 results[role] = None
-    checks = {cid: None for cid in canonical_checks(task['id'])}
+    intro = task['id'] in INTRO_MARKERS
+    report_checks = canonical_checks(task['id'], intro=intro)
+    checks = {cid: None for cid in report_checks}
     for value in results.values():
         if value:
             checks.update(value['checks'])
@@ -159,9 +161,9 @@ def collect(request, *, password=None):
                                                   'WEB06_PASSWORD_LOGIN', 'WEB06_CREATE_REFLECT')]
     checks['WEB_READY_DEPENDENCIES'] = merge_all(dependency)
     identity_data = {k: b[k] for k in ('lab_id', 'release_id', 'deployment_id', 'instances')}
-    report = build_report(task['id'], identity_data, {cid: checks.get(cid) for cid in canonical_checks(task['id'])},
+    report = build_report(task['id'], identity_data, {cid: checks.get(cid) for cid in report_checks},
                           request['run_id'], mode='functional' if password is not None else 'read_only',
-                          checked_at=datetime.now(timezone.utc).isoformat())
+                          checked_at=datetime.now(timezone.utc).isoformat(), intro=intro)
     return dict(report=report, storage_evidence=evidence['web'] if number == 3 else {})
 
 

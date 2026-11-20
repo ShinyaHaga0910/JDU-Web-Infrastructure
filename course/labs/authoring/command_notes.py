@@ -45,7 +45,9 @@ def explanation(command, lang):
         return a(f'作業場所を {target} へ移す。',f'Перейти в рабочий каталог {target}.',f'Ish katalogini {target} ga o‘zgartirish.')
     if args[0]=='mkdir':return a('練習の作業ディレクトリを作る。既存ならそのまま使う。','Создать рабочий каталог; существующий сохранить.','Mashq katalogini yaratish; mavjud bo‘lsa saqlash.')
     if args[0]=='nano':return a('practice.txtを編集する。本文を入力し、保存して終了する。','Открыть practice.txt: ввести текст, сохранить и выйти.','Practice.txt ni ochish: matn yozish, saqlash va chiqish.')
-    if args[0]=='printf':return a('自分のLab IDを含む練習用marker本文を作業ファイルへ書く。','Записать учебный marker со своим Lab ID в рабочий файл.','O‘z Lab ID bilan mashq marker matnini ish fayliga yozish.')
+    if args[0]=='printf':
+        if 'p0-connection.txt' in command:return a('ホームディレクトリの確認用ファイルに web と1行書く。','Записать одну строку web в проверочный файл домашнего каталога.','Uy katalogidagi tekshiruv fayliga bitta web satrini yozish.')
+        return a('自分のLab IDを含む練習用marker本文を作業ファイルへ書く。','Записать учебный marker со своим Lab ID в рабочий файл.','O‘z Lab ID bilan mashq marker matnini ish fayliga yozish.')
     if args[0]=='findmnt':return a('/var/libが載っているファイルシステムを調べる。','Определить файловую систему для /var/lib.','/var/lib joylashgan filesystem ni aniqlash.')
     if args[0]=='lsblk':return a('ディスクの名前・種類・容量・マウント先・識別情報を読む。','Показать имена, типы, размеры, точки монтирования и ID дисков.','Disk nomi, turi, hajmi, mount joyi va ID sini o‘qish.')
     if args[0]=='df':return a('/var/libの使用量と空き容量を確認する。','Проверить занятое и свободное место /var/lib.','/var/lib ishlatilgan va bo‘sh joyini tekshirish.')

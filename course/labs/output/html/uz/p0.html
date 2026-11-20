@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Nimani o‘rganamiz</a> · <a href="#section-2">Topshiriq</a> · <a href="#section-3">Serverlarga ulanish va kurs fayllari</a> · <a href="#section-4">Dastlabki sozlashda joylanadigan o‘quv fayllari</a> · <a href="#section-5">Yechim namunasi (bajarish tartibi)</a> · <a href="#section-6">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P0 Shaxsiy muhit va buyruqlarni bajarish joyi</h1>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Nimani o‘rganamiz</a> · <a href="#section-2">Topshiriq</a> · <a href="#section-3">Serverlarga ulanish va kurs fayllari</a> · <a href="#section-4">Dastlabki sozlashda joylanadigan o‘quv fayllari</a> · <a href="#section-5">Yechim namunasi (bajarish tartibi)</a> · <a href="#section-6">Tekshirish va topshirish</a> · <a href="#section-7">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P0 Shaxsiy muhit va buyruqlarni bajarish joyi</h1>
 <p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a></p>
 <p><a href="../ja/p0.html">日本語</a> · <a href="../ru/p0.html">Русский</a> · <a href="../uz/p0.html">O‘zbekcha</a></p>
 <p>Mos topshiriq: <a href="m0.html">M0</a>.</p>
@@ -42,7 +42,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Talabaning shaxsiy AWS hisobidagi CloudShell</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>Birinchi buyruqdagi i-YOUR-WEB-INSTANCE-ID o‘rniga P0.1 da tekshirilgan Web serverning Instance ID sini yozing va buyruqni CloudShell da bajaring. Ulangach, serverni dastlabki sozlashda joylangan /etc/jdu-web/bootstrap.json faylidan rolni o‘qing. role maydonida server vazifasi saqlanadi. web qiymati Web serverga ulanganligingizni tasdiqlaydi.</p>
+<p>Birinchi buyruqdagi i-YOUR-WEB-INSTANCE-ID o‘rniga P0.1 da tekshirilgan Web serverning Instance ID sini yozing va buyruqni CloudShell da bajaring. Ulangach, serverni dastlabki sozlashda joylangan /etc/jdu-web/bootstrap.json faylidan rolni o‘qing. role maydonida server vazifasi saqlanadi. web qiymati Web serverga ulanganligingizni tasdiqlaydi. Shu terminalda uy katalogingizga bitta web satri bor p0-connection.txt faylini yarating.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. CloudShell dan tanlangan EC2 ga SSM ochish; ulanishni kutish.
 aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
@@ -50,7 +50,11 @@ aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
 id -un
 # 3. Bootstrap dan faqat role ni o‘qib, ulangan server vazifasini tekshirish.
 python3 -c 'import json;print(json.load(open(&quot;/etc/jdu-web/bootstrap.json&quot;))[&quot;role&quot;])'
-# 4. Joriy server session ini yopib CloudShell ga qaytish.
+# 4. Uy katalogidagi tekshiruv fayliga bitta web satrini yozish.
+printf '%s\n' web &gt; &quot;$HOME/p0-connection.txt&quot;
+# 5. $HOME/p0-connection.txt mazmunini o‘zgartirmay o‘qish.
+cat &quot;$HOME/p0-connection.txt&quot;
+# 6. Joriy server session ini yopib CloudShell ga qaytish.
 exit
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
@@ -61,18 +65,7 @@ ssm-user
 $ python3 -c …
 web
 </code></pre>
-<h3>P0.3 Tayyorlikni brauzerda tekshirish</h3>
-<p><strong>Bajarish muhiti:</strong></p>
-<p>Shaxsiy PC brauzeri: Web Portal</p>
-<p><strong>Maqsad va amallar:</strong></p>
-<p>O‘qituvchi bergan havola orqali topshiriqlar sahifasini oching. Maktab Google orqali kirib, o‘z AWS hisobingizni bog‘lang. P0 ni tanlab tekshiruvni boshlang; ishlov davom etsa natijani yangilang.</p>
-<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Brauzer natijani avtomatik saqlaydi. PASS/FAIL/UNKNOWN va ishlov/saqlash holatini farqlang.</p>
-<p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>O‘z Lab, topshiriq ID va vaqtni tekshiring. Check natijalari va saqlash holatini o‘qing; tugashi va saqlanishini kuting. UNKNOWN o‘lchab bo‘lmagan holat, muvaffaqiyat emas.</p>
-<p><strong>Ishlamasa:</strong></p>
-<p>Yordam uchun check ID, vaqt va server rolini yozing. Token, parol va shaxsiy URL ni ulashmang.</p>
-<h3>P0.4 RDP orqali bastion ish stolini ochish</h3>
+<h3>P0.3 RDP orqali bastion ish stolini ochish</h3>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Talabaning Windows PC si (umumiy hisob)</p>
 <p><strong>Maqsad va amallar:</strong></p>
@@ -87,7 +80,9 @@ mstsc /prompt
 <p>Ubuntu bastion ichida Xfce va Firefox ochiladi; bu Windows browser idan boshqa. labuser da sudo yo‘q: qurishni CloudShell → SSM/ssm-user orqali bajaring.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Login failed bo‘lsa user nomi va klaviatura tartibini tekshiring. Parolni chat ga yubormang. Ulanmasa joriy IP va ruxsatli CIDR ni o‘qituvchi bilan tekshiring; 3389 ni hammaga ochmang. RDP ni yopishdan oldin ishni saqlang.</p>
-<h2 id="section-6">Tushunishni tekshirish (ballsiz)</h2>
+<h2 id="section-6">Tekshirish va topshirish</h2>
+<p>RDP mashqi tugagach, o‘qituvchi ko‘rsatgan topshiriqlar sahifasida P0 ni tanlab tekshiruvni boshlang. Web serverdagi uy katalogingizdagi tekshiruv faylida bitta <code>web</code> satri bo‘lsa, 1 ball beriladi.</p>
+<h2 id="section-7">Tushunishni tekshirish (ballsiz)</h2>
 <p>Web SSM session ichida DB qadamlarini kiritsangiz, qaysi server o‘zgaradi?</p>
 <p><strong>Izoh:</strong></p>
 <p>Joriy Web o‘zgaradi. Exit bilan CloudShell ga qaytib DB instance ID ga qayta ulaning.</p>

@@ -1,4 +1,4 @@
-<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M0 Shaxsiy muhit va buyruqlarni bajarish joyi</title><style>
+<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M0 Shaxsiy muhit va buyruqlarni bajarish joyi (1)</title><style>
 :root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
 *{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
 header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
@@ -13,12 +13,12 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Tayyor holat talablari</a> · <a href="#section-2">Serverlarga ulanish va kurs fayllari</a> · <a href="#section-3">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M0 Shaxsiy muhit va buyruqlarni bajarish joyi</h1>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Tayyor holat talablari</a> · <a href="#section-2">Serverlarga ulanish va kurs fayllari</a> · <a href="#section-3">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M0 Shaxsiy muhit va buyruqlarni bajarish joyi (1)</h1>
 <p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a></p>
 <p><a href="../ja/m0.html">日本語</a> · <a href="../ru/m0.html">Русский</a> · <a href="../uz/m0.html">O‘zbekcha</a></p>
 <p>Mos topshiriq: <a href="p0.html">P0</a>.</p>
 <h2 id="section-1">Tayyor holat talablari</h2>
-<p>P0 da Web serverga ulanishni mashq qildingiz. M0 da EC2 ro‘yxatidan o‘z DB serveringizni toping va uning instance ID si orqali CloudShell dan SSM bilan ulaning. DB serverda (roli db) ssm-user foydalanuvchisi bilan ishlayotganingizni tekshiring. So‘ng topshiriqlar sahifasida M0 ni tanlab, muhitingiz tayyorligini tekshiring.</p>
+<p>P0 da Web serverga ulanishni mashq qildingiz. M0 da EC2 ro‘yxatidan o‘z DB serveringizni toping va uning instance ID si orqali CloudShell dan SSM bilan ulaning. Rol db, foydalanuvchi ssm-user ekanini tekshiring. DB serverdagi uy katalogingizda faqat <code>db</code> satri bor <code>m0-connection.txt</code> faylini yarating. Topshiriqlar sahifasida M0 ni tanlang. Fayl tasdiqlansa 1 ball beriladi.</p>
 <h2 id="section-2">Serverlarga ulanish va kurs fayllari</h2>
 <p><img src="../../../assets/uz/m0-ssm.png" alt="O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda joylanadi." width="1040" height="680" loading="lazy"></p>
 <p>O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda joylanadi.</p>

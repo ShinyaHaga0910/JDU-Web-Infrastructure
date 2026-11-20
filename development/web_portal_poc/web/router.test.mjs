@@ -13,10 +13,22 @@ const sample={raw_earned:34,raw_maximum:59,current_unresolved:['M5'],missing_or_
               current:{M5:{evaluable:false,checked_at:'2026-10-27T09:00:00Z'}},selected:{M1:{raw_earned:8},M2:{raw_earned:13},M5:{raw_earned:13,received_at:'2026-10-27T09:05:00Z'}}};
 const req=(path,options={})=>new Request(`https://portal.example${path}`,options);
 
-test('score bounds match the active subset of the signed assessment registry',async()=>{
+test('score bounds match the course points and signed mission weights',async()=>{
   const registry=JSON.parse(await readFile(new URL('../../01_roles/cyber_security/tools/web_lab_assessment/assessment-registry.json',import.meta.url),'utf8'));
+  const curriculum=JSON.parse(await readFile(new URL('../../../course/curriculum.json',import.meta.url),'utf8'));
   const maxima=Object.fromEntries(registry.tasks.filter(t=>t.category==='automated_mission' && t.id!=='M3').map(t=>[t.id,t.raw_points_max]));
-  assert.deepEqual(MISSION_MAXIMA,maxima);
+  assert.deepEqual(MISSION_MAXIMA,{...curriculum.intro_points,...maxima});
+  assert.equal(Object.values(MISSION_MAXIMA).reduce((sum,value)=>sum+value,0),curriculum.raw_maximum);
+});
+
+test('saved connection grades appear in the current course total',async()=>{
+  const grade={...sample,raw_maximum:61,raw_earned:36,
+    selected:{...sample.selected,P0:{raw_earned:1},M0:{raw_earned:1}}};
+  const app=createApp({env,verify:verified,sessions,getGrade:async()=>({status:'ok',grade})});
+  const body=await (await app(req('/grades',{headers:{cookie:credentials}}))).text();
+  assert.match(body,/36 \/ 61/);
+  assert.match(body,/>P0<\/th><td>1<\/td>/);
+  assert.match(body,/>M0<\/th><td>1<\/td>/);
 });
 
 test('verified user sees only the server-resolved score and current unknown',async()=>{

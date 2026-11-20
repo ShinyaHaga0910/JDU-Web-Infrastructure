@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M0 サーバーの確認と接続</title><style>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M0 サーバーの確認と接続 (1)</title><style>
 :root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
 *{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
 header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
@@ -13,12 +13,12 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">完成要件</a> · <a href="#section-2">操作するサーバーと教材の配置先</a> · <a href="#section-3">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M0 サーバーの確認と接続</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">完成要件</a> · <a href="#section-2">操作するサーバーと教材の配置先</a> · <a href="#section-3">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M0 サーバーの確認と接続 (1)</h1>
 <p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
 <p><a href="../ja/m0.html">日本語</a> · <a href="../ru/m0.html">Русский</a> · <a href="../uz/m0.html">O‘zbekcha</a></p>
 <p>対応する詳しい練習は<a href="p0.html">P0</a>。</p>
 <h2 id="section-1">完成要件</h2>
-<p>P0ではWebサーバーを例に接続を練習した。M0ではEC2の一覧から自分のDBサーバーを選び、そのインスタンスIDを使ってCloudShellからSSMで接続する。接続先がDBサーバー（役割はdb）、操作ユーザーがssm-userであることを自分で確かめる。その後、課題画面でM0を選び、自分の環境の準備結果を確認する。</p>
+<p>P0ではWebサーバーを例に接続を練習した。M0ではEC2の一覧から自分のDBサーバーを選び、そのインスタンスIDを使ってCloudShellからSSMで接続する。接続先がDBサーバー（役割はdb）、操作ユーザーがssm-userであることを確かめる。DBサーバー上の自分のホームディレクトリに <code>m0-connection.txt</code> を作り、<code>db</code> だけを1行に記録する。課題画面でM0を選び、記録が確認されると1点になる。</p>
 <h2 id="section-2">操作するサーバーと教材の配置先</h2>
 <p><img src="../../../assets/ja/m0-ssm.png" alt="利用者PCのブラウザでAWSのCloudShellを開き、SSMで対象のEC2へ接続する。教材ファイルの配置先はWebサーバーとDBサーバー。共通登録コード方式では初期構築時に配置される。" width="1040" height="680" loading="lazy"></p>
 <p>利用者PCのブラウザでAWSのCloudShellを開き、SSMで対象のEC2へ接続する。教材ファイルの配置先はWebサーバーとDBサーバー。共通登録コード方式では初期構築時に配置される。</p>

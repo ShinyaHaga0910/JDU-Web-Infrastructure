@@ -22,7 +22,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P - batafsil qadamli mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.</p>
 <p>P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6</p>
 <p>P5 uchun ham M2 DNS kerak. P4 da DB ga IP va nom orqali ulanishni mashq qiling. Ilova db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating.</p>
-<p>M1=8, M2=13, M4=9, M5=13, M6=16: bu beshta topshiriqning avtomatik tekshiruvlari jami 59 xom ball. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.</p>
+<p>P0=1, M0=1, M1=8, M2=13, M4=9, M5=13, M6=16: jami 61 xom ball. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.</p>
 <h2 id="section-2">Muhit va tayyorgarlik</h2>
 <p>Avval boshlang‘ich tarqatma imzosi, yangi beshta server yoki mavjud muhitga install, ichki SSH va shaxsiy ro‘yxatni tugating. Yo‘riqnoma zip dagi distribution/STUDENT.md da. Maxfiy kalitni umumiy Windows ga saqlamang; shaxsiy Academy hisobining CloudShell idan foydalaning. O‘qituvchi anonim Lab ID, fingerprint va muddatni beradi.</p>
 <p>Umumiy private IP quyida; public IPv4 doimiy emas. AWS region us-east-1, Ubuntu24.04/amd64. RDP: labuser; SSM: ssm-user; ichki SSH: ubuntu. User nomi va server rolini adashtirmang.</p>
@@ -151,7 +151,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Talabaning shaxsiy AWS hisobidagi CloudShell</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>Birinchi buyruqdagi i-YOUR-WEB-INSTANCE-ID o‘rniga P0.1 da tekshirilgan Web serverning Instance ID sini yozing va buyruqni CloudShell da bajaring. Ulangach, serverni dastlabki sozlashda joylangan /etc/jdu-web/bootstrap.json faylidan rolni o‘qing. role maydonida server vazifasi saqlanadi. web qiymati Web serverga ulanganligingizni tasdiqlaydi.</p>
+<p>Birinchi buyruqdagi i-YOUR-WEB-INSTANCE-ID o‘rniga P0.1 da tekshirilgan Web serverning Instance ID sini yozing va buyruqni CloudShell da bajaring. Ulangach, serverni dastlabki sozlashda joylangan /etc/jdu-web/bootstrap.json faylidan rolni o‘qing. role maydonida server vazifasi saqlanadi. web qiymati Web serverga ulanganligingizni tasdiqlaydi. Shu terminalda uy katalogingizga bitta web satri bor p0-connection.txt faylini yarating.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. CloudShell dan tanlangan EC2 ga SSM ochish; ulanishni kutish.
 aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
@@ -159,7 +159,11 @@ aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
 id -un
 # 3. Bootstrap dan faqat role ni o‘qib, ulangan server vazifasini tekshirish.
 python3 -c 'import json;print(json.load(open(&quot;/etc/jdu-web/bootstrap.json&quot;))[&quot;role&quot;])'
-# 4. Joriy server session ini yopib CloudShell ga qaytish.
+# 4. Uy katalogidagi tekshiruv fayliga bitta web satrini yozish.
+printf '%s\n' web &gt; &quot;$HOME/p0-connection.txt&quot;
+# 5. $HOME/p0-connection.txt mazmunini o‘zgartirmay o‘qish.
+cat &quot;$HOME/p0-connection.txt&quot;
+# 6. Joriy server session ini yopib CloudShell ga qaytish.
 exit
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
@@ -170,18 +174,7 @@ ssm-user
 $ python3 -c …
 web
 </code></pre>
-<h4>P0.3 Tayyorlikni brauzerda tekshirish</h4>
-<p><strong>Bajarish muhiti:</strong></p>
-<p>Shaxsiy PC brauzeri: Web Portal</p>
-<p><strong>Maqsad va amallar:</strong></p>
-<p>O‘qituvchi bergan havola orqali topshiriqlar sahifasini oching. Maktab Google orqali kirib, o‘z AWS hisobingizni bog‘lang. P0 ni tanlab tekshiruvni boshlang; ishlov davom etsa natijani yangilang.</p>
-<p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Brauzer natijani avtomatik saqlaydi. PASS/FAIL/UNKNOWN va ishlov/saqlash holatini farqlang.</p>
-<p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>O‘z Lab, topshiriq ID va vaqtni tekshiring. Check natijalari va saqlash holatini o‘qing; tugashi va saqlanishini kuting. UNKNOWN o‘lchab bo‘lmagan holat, muvaffaqiyat emas.</p>
-<p><strong>Ishlamasa:</strong></p>
-<p>Yordam uchun check ID, vaqt va server rolini yozing. Token, parol va shaxsiy URL ni ulashmang.</p>
-<h4>P0.4 RDP orqali bastion ish stolini ochish</h4>
+<h4>P0.3 RDP orqali bastion ish stolini ochish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Talabaning Windows PC si (umumiy hisob)</p>
 <p><strong>Maqsad va amallar:</strong></p>
@@ -196,6 +189,8 @@ mstsc /prompt
 <p>Ubuntu bastion ichida Xfce va Firefox ochiladi; bu Windows browser idan boshqa. labuser da sudo yo‘q: qurishni CloudShell → SSM/ssm-user orqali bajaring.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Login failed bo‘lsa user nomi va klaviatura tartibini tekshiring. Parolni chat ga yubormang. Ulanmasa joriy IP va ruxsatli CIDR ni o‘qituvchi bilan tekshiring; 3389 ni hammaga ochmang. RDP ni yopishdan oldin ishni saqlang.</p>
+<h3>Tekshirish va topshirish</h3>
+<p>RDP mashqi tugagach, o‘qituvchi ko‘rsatgan topshiriqlar sahifasida P0 ni tanlab tekshiruvni boshlang. Web serverdagi uy katalogingizdagi tekshiruv faylida bitta <code>web</code> satri bo‘lsa, 1 ball beriladi.</p>
 <h3>Tushunishni tekshirish (ballsiz)</h3>
 <p>Web SSM session ichida DB qadamlarini kiritsangiz, qaysi server o‘zgaradi?</p>
 <p><strong>Izoh:</strong></p>
