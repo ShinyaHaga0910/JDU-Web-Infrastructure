@@ -5,11 +5,6 @@ import re
 
 from content import T
 
-def expiry_text(lang):
-    return T('配布版の有効期限：2027年1月31日末（UZT）。',
-        'Комплект действителен до конца 31 января 2027 года (UZT).',
-        'Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).')[lang]
-
 def browser_check(task, lang):
     out = T(
         f'1. 教師から案内された課題画面に学校のGoogleアカウントでログインし、自分のLabと **{task}** を選ぶ。',
@@ -54,7 +49,7 @@ def translations(name):
     return ' · '.join(f'[{label}](../{lang}/{name}.md)' for lang,label in
         [('ja','日本語'),('ru','Русский'),('uz','O‘zbekcha')])
 
-def write_pages(root, lang, registry, revision, distribution_id, render_html, labels, modules):
+def write_pages(root, lang, registry, render_html, labels, modules):
     docs = root/'docs'/lang
     output = root/'output/html'/lang
     tasks = {t['id']: t for t in registry['tasks']}
@@ -71,7 +66,7 @@ def write_pages(root, lang, registry, revision, distribution_id, render_html, la
             'Pは詳しい操作例つきの練習です。Mは練習で学んだ設定を別の対象に自分で適用する課題です。サーバーを自分で設定してからブラウザで確認します。',
             'P — практика с подробными шагами. M — самостоятельная настройка других объектов на основе навыков P. Сначала настройте серверы сами, затем проверьте в браузере.',
             'P — batafsil qadamli mashq. M — P da o‘rgangan sozlamani boshqa obyektga mustaqil qo‘llash. Avval serverlarni o‘zingiz sozlang, keyin brauzerda tekshiring.')[lang]
-        index = [f'# {WORDS[kind][lang]}', '', f'2026-11-13 · D12 P/M {revision}', '', nav(lang), '', translations(kind), '', intro, '', expiry_text(lang), '',
+        index = [f'# {WORDS[kind][lang]}', '', nav(lang), '', translations(kind), '', intro, '',
             '| '+T('練習', 'Практика', 'Mashq')[lang]+' | '+T('自力課題', 'Задание', 'Topshiriq')[lang]+' | '+WORDS['topic'][lang]+' | '+WORDS['points'][lang]+' |', '| --- | --- | --- | --- |']
         for module in modules:
             n = int(module['id'][1:])
@@ -102,5 +97,5 @@ def write_pages(root, lang, registry, revision, distribution_id, render_html, la
             neighbors=[]
             if position:neighbors.append(f'[{WORDS["previous"][lang]}: {ORDER[position-1]}]({ORDER[position-1].lower()}.md)')
             if position+1<len(ORDER):neighbors.append(f'[{WORDS["next"][lang]}: {ORDER[position+1]}]({ORDER[position+1].lower()}.md)')
-            text=f'# {task} {match[1]}\n\n{nav(lang)}\n\n{translations(task.lower())}\n\n2026-11-13 · D12 P/M {revision}\n\n{expiry_text(lang)}\n\n{related}\n\n{body.rstrip()}\n\n---\n\n'+ ' · '.join(neighbors)+'\n'
+            text=f'# {task} {match[1]}\n\n{nav(lang)}\n\n{translations(task.lower())}\n\n{related}\n\n{body.rstrip()}\n\n---\n\n'+ ' · '.join(neighbors)+'\n'
             write(task.lower(),text)

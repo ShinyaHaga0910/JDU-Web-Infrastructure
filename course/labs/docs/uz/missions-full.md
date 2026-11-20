@@ -1,9 +1,5 @@
 # Web Infrastructure: M0-M6 mustaqil topshiriqlar
 
-2026-11-13 | D12 P/M r1.5 | web-course-class193548-20261103-r3
-
-Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).
-
 O‘qituvchi tekshiruvi uchun birinchi nashr. Talabaning qo‘llanma bo‘yicha boshidan oxirigacha o‘tishi hali tekshirilmagan.
 
 Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga ega. Ona tili mutaxassisi tahriri hali bajarilmagan.
@@ -336,15 +332,7 @@ Natijalar avtomatik saqlanadi. Ishlov paytida natijani yangilang; baholarni saql
 
 Parol/token/cookie/maxfiy kalit/env ni hisobot yoki chat ga yubormang.
 
-## Manbalar va versiya
-
-Baholash shartlari: M jadvallari va tarqatmadagi belgilangan registry.
-
-web-course-class193548-20261103-r3; web-d11-2026-10-r1; registry SHA256 `3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33`.
-
-Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).
-
-Yuklash URL muddati tarqatma muddatidan farq qiladi. Sanani o‘zgartirmang; o‘qituvchidan amaldagi nusxani oling. Quyida 2026-10-23 tekshirilgan birlamchi hujjatlar.
+## Ma’lumot manbalari
 
 - [Nginx Beginner’s Guide](https://nginx.org/en/docs/beginners_guide.html)
 - [BIND 9: configurations and zones](https://bind9.readthedocs.io/en/v9.18.39/chapter3.html)

@@ -13,9 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Qo‘llanmadan foydalanish</a> · <a href="#section-2">Muhit va tayyorgarlik</a> · <a href="#section-3">Qadamlarni qanday o‘qish kerak</a> · <a href="#section-4">Tayyor tizim va ulanish yo‘llari</a> · <a href="#section-5">P0 Shaxsiy muhit va buyruqlarni bajarish joyi</a> · <a href="#section-6">P1 HTTP orqali statik faylni qaytarish</a> · <a href="#section-7">P2 Ichki DNS va odatiy nom yechimi</a> · <a href="#section-8">P4 PostgreSQL ga autentifikatsiya bilan ulanish</a> · <a href="#section-9">P5 Berilgan app ni Web va DB bilan bog‘lash</a> · <a href="#section-10">P6 Eng kam huquq va ochiq kirish chegarasi</a> · <a href="#section-11">Davom ettirish va natijalar</a> · <a href="#section-12">Manbalar va versiya</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: P0-P6 mashqlar va batafsil qadamlar</h1>
-<p>2026-11-13 | D12 P/M r1.5 | web-course-class193548-20261103-r3</p>
-<p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Qo‘llanmadan foydalanish</a> · <a href="#section-2">Muhit va tayyorgarlik</a> · <a href="#section-3">Qadamlarni qanday o‘qish kerak</a> · <a href="#section-4">Tayyor tizim va ulanish yo‘llari</a> · <a href="#section-5">P0 Shaxsiy muhit va buyruqlarni bajarish joyi</a> · <a href="#section-6">P1 HTTP orqali statik faylni qaytarish</a> · <a href="#section-7">P2 Ichki DNS va odatiy nom yechimi</a> · <a href="#section-8">P4 PostgreSQL ga autentifikatsiya bilan ulanish</a> · <a href="#section-9">P5 Berilgan app ni Web va DB bilan bog‘lash</a> · <a href="#section-10">P6 Eng kam huquq va ochiq kirish chegarasi</a> · <a href="#section-11">Davom ettirish va natijalar</a> · <a href="#section-12">Ma’lumot manbalari</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: P0-P6 mashqlar va batafsil qadamlar</h1>
 <p>O‘qituvchi tekshiruvi uchun birinchi nashr. Talabaning qo‘llanma bo‘yicha boshidan oxirigacha o‘tishi hali tekshirilmagan.</p>
 <p>Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga ega. Ona tili mutaxassisi tahriri hali bajarilmagan.</p>
 <p><a href="../ja/practice-full.html">日本語</a> · <a href="../ru/practice-full.html">Русский</a> · <a href="../uz/practice-full.html">O‘zbekcha</a></p>
@@ -1260,15 +1258,11 @@ curl --noproxy '*' -i http://web.lab.test/static/app.env
 <p>Keyingi safar o‘z Lab va ayni besh serverni ishga tushirib, running/SSM Online va joriy public IP ni tekshiring. Web Portal ga maktab Google orqali kirib, M0 tayyorligidan boshlang. Yaratish, kalit va ro‘yxatni har safar takrorlamang. Muddat tugasa o‘qituvchidan yangilashni so‘rang.</p>
 <p>Natijalar avtomatik saqlanadi. Ishlov paytida natijani yangilang; baholarni saqlangan baholar bo‘limidan ko‘ring. Topshiriq, vaqt va saqlash holatini solishtiring. UNKNOWN o‘lchab bo‘lmagan holat, muvaffaqiyat yoki tasdiqlangan nol emas. Tekshirilmagan M ning tasdiqlangan ballari saqlanadi. Oxirgi baholanadigan natija olinadi; turli urinish PASS lari qo‘shilmaydi, maksimum avtomatik tanlanmaydi.</p>
 <p>Parol/token/cookie/maxfiy kalit/env ni hisobot yoki chat ga yubormang.</p>
-<h2 id="section-12">Manbalar va versiya</h2>
-<p>Baholash shartlari: M jadvallari va tarqatmadagi belgilangan registry.</p>
-<p>web-course-class193548-20261103-r3; web-d11-2026-10-r1; registry SHA256 <code>3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33</code>.</p>
-<p>Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).</p>
-<p>Yuklash URL muddati tarqatma muddatidan farq qiladi. Sanani o‘zgartirmang; o‘qituvchidan amaldagi nusxani oling. Quyida 2026-10-23 tekshirilgan birlamchi hujjatlar.</p>
+<h2 id="section-12">Ma’lumot manbalari</h2>
 <ul>
 <li><a href="https://nginx.org/en/docs/beginners_guide.html">Nginx Beginner’s Guide</a></li>
 <li><a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BIND 9: configurations and zones</a></li>
 <li><a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">PostgreSQL 16: pg_hba.conf</a></li>
 <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html">EC2 instance states</a></li>
 </ul>
-</main><footer>web-course-class193548-20261103-r3 · 2026-11-13</footer></body></html>
+</main></body></html>

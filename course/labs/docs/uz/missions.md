@@ -1,14 +1,10 @@
 # Topshiriqlar M0–M6
 
-2026-11-13 · D12 P/M r1.5
-
 [Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M6](missions.md)
 
 [日本語](../ja/missions.md) · [Русский](../ru/missions.md) · [O‘zbekcha](../uz/missions.md)
 
 P — batafsil qadamli mashq. M — P da o‘rgangan sozlamani boshqa obyektga mustaqil qo‘llash. Avval serverlarni o‘zingiz sozlang, keyin brauzerda tekshiring.
-
-Tarqatma 2027-yil 31-yanvar oxirigacha amal qiladi (UZT).
 
 | Mashq | Topshiriq | Mavzu | Xom ball |
 | --- | --- | --- | --- |

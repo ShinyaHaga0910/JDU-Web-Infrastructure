@@ -27,7 +27,6 @@ from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, active_registry
 MODULES_BY_NUMBER = {int(m["id"][1:]): m for m in MODULES}
 MODULES = [MODULES_BY_NUMBER[n] for n in ACTIVE_NUMBERS]
 from build import KIT,EXPECTED_REGISTRY,MATERIAL_REVISION,INSTANCE_ID_IMAGE,INSTANCE_ID_SOURCE
-from pages import expiry_text
 from diagrams import diagram_stem
 from command_notes import annotated_blocks,command_groups,executable_only,explanation,CONFIG_STEPS
 from PIL import Image
@@ -63,8 +62,6 @@ def main():
         for kind in ('practice','missions'):
             path=ROOT/'docs'/lang/(kind+'-full.md');value=path.read_text(encoding='utf-8');docs[lang,kind]=value
             tokens=parser.parse(value)
-            ok(f'{lang}_{kind}_current_revision','D12 P/M '+MATERIAL_REVISION in value)
-            ok(f'{lang}_{kind}_current_expiry',value.count(expiry_text(lang))==2 and '2026-10-27' not in value)
             ok(f'{lang}_{kind}_browser_grading',not any(x in value for x in
                 ('jdu-web-check','jdu-web-my-progress','--functional','--no-submit','--retry','--prepare-stop','--observe-stopped')))
             ok(f'{lang}_{kind}_working_guide',all(p[lang] in value for p in READING))
@@ -104,7 +101,7 @@ def main():
             for number in ACTIVE_NUMBERS:
                 name=prefix+str(number)
                 value=(ROOT/'docs'/lang/(name.lower()+'.md')).read_text(encoding='utf-8')
-                ok(f'{lang}_{name}_page',value.startswith('# '+name+' ') and expiry_text(lang) in value)
+                ok(f'{lang}_{name}_page',value.startswith('# '+name+' '))
                 if prefix=='P':
                     for step in range(1,len(MODULES_BY_NUMBER[number]['steps'])+1):
                         ok(f'{lang}_{name}_{step}_page_step',f'### {name}.{step} ' in value and STEP_NOTES[f'{name}.{step}'][lang] in value)

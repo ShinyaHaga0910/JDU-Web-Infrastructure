@@ -15,7 +15,7 @@ sys.dont_write_bytecode = True
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = Path(os.environ.get('JDU_WEB_PROJECT_ROOT', str(Path(__file__).resolve().parents[3] / 'development')))
 from markdown_it import MarkdownIt
-from pages import write_pages, browser_check, expiry_text
+from pages import write_pages, browser_check
 from command_notes import annotated_blocks
 from diagrams import diagram_markdown, write_diagrams
 from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE
@@ -49,15 +49,13 @@ L = {
  'condition': T('満たすこと', 'Условие', 'Shart'),
  'submit': T('確認・提出', 'Проверка и отправка', 'Tekshirish va yuborish'),
  'resume': T('次回の再開・結果の確認', 'Продолжение и результаты', 'Davom ettirish va natijalar'),
- 'sources': T('根拠と使用版', 'Источники и версия', 'Manbalar va versiya'),
+ 'sources': T('参考資料', 'Справочные материалы', 'Ma’lumot manbalari'),
  'draft': T('教材初版・教師確認用。学生の最初からの通し試読は未実施。', 'Первая редакция для проверки преподавателем. Полное прохождение по пособию студентом ещё не проверено.', 'O‘qituvchi tekshiruvi uchun birinchi nashr. Talabaning qo‘llanma bo‘yicha boshidan oxirigacha o‘tishi hali tekshirilmagan.'),
  'translation': T('ロシア語・ウズベク語は日本語原稿と同じ手順・条件の翻訳初稿。母語話者校閲は未実施。', 'Русский и узбекский тексты синхронизированы с японским оригиналом. Редактура носителями языка ещё не выполнена.', 'Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga ega. Ona tili mutaxassisi tahriri hali bajarilmagan.'),
 }
 
 def emit_intro(lang, kind):
-    out = [f'# {L[kind][lang]}', '', f'2026-11-13 | D12 P/M {MATERIAL_REVISION} | {DIST_ID}', '',
-        expiry_text(lang), '',
-        L['draft'][lang], '', L['translation'][lang], '']
+    out = [f'# {L[kind][lang]}', '', L['draft'][lang], '', L['translation'][lang], '']
     out += [T('[日本語](../ja/' + kind + '.md) · [Русский](../ru/' + kind + '.md) · [O‘zbekcha](../uz/' + kind + '.md)',
               '[日本語](../ja/' + kind + '.md) · [Русский](../ru/' + kind + '.md) · [O‘zbekcha](../uz/' + kind + '.md)',
               '[日本語](../ja/' + kind + '.md) · [Русский](../ru/' + kind + '.md) · [O‘zbekcha](../uz/' + kind + '.md)')[lang], '']
@@ -106,11 +104,6 @@ def emit_end(lang):
         'Не отправляйте пароль/token/cookie/приватный ключ/env в отчёт или чат.',
         'Parol/token/cookie/maxfiy kalit/env ni hisobot yoki chat ga yubormang.')[lang], '',
       '## ' + L['sources'][lang], '',
-      T('採点条件は各Mの表と同梱の固定registryを参照する。', 'Критерии: таблицы M и фиксированный registry комплекта.', 'Baholash shartlari: M jadvallari va tarqatmadagi belgilangan registry.')[lang], '',
-      DIST_ID + '; web-d11-2026-10-r1; registry SHA256 `' + EXPECTED_REGISTRY + '`.', '', expiry_text(lang), '',
-      T('取得URLの期限と配布版の期限は別。期限を書き換えず、教師から有効な版を受け取る。以下は一般機能の一次資料（2026-10-23確認）。',
-        'Срок URL загрузки отличается от срока комплекта. Не меняйте даты; получите актуальный комплект у преподавателя. Ниже первичные документы общих функций, проверенные 2026-10-23.',
-        'Yuklash URL muddati tarqatma muddatidan farq qiladi. Sanani o‘zgartirmang; o‘qituvchidan amaldagi nusxani oling. Quyida 2026-10-23 tekshirilgan birlamchi hujjatlar.')[lang], '',
       '- [Nginx Beginner’s Guide](https://nginx.org/en/docs/beginners_guide.html)',
       '- [BIND 9: configurations and zones](https://bind9.readthedocs.io/en/v9.18.39/chapter3.html)',
       '- [PostgreSQL 16: pg_hba.conf](https://www.postgresql.org/docs/16/auth-pg-hba-conf.html)',
@@ -276,7 +269,7 @@ def render_html(md, lang, kind):
     body = re.sub(r'<h2>(.*?)</h2>', heading, body)
     links = ' · '.join(f'<a href="#{slug}">{text}</a>' for slug, text in toc)
     title = html.escape(md.splitlines()[0].removeprefix('# '))
-    return f'<!doctype html><html lang="{lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><style>{CSS}</style></head><body><a class="skip" href="#content">{html.escape(L["intro"][lang])}</a><header><p>JDU · Web Infrastructure · D12 P/M {MATERIAL_REVISION}</p><nav aria-label="Contents">{links}</nav></header><main id="content" tabindex="-1">{body}</main><footer>{DIST_ID} · 2026-11-13</footer></body></html>'
+    return f'<!doctype html><html lang="{lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><style>{CSS}</style></head><body><a class="skip" href="#content">{html.escape(L["intro"][lang])}</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents">{links}</nav></header><main id="content" tabindex="-1">{body}</main></body></html>'
 
 def make_pdf(md, lang, target):
     from reportlab.lib import colors
@@ -383,7 +376,7 @@ def make_pdf(md, lang, target):
         i+=1
     def footer(canvas,doc):
         canvas.saveState();canvas.setFont(body_font,8);canvas.setFillColor(colors.HexColor('#415569'))
-        canvas.drawString(44,27,'JDU Web Infrastructure · D12 P/M '+MATERIAL_REVISION+' · '+lang.upper())
+        canvas.drawString(44,27,'JDU Web Infrastructure · '+lang.upper())
         canvas.drawRightString(A4[0]-44,27,str(doc.page));canvas.restoreState()
     doc=SimpleDocTemplate(str(target),pagesize=A4,rightMargin=44,leftMargin=44,topMargin=38,bottomMargin=43,
         title=md.splitlines()[0].removeprefix('# '),author='JDU',pageCompression=1)
@@ -420,7 +413,7 @@ def main():
             (folder/(kind+'-full.md')).write_text(md,encoding='utf-8',newline='\n')
             out=ROOT/'output/html'/lang;out.mkdir(parents=True,exist_ok=True)
             (out/(kind+'-full.html')).write_text(render_html(md,lang,kind),encoding='utf-8',newline='\n')
-        write_pages(ROOT, lang, reg, MATERIAL_REVISION, DIST_ID, render_html, L, MODULES)
+        write_pages(ROOT, lang, reg, render_html, L, MODULES)
         if not a.no_pdf:
             for kind in ('practice','missions'):
                 out=ROOT/'output/pdf';out.mkdir(parents=True,exist_ok=True)
@@ -446,7 +439,7 @@ def main():
     for lang in LANGS:
         label={'ja':'日本語','ru':'Русский','uz':'O‘zbekcha'}[lang]
         links.append(f'<article><h2>{label}</h2><p><a href="{lang}/practice.html">P0–P6</a> · <a href="{lang}/missions.html">M0–M6</a></p><p><a href="../pdf/web_lab_practice_{lang}.pdf">P PDF</a> · <a href="../pdf/web_lab_missions_{lang}.pdf">M PDF</a></p></article>')
-    (ROOT/'output/html/index.html').write_text('<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JDU Web P/M 教材</title><style>'+CSS+'</style></head><body><main><h1>Web Infrastructure · P / M</h1><p>手順付き練習と自力課題 / Практика и задания / Mashqlar va topshiriqlar</p><p>2026-11-03 · D12 P/M '+MATERIAL_REVISION+'</p>'+''.join(links)+'<p>同梱署名版：2027-01-31末（UZT）まで有効。初回は教師の個別登録も必要です / Комплект действителен до 31.01.2027 (UZT); нужна личная регистрация / Tarqatma 31.01.2027 (UZT) gacha amal qiladi; shaxsiy ro‘yxat ham kerak.</p></main></body></html>',encoding='utf-8',newline='\n')
+    (ROOT/'output/html/index.html').write_text('<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JDU Web P/M 教材</title><style>'+CSS+'</style></head><body><main><h1>Web Infrastructure · P / M</h1><p>手順付き練習と自力課題 / Практика и задания / Mashqlar va topshiriqlar</p>'+''.join(links)+'</main></body></html>',encoding='utf-8',newline='\n')
     package=ROOT/'output/web-lab-pm-r1.zip'
     members=[p for folder in ('docs','assets','resources','distribution','output/html','output/pdf') for p in (ROOT/folder).rglob('*') if p.is_file()]
     members += [ROOT/'README.md',ROOT/'TEACHER-NOTES.md',ROOT/'VALIDATION.md']

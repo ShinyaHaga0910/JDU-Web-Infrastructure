@@ -1,9 +1,5 @@
 # Web演習：練習P0〜P6と詳しい操作例
 
-2026-11-13 | D12 P/M r1.5 | web-course-class193548-20261103-r3
-
-配布版の有効期限：2027年1月31日末（UZT）。
-
 教材初版・教師確認用。学生の最初からの通し試読は未実施。
 
 ロシア語・ウズベク語は日本語原稿と同じ手順・条件の翻訳初稿。母語話者校閲は未実施。
@@ -1862,15 +1858,7 @@ setupを閉じた後、アプリも停止した。setupを再び公開するこ�
 
 password/token/cookie/秘密鍵/env本文を提出物や会話へ送らない。
 
-## 根拠と使用版
-
-採点条件は各Mの表と同梱の固定registryを参照する。
-
-web-course-class193548-20261103-r3; web-d11-2026-10-r1; registry SHA256 `3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33`.
-
-配布版の有効期限：2027年1月31日末（UZT）。
-
-取得URLの期限と配布版の期限は別。期限を書き換えず、教師から有効な版を受け取る。以下は一般機能の一次資料（2026-10-23確認）。
+## 参考資料
 
 - [Nginx Beginner’s Guide](https://nginx.org/en/docs/beginners_guide.html)
 - [BIND 9: configurations and zones](https://bind9.readthedocs.io/en/v9.18.39/chapter3.html)

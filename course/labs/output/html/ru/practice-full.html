@@ -13,9 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">Как пользоваться пособием</a> · <a href="#section-2">Среда и подготовка</a> · <a href="#section-3">Как читать шаги</a> · <a href="#section-4">Система и пути соединений</a> · <a href="#section-5">P0 Своя среда и место выполнения команд</a> · <a href="#section-6">P1 Выдача статического файла по HTTP</a> · <a href="#section-7">P2 Внутренний DNS и системное разрешение имён</a> · <a href="#section-8">P4 Подключение к PostgreSQL с аутентификацией</a> · <a href="#section-9">P5 Соединить предоставленное приложение с Web и DB</a> · <a href="#section-10">P6 Минимальные права и границы публикации</a> · <a href="#section-11">Продолжение и результаты</a> · <a href="#section-12">Источники и версия</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: практика P0-P6 с подробными шагами</h1>
-<p>2026-11-13 | D12 P/M r1.5 | web-course-class193548-20261103-r3</p>
-<p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Как пользоваться пособием</a> · <a href="#section-2">Среда и подготовка</a> · <a href="#section-3">Как читать шаги</a> · <a href="#section-4">Система и пути соединений</a> · <a href="#section-5">P0 Своя среда и место выполнения команд</a> · <a href="#section-6">P1 Выдача статического файла по HTTP</a> · <a href="#section-7">P2 Внутренний DNS и системное разрешение имён</a> · <a href="#section-8">P4 Подключение к PostgreSQL с аутентификацией</a> · <a href="#section-9">P5 Соединить предоставленное приложение с Web и DB</a> · <a href="#section-10">P6 Минимальные права и границы публикации</a> · <a href="#section-11">Продолжение и результаты</a> · <a href="#section-12">Справочные материалы</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: практика P0-P6 с подробными шагами</h1>
 <p>Первая редакция для проверки преподавателем. Полное прохождение по пособию студентом ещё не проверено.</p>
 <p>Русский и узбекский тексты синхронизированы с японским оригиналом. Редактура носителями языка ещё не выполнена.</p>
 <p><a href="../ja/practice-full.html">日本語</a> · <a href="../ru/practice-full.html">Русский</a> · <a href="../uz/practice-full.html">O‘zbekcha</a></p>
@@ -1260,15 +1258,11 @@ curl --noproxy '*' -i http://web.lab.test/static/app.env
 <p>В следующий раз запустите свой Lab и те же пять узлов, проверьте running/SSM Online и текущие public IP. Войдите в Web Portal через школьный Google и начните с готовности M0. Не повторяйте создание, ключи и регистрацию каждый раз. При истечении срока запросите обновление у преподавателя.</p>
 <p>Результаты сохраняются автоматически. Во время обработки обновляйте результат; оценки смотрите в разделе сохранённых оценок. Сверяйте задание, время и сохранение. UNKNOWN означает невозможность измерения, а не успех или подтверждённый ноль. Подтверждённые баллы непроверенных M сохраняются. Используется последний оцениваемый результат, без объединения PASS разных запусков и автоматического выбора максимума.</p>
 <p>Не отправляйте пароль/token/cookie/приватный ключ/env в отчёт или чат.</p>
-<h2 id="section-12">Источники и версия</h2>
-<p>Критерии: таблицы M и фиксированный registry комплекта.</p>
-<p>web-course-class193548-20261103-r3; web-d11-2026-10-r1; registry SHA256 <code>3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33</code>.</p>
-<p>Комплект действителен до конца 31 января 2027 года (UZT).</p>
-<p>Срок URL загрузки отличается от срока комплекта. Не меняйте даты; получите актуальный комплект у преподавателя. Ниже первичные документы общих функций, проверенные 2026-10-23.</p>
+<h2 id="section-12">Справочные материалы</h2>
 <ul>
 <li><a href="https://nginx.org/en/docs/beginners_guide.html">Nginx Beginner’s Guide</a></li>
 <li><a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BIND 9: configurations and zones</a></li>
 <li><a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">PostgreSQL 16: pg_hba.conf</a></li>
 <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html">EC2 instance states</a></li>
 </ul>
-</main><footer>web-course-class193548-20261103-r3 · 2026-11-13</footer></body></html>
+</main></body></html>

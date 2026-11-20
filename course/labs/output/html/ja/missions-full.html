@@ -13,9 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure · D12 P/M r1.5</p><nav aria-label="Contents"><a href="#section-1">使い方と共通の約束</a> · <a href="#section-2">対象・前提・準備</a> · <a href="#section-3">操作例の読み方</a> · <a href="#section-4">完成像と通信経路</a> · <a href="#section-5">自力課題に取り組む前に</a> · <a href="#section-6">M0 自分の環境と実行場所</a> · <a href="#section-7">M1 HTTPで静的ファイルを返す (8)</a> · <a href="#section-8">M2 内部DNSと通常の名前解決 (13)</a> · <a href="#section-9">M4 PostgreSQLへの認証接続 (9)</a> · <a href="#section-10">M5 教員アプリをWeb・DBへ接続する (13)</a> · <a href="#section-11">M6 最小権限と公開範囲 (16)</a> · <a href="#section-12">次回の再開・結果の確認</a> · <a href="#section-13">根拠と使用版</a></nav></header><main id="content" tabindex="-1"><h1>Web演習：自力課題M0〜M6</h1>
-<p>2026-11-13 | D12 P/M r1.5 | web-course-class193548-20261103-r3</p>
-<p>配布版の有効期限：2027年1月31日末（UZT）。</p>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">使い方と共通の約束</a> · <a href="#section-2">対象・前提・準備</a> · <a href="#section-3">操作例の読み方</a> · <a href="#section-4">完成像と通信経路</a> · <a href="#section-5">自力課題に取り組む前に</a> · <a href="#section-6">M0 自分の環境と実行場所</a> · <a href="#section-7">M1 HTTPで静的ファイルを返す (8)</a> · <a href="#section-8">M2 内部DNSと通常の名前解決 (13)</a> · <a href="#section-9">M4 PostgreSQLへの認証接続 (9)</a> · <a href="#section-10">M5 教員アプリをWeb・DBへ接続する (13)</a> · <a href="#section-11">M6 最小権限と公開範囲 (16)</a> · <a href="#section-12">次回の再開・結果の確認</a> · <a href="#section-13">参考資料</a></nav></header><main id="content" tabindex="-1"><h1>Web演習：自力課題M0〜M6</h1>
 <p>教材初版・教師確認用。学生の最初からの通し試読は未実施。</p>
 <p>ロシア語・ウズベク語は日本語原稿と同じ手順・条件の翻訳初稿。母語話者校閲は未実施。</p>
 <p><a href="../ja/missions-full.html">日本語</a> · <a href="../ru/missions-full.html">Русский</a> · <a href="../uz/missions-full.html">O‘zbekcha</a></p>
@@ -629,15 +627,11 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>次回は本人のLabと同じ5台を起動し、running/SSM Onlineと現在の公開IPを確認する。Web Portalへ学校Googleでログインし、まずM0で準備確認する。作成・鍵生成・登録を毎回繰り返す必要はない。期限切れは教師へ更新を依頼する。</p>
 <p>結果は自動保存される。処理中は「結果を更新する」、成績確認は「保存済み成績を見る」を使う。確認対象の課題・時刻と保存状態を読む。UNKNOWNは観測不能で、合格や0点を確定した意味ではない。未確認Mの確定済み点数は保持される。最新の評価可能な結果を使い、異なる回のPASSを合算したり自動で最高点を選んだりしない。</p>
 <p>password/token/cookie/秘密鍵/env本文を提出物や会話へ送らない。</p>
-<h2 id="section-13">根拠と使用版</h2>
-<p>採点条件は各Mの表と同梱の固定registryを参照する。</p>
-<p>web-course-class193548-20261103-r3; web-d11-2026-10-r1; registry SHA256 <code>3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33</code>.</p>
-<p>配布版の有効期限：2027年1月31日末（UZT）。</p>
-<p>取得URLの期限と配布版の期限は別。期限を書き換えず、教師から有効な版を受け取る。以下は一般機能の一次資料（2026-10-23確認）。</p>
+<h2 id="section-13">参考資料</h2>
 <ul>
 <li><a href="https://nginx.org/en/docs/beginners_guide.html">Nginx Beginner’s Guide</a></li>
 <li><a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BIND 9: configurations and zones</a></li>
 <li><a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">PostgreSQL 16: pg_hba.conf</a></li>
 <li><a href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html">EC2 instance states</a></li>
 </ul>
-</main><footer>web-course-class193548-20261103-r3 · 2026-11-13</footer></body></html>
+</main></body></html>
