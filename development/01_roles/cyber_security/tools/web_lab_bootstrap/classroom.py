@@ -35,6 +35,13 @@ import uuid
 
 
 REGION = 'us-east-1'
+PORTAL_STACK = 'jdu-web-infrastructure-portal'
+PORTAL_NOT_READY = {
+    'en': 'Assignment portal is not ready. Run portal-prepare from teacher CloudShell to start its setup.',
+    'ja': '採点ポータルは準備中です。教師側CloudShellで portal-prepare を実行して準備を始めます。',
+    'ru': 'Портал пока не готов. Запустите portal-prepare в CloudShell преподавателя.',
+    'uz': 'Baholash portali hali tayyor emas. O‘qituvchi CloudShell muhitida portal-prepare buyrug‘ini bajaring.',
+}
 TEACHER_STACK = 'jdu-web-infrastructure-teacher'
 STUDENT_STACK_PREFIX = 'jdu-web-infrastructure-student-'
 REPO = 'https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure'
@@ -449,6 +456,30 @@ def assessment_api_source(ref):
     sources['progress_api'] = remote_source(ref, TEACHER + '/progress_api.py').decode()
     sources['registry_data'] = remote_source(ref, ASSESSMENT + '/assessment-registry.json').decode()
     return inline_source(sources)
+
+
+def assignment_portal_url(cfn):
+    from botocore.exceptions import ClientError
+
+    try:
+        stack = cfn.describe_stacks(StackName=PORTAL_STACK)['Stacks'][0]
+    except ClientError as error:
+        info = error.response['Error']
+        if info['Code'] == 'ValidationError' and info['Message'] == f'Stack with id {PORTAL_STACK} does not exist':
+            return None
+        raise
+    values = {row['ParameterKey']: row['ParameterValue'] for row in stack.get('Parameters', [])}
+    if stack['StackStatus'] not in ('CREATE_COMPLETE', 'UPDATE_COMPLETE', 'UPDATE_ROLLBACK_COMPLETE'):
+        return None
+    if values.get('PortalMode') != 'enabled' or values.get('CheckerEnabled') != 'true':
+        return None
+    for row in stack.get('Outputs', []):
+        if row['OutputKey'] == 'PortalUrl':
+            origin = row['OutputValue']
+            if (re.fullmatch(r'https://[a-z0-9]{10,64}\.[a-z0-9]{2,16}\.lambda-web\.us-east-1\.on\.aws', origin)
+                    and values.get('PublicOrigin') == origin):
+                return origin
+    return None
 
 
 def teacher_run(args, screen, session, account, work):
@@ -1245,10 +1276,18 @@ def main():
 
 def run_cli():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('role', choices=STAGES)
+    parser.add_argument('role', choices=(*STAGES, 'portal-url'))
     parser.add_argument('--ref', required=True, help='Exact GitHub commit for the installer and accompanying source files.')
     parser.add_argument('--lang', choices=TEXT)
     args = parser.parse_args()
+    if args.role == 'portal-url':
+        import boto3
+        url = assignment_portal_url(boto3.client('cloudformation', region_name=REGION))
+        if not url:
+            print(PORTAL_NOT_READY[args.lang or 'ja'], file=sys.stderr)
+            return 1
+        print(url)
+        return 0
     if not sys.stdin.isatty():
         print(dict(zip(LABELS, TEXT[args.lang or 'en']))['tty'], file=sys.stderr)
         return 2
@@ -1318,6 +1357,11 @@ def run_cli():
         screen.record(screen.text['notice'])
         if args.role == 'teacher':
             print(f'\n{screen.text["invite"]}\n{screen.text["share_code"]}\n{enrollment_code}', flush=True)
+            try:
+                url = assignment_portal_url(session.client('cloudformation'))
+            except Exception:
+                url = None
+            screen.record(f'PortalUrl: {url}' if url else PORTAL_NOT_READY[args.lang])
         else:
             screen.record('✓  ' + screen.text['student_success'])
             screen.record(screen.text['rdp_instruction'])

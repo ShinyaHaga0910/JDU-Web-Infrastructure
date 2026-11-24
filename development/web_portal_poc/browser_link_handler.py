@@ -21,7 +21,7 @@ RESPONSE_HOSTS = {
 
 
 def portal_origin(value):
-    if not isinstance(value,str) or not re.fullmatch(r'https://[a-z0-9]{10,64}\.gpb\.lambda-web\.us-east-1\.on\.aws',value):
+    if not isinstance(value,str) or not re.fullmatch(r'https://[a-z0-9]{10,64}\.[a-z0-9]{2,16}\.lambda-web\.us-east-1\.on\.aws',value):
         raise ValueError('Invalid portal origin')
     return value
 
