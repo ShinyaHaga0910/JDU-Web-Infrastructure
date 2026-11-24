@@ -87,7 +87,7 @@ MODULE_NOTES = {
   question=T('起動後に同じ本文が読めれば、別のWebを作っても合格と言えるか？', 'Достаточно ли одинакового текста на новом Web для выполнения задания?', 'Yangi Web da bir xil matn chiqishi topshiriq uchun yetarlimi?'),
   answer=T('同じ元instanceとvolumeの保持も条件なので言えない。本文だけでなく、対象の連続性と停止状態の観測が必要。', 'Нет: нужны исходные instance и volume, а также наблюдение остановленного состояния.', 'Yo‘q: asl instance va volume saqlanishi hamda stopped holati kuzatilishi kerak.')),
  'P4': dict(
-  before=T('DBに教材資源があり、WebからDBへ許可された経路を使う。', 'На DB есть учебные файлы; используется разрешённый путь Web → DB.', 'DB da o‘quv resurslari bor; Web → DB ruxsatli yo‘li ishlatiladi.'),
+  before=T('DBサーバーにサーバー構築用ファイルがあり、WebからDBへ許可された経路を使う。', 'На DB-сервере есть файлы для настройки; используется разрешённый путь Web → DB.', 'DB serverda sozlash fayllari bor; Web → DB ruxsatli yo‘li ishlatiladi.'),
   after=T('練習DBとsetup/runtime roleを作り、Webから認証付きSQLを実行する。', 'Созданы учебная БД и роли setup/runtime; SQL с Web проходит с паролем.', 'Mashq DB va setup/runtime role yaratiladi; Web dan parol bilan SQL bajariladi.'),
   mechanism=T('接続には、通信の到達、DBの待受、HBAの許可、password、SQL権限がそれぞれ必要。ssm-userはOS userで、catalog_practice_appはDB roleである。HBAは上から最初に一致した行を使う。SQLへ接続できることと、tableを作成できることも別の権限である。[HBA](https://www.postgresql.org/docs/16/auth-pg-hba-conf.html)・[SQL権限](https://www.postgresql.org/docs/16/sql-grant.html)。',
    'Нужны сетевой доступ, прослушивание DB, разрешение HBA, пароль и SQL-права. ssm-user - пользователь ОС, catalog_practice_app - роль БД. В HBA применяется первая совпавшая строка. Возможность подключиться не означает право создавать таблицы. [HBA](https://www.postgresql.org/docs/16/auth-pg-hba-conf.html) и [права SQL](https://www.postgresql.org/docs/16/sql-grant.html).',

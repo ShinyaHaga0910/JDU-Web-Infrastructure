@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Nimani o‘rganamiz</a> · <a href="#section-2">Topshiriq</a> · <a href="#section-3">Serverlarga ulanish va kurs fayllari</a> · <a href="#section-4">Dastlabki sozlashda joylanadigan o‘quv fayllari</a> · <a href="#section-5">Yechim namunasi (bajarish tartibi)</a> · <a href="#section-6">Tekshirish va topshirish</a> · <a href="#section-7">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P0 Shaxsiy muhit va buyruqlarni bajarish joyi</h1>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Nimani o‘rganamiz</a> · <a href="#section-2">Topshiriq</a> · <a href="#section-3">Serverlarga ulanish va sozlash fayllarini joylash</a> · <a href="#section-4">Dastlab joylanadigan serverlarni sozlash fayllari</a> · <a href="#section-5">Yechim namunasi (bajarish tartibi)</a> · <a href="#section-6">Tekshirish va topshirish</a> · <a href="#section-7">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P0 Shaxsiy muhit va buyruqlarni bajarish joyi</h1>
 <p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a></p>
 <p><a href="../ja/p0.html">日本語</a> · <a href="../ru/p0.html">Русский</a> · <a href="../uz/p0.html">O‘zbekcha</a></p>
 <p>Mos topshiriq: <a href="m0.html">M0</a>.</p>
@@ -21,15 +21,15 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>EC2 ro‘yxatidan kerakli serverni tanlash, Session Manager orqali ulanish va topshiriq natijasini tekshirish.</p>
 <h2 id="section-2">Topshiriq</h2>
 <p>Tayyor muhitingizda beshta serverning instance ID si va rolini tekshiring. Qaysi serverga va qaysi foydalanuvchi sifatida ulanganingizni aniqlang.</p>
-<h2 id="section-3">Serverlarga ulanish va kurs fayllari</h2>
-<p><img src="../../../assets/uz/p0-ssm.png" alt="Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlabki sozlashda fayllarni joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi." width="1040" height="680" loading="lazy"></p>
-<p>Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlabki sozlashda fayllarni joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi.</p>
+<h2 id="section-3">Serverlarga ulanish va sozlash fayllarini joylash</h2>
+<p><img src="../../../assets/uz/p0-ssm.png" alt="Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlab serverlarni sozlash fayllarini joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi." width="1040" height="680" loading="lazy"></p>
+<p>Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlab serverlarni sozlash fayllarini joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi.</p>
 <p><strong>Practice0 da bajariladigan ishlar</strong></p>
 <p>O‘z AWS hisobingizni, har bir server rolini va buyruq bajariladigan muhitni tekshiring.</p>
-<h2 id="section-4">Dastlabki sozlashda joylanadigan o‘quv fayllari</h2>
+<h2 id="section-4">Dastlab joylanadigan serverlarni sozlash fayllari</h2>
 <p>Muhit umumiy kod bilan yaratilgach, ilova va DB uchun SQL fayllari bor <code>catalog-app.tar.gz</code> arxivi Web va DB serverlaridagi <code>/var/lib/jdu-web/lesson-resources-r1</code> katalogiga joylangan bo‘ladi. Xavfsizlik uchun Web serverdan internetga chiquvchi HTTPS ulanishlari cheklangan, shuning uchun skript fayllarni quyidagi yo‘l orqali yetkazadi.</p>
-<p><img src="../../../assets/uz/p0-lesson-files.png" alt="Muhit umumiy kod orqali yaratilganda, CloudShell o‘quv fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi." width="1040" height="680" loading="lazy"></p>
-<p>Muhit umumiy kod orqali yaratilganda, CloudShell o‘quv fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi.</p>
+<p><img src="../../../assets/uz/p0-lesson-files.png" alt="Muhit umumiy kod orqali yaratilganda, CloudShell serverlarni sozlash fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi." width="1040" height="680" loading="lazy"></p>
+<p>Muhit umumiy kod orqali yaratilganda, CloudShell serverlarni sozlash fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi.</p>
 <h2 id="section-5">Yechim namunasi (bajarish tartibi)</h2>
 <h3>P0.1 Beshta serverning instance ID sini tekshirish</h3>
 <p><strong>Bajarish muhiti:</strong></p>

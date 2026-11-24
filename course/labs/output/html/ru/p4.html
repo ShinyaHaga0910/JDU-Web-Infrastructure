@@ -32,12 +32,12 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </ul>
 <h2 id="section-4">Как это работает</h2>
 <p><strong>Состояние перед началом:</strong></p>
-<p>На DB есть учебные файлы; используется разрешённый путь Web → DB.</p>
+<p>На DB-сервере есть файлы для настройки; используется разрешённый путь Web → DB.</p>
 <p><strong>Что сделать в Practice4</strong></p>
 <p>Созданы учебная БД и роли setup/runtime; SQL с Web проходит с паролем.</p>
 <p>Нужны сетевой доступ, прослушивание DB, разрешение HBA, пароль и SQL-права. ssm-user - пользователь ОС, catalog_practice_app - роль БД. В HBA применяется первая совпавшая строка. Возможность подключиться не означает право создавать таблицы. <a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBA</a> и <a href="https://www.postgresql.org/docs/16/sql-grant.html">права SQL</a>.</p>
 <h2 id="section-5">Пример решения (порядок действий)</h2>
-<h3>P4.1 Установить PostgreSQL и распаковать учебный SQL</h3>
+<h3>P4.1 Установить PostgreSQL и распаковать SQL для настройки БД</h3>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
@@ -57,7 +57,7 @@ sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
 <p><strong>Смысл команд и настроек:</strong></p>
 <p>Установка пакета и создание учебных объектов в БД - разные этапы. Pg_lsclusters показывает версию, кластер, порт и состояние. Sudo -u postgres запускает команду от системного postgres; -X отключает личную настройку psql.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Cluster 16/main, data directory /var/lib/postgresql/16/main. Учебный SQL находится в /var/lib/jdu-web/lesson-resources-r1/app/sql.</p>
+<p>Cluster 16/main, data directory /var/lib/postgresql/16/main. SQL для настройки БД находится в /var/lib/jdu-web/lesson-resources-r1/app/sql.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Не удаляйте существующие БД и роли. Если уже настроено, изучите состояние и выполняйте только недостающие шаги.</p>
 <h3>P4.2 Настроить прослушивание и SCRAM</h3>

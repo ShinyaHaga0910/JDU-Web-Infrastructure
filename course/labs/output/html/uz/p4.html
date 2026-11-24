@@ -32,12 +32,12 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </ul>
 <h2 id="section-4">Bu qanday ishlaydi</h2>
 <p><strong>Boshlashdan oldingi holat:</strong></p>
-<p>DB da o‘quv resurslari bor; Web → DB ruxsatli yo‘li ishlatiladi.</p>
+<p>DB serverda sozlash fayllari bor; Web → DB ruxsatli yo‘li ishlatiladi.</p>
 <p><strong>Practice4 da bajariladigan ishlar</strong></p>
 <p>Mashq DB va setup/runtime role yaratiladi; Web dan parol bilan SQL bajariladi.</p>
 <p>Tarmoq yo‘li, DB listen, HBA ruxsati, parol va SQL privilege alohida kerak. ssm-user - OS user, catalog_practice_app - DB role. HBA birinchi mos qatorni ishlatadi. Ulanish huquqi table yaratish huquqini anglatmaydi. <a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBA</a> va <a href="https://www.postgresql.org/docs/16/sql-grant.html">SQL privilege</a>.</p>
 <h2 id="section-5">Yechim namunasi (bajarish tartibi)</h2>
-<h3>P4.1 PostgreSQL o‘rnatish va o‘quv SQL ni ochish</h3>
+<h3>P4.1 PostgreSQL o‘rnatish va DB sozlash uchun SQL ni ochish</h3>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
@@ -57,7 +57,7 @@ sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
 <p>Package o‘rnatish va DB ichida o‘quv obyektlarini yaratish alohida bosqich. Pg_lsclusters version, cluster, port va holatni ko‘rsatadi. Sudo -u postgres command ni OS postgres bilan bajaradi; -X shaxsiy psql config ni o‘qimaydi.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>16/main, data directory /var/lib/postgresql/16/main. O‘quv SQL /var/lib/jdu-web/lesson-resources-r1/app/sql da.</p>
+<p>16/main, data directory /var/lib/postgresql/16/main. DB sozlash uchun SQL /var/lib/jdu-web/lesson-resources-r1/app/sql da.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Mavjud DB yoki role ni o‘chirmang. Oldin qurilgan bo‘lsa, holatni o‘qib faqat yetishmagan qadamlarni bajaring.</p>
 <h3>P4.2 DB tinglashi va SCRAM ni sozlash</h3>

@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Подключение к серверам и файлы курса</a> · <a href="#section-4">Учебные файлы, размещённые при создании среды</a> · <a href="#section-5">Пример решения (порядок действий)</a> · <a href="#section-6">Проверка и сдача</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P0 Своя среда и место выполнения команд</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Подключение к серверам и размещение файлов для настройки</a> · <a href="#section-4">Файлы для настройки серверов, размещённые при создании среды</a> · <a href="#section-5">Пример решения (порядок действий)</a> · <a href="#section-6">Проверка и сдача</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P0 Своя среда и место выполнения команд</h1>
 <p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
 <p><a href="../ja/p0.html">日本語</a> · <a href="../ru/p0.html">Русский</a> · <a href="../uz/p0.html">O‘zbekcha</a></p>
 <p>Связанное задание: <a href="m0.html">M0</a>.</p>
@@ -21,15 +21,15 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>Выбрать нужный сервер в списке EC2, подключиться через Session Manager и проверить результат задания.</p>
 <h2 id="section-2">Задание</h2>
 <p>В своей готовой среде проверьте идентификаторы и роли пяти серверов, затем проверьте, к какому серверу и под каким пользователем вы подключились.</p>
-<h2 id="section-3">Подключение к серверам и файлы курса</h2>
-<p><img src="../../../assets/ru/p0-ssm.png" alt="Зелёная стрелка показывает подключение к терминалу в P0.2. Синие стрелки показывают размещение файлов при создании среды. Repo-сервер раздаёт пакеты для Ubuntu." width="1040" height="680" loading="lazy"></p>
-<p>Зелёная стрелка показывает подключение к терминалу в P0.2. Синие стрелки показывают размещение файлов при создании среды. Repo-сервер раздаёт пакеты для Ubuntu.</p>
+<h2 id="section-3">Подключение к серверам и размещение файлов для настройки</h2>
+<p><img src="../../../assets/ru/p0-ssm.png" alt="Зелёная стрелка показывает подключение к терминалу в P0.2. Синие стрелки показывают размещение файлов для настройки серверов при создании среды. Repo-сервер раздаёт пакеты для Ubuntu." width="1040" height="680" loading="lazy"></p>
+<p>Зелёная стрелка показывает подключение к терминалу в P0.2. Синие стрелки показывают размещение файлов для настройки серверов при создании среды. Repo-сервер раздаёт пакеты для Ubuntu.</p>
 <p><strong>Что сделать в Practice0</strong></p>
 <p>Проверьте свой AWS-аккаунт, роль каждого сервера и среду выполнения команд.</p>
-<h2 id="section-4">Учебные файлы, размещённые при создании среды</h2>
+<h2 id="section-4">Файлы для настройки серверов, размещённые при создании среды</h2>
 <p>После создания среды по общему коду архив <code>catalog-app.tar.gz</code> с приложением и SQL для настройки БД уже находится в <code>/var/lib/jdu-web/lesson-resources-r1</code> на Web- и DB-серверах. В целях безопасности исходящие HTTPS-подключения с Web-сервера к интернету ограничены, поэтому скрипт доставляет файлы по показанному маршруту.</p>
-<p><img src="../../../assets/ru/p0-lesson-files.png" alt="При создании среды по общему коду CloudShell загружает учебные файлы с GitHub и размещает их на Web- и DB-серверах через SSM." width="1040" height="680" loading="lazy"></p>
-<p>При создании среды по общему коду CloudShell загружает учебные файлы с GitHub и размещает их на Web- и DB-серверах через SSM.</p>
+<p><img src="../../../assets/ru/p0-lesson-files.png" alt="При создании среды по общему коду CloudShell загружает файлы для настройки серверов с GitHub и размещает их на Web- и DB-серверах через SSM." width="1040" height="680" loading="lazy"></p>
+<p>При создании среды по общему коду CloudShell загружает файлы для настройки серверов с GitHub и размещает их на Web- и DB-серверах через SSM.</p>
 <h2 id="section-5">Пример решения (порядок действий)</h2>
 <h3>P0.1 Проверить instance ID пяти серверов</h3>
 <p><strong>Среда выполнения:</strong></p>

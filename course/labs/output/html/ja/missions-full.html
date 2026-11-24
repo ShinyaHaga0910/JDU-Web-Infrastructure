@@ -132,9 +132,9 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-6">M0 サーバーの確認と接続 (1)</h2>
 <h3>完成要件</h3>
 <p>P0ではWebサーバーへの接続を練習した。M0ではEC2の一覧から自分のDBサーバーを探し、同じ行の <strong>Instance ID</strong> をクリックする。詳細画面の <strong>Connect</strong> の右にある矢印から <strong>Connect with SSM Session Manager</strong> を選ぶ。接続先のロールが <code>db</code>、操作ユーザーが <code>ssm-user</code> であることを確かめる。DBサーバーの自分のホームディレクトリに <code>m0-connection.txt</code> を作り、<code>db</code> だけを1行に記録する。課題画面でM0を選び、記録が確認されると1点になる。</p>
-<h3>操作するサーバーと教材の配置先</h3>
-<p><img src="../../../assets/ja/m0-ssm.png" alt="緑の矢印はEC2の画面からSession ManagerでDBサーバーへ接続する経路。青の矢印は、初期構築時にCloudShellがSSMでWebとDBへ教材ファイルを配置する経路。" width="1040" height="680" loading="lazy"></p>
-<p>緑の矢印はEC2の画面からSession ManagerでDBサーバーへ接続する経路。青の矢印は、初期構築時にCloudShellがSSMでWebとDBへ教材ファイルを配置する経路。</p>
+<h3>操作するサーバーとサーバー構築用ファイルの配置先</h3>
+<p><img src="../../../assets/ja/m0-ssm.png" alt="緑の矢印はEC2の画面からSession ManagerでDBサーバーへ接続する経路。青の矢印は、初期構築時にCloudShellがSSMでWebとDBへサーバー構築用ファイルを配置する経路。" width="1040" height="680" loading="lazy"></p>
+<p>緑の矢印はEC2の画面からSession ManagerでDBサーバーへ接続する経路。青の矢印は、初期構築時にCloudShellがSSMでWebとDBへサーバー構築用ファイルを配置する経路。</p>
 <p><img src="../../../assets/shared/ec2-session-manager-instances.png" alt="EC2のInstances一覧。P0は名前の末尾が  の行、M0は  の行を選ぶ。" width="1393" height="382" loading="lazy"></p>
 <p>EC2のInstances一覧。P0は名前の末尾が <code>-web</code> の行、M0は <code>-db</code> の行を選ぶ。</p>
 <p><img src="../../../assets/shared/ec2-session-manager-connect.png" alt="EC2の詳細画面。Connectの右の矢印からConnect with SSM Session Managerを選ぶ。Webサーバーの画面を例に示す。" width="1245" height="319" loading="lazy"></p>

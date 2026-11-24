@@ -70,23 +70,23 @@ EC2の一覧から正しいサーバーを選び、Session Managerで接続し�
 
 構築済みの自分の環境で、5台のインスタンスIDとロールを確認し、接続先と操作ユーザーを確かめる。
 
-### 操作するサーバーと教材の配置先
+### 操作するサーバーとサーバー構築用ファイルの配置先
 
-![緑の矢印はP0.2の端末接続。青の矢印は初期構築時の教材ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。](../../assets/ja/p0-ssm.png)
+![緑の矢印はP0.2の端末接続。青の矢印は初期構築時のサーバー構築用ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。](../../assets/ja/p0-ssm.png)
 
-緑の矢印はP0.2の端末接続。青の矢印は初期構築時の教材ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。
+緑の矢印はP0.2の端末接続。青の矢印は初期構築時のサーバー構築用ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。
 
 **このPractice0で作業すること**
 
 自分のAWSアカウント、各サーバーのロール、コマンドを実行する環境を確認する。
 
-### 初期構築で配置される教材ファイル
+### 初期構築で配置されるサーバー構築用ファイル
 
-共通登録コードで初期構築を完了すると、備品管理アプリとDB設定用のSQLが入った `catalog-app.tar.gz` は、WebサーバーとDBサーバーの `/var/lib/jdu-web/lesson-resources-r1` に配置済みです。WebサーバーからインターネットへのHTTPS接続はセキュリティのために制限されているので、構築スクリプトが下の経路で教材を届けます。
+共通登録コードで初期構築を完了すると、備品管理アプリとDB設定用のSQLが入った `catalog-app.tar.gz` は、WebサーバーとDBサーバーの `/var/lib/jdu-web/lesson-resources-r1` に配置済みです。WebサーバーからインターネットへのHTTPS接続はセキュリティのために制限されているので、構築スクリプトが下の経路でサーバー構築用ファイルを届けます。
 
-![共通登録コードで環境を構築すると、CloudShellはGitHubから教材ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。](../../assets/ja/p0-lesson-files.png)
+![共通登録コードで環境を構築すると、CloudShellはGitHubからサーバー構築用ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。](../../assets/ja/p0-lesson-files.png)
 
-共通登録コードで環境を構築すると、CloudShellはGitHubから教材ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。
+共通登録コードで環境を構築すると、CloudShellはGitHubからサーバー構築用ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。
 
 ### 解答例（操作手順）
 
@@ -820,7 +820,7 @@ jdu_catalog_practice、catalog_practice_setup、catalog_practice_appを作る。
 
 **始める前の状態:**
 
-DBに教材資源があり、WebからDBへ許可された経路を使う。
+DBサーバーにサーバー構築用ファイルがあり、WebからDBへ許可された経路を使う。
 
 **このPractice4で作業すること**
 
@@ -830,7 +830,7 @@ DBに教材資源があり、WebからDBへ許可された経路を使う。
 
 ### 解答例（操作手順）
 
-#### P4.1 DBを導入し教材SQLを展開する
+#### P4.1 DBを導入しDB構築用SQLを展開する
 
 **実行環境:**
 
@@ -861,7 +861,7 @@ packageの導入と、DB内の教材データ作成は別の段階。pg_lscluste
 
 **期待する結果と読み方:**
 
-16/main、data directory=/var/lib/postgresql/16/main。教材SQLは/var/lib/jdu-web/lesson-resources-r1/app/sqlにある。
+16/main、data directory=/var/lib/postgresql/16/main。DB構築用SQLは/var/lib/jdu-web/lesson-resources-r1/app/sqlにある。
 
 **うまくいかないとき:**
 
@@ -1197,9 +1197,9 @@ getent ahostsv4 admin.lab.test
 sudo apt-get install --no-install-recommends python3-venv python3-pip
 # 4. 署名・hashを確認してアプリと固定wheelを教材領域へ展開する。
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py --wheels
-# 5. /var/lib/jdu-web/lesson-resources-r1/app に配置された公開教材ファイルを一覧する。
+# 5. /var/lib/jdu-web/lesson-resources-r1/app に配置されたサーバー構築用ファイルを一覧する。
 ls /var/lib/jdu-web/lesson-resources-r1/app
-# 6. /var/lib/jdu-web/lesson-resources-r1/wheels に配置された公開教材ファイルを一覧する。
+# 6. /var/lib/jdu-web/lesson-resources-r1/wheels に配置されたサーバー構築用ファイルを一覧する。
 ls /var/lib/jdu-web/lesson-resources-r1/wheels
 ```
 

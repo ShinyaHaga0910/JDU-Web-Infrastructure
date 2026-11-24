@@ -130,15 +130,15 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>EC2の一覧から正しいサーバーを選び、Session Managerで接続して、課題の結果を自分で確認できる。</p>
 <h3>課題</h3>
 <p>構築済みの自分の環境で、5台のインスタンスIDとロールを確認し、接続先と操作ユーザーを確かめる。</p>
-<h3>操作するサーバーと教材の配置先</h3>
-<p><img src="../../../assets/ja/p0-ssm.png" alt="緑の矢印はP0.2の端末接続。青の矢印は初期構築時の教材ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。" width="1040" height="680" loading="lazy"></p>
-<p>緑の矢印はP0.2の端末接続。青の矢印は初期構築時の教材ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。</p>
+<h3>操作するサーバーとサーバー構築用ファイルの配置先</h3>
+<p><img src="../../../assets/ja/p0-ssm.png" alt="緑の矢印はP0.2の端末接続。青の矢印は初期構築時のサーバー構築用ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。" width="1040" height="680" loading="lazy"></p>
+<p>緑の矢印はP0.2の端末接続。青の矢印は初期構築時のサーバー構築用ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。</p>
 <p><strong>このPractice0で作業すること</strong></p>
 <p>自分のAWSアカウント、各サーバーのロール、コマンドを実行する環境を確認する。</p>
-<h3>初期構築で配置される教材ファイル</h3>
-<p>共通登録コードで初期構築を完了すると、備品管理アプリとDB設定用のSQLが入った <code>catalog-app.tar.gz</code> は、WebサーバーとDBサーバーの <code>/var/lib/jdu-web/lesson-resources-r1</code> に配置済みです。WebサーバーからインターネットへのHTTPS接続はセキュリティのために制限されているので、構築スクリプトが下の経路で教材を届けます。</p>
-<p><img src="../../../assets/ja/p0-lesson-files.png" alt="共通登録コードで環境を構築すると、CloudShellはGitHubから教材ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。" width="1040" height="680" loading="lazy"></p>
-<p>共通登録コードで環境を構築すると、CloudShellはGitHubから教材ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。</p>
+<h3>初期構築で配置されるサーバー構築用ファイル</h3>
+<p>共通登録コードで初期構築を完了すると、備品管理アプリとDB設定用のSQLが入った <code>catalog-app.tar.gz</code> は、WebサーバーとDBサーバーの <code>/var/lib/jdu-web/lesson-resources-r1</code> に配置済みです。WebサーバーからインターネットへのHTTPS接続はセキュリティのために制限されているので、構築スクリプトが下の経路でサーバー構築用ファイルを届けます。</p>
+<p><img src="../../../assets/ja/p0-lesson-files.png" alt="共通登録コードで環境を構築すると、CloudShellはGitHubからサーバー構築用ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。" width="1040" height="680" loading="lazy"></p>
+<p>共通登録コードで環境を構築すると、CloudShellはGitHubからサーバー構築用ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。</p>
 <h3>解答例（操作手順）</h3>
 <h4>P0.1 5台のinstance IDを確認する</h4>
 <p><strong>実行環境:</strong></p>
@@ -591,12 +591,12 @@ guide.lab.test.  300  IN  A  10.20.1.20
 </ul>
 <h3>仕組みを理解する</h3>
 <p><strong>始める前の状態:</strong></p>
-<p>DBに教材資源があり、WebからDBへ許可された経路を使う。</p>
+<p>DBサーバーにサーバー構築用ファイルがあり、WebからDBへ許可された経路を使う。</p>
 <p><strong>このPractice4で作業すること</strong></p>
 <p>練習DBとsetup/runtime roleを作り、Webから認証付きSQLを実行する。</p>
 <p>接続には、通信の到達、DBの待受、HBAの許可、password、SQL権限がそれぞれ必要。ssm-userはOS userで、catalog_practice_appはDB roleである。HBAは上から最初に一致した行を使う。SQLへ接続できることと、tableを作成できることも別の権限である。<a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBA</a>・<a href="https://www.postgresql.org/docs/16/sql-grant.html">SQL権限</a>。</p>
 <h3>解答例（操作手順）</h3>
-<h4>P4.1 DBを導入し教材SQLを展開する</h4>
+<h4>P4.1 DBを導入しDB構築用SQLを展開する</h4>
 <p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
@@ -616,7 +616,7 @@ sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
 <p><strong>コマンド・設定値の意味:</strong></p>
 <p>packageの導入と、DB内の教材データ作成は別の段階。pg_lsclustersでversion・cluster・port・状態を読む。sudo -u postgresはOS userをpostgresへ切り替えて1コマンドを実行し、-Xは個人のpsql設定を読み込まない指定である。</p>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>16/main、data directory=/var/lib/postgresql/16/main。教材SQLは/var/lib/jdu-web/lesson-resources-r1/app/sqlにある。</p>
+<p>16/main、data directory=/var/lib/postgresql/16/main。DB構築用SQLは/var/lib/jdu-web/lesson-resources-r1/app/sqlにある。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>既存DBやroleは削除しない。すでに構築した場合は現在の状態を読み、未実施の手順だけ進める。</p>
 <h4>P4.2 DBの待受とSCRAMを設定する</h4>
@@ -841,9 +841,9 @@ getent ahostsv4 admin.lab.test
 sudo apt-get install --no-install-recommends python3-venv python3-pip
 # 4. 署名・hashを確認してアプリと固定wheelを教材領域へ展開する。
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py --wheels
-# 5. /var/lib/jdu-web/lesson-resources-r1/app に配置された公開教材ファイルを一覧する。
+# 5. /var/lib/jdu-web/lesson-resources-r1/app に配置されたサーバー構築用ファイルを一覧する。
 ls /var/lib/jdu-web/lesson-resources-r1/app
-# 6. /var/lib/jdu-web/lesson-resources-r1/wheels に配置された公開教材ファイルを一覧する。
+# 6. /var/lib/jdu-web/lesson-resources-r1/wheels に配置されたサーバー構築用ファイルを一覧する。
 ls /var/lib/jdu-web/lesson-resources-r1/wheels
 </code></pre>
 <p><strong>コマンド・設定値の意味:</strong></p>

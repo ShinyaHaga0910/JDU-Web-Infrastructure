@@ -74,11 +74,11 @@ bash枠は表示された実行場所の端末へ入力する。text枠は設定
 
 P0ではWebサーバーへの接続を練習した。M0ではEC2の一覧から自分のDBサーバーを探し、同じ行の **Instance ID** をクリックする。詳細画面の **Connect** の右にある矢印から **Connect with SSM Session Manager** を選ぶ。接続先のロールが `db`、操作ユーザーが `ssm-user` であることを確かめる。DBサーバーの自分のホームディレクトリに `m0-connection.txt` を作り、`db` だけを1行に記録する。課題画面でM0を選び、記録が確認されると1点になる。
 
-### 操作するサーバーと教材の配置先
+### 操作するサーバーとサーバー構築用ファイルの配置先
 
-![緑の矢印はEC2の画面からSession ManagerでDBサーバーへ接続する経路。青の矢印は、初期構築時にCloudShellがSSMでWebとDBへ教材ファイルを配置する経路。](../../assets/ja/m0-ssm.png)
+![緑の矢印はEC2の画面からSession ManagerでDBサーバーへ接続する経路。青の矢印は、初期構築時にCloudShellがSSMでWebとDBへサーバー構築用ファイルを配置する経路。](../../assets/ja/m0-ssm.png)
 
-緑の矢印はEC2の画面からSession ManagerでDBサーバーへ接続する経路。青の矢印は、初期構築時にCloudShellがSSMでWebとDBへ教材ファイルを配置する経路。
+緑の矢印はEC2の画面からSession ManagerでDBサーバーへ接続する経路。青の矢印は、初期構築時にCloudShellがSSMでWebとDBへサーバー構築用ファイルを配置する経路。
 
 ![EC2のInstances一覧。P0は名前の末尾が `-web` の行、M0は `-db` の行を選ぶ。](../../assets/shared/ec2-session-manager-instances.png)
 

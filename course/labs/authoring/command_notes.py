@@ -104,7 +104,7 @@ def explanation(command, lang):
     if program=='cat':
         if args[-1]=='/proc/sys/kernel/random/boot_id':return a('今回の起動を識別するboot IDを読み、停止前後の比較に使う。','Прочитать boot ID для сравнения загрузок до и после остановки.','To‘xtashdan oldin/keyin solishtirish uchun boot ID ni o‘qish.')
         return a(f'{args[-1]} の内容を変更せずに読む。',f'Прочитать {args[-1]} без изменения.',f'{args[-1]} mazmunini o‘zgartirmay o‘qish.')
-    if program=='ls':return a(f'{args[-1]} に配置された公開教材ファイルを一覧する。',f'Показать учебные файлы в {args[-1]}.',f'{args[-1]} dagi o‘quv fayllarini ro‘yxatlash.')
+    if program=='ls':return a(f'{args[-1]} に配置されたサーバー構築用ファイルを一覧する。',f'Показать файлы для настройки серверов в {args[-1]}.',f'{args[-1]} dagi serverlarni sozlash fayllarini ro‘yxatlash.')
     if program=='stat':return a('指定ファイルの所有者・グループ・権限・名前を読む。','Прочитать владельца, группу, права и имя указанных файлов.','Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.')
     if program=='cp':return a('元ファイルを控えへコピーする。既存の控えは上書きしない。','Скопировать исходный файл в резервную копию, не затирая существующую.','Asl fayldan nusxa olish; mavjud nusxani ustidan yozmaslik.') if '-an' in args else a('教員提供アプリを/optの運用先へ属性を保ってコピーする。','Скопировать приложение преподавателя в /opt с сохранением атрибутов.','O‘qituvchi app ini /opt ga atributlarini saqlab ko‘chirish.')
     if program=='mv':return a('既定サイトのリンクを控えへ移す。既存の控えは上書きしない。','Переместить ссылку стандартного сайта в копию без перезаписи.','Default sayt linkini nusxaga ko‘chirish; mavjud nusxani ustidan yozmaslik.')

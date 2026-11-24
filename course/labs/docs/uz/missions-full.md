@@ -74,11 +74,11 @@ Brauzerda topshiriqni tanlab natija va saqlash holatini tekshiring. M5/M6 funksi
 
 P0 da Web serverga ulanishni mashq qildingiz. M0 da o‘z DB serveringizni EC2 ro‘yxatidan toping va o‘sha qatordagi **Instance ID** ni bosing. **Connect** yonidagi o‘ng strelkani bosib, **Connect with SSM Session Manager** ni tanlang. Rol `db`, foydalanuvchi `ssm-user` ekanini tekshiring. DB serverdagi uy katalogingizda faqat `db` satri bor `m0-connection.txt` faylini yarating. Topshiriqlar sahifasida M0 ni tanlang. Fayl tasdiqlansa 1 ball beriladi.
 
-### Serverlarga ulanish va kurs fayllari
+### Serverlarga ulanish va sozlash fayllarini joylash
 
-![Yashil strelka EC2 sahifasidan Session Manager orqali DB serverga ulanishni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda CloudShell dan SSM orqali Web va DB ga fayllarni joylashni ko‘rsatadi.](../../assets/uz/m0-ssm.png)
+![Yashil strelka EC2 sahifasidan Session Manager orqali DB serverga ulanishni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda CloudShell dan SSM orqali Web va DB ga sozlash fayllarini joylashni ko‘rsatadi.](../../assets/uz/m0-ssm.png)
 
-Yashil strelka EC2 sahifasidan Session Manager orqali DB serverga ulanishni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda CloudShell dan SSM orqali Web va DB ga fayllarni joylashni ko‘rsatadi.
+Yashil strelka EC2 sahifasidan Session Manager orqali DB serverga ulanishni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda CloudShell dan SSM orqali Web va DB ga sozlash fayllarini joylashni ko‘rsatadi.
 
 ![EC2 dagi Instances ro‘yxati. P0 uchun nomi `-web`, M0 uchun `-db` bilan tugaydigan qatorni tanlang.](../../assets/shared/ec2-session-manager-instances.png)
 

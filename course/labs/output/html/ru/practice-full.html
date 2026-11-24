@@ -130,15 +130,15 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>Выбрать нужный сервер в списке EC2, подключиться через Session Manager и проверить результат задания.</p>
 <h3>Задание</h3>
 <p>В своей готовой среде проверьте идентификаторы и роли пяти серверов, затем проверьте, к какому серверу и под каким пользователем вы подключились.</p>
-<h3>Подключение к серверам и файлы курса</h3>
-<p><img src="../../../assets/ru/p0-ssm.png" alt="Зелёная стрелка показывает подключение к терминалу в P0.2. Синие стрелки показывают размещение файлов при создании среды. Repo-сервер раздаёт пакеты для Ubuntu." width="1040" height="680" loading="lazy"></p>
-<p>Зелёная стрелка показывает подключение к терминалу в P0.2. Синие стрелки показывают размещение файлов при создании среды. Repo-сервер раздаёт пакеты для Ubuntu.</p>
+<h3>Подключение к серверам и размещение файлов для настройки</h3>
+<p><img src="../../../assets/ru/p0-ssm.png" alt="Зелёная стрелка показывает подключение к терминалу в P0.2. Синие стрелки показывают размещение файлов для настройки серверов при создании среды. Repo-сервер раздаёт пакеты для Ubuntu." width="1040" height="680" loading="lazy"></p>
+<p>Зелёная стрелка показывает подключение к терминалу в P0.2. Синие стрелки показывают размещение файлов для настройки серверов при создании среды. Repo-сервер раздаёт пакеты для Ubuntu.</p>
 <p><strong>Что сделать в Practice0</strong></p>
 <p>Проверьте свой AWS-аккаунт, роль каждого сервера и среду выполнения команд.</p>
-<h3>Учебные файлы, размещённые при создании среды</h3>
+<h3>Файлы для настройки серверов, размещённые при создании среды</h3>
 <p>После создания среды по общему коду архив <code>catalog-app.tar.gz</code> с приложением и SQL для настройки БД уже находится в <code>/var/lib/jdu-web/lesson-resources-r1</code> на Web- и DB-серверах. В целях безопасности исходящие HTTPS-подключения с Web-сервера к интернету ограничены, поэтому скрипт доставляет файлы по показанному маршруту.</p>
-<p><img src="../../../assets/ru/p0-lesson-files.png" alt="При создании среды по общему коду CloudShell загружает учебные файлы с GitHub и размещает их на Web- и DB-серверах через SSM." width="1040" height="680" loading="lazy"></p>
-<p>При создании среды по общему коду CloudShell загружает учебные файлы с GitHub и размещает их на Web- и DB-серверах через SSM.</p>
+<p><img src="../../../assets/ru/p0-lesson-files.png" alt="При создании среды по общему коду CloudShell загружает файлы для настройки серверов с GitHub и размещает их на Web- и DB-серверах через SSM." width="1040" height="680" loading="lazy"></p>
+<p>При создании среды по общему коду CloudShell загружает файлы для настройки серверов с GitHub и размещает их на Web- и DB-серверах через SSM.</p>
 <h3>Пример решения (порядок действий)</h3>
 <h4>P0.1 Проверить instance ID пяти серверов</h4>
 <p><strong>Среда выполнения:</strong></p>
@@ -591,12 +591,12 @@ guide.lab.test.  300  IN  A  10.20.1.20
 </ul>
 <h3>Как это работает</h3>
 <p><strong>Состояние перед началом:</strong></p>
-<p>На DB есть учебные файлы; используется разрешённый путь Web → DB.</p>
+<p>На DB-сервере есть файлы для настройки; используется разрешённый путь Web → DB.</p>
 <p><strong>Что сделать в Practice4</strong></p>
 <p>Созданы учебная БД и роли setup/runtime; SQL с Web проходит с паролем.</p>
 <p>Нужны сетевой доступ, прослушивание DB, разрешение HBA, пароль и SQL-права. ssm-user - пользователь ОС, catalog_practice_app - роль БД. В HBA применяется первая совпавшая строка. Возможность подключиться не означает право создавать таблицы. <a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBA</a> и <a href="https://www.postgresql.org/docs/16/sql-grant.html">права SQL</a>.</p>
 <h3>Пример решения (порядок действий)</h3>
-<h4>P4.1 Установить PostgreSQL и распаковать учебный SQL</h4>
+<h4>P4.1 Установить PostgreSQL и распаковать SQL для настройки БД</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
@@ -616,7 +616,7 @@ sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
 <p><strong>Смысл команд и настроек:</strong></p>
 <p>Установка пакета и создание учебных объектов в БД - разные этапы. Pg_lsclusters показывает версию, кластер, порт и состояние. Sudo -u postgres запускает команду от системного postgres; -X отключает личную настройку psql.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Cluster 16/main, data directory /var/lib/postgresql/16/main. Учебный SQL находится в /var/lib/jdu-web/lesson-resources-r1/app/sql.</p>
+<p>Cluster 16/main, data directory /var/lib/postgresql/16/main. SQL для настройки БД находится в /var/lib/jdu-web/lesson-resources-r1/app/sql.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Не удаляйте существующие БД и роли. Если уже настроено, изучите состояние и выполняйте только недостающие шаги.</p>
 <h4>P4.2 Настроить прослушивание и SCRAM</h4>
@@ -841,9 +841,9 @@ getent ahostsv4 admin.lab.test
 sudo apt-get install --no-install-recommends python3-venv python3-pip
 # 4. Проверить подпись/hash, подготовить приложение и фиксированные wheel.
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py --wheels
-# 5. Показать учебные файлы в /var/lib/jdu-web/lesson-resources-r1/app.
+# 5. Показать файлы для настройки серверов в /var/lib/jdu-web/lesson-resources-r1/app.
 ls /var/lib/jdu-web/lesson-resources-r1/app
-# 6. Показать учебные файлы в /var/lib/jdu-web/lesson-resources-r1/wheels.
+# 6. Показать файлы для настройки серверов в /var/lib/jdu-web/lesson-resources-r1/wheels.
 ls /var/lib/jdu-web/lesson-resources-r1/wheels
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>

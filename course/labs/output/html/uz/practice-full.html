@@ -130,15 +130,15 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>EC2 ro‘yxatidan kerakli serverni tanlash, Session Manager orqali ulanish va topshiriq natijasini tekshirish.</p>
 <h3>Topshiriq</h3>
 <p>Tayyor muhitingizda beshta serverning instance ID si va rolini tekshiring. Qaysi serverga va qaysi foydalanuvchi sifatida ulanganingizni aniqlang.</p>
-<h3>Serverlarga ulanish va kurs fayllari</h3>
-<p><img src="../../../assets/uz/p0-ssm.png" alt="Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlabki sozlashda fayllarni joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi." width="1040" height="680" loading="lazy"></p>
-<p>Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlabki sozlashda fayllarni joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi.</p>
+<h3>Serverlarga ulanish va sozlash fayllarini joylash</h3>
+<p><img src="../../../assets/uz/p0-ssm.png" alt="Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlab serverlarni sozlash fayllarini joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi." width="1040" height="680" loading="lazy"></p>
+<p>Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlab serverlarni sozlash fayllarini joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi.</p>
 <p><strong>Practice0 da bajariladigan ishlar</strong></p>
 <p>O‘z AWS hisobingizni, har bir server rolini va buyruq bajariladigan muhitni tekshiring.</p>
-<h3>Dastlabki sozlashda joylanadigan o‘quv fayllari</h3>
+<h3>Dastlab joylanadigan serverlarni sozlash fayllari</h3>
 <p>Muhit umumiy kod bilan yaratilgach, ilova va DB uchun SQL fayllari bor <code>catalog-app.tar.gz</code> arxivi Web va DB serverlaridagi <code>/var/lib/jdu-web/lesson-resources-r1</code> katalogiga joylangan bo‘ladi. Xavfsizlik uchun Web serverdan internetga chiquvchi HTTPS ulanishlari cheklangan, shuning uchun skript fayllarni quyidagi yo‘l orqali yetkazadi.</p>
-<p><img src="../../../assets/uz/p0-lesson-files.png" alt="Muhit umumiy kod orqali yaratilganda, CloudShell o‘quv fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi." width="1040" height="680" loading="lazy"></p>
-<p>Muhit umumiy kod orqali yaratilganda, CloudShell o‘quv fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi.</p>
+<p><img src="../../../assets/uz/p0-lesson-files.png" alt="Muhit umumiy kod orqali yaratilganda, CloudShell serverlarni sozlash fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi." width="1040" height="680" loading="lazy"></p>
+<p>Muhit umumiy kod orqali yaratilganda, CloudShell serverlarni sozlash fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi.</p>
 <h3>Yechim namunasi (bajarish tartibi)</h3>
 <h4>P0.1 Beshta serverning instance ID sini tekshirish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
@@ -591,12 +591,12 @@ guide.lab.test.  300  IN  A  10.20.1.20
 </ul>
 <h3>Bu qanday ishlaydi</h3>
 <p><strong>Boshlashdan oldingi holat:</strong></p>
-<p>DB da o‘quv resurslari bor; Web → DB ruxsatli yo‘li ishlatiladi.</p>
+<p>DB serverda sozlash fayllari bor; Web → DB ruxsatli yo‘li ishlatiladi.</p>
 <p><strong>Practice4 da bajariladigan ishlar</strong></p>
 <p>Mashq DB va setup/runtime role yaratiladi; Web dan parol bilan SQL bajariladi.</p>
 <p>Tarmoq yo‘li, DB listen, HBA ruxsati, parol va SQL privilege alohida kerak. ssm-user - OS user, catalog_practice_app - DB role. HBA birinchi mos qatorni ishlatadi. Ulanish huquqi table yaratish huquqini anglatmaydi. <a href="https://www.postgresql.org/docs/16/auth-pg-hba-conf.html">HBA</a> va <a href="https://www.postgresql.org/docs/16/sql-grant.html">SQL privilege</a>.</p>
 <h3>Yechim namunasi (bajarish tartibi)</h3>
-<h4>P4.1 PostgreSQL o‘rnatish va o‘quv SQL ni ochish</h4>
+<h4>P4.1 PostgreSQL o‘rnatish va DB sozlash uchun SQL ni ochish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
@@ -616,7 +616,7 @@ sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
 <p>Package o‘rnatish va DB ichida o‘quv obyektlarini yaratish alohida bosqich. Pg_lsclusters version, cluster, port va holatni ko‘rsatadi. Sudo -u postgres command ni OS postgres bilan bajaradi; -X shaxsiy psql config ni o‘qimaydi.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>16/main, data directory /var/lib/postgresql/16/main. O‘quv SQL /var/lib/jdu-web/lesson-resources-r1/app/sql da.</p>
+<p>16/main, data directory /var/lib/postgresql/16/main. DB sozlash uchun SQL /var/lib/jdu-web/lesson-resources-r1/app/sql da.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Mavjud DB yoki role ni o‘chirmang. Oldin qurilgan bo‘lsa, holatni o‘qib faqat yetishmagan qadamlarni bajaring.</p>
 <h4>P4.2 DB tinglashi va SCRAM ni sozlash</h4>
@@ -841,9 +841,9 @@ getent ahostsv4 admin.lab.test
 sudo apt-get install --no-install-recommends python3-venv python3-pip
 # 4. Imzo/hash ni tekshirib app va belgilangan wheel larni tayyorlash.
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py --wheels
-# 5. /var/lib/jdu-web/lesson-resources-r1/app dagi o‘quv fayllarini ro‘yxatlash.
+# 5. /var/lib/jdu-web/lesson-resources-r1/app dagi serverlarni sozlash fayllarini ro‘yxatlash.
 ls /var/lib/jdu-web/lesson-resources-r1/app
-# 6. /var/lib/jdu-web/lesson-resources-r1/wheels dagi o‘quv fayllarini ro‘yxatlash.
+# 6. /var/lib/jdu-web/lesson-resources-r1/wheels dagi serverlarni sozlash fayllarini ro‘yxatlash.
 ls /var/lib/jdu-web/lesson-resources-r1/wheels
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>

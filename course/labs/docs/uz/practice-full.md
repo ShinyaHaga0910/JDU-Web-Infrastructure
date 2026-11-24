@@ -70,23 +70,23 @@ EC2 ro‘yxatidan kerakli serverni tanlash, Session Manager orqali ulanish va to
 
 Tayyor muhitingizda beshta serverning instance ID si va rolini tekshiring. Qaysi serverga va qaysi foydalanuvchi sifatida ulanganingizni aniqlang.
 
-### Serverlarga ulanish va kurs fayllari
+### Serverlarga ulanish va sozlash fayllarini joylash
 
-![Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlabki sozlashda fayllarni joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi.](../../assets/uz/p0-ssm.png)
+![Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlab serverlarni sozlash fayllarini joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi.](../../assets/uz/p0-ssm.png)
 
-Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlabki sozlashda fayllarni joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi.
+Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlab serverlarni sozlash fayllarini joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi.
 
 **Practice0 da bajariladigan ishlar**
 
 O‘z AWS hisobingizni, har bir server rolini va buyruq bajariladigan muhitni tekshiring.
 
-### Dastlabki sozlashda joylanadigan o‘quv fayllari
+### Dastlab joylanadigan serverlarni sozlash fayllari
 
 Muhit umumiy kod bilan yaratilgach, ilova va DB uchun SQL fayllari bor `catalog-app.tar.gz` arxivi Web va DB serverlaridagi `/var/lib/jdu-web/lesson-resources-r1` katalogiga joylangan bo‘ladi. Xavfsizlik uchun Web serverdan internetga chiquvchi HTTPS ulanishlari cheklangan, shuning uchun skript fayllarni quyidagi yo‘l orqali yetkazadi.
 
-![Muhit umumiy kod orqali yaratilganda, CloudShell o‘quv fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi.](../../assets/uz/p0-lesson-files.png)
+![Muhit umumiy kod orqali yaratilganda, CloudShell serverlarni sozlash fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi.](../../assets/uz/p0-lesson-files.png)
 
-Muhit umumiy kod orqali yaratilganda, CloudShell o‘quv fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi.
+Muhit umumiy kod orqali yaratilganda, CloudShell serverlarni sozlash fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi.
 
 ### Yechim namunasi (bajarish tartibi)
 
@@ -820,7 +820,7 @@ Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelka
 
 **Boshlashdan oldingi holat:**
 
-DB da o‘quv resurslari bor; Web → DB ruxsatli yo‘li ishlatiladi.
+DB serverda sozlash fayllari bor; Web → DB ruxsatli yo‘li ishlatiladi.
 
 **Practice4 da bajariladigan ishlar**
 
@@ -830,7 +830,7 @@ Tarmoq yo‘li, DB listen, HBA ruxsati, parol va SQL privilege alohida kerak. ss
 
 ### Yechim namunasi (bajarish tartibi)
 
-#### P4.1 PostgreSQL o‘rnatish va o‘quv SQL ni ochish
+#### P4.1 PostgreSQL o‘rnatish va DB sozlash uchun SQL ni ochish
 
 **Bajarish muhiti:**
 
@@ -861,7 +861,7 @@ Package o‘rnatish va DB ichida o‘quv obyektlarini yaratish alohida bosqich. 
 
 **Kutilgan natija va ma’nosi:**
 
-16/main, data directory /var/lib/postgresql/16/main. O‘quv SQL /var/lib/jdu-web/lesson-resources-r1/app/sql da.
+16/main, data directory /var/lib/postgresql/16/main. DB sozlash uchun SQL /var/lib/jdu-web/lesson-resources-r1/app/sql da.
 
 **Ishlamasa:**
 
@@ -1197,9 +1197,9 @@ getent ahostsv4 admin.lab.test
 sudo apt-get install --no-install-recommends python3-venv python3-pip
 # 4. Imzo/hash ni tekshirib app va belgilangan wheel larni tayyorlash.
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py --wheels
-# 5. /var/lib/jdu-web/lesson-resources-r1/app dagi o‘quv fayllarini ro‘yxatlash.
+# 5. /var/lib/jdu-web/lesson-resources-r1/app dagi serverlarni sozlash fayllarini ro‘yxatlash.
 ls /var/lib/jdu-web/lesson-resources-r1/app
-# 6. /var/lib/jdu-web/lesson-resources-r1/wheels dagi o‘quv fayllarini ro‘yxatlash.
+# 6. /var/lib/jdu-web/lesson-resources-r1/wheels dagi serverlarni sozlash fayllarini ro‘yxatlash.
 ls /var/lib/jdu-web/lesson-resources-r1/wheels
 ```
 

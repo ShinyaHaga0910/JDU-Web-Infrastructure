@@ -13,15 +13,15 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Требуемый результат</a> · <a href="#section-2">Подключение к серверам и файлы курса</a> · <a href="#section-3">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M0 Своя среда и место выполнения команд (1)</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Требуемый результат</a> · <a href="#section-2">Подключение к серверам и размещение файлов для настройки</a> · <a href="#section-3">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M0 Своя среда и место выполнения команд (1)</h1>
 <p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
 <p><a href="../ja/m0.html">日本語</a> · <a href="../ru/m0.html">Русский</a> · <a href="../uz/m0.html">O‘zbekcha</a></p>
 <p>Связанное задание: <a href="p0.html">P0</a>.</p>
 <h2 id="section-1">Требуемый результат</h2>
 <p>В P0 вы учились подключаться к Web-серверу. В M0 найдите свой DB-сервер в списке EC2 и нажмите <strong>Instance ID</strong> в его строке. Нажмите стрелку справа от <strong>Connect</strong> и выберите <strong>Connect with SSM Session Manager</strong>. Проверьте роль <code>db</code> и пользователя <code>ssm-user</code>. Создайте в своём домашнем каталоге на DB-сервере файл <code>m0-connection.txt</code> с единственной строкой <code>db</code>. Выберите M0 на странице заданий. За подтверждённый файл начисляется 1 балл.</p>
-<h2 id="section-2">Подключение к серверам и файлы курса</h2>
-<p><img src="../../../assets/ru/m0-ssm.png" alt="Зелёная стрелка показывает подключение к DB-серверу через Session Manager в EC2. Синие стрелки показывают размещение файлов на Web и DB из CloudShell через SSM при создании среды." width="1040" height="680" loading="lazy"></p>
-<p>Зелёная стрелка показывает подключение к DB-серверу через Session Manager в EC2. Синие стрелки показывают размещение файлов на Web и DB из CloudShell через SSM при создании среды.</p>
+<h2 id="section-2">Подключение к серверам и размещение файлов для настройки</h2>
+<p><img src="../../../assets/ru/m0-ssm.png" alt="Зелёная стрелка показывает подключение к DB-серверу через Session Manager в EC2. Синие стрелки показывают размещение файлов для настройки серверов на Web и DB из CloudShell через SSM при создании среды." width="1040" height="680" loading="lazy"></p>
+<p>Зелёная стрелка показывает подключение к DB-серверу через Session Manager в EC2. Синие стрелки показывают размещение файлов для настройки серверов на Web и DB из CloudShell через SSM при создании среды.</p>
 <p><img src="../../../assets/shared/ec2-session-manager-instances.png" alt="Список Instances в EC2. Для P0 выберите строку с окончанием имени , для M0 - ." width="1393" height="382" loading="lazy"></p>
 <p>Список Instances в EC2. Для P0 выберите строку с окончанием имени <code>-web</code>, для M0 - <code>-db</code>.</p>
 <p><img src="../../../assets/shared/ec2-session-manager-connect.png" alt="Страница EC2. Нажмите стрелку справа от Connect и выберите Connect with SSM Session Manager. На снимке показан Web-сервер." width="1245" height="319" loading="lazy"></p>

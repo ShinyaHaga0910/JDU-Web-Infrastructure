@@ -12,7 +12,7 @@
 | 2 | 学生 | 共通配布物を検証し、本人CloudShellで受取先を作る | 署名・期限一致、公開requestを教師に渡す |
 | 3 | 教師 | 学生AWS・受取先を照合して個別配布 | 本人だけが復号できる暗号文を渡す |
 | 4 | 学生 | CloudFormationで5台作成、初期化後の閉鎖・SSH・採点登録 | 同じ5台・96GiB・SSM・GUI・登録を確認 |
-| 5 | 学生/教師 | 採点コマンドの初期導入と公開教材資源の配置、ブラウザ接続の設定 | 学生の学校Google・AWS・Labが一致し、課題画面が使える |
+| 5 | 学生/教師 | 採点コマンドの初期導入とサーバー構築用ファイルの配置、ブラウザ接続の設定 | 学生の学校Google・AWS・Labが一致し、課題画面が使える |
 | 6 | 学生 | Pの手順に沿ってサーバーを設定し、Mを自力で構築 | ブラウザの課題確認に実設定が反映される |
 | 7 | 教師/学生 | 結果・成績原本・教師一覧を照合 | 同じ課題の結果と保存時刻が一致 |
 
@@ -190,7 +190,7 @@ bash core/jdu-web-lab ssm --state "$STATE" --role web
 # 接続先ではssm-user。終了時はexit
 ```
 
-### 5. 公開教材資源とブラウザへの初回連携
+### 5. サーバー構築用ファイルとブラウザへの初回連携
 
 ここは初期配備の外にある重要な工程です。
 
@@ -215,7 +215,7 @@ bash core/jdu-web-lab ssm --state "$STATE" --role web
 ## 2026-11-03の監査とその後の対応
 
 - 完了：正式r3を2027-01-31末まで正規更新。元state/設定を保持した実installを確認。
-- 完了：教材P0をr3へ対応させ、Web/DBに公開教材資源を配置。3言語教材も同期。
+- 完了：教材P0をr3へ対応させ、Web/DBにサーバー構築用ファイルを配置。3言語教材も同期。
 - 完了：学生ごとのブラウザ接続設定を含む、新5台からP1/M1までの初回手順の受入。全P/M詳細手順の学生試読とは区別する。
 
 ## 新5台からの実受入結果（2026-11-03）
@@ -226,7 +226,7 @@ bash core/jdu-web-lab ssm --state "$STATE" --role web
 | CloudFormation | 新5台CREATE_COMPLETE→演習用通信制限への変更UPDATE_COMPLETE、AWS/role/networkすべて合格 |
 | 管理接続 | 全5台SSM Online、内部4台への恒久SSHを一時鍵の期限後にも確認。Windowsへ秘密鍵を保存しない |
 | GUI | 本人が新踏み台へRDP接続しデスクトップ・Firefoxの起動を確認。preflightも合格 |
-| 教材 | 新course導入、Web/DBの公開教材資源配置。完成アプリやDBを自動構築しない |
+| 教材 | 新course導入、Web/DBのサーバー構築用ファイル配置。完成アプリやDBを自動構築しない |
 | Google/AWS登録 | 同じ承認済み検証用Googleを新Labへ対応付け、ブラウザから本人確認用CFN3資源を作成→登録完了 |
 | P1実操作 | 実CloudShell→SSM→ssm-userで内部APTからNginxを導入し練習ページを配置。ブラウザ全10項目合格、結果を保存 |
 | M1設定前→後 | P1だけなら3/8。Web内でM1の指定ファイルを作成後は8/8、11:59:44 UZTに原本へ自動保存 |
@@ -248,7 +248,7 @@ bash core/jdu-web-lab ssm --state "$STATE" --role web
 | 元5台・SSM・root | 全running/SSM Online、元5 volume・暗号化96GiB保持 |
 | CloudShellからWebへ | `aws ssm start-session`で接続し、`whoami`がssm-user、`hostname`がip-10-20-1-20 |
 | Webサービス/課題ファイル | Nginx active、practice.txt/mission.txtあり |
-| P0の新しい教材資源 | `/var/lib/jdu-web/lesson-resources-r1`なし。教材helperの配置工程は実施済みと扱えない |
+| P0で扱うサーバー構築用ファイル | `/var/lib/jdu-web/lesson-resources-r1`なし。構築補助スクリプトの配置工程は実施済みと扱えない |
 | ブラウザM0 | 3項目合格、04:43:00 UTCに結果を自動保存 |
 | ブラウザM1 | 8/8、04:44:46 UTCに自動保存。学生保存成績62/62・教師一覧の同時刻反映 |
 | 原本の独立照合 | 82→84行、M0/M1のREQUESTのみ2行追加。本文hash/receipt一致、元受付・登録metadata・無関係な行は保持 |

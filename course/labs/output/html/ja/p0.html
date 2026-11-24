@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">操作するサーバーと教材の配置先</a> · <a href="#section-4">初期構築で配置される教材ファイル</a> · <a href="#section-5">解答例（操作手順）</a> · <a href="#section-6">確認・提出</a> · <a href="#section-7">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P0 サーバーの確認と接続</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">操作するサーバーとサーバー構築用ファイルの配置先</a> · <a href="#section-4">初期構築で配置されるサーバー構築用ファイル</a> · <a href="#section-5">解答例（操作手順）</a> · <a href="#section-6">確認・提出</a> · <a href="#section-7">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P0 サーバーの確認と接続</h1>
 <p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
 <p><a href="../ja/p0.html">日本語</a> · <a href="../ru/p0.html">Русский</a> · <a href="../uz/p0.html">O‘zbekcha</a></p>
 <p>対応する自力課題は<a href="m0.html">M0</a>。</p>
@@ -21,15 +21,15 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>EC2の一覧から正しいサーバーを選び、Session Managerで接続して、課題の結果を自分で確認できる。</p>
 <h2 id="section-2">課題</h2>
 <p>構築済みの自分の環境で、5台のインスタンスIDとロールを確認し、接続先と操作ユーザーを確かめる。</p>
-<h2 id="section-3">操作するサーバーと教材の配置先</h2>
-<p><img src="../../../assets/ja/p0-ssm.png" alt="緑の矢印はP0.2の端末接続。青の矢印は初期構築時の教材ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。" width="1040" height="680" loading="lazy"></p>
-<p>緑の矢印はP0.2の端末接続。青の矢印は初期構築時の教材ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。</p>
+<h2 id="section-3">操作するサーバーとサーバー構築用ファイルの配置先</h2>
+<p><img src="../../../assets/ja/p0-ssm.png" alt="緑の矢印はP0.2の端末接続。青の矢印は初期構築時のサーバー構築用ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。" width="1040" height="680" loading="lazy"></p>
+<p>緑の矢印はP0.2の端末接続。青の矢印は初期構築時のサーバー構築用ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。</p>
 <p><strong>このPractice0で作業すること</strong></p>
 <p>自分のAWSアカウント、各サーバーのロール、コマンドを実行する環境を確認する。</p>
-<h2 id="section-4">初期構築で配置される教材ファイル</h2>
-<p>共通登録コードで初期構築を完了すると、備品管理アプリとDB設定用のSQLが入った <code>catalog-app.tar.gz</code> は、WebサーバーとDBサーバーの <code>/var/lib/jdu-web/lesson-resources-r1</code> に配置済みです。WebサーバーからインターネットへのHTTPS接続はセキュリティのために制限されているので、構築スクリプトが下の経路で教材を届けます。</p>
-<p><img src="../../../assets/ja/p0-lesson-files.png" alt="共通登録コードで環境を構築すると、CloudShellはGitHubから教材ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。" width="1040" height="680" loading="lazy"></p>
-<p>共通登録コードで環境を構築すると、CloudShellはGitHubから教材ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。</p>
+<h2 id="section-4">初期構築で配置されるサーバー構築用ファイル</h2>
+<p>共通登録コードで初期構築を完了すると、備品管理アプリとDB設定用のSQLが入った <code>catalog-app.tar.gz</code> は、WebサーバーとDBサーバーの <code>/var/lib/jdu-web/lesson-resources-r1</code> に配置済みです。WebサーバーからインターネットへのHTTPS接続はセキュリティのために制限されているので、構築スクリプトが下の経路でサーバー構築用ファイルを届けます。</p>
+<p><img src="../../../assets/ja/p0-lesson-files.png" alt="共通登録コードで環境を構築すると、CloudShellはGitHubからサーバー構築用ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。" width="1040" height="680" loading="lazy"></p>
+<p>共通登録コードで環境を構築すると、CloudShellはGitHubからサーバー構築用ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。</p>
 <h2 id="section-5">解答例（操作手順）</h2>
 <h3>P0.1 5台のinstance IDを確認する</h3>
 <p><strong>実行環境:</strong></p>

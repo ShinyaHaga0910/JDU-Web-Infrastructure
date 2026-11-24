@@ -13,15 +13,15 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Tayyor holat talablari</a> · <a href="#section-2">Serverlarga ulanish va kurs fayllari</a> · <a href="#section-3">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M0 Shaxsiy muhit va buyruqlarni bajarish joyi (1)</h1>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Tayyor holat talablari</a> · <a href="#section-2">Serverlarga ulanish va sozlash fayllarini joylash</a> · <a href="#section-3">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M0 Shaxsiy muhit va buyruqlarni bajarish joyi (1)</h1>
 <p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a></p>
 <p><a href="../ja/m0.html">日本語</a> · <a href="../ru/m0.html">Русский</a> · <a href="../uz/m0.html">O‘zbekcha</a></p>
 <p>Mos topshiriq: <a href="p0.html">P0</a>.</p>
 <h2 id="section-1">Tayyor holat talablari</h2>
 <p>P0 da Web serverga ulanishni mashq qildingiz. M0 da o‘z DB serveringizni EC2 ro‘yxatidan toping va o‘sha qatordagi <strong>Instance ID</strong> ni bosing. <strong>Connect</strong> yonidagi o‘ng strelkani bosib, <strong>Connect with SSM Session Manager</strong> ni tanlang. Rol <code>db</code>, foydalanuvchi <code>ssm-user</code> ekanini tekshiring. DB serverdagi uy katalogingizda faqat <code>db</code> satri bor <code>m0-connection.txt</code> faylini yarating. Topshiriqlar sahifasida M0 ni tanlang. Fayl tasdiqlansa 1 ball beriladi.</p>
-<h2 id="section-2">Serverlarga ulanish va kurs fayllari</h2>
-<p><img src="../../../assets/uz/m0-ssm.png" alt="Yashil strelka EC2 sahifasidan Session Manager orqali DB serverga ulanishni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda CloudShell dan SSM orqali Web va DB ga fayllarni joylashni ko‘rsatadi." width="1040" height="680" loading="lazy"></p>
-<p>Yashil strelka EC2 sahifasidan Session Manager orqali DB serverga ulanishni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda CloudShell dan SSM orqali Web va DB ga fayllarni joylashni ko‘rsatadi.</p>
+<h2 id="section-2">Serverlarga ulanish va sozlash fayllarini joylash</h2>
+<p><img src="../../../assets/uz/m0-ssm.png" alt="Yashil strelka EC2 sahifasidan Session Manager orqali DB serverga ulanishni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda CloudShell dan SSM orqali Web va DB ga sozlash fayllarini joylashni ko‘rsatadi." width="1040" height="680" loading="lazy"></p>
+<p>Yashil strelka EC2 sahifasidan Session Manager orqali DB serverga ulanishni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda CloudShell dan SSM orqali Web va DB ga sozlash fayllarini joylashni ko‘rsatadi.</p>
 <p><img src="../../../assets/shared/ec2-session-manager-instances.png" alt="EC2 dagi Instances ro‘yxati. P0 uchun nomi , M0 uchun  bilan tugaydigan qatorni tanlang." width="1393" height="382" loading="lazy"></p>
 <p>EC2 dagi Instances ro‘yxati. P0 uchun nomi <code>-web</code>, M0 uchun <code>-db</code> bilan tugaydigan qatorni tanlang.</p>
 <p><img src="../../../assets/shared/ec2-session-manager-connect.png" alt="EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session Manager ni tanlang. Rasmda Web server ko‘rsatilgan." width="1245" height="319" loading="lazy"></p>
