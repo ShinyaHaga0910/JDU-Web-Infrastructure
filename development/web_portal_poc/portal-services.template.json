@@ -9,7 +9,7 @@
     "GradeTableName": {"Type": "String", "MinLength": 3},
     "BindingTableName": {"Type": "String", "MinLength": 3},
     "SecretScope": {"Type": "String", "AllowedPattern": "[a-z0-9-]{3,40}"},
-    "MicrosoftTestAccess": {"Type": "String", "Default": "", "AllowedPattern": "(?:lab-[a-f0-9]{20}:200[0-9]{39}:[0-9]{10})?"}
+    "GoogleTestAccess": {"Type": "String", "Default": "", "AllowedPattern": "(?:lab-[a-f0-9]{20}:[a-f0-9]{64}:[0-9]{10})?"}
   },
   "Resources": {
     "SubjectKey": {
@@ -27,7 +27,7 @@
       "Environment": {"Variables": {
         "PORTAL_AWS_ACCOUNT_ID": {"Ref": "AWS::AccountId"}, "PORTAL_SUBJECT_KEY_SECRET_ARN": {"Ref": "SubjectKey"},
         "PORTAL_BINDING_TABLE": {"Ref": "BindingTableName"}, "GRADE_TABLE": {"Ref": "GradeTableName"},
-        "PORTAL_MICROSOFT_TEST_ACCESS": {"Ref": "MicrosoftTestAccess"}
+        "PORTAL_GOOGLE_TEST_ACCESS": {"Ref": "GoogleTestAccess"}
       }}
     }},
     "GradeReader": {"Type": "AWS::Lambda::Function", "Properties": {

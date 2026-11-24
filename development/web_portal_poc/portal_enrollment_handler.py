@@ -4,6 +4,7 @@ begin/status claims come only from the portal's verified Google session.
 complete transports a fresh signed STS request; never log events or exceptions.
 Existing LabRole is broader than this application's intended operations.
 """
+import hashlib
 import json
 import os
 import re
@@ -23,9 +24,12 @@ def valid(event, test_access=''):
         return False
     operation = event.get('operation')
     if operation == 'claim_test_student':
-        allowed = re.fullmatch(r'(lab-[a-f0-9]{20}):(200[0-9]{39}):([0-9]{10})', test_access)
-        if (not allowed or set(event) != {'operation', 'subject', 'session_id', 'token_hash', 'request_id', 'code'}
-                or event['subject'] != allowed[2] or time.time() >= int(allowed[3])):
+        allowed = re.fullmatch(r'(lab-[a-f0-9]{20}):([a-f0-9]{64}):([0-9]{10})', test_access)
+        if (not allowed or set(event) != {'operation', 'subject', 'email', 'session_id', 'token_hash', 'request_id', 'code'}
+                or not isinstance(event['subject'], str) or not re.fullmatch(r'201[0-9]{39}', event['subject'])
+                or not isinstance(event['email'], str) or not re.fullmatch(r'[a-z0-9.]+@gmail\.com', event['email'])
+                or hashlib.sha256(event['email'].encode('ascii')).hexdigest() != allowed[2]
+                or time.time() >= int(allowed[3])):
             return False
         match = CODE.fullmatch(event['code']) if isinstance(event['code'], str) else None
         return bool(match and match[1] == allowed[1] and all(isinstance(event[k], str) and HEX.fullmatch(event[k])
@@ -78,7 +82,7 @@ def serve(event, service, preparation=None, check_student=None, *, test_access='
             if check_student is None:
                 return {'status': 'unavailable'}
             if operation == 'claim_test_student':
-                values.update(email=None, test_lab=test_access.split(':', 1)[0])
+                values['test_lab'] = test_access.split(':', 1)[0]
             result = service.claim(**values, check_student=check_student)
         else:
             result = getattr(service, operation)(**values)
@@ -90,7 +94,7 @@ def serve(event, service, preparation=None, check_student=None, *, test_access='
 
 
 def handler(event, context):
-    test_access = os.environ.get('PORTAL_MICROSOFT_TEST_ACCESS', '')
+    test_access = os.environ.get('PORTAL_GOOGLE_TEST_ACCESS', '')
     if not valid(event, test_access):
         return {'status': 'unauthorized'}
     try:

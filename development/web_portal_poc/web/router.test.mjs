@@ -218,25 +218,25 @@ test('unregistered school students are redirected to registration before grading
   assert.equal(unavailable.status,200);
 });
 
-test('the Microsoft test student can open enrollment but cannot reach teacher or preparation routes', async()=>{
-  const lab='lab-'+'a'.repeat(20), access='b'.repeat(64), subject='200'+'0'.repeat(38)+'1';
+test('the Google test student can open enrollment but cannot reach teacher or preparation routes', async()=>{
+  const lab='lab-'+'a'.repeat(20), access='b'.repeat(64), subject='201'+'0'.repeat(38)+'1';
   const cookie='__Host-jdu-session=test-token; __Host-jdu-access='+access;
   let gradeResult={status:'unauthorized'};
   const envWithTest={...env,PORTAL_CHECKER_ENABLED:'true',PORTAL_SELF_LINK_ENABLED:'true',
-    MICROSOFT_TEST_CONFIG:{client_id:'11111111-1111-1111-1111-111111111111',object_id:'00000000-0000-0000-0000-000000000001',
-      client_secret:'synthetic-microsoft-secret',lab_id:lab,expires_at:Math.floor(Date.now()/1000)+600}};
+    GOOGLE_TEST_CONFIG:{client_id:[4321,'test.apps.googleusercontent.com'].join('-'),email:'allowed.test@gmail.com',
+      client_secret:['GOCSPX','synthetic-test-client-secret'].join('-'),lab_id:lab,expires_at:Math.floor(Date.now()/1000)+600}};
   const app=createApp({env:envWithTest,verify:async()=>{throw Error('Not a Google token');},
     verifyTestStudent:async()=>({sub:subject,testLab:lab}),sessions:{check:async()=>true},
     getGrade:async()=>gradeResult,checker:async()=>assert.fail('No check should run'),
-    getTeacher:async()=>assert.fail('No teacher lookup for Microsoft test identity'),
+    getTeacher:async()=>assert.fail('No teacher lookup for Google test identity'),
     enroll:async()=>assert.fail('No enrollment on GET')});
-  assert.equal((await app(req('/auth/microsoft?lang=ru'))).status,303);
+  assert.equal((await app(req('/auth/google-test?lang=ru'))).status,303);
   const checks=await app(req('/checks?lang=ru',{headers:{cookie}}));
   assert.equal(checks.headers.get('location'),'/link?lang=ru');
   assert.equal((await app(req('/link?lang=ru',{headers:{cookie}}))).status,200);
   assert.equal((await app(req('/teacher',{headers:{cookie}}))).status,403);
   assert.equal((await app(req('/prepare',{headers:{cookie}}))).status,404);
-  assert.equal((await createApp({env})(req('/auth/microsoft'))).status,404);
+  assert.equal((await createApp({env})(req('/auth/google-test'))).status,404);
   gradeResult={status:'ok',grade:{...sample,lab_id:'lab-'+'b'.repeat(20)}};
   for(const path of ['/checks','/grades','/status']) assert.equal((await app(req(path,{headers:{cookie}}))).status,403);
 });

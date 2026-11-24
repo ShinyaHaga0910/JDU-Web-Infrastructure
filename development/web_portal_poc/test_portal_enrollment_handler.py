@@ -1,3 +1,4 @@
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -44,23 +45,25 @@ class HandlerTest(unittest.TestCase):
             self.assertEqual(serve(event, service), {'status': expected})
         self.assertEqual(handler({'operation': 'approve'}, None), {'status': 'unauthorized'})
 
-    def test_microsoft_test_claim_is_limited_to_one_subject_and_lab(self):
+    def test_google_test_claim_is_limited_to_one_subject_and_lab(self):
         service, checker = Mock(), Mock()
-        lab, subject = 'lab-' + 'a' * 20, '200' + '1' * 39
+        lab, subject = 'lab-' + 'a' * 20, '201' + '1' * 39
         now = int(time.time())
         event = {k: v for k, v in self.event.items() if k != 'email'}
-        event.update(operation='claim_test_student', subject=subject,
+        email = 'test.only@gmail.com'
+        digest = hashlib.sha256(email.encode('ascii')).hexdigest()
+        event.update(operation='claim_test_student', subject=subject, email=email,
                      code=f'jdu-link1.{lab}.123456789012.{now}.' + 'f' * 64)
-        access = f'{lab}:{subject}:{now + 600}'
-        for fields, config in (({}, ''), ({}, f'{lab}:{subject}:{now - 1}'),
-                               ({'subject': '12345'}, access), ({'code': event['code'].replace(lab, 'lab-' + 'b'*20)}, access)):
+        access = f'{lab}:{digest}:{now + 600}'
+        for fields, config in (({}, ''), ({}, f'{lab}:{digest}:{now - 1}'),
+                               ({'subject': '12345'}, access), ({'email': 'other@gmail.com'}, access), ({'code': event['code'].replace(lab, 'lab-' + 'b'*20)}, access)):
             self.assertEqual(serve(event | fields, service, check_student=checker, test_access=config),
                              {'status': 'unauthorized'})
         service.claim.assert_not_called()
         service.claim.return_value = {'registered': True}
         self.assertEqual(serve(event, service, check_student=checker, test_access=access)['status'], 'ok')
         self.assertEqual(service.claim.call_args.kwargs['test_lab'], lab)
-        self.assertIsNone(service.claim.call_args.kwargs['email'])
+        self.assertEqual(service.claim.call_args.kwargs['email'], email)
 
     def test_source_only_package_reproducible_loadable_and_registry_unchanged(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -126,9 +126,9 @@ class PortalEnrollment:
         if test_lab is None:
             pk = email_key(email, self.pepper)
         else:
-            if lab != test_lab or email is not None:
+            if lab != test_lab:
                 raise EnrollmentDenied('Test student Lab mismatch')
-            pk = 'APPROVAL#' + hmac.new(self.pepper, b'microsoft-test-student-v1\0' + subject.encode('ascii'),
+            pk = 'APPROVAL#' + hmac.new(self.pepper, b'google-test-student-v1\0' + subject.encode('ascii'),
                                         hashlib.sha256).hexdigest()
         subject_pk = subject_key(subject, self.pepper)
         session_pk = 'SESSION#' + digest(session_id)
