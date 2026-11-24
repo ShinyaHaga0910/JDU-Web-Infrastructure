@@ -1,6 +1,19 @@
 {
   "ubuntu_snapshot": "20261015T090000Z",
   "additional_debs": {
+    "/pool/main/h/htop/htop_3.3.0-4build1_amd64.deb": "ee0e9cffc789788164214bac9b6e285a5127c07be1815129875c6c538ba849c6",
+    "/pool/main/j/jq/jq_1.7.1-3ubuntu0.24.04.2_amd64.deb": "f59183392f84fe67b407b494d8ba6185e9b0e4a106ffcb369490bd20a83fd40e",
+    "/pool/main/j/jq/libjq1_1.7.1-3ubuntu0.24.04.2_amd64.deb": "078fbf38b2e7c3f24cc5dc894d1bb03b617894b887a6e13d5943e13818e724f3",
+    "/pool/main/l/less/less_590-2ubuntu2.1_amd64.deb": "f26481c7f5e492e7536f9e75a9aa237f4772b637cdc933f356bc567e180b8a39",
+    "/pool/main/libe/libevent/libevent-core-2.1-7t64_2.1.12-stable-9ubuntu2.2_amd64.deb": "2a5264b572f5fe50fc9d63e115d308c79b9fb746d13cc55b5ea1f0f01a78daa7",
+    "/pool/main/libo/libonig/libonig5_6.9.9-1build1_amd64.deb": "605f42287d2bcb6c84f5a02377c7cd777090c5e857259a4030a571989f19dde2",
+    "/pool/main/libu/libutempter/libutempter0_1.2.1-3build1_amd64.deb": "46c0dfbfeca19ba0773398d654b7e7225b178f26b414f0e2f8250519551bfb32",
+    "/pool/main/r/rsync/rsync_3.2.7-1ubuntu1.5_amd64.deb": "8f952895697d19a6f1caa71f17c7d4e8c1f1fb485eb824ffe3e4c77dd587b338",
+    "/pool/main/t/tmux/tmux_3.4-1ubuntu0.1_amd64.deb": "2913e17aa61879d1f905aab6f374f153f1ece63aefba1b996e387325d1d5338d",
+    "/pool/main/u/unzip/unzip_6.0-28ubuntu4.1_amd64.deb": "a505b9d491386167bd8e14e3383315a4a7d6539e4406745901ccf009a7988271",
+    "/pool/main/z/zip/zip_3.0-13ubuntu0.2_amd64.deb": "30b325b542ef8e9a22a5e1e1cfce8c4f4b75db73e339e76bf405b635861f1f76",
+    "/pool/universe/n/ncdu/ncdu_1.19-0.1_amd64.deb": "0102a8a8630e88aea75b51b367fae218d4d64cc9f8c7093d9fec773b799d3316",
+    "/pool/universe/r/rust-ripgrep/ripgrep_14.1.0-1_amd64.deb": "c5ae63c7bee915b1cfc9f0bd07c55b4ce7f2bcd1133cba4da56719aac26101a4",
     "/pool/universe/t/tree/tree_2.1.1-2ubuntu3_amd64.deb": "6164d7cb4a384de578d004a59054b01dbb65d332ab82697a85bdcd07a8b969d5"
   },
   "firefox": {
