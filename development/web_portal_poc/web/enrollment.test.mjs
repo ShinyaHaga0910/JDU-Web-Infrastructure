@@ -151,3 +151,25 @@ test('HTTP body reader bounds both declared and streamed content without destroy
     assert.equal(r.destroyed,false);
   }
 });
+
+test('self-link shows a session-bound challenge and only POST calls the private backend',async()=>{
+  const calls=[];
+  const app=createApp({env:{...env,PORTAL_SELF_LINK_ENABLED:'true'},verify,sessions,
+    enroll:async e=>{calls.push(e);return {status:'ok',enrollment:{registered:true}};}});
+  const page=await app(req('/link',{headers:{cookie}}));
+  assert.equal(page.status,200);
+  const html=await page.text(), requestId=html.match(/name="request_id" value="([a-f0-9]{64})"/)[1];
+  assert.match(html,new RegExp('portal-link-code --lang ja --challenge '+requestId));
+  assert.equal(calls.length,0);
+  const code='jdu-link1.lab-'+'1'.repeat(20)+'.123456789012.1770000000.'+'c'.repeat(64);
+  const body=new URLSearchParams({request_id:requestId,code,csrf:formToken(config,sid,token,requestId)});
+  const blocked=await app(req('/link',post(body,{origin:'https://elsewhere.example'})));
+  assert.equal(blocked.status,403);
+  assert.equal(calls.length,0);
+  const result=await app(req('/link',post(body)));
+  assert.equal(result.headers.get('location'),'/checks?lang=ja');
+  assert.equal(calls.length,1);
+  assert.equal(calls[0].subject,identity.sub);
+  assert.equal(calls[0].request_id,requestId);
+  assert.equal(calls[0].operation,'claim');
+});

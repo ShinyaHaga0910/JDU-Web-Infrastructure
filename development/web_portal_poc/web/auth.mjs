@@ -39,7 +39,7 @@ export function equal(a, b) {
 export function loginTarget(value='/',config) {
   if(typeof value!=='string' || value.length>1024 || !value.startsWith('/') || value.startsWith('//') || /[\\\x00-\x1f\x7f]/u.test(value))throw Error('Invalid login destination');
   const target=new URL(value,config.origin);
-  const paths=new Set(['/','/checks','/grades','/status','/teacher','/teacher/student','/enroll','/prepare']);
+  const paths=new Set(['/','/checks','/grades','/status','/teacher','/teacher/student','/enroll','/link','/prepare']);
   const fields=new Set(['lang','task_id','job_id','check_mode','context','lab_id','after']);
   if(target.origin!==config.origin || !paths.has(target.pathname) || target.hash || [...target.searchParams.keys()].some(k=>!fields.has(k)) || new Set(target.searchParams.keys()).size!==[...target.searchParams.keys()].length)throw Error('Invalid login destination');
   return target.pathname+target.search;

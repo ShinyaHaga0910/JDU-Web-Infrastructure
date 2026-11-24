@@ -74,6 +74,37 @@ class PortalEnrollmentTest(unittest.TestCase):
             UpdateExpression='SET #active=:no', ExpressionAttributeNames={'#active': 'active'},
             ExpressionAttributeValues=encoded({':no': False}))
 
+    def test_self_link_requires_live_session_correct_lab_code_and_student_checker(self):
+        from lab_link_code import signed_code
+        lab = 'lab-' + '1' * 20
+        new_meta = dict(self.meta, pk='LAB#' + lab, lab_id=lab)
+        self.db.put_item(TableName='grades', Item=encoded(new_meta))
+        account = self.grant['account']
+        email = 'self-linked@jdu.uz'
+        code = signed_code(self.operation, lab, account, int(self.now), new_meta['token_hash'])
+        calls = []
+        def check_student(a, l):
+            calls.append((a, l))
+            return (a, l) == (account, lab)
+
+        values = dict(subject=self.subject, email=email, session_id=self.sid, token_hash=self.token_hash,
+                      request_id=self.operation, code=code, check_student=check_student)
+        for bad in ({'request_id': 'b' * 64}, {'session_id': 'b' * 64}, {'email': 'outside@example.org'},
+                    {'code': signed_code(self.operation, lab, account, int(self.now) - 601, new_meta['token_hash'])}):
+            with self.subTest(bad=bad), self.assertRaises(EnrollmentDenied):
+                self.service.claim(**{**values, **bad})
+        self.assertEqual(calls, [])
+        with self.assertRaises(EnrollmentDenied):
+            self.service.claim(**{**values, 'check_student': lambda *_: False})
+        self.assertEqual(self.bindings(), [])
+        self.assertTrue(self.service.claim(**values)['registered'])
+        self.assertTrue(self.service.claim(**values)['registered'])
+        self.assertEqual(calls, [(account, lab)])
+        self.assertTrue(self.service.status(self.subject, email, self.sid, self.token_hash)['registered'])
+        with self.assertRaises(EnrollmentDenied):
+            self.service.claim(**{**values, 'email': 'another@jdu.uz', 'subject': '123'})
+        self.assertEqual(self.service.get('grades', 'LAB#' + lab, 'META'), new_meta)
+
     def test_complete_creates_both_identity_and_account_mapping_atomically(self):
         pending = self.begin()
         result = self.service.complete(pending['pair_id'], self.proof())
@@ -239,7 +270,7 @@ class PortalEnrollmentTest(unittest.TestCase):
         self.assertFalse(self.read('PAIR#'+digest(pair['pair_id']),'IDENTITY')['used'])
         self.assertNotIn('bound_subject',self.read(email_key(self.email,self.pepper),'LAB'))
 
-    def test_new_atomic_mapping_drives_existing_62_point_reader_and_rejects_other_identity(self):
+    def test_new_atomic_mapping_drives_current_61_point_reader_and_rejects_other_identity(self):
         from identity_grade import identity_grade
         import test_grade_reader as fixtures
         fixture = fixtures.GradeTest('test_saved_score_and_unknown_current_use_existing_projection')
@@ -254,7 +285,7 @@ class PortalEnrollmentTest(unittest.TestCase):
         class BindingStore:
             def get(self, pk, sk): return service.get('bindings', pk, sk)
         result = identity_grade(self.subject, self.pepper, BindingStore(), fixture.store)
-        self.assertEqual((result['raw_earned'], result['raw_maximum']), (62, 62))
+        self.assertEqual((result['raw_earned'], result['raw_maximum']), (59, 61))
         self.assertIn('M5', result['current_unresolved'])
         with self.assertRaises(fixtures.legacy.ApiError):
             identity_grade('111111111111111111', self.pepper, BindingStore(), fixture.store)

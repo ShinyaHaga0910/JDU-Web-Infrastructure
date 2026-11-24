@@ -246,9 +246,9 @@ def make_markdown(reg, lang, kind):
                     out += ['**' + L['trouble'][lang] + ':** ' + s['trouble'][lang], '']
             if m['id']=='P0':
                 out += ['### '+T('確認・提出','Проверка и сдача','Tekshirish va topshirish')[lang], '', T(
-                    '教師が案内する採点ページのURLを自分のPCのブラウザで開き、学校のGoogleアカウントでログインする。CloudShellでの操作は不要。',
-                    'Откройте адрес портала из объявления преподавателя в браузере на своём компьютере и войдите с учебным аккаунтом Google. Команды в CloudShell не нужны.',
-                    'O‘qituvchi bergan baholash manzilini o‘z kompyuteringizdagi brauzerda oching va ta’lim muassasasining Google hisobi bilan kiring. CloudShell da buyruq bajarish shart emas.')[lang], '', T(
+                    '教師が案内する採点ページのURLを自分のPCのブラウザで開き、学校のGoogleアカウントでログインする。初回だけ「自分のAWS環境を登録」を選び、画面の手順で連携する。',
+                    'Откройте адрес портала из объявления преподавателя в браузере на своём компьютере и войдите с учебным аккаунтом Google. При первом входе выберите регистрацию своей среды AWS и следуйте указаниям на экране.',
+                    'O‘qituvchi bergan baholash manzilini o‘z kompyuteringizdagi brauzerda oching va ta’lim muassasasining Google hisobi bilan kiring. Birinchi kirishda o‘z AWS muhitingizni ro‘yxatdan o‘tkazish bo‘limini tanlang va ekrandagi ko‘rsatmalarga amal qiling.')[lang], '', T(
                     'P0の枠で **この課題を確認する** を押す。同じページで今回の結果を確認し、P0の枠に **1 / 1** が保存されたことを確認する。',
                     'В карточке P0 нажмите **Проверить это задание**. Посмотрите результат на этой же странице и убедитесь, что в карточке P0 сохранён **1 / 1**.',
                     'P0 kartasidagi **Ushbu vazifani tekshirish** tugmasini bosing. Shu sahifada natijani tekshirib, P0 kartasida **1 / 1** saqlanganiga ishonch hosil qiling.')[lang], '']

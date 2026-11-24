@@ -22,7 +22,7 @@ export function createEnrollmentClient(env=process.env,client=new LambdaClient({
   if (!/^[0-9]{12}$/.test(account||'') || typeof arn!=='string'
       || !new RegExp(`^arn:aws:lambda:us-east-1:${account}:function:[A-Za-z0-9_-]+$`).test(arn)) throw Error('Invalid registration service');
   return async event=>{
-    if (!event || !['begin','status','complete','prepare_begin','prepare_status','prepare_complete','prepare_confirm','prepare_plan','prepare_create','prepare_advance','prepare_registration_context','prepare_register'].includes(event.operation)) throw Error('Invalid registration');
+    if (!event || !['begin','status','claim','complete','prepare_begin','prepare_status','prepare_complete','prepare_confirm','prepare_plan','prepare_create','prepare_advance','prepare_registration_context','prepare_register'].includes(event.operation)) throw Error('Invalid registration');
     const payload=Buffer.from(JSON.stringify(event));
     if (payload.length>16384) throw Error('Invalid registration');
     const result=await client.send(new InvokeCommand({FunctionName:arn,InvocationType:'RequestResponse',Payload:payload}),

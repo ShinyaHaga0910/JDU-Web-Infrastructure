@@ -228,7 +228,7 @@ def activate(session, account, revision, origin, google_source, students, expire
         if existing != oauth:
             raise ValueError('Existing OAuth configuration differs; inspect before updating')
     refs = backend(session, account)
-    digest = publish_link(session, account, origin, students, expires)
+    digest = publish_link(session, account, origin, students, expires) if students else 'disabled'
     bucket = outputs(read_stack(cfn, STACK + '-artifacts'))['BucketName']
     with TemporaryDirectory() as work:
         archive = Path(work) / 'portal-web.zip'
@@ -238,7 +238,8 @@ def activate(session, account, revision, origin, google_source, students, expire
         **code, 'WebFunctionName': FUNCTION, 'ReleaseId': revision, 'LabRoleArn': f'arn:aws:iam::{account}:role/LabRole',
         'PortalMode': 'enabled', 'PortalExpiresAt': expires, 'PublicOrigin': origin, 'GoogleOAuthSecretArn': target,
         'BindingTableName': refs['BindingTableName'], 'GradeReaderFunctionArn': refs['GradeReaderArn'],
-        'CheckerFunctionArn': refs['CheckerArn'], 'CheckerEnabled': 'true', 'EnrollmentEnabled': 'true',
+        'CheckerFunctionArn': refs['CheckerArn'], 'CheckerEnabled': 'true', 'SelfLinkEnabled': 'true',
+        'EnrollmentEnabled': 'true' if students else 'false',
         'EnrollmentFunctionArn': refs['EnrollmentArn'], 'BootstrapTemplateDigest': digest,
     }, update=True)
     if get_portal_url(read_stack(cfn, STACK)) != origin:
@@ -366,8 +367,6 @@ def main():
         backend(session, account)
         print('Portal backend connected to the existing grade table.')
     elif args.phase == 'portal-enable':
-        if not args.student_account:
-            parser.error('--student-account is required')
         portal = read_stack(session.client('cloudformation'), STACK)
         origin = get_portal_url(portal)
         expires = expiry_timestamp(args.expires_on) if args.expires_on else stack_parameters(portal).get('PortalExpiresAt', '')

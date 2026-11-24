@@ -27,24 +27,23 @@ bash "$setup" portal-secret --google-client-id GOOGLE-CLIENT-ID
 
 ## 3. Googleログインと採点を接続する
 
-既存の鍵を再利用する場合は、`GOOGLE-SECRET-NAME` をSecrets Managerのシークレット名に置き換えます。直前に `portal-secret` で鍵を登録した場合は、`--google-secret GOOGLE-SECRET-NAME` を省略します。受講者のAWSアカウントを `--student-account` で指定します。クラスに複数ある場合は、このオプションをアカウントごとに繰り返します。
+既存の鍵を再利用する場合は、`GOOGLE-SECRET-NAME` をSecrets Managerのシークレット名に置き換えます。直前に `portal-secret` で鍵を登録した場合は、`--google-secret GOOGLE-SECRET-NAME` を省略します。
 
 ```bash
-bash "$setup" portal-enable --google-secret GOOGLE-SECRET-NAME \
-  --student-account STUDENT-AWS-ACCOUNT
+bash "$setup" portal-enable --google-secret GOOGLE-SECRET-NAME
 ```
 
 手順1で指定した最終日が使われます。タシケント時間でその日いっぱい利用でき、翌日の午前0時からポータルは利用できなくなります。有効化するときに日付を変更する場合は `--expires-on YYYY-MM-DD` を追加します。
 
-スクリプトは、登録済みの採点テーブルに成績表示・提出サービスを接続します。ログイン用のシークレットは現在のポータル用に作り、Google側で使っているクライアントを再利用します。学生AWSへの許可は、本人確認用テンプレート1ファイルを読むためのものです。
+スクリプトは、登録済みの採点テーブルに成績表示・提出サービスを接続します。ログイン用のシークレットは現在のポータル用に作り、Google側で使っているクライアントを再利用します。
 
-## 4. 利用するGoogleアカウントを登録する
+## 4. 学生が自分の演習環境を登録する
 
-学生のAWSアカウントと、教師基盤に登録された学生のLab IDを指定します。続く入力欄には学生の学校Googleメールを入れます。
+`@jdu.uz` のアカウントで学生向けページにログインできます。学生のメールアドレスやAWSアカウントを教師が個別に登録する作業はありません。
 
-```bash
-bash "$setup" portal-approve --student-account STUDENT-AWS-ACCOUNT --lab-id STUDENT-LAB-ID
-```
+初回だけ **自分のAWS環境を登録** を開き、表示されたコマンドを自分の学生用CloudShellで実行します。複数の演習環境が表示されたら、今回使うLabを選びます。CloudShellが表示する連携コードを採点ページに貼り付け、**連携する** を押します。連携コードは、発行元のページで10分間使えます。
+
+### 教師用の成績一覧を設定する
 
 教師用の成績一覧は、閲覧を許可するクラスとLabを指定します。複数の場合は `--lab-id` をLabごとに繰り返します。続く入力欄には教師の学校Googleメールを入れます。
 
@@ -63,6 +62,6 @@ bash "$setup" portal-url
 
 ## 学期が終わったら
 
-期限になると、学生・教師のログインとブラウザ採点が自動で停止します。既にログインしているブラウザにも適用されます。学生AWSに付与した本人確認用ファイルの読み取り許可も期限切れになります。成績原本は保持されます。
+期限になると、学生・教師のログインとブラウザ採点が自動で停止します。既にログインしているブラウザにも適用されます。成績原本は保持されます。
 
 Google Cloudの **Clients → 授業用クライアント → Authorized redirect URIs** を開き、今回のポータルの `/auth/callback` だけを削除して保存します。ほかの授業のリダイレクトURIは残します。LMSの授業案内から採点URLを外します。

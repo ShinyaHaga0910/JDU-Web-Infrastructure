@@ -1288,6 +1288,57 @@ def reset_rdp(args, screen, session, account, parent):
         screen.record(f'RDP: {instance["PublicIpAddress"]}  /  labuser')
 
 
+def student_link_code(args):
+    import boto3
+
+    labels = {
+        'en': ('Enter the confirmation number shown on the portal', 'Copy this linking code into the portal'),
+        'ja': ('採点ページの確認番号を貼り付けてください', 'この連携コードを採点ページに貼り付けてください'),
+        'ru': ('Введите номер подтверждения с портала', 'Вставьте этот код привязки на портале'),
+        'uz': ('Portalda ko‘rsatilgan tasdiqlash raqamini kiriting', 'Bu bog‘lash kodini portalga kiriting'),
+    }[args.lang or 'ja']
+    if not re.fullmatch(r'[a-f0-9]{40}', args.ref):
+        raise ValueError('SOURCE_REVISION')
+    challenge = args.challenge or input(labels[0] + ': ').strip()
+    if not re.fullmatch(r'[a-f0-9]{64}', challenge):
+        raise ValueError('INVALID_PORTAL_CONFIRMATION_NUMBER')
+    session = boto3.Session(region_name=REGION)
+    account = session.client('sts').get_caller_identity()['Account']
+    if not ACCOUNT.fullmatch(account):
+        raise ValueError('AWS_ACCOUNT')
+    parent = Path.home() / '.local/share/jdu-web-classroom' / account / 'student'
+    with tempfile.TemporaryDirectory() as path:
+        for name, source in (('install_teacher.py', TEACHER + '/install_teacher.py'),
+                             ('lab_link_code.py', 'development/web_portal_poc/lab_link_code.py')):
+            Path(path, name).write_bytes(remote_source(args.ref, source))
+        sys.path.insert(0, path)
+        from install_teacher import read_private
+        from lab_link_code import signed_code
+
+        labs = reset_labs(session.client('cloudformation'), account, parent)
+        identities = [read_private(file) for file in sorted(parent.glob('enrollment-*.json'))
+                      if re.fullmatch(r'enrollment-[a-f0-9]{64}\.json', file.name)]
+        enrolled = {item['lab_id']: item['lab_token'] for item in identities if item.get('lab_id') in labs}
+        if args.lab_id:
+            lab = args.lab_id
+        elif len(enrolled) == 1:
+            lab = next(iter(enrolled))
+        else:
+            if not enrolled:
+                raise ValueError('NO_REGISTERED_STUDENT_LAB')
+            options = sorted(enrolled)
+            for index, name in enumerate(options, 1):
+                print(f'[{index}] {name}')
+            choice = input('1-' + str(len(options)) + ': ').strip()
+            if not re.fullmatch(r'[1-9][0-9]*', choice) or int(choice) > len(options):
+                raise ValueError('INVALID_STUDENT_LAB')
+            lab = options[int(choice)-1]
+        if lab not in enrolled or not re.fullmatch(r'[A-Za-z0-9_-]{43}', enrolled[lab]):
+            raise ValueError('NO_REGISTERED_STUDENT_LAB')
+        value = signed_code(challenge, lab, account, int(time.time()), hashlib.sha256(enrolled[lab].encode()).hexdigest())
+        print(f'{labels[1]}:\n{value}')
+
+
 def main():
     try:
         return run_cli()
@@ -1298,11 +1349,20 @@ def main():
 
 def run_cli():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('role', choices=(*STAGES, 'portal-url'))
+    parser.add_argument('role', choices=(*STAGES, 'portal-url', 'portal-link-code'))
     parser.add_argument('--ref', required=True, help='Exact GitHub commit for the installer and accompanying source files.')
     parser.add_argument('--lang', choices=TEXT)
     parser.add_argument('--expires-on', help='Last day of the semester in Tashkent (teacher setup)')
+    parser.add_argument('--challenge', help='Confirmation number shown on the assignment portal')
+    parser.add_argument('--lab-id', help='Select an existing Lab for the portal link code')
     args = parser.parse_args()
+    if args.role == 'portal-link-code':
+        try:
+            student_link_code(args)
+            return 0
+        except (OSError, ValueError, RuntimeError) as error:
+            print(str(error) if isinstance(error, ValueError) else 'PORTAL_LINK_CODE_UNAVAILABLE', file=sys.stderr)
+            return 1
     if args.role == 'portal-url':
         import boto3
         url = assignment_portal_url(boto3.client('cloudformation', region_name=REGION))

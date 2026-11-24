@@ -18,6 +18,7 @@ import time
 from boto3.dynamodb.types import TypeDeserializer, TypeSerializer
 import identity_proof
 from identity_keys import subject_key
+from lab_link_code import CODE, verify_code
 
 HEX = re.compile(r'[a-f0-9]{64}\Z')
 SUBJECT = re.compile(r'SUBJECT#[a-f0-9]{64}\Z')
@@ -116,6 +117,45 @@ class PortalEnrollment:
         except self.client.exceptions.TransactionCanceledException:
             raise EnrollmentDenied('Approval conflicts or original Lab changed') from None
         return {'approved': True, 'lab_id': grant['lab_id']}
+
+    def claim(self, subject, email, session_id, token_hash, request_id, code, check_student):
+        match = CODE.fullmatch(code)
+        if not match or not HEX.fullmatch(session_id) or not HEX.fullmatch(request_id):
+            raise EnrollmentDenied('Invalid Lab link')
+        lab, account, _, _ = match.groups()
+        pk = email_key(email, self.pepper)
+        subject_pk = subject_key(subject, self.pepper)
+        session_pk = 'SESSION#' + digest(session_id)
+        self.session(session_pk, token_hash)
+        meta = self.get(self.grades, 'LAB#' + lab, 'META') or {}
+        grant = checked_grant({'account': account, **{name: meta.get(name) for name in
+                              ('lab_id', 'deployment_id', 'token_hash', 'instances')}})
+        now = int(self.clock())
+        if (meta.get('active') is not True or lab != grant['lab_id']
+                or not verify_code(request_id, code, grant['token_hash'], now)):
+            raise EnrollmentDenied('Lab link unavailable')
+        if self.registered(subject_pk, grant, pk):
+            return {'registered': True, 'lab_id': lab}
+        if not check_student(account, lab):
+            raise EnrollmentDenied('Student checker unavailable')
+        # Atomically enforce the verified session, the original registration and
+        # uniqueness of the school identity, AWS account, and Lab.
+        approval = {'pk': pk, 'sk': 'LAB', 'active': True, 'grant': grant,
+                    'grant_digest': grant_digest(grant), 'enrollment_deadline': now + PAIR_SECONDS,
+                    'created_at': now, 'bound_subject': subject_pk}
+        bound = self.binding_records(subject_pk, grant, pk)
+        session = {'session_pk': session_pk, 'session_token_hash': token_hash}
+        try:
+            self.client.transact_write_items(TransactItems=[
+                self.meta_condition(grant), self.session_condition(session, int(self.clock())),
+                *[{'Put': {'TableName': self.table, 'Item': encoded(row),
+                           'ConditionExpression': 'attribute_not_exists(pk)'}} for row in [approval, *bound]],
+            ])
+        except self.client.exceptions.TransactionCanceledException:
+            self.session(session_pk, token_hash)
+            if not self.registered(subject_pk, grant, pk):
+                raise EnrollmentDenied('Lab is already linked or the registration changed') from None
+        return {'registered': True, 'lab_id': lab}
 
     def session(self, session_pk, token_hash):
         if (not isinstance(session_pk, str) or not re.fullmatch(r'SESSION#[a-f0-9]{64}', session_pk)

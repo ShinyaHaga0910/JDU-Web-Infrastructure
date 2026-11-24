@@ -52,7 +52,7 @@ const redirect = (location, values=[]) => { const h=new Headers(security); h.set
 function page(lang, title, content, selection) {
   const tail=selection?.teacher ? Object.entries(selection.params).map(([k,v])=>`&amp;${k}=${encodeURIComponent(v)}`).join('') : selection?`&amp;task_id=${selection.task_id}&amp;job_id=${selection.job_id}${selection.check_mode?`&amp;check_mode=${selection.check_mode}`:''}`:'';
   const nav = ['ja','ru','uz'].map(k => `<a href="?lang=${k}${tail}"${k===lang?' aria-current="page"':''}>${k.toUpperCase()}</a>`).join(' ');
-  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)}</title><style>body{overflow-wrap:break-word;font:1rem/1.6 system-ui,sans-serif;margin:0;background:#f5f7fa;color:#182435}main{max-width:64rem;margin:auto;padding:1.5rem}nav{display:flex;flex-wrap:wrap;gap:1rem}a,button{color:#064ca4}button{font:inherit;background:white;border:1px solid #64748b;border-radius:.35rem;padding:.65rem 1rem;cursor:pointer}a:focus-visible,button:focus-visible{outline:3px solid #d34800;outline-offset:3px}section{background:white;border:1px solid #d6dee8;border-radius:.5rem;padding:1rem;margin-block:1rem}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:44rem}th,td{padding:.6rem;text-align:left;border-bottom:1px solid #d6dee8}.num{font-size:1.6rem;font-weight:700}footer{margin-top:2rem}li[aria-current=step]{font-weight:700}fieldset{border:1px solid #a9b6c7;border-radius:.35rem;padding:1rem;margin-block:1rem}.confirm{display:flex;align-items:flex-start;gap:.5rem;min-height:48px;padding-block:.5rem}input[type=password]{display:block;font:inherit;box-sizing:border-box;inline-size:min(100%,28rem);min-block-size:48px;padding:.6rem;margin-block:.4rem 1rem;border:1px solid #64748b;border-radius:.35rem}input[type=checkbox]{width:1.25rem;height:1.25rem;margin:.2rem 0;flex-shrink:0}a.action{display:inline-flex;align-items:center;min-height:48px;padding:0 .75rem;border:1px solid #64748b;border-radius:.35rem}a.action:focus-visible,input:focus-visible{outline:3px solid #d34800;outline-offset:3px}.check-tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1rem}.check-tasks section{margin:0}.page-toolbar,.task-heading{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}.page-toolbar{margin-block:0 1rem}.saved-total{margin-inline-end:auto}.saved-total strong{font-size:1.4rem;margin-inline-start:.45rem;color:#174f83}.task-heading{justify-content:space-between;margin-block-end:.7rem}.task-heading h2{margin:0}.task-score{font-weight:700;font-variant-numeric:tabular-nums}.check-tasks section form+form{margin-top:.5rem}.check-tasks section button{width:100%;min-height:44px;text-align:start}.check-tasks section form:first-of-type button{background:#174f83;color:white;border-color:#174f83}summary{cursor:pointer;min-height:24px}.teacher-table{max-block-size:70vh;overflow:auto}.teacher-table .score-full{background:#e5f5ea;color:#176238}.teacher-table .score-partial{background:#fff1d7;color:#704900}.teacher-table td{font-variant-numeric:tabular-nums}.teacher-table table{border-collapse:separate;border-spacing:0;min-width:68rem}.teacher-table caption{text-align:left;font-weight:700;padding-block:.75rem}.teacher-table thead th{position:sticky;inset-block-start:0;background:#eaf0f7;z-index:2}.teacher-table tbody th{position:sticky;inset-inline-start:0;background:white;z-index:1}.teacher-table thead th:first-child{inset-inline-start:0;z-index:3}.teacher-table:focus-visible{outline:3px solid #d34800;outline-offset:3px}</style></head><body><main><nav aria-label="Languages">${nav}</nav><h1>${escape(title)}</h1>${content}</main></body></html>`;
+  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)}</title><style>body{overflow-wrap:break-word;font:1rem/1.6 system-ui,sans-serif;margin:0;background:#f5f7fa;color:#182435}main{max-width:64rem;margin:auto;padding:1.5rem}nav{display:flex;flex-wrap:wrap;gap:1rem}a,button{color:#064ca4}button{font:inherit;background:white;border:1px solid #64748b;border-radius:.35rem;padding:.65rem 1rem;cursor:pointer}a:focus-visible,button:focus-visible{outline:3px solid #d34800;outline-offset:3px}section{background:white;border:1px solid #d6dee8;border-radius:.5rem;padding:1rem;margin-block:1rem}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:44rem}th,td{padding:.6rem;text-align:left;border-bottom:1px solid #d6dee8}.num{font-size:1.6rem;font-weight:700}footer{margin-top:2rem}li[aria-current=step]{font-weight:700}fieldset{border:1px solid #a9b6c7;border-radius:.35rem;padding:1rem;margin-block:1rem}.confirm{display:flex;align-items:flex-start;gap:.5rem;min-height:48px;padding-block:.5rem}input[type=password]{display:block;font:inherit;box-sizing:border-box;inline-size:min(100%,28rem);min-block-size:48px;padding:.6rem;margin-block:.4rem 1rem;border:1px solid #64748b;border-radius:.35rem}input[type=checkbox]{width:1.25rem;height:1.25rem;margin:.2rem 0;flex-shrink:0}a.action{display:inline-flex;align-items:center;min-height:48px;padding:0 .75rem;border:1px solid #64748b;border-radius:.35rem}a.action:focus-visible,input:focus-visible{outline:3px solid #d34800;outline-offset:3px}.check-tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1rem}.check-tasks section{margin:0}.page-toolbar,.task-heading{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}.page-toolbar{margin-block:0 1rem}.saved-total{margin-inline-end:auto}.saved-total strong{font-size:1.4rem;margin-inline-start:.45rem;color:#174f83}.task-heading{justify-content:space-between;margin-block-end:.7rem}.task-heading h2{margin:0}.task-score{font-weight:700;font-variant-numeric:tabular-nums}.check-tasks section form+form{margin-top:.5rem}.check-tasks section button{width:100%;min-height:44px;text-align:start}.check-tasks section form:first-of-type button{background:#174f83;color:white;border-color:#174f83}summary{cursor:pointer;min-height:24px}#link-number{display:block;width:100%;box-sizing:border-box;font:1rem/1.5 monospace;padding:.6rem;margin-block:.4rem 1rem;overflow:auto}.teacher-table{max-block-size:70vh;overflow:auto}.teacher-table .score-full{background:#e5f5ea;color:#176238}.teacher-table .score-partial{background:#fff1d7;color:#704900}.teacher-table td{font-variant-numeric:tabular-nums}.teacher-table table{border-collapse:separate;border-spacing:0;min-width:68rem}.teacher-table caption{text-align:left;font-weight:700;padding-block:.75rem}.teacher-table thead th{position:sticky;inset-block-start:0;background:#eaf0f7;z-index:2}.teacher-table tbody th{position:sticky;inset-inline-start:0;background:white;z-index:1}.teacher-table thead th:first-child{inset-inline-start:0;z-index:3}.teacher-table:focus-visible{outline:3px solid #d34800;outline-offset:3px}</style></head><body><main><nav aria-label="Languages">${nav}</nav><h1>${escape(title)}</h1>${content}</main></body></html>`;
 }
 
 export function portalExpired(env) {
@@ -123,6 +123,7 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
     try { config=configFrom(env); } catch { return response('Unavailable',503); }
     if (url.origin !== config.origin) return response('Forbidden',403);
     const enrollmentEnabled=env.PORTAL_ENROLLMENT_ENABLED==='true' && typeof enroll==='function';
+    const selfLink=env.PORTAL_SELF_LINK_ENABLED==='true' && typeof enroll==='function';
     const preparationEnabled=env.PORTAL_PREPARATION_ENABLED==='true' && typeof enroll==='function';
     if (url.pathname==='/api/enrollment/complete' || url.pathname==='/api/preparation/complete') {
       // Server-to-server signed proof only. The nonce was minted by an active,
@@ -174,11 +175,12 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
         h.set('Content-Type','text/plain; charset=utf-8'); return new Response('Unavailable',{status:503,headers:h});
       }
     }
+    const linkPost=url.pathname==='/link' && request.method==='POST' && selfLink;
     const enrollmentPost=url.pathname==='/enroll' && request.method==='POST' && enrollmentEnabled;
     const preparationPost=url.pathname==='/prepare' && request.method==='POST' && preparationEnabled;
     const checkerEnabled=env.PORTAL_CHECKER_ENABLED==='true' && typeof checker==='function';
     const checkerPost=url.pathname==='/checks' && request.method==='POST' && checkerEnabled;
-    if (!['GET','HEAD'].includes(request.method) && !enrollmentPost && !preparationPost && !checkerPost) return response('Method not allowed',405);
+    if (!['GET','HEAD'].includes(request.method) && !linkPost && !enrollmentPost && !preparationPost && !checkerPost) return response('Method not allowed',405);
     if (url.pathname === '/signed-out') return response(page(lang,t.title,`<p>${escape(t.signedout)}</p><p>${escape(t.shared)}</p><a href="/auth/login">${escape(t.login)}</a>`));
     const signInAgain=()=>{
       const copy={ja:['ログインの有効期限が切れました。再ログインして確認を続けてください。','ログインし直す'],ru:['Срок входа истёк. Войдите снова, чтобы продолжить проверку.','Войти снова'],uz:['Kirish muddati tugadi. Tekshiruvni davom ettirish uchun qayta kiring.','Qayta kirish']}[lang];
@@ -191,11 +193,11 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
     if (!sessions) return response('Unavailable',503);
     try {if (!await sessions.check(jar.get(ACCESS),token)) return url.pathname==='/' ? redirect('/auth/login') : signInAgain();}
     catch {return response('Unavailable',503);}
-    const teacherIdentity=typeof identity?.sub==='string' && typeof identity?.email==='string' && identity.email_verified===true && identity.hd==='jdu.uz';
+    const schoolIdentity=typeof identity?.sub==='string' && typeof identity?.email==='string' && identity.email_verified===true && identity.hd==='jdu.uz';
     if (url.pathname==='/teacher' || url.pathname==='/teacher/student') {
       const tt=teacherText[lang];
       const fail=(message,status)=>response(page(lang,tt.title,`<p role="alert">${escape(message)}</p><a href="/?lang=${lang}">${escape(tt.home)}</a>`),status);
-      if(!teacherIdentity || typeof getTeacher!=='function')return fail(tt.denied,403);
+      if(!schoolIdentity || typeof getTeacher!=='function')return fail(tt.denied,403);
       const detail=url.pathname==='/teacher/student',context=url.searchParams.get('context')||'course',after=url.searchParams.get('after')||'';
       const fields=detail?['lang','lab_id']:['lang','context','after'];
       if([...url.searchParams.keys()].some(k=>!fields.includes(k)) || [...url.searchParams.keys()].some(k=>url.searchParams.getAll(k).length!==1)
@@ -262,7 +264,7 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
         const session=jar.get(ACCESS);
         const maxima=grade?.raw_maximum===59?LEGACY_MAXIMA:MISSION_MAXIMA;
         const total=grade ? `<span class="saved-total">${escape(t.total)} <strong>${Object.keys(grade.selected).length?`${grade.raw_earned} / ${grade.raw_maximum}`:'—'}</strong></span>` : '';
-        const accountLink=enrollmentEnabled && unbound ? `<a class="action" href="/enroll?lang=${lang}">${escape(enrollmentText(lang).title)}</a>` : '';
+        const accountLink=(selfLink || enrollmentEnabled) && unbound ? `<a class="action" href="${selfLink?'/link':'/enroll'}?lang=${lang}">${escape(enrollmentText(lang).title)}</a>` : '';
         const bar=`<div class="page-toolbar">${total}${accountLink}<form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form></div>`;
         const report=selected ? `<section aria-label="${escape(ct.done)}">${checkHtml(lang,{config,session,token,selected,result})}</section>` : '';
         const tasks=checkHtml(lang,{config,session,token,grade,maxima,blocked:unbound});
@@ -274,7 +276,7 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
       const pt=preparationText[lang];
       const fail=(message,status=503)=>response(page(lang,pt.title,`<p role="alert">${escape(message)}</p><a href="/prepare?lang=${lang}">${escape(pt.refresh)}</a>`),status);
       try {
-        if (!teacherIdentity || [...url.searchParams.keys()].some(k=>k!=='lang') || url.searchParams.getAll('lang').length>1) return fail(pt.denied,403);
+        if (!schoolIdentity || [...url.searchParams.keys()].some(k=>k!=='lang') || url.searchParams.getAll('lang').length>1) return fail(pt.denied,403);
         const session=jar.get(ACCESS);
         const claims={subject:identity.sub,email:identity.email,session_id:session,token_hash:tokenHash(token)};
         let fields,operation,requestId=operationId();
@@ -326,6 +328,44 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
         return response(page(lang,pt.title,preparationHtml(lang,value,{config,session,token,requestId,bootstrapLink})),200,{'Referrer-Policy':'same-origin'});
       } catch {return fail(pt.unavailable);}
     }
+
+    if (url.pathname==='/link') {
+      if (!selfLink || !schoolIdentity) return response('Forbidden',403);
+      const labels={
+        ja:['CloudShellで実行するコマンド','学生側のCloudShellでこのコマンドを実行し、表示された連携コードを貼り付けます。','連携コード','連携する','連携できませんでした。新しい確認番号で試してください。'],
+        ru:['Команда CloudShell','Выполните команду в CloudShell студента, затем вставьте полученный код.','Код привязки','Привязать','Не удалось привязать Lab. Повторите с новым номером.'],
+        uz:['CloudShell buyrug‘i','Buyruqni talaba CloudShell muhitida bajaring va olingan kodni kiriting.','Bog‘lash kodi','Bog‘lash','Labni bog‘lab bo‘lmadi. Yangi raqam bilan qayta urining.'],
+      }[lang];
+      const sessionId=jar.get(ACCESS);
+      let failure='';
+      if (linkPost) {
+        if (request.headers.get('origin')!==config.origin || request.headers.get('content-type')?.split(';')[0]!=='application/x-www-form-urlencoded') return response('Forbidden',403);
+        try {
+          const raw=await request.text();
+          if (Buffer.byteLength(raw)>1024) return response('Payload too large',413);
+          const fields=new URLSearchParams(raw), requestId=fields.get('request_id'), code=fields.get('code')?.trim();
+          if ([...fields.keys()].sort().join(',')!=='code,csrf,request_id'
+              || !checkForm(config,sessionId,token,requestId,fields.get('csrf'))) return response('Forbidden',403);
+          if (/^jdu-link1\.lab-[a-f0-9]{20}\.[0-9]{12}\.[0-9]{10}\.[a-f0-9]{64}$/.test(code||'')) {
+            const result=await enroll({operation:'claim',subject:identity.sub,email:identity.email,session_id:sessionId,
+              token_hash:tokenHash(token),request_id:requestId,code});
+            if (result?.status==='ok' && result.enrollment?.registered===true) return redirect(`/checks?lang=${lang}`);
+          }
+        } catch {}
+        failure=`<p role="alert">${escape(labels[4])}</p>`;
+      }
+      const requestId=operationId(), csrf=formToken(config,sessionId,token,requestId);
+      const command=`setup=$(mktemp)
+curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/refs/heads/main/development/setup-classroom.sh -o "$setup" &&
+  bash "$setup" portal-link-code --lang ${lang} --challenge ${requestId}`;
+      const body=`${failure}<section><p>${escape(labels[1])}</p><label for="link-number">${escape(labels[0])}</label>
+        <textarea id="link-number" rows="4" readonly>${escape(command)}</textarea>
+        <form action="/link?lang=${lang}" method="post"><input type="hidden" name="request_id" value="${requestId}">
+        <input type="hidden" name="csrf" value="${csrf}"><label for="link-code">${escape(labels[2])}</label>
+        <input id="link-code" type="password" name="code" required maxlength="180" autocomplete="off">
+        <button type="submit">${escape(labels[3])}</button></form></section>`;
+      return response(page(lang,enrollmentText(lang).title,body),failure?403:200,{'Referrer-Policy':'same-origin'});
+    }
     if (url.pathname==='/enroll') {
       if (!enrollmentEnabled) return response('Not found',404);
       const et=enrollmentText(lang);
@@ -364,7 +404,7 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
     }
     if (url.pathname === '/') {
       let teacherLink='';
-      if(teacherIdentity && typeof getTeacher==='function') {
+      if(schoolIdentity && typeof getTeacher==='function') {
         try {const result=await getTeacher({operation:'teacher_access',subject:identity.sub,email:identity.email});if(result?.status==='ok' && /^[0-9]{1,12}$/.test(result.teacher?.class_id||''))teacherLink=`<p><a href="/teacher?lang=${lang}">${escape(teacherText[lang].title)}</a></p>`;} catch {}
       }
       if (checkerEnabled && !preparationEnabled) return redirect(teacherLink?`/teacher?lang=${lang}`:`/checks?lang=${lang}`);

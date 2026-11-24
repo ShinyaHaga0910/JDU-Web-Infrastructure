@@ -4,10 +4,12 @@ begin/status claims come only from the portal's verified Google session.
 complete transports a fresh signed STS request; never log events or exceptions.
 Existing LabRole is broader than this application's intended operations.
 """
+import json
 import os
 import re
 
 from identity_proof import ProofError
+from lab_link_code import CODE
 from portal_enrollment import PortalEnrollment, EnrollmentDenied
 from portal_preparation import PortalPreparation
 
@@ -28,10 +30,12 @@ def valid(event):
         return (set(event) == {'operation', 'pair_id', 'proof_url'}
                 and isinstance(event['pair_id'], str) and HEX.fullmatch(event['pair_id'])
                 and isinstance(event['proof_url'], str) and len(event['proof_url']) <= 8192)
-    extra = {'request_id'} if operation == 'begin' else {'plan_digest', 'password', 'confirmation'} if operation == 'create' else {'delivery'} if operation=='register' else set()
-    if (operation not in ('begin', 'status', 'confirm', 'plan', 'create','advance','registration_context','register')
+    extra = {'request_id', 'code'} if operation == 'claim' else {'request_id'} if operation == 'begin' else {'plan_digest', 'password', 'confirmation'} if operation == 'create' else {'delivery'} if operation=='register' else set()
+    if (operation not in ('begin', 'status', 'claim', 'confirm', 'plan', 'create','advance','registration_context','register')
             or operation in ('confirm', 'plan', 'create','advance','registration_context','register') and event['operation'] != 'prepare_' + operation
             or set(event) != IDENTITY | {'operation'} | extra):
+        return False
+    if operation=='claim' and (not isinstance(event['code'], str) or not CODE.fullmatch(event['code'])):
         return False
     if operation=='register' and event['delivery'] is not None:
         try:
@@ -45,10 +49,10 @@ def valid(event):
             and isinstance(event['email'], str) and event['email'].isascii()
             and re.fullmatch(r'[^@\s]{1,64}@jdu\.uz', event['email'], flags=re.I)
             and all(isinstance(event[k], str) and HEX.fullmatch(event[k])
-                    for k in ('session_id', 'token_hash') + (('request_id',) if operation == 'begin' else ())))
+                    for k in ('session_id', 'token_hash') + (('request_id',) if operation in ('begin', 'claim') else ())))
 
 
-def serve(event, service, preparation=None):
+def serve(event, service, preparation=None, check_student=None):
     if not valid(event):
         return {'status': 'unauthorized'}
     try:
@@ -61,6 +65,10 @@ def serve(event, service, preparation=None):
             return {'status': 'ok', 'preparation': result}
         if operation == 'complete':
             result = service.complete(values['pair_id'], values['proof_url'])
+        elif operation == 'claim':
+            if check_student is None:
+                return {'status': 'unavailable'}
+            result = service.claim(**values, check_student=check_student)
         else:
             result = getattr(service, operation)(**values)
         return {'status': 'ok', 'enrollment': result}
@@ -91,6 +99,16 @@ def handler(event, context):
         from botocore.config import Config
         initial = InitialGateway(boto3.client('lambda', region_name='us-east-1', config=Config(
             connect_timeout=3, read_timeout=100, retries={'total_max_attempts':1})))
-        return serve(event, service, PortalPreparation(service, initial))
+        def check_student(student, lab):
+            if student == account:
+                return False
+            client = boto3.client('lambda', region_name='us-east-1', config=Config(
+                connect_timeout=2, read_timeout=7, retries={'total_max_attempts': 1}))
+            answer = client.invoke(FunctionName=f'arn:aws:lambda:us-east-1:{student}:function:jdu-web-check-{lab}',
+                                   InvocationType='RequestResponse', Payload=b'{"operation":"installation-check"}')
+            return (answer.get('StatusCode') == 200 and not answer.get('FunctionError')
+                    and json.loads(answer['Payload'].read(100)) == {'status': 'ready'})
+
+        return serve(event, service, PortalPreparation(service, initial), check_student)
     except Exception:
         return {'status': 'unavailable'}
