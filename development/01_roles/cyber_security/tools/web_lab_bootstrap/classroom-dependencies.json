@@ -1,5 +1,8 @@
 {
   "ubuntu_snapshot": "20261015T090000Z",
+  "additional_debs": {
+    "/pool/universe/t/tree/tree_2.1.1-2ubuntu3_amd64.deb": "6164d7cb4a384de578d004a59054b01dbb65d332ab82697a85bdcd07a8b969d5"
+  },
   "firefox": {
     "filename": "firefox-158.0.tar.xz",
     "url": "https://archive.mozilla.org/pub/firefox/releases/158.0/linux-x86_64/en-US/firefox-158.0.tar.xz",

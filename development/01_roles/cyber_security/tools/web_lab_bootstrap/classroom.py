@@ -679,13 +679,16 @@ def assets(ref):
     profile = json.loads(remote_source(ref, BOOT + '/package-profile.json'))
     index = {}
     versions = {}
+    snapshot = f'https://snapshot.ubuntu.com/ubuntu/{definition["ubuntu_snapshot"]}'
     for row in debs:
         if row['package'] == 'firefox':
             continue
         name = Path(row['path']).name
         path = urlsplit(row['source']).path.removeprefix('/ubuntu')
-        index[name] = (f'https://snapshot.ubuntu.com/ubuntu/{definition["ubuntu_snapshot"]}{path}', row['sha256'])
+        index[name] = (snapshot + path, row['sha256'])
         versions[row['package']] = row['version']
+    for path, digest in definition.get('additional_debs', {}).items():
+        index[Path(path).name] = (snapshot + path, digest)
     for wheel in wheels:
         with urlopen(f'https://pypi.org/pypi/{wheel["name"]}/{wheel["version"]}/json', timeout=30) as response:
             matches = [r for r in json.load(response)['urls'] if r['filename'] == wheel['filename']
