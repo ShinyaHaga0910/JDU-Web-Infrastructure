@@ -1,24 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1030" viewBox="0 0 1600 1030" role="img">
-<title>ブラウザからWebサーバーへTCP接続し、HTTPリクエストを送り、HTTPレスポンスを受け取る順番</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="860" viewBox="0 0 1600 860" role="img">
+<title>SYN、SYN＋ACK、ACKの後にHTTPリクエストとレスポンスを送る</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図4-2  接続、HTTPのリクエスト、HTTPのレスポンス</text>
-<rect x="45" y="120" width="370" height="155" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
-<text x="230" y="141" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">利用者PC</text>
-<text x="230" y="199" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">ブラウザ</text>
-<rect x="1100" y="120" width="450" height="155" rx="18" fill="#f5f7fa" stroke="#2165a7" stroke-width="2"/>
-<text x="1325" y="134" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
-<text x="1325" y="181" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="middle">Webサーバー</text>
-<text x="1325" y="232" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="23" dominant-baseline="text-before-edge" text-anchor="middle">80番ポートで接続を受け付ける</text>
-<polyline points="230,275 230,870" fill="none" stroke="#91a1b2" stroke-width="2" stroke-dasharray="13 9"/><polygon points="230,870 223.04055145422032,855.5928463623571 236.95944854577968,855.5928463623571" fill="#91a1b2"/>
-<polyline points="1325,275 1325,870" fill="none" stroke="#91a1b2" stroke-width="2" stroke-dasharray="13 9"/><polygon points="1325,870 1318.0405514542203,855.5928463623571 1331.9594485457797,855.5928463623571" fill="#91a1b2"/>
-<text x="778" y="315" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">① TCPで80番ポートへの接続を確立する</text>
-<polyline points="230,385 1325,385" fill="none" stroke="#9d651a" stroke-width="4"/><polygon points="1325,385 1310.5928463623572,391.9594485457797 1310.5928463623572,378.0405514542203" fill="#9d651a"/>
-<text x="778" y="464" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">② ブラウザがHTTPのリクエストを送る</text>
-<text x="778" y="515" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">GET /example.txt HTTP/1.1</text>
-<polyline points="230,580 1325,580" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1325,580 1310.5928463623572,586.9594485457797 1310.5928463623572,573.0405514542203" fill="#2165a7"/>
-<text x="778" y="664" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">③ WebサーバーがHTTPのレスポンスを返す</text>
-<text x="778" y="716" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">HTTP/1.1 200 OK ＋ ヘッダーと本文</text>
-<polyline points="1325,785 230,785" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="230,785 244.40715363764284,778.0405514542203 244.40715363764284,791.9594485457797" fill="#2165a7"/>
-<text x="55" y="920" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">上から下へ順に読む。接続しただけでは、リクエストするページはまだ伝わっていない。</text>
-<text x="55" y="975" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">ブラウザは、リクエストに対する結果とデータをレスポンスから読み取って表示する。</text>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="40" dominant-baseline="text-before-edge" text-anchor="start">図4-2  スリーウェイハンドシェイクとHTTP</text>
+<rect x="105" y="98" width="350" height="90" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
+<text x="280" y="125" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="34" dominant-baseline="text-before-edge" text-anchor="middle">利用者PCのブラウザ</text>
+<rect x="1120" y="98" width="400" height="90" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
+<text x="1320" y="125" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">Webサーバーの80番ポート</text>
+<rect x="240" y="205" width="1120" height="340" rx="18" fill="#fff8ed" stroke="#e5cfae" stroke-width="2"/>
+<rect x="240" y="563" width="1120" height="266" rx="18" fill="#f0f7ff" stroke="#c3d7ea" stroke-width="2"/>
+<polyline points="280,188 280,809" fill="none" stroke="#91a1b2" stroke-width="2" stroke-dasharray="13 9"/><polygon points="280,809 273.0405514542203,794.5928463623571 286.9594485457797,794.5928463623571" fill="#91a1b2"/>
+<polyline points="1320,188 1320,809" fill="none" stroke="#91a1b2" stroke-width="2" stroke-dasharray="13 9"/><polygon points="1320,809 1313.0405514542203,794.5928463623571 1326.9594485457797,794.5928463623571" fill="#91a1b2"/>
+<text x="315" y="223" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">TCP接続を確立</text>
+<text x="800" y="270" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">① SYN</text>
+<polyline points="280,315 1320,315" fill="none" stroke="#9d651a" stroke-width="4"/><polygon points="1320,315 1305.5928463623572,321.9594485457797 1305.5928463623572,308.0405514542203" fill="#9d651a"/>
+<text x="800" y="362" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">② SYN＋ACK</text>
+<polyline points="1320,407 280,407" fill="none" stroke="#9d651a" stroke-width="4"/><polygon points="280,407 294.4071536376428,400.0405514542203 294.4071536376428,413.9594485457797" fill="#9d651a"/>
+<text x="800" y="454" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">③ ACK</text>
+<polyline points="280,499 1320,499" fill="none" stroke="#9d651a" stroke-width="4"/><polygon points="1320,499 1305.5928463623572,505.9594485457797 1305.5928463623572,492.0405514542203" fill="#9d651a"/>
+<text x="315" y="582" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">HTTPのやり取り</text>
+<text x="800" y="632" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">リクエスト   GET /example.txt HTTP/1.1</text>
+<polyline points="280,679 1320,679" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1320,679 1305.5928463623572,685.9594485457797 1305.5928463623572,672.0405514542203" fill="#2165a7"/>
+<text x="800" y="724" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">レスポンス   HTTP/1.1 200 OK ＋ ヘッダーと本文</text>
+<polyline points="1320,771 280,771" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="280,771 294.4071536376428,764.0405514542203 294.4071536376428,777.9594485457797" fill="#2165a7"/>
 </svg>

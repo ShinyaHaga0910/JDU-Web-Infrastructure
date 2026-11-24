@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="735" viewBox="0 0 1600 735" role="img">
+<title>HTTPリクエストのバイト列がTCPセグメントのデータ部分に入る例</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="40" dominant-baseline="text-before-edge" text-anchor="start">図4-3  TCPのデータ部分にHTTPが入る</text>
+<text x="55" y="100" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="34" dominant-baseline="text-before-edge" text-anchor="start">アプリがTCPに渡すHTTPリクエスト</text>
+<rect x="55" y="160" width="900" height="98" rx="0" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
+<text x="505.0" y="190" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="37" dominant-baseline="text-before-edge" text-anchor="middle">GET /example.txt HTTP/1.1  ＋  Host:</text>
+<rect x="955" y="160" width="590" height="98" rx="0" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
+<text x="1250.0" y="190" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="37" dominant-baseline="text-before-edge" text-anchor="middle">203.0.113.20  ＋  空行</text>
+<text x="800" y="286" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">TCPが2つに分ける場合の例</text>
+<polyline points="505,258 505,389" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="505,389 498.0405514542203,374.5928463623572 511.9594485457797,374.5928463623572" fill="#2165a7"/>
+<polyline points="1250,258 1250,272 1570,272 1570,612 1545,612" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="1545,612 1559.4071536376428,605.0405514542203 1559.4071536376428,618.9594485457797" fill="#16745b"/>
+<text x="55" y="345" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">TCPセグメント ①</text>
+<rect x="55" y="389" width="410" height="98" rx="0" fill="#fff3df" stroke="#9d651a" stroke-width="2"/>
+<rect x="465" y="389" width="1080" height="98" rx="0" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
+<text x="260" y="407" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="34" dominant-baseline="text-before-edge" text-anchor="middle">TCPヘッダー</text>
+<text x="260" y="447" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="middle">ポート番号・順番の情報など</text>
+<text x="495" y="400" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">TCPのデータ部分</text>
+<text x="495" y="440" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">GET /example.txt HTTP/1.1  ＋  Host:</text>
+<text x="55" y="519" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">TCPセグメント ②</text>
+<rect x="55" y="563" width="410" height="98" rx="0" fill="#fff3df" stroke="#9d651a" stroke-width="2"/>
+<rect x="465" y="563" width="1080" height="98" rx="0" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
+<text x="260" y="581" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="34" dominant-baseline="text-before-edge" text-anchor="middle">TCPヘッダー</text>
+<text x="260" y="621" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="middle">ポート番号・順番の情報など</text>
+<text x="495" y="574" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">TCPのデータ部分</text>
+<text x="495" y="614" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">203.0.113.20  ＋  空行</text>
+</svg>

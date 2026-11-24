@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1040" viewBox="0 0 1600 1040" role="img">
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="920" viewBox="0 0 1600 920" role="img">
 <title>HTTPレスポンスを三つの枠に分け、各部分と意味を同じ番号・高さ・背景色・矢印で対応付ける</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図4-3  レスポンスの各部分と、その意味</text>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="40" dominant-baseline="text-before-edge" text-anchor="start">図4-5  HTTPレスポンスの構成</text>
 <text x="75" y="111" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">HTTP/1.1で届いた内容</text>
 <text x="1055" y="111" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">各部分の意味</text>
 <rect x="40" y="200" width="910" height="160" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
@@ -28,6 +28,4 @@
 <text x="75" y="664" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">空行（ヘッダーと本文の区切り）</text>
 <text x="75" y="805" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">School inventory server</text>
 <text x="1075" y="805" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">画面に表示する文章</text>
-<text x="55" y="930" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">同じ番号の枠が一組。矢印に沿って、届いた内容と右の説明を読み比べる。</text>
-<text x="55" y="987" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">三つの枠は、実際には一つに続いて届くHTTPレスポンスの一部分を表す。</text>
 </svg>

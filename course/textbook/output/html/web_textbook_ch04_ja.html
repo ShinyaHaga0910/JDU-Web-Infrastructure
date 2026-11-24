@@ -24,12 +24,20 @@
 http://203.0.113.20/example.txt</code></pre>
 <p>今回のアプリ管理のように8080番ポートを使う場合は、URLにも<code>:8080</code>を付ける。接続先のポート番号を省略したHTTPのURLでは、Webサーバーの80番ポートへ向かう。<a href="https://www.rfc-editor.org/rfc/rfc9110.html#section-4.2.1">HTTPのURLと既定ポート</a></p>
 <h2 id="42-接続した後にhttpのリクエストを送る">4.2 接続した後にHTTPのリクエストを送る</h2>
-<p>利用者PCのブラウザでHTTPのURLを開くとき、まずブラウザは指定されたWebサーバーの80番ポートへTCPで接続する。接続が確立すると、その通信を使ってHTTPのリクエストを送る。TCPはデータを届けるための通信方式、HTTPはその上でページなどをリクエストするための取り決めとして働く。</p>
-<p>例えば、80番ポートへ接続できただけでは、どのページを返してほしいかはWebサーバーへ伝わっていない。ブラウザがHTTPで<code>/example.txt</code>をリクエストすることで、Webサーバーは何を求められたのかを読み取れる。</p>
-<figure><img src="../../assets/figures/ch04-fig02-roundtrip.png" alt="TCPでWebサーバーの80番ポートへ接続し、ブラウザからHTTPリクエストを送り、WebサーバーからHTTPレスポンスを受け取る順番。" width="1600" height="1030"></figure>
-<p><strong>図4-2 接続、リクエスト、レスポンスの順番。</strong> 上から下へ順に読む。接続した後にブラウザが対象をリクエストし、Webサーバーが処理結果とデータを返す。図は初めて接続して一つの対象を取得する場面を示している。</p>
-<p>Webサーバーはリクエストを読み、指定されたファイルを返すなどの処理を行う。対象を返せる場合も、見つからない場合も、その結果をHTTPのレスポンスとしてブラウザへ知らせる。ブラウザはレスポンスを受け取り、その内容に応じてページやエラーの画面を表示する。</p>
-<p>実際のブラウザは、一度確立した接続を続けて使うこともある。一つの接続でやり取りできるリクエストが、必ず一回だけというわけではない。本章では、一回のリクエストとそれに対するレスポンスを取り出して考える。<a href="https://www.rfc-editor.org/rfc/rfc9112.html">HTTP/1.1のメッセージ</a></p>
+<h3 id="tcpで接続を確立する">TCPで接続を確立する</h3>
+<p>利用者PCのブラウザでHTTPのURLを開き、新しく接続するとき、ブラウザはWebサーバーの80番ポートへTCPで接続する。接続を始めるとき、両側のTCPは <strong>スリーウェイハンドシェイク</strong> という3段階のやり取りを行う。</p>
+<p>① 利用者PCが <strong>SYN</strong> を送り、Webサーバーに接続を申し込む。</p>
+<p>② Webサーバーが <strong>SYN＋ACK</strong> を返し、申し込みを受け取ったことと、自分側の通信を始めることを伝える。</p>
+<p>③ 利用者PCが <strong>ACK</strong> を返し、Webサーバーの返事を受け取ったことを伝える。</p>
+<p>この手順で、両側はデータの順番を管理するための開始番号を知らせ合う。接続が成立したら、ブラウザはHTTPで <code>GET /example.txt HTTP/1.1</code> などを送り、取得したい対象を伝える。ブラウザは、一度確立したTCP接続を次のリクエストにも使える。<a href="https://www.rfc-editor.org/rfc/rfc9293.html#section-3.5">RFC 9293 TCPの接続確立</a></p>
+<figure><img src="../../assets/figures/ch04-fig02-roundtrip.png" alt="利用者PCとWebサーバーがSYN、SYN＋ACK、ACKをやり取りした後、HTTPリクエストとレスポンスを送る。" width="1600" height="860"></figure>
+<p><strong>図4-2 スリーウェイハンドシェイクとHTTPのやり取り。</strong> 上から下へ順に読む。上の3本はTCPの接続に使い、下の2本はHTTPのメッセージを送る向きを示す。</p>
+<h3 id="httpのメッセージをtcpで運ぶ">HTTPのメッセージをTCPで運ぶ</h3>
+<p>ブラウザが作ったHTTP/1.1のリクエストは、先頭行やヘッダーなどが並んだデータとしてTCPに渡される。TCPは連続したバイト列として受け取り、送信時に必要に応じて分ける。TCPが送る一つのまとまりを <strong>TCPセグメント</strong> という。</p>
+<p>TCPセグメントの先頭には、送信元・宛先のポート番号やデータの順番を示す番号が入った <strong>TCPヘッダー</strong> がある。その後に <strong>TCPのデータ部分</strong> が続く。HTTPのメソッド <code>GET</code> や <code>POST</code>、レスポンスの <code>200 OK</code>、HTTPのヘッダーや本文は、すべてこのデータ部分で運ばれる。</p>
+<figure><img src="../../assets/figures/ch04-fig03-tcp-data.png" alt="HTTPリクエストのバイト列を2つに分けて運ぶ例。それぞれのTCPセグメントは、TCPヘッダーとHTTPの一部を収めたデータ部分を持つ。" width="1600" height="735"></figure>
+<p><strong>図4-3 TCPのどこにHTTPが入るか。</strong> 分割の例として、HTTPの <code>Host:</code> の行を途中で区切っている。TCPは受信側のアプリにデータを順番どおりに渡す。Webサーバーは、渡されたバイト列をHTTPの先頭行、ヘッダー、本文として読み取る。</p>
+<p>ネットワーク上では、TCPセグメントはIPパケットに入って届く。分割する位置はTCPの都合で決まるので、一つのHTTPメッセージが複数のTCPセグメントにまたがることがある。<a href="https://www.rfc-editor.org/rfc/rfc9293.html#section-2.2">RFC 9293 TCPの概要</a> · <a href="https://www.rfc-editor.org/rfc/rfc9112.html#section-2.1">RFC 9112 HTTP/1.1のメッセージ形式</a></p>
 <h2 id="43-getとpostでリクエストの目的を伝える">4.3 GETとPOSTでリクエストの目的を伝える</h2>
 <p>Webサーバーへリクエストを送るときは、接続先やパスに加え、「何をしてほしいか」も伝える。この目的を表す指定が<strong>HTTPメソッド</strong>である。HTTPには複数のメソッドがあるが、ここでは基本として、<strong>GET</strong>と<strong>POST</strong>の二つを押さえる。</p>
 <p>GETは「内容を取得したい」、POSTは「データを送るので処理してほしい」という目的で使う。まず二つを並べて見てみよう。</p>
@@ -46,12 +54,14 @@ Host: 203.0.113.20</code></pre>
 <h3 id="post：データを送って処理してもらう">POST：データを送って処理してもらう</h3>
 <p>管理画面で新しい備品を登録する場面を考える。ブラウザで備品名と数量を入力して「保存」を押すと、入力内容をWebサーバーへ渡し、登録する処理をしてもらう必要がある。このような場面で使う基本のメソッドがPOSTである。<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/POST">POSTメソッド</a></p>
 <p>POSTのリクエストでは、備品名や数量などのデータをリクエストの<strong>本文</strong>へ入れて送る。Webサーバー側のアプリは、そのデータを受け取って処理し、結果をレスポンスとしてブラウザへ返す。POSTは登録だけに限らず、送ったデータを使うさまざまな処理に使われる。</p>
+<figure><img src="../../assets/figures/ch04-fig04-request.png" alt="POSTリクエストを、メソッド・パス・HTTPバージョンがあるリクエスト行、HTTPヘッダー、空行、備品名と数量を含む本文に分けた図。" width="1600" height="765"></figure>
+<p><strong>図4-4 HTTPリクエストの構成。</strong> 最初の行を <strong>リクエスト行</strong> といい、先頭にメソッドを書く。POSTの例では空行の後に入力内容が続く。先ほどのGETの例では、リクエスト行とヘッダーに続く空行で終わる。<a href="https://www.rfc-editor.org/rfc/rfc9112.html#section-3">RFC 9112 リクエスト行</a></p>
 <p>同じブラウザの操作でも、一覧を開いて内容を受け取る場面と、入力内容を送って保存してもらう場面では、リクエストの目的が違う。今回の一般向けの備品一覧はGETによる閲覧、踏み台サーバーのブラウザから使う管理画面の保存はPOSTによる送信、と結び付けて考える。</p>
 <h2 id="44-httpのレスポンスには結果とデータが入る">4.4 HTTPのレスポンスには結果とデータが入る</h2>
 <h3 id="curlでレスポンスを表示する">curlでレスポンスを表示する</h3>
 <p>まず、端末にHTTPレスポンスがどのように表示されるかを見てみよう。<strong>curl</strong>は、URLを指定してデータを取得するコマンドである。<code>-i</code>は、取得した本文と一緒にレスポンスのヘッダーも表示するオプションである。</p>
 <p>Webサーバーの<code>/example.txt</code>から、<code>School inventory server</code>という一行の文章を返す設定ができている場合を考える。踏み台サーバーの端末で次のコマンドを実行すると、Webサーバーの80番ポートへリクエストが送られる。</p>
-<p><strong>実行場所：踏み台サーバーの端末。接続先はWebサーバーの内部IPである。</strong></p>
+<p><strong>実行場所は踏み台サーバーの端末。</strong> 接続先はWebサーバーの内部IPである。2台の位置と通信経路は図4-6に示す。</p>
 <pre><code>curl -i http://10.20.1.20/example.txt</code></pre>
 <p><strong>表示例：コマンドの実行後に端末へ表示されるレスポンス。日時などの一部のヘッダーは省略している。</strong></p>
 <pre><code>HTTP/1.1 200 OK
@@ -61,11 +71,11 @@ Content-Length: 24
 School inventory server</code></pre>
 <p>上のコマンドに対して、端末にはステータス、ヘッダー、空行、本文の順に表示される。ブラウザではページとして表示される文章も、curlではこのように文字で読める。</p>
 <h3 id="表示されたレスポンスを三つに分ける">表示されたレスポンスを三つに分ける</h3>
-<p>先頭の<code>HTTP/1.1 200 OK</code>は、リクエストを処理した結果を示す行である。<code>200</code>は成功を示す番号であり、<strong>ステータスコード</strong>という。<code>OK</code>はその状態を説明する語である。</p>
+<p>先頭の<code>HTTP/1.1 200 OK</code>は、リクエストを処理した結果を示す <strong>ステータス行</strong> である。<code>200</code>は成功を示す番号であり、<strong>ステータスコード</strong>という。<code>OK</code>はその状態を説明する語である。</p>
 <p>続く<code>Content-Type</code>と<code>Content-Length</code>は、レスポンスのヘッダーである。<code>Content-Type: text/plain</code>は、本文が通常のテキストであることを示す。<code>Content-Length: 24</code>は本文の長さをバイト数で示している。この例の本文は、末尾の改行を含めて24バイトである。</p>
 <p>ヘッダーの後には空行があり、その後に<strong>本文</strong>が続く。上の例では<code>School inventory server</code>が取得したデータである。ヘッダーはデータの種類などを説明する情報、本文は実際に受け取るデータとして分けて読む。</p>
-<figure><img src="../../assets/figures/ch04-fig03-response.png" alt="HTTPレスポンスのステータス、ヘッダー、本文をそれぞれの説明に対応付ける。" width="1600" height="1040"></figure>
-<p><strong>図4-3 レスポンスの各部分と説明を一組ずつ対応させる。</strong> 左列は一つのHTTPレスポンスを、①ステータス行、②ヘッダー、③本文に分けたもの。右列は同じ番号の部分の意味を示す。同じ高さの枠を矢印で結び、番号と背景色でも対応を示している。ヘッダーと本文の間には空行がある。</p>
+<figure><img src="../../assets/figures/ch04-fig05-response.png" alt="HTTPレスポンスのステータス行、ヘッダー、本文をそれぞれの説明に対応付ける。" width="1600" height="920"></figure>
+<p><strong>図4-5 HTTPレスポンスの構成。</strong> 左列は受け取った内容、右列は各部分の意味を示す。リクエストでは先頭行にメソッドを書く。レスポンスでは先頭行に処理の結果を書く。どちらもヘッダーの後に空行があり、本文がある場合はその後に続く。</p>
 <h3 id="ブラウザは本文の種類に応じて表示する">ブラウザは本文の種類に応じて表示する</h3>
 <p>ブラウザでこのレスポンスを受け取ると、通常は本文の文章が表示される。<code>200 OK</code>や<code>Content-Type</code>などのヘッダーは、普段のページ表示では前面に出てこない。ブラウザがその情報を使って、受け取ったデータをどう扱うか判断する。</p>
 <p>HTMLのページを返す場合は、例えば<code>Content-Type: text/html</code>を使う。ブラウザはHTMLを読み、文字やリンクなどを配置して画面を作る。ページの中で画像やCSSという表示用のファイルが指定されていれば、ブラウザはそれらを取得するために追加のリクエストを送ることもある。<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Messages">HTTPのリクエストとレスポンス</a></p>
@@ -86,6 +96,8 @@ School inventory server</code></pre>
 <h3 id="同じ対象でも、どこから取得したかで分かることが違う">同じ対象でも、どこから取得したかで分かることが違う</h3>
 <div class="table-wrap"><table><thead><tr><th scope="col">取得する場所</th><th scope="col">指定するURLと使う入口</th></tr></thead><tbody><tr><td>利用者PCのブラウザ</td><td><code>http://203.0.113.20/example.txt</code>のようにWebサーバーの公開IPを指定し、80番ポートへ接続する</td></tr><tr><td>踏み台サーバーのブラウザやcurl</td><td><code>http://10.20.1.20/example.txt</code>でWebサーバーの内部IPを指定し、80番ポートへ接続する</td></tr><tr><td>Webサーバー自身のcurl</td><td><code>http://127.0.0.1/example.txt</code>で、そのWebサーバー自身の80番ポートへ接続する</td></tr></tbody></table></div>
 <p>表の<code>203.0.113.20</code>は、説明のために使っている公開IPの例である。実際に接続するときは、AWSのEC2画面でWebサーバーの「パブリックIPv4アドレス」を確認し、そのアドレスに置き換える。</p>
+<figure><img src="../../assets/figures/ch04-fig06-internal-http.png" alt="同じAWS VPCにある踏み台サーバーのcurlが、Webサーバーの内部IP 10.20.1.20の80番ポートへHTTPリクエストを送り、HTTPレスポンスを受け取る構成図。" width="1600" height="645"></figure>
+<p><strong>図4-6 踏み台サーバーからWebサーバーへの内部通信。</strong> 図の左にある踏み台サーバー上で <code>curl</code> を実行する。リクエストはVPC内を通り、右にあるWebサーバーの内部IP <code>10.20.1.20</code> の80番ポートに届く。レスポンスも同じTCP接続を使ってVPC内を戻る。</p>
 <p>同じパスの文章を取得する場合も、利用者PCから取得した結果はインターネット側からの閲覧、踏み台サーバーから取得した結果はVPC内からの閲覧を示す。Webサーバー自身からの成功だけでは、利用者PCからも取得できるとまでは分からない。</p>
 <h2 id="47-httpで届くことと暗号化は別の性質である">4.7 HTTPで届くことと暗号化は別の性質である</h2>
 <p>今回の説明と構築の基本では、<code>http://</code>のURLを使ってHTTPのリクエストとレスポンスを学ぶ。HTTPのやり取りが成立したことは、必要なページやデータをリクエストして返してもらえることを示す。一方、<code>http://</code>での通信そのものは、通信内容を暗号化する仕組みを備えていない。</p>
@@ -110,7 +122,8 @@ School inventory server</code></pre>
 <h3 id="問4">問4</h3>
 <p>取得した本文と一緒に、レスポンスのヘッダーも表示するためのオプションである。出力からステータスやContent-Typeなども読み取れる。</p>
 <h2 id="参考資料">参考資料</h2>
-<p>確認日：2026-11-03。URL、リクエスト・レスポンス、本文は仕組みを説明するための例である。</p>
+<p>確認日 2026-11-24。URL、リクエスト・レスポンス、本文は仕組みを説明するための例である。</p>
+<p class="bullet">・ <a href="https://www.rfc-editor.org/rfc/rfc9293.html">RFC 9293 Transmission Control Protocol</a></p>
 <p class="bullet">・ <a href="https://www.rfc-editor.org/rfc/rfc9110.html">RFC 9110 HTTP Semantics</a></p>
 <p class="bullet">・ <a href="https://www.rfc-editor.org/rfc/rfc9112.html">RFC 9112 HTTP/1.1</a></p>
 <p class="bullet">・ <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Messages">MDN HTTP messages</a></p>
