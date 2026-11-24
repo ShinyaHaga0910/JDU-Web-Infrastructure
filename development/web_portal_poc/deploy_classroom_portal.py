@@ -1,7 +1,7 @@
 """Deploy the assignment portal separately from the existing classroom stacks."""
 import argparse
 import base64
-from datetime import date, datetime, time, timedelta
+from datetime import date, datetime, time, timedelta, timezone
 from zoneinfo import ZoneInfo
 import hashlib
 import json
@@ -20,6 +20,7 @@ REGION = 'us-east-1'
 STACK = 'jdu-web-infrastructure-portal'
 TEACHER = 'jdu-web-infrastructure-teacher'
 FUNCTION = STACK
+GOOGLE_SECRET_NAME = 'jdu/web-portal/infrastructure-classroom/google-oauth'
 
 
 def read_stack(cfn, name):
@@ -104,13 +105,14 @@ def get_portal_url(stack):
     return origin
 
 
-def prepare(session, account, revision):
+def prepare(session, account, revision, expires=None):
     cfn = session.client('cloudformation')
     existing = read_stack(cfn, STACK)
     if existing and existing['StackStatus'] in ('CREATE_COMPLETE', 'UPDATE_COMPLETE', 'UPDATE_ROLLBACK_COMPLETE'):
         if not any(tag['Key'] == 'JduComponent' and tag['Value'] == 'ClassroomPortal' for tag in existing.get('Tags', [])):
             raise ValueError('The existing portal belongs to a different installer')
-        return get_portal_url(existing)
+        if not expires or stack_parameters(existing).get('PortalMode') == 'enabled':
+            return get_portal_url(existing)
     teacher = read_stack(cfn, TEACHER)
     if not teacher or teacher['StackStatus'] not in ('CREATE_COMPLETE', 'UPDATE_COMPLETE', 'UPDATE_ROLLBACK_COMPLETE'):
         raise ValueError('Teacher foundation stack is not ready in this account')
@@ -124,7 +126,8 @@ def prepare(session, account, revision):
     apply_stack(cfn, STACK, template('web/portal-web.template.json'), {
         **code, 'WebFunctionName': FUNCTION, 'ReleaseId': revision,
         'LabRoleArn': f'arn:aws:iam::{account}:role/LabRole',
-    })
+        **({'PortalExpiresAt': expires} if expires else {}),
+    }, update=bool(existing and expires))
     return get_portal_url(read_stack(cfn, STACK))
 
 
@@ -157,7 +160,7 @@ def backend(session, account):
     return {'GradeTable': grades, 'BindingTableName': bindings, **services, **checker}
 
 
-def publish_link(session, account, origin, students):
+def publish_link(session, account, origin, students, expires):
     from build_browser_link_template import template as account_link
 
     if any(not re.fullmatch(r'[0-9]{12}', student) or student == account for student in students):
@@ -167,6 +170,8 @@ def publish_link(session, account, origin, students):
     definition = template('browser-link-artifacts.template.json')
     rule = definition['Resources']['AssignedStudentRead']['Properties']['PolicyDocument']['Statement'][0]
     rule['Principal']['AWS'] = [f'arn:aws:iam::{student}:root' for student in sorted(set(students))]
+    deadline = datetime.fromtimestamp(int(expires), timezone.utc).isoformat().replace('+00:00', 'Z')
+    rule['Condition']['DateLessThan'] = {'aws:CurrentTime': deadline}
     del definition['Parameters']['StudentAccount']
     cfn, s3 = session.client('cloudformation'), session.client('s3')
     bucket = apply_stack(cfn, STACK + '-link-' + digest[:12], definition,
@@ -212,7 +217,7 @@ def activate(session, account, revision, origin, google_source, students, expire
         raise ValueError('Invalid Google OAuth credential format')
     oauth = dict(schema_version=1, client_id=raw['client_id'], client_secret=raw['client_secret'],
                  redirect_uri=origin + '/auth/callback')
-    name = 'jdu/web-portal/infrastructure-classroom/google-oauth'
+    name = GOOGLE_SECRET_NAME
     try:
         target = sm.describe_secret(SecretId=name)['ARN']
     except sm.exceptions.ResourceNotFoundException:
@@ -223,7 +228,7 @@ def activate(session, account, revision, origin, google_source, students, expire
         if existing != oauth:
             raise ValueError('Existing OAuth configuration differs; inspect before updating')
     refs = backend(session, account)
-    digest = publish_link(session, account, origin, students)
+    digest = publish_link(session, account, origin, students, expires)
     bucket = outputs(read_stack(cfn, STACK + '-artifacts'))['BucketName']
     with TemporaryDirectory() as work:
         archive = Path(work) / 'portal-web.zip'
@@ -239,6 +244,21 @@ def activate(session, account, revision, origin, google_source, students, expire
     if get_portal_url(read_stack(cfn, STACK)) != origin:
         raise ValueError('Unexpected portal endpoint after update')
 
+
+def configure_google_secret(session, account, origin, client_id):
+    import getpass
+    import sys
+    from uuid import uuid4
+
+    from store_google_oauth import preflight, store
+
+    if not sys.stdin.isatty():
+        raise ValueError('Interactive input is required')
+    sm = session.client('secretsmanager')
+    preflight(session.client('sts'), sm, account, client_id, origin, GOOGLE_SECRET_NAME)
+    secret = getpass.getpass('Google OAuth client secret (hidden): ')
+    store(sm, account, client_id, origin, GOOGLE_SECRET_NAME, secret, uuid4().hex)
+    print('Google OAuth credentials saved in AWS Secrets Manager.')
 
 def approve_student(session, student, lab):
     import getpass
@@ -312,8 +332,10 @@ def main():
     import boto3
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('phase', choices=('portal-prepare', 'portal-connect', 'portal-enable', 'portal-approve', 'portal-teacher'))
-    parser.add_argument('--google-secret')
+    parser.add_argument('phase', choices=('portal-prepare', 'portal-init', 'portal-connect', 'portal-enable', 'portal-approve', 'portal-teacher', 'portal-secret'))
+    parser.add_argument('--google-secret', default=GOOGLE_SECRET_NAME)
+    parser.add_argument('--google-client-id')
+    parser.add_argument('--lang', choices=('en', 'ja', 'ru', 'uz'), default='ja')
     parser.add_argument('--expires-on', help='Last day of the semester in Asia/Tashkent (YYYY-MM-DD)')
     parser.add_argument('--student-account', action='append', default=[])
     parser.add_argument('--lab-id', action='append', default=[])
@@ -326,20 +348,38 @@ def main():
     account = session.client('sts').get_caller_identity()['Account']
     if not re.fullmatch(r'[0-9]{12}', account):
         raise ValueError('Unexpected AWS account')
-    if args.phase == 'portal-prepare':
-        origin = prepare(session, account, args.ref)
+    if args.phase in ('portal-prepare', 'portal-init'):
+        expires = expiry_timestamp(args.expires_on) if args.phase == 'portal-init' else None
+        origin = prepare(session, account, args.ref, expires)
+        if expires:
+            backend(session, account)
+            messages = {
+                'en': 'Add the redirect URI in Google Cloud, then run portal-enable.',
+                'ja': 'Google CloudにリダイレクトURIを追加した後、portal-enable を実行してください。',
+                'ru': 'Добавьте URI перенаправления в Google Cloud и запустите portal-enable.',
+                'uz': 'Google Cloud da qayta yo‘naltirish URI manzilini qo‘shing, so‘ng portal-enable ni bajaring.',
+            }
+            print(messages[args.lang])
         print(f'PortalUrl: {origin}')
         print(f'Google OAuth redirect URI: {origin}/auth/callback')
     elif args.phase == 'portal-connect':
         backend(session, account)
         print('Portal backend connected to the existing grade table.')
     elif args.phase == 'portal-enable':
-        if not args.google_secret or not args.student_account or not args.expires_on:
-            parser.error('--google-secret, --student-account and --expires-on are required')
-        expires = expiry_timestamp(args.expires_on)
-        origin = get_portal_url(read_stack(session.client('cloudformation'), STACK))
+        if not args.student_account:
+            parser.error('--student-account is required')
+        portal = read_stack(session.client('cloudformation'), STACK)
+        origin = get_portal_url(portal)
+        expires = expiry_timestamp(args.expires_on) if args.expires_on else stack_parameters(portal).get('PortalExpiresAt', '')
+        if not re.fullmatch(r'[0-9]{10}', expires) or int(expires) <= datetime.now().timestamp():
+            parser.error('Configure a future semester end using --expires-on YYYY-MM-DD')
         activate(session, account, args.ref, origin, args.google_secret, args.student_account, expires)
         print(f'PortalUrl: {origin}')
+    elif args.phase == 'portal-secret':
+        if not args.google_client_id:
+            parser.error('--google-client-id is required')
+        origin = get_portal_url(read_stack(session.client('cloudformation'), STACK))
+        configure_google_secret(session, account, origin, args.google_client_id)
     elif args.phase == 'portal-approve':
         if len(args.student_account) != 1 or len(args.lab_id) != 1:
             parser.error('One --student-account and --lab-id are required')

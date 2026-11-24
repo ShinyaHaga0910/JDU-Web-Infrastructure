@@ -24,7 +24,7 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
 
 Yangi muhit uchun GitHub’dagi joriy versiya ishlatiladi. Talaba sozlashni davom ettirganda, kerakli fayllar sozlash boshlangan versiyadan olinadi.
 
-**O‘qituvchi** buyruqlarni o‘zining Learner Lab muhitida `teacher` argumenti bilan bajaradi. Til tanlangach, sozlash va tekshirish avtomatik davom etadi. Oxirida ekranda ko‘rsatilgan umumiy ro‘yxatdan o‘tish kodini faqat kurs qatnashchilariga yuboring.
+**O‘qituvchi** buyruqlarni o‘zining Learner Lab muhitida `teacher` argumenti bilan bajaradi. Tilni tanlang va Toshkent vaqti bo‘yicha semestrning oxirgi kunini kiriting. Skript infratuzilma va portalni tayyorlaydi. Umumiy ro‘yxatdan o‘tish kodini faqat kurs qatnashchilariga yuboring. Ko‘rsatilgan URI manzilini Google Cloud hisobiga qo‘shib, portalni yoqing.
 
 #### Talaba uchun buyruq
 

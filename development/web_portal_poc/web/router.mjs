@@ -215,7 +215,7 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
           return response(page(lang,tt.title,`<h2>${escape(row.lab_id)}</h2><p>${escape(tt[row.context])}</p>`+gradeHtml(lang,row.grade)+`<p><a href="/teacher?lang=${lang}&amp;context=${row.context}">${escape(tt.back)}</a></p>`,{teacher:true,params:{lab_id:row.lab_id}}));
         }
         for(const row of value.students)if(row.status==='ok' && row.grade?.lab_id!==row.lab_id)throw Error('Wrong grade');
-        return response(page(lang,tt.title,teacherListHtml(lang,value,{validateGrade:checkedGrade,maxima:MISSION_MAXIMA}),{teacher:true,params:{context,after}}));
+        return response(page(lang,tt.title,teacherListHtml(lang,value,{validateGrade:checkedGrade,maxima:MISSION_MAXIMA}),{teacher:true,params:{context,after}}),200,{'Referrer-Policy':'same-origin'});
       } catch {return fail(tt.error,503);}
     }
     if (url.pathname==='/checks') {
@@ -261,9 +261,9 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
         }
         const session=jar.get(ACCESS);
         const maxima=grade?.raw_maximum===59?LEGACY_MAXIMA:MISSION_MAXIMA;
-        const total=grade ? `<span class="saved-total">${escape(t.total)} <strong>${grade.raw_earned} / ${grade.raw_maximum}</strong></span>` : '';
+        const total=grade ? `<span class="saved-total">${escape(t.total)} <strong>${Object.keys(grade.selected).length?`${grade.raw_earned} / ${grade.raw_maximum}`:'—'}</strong></span>` : '';
         const accountLink=enrollmentEnabled && unbound ? `<a class="action" href="/enroll?lang=${lang}">${escape(enrollmentText(lang).title)}</a>` : '';
-        const bar=`<div class="page-toolbar">${total}${accountLink}<a class="action" href="/status?lang=${lang}">${escape(t.status)}</a><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form></div>`;
+        const bar=`<div class="page-toolbar">${total}${accountLink}<form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form></div>`;
         const report=selected ? `<section aria-label="${escape(ct.done)}">${checkHtml(lang,{config,session,token,selected,result})}</section>` : '';
         const tasks=checkHtml(lang,{config,session,token,grade,maxima,blocked:unbound});
         return response(page(lang,ct.title,bar+(warning?`<p role="status">${escape(warning)}</p>`:'')+report+tasks,selected),result?.status==='unauthorized'?403:result && result.status!=='ok'?503:200,extras);

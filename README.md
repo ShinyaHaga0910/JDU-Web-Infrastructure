@@ -24,7 +24,7 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
 
 構築・採点コードをmainに反映すると、GitHub Actionsが構築スクリプトとブラウザ採点用の配布物を同じ版で作ります。[ビルドと成果物の取得方法](development/README.md#採点を変更したときのビルド)
 
-**教師用Learner Lab** では上記のまま実行します。言語を選ぶと構築と確認が自動で進みます。完了画面の最後に表示される共通登録コードを、受講者だけが閲覧できる場所で共有します。
+**教師用Learner Lab** では上記のまま実行します。言語を選び、学期最終日を入力すると、教師基盤と採点ポータルの準備が進みます。共通登録コードは受講者だけが見られる場所で共有します。表示されたリダイレクトURIをGoogle Cloudに登録し、採点ポータルを有効にします。
 
 [教師向けの採点ポータル設定（Google Cloud・採点URL）](development/web_portal_poc/CLASSROOM-PORTAL.md)
 
@@ -48,7 +48,7 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
 
 新規スタックは、教師側が `jdu-web-infrastructure-teacher`、学生側が `jdu-web-infrastructure-student-<Lab ID>` です。
 
-学生側のスクリプトは、CloudFormationで課題確認Lambdaと結果保存先も作成します。初期化後に同じ版の採点コードをLambdaへ転送し、5台への接続状態をLambdaから検査します。教師側では、学校Googleアカウントでログインする課題画面と学生Labの連携を準備します。学生は教師から案内された課題画面をP0から使います。新手順のLearner Labでの通し確認は未完了です。
+学生側のスクリプトは、CloudFormationで課題確認Lambdaと結果保存先も作成します。初期化後に同じ版の採点コードをLambdaへ転送し、5台への接続状態をLambdaから検査します。教師側では、Google Cloudの設定後に課題画面を有効にし、学生Labとの連携を準備します。学生は教師から案内された課題画面をP0から使います。新手順のLearner Labでの通し確認は未完了です。
 
 #### RDPパスワードを忘れたとき
 

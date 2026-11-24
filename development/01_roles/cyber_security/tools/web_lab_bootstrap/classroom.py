@@ -458,6 +458,25 @@ def assessment_api_source(ref):
     return inline_source(sources)
 
 
+SEMESTER_PROMPT = {
+    'en': 'Last day of the semester (YYYY-MM-DD, Tashkent time)',
+    'ja': '学期最終日を入力してください（YYYY-MM-DD、タシケント時間）',
+    'ru': 'Последний день семестра (ГГГГ-ММ-ДД, время Ташкента)',
+    'uz': 'Semestrning oxirgi kuni (YYYY-MM-DD, Toshkent vaqti)',
+}
+
+
+def prepare_assignment_portal(args, directory):
+    launcher = remote_source(args.ref, 'development/setup-classroom.sh')
+    marker = b"\nref=''\n"
+    if launcher.count(marker) != 1:
+        raise ValueError('PORTAL_LAUNCHER_REVISION')
+    path = Path(directory, 'setup-assignment-portal.sh')
+    path.write_bytes(launcher.replace(marker, f"\nref='{args.ref}'\n".encode()))
+    subprocess.run(['bash', str(path), 'portal-init', '--expires-on', args.expires_on,
+                    '--lang', args.lang], check=True)
+
+
 def assignment_portal_url(cfn):
     from botocore.exceptions import ClientError
 
@@ -1282,6 +1301,7 @@ def run_cli():
     parser.add_argument('role', choices=(*STAGES, 'portal-url'))
     parser.add_argument('--ref', required=True, help='Exact GitHub commit for the installer and accompanying source files.')
     parser.add_argument('--lang', choices=TEXT)
+    parser.add_argument('--expires-on', help='Last day of the semester in Tashkent (teacher setup)')
     args = parser.parse_args()
     if args.role == 'portal-url':
         import boto3
@@ -1320,6 +1340,14 @@ def run_cli():
         args.lang = selections[answer]
     screen = Screen(args.lang, args.role)
     try:
+        if args.role == 'teacher':
+            from datetime import date, datetime
+            from zoneinfo import ZoneInfo
+            if not args.expires_on:
+                args.expires_on = input(SEMESTER_PROMPT[args.lang] + ': ').strip()
+            if (not re.fullmatch(r'[0-9]{4}-[0-9]{2}-[0-9]{2}', args.expires_on)
+                    or date.fromisoformat(args.expires_on) < datetime.now(ZoneInfo('Asia/Tashkent')).date()):
+                raise ValueError('SEMESTER_END_DATE')
         screen.step('aws')
         if not re.fullmatch('[a-f0-9]{40}', args.ref):
             raise ValueError('SOURCE_REVISION')
@@ -1364,7 +1392,11 @@ def run_cli():
                 url = assignment_portal_url(session.client('cloudformation'))
             except Exception:
                 url = None
-            screen.record(f'PortalUrl: {url}' if url else PORTAL_NOT_READY[args.lang])
+            if url:
+                screen.record(f'PortalUrl: {url}')
+            else:
+                with tempfile.TemporaryDirectory() as portal_directory:
+                    prepare_assignment_portal(args, portal_directory)
         else:
             screen.record('✓  ' + screen.text['student_success'])
             screen.record(screen.text['rdp_instruction'])
