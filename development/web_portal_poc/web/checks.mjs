@@ -83,12 +83,23 @@ export function checkHtml(lang,{config,session,token,selected,result,grade,maxim
       const v={...value,task_id,job_id:randomUUID(),...(mode?{check_mode:mode}:{})};
       const normal={...value,task_id,job_id:randomUUID()};
       const saved=grade?.selected[task_id];
-      const points=Object.hasOwn(maxima,task_id) ? `<span class="task-score" aria-label="${escape(t.grades)}: ${saved?`${saved.raw_earned} / ${maxima[task_id]}`:'—'}">${saved?`${saved.raw_earned} / ${maxima[task_id]}`:'—'}</span>` : '';
-      const heading=`<div class="task-heading"><h2>${task_id}</h2>${points}</div>`;
-      if(blocked) return `<section>${heading}</section>`;
-      return `<section>${heading}${form(lang,v,checkToken(config,session,token,v),`<input type="hidden" name="task_id" value="${task_id}">`,mode==='storage'?st.prepare:mode==='functional'?st.functional:t.start)}${mode?form(lang,normal,checkToken(config,session,token,normal),`<input type="hidden" name="task_id" value="${task_id}">`,st.readOnly):''}</section>`;
+      const maximum=maxima[task_id];
+      const score=saved?`${saved.raw_earned} / ${maximum}`:maximum?
+        {ja:'未採点',ru:'Без оценки',uz:'Baholanmagan'}[lang]:'—';
+      const status=saved?(saved.raw_earned===maximum?'score-full':'score-partial'):'score-empty';
+      const actions=blocked?'':form(lang,v,checkToken(config,session,token,v),
+        `<input type="hidden" name="task_id" value="${task_id}">`,mode==='storage'?st.prepare:mode==='functional'?st.functional:t.start)
+        +(mode?form(lang,normal,checkToken(config,session,token,normal),
+          `<input type="hidden" name="task_id" value="${task_id}">`,st.readOnly):'');
+      return `<tr><th scope="row">${task_id}</th><td><span class="task-score ${status}">${score}</span></td><td><div class="task-actions">${actions}</div></td></tr>`;
     }).join('');
-    return '<div class="check-tasks">'+forms+'</div>';
+    const [taskTitle,scoreTitle,actionTitle]={
+      ja:['課題','保存済みの点数','操作'],ru:['Задание','Сохранённые баллы','Действие'],
+      uz:['Vazifa','Saqlangan ball','Amal'],
+    }[lang];
+    return `<div class="table-wrap student-table" role="region" aria-label="${escape(t.title)}" tabindex="0">
+      <table><thead><tr><th scope="col">${taskTitle}</th><th scope="col">${scoreTitle}</th><th scope="col">${actionTitle}</th></tr></thead>
+      <tbody>${forms}</tbody></table></div>`;
   }
   if (!validOperation(selected)) throw Error('Invalid selection');
   if (result?.status!=='ok') return `<p role="alert">${escape(result?.status==='busy'?t.busy:result?.status==='unauthorized'?t.denied:t.unavailable)}</p>`;
