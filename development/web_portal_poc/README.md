@@ -105,6 +105,14 @@ Webで検証したGoogle identityと有効な10分sessionから5分間の登録�
 
 教師CloudShellで19ファイルと内包codeのhashを照合。AWSがtemplateを受理し、`jdu-web-portal-services-20261029`のCREATE change setはCREATE_COMPLETE/AVAILABLE、対象は上記5資源のAddだけ、DescribeEventsのvalidation errorは0・未取得pageなし。**まだexecuteしていない。** 元成績/元5台/公開中Webの変更はない。新しい非公開機能と鍵の作成は本人の最終操作待ちであり、実学生Googleとの紐付けや本人の成績表示は未受入。[秘密を含まない計画記録](verification/2026-10-29-portal-enrollment-plan.public.json)。
 
+## ウォークスルー用のMicrosoftログイン
+
+初期状態では無効です。検証用Microsoft Entraアプリには個人Microsoftアカウントを許可し、WebのリダイレクトURIにポータルの `/auth/microsoft/callback` を登録します。使用する権限はサインイン用の `openid profile` です。
+
+教師側のAWS Secrets Managerで、名前が `jdu/web-portal/<名前>/microsoft-test` のシークレットに `client_id`、`client_secret`、`object_id`、`lab_id`、`expires_at` をJSONで設定します。`object_id` は許可する個人Microsoftアカウントの署名済みIDトークンに含まれる `oid` です。メールアドレスで権限を付与しません。`expires_at` は現在から7日以内かつ学期末までのUnix時刻（秒）です。
+
+教師側で `setup-classroom.sh portal-enable --microsoft-test-secret <シークレット名>` を実行します。検証担当者はポータルの `/auth/microsoft?lang=ja` を開き、Microsoft側に設定済みのパスキーを使ってサインインできます。初回のLab登録には学生側CloudShellが発行する連携コードが必要です。テストアカウントに教師画面の権限は付与されません。終了時は同じポータルの `portal-enable` をオプションなしで実行すると、期限前でもテストログインが無効になります。
+
 ## 今回のコード
 
 - `grade_reader.py` は既存の学生用lab tokenで認証し、既存 `project_lab` の62素点と現在／参照結果を返す。教師用APIの内部で使うための関数であり、HTTP入口やブラウザ認証を公開しない。生のtoken、メール、チェック明細は結果に含めない。

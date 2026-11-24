@@ -5,6 +5,32 @@ const googleKeys = createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2
 export const SESSION = '__Host-jdu-session';
 export const FLOW = '__Host-jdu-flow';
 const issuers = ['https://accounts.google.com', 'accounts.google.com'];
+const microsoftTenant = '9188040d-6c67-4c5b-b112-36a304b66dad';
+const microsoftBase = 'https://login.microsoftonline.com/consumers';
+const microsoftKeys = createRemoteJWKSet(new URL(microsoftBase+'/discovery/v2.0/keys'), {timeoutDuration:5000});
+const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
+
+export function microsoftConfig(env,config) {
+  const value=env.MICROSOFT_TEST_CONFIG;
+  if (!value || ![value.client_id,value.object_id,value.client_secret,value.lab_id].every(v=>typeof v==='string')
+      || !uuid.test(value.client_id) || !uuid.test(value.object_id)
+      || !/^[\x21-\x7e]{16,256}$/.test(value.client_secret)
+      || !/^lab-[a-f0-9]{20}$/.test(value.lab_id)
+      || !Number.isSafeInteger(value.expires_at) || value.expires_at<=Date.now()/1000) return null;
+  return {...config,provider:'microsoft',clientId:value.client_id,secret:value.client_secret,
+    objectId:value.object_id,labId:value.lab_id,expiresAt:value.expires_at,redirect:config.origin+'/auth/microsoft/callback'};
+}
+
+export async function verifyMicrosoft(token,config,{nonce,keys=microsoftKeys}={}) {
+  if (!config || config.expiresAt<=Date.now()/1000) throw Error('Microsoft test access expired');
+  const {payload}=await jwtVerify(token,keys,{issuer:`https://login.microsoftonline.com/${microsoftTenant}/v2.0`,
+    audience:config.clientId,algorithms:['RS256'],requiredClaims:['sub','oid','tid','iat','exp'],maxTokenAge:'1h',clockTolerance:5});
+  if (payload.tid!==microsoftTenant || payload.oid!==config.objectId
+      || (payload.azp && payload.azp!==config.clientId)
+      || (nonce!==undefined && !equal(payload.nonce,nonce))) throw Error('Microsoft test identity required');
+  const sub='200'+BigInt('0x'+payload.oid.replaceAll('-','')).toString().padStart(39,'0');
+  return {sub,exp:Math.min(payload.exp,config.expiresAt),testLab:config.labId};
+}
 
 export function configFrom(env) {
   if (env.PORTAL_MODE !== 'enabled') throw new Error('Closed');
@@ -48,8 +74,11 @@ export async function login(config,returnTo='/') {
   returnTo=loginTarget(returnTo,config);
   const state = random(), nonce = random(), verifier = random();
   const sealed = await new EncryptJWT({ state, nonce, verifier, returnTo }).setProtectedHeader({ alg: 'dir', enc: 'A256GCM' }).setIssuer(config.origin).setAudience('oauth-flow').setIssuedAt().setExpirationTime('5m').encrypt(flowKey(config));
-  const location = new URL('https://accounts.google.com/o/oauth2/v2/auth');
-  location.search = new URLSearchParams({ client_id: config.clientId, redirect_uri: config.redirect, response_type: 'code', scope: 'openid email', state, nonce, code_challenge: createHash('sha256').update(verifier).digest('base64url'), code_challenge_method: 'S256', hd: config.domain, prompt: 'select_account' }).toString();
+  const microsoft=config.provider==='microsoft';
+  const location = new URL(microsoft?microsoftBase+'/oauth2/v2.0/authorize':'https://accounts.google.com/o/oauth2/v2/auth');
+  location.search = new URLSearchParams({ client_id: config.clientId, redirect_uri: config.redirect, response_type: 'code',
+    scope: microsoft?'openid profile':'openid email', state, nonce, code_challenge: createHash('sha256').update(verifier).digest('base64url'),
+    code_challenge_method: 'S256', ...(microsoft?{}:{hd:config.domain}), prompt: 'select_account' }).toString();
   return { location: location.toString(), flowCookie: cookie(FLOW, sealed, 300) };
 }
 export async function readFlow(token, config) {
@@ -66,7 +95,8 @@ export async function callback(request, config, { exchange = fetch, verify = ver
   if (url.searchParams.getAll('state').length !== 1 || url.searchParams.getAll('code').length !== 1 || url.searchParams.has('error')) throw new Error('Invalid callback');
   const flow = await readFlow(cookies(request).get(FLOW), config);
   if (!equal(url.searchParams.get('state'), flow.state)) throw new Error('Invalid state');
-  const response = await exchange('https://oauth2.googleapis.com/token', { method: 'POST', signal: AbortSignal.timeout(5000), headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'authorization_code', code: url.searchParams.get('code'), redirect_uri: config.redirect, client_id: config.clientId, client_secret: config.secret, code_verifier: flow.verifier }) });
+  const tokenEndpoint=config.provider==='microsoft'?microsoftBase+'/oauth2/v2.0/token':'https://oauth2.googleapis.com/token';
+  const response = await exchange(tokenEndpoint, { method: 'POST', signal: AbortSignal.timeout(5000), headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ grant_type: 'authorization_code', code: url.searchParams.get('code'), redirect_uri: config.redirect, client_id: config.clientId, client_secret: config.secret, code_verifier: flow.verifier }) });
   if (!response.ok) throw new Error('Exchange failed');
   const result = await response.json();
   if (typeof result.id_token !== 'string' || result.id_token.length > 3500) throw new Error('Invalid token');

@@ -1,4 +1,4 @@
-import { configFrom, cookies, cookie, login, loginTarget, callback, verifyGoogle, SESSION, FLOW } from './auth.mjs';
+import { configFrom, cookies, cookie, login, loginTarget, callback, verifyGoogle, microsoftConfig, verifyMicrosoft, SESSION, FLOW } from './auth.mjs';
 import { ACCESS } from './sessions.mjs';
 import { formToken, checkForm, operationId, tokenHash } from './enrollment-client.mjs';
 import { enrollmentHtml, enrollmentText, checkedEnrollment } from './enrollment-page.mjs';
@@ -105,7 +105,7 @@ function statusHtml(lang, observation) {
   return `<section><p>${escape(t.observed)}: ${escape(timestamp)}</p><div class="table-wrap"><table><thead><tr><th scope="col">${escape(t.role)}</th><th scope="col">${escape(t.ec2)}</th><th scope="col">${escape(t.ssm)}</th><th scope="col">${escape(t.publicIp)}</th></tr></thead><tbody>${body}</tbody></table></div></section>`;
 }
 
-export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch, getGrade, getStatus, sessions, getAcceptanceHealth, enroll, checker, getTeacher}={}) {
+export function createApp({env=process.env, verify=verifyGoogle, verifyTestStudent=verifyMicrosoft, exchange=fetch, getGrade, getStatus, sessions, getAcceptanceHealth, enroll, checker, getTeacher}={}) {
   return async request => {
     const url=new URL(request.url), lang=language(url), t=text[lang];
     if (url.pathname === '/healthz') return new Response('ok',{headers:{...security,'Content-Type':'text/plain; charset=utf-8'}});
@@ -130,6 +130,7 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
     if (url.origin !== config.origin) return response('Forbidden',403);
     const enrollmentEnabled=env.PORTAL_ENROLLMENT_ENABLED==='true' && typeof enroll==='function';
     const selfLink=env.PORTAL_SELF_LINK_ENABLED==='true' && typeof enroll==='function';
+    const microsoft=selfLink ? microsoftConfig(env,config) : null;
     const preparationEnabled=env.PORTAL_PREPARATION_ENABLED==='true' && typeof enroll==='function';
     if (url.pathname==='/api/enrollment/complete' || url.pathname==='/api/preparation/complete') {
       // Server-to-server signed proof only. The nonce was minted by an active,
@@ -152,19 +153,25 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
         return new Response(JSON.stringify(preparing?{aws_confirmed:true}:{registered:true}),{headers:{...security,'Content-Type':'application/json; charset=utf-8'}});
       } catch {return response('Unavailable',503);}
     }
-    if (url.pathname === '/auth/login' && request.method === 'GET') {
-      try {const flow=await login(config,url.searchParams.get('next')||'/'); return redirect(flow.location,[flow.flowCookie]);} catch {return response('Unavailable',503);}
+    const microsoftRoute=url.pathname==='/auth/microsoft' || url.pathname==='/auth/microsoft/callback';
+    if (microsoftRoute && !microsoft) return response('Not found',404);
+    if ((url.pathname === '/auth/login' || url.pathname==='/auth/microsoft') && request.method === 'GET') {
+      try {
+        const flow=await login(microsoftRoute?microsoft:config,microsoftRoute?`/checks?lang=${lang}`:url.searchParams.get('next')||'/');
+        return redirect(flow.location,[flow.flowCookie]);
+      } catch {return response('Unavailable',503);}
     }
-    if (url.pathname === '/auth/callback' && request.method === 'GET') {
+    if ((url.pathname === '/auth/callback' || url.pathname==='/auth/microsoft/callback') && request.method === 'GET') {
       if (!sessions) return response('Unavailable',503,{'Set-Cookie':cookie(FLOW,'',0)});
+      const providerConfig=microsoftRoute?microsoft:config, verifyLogin=microsoftRoute?verifyTestStudent:verify;
       let result;
-      try {result=await callback(request,config,{exchange,verify});}
+      try {result=await callback(request,providerConfig,{exchange,verify:verifyLogin});}
       catch {return response('Sign-in failed',403,{'Set-Cookie':cookie(FLOW,'',0)});}
       try {
         const prefix=SESSION+'=';
         if (!result.sessionCookie.startsWith(prefix)) throw new Error('Invalid login');
         const token=result.sessionCookie.slice(prefix.length).split(';',1)[0];
-        const identity=await verify(token,config);
+        const identity=await verifyLogin(token,providerConfig);
         const access=await sessions.issue(token,identity.exp);
         return redirect(result.returnTo,[cookie(SESSION,token,access.ttl),cookie(ACCESS,access.id,access.ttl),result.clearFlow]);
       } catch {return response('Unavailable',503,{'Set-Cookie':cookie(FLOW,'',0)});}
@@ -194,13 +201,29 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
       return response(page(lang,t.title,`<p role="alert">${copy[0]}</p><a href="/auth/login?next=${encodeURIComponent(next)}">${copy[1]}</a>`),403);
     };
     let identity, jar, token;
-    try {jar=cookies(request); token=jar.get(SESSION); identity=await verify(token,config);}
+    try {
+      jar=cookies(request); token=jar.get(SESSION);
+      try {identity=await verify(token,config);}
+      catch (error) {
+        if (!microsoft) throw error;
+        identity=await verifyTestStudent(token,microsoft);
+      }
+    }
     catch {return url.pathname==='/' ? redirect('/auth/login') : signInAgain();}
     if (!sessions) return response('Unavailable',503);
     try {if (!await sessions.check(jar.get(ACCESS),token)) return url.pathname==='/' ? redirect('/auth/login') : signInAgain();}
     catch {return response('Unavailable',503);}
     const schoolIdentity=typeof identity?.sub==='string' && typeof identity?.email==='string' && identity.email_verified===true && identity.hd==='jdu.uz';
-    const registration=schoolIdentity && (selfLink ? '/link' : enrollmentEnabled ? '/enroll' : null);
+    const testIdentity=Boolean(microsoft && identity.testLab===microsoft.labId);
+    const registration=(schoolIdentity || testIdentity) && (selfLink ? '/link' : enrollmentEnabled ? '/enroll' : null);
+    if (testIdentity && ['/checks','/grades','/status'].includes(url.pathname)) {
+      try {
+        const registered=await getGrade(identity.sub);
+        if (registered?.status==='unauthorized') return redirect(`/link?lang=${lang}`);
+        if (registered?.status!=='ok') return response('Unavailable',503);
+        if (registered.grade?.lab_id!==microsoft.labId) return response('Forbidden',403);
+      } catch {return response('Unavailable',503);}
+    }
     if (url.pathname==='/teacher' || url.pathname==='/teacher/student') {
       const tt=teacherText[lang];
       const fail=(message,status)=>response(page(lang,tt.title,`<p role="alert">${escape(message)}</p><a href="/?lang=${lang}">${escape(tt.home)}</a>`),status);
@@ -357,7 +380,7 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
     }
 
     if (url.pathname==='/link') {
-      if (!selfLink || !schoolIdentity) return response('Forbidden',403);
+      if (!selfLink || (!schoolIdentity && !testIdentity)) return response('Forbidden',403);
       const labels={
         ja:{command:'CloudShellで実行するコマンド',code:'連携コード',submit:'連携する',error:'連携できませんでした。画面に表示された新しいコマンドでやり直してください。'},
         ru:{command:'Команда CloudShell',code:'Код привязки',submit:'Привязать',error:'Не удалось привязать Lab. Выполните новую команду на этой странице.'},
@@ -373,8 +396,10 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
           const fields=new URLSearchParams(raw), requestId=fields.get('request_id'), code=fields.get('code')?.trim();
           if ([...fields.keys()].sort().join(',')!=='code,csrf,request_id'
               || !checkForm(config,sessionId,token,requestId,fields.get('csrf'))) return response('Forbidden',403);
-          if (/^jdu-link1\.lab-[a-f0-9]{20}\.[0-9]{12}\.[0-9]{10}\.[a-f0-9]{64}$/.test(code||'')) {
-            const result=await enroll({operation:'claim',subject:identity.sub,email:identity.email,session_id:sessionId,
+          if (/^jdu-link1\.lab-[a-f0-9]{20}\.[0-9]{12}\.[0-9]{10}\.[a-f0-9]{64}$/.test(code||'')
+              && (!testIdentity || code.split('.')[1]===identity.testLab)) {
+            const result=await enroll({operation:testIdentity?'claim_test_student':'claim',subject:identity.sub,
+              ...(testIdentity?{}:{email:identity.email}),session_id:sessionId,
               token_hash:tokenHash(token),request_id:requestId,code});
             if (result?.status==='ok' && result.enrollment?.registered===true) return redirect(`/checks?lang=${lang}`);
           }

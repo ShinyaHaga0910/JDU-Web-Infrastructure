@@ -131,7 +131,7 @@ def prepare(session, account, revision, expires=None):
     return get_portal_url(read_stack(cfn, STACK))
 
 
-def backend(session, account):
+def backend(session, account, microsoft_access=''):
     cfn = session.client('cloudformation')
     teacher = read_stack(cfn, TEACHER)
     if not teacher or teacher['StackStatus'] not in ('CREATE_COMPLETE', 'UPDATE_COMPLETE', 'UPDATE_ROLLBACK_COMPLETE'):
@@ -149,7 +149,7 @@ def backend(session, account):
         services = apply_stack(cfn, STACK + '-services', template('portal-services.template.json'), {
             **publish(s3, account, bucket, 'services', services_code.name, services_code.read_bytes(), 'application/zip'),
             'LabRoleArn': role, 'GradeTableName': grades, 'BindingTableName': bindings,
-            'SecretScope': 'infrastructure-classroom',
+            'SecretScope': 'infrastructure-classroom', 'MicrosoftTestAccess': microsoft_access,
         }, update=True)
         checker_template = template('teacher-checker.template.json')
         checker_template['Resources']['Checker']['Properties']['FunctionName'] = STACK + '-checker'
@@ -198,7 +198,27 @@ def expiry_timestamp(value):
     return str(int(midnight.timestamp()))
 
 
-def activate(session, account, revision, origin, google_source, students, expires):
+def microsoft_test_access(sm, account, source, expires):
+    if source == 'disabled':
+        return 'disabled', ''
+    arn = sm.describe_secret(SecretId=source)['ARN']
+    if not re.fullmatch(rf'arn:aws:secretsmanager:{REGION}:{account}:secret:jdu/web-portal/[a-z0-9-]+/microsoft-test-[A-Za-z0-9]{{6}}', arn):
+        raise ValueError('Use a same-account Microsoft test secret')
+    data = json.loads(sm.get_secret_value(SecretId=arn, VersionStage='AWSCURRENT')['SecretString'])
+    uuid_pattern = r'[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}'
+    now = int(datetime.now(tz=timezone.utc).timestamp())
+    if (not isinstance(data, dict) or set(data) != {'client_id', 'client_secret', 'object_id', 'lab_id', 'expires_at'}
+            or not all(isinstance(data[field], str) and re.fullmatch(uuid_pattern, data[field])
+                       for field in ('client_id', 'object_id'))
+            or not isinstance(data['client_secret'], str) or not re.fullmatch(r'[!-~]{16,256}', data['client_secret'])
+            or not isinstance(data['lab_id'], str) or not re.fullmatch(r'lab-[a-f0-9]{20}', data['lab_id'])
+            or type(data['expires_at']) is not int or not now < data['expires_at'] <= min(now + 7 * 86400, int(expires))):
+        raise ValueError('Invalid Microsoft test configuration or deadline')
+    subject = '200' + str(int(data['object_id'].replace('-', ''), 16)).zfill(39)
+    return arn, f"{data['lab_id']}:{subject}:{data['expires_at']}"
+
+
+def activate(session, account, revision, origin, google_source, students, expires, microsoft_source='disabled'):
     cfn = session.client('cloudformation')
     live = read_stack(cfn, STACK)
     if not live or get_portal_url(live) != origin:
@@ -227,7 +247,8 @@ def activate(session, account, revision, origin, google_source, students, expire
         existing = json.loads(sm.get_secret_value(SecretId=target, VersionStage='AWSCURRENT')['SecretString'])
         if existing != oauth:
             raise ValueError('Existing OAuth configuration differs; inspect before updating')
-    refs = backend(session, account)
+    microsoft_arn, microsoft_access = microsoft_test_access(sm, account, microsoft_source, expires)
+    refs = backend(session, account, microsoft_access)
     digest = publish_link(session, account, origin, students, expires) if students else 'disabled'
     bucket = outputs(read_stack(cfn, STACK + '-artifacts'))['BucketName']
     with TemporaryDirectory() as work:
@@ -237,6 +258,7 @@ def activate(session, account, revision, origin, google_source, students, expire
     apply_stack(cfn, STACK, template('web/portal-web.template.json'), {
         **code, 'WebFunctionName': FUNCTION, 'ReleaseId': revision, 'LabRoleArn': f'arn:aws:iam::{account}:role/LabRole',
         'PortalMode': 'enabled', 'PortalExpiresAt': expires, 'PublicOrigin': origin, 'GoogleOAuthSecretArn': target,
+        'MicrosoftTestSecretArn': microsoft_arn,
         'BindingTableName': refs['BindingTableName'], 'GradeReaderFunctionArn': refs['GradeReaderArn'],
         'CheckerFunctionArn': refs['CheckerArn'], 'CheckerEnabled': 'true', 'SelfLinkEnabled': 'true',
         'EnrollmentEnabled': 'true' if students else 'false',
@@ -335,6 +357,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('phase', choices=('portal-prepare', 'portal-init', 'portal-connect', 'portal-enable', 'portal-approve', 'portal-teacher', 'portal-secret'))
     parser.add_argument('--google-secret', default=GOOGLE_SECRET_NAME)
+    parser.add_argument('--microsoft-test-secret', default='disabled',
+                        help='Optional same-account Secrets Manager secret for one short-lived Microsoft test student')
     parser.add_argument('--google-client-id')
     parser.add_argument('--lang', choices=('en', 'ja', 'ru', 'uz'), default='ja')
     parser.add_argument('--expires-on', help='Last day of the semester in Asia/Tashkent (YYYY-MM-DD)')
@@ -372,7 +396,8 @@ def main():
         expires = expiry_timestamp(args.expires_on) if args.expires_on else stack_parameters(portal).get('PortalExpiresAt', '')
         if not re.fullmatch(r'[0-9]{10}', expires) or int(expires) <= datetime.now().timestamp():
             parser.error('Configure a future semester end using --expires-on YYYY-MM-DD')
-        activate(session, account, args.ref, origin, args.google_secret, args.student_account, expires)
+        activate(session, account, args.ref, origin, args.google_secret, args.student_account, expires,
+                 args.microsoft_test_secret)
         print(f'PortalUrl: {origin}')
     elif args.phase == 'portal-secret':
         if not args.google_client_id:

@@ -7,6 +7,7 @@ Existing LabRole is broader than this application's intended operations.
 import json
 import os
 import re
+import time
 
 from identity_proof import ProofError
 from lab_link_code import CODE
@@ -17,10 +18,18 @@ HEX = re.compile(r'[a-f0-9]{64}\Z')
 IDENTITY = {'subject', 'email', 'session_id', 'token_hash'}
 
 
-def valid(event):
+def valid(event, test_access=''):
     if type(event) is not dict:
         return False
     operation = event.get('operation')
+    if operation == 'claim_test_student':
+        allowed = re.fullmatch(r'(lab-[a-f0-9]{20}):(200[0-9]{39}):([0-9]{10})', test_access)
+        if (not allowed or set(event) != {'operation', 'subject', 'session_id', 'token_hash', 'request_id', 'code'}
+                or event['subject'] != allowed[2] or time.time() >= int(allowed[3])):
+            return False
+        match = CODE.fullmatch(event['code']) if isinstance(event['code'], str) else None
+        return bool(match and match[1] == allowed[1] and all(isinstance(event[k], str) and HEX.fullmatch(event[k])
+                    for k in ('session_id', 'token_hash', 'request_id')))
     if isinstance(operation, str) and operation.startswith('prepare_'):
         # Explicit whitelist below still rejects approve/revoke/worker actions.
         operation = operation.removeprefix('prepare_')
@@ -52,8 +61,8 @@ def valid(event):
                     for k in ('session_id', 'token_hash') + (('request_id',) if operation in ('begin', 'claim') else ())))
 
 
-def serve(event, service, preparation=None, check_student=None):
-    if not valid(event):
+def serve(event, service, preparation=None, check_student=None, *, test_access=''):
+    if not valid(event, test_access):
         return {'status': 'unauthorized'}
     try:
         operation = event['operation']
@@ -65,9 +74,11 @@ def serve(event, service, preparation=None, check_student=None):
             return {'status': 'ok', 'preparation': result}
         if operation == 'complete':
             result = service.complete(values['pair_id'], values['proof_url'])
-        elif operation == 'claim':
+        elif operation in ('claim', 'claim_test_student'):
             if check_student is None:
                 return {'status': 'unavailable'}
+            if operation == 'claim_test_student':
+                values.update(email=None, test_lab=test_access.split(':', 1)[0])
             result = service.claim(**values, check_student=check_student)
         else:
             result = getattr(service, operation)(**values)
@@ -79,7 +90,8 @@ def serve(event, service, preparation=None, check_student=None):
 
 
 def handler(event, context):
-    if not valid(event):
+    test_access = os.environ.get('PORTAL_MICROSOFT_TEST_ACCESS', '')
+    if not valid(event, test_access):
         return {'status': 'unauthorized'}
     try:
         import boto3
@@ -109,6 +121,6 @@ def handler(event, context):
             return (answer.get('StatusCode') == 200 and not answer.get('FunctionError')
                     and json.loads(answer['Payload'].read(100)) == {'status': 'ready'})
 
-        return serve(event, service, PortalPreparation(service, initial), check_student)
+        return serve(event, service, PortalPreparation(service, initial), check_student, test_access=test_access)
     except Exception:
         return {'status': 'unavailable'}

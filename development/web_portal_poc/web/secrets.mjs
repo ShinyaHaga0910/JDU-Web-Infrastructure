@@ -7,6 +7,7 @@ export function createRuntimeEnv(env=process.env,
   const base={...env};
   delete base.GOOGLE_CLIENT_ID;
   delete base.GOOGLE_CLIENT_SECRET;
+  delete base.MICROSOFT_TEST_CONFIG;
   let cached, expires=0, pending;
   return async () => {
     if (base.PORTAL_MODE!=='enabled') return {...base};
@@ -28,6 +29,15 @@ export function createRuntimeEnv(env=process.env,
             || typeof secret.client_secret!=='string' || !/^GOCSPX-[A-Za-z0-9_-]{16,256}$/.test(secret.client_secret)
             || secret.redirect_uri!==origin.origin+'/auth/callback') throw new Error();
         cached={...base,GOOGLE_CLIENT_ID:secret.client_id,GOOGLE_CLIENT_SECRET:secret.client_secret};
+        const testArn=base.PORTAL_MICROSOFT_TEST_SECRET_ARN || '';
+        if (new RegExp('^arn:aws:secretsmanager:us-east-1:'+account+':secret:jdu/web-portal/[a-z0-9-]+/microsoft-test-[A-Za-z0-9]{6}$').test(testArn)) {
+          try {
+            const test=await client.send(new GetSecretValueCommand({SecretId:testArn,VersionStage:'AWSCURRENT'}),
+              {abortSignal:AbortSignal.timeout(5000)});
+            if (test.ARN===testArn && typeof test.SecretString==='string' && test.SecretString.length<=4096)
+              cached.MICROSOFT_TEST_CONFIG=JSON.parse(test.SecretString);
+          } catch {} // Failure closes the test route; Google sign-in remains available.
+        }
         expires=clock()+300000;
         return cached;
       } catch { throw new Error('Login configuration unavailable'); }

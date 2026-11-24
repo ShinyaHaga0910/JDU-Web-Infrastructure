@@ -8,7 +8,8 @@
     "LabRoleArn": {"Type": "String", "AllowedPattern": "arn:aws:iam::[0-9]{12}:role/LabRole"},
     "GradeTableName": {"Type": "String", "MinLength": 3},
     "BindingTableName": {"Type": "String", "MinLength": 3},
-    "SecretScope": {"Type": "String", "AllowedPattern": "[a-z0-9-]{3,40}"}
+    "SecretScope": {"Type": "String", "AllowedPattern": "[a-z0-9-]{3,40}"},
+    "MicrosoftTestAccess": {"Type": "String", "Default": "", "AllowedPattern": "(?:lab-[a-f0-9]{20}:200[0-9]{39}:[0-9]{10})?"}
   },
   "Resources": {
     "SubjectKey": {
@@ -25,7 +26,8 @@
       "Code": {"S3Bucket": {"Ref": "ArtifactBucket"}, "S3Key": {"Ref": "ArtifactKey"}, "S3ObjectVersion": {"Ref": "ArtifactVersion"}},
       "Environment": {"Variables": {
         "PORTAL_AWS_ACCOUNT_ID": {"Ref": "AWS::AccountId"}, "PORTAL_SUBJECT_KEY_SECRET_ARN": {"Ref": "SubjectKey"},
-        "PORTAL_BINDING_TABLE": {"Ref": "BindingTableName"}, "GRADE_TABLE": {"Ref": "GradeTableName"}
+        "PORTAL_BINDING_TABLE": {"Ref": "BindingTableName"}, "GRADE_TABLE": {"Ref": "GradeTableName"},
+        "PORTAL_MICROSOFT_TEST_ACCESS": {"Ref": "MicrosoftTestAccess"}
       }}
     }},
     "GradeReader": {"Type": "AWS::Lambda::Function", "Properties": {

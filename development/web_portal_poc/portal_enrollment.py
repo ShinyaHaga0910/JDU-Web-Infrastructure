@@ -118,12 +118,18 @@ class PortalEnrollment:
             raise EnrollmentDenied('Approval conflicts or original Lab changed') from None
         return {'approved': True, 'lab_id': grant['lab_id']}
 
-    def claim(self, subject, email, session_id, token_hash, request_id, code, check_student):
+    def claim(self, subject, email, session_id, token_hash, request_id, code, check_student, *, test_lab=None):
         match = CODE.fullmatch(code)
         if not match or not HEX.fullmatch(session_id) or not HEX.fullmatch(request_id):
             raise EnrollmentDenied('Invalid Lab link')
         lab, account, _, _ = match.groups()
-        pk = email_key(email, self.pepper)
+        if test_lab is None:
+            pk = email_key(email, self.pepper)
+        else:
+            if lab != test_lab or email is not None:
+                raise EnrollmentDenied('Test student Lab mismatch')
+            pk = 'APPROVAL#' + hmac.new(self.pepper, b'microsoft-test-student-v1\0' + subject.encode('ascii'),
+                                        hashlib.sha256).hexdigest()
         subject_pk = subject_key(subject, self.pepper)
         session_pk = 'SESSION#' + digest(session_id)
         self.session(session_pk, token_hash)
