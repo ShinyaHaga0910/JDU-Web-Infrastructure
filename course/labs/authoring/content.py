@@ -49,12 +49,64 @@ cat p0-connection.txt
  T('`id -un` は `ssm-user`、`pwd` は `/home/ssm-user` を表示する。JSONファイルには `"role": "web"` が含まれ、最後の `cat` では `web` だけが1行表示される。', 'Команда `id -un` выводит `ssm-user`, а `pwd` — `/home/ssm-user`. В JSON-файле есть `"role": "web"`, а последняя команда `cat` выводит только строку `web`.', '`id -un` buyrug‘i `ssm-user`, `pwd` esa `/home/ssm-user` ni ko‘rsatadi. JSON faylda `"role": "web"` bor va oxirgi `cat` buyrug‘i faqat bitta `web` satrini chiqaradi.'),
  None)
 step(m, T('RDPで踏み台のデスクトップを開く', 'Открыть рабочий стол бастиона по RDP', 'RDP orqali bastion ish stolini ochish'), 'pc',
- T('EC2で確認した現在の踏み台の公開IPv4を使う。Windowsキー＋Rを押し、mstsc /promptを入力してEnter。ComputerへそのIPを指定し、userはlabuser、passwordは本人が初期配備で設定したRDP用を使う。Windowsアカウントのpasswordではない。「資格情報を記憶する」は選ばない。青いxrdp loginが出たらSession=Xorgを確認し、labuserで入る。',
-   'Используйте текущий public IPv4 бастиона из EC2. Нажмите Windows+R, введите mstsc /prompt и Enter. В Computer укажите IP, пользователь labuser, пароль — свой RDP из начальной установки, не пароль Windows. Не выбирайте сохранение credentials. Если появится синий login xrdp, выберите Session=Xorg и labuser.',
-   'EC2 dagi hozirgi bastion public IPv4 ni ishlating. Windows+R ni bosib mstsc /prompt kiriting va Enter bosing. Computer ga IP, user ga labuser, parolga boshlang‘ich o‘rnatishda belgilangan shaxsiy RDP parolini kiriting; Windows paroli emas. Credentials ni saqlashni tanlamang. Ko‘k xrdp login chiqsa Session=Xorg va labuser ni tekshiring.'),
+ T('Windowsの「リモート デスクトップ接続」で、自分の踏み台サーバーのデスクトップを開く。',
+   'Откройте рабочий стол своего бастиона через приложение Windows «Подключение к удалённому рабочему столу».',
+   'Windows dagi Remote Desktop Connection orqali o‘z oraliq serveringizning ish stolini oching.'),
  'mstsc /prompt',
- T('UbuntuのXfceデスクトップとFirefoxが開く。これは踏み台内のbrowserであり、Windows側のbrowserとは別。RDPのlabuserにはsudo管理権限がないため、構築はCloudShellからSSM/ssm-userで行う。', 'Открываются Xfce и Firefox внутри Ubuntu-бастиона. Это не браузер Windows. labuser не имеет sudo: настройку выполняйте через CloudShell → SSM/ssm-user.', 'Ubuntu bastion ichida Xfce va Firefox ochiladi; bu Windows browser idan boshqa. labuser da sudo yo‘q: qurishni CloudShell → SSM/ssm-user orqali bajaring.'),
+ T('踏み台サーバーのUbuntuのデスクトップ（Xfce）が表示される。左上の「Applications」からFirefoxなどを開ける。', 'Откроется рабочий стол Ubuntu (Xfce) бастиона. Чтобы открыть Firefox и другие программы, используйте меню Applications.', 'Oraliq serverning Ubuntu ish stoli (Xfce) ochiladi. Yuqori chapdagi Applications menyusidan Firefox va boshqa dasturlarni ochish mumkin.'),
  T('Login failedならuser名と日本語/英語等のkeyboard配列を確認する。passwordを会話へ送らない。到達しない場合は現在のIPと許可された接続元CIDRを教師と確認し、3389を全公開しない。終了時はRDP内の自分の作業を保存し、接続を閉じる。', 'При Login failed проверьте имя и раскладку клавиатуры. Не отправляйте пароль в чат. При недоступности сверьте текущий IP и разрешённый CIDR с преподавателем; не открывайте 3389 для всех. Перед закрытием RDP сохраните работу.', 'Login failed bo‘lsa user nomi va klaviatura tartibini tekshiring. Parolni chat ga yubormang. Ulanmasa joriy IP va ruxsatli CIDR ni o‘qituvchi bilan tekshiring; 3389 ni hammaga ochmang. RDP ni yopishdan oldin ishni saqlang.'))
+
+
+P0_GRADING_STEPS = (
+    ('p0-portal-home',
+     T('トップページで「課題の確認」を開く', 'Откройте «Проверка задания»', '«Vazifani tekshirish» bo‘limini oching'),
+     T('ログイン後、「Web演習」のトップページで **課題の確認** をクリックする。',
+       'После входа на главной странице нажмите **Проверка задания**.',
+       'Hisobga kirgach, bosh sahifada **Vazifani tekshirish** ni bosing.')),
+    ('p0-portal-pick',
+     T('P0の採点を開始する', 'Запустите проверку P0', 'P0 tekshiruvini boshlang'),
+     T('P0の枠にある **この課題を確認する** をクリックする。画面を開いたまま1〜2分を目安に待つ。「確認を実行中です」の表示が続くときは、**結果を更新する** をクリックする。',
+       'В карточке P0 нажмите **Проверить это задание**. Оставьте страницу открытой и подождите примерно 1–2 минуты. Если проверка всё ещё выполняется, нажмите **Обновить результат**.',
+       'P0 kartasidagi **Ushbu vazifani tekshirish** tugmasini bosing. Sahifani ochiq qoldirib, taxminan 1–2 daqiqa kuting. Tekshiruv hali davom etayotgan bo‘lsa, **Natijani yangilash** ni bosing.')),
+    ('p0-portal-result',
+     T('今回の点数と保存状況を見る', 'Посмотрите балл и статус сохранения', 'Joriy ball va saqlash holatini ko‘ring'),
+     T('Webサーバーで作った `p0-connection.txt` の内容が `web` の1行なら、「今回の素点」が **1 / 1** になる。「成績原本に保存しました。」と表示されたら、**保存済み成績を見る** をクリックする。',
+       'Если в созданном на Web-сервере файле `p0-connection.txt` записана одна строка `web`, в поле «Баллы этой проверки» будет **1 / 1**. После сообщения о сохранении результата нажмите **Сохранённые оценки**.',
+       'Web serverda yaratilgan `p0-connection.txt` faylida bitta `web` satri bo‘lsa, «Ushbu tekshiruv bali» **1 / 1** bo‘ladi. Natija jurnalga saqlangani haqida xabar chiqqach, **Saqlangan baholar** ni bosing.')),
+    ('p0-portal-saved',
+     T('保存済みの成績でP0の点数を確認する', 'Проверьте сохранённый балл P0', 'P0 uchun saqlangan ballni tekshiring'),
+     T('「保存済みの成績」の表でP0の行を見つけ、**1点** が保存されていることを確認する。',
+       'Найдите строку P0 в таблице сохранённых оценок и убедитесь, что сохранён **1 балл**.',
+       'Saqlangan baholar jadvalidan P0 qatorini toping va **1 ball** saqlanganini tekshiring.')),
+)
+
+
+RDP_STEPS = (
+    ('rdp-bastion-select', T('踏み台サーバーを選ぶ', 'Выберите бастион', 'Oraliq serverni tanlang'), T(
+        'EC2 → Instancesで、自分の演習環境のうち名前の末尾が `-bastion` の行を探し、同じ行の **Instance ID** をクリックする。',
+        'Откройте EC2 → Instances, найдите в своей учебной среде строку с окончанием имени `-bastion` и нажмите **Instance ID** в этой строке.',
+        'EC2 → Instances bo‘limida o‘z muhitingizdagi nomi `-bastion` bilan tugaydigan qatorni toping va shu qatordagi **Instance ID** ni bosing.')),
+    ('rdp-bastion-public-ip', T('公開IPv4アドレスをコピーする', 'Скопируйте публичный IPv4-адрес', 'Ommaviy IPv4 manzilini nusxalang'), T(
+        'インスタンスの詳細画面で **Public IPv4 address** の横にあるコピーアイコンを押す。次に入力するのは、自分の画面に表示された現在の公開IPv4アドレス。スクリーンショットの値は例。',
+        'На странице экземпляра нажмите значок копирования рядом с **Public IPv4 address**. На следующем шаге используйте текущий адрес из своей консоли. Адрес на снимке приведён для примера.',
+        'Instans tafsilotlarida **Public IPv4 address** yonidagi nusxalash belgisini bosing. Keyingi qadamda o‘z oynangizdagi joriy ommaviy IPv4 manzilini ishlating. Rasmdagi manzil misol.')),
+    ('rdp-connect', T('公開IPv4アドレスを入力して接続する', 'Введите публичный IPv4-адрес и подключитесь', 'Ommaviy IPv4 manzilini kiritib ulaning'), T(
+        '「リモート デスクトップ接続」の **コンピューター** 欄に、手順2でコピーした公開IPv4アドレスを貼り付け、**接続** を押す。',
+        'В окне «Подключение к удалённому рабочему столу» вставьте скопированный на шаге 2 публичный IPv4-адрес в поле **Компьютер** и нажмите **Подключить**.',
+        'Remote Desktop Connection oynasidagi **Computer** maydoniga 2-qadamda nusxalangan ommaviy IPv4 manzilini qo‘ying va **Connect** tugmasini bosing.')),
+    ('rdp-certificate', T('証明書の確認画面を読む', 'Проверьте предупреждение о сертификате', 'Sertifikat ogohlantirishini tekshiring'), T(
+        'この画面が出た場合は、表示された接続先を手順2の公開IPv4アドレスと照合する。接続先が今回の踏み台であり、演習用の証明書だと教師に確認できたら **はい** を押す。確認できない場合は **いいえ** を押して教師に相談する。',
+        'Если появилось это окно, сверьте адрес назначения с публичным IPv4 из шага 2. Нажмите **Да**, когда преподаватель подтвердит, что это ваш бастион и сертификат учебной среды. Если подтвердить это не удалось, нажмите **Нет** и обратитесь к преподавателю.',
+        'Bu oyna chiqsa, ulanish manzilini 2-qadamdagi ommaviy IPv4 manzili bilan solishtiring. O‘qituvchi bu sizning oraliq serveringiz va mashq sertifikati ekanini tasdiqlasa, **Yes** ni bosing. Tasdiqlanmasa, **No** ni bosing va o‘qituvchiga murojaat qiling.')),
+    ('rdp-xrdp-login', T('踏み台サーバーにログインする', 'Войдите на бастион', 'Oraliq serverga kiring'), T(
+        'xrdpのログイン画面で **Session** が `Xorg` になっていることを確かめる。**username** に `labuser`、**password** に学生用セットアップで自分が設定したRDPパスワードを入力し、**OK** を押す。',
+        'В окне входа xrdp проверьте, что в поле **Session** выбрано `Xorg`. Введите `labuser` в поле **username**, свой пароль RDP из начальной настройки в поле **password** и нажмите **OK**.',
+        'xrdp kirish oynasida **Session** maydonida `Xorg` tanlanganini tekshiring. **username** maydoniga `labuser`, **password** maydoniga dastlab belgilagan RDP parolingizni yozing va **OK** ni bosing.')),
+    ('rdp-desktop', T('デスクトップが開いたことを確認する', 'Убедитесь, что рабочий стол открылся', 'Ish stoli ochilganini tekshiring'), T(
+        'リモート デスクトップ接続のウィンドウ内に、左上の **Applications** メニューや **Home** アイコンが表示されれば、踏み台サーバーに接続できている。',
+        'Если в окне удалённого рабочего стола видно меню **Applications** слева вверху и значок **Home**, вы подключены к бастиону.',
+        'Uzoq ish stoli oynasining yuqori chapida **Applications** menyusi va **Home** belgisi ko‘rinsa, oraliq serverga ulangansiz.')),
+)
 
 m = module('P1', T('HTTPで静的ファイルを返す', 'Выдача статического файла по HTTP', 'HTTP orqali statik faylni qaytarish'),
  T('Nginx、保存先、待受、HTTP応答、access logを一組で確認する。', 'Связать Nginx, файл, прослушивание порта, HTTP-ответ и access log.', 'Nginx, fayl joyi, tinglash porti, HTTP javobi va access log ni bog‘lash.'),

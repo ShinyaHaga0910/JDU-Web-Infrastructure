@@ -85,7 +85,7 @@ def main():
             ok(f'{lang}_{kind}_pdf_A4',all(abs(float(p.mediabox.width)-595.276)<1 and abs(float(p.mediabox.height)-841.890)<1 for p in pdf.pages))
             ok(f'{lang}_{kind}_pdf_text',len(text)>5000 and all(prefix+str(n) in text for n in ACTIVE_NUMBERS for prefix in [('P' if kind=='practice' else 'M')]) and '\ufffd' not in text and '\x00' not in text)
             images=sum(sum(obj.get_object().get('/Subtype')=='/Image' for obj in p.get('/Resources',{}).get('/XObject',{}).values()) for p in pdf.pages)
-            ok(f'{lang}_{kind}_pdf_figures',images==(11 if kind=='practice' else 8))
+            ok(f'{lang}_{kind}_pdf_figures',images==(21 if kind=='practice' else 8))
             if kind=='practice':
                 expected=sum(sum(active for active,_ in command_groups(s['code'])) for m in MODULES for i,s in enumerate(m['steps'],1) if s['code'] and (m['id'],i) not in CONFIG_STEPS)
                 ok(f'{lang}_pdf_numbered_comments',len(re.findall(r'(?:#|--) \d+\.',text))==expected)
@@ -146,7 +146,7 @@ def main():
                 task=prefix+str(number)
                 md=(ROOT/'docs'/lang/(task.lower()+'.md')).read_text(encoding='utf-8')
                 images=[c for t in parser.parse(md) for c in t.children or [] if c.type=='image']
-                expected_images={'P0': 6, 'M0': 3}.get(task, 1)
+                expected_images={'P0': 16, 'M0': 3}.get(task, 1)
                 ok(f'{lang}_{task}_diagram_in_page',len(images)==expected_images and len(images[0].content)>60)
                 if task=='P0':
                     resource_link=f'../../assets/{lang}/{RESOURCE_DIAGRAM}.png'
@@ -242,7 +242,7 @@ def main():
     result=dict(scope='D12_P_M_materials_local_checks_not_AWS_walkthrough',checked_on=date.today().isoformat(),
         languages=list(LANGS),material_revision=MATERIAL_REVISION,practice_tasks=6,practice_steps=41,
         task_pages=36,task_diagrams=36,numbered_command_comments_per_language=annotations,executable_source_preserved=True,
-        explained_steps=sum(key.split(".")[0] in ACTIVE_ORDER for key in STEP_NOTES),module_understanding_questions=len(MODULES),communication_routes=len(ROUTES),
+        explained_steps=sum(key.split(".")[0] in ACTIVE_ORDER for key in STEP_NOTES),module_understanding_questions=sum('question' in MODULE_NOTES[module['id']] for module in MODULES),communication_routes=len(ROUTES),
         worked_output_examples=len(OUTPUT_EXAMPLES),mission_tasks=6,scored_checks=61,raw_points=61,
         checks_passed=len(checks),bash_blocks_syntax_checked=fences,
         pdfs={p.name:dict(pages=len(PdfReader(p).pages),bytes=p.stat().st_size) for p in (ROOT/'output/pdf').glob('*.pdf')},

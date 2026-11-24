@@ -18,7 +18,7 @@ from markdown_it import MarkdownIt
 from pages import write_pages, browser_check
 from command_notes import annotated_blocks
 from diagrams import diagram_markdown, lesson_files_markdown, write_diagrams
-from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE
+from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE, RDP_STEPS, P0_GRADING_STEPS
 from checks import CHECKS
 from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, RAW_MAXIMUM, active_registry
 from explanations import LABELS, READING, ROUTES, MISSION_PLAN, MODULE_NOTES, STEP_NOTES, OUTPUT_EXAMPLES
@@ -173,6 +173,14 @@ def session_connect_guide(lang):
         'EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session Manager ni tanlang. Rasmda Web server ko‘rsatilgan.'), lang)
 
 
+def illustrated_steps(lang, steps):
+    out = []
+    for number, (image, title, instruction) in steps:
+        out += [f'**{number}. {title[lang]}**', '', instruction[lang], '',
+                f'![{title[lang]}](../../assets/shared/{image}.png)', '']
+    return out
+
+
 def make_markdown(reg, lang, kind):
     out = emit_intro(lang, kind)
     out += ['## ' + LABELS['read'][lang], '']
@@ -209,15 +217,19 @@ def make_markdown(reg, lang, kind):
                 if step_id=='P0.2':
                     out += session_connect_guide(lang)
                 if step_id=='P0.3':
+                    rdp_steps = list(enumerate(RDP_STEPS, 1))
+                    out += illustrated_steps(lang, rdp_steps[:2])
                     out += shared_image('windows-run-rdp', T(
-                        'Windowsキー＋Rで「ファイル名を指定して実行」を開き、「名前」欄に `mstsc /prompt` を入力する。',
-                        'Нажмите Windows+R, чтобы открыть окно «Выполнить», и введите `mstsc /prompt` в поле «Открыть».',
-                        'Windows+R tugmalarini bosib Run oynasini oching va Open maydoniga `mstsc /prompt` yozing.'), lang)
+                        'Windowsキー＋Rで「ファイル名を指定して実行」を開く。「名前」欄に `mstsc /prompt` を入力し、**OK** を押す。',
+                        'Нажмите Windows+R, чтобы открыть окно «Выполнить». Введите `mstsc /prompt` в поле «Открыть» и нажмите **OK**.',
+                        'Windows+R tugmalarini bosib Run oynasini oching. Open maydoniga `mstsc /prompt` yozing va **OK** ni bosing.'), lang)
                 if s['code']:
                     for fence,source in annotated_blocks(m['id'],i,s['code'],lang):
                         label=T('設定・入力データ（端末で実行するコマンドではない）','Конфигурация или данные: не выполнять как команды','Sozlama yoki ma’lumot: terminal buyrug‘i emas')[lang] if fence=='text' else T('入力するコマンド（番号はこの手順内の順番）','Команды: нумерация внутри этого шага','Buyruqlar: raqamlar shu qadam ichidagi tartib')[lang]
                         if fence=='sql':label=T('ここからはpsql内で入力する','Далее вводить внутри psql','Bundan keyin psql ichida kiriting')[lang]
                         out += [label, '', '```' + fence, shell_lines(source) if fence=='bash' else source, '```', '']
+                if step_id=='P0.3':
+                    out += illustrated_steps(lang, rdp_steps[2:])
                 if step_id in STEP_NOTES:
                     out += ['**' + LABELS['meaning'][lang] + ':** ' + STEP_NOTES[step_id][lang], '']
                 out += ['**' + L['expect'][lang] + ':** ' + s['expect'][lang], '']
@@ -234,14 +246,16 @@ def make_markdown(reg, lang, kind):
                     out += ['**' + L['trouble'][lang] + ':** ' + s['trouble'][lang], '']
             if m['id']=='P0':
                 out += ['### '+T('確認・提出','Проверка и сдача','Tekshirish va topshirish')[lang], '', T(
-                    '学生用の初回構築スクリプトが、課題を確認するAWSサービス（Lambda）を準備する。RDPの練習が終わったら、教師から案内された課題画面に学校のGoogleアカウントでログインし、自分のLabとP0を選んで「この課題を確認する」を押す。Webサーバーの自分のホームディレクトリに確認用ファイルがあり、内容が `web` の1行なら1点になる。「保存済み成績を見る」で1点が保存されたことを確認する。',
-                    'Скрипт начальной настройки создаёт в AWS сервис проверки заданий (Lambda). После упражнения с RDP войдите на указанную преподавателем страницу через учебный аккаунт Google, выберите свой Lab и P0 и запустите проверку. Верный файл из одной строки `web` в вашем домашнем каталоге на Web-сервере даёт 1 балл. Проверьте, что балл сохранён.',
-                    'Dastlabki sozlash skripti AWS da topshiriqlarni tekshirish xizmatini (Lambda) yaratadi. RDP mashqidan so‘ng o‘qituvchi ko‘rsatgan sahifaga ta’lim muassasasining Google hisobi bilan kiring, o‘z Lab muhitingizni va P0 ni tanlang, so‘ng tekshiruvni boshlang. Web serverdagi uy katalogingizdagi faylda bitta `web` satri bo‘lsa, 1 ball beriladi. Ball saqlanganini tekshiring.')[lang], '']
+                    'P0の作業を終えたら、教師がクラスごとに案内する採点ページのURLを、自分のPCのブラウザで開く。採点ページを開くためにCloudShellでコマンドを実行する必要はない。Googleのログイン画面が表示されたら、学校のGoogleアカウントでログインする。以下はサンプルデータを使った日本語の画面例。画面上部の「RU」「UZ」で表示言語を切り替えられる。',
+                    'После выполнения P0 откройте на своём компьютере в браузере адрес страницы проверки, который преподаватель сообщил вашему классу. Команды в CloudShell для этого не требуются. Если появится экран входа Google, войдите с учебной учётной записью. Ниже приведены примеры на японском с демонстрационными данными. Язык можно переключить вверху страницы кнопками RU или UZ.',
+                    'P0 ni bajargach, o‘qituvchi guruhingizga bergan baholash sahifasi URL manzilini o‘z kompyuteringizdagi brauzerda oching. Buning uchun CloudShell da buyruq bajarish shart emas. Google kirish oynasi ochilsa, ta’lim muassasasining Google hisobi bilan kiring. Quyidagi yaponcha ekranlarda namuna ma’lumotlari ishlatilgan. Sahifa yuqorisidagi RU yoki UZ orqali tilni almashtirish mumkin.')[lang], '']
+                out += illustrated_steps(lang, enumerate(P0_GRADING_STEPS, 1))
             if m['id'] in OUTPUT_EXAMPLES:
                 example,reading=OUTPUT_EXAMPLES[m['id']]
                 out += ['### ' + LABELS['output'][lang], '', '```text', example, '```', '', reading[lang], '']
-            out += ['### ' + LABELS['reflect'][lang], '', notes['question'][lang], '',
-                    '**' + LABELS['answer'][lang] + ':** ' + notes['answer'][lang], '']
+            if 'question' in notes:
+                out += ['### ' + LABELS['reflect'][lang], '', notes['question'][lang], '',
+                        '**' + LABELS['answer'][lang] + ':** ' + notes['answer'][lang], '']
     else:
         out += ['## ' + LABELS['plan'][lang], '']
         out += [p[lang] + '\n' for p in MISSION_PLAN]

@@ -59,9 +59,7 @@ MODULE_NOTES = {
   after=T(
    '自分のAWSアカウント、各サーバーのロール、コマンドを実行する環境を確認する。',
    'Проверьте свой AWS-аккаунт, роль каждого сервера и среду выполнения команд.',
-   'O‘z AWS hisobingizni, har bir server rolini va buyruq bajariladigan muhitni tekshiring.'),
-  question=T('WebへSSM接続したままDBの手順を入力すると、どのサーバーが変わるか？', 'Какой узел изменится, если выполнить шаги DB в открытом SSM-сеансе Web?', 'Web SSM session ichida DB qadamlarini kiritsangiz, qaysi server o‘zgaradi?'),
-  answer=T('現在接続中のWebサーバーに対してコマンドが実行される。DBを操作するときは、EC2の一覧でDBサーバーを選び、Session Managerで別の端末を開く。', 'Команды выполняются на подключённом Web-сервере. Для работы с DB выберите DB-сервер в списке EC2 и откройте новый терминал через Session Manager.', 'Buyruqlar ulangan Web serverda bajariladi. DB bilan ishlash uchun EC2 ro‘yxatidan DB serverni tanlab, Session Manager orqali yangi terminal oching.')),
+   'O‘z AWS hisobingizni, har bir server rolini va buyruq bajariladigan muhitni tekshiring.')),
  'P1': dict(
   before=T('Webは提供済みだが、練習用ファイルはまだ配信していない。', 'Web уже создан, но учебный файл ещё не выдаётся.', 'Web yaratilgan, ammo mashq fayli hali qaytarilmayapti.'),
   after=T('Nginxが公開80番でpractice.txtを返し、要求をlogへ残す。', 'Nginx выдаёт practice.txt на порту 80 и записывает запрос в журнал.', 'Nginx 80 portda practice.txt qaytarib, request ni log ga yozadi.'),

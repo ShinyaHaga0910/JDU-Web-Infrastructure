@@ -179,25 +179,51 @@ cat p0-connection.txt
 <p><strong>実行環境:</strong></p>
 <p>学生のWindows PC（共有アカウント）</p>
 <p><strong>目的と操作:</strong></p>
-<p>EC2で確認した現在の踏み台の公開IPv4を使う。Windowsキー＋Rを押し、mstsc /promptを入力してEnter。ComputerへそのIPを指定し、userはlabuser、passwordは本人が初期配備で設定したRDP用を使う。Windowsアカウントのpasswordではない。「資格情報を記憶する」は選ばない。青いxrdp loginが出たらSession=Xorgを確認し、labuserで入る。</p>
-<p><img src="../../../assets/shared/windows-run-rdp.png" alt="Windowsキー＋Rで「ファイル名を指定して実行」を開き、「名前」欄に  を入力する。" width="643" height="1072" loading="lazy"></p>
-<p>Windowsキー＋Rで「ファイル名を指定して実行」を開き、「名前」欄に <code>mstsc /prompt</code> を入力する。</p>
+<p>Windowsの「リモート デスクトップ接続」で、自分の踏み台サーバーのデスクトップを開く。</p>
+<p><strong>1. 踏み台サーバーを選ぶ</strong></p>
+<p>EC2 → Instancesで、自分の演習環境のうち名前の末尾が <code>-bastion</code> の行を探し、同じ行の <strong>Instance ID</strong> をクリックする。</p>
+<p><img src="../../../assets/shared/rdp-bastion-select.png" alt="踏み台サーバーを選ぶ" width="1920" height="1080" loading="lazy"></p>
+<p><strong>2. 公開IPv4アドレスをコピーする</strong></p>
+<p>インスタンスの詳細画面で <strong>Public IPv4 address</strong> の横にあるコピーアイコンを押す。次に入力するのは、自分の画面に表示された現在の公開IPv4アドレス。スクリーンショットの値は例。</p>
+<p><img src="../../../assets/shared/rdp-bastion-public-ip.png" alt="公開IPv4アドレスをコピーする" width="1920" height="1080" loading="lazy"></p>
+<p><img src="../../../assets/shared/windows-run-rdp.png" alt="Windowsキー＋Rで「ファイル名を指定して実行」を開く。「名前」欄に  を入力し、OK を押す。" width="643" height="1072" loading="lazy"></p>
+<p>Windowsキー＋Rで「ファイル名を指定して実行」を開く。「名前」欄に <code>mstsc /prompt</code> を入力し、<strong>OK</strong> を押す。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. WindowsのRDP接続画面を開き、資格情報の入力を求める。
 mstsc /prompt
 </code></pre>
+<p><strong>3. 公開IPv4アドレスを入力して接続する</strong></p>
+<p>「リモート デスクトップ接続」の <strong>コンピューター</strong> 欄に、手順2でコピーした公開IPv4アドレスを貼り付け、<strong>接続</strong> を押す。</p>
+<p><img src="../../../assets/shared/rdp-connect.png" alt="公開IPv4アドレスを入力して接続する" width="672" height="412" loading="lazy"></p>
+<p><strong>4. 証明書の確認画面を読む</strong></p>
+<p>この画面が出た場合は、表示された接続先を手順2の公開IPv4アドレスと照合する。接続先が今回の踏み台であり、演習用の証明書だと教師に確認できたら <strong>はい</strong> を押す。確認できない場合は <strong>いいえ</strong> を押して教師に相談する。</p>
+<p><img src="../../../assets/shared/rdp-certificate.png" alt="証明書の確認画面を読む" width="575" height="711" loading="lazy"></p>
+<p><strong>5. 踏み台サーバーにログインする</strong></p>
+<p>xrdpのログイン画面で <strong>Session</strong> が <code>Xorg</code> になっていることを確かめる。<strong>username</strong> に <code>labuser</code>、<strong>password</strong> に学生用セットアップで自分が設定したRDPパスワードを入力し、<strong>OK</strong> を押す。</p>
+<p><img src="../../../assets/shared/rdp-xrdp-login.png" alt="踏み台サーバーにログインする" width="1069" height="930" loading="lazy"></p>
+<p><strong>6. デスクトップが開いたことを確認する</strong></p>
+<p>リモート デスクトップ接続のウィンドウ内に、左上の <strong>Applications</strong> メニューや <strong>Home</strong> アイコンが表示されれば、踏み台サーバーに接続できている。</p>
+<p><img src="../../../assets/shared/rdp-desktop.png" alt="デスクトップが開いたことを確認する" width="1068" height="930" loading="lazy"></p>
 <p><strong>コマンド・設定値の意味:</strong></p>
 <p>RDPは踏み台の画面と入力を運ぶ。踏み台内Firefoxからの通信の送信元はWindowsではなく踏み台になる。日本語/英語などのキー配列はpasswordの記号入力にも影響するため、表示言語と配列を区別する。</p>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>UbuntuのXfceデスクトップとFirefoxが開く。これは踏み台内のbrowserであり、Windows側のbrowserとは別。RDPのlabuserにはsudo管理権限がないため、構築はCloudShellからSSM/ssm-userで行う。</p>
+<p>踏み台サーバーのUbuntuのデスクトップ（Xfce）が表示される。左上の「Applications」からFirefoxなどを開ける。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>Login failedならuser名と日本語/英語等のkeyboard配列を確認する。passwordを会話へ送らない。到達しない場合は現在のIPと許可された接続元CIDRを教師と確認し、3389を全公開しない。終了時はRDP内の自分の作業を保存し、接続を閉じる。</p>
 <h3>確認・提出</h3>
-<p>学生用の初回構築スクリプトが、課題を確認するAWSサービス（Lambda）を準備する。RDPの練習が終わったら、教師から案内された課題画面に学校のGoogleアカウントでログインし、自分のLabとP0を選んで「この課題を確認する」を押す。Webサーバーの自分のホームディレクトリに確認用ファイルがあり、内容が <code>web</code> の1行なら1点になる。「保存済み成績を見る」で1点が保存されたことを確認する。</p>
-<h3>理解の確認（採点外）</h3>
-<p>WebへSSM接続したままDBの手順を入力すると、どのサーバーが変わるか？</p>
-<p><strong>考え方:</strong></p>
-<p>現在接続中のWebサーバーに対してコマンドが実行される。DBを操作するときは、EC2の一覧でDBサーバーを選び、Session Managerで別の端末を開く。</p>
+<p>P0の作業を終えたら、教師がクラスごとに案内する採点ページのURLを、自分のPCのブラウザで開く。採点ページを開くためにCloudShellでコマンドを実行する必要はない。Googleのログイン画面が表示されたら、学校のGoogleアカウントでログインする。以下はサンプルデータを使った日本語の画面例。画面上部の「RU」「UZ」で表示言語を切り替えられる。</p>
+<p><strong>1. トップページで「課題の確認」を開く</strong></p>
+<p>ログイン後、「Web演習」のトップページで <strong>課題の確認</strong> をクリックする。</p>
+<p><img src="../../../assets/shared/p0-portal-home.png" alt="トップページで「課題の確認」を開く" width="1280" height="720" loading="lazy"></p>
+<p><strong>2. P0の採点を開始する</strong></p>
+<p>P0の枠にある <strong>この課題を確認する</strong> をクリックする。画面を開いたまま1〜2分を目安に待つ。「確認を実行中です」の表示が続くときは、<strong>結果を更新する</strong> をクリックする。</p>
+<p><img src="../../../assets/shared/p0-portal-pick.png" alt="P0の採点を開始する" width="1265" height="712" loading="lazy"></p>
+<p><strong>3. 今回の点数と保存状況を見る</strong></p>
+<p>Webサーバーで作った <code>p0-connection.txt</code> の内容が <code>web</code> の1行なら、「今回の素点」が <strong>1 / 1</strong> になる。「成績原本に保存しました。」と表示されたら、<strong>保存済み成績を見る</strong> をクリックする。</p>
+<p><img src="../../../assets/shared/p0-portal-result.png" alt="今回の点数と保存状況を見る" width="1265" height="712" loading="lazy"></p>
+<p><strong>4. 保存済みの成績でP0の点数を確認する</strong></p>
+<p>「保存済みの成績」の表でP0の行を見つけ、<strong>1点</strong> が保存されていることを確認する。</p>
+<p><img src="../../../assets/shared/p0-portal-saved.png" alt="保存済みの成績でP0の点数を確認する" width="1265" height="712" loading="lazy"></p>
 <h2 id="section-6">P1 HTTPで静的ファイルを返す</h2>
 <h3>学ぶこと</h3>
 <p>Nginx、保存先、待受、HTTP応答、access logを一組で確認する。</p>

@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Nimani o‘rganamiz</a> · <a href="#section-2">Topshiriq</a> · <a href="#section-3">Serverlarga ulanish va sozlash fayllarini joylash</a> · <a href="#section-4">Dastlab joylanadigan serverlarni sozlash fayllari</a> · <a href="#section-5">Yechim namunasi (bajarish tartibi)</a> · <a href="#section-6">Tekshirish va topshirish</a> · <a href="#section-7">Tushunishni tekshirish (ballsiz)</a></nav></header><main id="content" tabindex="-1"><h1>P0 Shaxsiy muhit va buyruqlarni bajarish joyi</h1>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Nimani o‘rganamiz</a> · <a href="#section-2">Topshiriq</a> · <a href="#section-3">Serverlarga ulanish va sozlash fayllarini joylash</a> · <a href="#section-4">Dastlab joylanadigan serverlarni sozlash fayllari</a> · <a href="#section-5">Yechim namunasi (bajarish tartibi)</a> · <a href="#section-6">Tekshirish va topshirish</a></nav></header><main id="content" tabindex="-1"><h1>P0 Shaxsiy muhit va buyruqlarni bajarish joyi</h1>
 <p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a></p>
 <p><a href="../ja/p0.html">日本語</a> · <a href="../ru/p0.html">Русский</a> · <a href="../uz/p0.html">O‘zbekcha</a></p>
 <p>Mos topshiriq: <a href="m0.html">M0</a>.</p>
@@ -70,25 +70,51 @@ cat p0-connection.txt
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Talabaning Windows PC si (umumiy hisob)</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>EC2 dagi hozirgi bastion public IPv4 ni ishlating. Windows+R ni bosib mstsc /prompt kiriting va Enter bosing. Computer ga IP, user ga labuser, parolga boshlang‘ich o‘rnatishda belgilangan shaxsiy RDP parolini kiriting; Windows paroli emas. Credentials ni saqlashni tanlamang. Ko‘k xrdp login chiqsa Session=Xorg va labuser ni tekshiring.</p>
-<p><img src="../../../assets/shared/windows-run-rdp.png" alt="Windows+R tugmalarini bosib Run oynasini oching va Open maydoniga  yozing." width="643" height="1072" loading="lazy"></p>
-<p>Windows+R tugmalarini bosib Run oynasini oching va Open maydoniga <code>mstsc /prompt</code> yozing.</p>
+<p>Windows dagi Remote Desktop Connection orqali o‘z oraliq serveringizning ish stolini oching.</p>
+<p><strong>1. Oraliq serverni tanlang</strong></p>
+<p>EC2 → Instances bo‘limida o‘z muhitingizdagi nomi <code>-bastion</code> bilan tugaydigan qatorni toping va shu qatordagi <strong>Instance ID</strong> ni bosing.</p>
+<p><img src="../../../assets/shared/rdp-bastion-select.png" alt="Oraliq serverni tanlang" width="1920" height="1080" loading="lazy"></p>
+<p><strong>2. Ommaviy IPv4 manzilini nusxalang</strong></p>
+<p>Instans tafsilotlarida <strong>Public IPv4 address</strong> yonidagi nusxalash belgisini bosing. Keyingi qadamda o‘z oynangizdagi joriy ommaviy IPv4 manzilini ishlating. Rasmdagi manzil misol.</p>
+<p><img src="../../../assets/shared/rdp-bastion-public-ip.png" alt="Ommaviy IPv4 manzilini nusxalang" width="1920" height="1080" loading="lazy"></p>
+<p><img src="../../../assets/shared/windows-run-rdp.png" alt="Windows+R tugmalarini bosib Run oynasini oching. Open maydoniga  yozing va OK ni bosing." width="643" height="1072" loading="lazy"></p>
+<p>Windows+R tugmalarini bosib Run oynasini oching. Open maydoniga <code>mstsc /prompt</code> yozing va <strong>OK</strong> ni bosing.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. Windows RDP ni hisob ma’lumotlarini so‘rash bilan ochish.
 mstsc /prompt
 </code></pre>
+<p><strong>3. Ommaviy IPv4 manzilini kiritib ulaning</strong></p>
+<p>Remote Desktop Connection oynasidagi <strong>Computer</strong> maydoniga 2-qadamda nusxalangan ommaviy IPv4 manzilini qo‘ying va <strong>Connect</strong> tugmasini bosing.</p>
+<p><img src="../../../assets/shared/rdp-connect.png" alt="Ommaviy IPv4 manzilini kiritib ulaning" width="672" height="412" loading="lazy"></p>
+<p><strong>4. Sertifikat ogohlantirishini tekshiring</strong></p>
+<p>Bu oyna chiqsa, ulanish manzilini 2-qadamdagi ommaviy IPv4 manzili bilan solishtiring. O‘qituvchi bu sizning oraliq serveringiz va mashq sertifikati ekanini tasdiqlasa, <strong>Yes</strong> ni bosing. Tasdiqlanmasa, <strong>No</strong> ni bosing va o‘qituvchiga murojaat qiling.</p>
+<p><img src="../../../assets/shared/rdp-certificate.png" alt="Sertifikat ogohlantirishini tekshiring" width="575" height="711" loading="lazy"></p>
+<p><strong>5. Oraliq serverga kiring</strong></p>
+<p>xrdp kirish oynasida <strong>Session</strong> maydonida <code>Xorg</code> tanlanganini tekshiring. <strong>username</strong> maydoniga <code>labuser</code>, <strong>password</strong> maydoniga dastlab belgilagan RDP parolingizni yozing va <strong>OK</strong> ni bosing.</p>
+<p><img src="../../../assets/shared/rdp-xrdp-login.png" alt="Oraliq serverga kiring" width="1069" height="930" loading="lazy"></p>
+<p><strong>6. Ish stoli ochilganini tekshiring</strong></p>
+<p>Uzoq ish stoli oynasining yuqori chapida <strong>Applications</strong> menyusi va <strong>Home</strong> belgisi ko‘rinsa, oraliq serverga ulangansiz.</p>
+<p><img src="../../../assets/shared/rdp-desktop.png" alt="Ish stoli ochilganini tekshiring" width="1068" height="930" loading="lazy"></p>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
 <p>RDP bastion ekrani va kiritishni uzatadi. RDP ichidagi Firefox request i Windows emas, bastiondan chiqadi. Klaviatura tartibi paroldagi belgilarga ta’sir qiladi; interfeys tili va keyboard layout alohida sozlamadir.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>Ubuntu bastion ichida Xfce va Firefox ochiladi; bu Windows browser idan boshqa. labuser da sudo yo‘q: qurishni CloudShell → SSM/ssm-user orqali bajaring.</p>
+<p>Oraliq serverning Ubuntu ish stoli (Xfce) ochiladi. Yuqori chapdagi Applications menyusidan Firefox va boshqa dasturlarni ochish mumkin.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Login failed bo‘lsa user nomi va klaviatura tartibini tekshiring. Parolni chat ga yubormang. Ulanmasa joriy IP va ruxsatli CIDR ni o‘qituvchi bilan tekshiring; 3389 ni hammaga ochmang. RDP ni yopishdan oldin ishni saqlang.</p>
 <h2 id="section-6">Tekshirish va topshirish</h2>
-<p>Dastlabki sozlash skripti AWS da topshiriqlarni tekshirish xizmatini (Lambda) yaratadi. RDP mashqidan so‘ng o‘qituvchi ko‘rsatgan sahifaga ta’lim muassasasining Google hisobi bilan kiring, o‘z Lab muhitingizni va P0 ni tanlang, so‘ng tekshiruvni boshlang. Web serverdagi uy katalogingizdagi faylda bitta <code>web</code> satri bo‘lsa, 1 ball beriladi. Ball saqlanganini tekshiring.</p>
-<h2 id="section-7">Tushunishni tekshirish (ballsiz)</h2>
-<p>Web SSM session ichida DB qadamlarini kiritsangiz, qaysi server o‘zgaradi?</p>
-<p><strong>Izoh:</strong></p>
-<p>Buyruqlar ulangan Web serverda bajariladi. DB bilan ishlash uchun EC2 ro‘yxatidan DB serverni tanlab, Session Manager orqali yangi terminal oching.</p>
+<p>P0 ni bajargach, o‘qituvchi guruhingizga bergan baholash sahifasi URL manzilini o‘z kompyuteringizdagi brauzerda oching. Buning uchun CloudShell da buyruq bajarish shart emas. Google kirish oynasi ochilsa, ta’lim muassasasining Google hisobi bilan kiring. Quyidagi yaponcha ekranlarda namuna ma’lumotlari ishlatilgan. Sahifa yuqorisidagi RU yoki UZ orqali tilni almashtirish mumkin.</p>
+<p><strong>1. «Vazifani tekshirish» bo‘limini oching</strong></p>
+<p>Hisobga kirgach, bosh sahifada <strong>Vazifani tekshirish</strong> ni bosing.</p>
+<p><img src="../../../assets/shared/p0-portal-home.png" alt="«Vazifani tekshirish» bo‘limini oching" width="1280" height="720" loading="lazy"></p>
+<p><strong>2. P0 tekshiruvini boshlang</strong></p>
+<p>P0 kartasidagi <strong>Ushbu vazifani tekshirish</strong> tugmasini bosing. Sahifani ochiq qoldirib, taxminan 1-2 daqiqa kuting. Tekshiruv hali davom etayotgan bo‘lsa, <strong>Natijani yangilash</strong> ni bosing.</p>
+<p><img src="../../../assets/shared/p0-portal-pick.png" alt="P0 tekshiruvini boshlang" width="1265" height="712" loading="lazy"></p>
+<p><strong>3. Joriy ball va saqlash holatini ko‘ring</strong></p>
+<p>Web serverda yaratilgan <code>p0-connection.txt</code> faylida bitta <code>web</code> satri bo‘lsa, «Ushbu tekshiruv bali» <strong>1 / 1</strong> bo‘ladi. Natija jurnalga saqlangani haqida xabar chiqqach, <strong>Saqlangan baholar</strong> ni bosing.</p>
+<p><img src="../../../assets/shared/p0-portal-result.png" alt="Joriy ball va saqlash holatini ko‘ring" width="1265" height="712" loading="lazy"></p>
+<p><strong>4. P0 uchun saqlangan ballni tekshiring</strong></p>
+<p>Saqlangan baholar jadvalidan P0 qatorini toping va <strong>1 ball</strong> saqlanganini tekshiring.</p>
+<p><img src="../../../assets/shared/p0-portal-saved.png" alt="P0 uchun saqlangan ballni tekshiring" width="1265" height="712" loading="lazy"></p>
 <hr />
 <p><a href="m0.html">Keyingi: M0</a></p>
 </main></body></html>
