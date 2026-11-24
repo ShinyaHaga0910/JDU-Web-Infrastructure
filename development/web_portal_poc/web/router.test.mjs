@@ -233,7 +233,18 @@ test('the Google test student can open enrollment but cannot reach teacher or pr
   assert.equal((await app(req('/auth/google-test?lang=ru'))).status,303);
   const checks=await app(req('/checks?lang=ru',{headers:{cookie}}));
   assert.equal(checks.headers.get('location'),'/link?lang=ru');
-  assert.equal((await app(req('/link?lang=ru',{headers:{cookie}}))).status,200);
+  const link=await app(req('/link?lang=ru',{headers:{cookie}}));
+  assert.equal(link.status,200);
+  const linkPage=await link.text();
+  assert.ok(linkPage.includes('--lab-id '+lab));
+  const requestId=linkPage.match(/name="request_id" value="([a-f0-9]{64})"/)[1];
+  const csrf=linkPage.match(/name="csrf" value="([a-f0-9]{64})"/)[1];
+  const wrongCode='jdu-link1.lab-'+'b'.repeat(20)+'.123456789012.'+Math.floor(Date.now()/1000)+'.'+'c'.repeat(64);
+  const wrongLab=await app(req('/link?lang=ru',{method:'POST',
+    headers:{cookie,origin:env.PUBLIC_ORIGIN,'content-type':'application/x-www-form-urlencoded'},
+    body:new URLSearchParams({request_id:requestId,csrf,code:wrongCode})}));
+  assert.equal(wrongLab.status,403);
+  assert.match(await wrongLab.text(),/Код выдан для другой среды AWS/);
   assert.equal((await app(req('/teacher',{headers:{cookie}}))).status,403);
   assert.equal((await app(req('/prepare',{headers:{cookie}}))).status,404);
   assert.equal((await createApp({env})(req('/auth/google-test'))).status,404);

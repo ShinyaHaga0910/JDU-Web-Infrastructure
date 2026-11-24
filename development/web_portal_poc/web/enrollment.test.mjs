@@ -26,7 +26,7 @@ test('registration GET displays only approved scope and never starts a pairing',
   assert.equal(result.status,200);assert.equal(calls[0].operation,'status');
   assert.equal(calls[0].subject,identity.sub);assert.equal(calls[0].email,identity.email);
   assert.match(html,/123456789012/);assert.match(html,/method="post"/);assert.match(html,/required/);
-  assert.doesNotMatch(html,/synthetic@|12345678<|account=other|__Host-jdu|valid/);
+  assert.doesNotMatch(html,/synthetic@|12345678<|account=other|__Host-jdu|\bvalid\b/);
   assert.match(result.headers.get('cache-control'),/no-store/);
 });
 
@@ -161,10 +161,22 @@ test('self-link shows a session-bound challenge and only POST calls the private 
   const html=await page.text(), requestId=html.match(/name="request_id" value="([a-f0-9]{64})"/)[1];
   assert.match(html,new RegExp('portal-link-code --lang ja --challenge '+requestId));
   assert.equal(calls.length,0);
-  const code='jdu-link1.lab-'+'1'.repeat(20)+'.123456789012.1770000000.'+'c'.repeat(64);
+  const codeAt=stamp=>'jdu-link1.lab-'+'1'.repeat(20)+'.123456789012.'+stamp+'.'+'c'.repeat(64);
+  const now=Math.floor(Date.now()/1000);
+  const code=codeAt(now);
   const body=new URLSearchParams({request_id:requestId,code,csrf:formToken(config,sid,token,requestId)});
   const blocked=await app(req('/link',post(body,{origin:'https://elsewhere.example'})));
   assert.equal(blocked.status,403);
+  assert.equal(calls.length,0);
+  for(const [invalid,pattern] of [['not-a-code',/1行まるごと/],[codeAt(now-601),/有効期限（10分）/]]){
+    const failed=new URLSearchParams(body);failed.set('code',invalid);
+    const error=await app(req('/link',post(failed)));
+    assert.equal(error.status,403);
+    const html=await error.text();
+    assert.match(html,/id="link-error" class="registration-error" role="alert"/);
+    assert.match(html,/aria-invalid="true" aria-describedby="link-error"/);
+    assert.match(html,pattern);
+  }
   assert.equal(calls.length,0);
   const result=await app(req('/link',post(body)));
   assert.equal(result.headers.get('location'),'/checks?lang=ja');
