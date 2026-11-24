@@ -16,7 +16,7 @@ P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6
 
 P5 uchun ham M2 DNS kerak. P4 da DB ga IP va nom orqali ulanishni mashq qiling. Ilova db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating.
 
-P0=1, M0=1, M1=8, M2=13, M4=9, M5=13, M6=16: jami 61 xom ball. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.
+P0=1, M0=4, M1=8, M2=13, M4=9, M5=13, M6=16: jami 64 xom ball. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.
 
 ## Muhit va tayyorgarlik
 
@@ -68,21 +68,30 @@ Keyin har talabni qayerdan va nima bilan tekshirishni belgilang. Faylni ko‘ris
 
 Brauzerda topshiriqni tanlab natija va saqlash holatini tekshiring. M5/M6 funksiyalari uchun app administratorining mavjud parolini yashirin kiriting. Baholar avtomatik saqlanadi. Tushunish savollari va qaydlar bahoga qo‘shimcha talab emas.
 
-## M0 Shaxsiy muhit va buyruqlarni bajarish joyi (1)
+## M0 Shaxsiy muhit va buyruqlarni bajarish joyi (4)
 
 ### Tayyor holat talablari
 
-P0 da Web serverga ulanishni mashq qildingiz. M0 da o‘z DB serveringizni EC2 ro‘yxatidan toping va o‘sha qatordagi **Instance ID** ni bosing. **Connect** yonidagi o‘ng strelkani bosib, **Connect with SSM Session Manager** ni tanlang. Rol `db`, foydalanuvchi `ssm-user` ekanini tekshiring. DB serverdagi uy katalogingizda faqat `db` satri bor `m0-connection.txt` faylini yarating. Topshiriqlar sahifasida M0 ni tanlang. Fayl tasdiqlansa 1 ball beriladi.
+P0 dagi ulanish tartibini qo‘llab, to‘rtta server uchun Session Manager’ni oching. EC2 ro‘yxatida kerakli serverning **Instance ID** sini, so‘ng **Connect** yonidagi strelkani va **Connect with SSM Session Manager** bandini bosing. Har bir serverga `ssm-user` sifatida ulanib, uy katalogingizda `m0-connection.txt` faylini yarating va jadvaldagi qiymatni bitta qatorga yozing.
+
+| Server | EC2 dagi nomining oxiri | Fayl mazmuni |
+| --- | --- | --- |
+| DB server | `-db` | `db` |
+| DNS server | `-dns` | `dns` |
+| Repo server | `-repo` | `repo` |
+| Bastion server | `-bastion` | `bastion` |
+
+Topshiriqlar sahifasida **M0** ni tanlang. Har bir to‘g‘ri fayl uchun 1 ball beriladi. Jami 4 ball.
 
 ### Serverlarga ulanish va sozlash fayllarini joylash
 
-![Yashil strelka EC2 sahifasidan Session Manager orqali DB serverga ulanishni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda CloudShell dan SSM orqali Web va DB ga sozlash fayllarini joylashni ko‘rsatadi.](../../assets/uz/m0-ssm.png)
+![Yashil strelkalar Session Manager orqali ulanib, fayl yaratiladigan to‘rtta serverni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda fayllar qayerga joylanishini ko‘rsatadi.](../../assets/uz/m0-ssm.png)
 
-Yashil strelka EC2 sahifasidan Session Manager orqali DB serverga ulanishni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda CloudShell dan SSM orqali Web va DB ga sozlash fayllarini joylashni ko‘rsatadi.
+Yashil strelkalar Session Manager orqali ulanib, fayl yaratiladigan to‘rtta serverni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda fayllar qayerga joylanishini ko‘rsatadi.
 
-![EC2 dagi Instances ro‘yxati. P0 uchun nomi `-web`, M0 uchun `-db` bilan tugaydigan qatorni tanlang.](../../assets/shared/ec2-session-manager-instances.png)
+![EC2 dagi Instances ro‘yxati. P0 uchun nomi `-web`, M0 uchun `-db`, `-dns`, `-repo` va `-bastion` bilan tugaydigan qatorlarni navbat bilan tanlang.](../../assets/shared/ec2-session-manager-instances.png)
 
-EC2 dagi Instances ro‘yxati. P0 uchun nomi `-web`, M0 uchun `-db` bilan tugaydigan qatorni tanlang.
+EC2 dagi Instances ro‘yxati. P0 uchun nomi `-web`, M0 uchun `-db`, `-dns`, `-repo` va `-bastion` bilan tugaydigan qatorlarni navbat bilan tanlang.
 
 ![EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session Manager ni tanlang. Rasmda Web server ko‘rsatilgan.](../../assets/shared/ec2-session-manager-connect.png)
 

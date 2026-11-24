@@ -243,7 +243,7 @@ def main():
         languages=list(LANGS),material_revision=MATERIAL_REVISION,practice_tasks=6,practice_steps=41,
         task_pages=36,task_diagrams=36,numbered_command_comments_per_language=annotations,executable_source_preserved=True,
         explained_steps=sum(key.split(".")[0] in ACTIVE_ORDER for key in STEP_NOTES),module_understanding_questions=sum('question' in MODULE_NOTES[module['id']] for module in MODULES),communication_routes=len(ROUTES),
-        worked_output_examples=len(OUTPUT_EXAMPLES),mission_tasks=6,scored_checks=61,raw_points=61,
+        worked_output_examples=len(OUTPUT_EXAMPLES),mission_tasks=6,scored_checks=64,raw_points=64,
         checks_passed=len(checks),bash_blocks_syntax_checked=fences,
         pdfs={p.name:dict(pages=len(PdfReader(p).pages),bytes=p.stat().st_size) for p in (ROOT/'output/pdf').glob('*.pdf')},
         distribution_id=pins['distribution_id'],registry_sha256=EXPECTED_REGISTRY,package_sha256=hashlib.sha256(package.read_bytes()).hexdigest(),

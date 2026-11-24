@@ -16,7 +16,7 @@ P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6
 
 P5にもM2のDNSが必要。P4ではIPと名前を使ったDB接続を練習する。アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。
 
-P0=1、M0=1、M1=8、M2=13、M4=9、M5=13、M6=16（計61素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。
+P0=1、M0=4、M1=8、M2=13、M4=9、M5=13、M6=16（計64素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。
 
 ## 対象・前提・準備
 
@@ -68,21 +68,30 @@ bash枠は表示された実行場所の端末へ入力する。text枠は設定
 
 ブラウザで課題を選んで確認し、結果と保存状態を読む。M5/M6の機能確認では既存アプリ管理者パスワードを非表示入力する。成績は自動保存される。理解の確認用メモやPの説明問題を、追加の成績要件にはしない。
 
-## M0 サーバーの確認と接続 (1)
+## M0 サーバーの確認と接続 (4)
 
 ### 完成要件
 
-P0ではWebサーバーへの接続を練習した。M0ではEC2の一覧から自分のDBサーバーを探し、同じ行の **Instance ID** をクリックする。詳細画面の **Connect** の右にある矢印から **Connect with SSM Session Manager** を選ぶ。接続先のロールが `db`、操作ユーザーが `ssm-user` であることを確かめる。DBサーバーの自分のホームディレクトリに `m0-connection.txt` を作り、`db` だけを1行に記録する。課題画面でM0を選び、記録が確認されると1点になる。
+P0で練習したSession Managerの接続手順を使い、今回はDB・DNS・配布・踏み台の4台を操作します。EC2の一覧で対象の行の **Instance ID** をクリックし、**Connect** の右にある矢印から **Connect with SSM Session Manager** を選びます。各サーバーで `ssm-user` として接続し、自分のホームディレクトリに `m0-connection.txt` を作って、下の表にある文字だけを1行で保存してください。
+
+| サーバー | EC2の名前の末尾 | ファイルに書く内容 |
+| --- | --- | --- |
+| DBサーバー | `-db` | `db` |
+| DNSサーバー | `-dns` | `dns` |
+| 配布サーバー | `-repo` | `repo` |
+| 踏み台サーバー | `-bastion` | `bastion` |
+
+課題画面で **M0** を選ぶと、4台のファイルを個別に確認できます。ファイル1つにつき1点で、満点は4点です。
 
 ### 操作するサーバーとサーバー構築用ファイルの配置先
 
-![緑の矢印はEC2の画面からSession ManagerでDBサーバーへ接続する経路。青の矢印は、初期構築時にCloudShellがSSMでWebとDBへサーバー構築用ファイルを配置する経路。](../../assets/ja/m0-ssm.png)
+![緑の矢印はM0でSession Managerから接続する4台を示す。それぞれのサーバーで確認用ファイルを作る。青の矢印は初期構築時のサーバー構築用ファイルの配置を示す。](../../assets/ja/m0-ssm.png)
 
-緑の矢印はEC2の画面からSession ManagerでDBサーバーへ接続する経路。青の矢印は、初期構築時にCloudShellがSSMでWebとDBへサーバー構築用ファイルを配置する経路。
+緑の矢印はM0でSession Managerから接続する4台を示す。それぞれのサーバーで確認用ファイルを作る。青の矢印は初期構築時のサーバー構築用ファイルの配置を示す。
 
-![EC2のInstances一覧。P0は名前の末尾が `-web` の行、M0は `-db` の行を選ぶ。](../../assets/shared/ec2-session-manager-instances.png)
+![EC2のInstances一覧。P0は名前の末尾が `-web` の行、M0は `-db`・`-dns`・`-repo`・`-bastion` の行を順に選ぶ。](../../assets/shared/ec2-session-manager-instances.png)
 
-EC2のInstances一覧。P0は名前の末尾が `-web` の行、M0は `-db` の行を選ぶ。
+EC2のInstances一覧。P0は名前の末尾が `-web` の行、M0は `-db`・`-dns`・`-repo`・`-bastion` の行を順に選ぶ。
 
 ![EC2の詳細画面。Connectの右の矢印からConnect with SSM Session Managerを選ぶ。Webサーバーの画面を例に示す。](../../assets/shared/ec2-session-manager-connect.png)
 

@@ -39,7 +39,7 @@ const text = {
 };
 const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LEGACY_MAXIMA=Object.freeze({M1:8,M2:13,M4:9,M5:13,M6:16});
-export const MISSION_MAXIMA=Object.freeze({P0:1,M0:1,...LEGACY_MAXIMA});
+export const MISSION_MAXIMA=Object.freeze({P0:1,M0:4,...LEGACY_MAXIMA});
 const stateText={
   ja:{running:'稼働中',stopped:'停止中',pending:'起動中',stopping:'停止処理中','shutting-down':'終了処理中',terminated:'終了済み',unknown:'確認できない',Online:'接続可',ConnectionLost:'接続なし',Inactive:'非アクティブ'},
   ru:{running:'Работает',stopped:'Остановлен',pending:'Запускается',stopping:'Останавливается','shutting-down':'Завершается',terminated:'Завершён',unknown:'Неизвестно',Online:'Доступно',ConnectionLost:'Нет связи',Inactive:'Неактивно'},
@@ -68,8 +68,8 @@ export function portalExpired(env) {
 }
 
 export function checkedGrade(grade) {
-  if (!grade || !Number.isInteger(grade.raw_earned) || ![59,61].includes(grade.raw_maximum) || grade.raw_earned < 0 || grade.raw_earned > grade.raw_maximum || !Array.isArray(grade.current_unresolved) || !Array.isArray(grade.missing_or_unresolved) || !grade.selected || typeof grade.selected !== 'object') throw new Error('Invalid grade');
-  const maxima=grade.raw_maximum===59?LEGACY_MAXIMA:MISSION_MAXIMA;
+  if (!grade || !Number.isInteger(grade.raw_earned) || ![59,61,64].includes(grade.raw_maximum) || grade.raw_earned < 0 || grade.raw_earned > grade.raw_maximum || !Array.isArray(grade.current_unresolved) || !Array.isArray(grade.missing_or_unresolved) || !grade.selected || typeof grade.selected !== 'object') throw new Error('Invalid grade');
+  const maxima=grade.raw_maximum===59?LEGACY_MAXIMA:grade.raw_maximum===61?{...MISSION_MAXIMA,M0:1}:MISSION_MAXIMA;
   if (Object.keys(grade.selected).some(id => !Object.hasOwn(maxima,id) || !Number.isInteger(grade.selected[id]?.raw_earned) || grade.selected[id].raw_earned < 0 || grade.selected[id].raw_earned > maxima[id]) || Object.values(grade.selected).reduce((sum,row)=>sum+row.raw_earned,0)!==grade.raw_earned) throw new Error('Invalid selected scores');
   return grade;
 }

@@ -1,5 +1,5 @@
 """Fixed-denominator views; latest evaluable attempt is separate from current health."""
-from registry import (CONTRACT_ID, CONTRACT_SHA256, INTRO_CONTRACT_SHA256, INTRO_MARKERS, MAXIMUM, MISSIONS, TASKS,
+from registry import (CONTRACT_ID, CONTRACT_SHA256, INTRO_CONTRACT_SHA256, M0_CONTRACT_SHA256, INTRO_MARKERS, MAXIMUM, MISSIONS, TASKS,
                       COURSE_ID, COURSE_TASKS, COURSE_GRADED_TASKS, COURSE_MAXIMUM, COURSE_POINTS)
 
 
@@ -39,7 +39,7 @@ def project_course_lab(lab):
     view = project_lab(lab)
     current = {key: row for key, row in view['current'].items() if key in COURSE_TASKS and key not in INTRO_MARKERS}
     selected = {key: row for key, row in view['selected'].items() if key in COURSE_GRADED_TASKS}
-    intro_rows = {r['sk']: r for r in lab.get('results', []) if r.get('contract_sha256') == INTRO_CONTRACT_SHA256
+    intro_rows = {r['sk']: r for r in lab.get('results', []) if r.get('contract_sha256') in (INTRO_CONTRACT_SHA256, M0_CONTRACT_SHA256)
                   and r.get('deployment_id') == lab.get('deployment_id')}
     for task in INTRO_MARKERS:
         latest = intro_rows.get(current_key(task, INTRO_CONTRACT_SHA256))
@@ -48,6 +48,13 @@ def project_course_lab(lab):
             current[task] = latest
         if grade:
             selected[task] = grade
+    for target, key in ((current, current_key), (selected, grade_key)):
+        updated = intro_rows.get(key('M0', M0_CONTRACT_SHA256))
+        if updated:
+            target['M0'] = updated
+        elif 'M0' in target:
+            target['M0'] = {**target['M0'], 'raw_maximum': COURSE_POINTS['M0'],
+                            'unresolved': COURSE_POINTS['M0'] - 1, 'complete': False, 'evaluable': False}
     pending = [mid for mid in COURSE_GRADED_TASKS if mid not in selected]
     uncertain = [mid for mid in COURSE_GRADED_TASKS if mid in current and not current[mid].get('evaluable')]
     return {**view, 'curriculum_id': COURSE_ID, 'raw_maximum': COURSE_MAXIMUM,

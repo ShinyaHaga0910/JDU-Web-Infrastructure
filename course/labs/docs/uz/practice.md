@@ -8,7 +8,7 @@ P — batafsil qadamli mashq. M — P da o‘rgangan sozlamani boshqa obyektga m
 
 | Mashq | Topshiriq | Mavzu | Xom ball |
 | --- | --- | --- | --- |
-| [P0](p0.md) | [M0](m0.md) | Shaxsiy muhit va buyruqlarni bajarish joyi | 1 |
+| [P0](p0.md) | [M0](m0.md) | Shaxsiy muhit va buyruqlarni bajarish joyi | 4 |
 | [P1](p1.md) | [M1](m1.md) | HTTP orqali statik faylni qaytarish | 8 |
 | [P2](p2.md) | [M2](m2.md) | Ichki DNS va odatiy nom yechimi | 13 |
 | [P4](p4.md) | [M4](m4.md) | PostgreSQL ga autentifikatsiya bilan ulanish | 9 |

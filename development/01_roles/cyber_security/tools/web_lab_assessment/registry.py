@@ -26,17 +26,30 @@ INTRO_MARKERS = {'P0': ('WEB01_WEB_MARKER', 'web', 'p0-connection.txt'),
 INTRO_CONTRACT_ID = CONTRACT_ID + '-connection-v1'
 INTRO_CONTRACT_SHA256 = hashlib.sha256(json.dumps(
     [CONTRACT_SHA256, INTRO_CONTRACT_ID, INTRO_MARKERS], sort_keys=True).encode()).hexdigest()
-COURSE_POINTS = dict.fromkeys(INTRO_MARKERS, 1) | {tid: TASKS[tid]['raw_points_max'] for tid in COURSE_MISSIONS}
+COURSE_INTRO_MARKERS = {
+    'P0': (INTRO_MARKERS['P0'],),
+    'M0': (
+        INTRO_MARKERS['M0'],
+        ('WEB01_DNS_MARKER', 'dns', 'm0-connection.txt'),
+        ('WEB01_REPO_MARKER', 'repo', 'm0-connection.txt'),
+        ('WEB01_BASTION_MARKER', 'bastion', 'm0-connection.txt'),
+    ),
+}
+M0_CONTRACT_ID = CONTRACT_ID + '-connection-v2'
+M0_CONTRACT_SHA256 = hashlib.sha256(json.dumps(
+    [CONTRACT_SHA256, M0_CONTRACT_ID, COURSE_INTRO_MARKERS['M0']], sort_keys=True).encode()).hexdigest()
+COURSE_POINTS = {tid: len(markers) for tid, markers in COURSE_INTRO_MARKERS.items()} | {
+    tid: TASKS[tid]['raw_points_max'] for tid in COURSE_MISSIONS}
 COURSE_GRADED_TASKS = tuple(COURSE_POINTS)
 COURSE_MAXIMUM = sum(COURSE_POINTS.values())
 STATUSES = {'PASS', 'FAIL', 'UNKNOWN', 'NOT_APPLICABLE'}
 
 
-def canonical_checks(task_id, *, intro=False):
+def canonical_checks(task_id, *, intro=False, legacy_intro=False):
     checks = {cid: CHECKS[cid]['role'] for cid in TASKS[task_id]['required_report_checks']}
     if intro:
-        cid, role, _ = INTRO_MARKERS[task_id]
-        checks[cid] = role
+        markers = (INTRO_MARKERS[task_id],) if legacy_intro else COURSE_INTRO_MARKERS[task_id]
+        checks.update((cid, role) for cid, role, _ in markers)
     return checks
 
 
@@ -48,7 +61,9 @@ def validate_report(report, instances):
             or report['mission_id'] not in TASKS or report['mode'] not in ('read_only', 'functional')):
         raise ValueError('Unsupported assessment contract or fields')
     contract = report['contract_id'], report['contract_sha256']
-    intro = contract == (INTRO_CONTRACT_ID, INTRO_CONTRACT_SHA256) and report['mission_id'] in INTRO_MARKERS
+    legacy_intro = (contract == (INTRO_CONTRACT_ID, INTRO_CONTRACT_SHA256)
+                    and report['mission_id'] in INTRO_MARKERS)
+    intro = legacy_intro or (contract == (M0_CONTRACT_ID, M0_CONTRACT_SHA256) and report['mission_id'] == 'M0')
     if not intro and contract != (CONTRACT_ID, CONTRACT_SHA256):
         raise ValueError('Unsupported assessment contract')
     for name in ('request_id', 'run_id', 'deployment_id'):
@@ -58,7 +73,7 @@ def validate_report(report, instances):
     stamp = datetime.fromisoformat(report['checked_at'])
     if stamp.tzinfo is None or stamp.utcoffset().total_seconds() != 0:
         raise ValueError('UTC observation time required')
-    wanted = canonical_checks(report['mission_id'], intro=intro)
+    wanted = canonical_checks(report['mission_id'], intro=intro, legacy_intro=legacy_intro)
     checks = report['checks']
     if type(checks) is not list or not 1 <= len(checks) <= 100 or len(checks) != len(wanted):
         raise ValueError('Complete canonical check set required')
@@ -85,8 +100,10 @@ def score(report):
     task = TASKS[report['mission_id']]
     observed = {c['id']: c['status'] for c in report['checks']}
     scored, ready = task['progress_scored_checks'], task['readiness_checks']
-    intro = report['contract_sha256'] == INTRO_CONTRACT_SHA256
-    if intro:
+    intro = report['contract_sha256'] in (INTRO_CONTRACT_SHA256, M0_CONTRACT_SHA256)
+    if report['contract_sha256'] == M0_CONTRACT_SHA256:
+        scored = [cid for cid, _, _ in COURSE_INTRO_MARKERS[task['id']]]
+    elif intro:
         scored = [INTRO_MARKERS[task['id']][0]]
     unresolved = sum(observed[c] not in ('PASS', 'FAIL') for c in scored)
     ready_ok = all(observed[c] == 'PASS' for c in ready)
@@ -99,9 +116,12 @@ def score(report):
 
 def build_report(task_id, identity, observations, run_id, *, mode='read_only', checked_at, intro=False):
     report = {k: identity[k] for k in ('lab_id', 'release_id', 'deployment_id')}
+    contract_id, contract_hash = CONTRACT_ID, CONTRACT_SHA256
+    if intro:
+        contract_id, contract_hash = ((M0_CONTRACT_ID, M0_CONTRACT_SHA256) if task_id == 'M0'
+                                     else (INTRO_CONTRACT_ID, INTRO_CONTRACT_SHA256))
     report.update(schema_version=2, kind='assessment', mission_id=task_id,
-                  contract_id=INTRO_CONTRACT_ID if intro else CONTRACT_ID,
-                  contract_sha256=INTRO_CONTRACT_SHA256 if intro else CONTRACT_SHA256,
+                  contract_id=contract_id, contract_sha256=contract_hash,
                   request_id=str(uuid.uuid4()), run_id=run_id, checked_at=checked_at, mode=mode)
     report['checks'] = []
     for cid, role in canonical_checks(task_id, intro=intro).items():

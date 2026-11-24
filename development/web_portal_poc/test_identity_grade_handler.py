@@ -18,7 +18,7 @@ class HandlerTest(unittest.TestCase):
     def test_verified_identity_gets_student_safe_existing_score(self):
         result = self.serve({'subject': self.fixture.subject})
         self.assertEqual(result['status'], 'ok')
-        self.assertEqual((result['grade']['raw_earned'], result['grade']['raw_maximum']), (59, 61))
+        self.assertEqual((result['grade']['raw_earned'], result['grade']['raw_maximum']), (59, 64))
         self.assertNotIn('token_hash', repr(result))
         self.assertNotIn(self.fixture.subject, repr(result))
 

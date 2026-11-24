@@ -113,7 +113,7 @@ class SubjectBindingTest(unittest.TestCase):
         class Bindings:
             def get(self, pk, sk): return copy.deepcopy(rows.get((pk, sk)))
         view = identity_grade(self.subject, self.pepper, Bindings(), fixture.store)
-        self.assertEqual((view['raw_earned'], view['raw_maximum']), (59, 61))
+        self.assertEqual((view['raw_earned'], view['raw_maximum']), (59, 64))
         self.assertIn('M5', view['current_unresolved'])
         with self.assertRaises(legacy.ApiError):
             identity_grade('22222222', self.pepper, Bindings(), fixture.store)

@@ -16,7 +16,7 @@ P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6
 
 P5にもM2のDNSが必要。P4ではIPと名前を使ったDB接続を練習する。アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。
 
-P0=1、M0=1、M1=8、M2=13、M4=9、M5=13、M6=16（計61素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。
+P0=1、M0=4、M1=8、M2=13、M4=9、M5=13、M6=16（計64素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。
 
 ## 対象・前提・準備
 
@@ -100,9 +100,9 @@ EC2の一覧から正しいサーバーを選び、Session Managerで接続し�
 
 AWSマネジメントコンソール上部のSearch欄にEC2と入力し、EC2の管理画面を開く。EC2 → Instancesを開き、Name列で自分の演習環境の5台のサーバーを確認する。同じ行のInstance ID列からi-を含めてIDを確認する。
 
-![EC2のInstances一覧。P0は名前の末尾が `-web` の行、M0は `-db` の行を選ぶ。](../../assets/shared/ec2-session-manager-instances.png)
+![EC2のInstances一覧。P0は名前の末尾が `-web` の行、M0は `-db`・`-dns`・`-repo`・`-bastion` の行を順に選ぶ。](../../assets/shared/ec2-session-manager-instances.png)
 
-EC2のInstances一覧。P0は名前の末尾が `-web` の行、M0は `-db` の行を選ぶ。
+EC2のInstances一覧。P0は名前の末尾が `-web` の行、M0は `-db`・`-dns`・`-repo`・`-bastion` の行を順に選ぶ。
 
 #### P0.2 Session ManagerでWebサーバーに接続する
 

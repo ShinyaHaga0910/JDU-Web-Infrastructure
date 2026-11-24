@@ -1,4 +1,4 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M0 Своя среда и место выполнения команд (1)</title><style>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M0 Своя среда и место выполнения команд (4)</title><style>
 :root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
 *{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
 header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
@@ -13,17 +13,49 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Требуемый результат</a> · <a href="#section-2">Подключение к серверам и размещение файлов для настройки</a> · <a href="#section-3">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M0 Своя среда и место выполнения команд (1)</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Требуемый результат</a> · <a href="#section-2">Подключение к серверам и размещение файлов для настройки</a> · <a href="#section-3">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M0 Своя среда и место выполнения команд (4)</h1>
 <p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
 <p><a href="../ja/m0.html">日本語</a> · <a href="../ru/m0.html">Русский</a> · <a href="../uz/m0.html">O‘zbekcha</a></p>
 <p>Связанное задание: <a href="p0.html">P0</a>.</p>
 <h2 id="section-1">Требуемый результат</h2>
-<p>В P0 вы учились подключаться к Web-серверу. В M0 найдите свой DB-сервер в списке EC2 и нажмите <strong>Instance ID</strong> в его строке. Нажмите стрелку справа от <strong>Connect</strong> и выберите <strong>Connect with SSM Session Manager</strong>. Проверьте роль <code>db</code> и пользователя <code>ssm-user</code>. Создайте в своём домашнем каталоге на DB-сервере файл <code>m0-connection.txt</code> с единственной строкой <code>db</code>. Выберите M0 на странице заданий. За подтверждённый файл начисляется 1 балл.</p>
+<p>Воспользуйтесь способом подключения из P0 и откройте Session Manager для четырёх серверов. В списке EC2 нажмите <strong>Instance ID</strong> нужного сервера, затем стрелку справа от <strong>Connect</strong> и <strong>Connect with SSM Session Manager</strong>. На каждом сервере войдите как <code>ssm-user</code> и создайте в своём домашнем каталоге файл <code>m0-connection.txt</code> с одной строкой из таблицы.</p>
+<table>
+<thead>
+<tr>
+<th scope="col">Сервер</th>
+<th scope="col">Окончание имени в EC2</th>
+<th scope="col">Содержимое файла</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Сервер БД</td>
+<td><code>-db</code></td>
+<td><code>db</code></td>
+</tr>
+<tr>
+<td>DNS-сервер</td>
+<td><code>-dns</code></td>
+<td><code>dns</code></td>
+</tr>
+<tr>
+<td>Сервер пакетов</td>
+<td><code>-repo</code></td>
+<td><code>repo</code></td>
+</tr>
+<tr>
+<td>Сервер Bastion</td>
+<td><code>-bastion</code></td>
+<td><code>bastion</code></td>
+</tr>
+</tbody>
+</table>
+<p>Выберите <strong>M0</strong> на странице заданий. За каждый верный файл начисляется 1 балл, всего можно получить 4 балла.</p>
 <h2 id="section-2">Подключение к серверам и размещение файлов для настройки</h2>
-<p><img src="../../../assets/ru/m0-ssm.png" alt="Зелёная стрелка показывает подключение к DB-серверу через Session Manager в EC2. Синие стрелки показывают размещение файлов для настройки серверов на Web и DB из CloudShell через SSM при создании среды." width="1040" height="680" loading="lazy"></p>
-<p>Зелёная стрелка показывает подключение к DB-серверу через Session Manager в EC2. Синие стрелки показывают размещение файлов для настройки серверов на Web и DB из CloudShell через SSM при создании среды.</p>
-<p><img src="../../../assets/shared/ec2-session-manager-instances.png" alt="Список Instances в EC2. Для P0 выберите строку с окончанием имени , для M0 - ." width="1393" height="382" loading="lazy"></p>
-<p>Список Instances в EC2. Для P0 выберите строку с окончанием имени <code>-web</code>, для M0 - <code>-db</code>.</p>
+<p><img src="../../../assets/ru/m0-ssm.png" alt="Зелёные стрелки указывают на четыре сервера для подключения через Session Manager и создания файла. Синие стрелки показывают размещение файлов при создании среды." width="1040" height="680" loading="lazy"></p>
+<p>Зелёные стрелки указывают на четыре сервера для подключения через Session Manager и создания файла. Синие стрелки показывают размещение файлов при создании среды.</p>
+<p><img src="../../../assets/shared/ec2-session-manager-instances.png" alt="Список Instances в EC2. Для P0 выберите строку с окончанием имени , для M0 - , ,  и  по очереди." width="1393" height="382" loading="lazy"></p>
+<p>Список Instances в EC2. Для P0 выберите строку с окончанием имени <code>-web</code>, для M0 - <code>-db</code>, <code>-dns</code>, <code>-repo</code> и <code>-bastion</code> по очереди.</p>
 <p><img src="../../../assets/shared/ec2-session-manager-connect.png" alt="Страница EC2. Нажмите стрелку справа от Connect и выберите Connect with SSM Session Manager. На снимке показан Web-сервер." width="1245" height="319" loading="lazy"></p>
 <p>Страница EC2. Нажмите стрелку справа от Connect и выберите Connect with SSM Session Manager. На снимке показан Web-сервер.</p>
 <h2 id="section-3">Проверка и отправка</h2>

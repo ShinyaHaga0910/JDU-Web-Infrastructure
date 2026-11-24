@@ -1,4 +1,4 @@
-<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M0 Shaxsiy muhit va buyruqlarni bajarish joyi (1)</title><style>
+<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M0 Shaxsiy muhit va buyruqlarni bajarish joyi (4)</title><style>
 :root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
 *{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
 header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
@@ -13,17 +13,49 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Tayyor holat talablari</a> · <a href="#section-2">Serverlarga ulanish va sozlash fayllarini joylash</a> · <a href="#section-3">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M0 Shaxsiy muhit va buyruqlarni bajarish joyi (1)</h1>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Tayyor holat talablari</a> · <a href="#section-2">Serverlarga ulanish va sozlash fayllarini joylash</a> · <a href="#section-3">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M0 Shaxsiy muhit va buyruqlarni bajarish joyi (4)</h1>
 <p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a></p>
 <p><a href="../ja/m0.html">日本語</a> · <a href="../ru/m0.html">Русский</a> · <a href="../uz/m0.html">O‘zbekcha</a></p>
 <p>Mos topshiriq: <a href="p0.html">P0</a>.</p>
 <h2 id="section-1">Tayyor holat talablari</h2>
-<p>P0 da Web serverga ulanishni mashq qildingiz. M0 da o‘z DB serveringizni EC2 ro‘yxatidan toping va o‘sha qatordagi <strong>Instance ID</strong> ni bosing. <strong>Connect</strong> yonidagi o‘ng strelkani bosib, <strong>Connect with SSM Session Manager</strong> ni tanlang. Rol <code>db</code>, foydalanuvchi <code>ssm-user</code> ekanini tekshiring. DB serverdagi uy katalogingizda faqat <code>db</code> satri bor <code>m0-connection.txt</code> faylini yarating. Topshiriqlar sahifasida M0 ni tanlang. Fayl tasdiqlansa 1 ball beriladi.</p>
+<p>P0 dagi ulanish tartibini qo‘llab, to‘rtta server uchun Session Manager’ni oching. EC2 ro‘yxatida kerakli serverning <strong>Instance ID</strong> sini, so‘ng <strong>Connect</strong> yonidagi strelkani va <strong>Connect with SSM Session Manager</strong> bandini bosing. Har bir serverga <code>ssm-user</code> sifatida ulanib, uy katalogingizda <code>m0-connection.txt</code> faylini yarating va jadvaldagi qiymatni bitta qatorga yozing.</p>
+<table>
+<thead>
+<tr>
+<th scope="col">Server</th>
+<th scope="col">EC2 dagi nomining oxiri</th>
+<th scope="col">Fayl mazmuni</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DB server</td>
+<td><code>-db</code></td>
+<td><code>db</code></td>
+</tr>
+<tr>
+<td>DNS server</td>
+<td><code>-dns</code></td>
+<td><code>dns</code></td>
+</tr>
+<tr>
+<td>Repo server</td>
+<td><code>-repo</code></td>
+<td><code>repo</code></td>
+</tr>
+<tr>
+<td>Bastion server</td>
+<td><code>-bastion</code></td>
+<td><code>bastion</code></td>
+</tr>
+</tbody>
+</table>
+<p>Topshiriqlar sahifasida <strong>M0</strong> ni tanlang. Har bir to‘g‘ri fayl uchun 1 ball beriladi. Jami 4 ball.</p>
 <h2 id="section-2">Serverlarga ulanish va sozlash fayllarini joylash</h2>
-<p><img src="../../../assets/uz/m0-ssm.png" alt="Yashil strelka EC2 sahifasidan Session Manager orqali DB serverga ulanishni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda CloudShell dan SSM orqali Web va DB ga sozlash fayllarini joylashni ko‘rsatadi." width="1040" height="680" loading="lazy"></p>
-<p>Yashil strelka EC2 sahifasidan Session Manager orqali DB serverga ulanishni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda CloudShell dan SSM orqali Web va DB ga sozlash fayllarini joylashni ko‘rsatadi.</p>
-<p><img src="../../../assets/shared/ec2-session-manager-instances.png" alt="EC2 dagi Instances ro‘yxati. P0 uchun nomi , M0 uchun  bilan tugaydigan qatorni tanlang." width="1393" height="382" loading="lazy"></p>
-<p>EC2 dagi Instances ro‘yxati. P0 uchun nomi <code>-web</code>, M0 uchun <code>-db</code> bilan tugaydigan qatorni tanlang.</p>
+<p><img src="../../../assets/uz/m0-ssm.png" alt="Yashil strelkalar Session Manager orqali ulanib, fayl yaratiladigan to‘rtta serverni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda fayllar qayerga joylanishini ko‘rsatadi." width="1040" height="680" loading="lazy"></p>
+<p>Yashil strelkalar Session Manager orqali ulanib, fayl yaratiladigan to‘rtta serverni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda fayllar qayerga joylanishini ko‘rsatadi.</p>
+<p><img src="../../../assets/shared/ec2-session-manager-instances.png" alt="EC2 dagi Instances ro‘yxati. P0 uchun nomi , M0 uchun , ,  va  bilan tugaydigan qatorlarni navbat bilan tanlang." width="1393" height="382" loading="lazy"></p>
+<p>EC2 dagi Instances ro‘yxati. P0 uchun nomi <code>-web</code>, M0 uchun <code>-db</code>, <code>-dns</code>, <code>-repo</code> va <code>-bastion</code> bilan tugaydigan qatorlarni navbat bilan tanlang.</p>
 <p><img src="../../../assets/shared/ec2-session-manager-connect.png" alt="EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session Manager ni tanlang. Rasmda Web server ko‘rsatilgan." width="1245" height="319" loading="lazy"></p>
 <p>EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session Manager ni tanlang. Rasmda Web server ko‘rsatilgan.</p>
 <h2 id="section-3">Tekshirish va yuborish</h2>

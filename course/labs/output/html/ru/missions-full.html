@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Как пользоваться пособием</a> · <a href="#section-2">Среда и подготовка</a> · <a href="#section-3">Как читать шаги</a> · <a href="#section-4">Система и пути соединений</a> · <a href="#section-5">Перед самостоятельной работой</a> · <a href="#section-6">M0 Своя среда и место выполнения команд (1)</a> · <a href="#section-7">M1 Выдача статического файла по HTTP (8)</a> · <a href="#section-8">M2 Внутренний DNS и системное разрешение имён (13)</a> · <a href="#section-9">M4 Подключение к PostgreSQL с аутентификацией (9)</a> · <a href="#section-10">M5 Соединить предоставленное приложение с Web и DB (13)</a> · <a href="#section-11">M6 Минимальные права и границы публикации (16)</a> · <a href="#section-12">Продолжение и результаты</a> · <a href="#section-13">Справочные материалы</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: самостоятельные задания M0-M6</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Как пользоваться пособием</a> · <a href="#section-2">Среда и подготовка</a> · <a href="#section-3">Как читать шаги</a> · <a href="#section-4">Система и пути соединений</a> · <a href="#section-5">Перед самостоятельной работой</a> · <a href="#section-6">M0 Своя среда и место выполнения команд (4)</a> · <a href="#section-7">M1 Выдача статического файла по HTTP (8)</a> · <a href="#section-8">M2 Внутренний DNS и системное разрешение имён (13)</a> · <a href="#section-9">M4 Подключение к PostgreSQL с аутентификацией (9)</a> · <a href="#section-10">M5 Соединить предоставленное приложение с Web и DB (13)</a> · <a href="#section-11">M6 Минимальные права и границы публикации (16)</a> · <a href="#section-12">Продолжение и результаты</a> · <a href="#section-13">Справочные материалы</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: самостоятельные задания M0-M6</h1>
 <p>Первая редакция для проверки преподавателем. Полное прохождение по пособию студентом ещё не проверено.</p>
 <p>Русский и узбекский тексты синхронизированы с японским оригиналом. Редактура носителями языка ещё не выполнена.</p>
 <p><a href="../ja/missions-full.html">日本語</a> · <a href="../ru/missions-full.html">Русский</a> · <a href="../uz/missions-full.html">O‘zbekcha</a></p>
@@ -22,7 +22,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>Сначала прочитайте задание P; при необходимости проходите подробный пример по шагам. P - тренировка с подробными шагами. В M самостоятельно используйте другие объекты/значения. Номера заданий не являются номерами занятий; идите в своём темпе. Выполнение P не означает выполнение M.</p>
 <p>P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6</p>
 <p>P5 требует DNS из M2. В P4 потренируйтесь подключаться к БД по IP и имени. Приложение использует db.lab.test. Перед переключением practice → mission завершите setup в P6.</p>
-<p>P0=1, M0=1, M1=8, M2=13, M4=9, M5=13, M6=16: всего 61 балл. Нет личной демонстрации, backup/restore, дополнительных дисков и разработки приложения. Пересчёт в 25 баллов делает преподаватель отдельно. Повторные отправки возможны до объявленного срока. PASS разных попыток не объединяются; максимум автоматически не выбирается.</p>
+<p>P0=1, M0=4, M1=8, M2=13, M4=9, M5=13, M6=16: всего 64 балла. Нет личной демонстрации, backup/restore, дополнительных дисков и разработки приложения. Пересчёт в 25 баллов делает преподаватель отдельно. Повторные отправки возможны до объявленного срока. PASS разных попыток не объединяются; максимум автоматически не выбирается.</p>
 <h2 id="section-2">Среда и подготовка</h2>
 <p>Сначала завершите проверку подписи начального комплекта, создание пяти узлов либо install в существующую среду, внутренний SSH и личную регистрацию. Инструкция - distribution/STUDENT.md в zip. Не храните приватные ключи в общем Windows; используйте CloudShell личного Academy account. Преподаватель выдаёт личный анонимный Lab ID, fingerprint и срок действия.</p>
 <p>Общие private IP ниже; public IPv4 не фиксируется. AWS region us-east-1, Ubuntu24.04/amd64. RDP: labuser; SSM: ssm-user; внутренний SSH: ubuntu. Не путайте пользователя и роль сервера.</p>
@@ -129,14 +129,46 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>Из требований выпишите, на каком сервере меняется файл, имя, БД или роль. Сравните значения P и M и выберите объекты задания M. Таблица проверок описывает требуемое состояние, а не порядок команд.</p>
 <p>Затем решите, откуда и чем подтвердить каждое требование. Проверка файла и проверка соединения могут выполняться на разных узлах. Отдельно фиксируйте успех разрешённого пути и отказ запрещённого.</p>
 <p>Выберите задание в браузере, проверьте результат и сохранение. Для функций M5/M6 скрыто введите существующий пароль администратора приложения. Оценки сохраняются автоматически. Вопросы на понимание и заметки не добавляют требований к оценке.</p>
-<h2 id="section-6">M0 Своя среда и место выполнения команд (1)</h2>
+<h2 id="section-6">M0 Своя среда и место выполнения команд (4)</h2>
 <h3>Требуемый результат</h3>
-<p>В P0 вы учились подключаться к Web-серверу. В M0 найдите свой DB-сервер в списке EC2 и нажмите <strong>Instance ID</strong> в его строке. Нажмите стрелку справа от <strong>Connect</strong> и выберите <strong>Connect with SSM Session Manager</strong>. Проверьте роль <code>db</code> и пользователя <code>ssm-user</code>. Создайте в своём домашнем каталоге на DB-сервере файл <code>m0-connection.txt</code> с единственной строкой <code>db</code>. Выберите M0 на странице заданий. За подтверждённый файл начисляется 1 балл.</p>
+<p>Воспользуйтесь способом подключения из P0 и откройте Session Manager для четырёх серверов. В списке EC2 нажмите <strong>Instance ID</strong> нужного сервера, затем стрелку справа от <strong>Connect</strong> и <strong>Connect with SSM Session Manager</strong>. На каждом сервере войдите как <code>ssm-user</code> и создайте в своём домашнем каталоге файл <code>m0-connection.txt</code> с одной строкой из таблицы.</p>
+<table>
+<thead>
+<tr>
+<th scope="col">Сервер</th>
+<th scope="col">Окончание имени в EC2</th>
+<th scope="col">Содержимое файла</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Сервер БД</td>
+<td><code>-db</code></td>
+<td><code>db</code></td>
+</tr>
+<tr>
+<td>DNS-сервер</td>
+<td><code>-dns</code></td>
+<td><code>dns</code></td>
+</tr>
+<tr>
+<td>Сервер пакетов</td>
+<td><code>-repo</code></td>
+<td><code>repo</code></td>
+</tr>
+<tr>
+<td>Сервер Bastion</td>
+<td><code>-bastion</code></td>
+<td><code>bastion</code></td>
+</tr>
+</tbody>
+</table>
+<p>Выберите <strong>M0</strong> на странице заданий. За каждый верный файл начисляется 1 балл, всего можно получить 4 балла.</p>
 <h3>Подключение к серверам и размещение файлов для настройки</h3>
-<p><img src="../../../assets/ru/m0-ssm.png" alt="Зелёная стрелка показывает подключение к DB-серверу через Session Manager в EC2. Синие стрелки показывают размещение файлов для настройки серверов на Web и DB из CloudShell через SSM при создании среды." width="1040" height="680" loading="lazy"></p>
-<p>Зелёная стрелка показывает подключение к DB-серверу через Session Manager в EC2. Синие стрелки показывают размещение файлов для настройки серверов на Web и DB из CloudShell через SSM при создании среды.</p>
-<p><img src="../../../assets/shared/ec2-session-manager-instances.png" alt="Список Instances в EC2. Для P0 выберите строку с окончанием имени , для M0 - ." width="1393" height="382" loading="lazy"></p>
-<p>Список Instances в EC2. Для P0 выберите строку с окончанием имени <code>-web</code>, для M0 - <code>-db</code>.</p>
+<p><img src="../../../assets/ru/m0-ssm.png" alt="Зелёные стрелки указывают на четыре сервера для подключения через Session Manager и создания файла. Синие стрелки показывают размещение файлов при создании среды." width="1040" height="680" loading="lazy"></p>
+<p>Зелёные стрелки указывают на четыре сервера для подключения через Session Manager и создания файла. Синие стрелки показывают размещение файлов при создании среды.</p>
+<p><img src="../../../assets/shared/ec2-session-manager-instances.png" alt="Список Instances в EC2. Для P0 выберите строку с окончанием имени , для M0 - , ,  и  по очереди." width="1393" height="382" loading="lazy"></p>
+<p>Список Instances в EC2. Для P0 выберите строку с окончанием имени <code>-web</code>, для M0 - <code>-db</code>, <code>-dns</code>, <code>-repo</code> и <code>-bastion</code> по очереди.</p>
 <p><img src="../../../assets/shared/ec2-session-manager-connect.png" alt="Страница EC2. Нажмите стрелку справа от Connect и выберите Connect with SSM Session Manager. На снимке показан Web-сервер." width="1245" height="319" loading="lazy"></p>
 <p>Страница EC2. Нажмите стрелку справа от Connect и выберите Connect with SSM Session Manager. На снимке показан Web-сервер.</p>
 <h3>Проверка и отправка</h3>

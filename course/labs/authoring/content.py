@@ -434,9 +434,36 @@ step(m, T('正規成功と拒否を同じ確認回で送る', 'Отправит�
 # M requirements and pass-condition tables are generated from the accepted frozen registry.
 MISSION_GUIDANCE = {
  'M0': T(
-    'P0ではWebサーバーへの接続を練習した。M0ではEC2の一覧から自分のDBサーバーを探し、同じ行の **Instance ID** をクリックする。詳細画面の **Connect** の右にある矢印から **Connect with SSM Session Manager** を選ぶ。接続先のロールが `db`、操作ユーザーが `ssm-user` であることを確かめる。DBサーバーの自分のホームディレクトリに `m0-connection.txt` を作り、`db` だけを1行に記録する。課題画面でM0を選び、記録が確認されると1点になる。',
-    'В P0 вы учились подключаться к Web-серверу. В M0 найдите свой DB-сервер в списке EC2 и нажмите **Instance ID** в его строке. Нажмите стрелку справа от **Connect** и выберите **Connect with SSM Session Manager**. Проверьте роль `db` и пользователя `ssm-user`. Создайте в своём домашнем каталоге на DB-сервере файл `m0-connection.txt` с единственной строкой `db`. Выберите M0 на странице заданий. За подтверждённый файл начисляется 1 балл.',
-    'P0 da Web serverga ulanishni mashq qildingiz. M0 da o‘z DB serveringizni EC2 ro‘yxatidan toping va o‘sha qatordagi **Instance ID** ni bosing. **Connect** yonidagi o‘ng strelkani bosib, **Connect with SSM Session Manager** ni tanlang. Rol `db`, foydalanuvchi `ssm-user` ekanini tekshiring. DB serverdagi uy katalogingizda faqat `db` satri bor `m0-connection.txt` faylini yarating. Topshiriqlar sahifasida M0 ni tanlang. Fayl tasdiqlansa 1 ball beriladi.'),
+    '''P0で練習したSession Managerの接続手順を使い、今回はDB・DNS・配布・踏み台の4台を操作します。EC2の一覧で対象の行の **Instance ID** をクリックし、**Connect** の右にある矢印から **Connect with SSM Session Manager** を選びます。各サーバーで `ssm-user` として接続し、自分のホームディレクトリに `m0-connection.txt` を作って、下の表にある文字だけを1行で保存してください。
+
+| サーバー | EC2の名前の末尾 | ファイルに書く内容 |
+| --- | --- | --- |
+| DBサーバー | `-db` | `db` |
+| DNSサーバー | `-dns` | `dns` |
+| 配布サーバー | `-repo` | `repo` |
+| 踏み台サーバー | `-bastion` | `bastion` |
+
+課題画面で **M0** を選ぶと、4台のファイルを個別に確認できます。ファイル1つにつき1点で、満点は4点です。''',
+    '''Воспользуйтесь способом подключения из P0 и откройте Session Manager для четырёх серверов. В списке EC2 нажмите **Instance ID** нужного сервера, затем стрелку справа от **Connect** и **Connect with SSM Session Manager**. На каждом сервере войдите как `ssm-user` и создайте в своём домашнем каталоге файл `m0-connection.txt` с одной строкой из таблицы.
+
+| Сервер | Окончание имени в EC2 | Содержимое файла |
+| --- | --- | --- |
+| Сервер БД | `-db` | `db` |
+| DNS-сервер | `-dns` | `dns` |
+| Сервер пакетов | `-repo` | `repo` |
+| Сервер Bastion | `-bastion` | `bastion` |
+
+Выберите **M0** на странице заданий. За каждый верный файл начисляется 1 балл, всего можно получить 4 балла.''',
+    '''P0 dagi ulanish tartibini qo‘llab, to‘rtta server uchun Session Manager’ni oching. EC2 ro‘yxatida kerakli serverning **Instance ID** sini, so‘ng **Connect** yonidagi strelkani va **Connect with SSM Session Manager** bandini bosing. Har bir serverga `ssm-user` sifatida ulanib, uy katalogingizda `m0-connection.txt` faylini yarating va jadvaldagi qiymatni bitta qatorga yozing.
+
+| Server | EC2 dagi nomining oxiri | Fayl mazmuni |
+| --- | --- | --- |
+| DB server | `-db` | `db` |
+| DNS server | `-dns` | `dns` |
+| Repo server | `-repo` | `repo` |
+| Bastion server | `-bastion` | `bastion` |
+
+Topshiriqlar sahifasida **M0** ni tanlang. Har bir to‘g‘ri fayl uchun 1 ball beriladi. Jami 4 ball.'''),
  'M1': T('P1を参考に、指定された別fileと本文を独力でHTTP配信する。P1のpractice.txtを残す。file・service・listen・local/踏み台/public HTTP・今回要求のlogが対象。', 'По навыкам P1 самостоятельно выдайте другой заданный файл и текст. Сохраните practice.txt. Проверяются файл, сервис, слушатель, local/bastion/public HTTP и журнал текущего запроса.', 'P1 ko‘nikmasi bilan belgilangan boshqa fayl va matnni mustaqil tarqating. practice.txt ni saqlang. Fayl, service, listen, local/bastion/public HTTP va joriy so‘rov log i tekshiriladi.'),
  'M2': T('同じlab.test zoneへ正式6名を設定する。P2のguide/practice-dbは保持してよい。踏み台/Webの通常resolver、名前によるM1 HTTP、DB名、UDP/TCP、外部forward、NXDOMAIN、ACL、AXFR拒否まで確認する。', 'Добавьте шесть основных имён в ту же zone lab.test. guide/practice-db можно сохранить. Нужны обычный resolver бастиона/Web, HTTP M1 по имени, имя DB, UDP/TCP, forwarding, NXDOMAIN, ACL и запрет AXFR.', 'Ayni lab.test zone ga oltita asosiy nomni qo‘shing. guide/practice-db qolishi mumkin. Bastion/Web odatiy resolver, nom orqali M1 HTTP, DB nomi, UDP/TCP, forwarding, NXDOMAIN, ACL va AXFR rad etilishi kerak.'),
  'M3': T('M専用markerを自分のLab IDで作る。P3とは別のブラウザで停止前記録→AWS Stop→ブラウザで停止完了確認→AWS Start→ブラウザで再開後確認を行う。対象は同じWebと元root volume。単なるrebootでは不可。backup/restoreとdisk追加は不要。', 'Создайте отдельный marker M со своим Lab ID. Отдельно от P3 пройдите браузер: запись до остановки → AWS Stop → браузер: подтверждение остановки → AWS Start → браузер: проверка после запуска. Нужны тот же Web и исходный root volume; reboot не подходит. Backup/restore и новый диск не нужны.', 'O‘z Lab ID bilan alohida M marker yarating. P3 dan alohida brauzerda oldingi holat → AWS Stop → brauzerda to‘xtashni tekshirish → AWS Start → brauzerda saqlanishni tekshirish ketma-ketligini bajaring. Ayni Web va asl root volume kerak; oddiy reboot yetmaydi. Backup/restore va yangi disk kerak emas.'),

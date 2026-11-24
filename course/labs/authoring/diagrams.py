@@ -108,7 +108,7 @@ def connection_diagram(s):
     lang=s.lang
     practice=s.task=='P0'
     title=T('Webサーバーへの接続とサーバー構築用ファイルの配置','Подключение к Web и размещение файлов для настройки','Web serverga ulanish va sozlash fayllarini joylash') if practice else T(
-        'DBサーバーへの接続とサーバー構築用ファイルの配置','Подключение к DB и размещение файлов для настройки','DB serverga ulanish va sozlash fayllarini joylash')
+        'M0で操作する4台のサーバー','Четыре сервера для задания M0','M0 da ishlatiladigan to‘rtta server')
     s.text(25,15,title[lang],25)
     s.rect(224,65,790,575,fill='#f1f7fc',stroke='#7e9cb3',width=2)
     s.text(247,77,'AWS',20)
@@ -125,14 +125,19 @@ def connection_diagram(s):
     s.path([(612,442),(612,461),(655,461)],color=blue)
     s.text(354,494,T('初期構築でファイルを配置','Файлы при развёртывании','Sozlashda fayllarni joylash')[lang],16,color=blue,center=True,max_width=235)
     s.text(353,522,'SSM',16,color=blue,center=True)
-    target_y=255 if practice else 421
-    s.path([(438,248),(526,248),(526,target_y),(655,target_y)], 'P0.2' if practice else 'M0', (494,215))
+    if practice:
+        s.path([(438,248),(526,248),(526,255),(655,255)], 'P0.2', (494,215))
+    else:
+        s.path([(438,248),(526,248),(526,175),(655,175)], 'M0', (494,215))
+        for target_y in (343, 427, 511):
+            s.path([(526,248),(526,target_y),(655,target_y)])
     roles=('bastion','web','dns','db','repo')
     for i,role in enumerate(roles):
         y=155+i*84
         receives_files=role in ('web','db')
         fill='#edf4ff' if receives_files else '#f4f7fa'
-        stroke=TEAL if i==(1 if practice else 3) else blue if receives_files else GRAY
+        target = role == 'web' if practice else role != 'web'
+        stroke=TEAL if target else blue if receives_files else GRAY
         s.rect(655,y,309,71,fill=fill,stroke=stroke,width=2)
         name=LABELS[role][lang]+('ー' if lang=='ja' else '')
         s.text(670,y+6,'EC2 '+name,18)
@@ -157,9 +162,9 @@ def diagram_text(task,lang):
                 'Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlab serverlarni sozlash fayllarini joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi.')[lang]
             return caption,caption
         caption=T(
-            '緑の矢印はEC2の画面からSession ManagerでDBサーバーへ接続する経路。青の矢印は、初期構築時にCloudShellがSSMでWebとDBへサーバー構築用ファイルを配置する経路。',
-            'Зелёная стрелка показывает подключение к DB-серверу через Session Manager в EC2. Синие стрелки показывают размещение файлов для настройки серверов на Web и DB из CloudShell через SSM при создании среды.',
-            'Yashil strelka EC2 sahifasidan Session Manager orqali DB serverga ulanishni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda CloudShell dan SSM orqali Web va DB ga sozlash fayllarini joylashni ko‘rsatadi.')[lang]
+            '緑の矢印はM0でSession Managerから接続する4台を示す。それぞれのサーバーで確認用ファイルを作る。青の矢印は初期構築時のサーバー構築用ファイルの配置を示す。',
+            'Зелёные стрелки указывают на четыре сервера для подключения через Session Manager и создания файла. Синие стрелки показывают размещение файлов при создании среды.',
+            'Yashil strelkalar Session Manager orqali ulanib, fayl yaratiladigan to‘rtta serverni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda fayllar qayerga joylanishini ko‘rsatadi.')[lang]
         return caption,caption
     before,action,result=STAGES[n]
     caption=T('図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。','Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки.','Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir.')[lang]

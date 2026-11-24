@@ -11,7 +11,7 @@ import progress_api as legacy
 from progress_api_v2 import AssessmentStore, assessment_attempt
 from portal_submission import PortalSubmissions
 from portal_checker_handler import serve
-from registry import build_report, canonical_checks, INTRO_MARKERS
+from registry import build_report, canonical_checks, COURSE_INTRO_MARKERS
 from grading import grade_key, current_key, project_lab, project_course_lab
 
 
@@ -105,9 +105,9 @@ class SubmissionTest(unittest.TestCase):
         self.assertEqual(project_lab(self.grades.labs(self.meta['lab_id'])[0])['raw_earned'],62)
 
     def test_connection_grades_use_student_evidence_and_preserve_legacy_scores(self):
-        for task, (marker, _, _) in INTRO_MARKERS.items():
+        for task, markers in COURSE_INTRO_MARKERS.items():
             self.spec = self.new_spec(task)
-            missing = self.report(task, observations={marker: False}, intro=True)
+            missing = self.report(task, observations={marker: False for marker, _, _ in markers}, intro=True)
             self.assertTrue(self.save(missing)['counts_toward_assessment'])
             self.assertEqual(self.grades.get(self.meta['pk'], grade_key(task, missing['contract_sha256']))['raw_earned'], 0)
             self.spec = self.new_spec(task)
@@ -117,7 +117,7 @@ class SubmissionTest(unittest.TestCase):
             self.spec = self.new_spec(task)
             self.assertFalse(self.save(self.report(task))['counts_toward_assessment'])
         lab = self.grades.labs(self.meta['lab_id'])[0]
-        self.assertEqual(project_course_lab(lab)['raw_earned'], 61)
+        self.assertEqual(project_course_lab(lab)['raw_earned'], 64)
         self.assertEqual(project_lab(lab)['raw_earned'], 62)
 
     def test_retry_returns_first_receipt_without_reordering_a_newer_lower_grade(self):

@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import Mock, patch
 TOOLS = Path(__file__).resolve().parents[1] / '01_roles/cyber_security/tools'
 sys.path[:0] = [str(TOOLS / 'web_lab_assessment'), str(TOOLS / 'web_lab_teacher')]
-from registry import (CONTRACT_SHA256, INTRO_CONTRACT_SHA256, MISSIONS, TASKS, COURSE_ID, COURSE_TASKS,
+from registry import (CONTRACT_SHA256, INTRO_CONTRACT_SHA256, M0_CONTRACT_SHA256, MISSIONS, TASKS, COURSE_ID, COURSE_TASKS,
                       COURSE_MISSIONS, COURSE_MAXIMUM, COURSE_POINTS, INTRO_MARKERS)
 from grading import grade_key, current_key, project_lab, project_course_lab
 from portal_checker_handler import serve
@@ -21,18 +21,30 @@ class RetirementTest(unittest.TestCase):
             lab['results'] += [dict(row, sk=grade_key(mid)), dict(row, sk=current_key(mid))]
         return lab
 
-    def add_connection_grades(self, lab):
+    def add_connection_grades(self, lab, *, legacy=False):
         for task in INTRO_MARKERS:
-            row = {'contract_sha256': INTRO_CONTRACT_SHA256, 'deployment_id': 'same',
-                   'raw_earned': 1, 'evaluable': True, 'complete': True}
-            lab['results'] += [dict(row, sk=grade_key(task, INTRO_CONTRACT_SHA256)),
-                               dict(row, sk=current_key(task, INTRO_CONTRACT_SHA256))]
+            contract = M0_CONTRACT_SHA256 if task == 'M0' and not legacy else INTRO_CONTRACT_SHA256
+            row = {'contract_sha256': contract, 'deployment_id': 'same',
+                   'raw_earned': COURSE_POINTS[task] if not legacy else 1, 'evaluable': True, 'complete': True}
+            lab['results'] += [dict(row, sk=grade_key(task, contract)), dict(row, sk=current_key(task, contract))]
+
+    def test_previous_m0_point_is_kept_until_the_four_servers_are_checked(self):
+        lab = self.full_history()
+        self.add_connection_grades(lab, legacy=True)
+        before = copy.deepcopy(lab)
+        view = project_course_lab(lab)
+        self.assertEqual((view['raw_earned'], view['raw_maximum']), (61, 64))
+        self.assertEqual(view['current_unresolved'], ['M0'])
+        self.assertFalse(view['complete'])
+        self.assertEqual(lab, before)
+        self.add_connection_grades(lab)
+        self.assertEqual(project_course_lab(lab)['raw_earned'], 64)
 
     def test_historical_full_score_is_59_in_current_course_without_row_changes(self):
         lab = self.full_history(); before = copy.deepcopy(lab)
         self.assertEqual(project_lab(lab)['raw_earned'], 62)
         view = project_course_lab(lab)
-        self.assertEqual((view['raw_earned'], view['raw_maximum']), (59, 61))
+        self.assertEqual((view['raw_earned'], view['raw_maximum']), (59, 64))
         self.assertEqual(set(view['selected']), set(COURSE_MISSIONS))
         self.assertFalse(view['complete']); self.assertFalse(view['fully_evaluated'])
         self.assertEqual(view['missing_or_unresolved'], ['P0', 'M0'])
@@ -44,7 +56,7 @@ class RetirementTest(unittest.TestCase):
         lab['results'] = [r for r in lab['results'] if r['sk'] != grade_key('M3')]
         next(r for r in lab['results'] if r['sk'] == current_key('M3')).update(evaluable=False, complete=False)
         view = project_course_lab(lab)
-        self.assertEqual(view['raw_earned'], 61)
+        self.assertEqual(view['raw_earned'], 64)
         self.assertEqual(view['missing_or_unresolved'], [])
         self.assertEqual(view['current_unresolved'], []); self.assertTrue(view['complete'])
 
@@ -53,7 +65,7 @@ class RetirementTest(unittest.TestCase):
         self.add_connection_grades(lab)
         lab['results'] = [r for r in lab['results'] if r['sk'] != grade_key('M4')]
         view = project_course_lab(lab)
-        self.assertEqual(view['raw_earned'], 52)
+        self.assertEqual(view['raw_earned'], 55)
         self.assertEqual(view['missing_or_unresolved'], ['M4']); self.assertFalse(view['complete'])
 
     def test_retired_requests_are_rejected_before_identity_or_aws_calls(self):
@@ -66,7 +78,7 @@ class RetirementTest(unittest.TestCase):
             resolve.assert_not_called()
 
     def test_runtime_matches_the_authoring_curriculum(self):
-        p = json.loads((Path(__file__).resolve().parents[2] / 'course/curriculum.json').read_text())
+        p = json.loads((Path(__file__).resolve().parents[2] / 'course/curriculum.json').read_text(encoding='utf-8'))
         self.assertEqual(p['curriculum_id'], COURSE_ID)
         self.assertEqual(p['raw_maximum'], COURSE_MAXIMUM)
         self.assertEqual(set(p['active_order']), set(COURSE_TASKS))

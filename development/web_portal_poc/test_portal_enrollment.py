@@ -285,7 +285,7 @@ class PortalEnrollmentTest(unittest.TestCase):
         class BindingStore:
             def get(self, pk, sk): return service.get('bindings', pk, sk)
         result = identity_grade(self.subject, self.pepper, BindingStore(), fixture.store)
-        self.assertEqual((result['raw_earned'], result['raw_maximum']), (59, 61))
+        self.assertEqual((result['raw_earned'], result['raw_maximum']), (59, 64))
         self.assertIn('M5', result['current_unresolved'])
         with self.assertRaises(fixtures.legacy.ApiError):
             identity_grade('111111111111111111', self.pepper, BindingStore(), fixture.store)

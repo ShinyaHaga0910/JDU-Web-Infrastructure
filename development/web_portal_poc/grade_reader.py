@@ -6,15 +6,15 @@ invoke it inside a secured teacher-side service with an existing lab token.
 import hmac
 import progress_api as legacy
 from grading import project_course_lab
-from registry import COURSE_GRADED_TASKS, INTRO_MARKERS, STATUSES, TASKS
+from registry import COURSE_GRADED_TASKS, COURSE_INTRO_MARKERS, STATUSES, TASKS
 
 
 def scored_checks(task_id, checks):
     """Return only checks that contribute to the course score."""
     if task_id not in COURSE_GRADED_TASKS or not isinstance(checks, list):
         return []
-    if task_id in INTRO_MARKERS:
-        scored = {INTRO_MARKERS[task_id][0]}
+    if task_id in COURSE_INTRO_MARKERS:
+        scored = {cid for cid, _, _ in COURSE_INTRO_MARKERS[task_id]}
     else:
         scored = set(TASKS[task_id]['progress_scored_checks'])
     return [{'id': item['id'], 'status': item['status']} for item in checks

@@ -17,7 +17,7 @@ import progress_api as legacy
 from test_progress_api import MemoryStore
 from grading import export_labs, grade_key, current_key, project_lab
 from progress_api_v2 import AssessmentService
-from registry import build_report, canonical_checks, score, TASKS, CONTRACT_ID, CONTRACT_SHA256, INTRO_MARKERS
+from registry import build_report, canonical_checks, score, TASKS, CONTRACT_ID, CONTRACT_SHA256, COURSE_INTRO_MARKERS, COURSE_POINTS
 
 
 @unittest.skipUnless(os.name == 'posix', 'Linux filesystem observation')
@@ -29,7 +29,7 @@ class MarkerTest(unittest.TestCase):
             home = Path(directory)
             user = SimpleNamespace(pw_dir=str(home), pw_uid=os.getuid())
             with patch('system_observer.pwd.getpwnam', return_value=user):
-                for _, role, filename in INTRO_MARKERS.values():
+                for _, role, filename in (marker for markers in COURSE_INTRO_MARKERS.values() for marker in markers):
                     marker = home / filename
                     self.assertIs(connection_marker(role, filename), False)
                     wrong_role = 'db' if role == 'web' else 'web'
@@ -42,6 +42,7 @@ class MarkerTest(unittest.TestCase):
                     marker.rename(home / (role + '.txt'))
                     marker.symlink_to(home / (role + '.txt'))
                     self.assertIs(connection_marker(role, filename), False)
+                    marker.unlink()
 
 
 class Store(MemoryStore):
@@ -110,8 +111,8 @@ class AssessmentTests(unittest.TestCase):
         self.assertEqual(self.call('POST /api/web/submit', self.report(), shared)['statusCode'], 401)
         for task in ('M1', 'M2', 'M4', 'M5', 'M6'):
             self.submit(self.report(task))
-        for task, (marker, _, _) in INTRO_MARKERS.items():
-            missing = self.report(task, {marker: False}, mode='read_only', intro=True)
+        for task, markers in COURSE_INTRO_MARKERS.items():
+            missing = self.report(task, {marker: False for marker, _, _ in markers}, mode='read_only', intro=True)
             self.assertEqual(score(missing)['raw_earned'], 0)
             self.assertFalse(score(missing)['complete'])
             self.submit(missing)
@@ -122,14 +123,14 @@ class AssessmentTests(unittest.TestCase):
         self.assertEqual(self.call('POST /api/web/admin/assessment-context', classification, self.admin)['statusCode'], 200)
         export = json.loads(self.call('POST /api/web/admin/grades', {}, self.admin)['body'])
         row = export['students'][0]
-        self.assertEqual((row['lab_id'], row['raw_earned'], export['raw_maximum']), ('new-student', 61, 61))
-        for task in INTRO_MARKERS:
-            self.assertEqual(row['missions'][task]['selected']['raw_earned'], 1)
+        self.assertEqual((row['lab_id'], row['raw_earned'], export['raw_maximum']), ('new-student', 64, 64))
+        for task in COURSE_INTRO_MARKERS:
+            self.assertEqual(row['missions'][task]['selected']['raw_earned'], COURSE_POINTS[task])
         self.assertNotIn('M3', row['missions'])
         student_session = self.call('POST /api/web/student/session', {'lab_id': 'new-student'})
         url = json.loads(student_session['body'])['url']
         dashboard = self.app.handle({'routeKey': 'GET /dashboard', 'queryStringParameters': {'session': url.split('session=')[1]}})
-        self.assertIn('61 / 61', dashboard['body'])
+        self.assertIn('64 / 64', dashboard['body'])
         self.assertNotIn('M3 /', dashboard['body'])
 
     def test_all_missions_exactly_62_and_preparation_zero(self):
@@ -139,6 +140,14 @@ class AssessmentTests(unittest.TestCase):
         self.assertEqual((view['raw_earned'], view['raw_maximum']), (62, 62))
         self.assertEqual(len(view['selected']), 6)
         self.assertNotIn('M7', TASKS)
+
+    def test_m0_scores_each_server_independently(self):
+        observed = {'WEB01_DNS_MARKER': False, 'WEB01_REPO_MARKER': False}
+        report = self.report('M0', observed, mode='read_only', intro=True)
+        result = score(report)
+        self.assertEqual((result['raw_earned'], result['raw_maximum']), (2, 4))
+        self.assertTrue(result['evaluable'])
+        self.assertFalse(result['complete'])
 
     def test_initial_http_two_of_ten_is_zero_of_eight(self):
         failures = {cid: False for cid in TASKS['M1']['progress_scored_checks']}

@@ -28,9 +28,9 @@
   },
   "intro_points": {
     "P0": 1,
-    "M0": 1
+    "M0": 4
   },
-  "raw_maximum": 61,
+  "raw_maximum": 64,
   "active_textbook_chapters": [
     1,
     2,
