@@ -117,4 +117,4 @@ def figures():
 if __name__ == '__main__':
     build(source=ROOT/'docs/ja/05-nginx-static-files.md', chapter=5,
           diagram_builder=figures, report_name='chapter05.validation.public.json',
-          new_page_headings=('章末問題', '章末解答', '参考資料'))
+          new_page_headings=('セキュリティ調査にもログを使う', '章末問題', '章末解答', '参考資料'))

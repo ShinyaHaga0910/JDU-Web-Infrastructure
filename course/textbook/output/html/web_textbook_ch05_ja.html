@@ -16,10 +16,9 @@
 <p><strong>EC2 Webサーバー</strong>は、Ubuntu OSが動く仮想的なコンピューターである。<strong>Nginx</strong>は、そのUbuntu OSに導入して使うソフトウェアである。EC2が動いていても、Nginxが導入・起動されていなければ、NginxによるHTTPの受付は始まらない。</p>
 <h3 id="1-導入する">1. 導入する</h3>
 <p>初回セットアップで、Nginxのパッケージは <strong>配布サーバー</strong> に用意される。<strong>Webサーバー</strong> には、APTが配布サーバー（<code>10.20.2.30</code>）を使うための設定が入る。WebサーバーへのNginxのインストールは、P1で行う。</p>
-<p>Webサーバーの端末で、次のコマンドを順に実行する。</p>
-<pre><code>sudo apt-get update -o APT::Update::Error-Mode=any
-sudo apt-get install --no-install-recommends nginx</code></pre>
-<p>1行目で、配布サーバーから利用できるパッケージの一覧を取得する。2行目で、APTがNginxと動作に必要なパッケージを配布サーバーから取得し、Webサーバーにプログラムや初期設定を配置する。</p>
+<p>パッケージ一覧が準備できていれば、Webサーバーの端末で次のコマンドを使ってインストールできる。</p>
+<pre><code>sudo apt install nginx</code></pre>
+<p>このコマンドで、APTはNginxと必要なパッケージを配布サーバーから取得し、Webサーバーにプログラムや初期設定を配置する。演習で使う一覧の更新手順と、オプション付きの導入コマンドはP1で扱う。<a href="https://ubuntu.com/server/docs/how-to/software/package-management/#install-a-package">Ubuntuのパッケージ管理</a></p>
 <h3 id="2-起動する">2. 起動する</h3>
 <p>Ubuntu OSでは、サービスを管理する <strong>systemd</strong> に起動を指示する。Webサーバーで次のコマンドを実行すると、systemdが現在の <code>nginx</code> サービスを起動する。インストール時にすでに起動している場合もある。現在動いているかは <code>systemctl is-active nginx</code> で確認でき、起動中なら <code>active</code> と表示される。<a href="https://www.freedesktop.org/software/systemd/man/latest/systemctl.html">systemctlのサービス管理</a></p>
 <pre><code>sudo systemctl start nginx</code></pre>
@@ -86,12 +85,13 @@ sudo systemctl reload nginx</code></pre>
 &quot;GET /example.txt HTTP/1.1&quot; 200 24 &quot;-&quot; &quot;curl/8.x&quot;</code></pre>
 <p>上は読みやすく2行に分けているが、実際のログでは1行に続いて記録される例である。<code>10.20.1.10</code>はリクエストの送信元である踏み台サーバー、角括弧の中は時刻、<code>GET /example.txt HTTP/1.1</code>は受け付けたリクエストを表す。続く<code>200</code>はレスポンスのステータス、<code>24</code>は送信した本文のバイト数である。この形式では末尾に、クライアントの種類などの情報も記録される。<a href="https://nginx.org/en/docs/http/ngx_http_log_module.html">Nginxのアクセスログ形式</a></p>
 <p>ブラウザやcurlでアクセスした時刻とパスを手掛かりに、その操作に対応するログを探す。同じファイルの古い記録が残っていることもあるため、パスだけでなく時刻や送信元も合わせて読む。ブラウザが画像なども取得した場合には、開いたページ以外のリクエストが記録されることもある。</p>
-<h3 id="不審なアクセスを調べる">不審なアクセスを調べる</h3>
-<p>例えば、備品一覧を配信するサーバーに、普段使われないURLへのリクエストが短時間に大量に届き、404が続いたとする。アクセスログで時刻・送信元IP・リクエスト先を見比べると、公開されている入口を探す動きの手掛かりになる。アプリの導入後は、URLに記録された入力値から、入力をSQLの命令として処理させようとする <strong>SQLインジェクション</strong> の試みが疑われることもある。</p>
-<p>実際に侵入された可能性を調べるときは、不審なリクエストがあった時間帯を起点に、OSのログイン記録やアプリ・DBの記録も照合する。アクセスログからはリクエストが届いたことと、Nginxが返した結果が分かる。どの処理や変更まで行われたかは、それを記録するログで確認する。<a href="https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html#which-events-to-log">OWASPのログ記録ガイド</a></p>
 <h3 id="エラーログでは問題の手掛かりを読む">エラーログでは問題の手掛かりを読む</h3>
 <p><strong>エラーログ</strong>には、設定やファイルへのアクセスなどで起きた問題が記録される。今回のNginxでは、<code>/var/log/nginx/error.log</code>がその保存先である。例えば<code>Permission denied</code>が含まれる場合は読み取りや通過の権限、<code>No such file or directory</code>が含まれる場合は記録された保存先とファイルの有無が手掛かりになる。<a href="https://nginx.org/en/docs/ngx_core_module.html#error_log">Nginxのエラーログ</a></p>
 <p>アクセスログは「どのリクエストを、どの結果で処理したか」、エラーログは「処理中に何が問題になったか」を読むために使う。設定でログの保存先を変えた場合は、その設定に書かれたファイルを読む。</p>
+<h3 id="セキュリティ調査にもログを使う">セキュリティ調査にもログを使う</h3>
+<p>Nginxのログは、配信のエラーを調べるときに加え、不審なアクセスや侵入の可能性を調べるときにも使える。アクセスログの時刻、送信元IP、リクエスト先、レスポンスのステータスを手掛かりに、普段と違う動きを探す。</p>
+<p>例えば、備品一覧を配信するサーバーに、普段使われないURLへのリクエストが短時間に大量に届き、404が続いたとする。どのURLが続けてリクエストされたかを見ると、公開されている入口を探す動きの手掛かりになる。アプリの導入後は、URLに記録された入力値から、入力をSQLの命令として処理させようとする <strong>SQLインジェクション</strong> の試みが疑われることもある。</p>
+<p>侵入の可能性を調べるときは、不審なリクエストがあった時間帯を起点に、OSのログイン記録やアプリ・DBの記録も照合する。どの処理や変更まで行われたかは、それを記録するログで確認する。<a href="https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html#which-events-to-log">OWASPのログ記録ガイド</a></p>
 <p>練習・課題1では、Webサーバー上でNginxを動かし、指定されたファイルをHTTPで配信する構成を作る。その後にアプリを導入しても、既存の静的ファイルを取得するURLは引き続き利用できるようにする。</p>
 <p>次の第6章では、IPアドレスを直接指定する代わりに、名前から接続先を調べるDNSの仕組みを学ぶ。</p>
 <h2 id="章末問題">章末問題</h2>

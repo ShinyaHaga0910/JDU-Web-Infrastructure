@@ -153,9 +153,9 @@
       "chapter": 5,
       "title": "第5章 Nginxによる静的ファイルの配信",
       "source": "docs/ja/05-nginx-static-files.md",
-      "source_sha256": "f5622d5eeef091d5d964f89094bba1d509214d5c09c75f6b69c58dc1fbb1b67d",
+      "source_sha256": "8360fd7f5154c2f9dd83e57050ce45824aed81f5d19c040477e675f23b1323a6",
       "pdf": "output/pdf/web_textbook_ch05_ja.pdf",
-      "pdf_sha256": "974c54b3bc358a1e16ac83ed6a3ae40d827adf661494faff86283cd992e04956",
+      "pdf_sha256": "6807b039ccdc8f496a0eb42953910fbe74937e8b0f1e90e5c58ae1e7c437b367",
       "pages": 12,
       "start_page": 56,
       "end_page": 67,
@@ -177,7 +177,7 @@
           "sha256": "4968e7dd727f4c3a4c62ddcdb690faa19e71ebbab5416083d7ca2f49485dd5de"
         }
       ],
-      "text_blocks": 136
+      "text_blocks": 137
     },
     {
       "chapter": 6,
@@ -384,7 +384,7 @@
     "build\\build_chapter02.py": "ef08d5ad93504c85a3961ddfc90137827c03cfcf11d745c905babe1c48ce1282",
     "build\\build_chapter03.py": "864aef46f7e520f3f4b3218d5bbaf22e195e1db948f4d9340554305d19f0a27c",
     "build\\build_chapter04.py": "7cf272d632203974d9a21bbeae73ba2f2a94beeaf25483aeed0e36783032c8ee",
-    "build\\build_chapter05.py": "8c048dd5c95c3a0b8128dff6958fc43bf4f63bedc2803e56e30308a4aa2fbd86",
+    "build\\build_chapter05.py": "16f8e526d0e128acd9f478703700bfe8bff8f0ccec998e45a5a10704f78876ac",
     "build\\build_chapter06.py": "c045ef1428055de42d49c8490826d70b941efbe8c26a434398e9be9456c09454",
     "build\\build_chapter07.py": "8d446062f41f893c118e00e2657ac9f70a9c689e004734e52174b22a03acf181",
     "build\\build_chapter08.py": "2721f75afd3dbc60b971e7d885c2dd75a3ada98d27dc4e9fea329a4505103498",
@@ -399,7 +399,7 @@
     "docs\\ja\\02-network-paths.md": "f33c68a5e0a90d7b8d5eb32c1be759b95cf85b75f08298d9d4808744668d2dc2",
     "docs\\ja\\03-connecting-and-working.md": "4dbb6849aeca2f5a2aac71f6dc5916a07f83d2ba14db72f4e329a4310e1d71e3",
     "docs\\ja\\04-http-requests-and-responses.md": "5f7d6d9d4c9d8e3e74aaba5bf71e566e45285be82e8e5fea1ed985808c9b75c9",
-    "docs\\ja\\05-nginx-static-files.md": "f5622d5eeef091d5d964f89094bba1d509214d5c09c75f6b69c58dc1fbb1b67d",
+    "docs\\ja\\05-nginx-static-files.md": "8360fd7f5154c2f9dd83e57050ce45824aed81f5d19c040477e675f23b1323a6",
     "docs\\ja\\06-dns-name-resolution.md": "b81bd37b719f106c4c2ab5172d90f8b434b6ce212910e4d5feac432fb85325fc",
     "docs\\ja\\07-internal-dns-configuration.md": "6e5cbc2fb3073e225576f2e08edc64d55532f9df06066255d093a787ece6cecf",
     "docs\\ja\\08-databases-and-sql.md": "c096ab35071a16b88e98980c2586c2e6d6fb7e300906ad0c3d40525239679c04",
@@ -413,7 +413,7 @@
     "C:\\Windows\\Fonts\\NotoSansJP-VF.ttf": "5113756f8a3b5d01b2211025e267c50121e3b36f465b7bbaf3cdaf4c3430bfd0",
     "C:\\Windows\\Fonts\\NotoSerifJP-VF.ttf": "b7e0d299a21bd2009eff27aca5e9508c75ab494de222f96bd0bbe355a8d8ced5"
   },
-  "sha256": "9fbc04a71173425ae714587b29a68c9095a068655ac3026edf385f37afb43df8",
+  "sha256": "454e2d962b441b3da9a0034d485b865397285e9b8847340b8d0523f32e256e14",
   "all_chapters_rebuilt": true,
   "source_inputs_unchanged_during_build": true,
   "chapter_text_preserved": true,
