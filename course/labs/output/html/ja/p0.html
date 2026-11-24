@@ -42,25 +42,25 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
-<p>P0.1で確認したWebサーバーの <strong>Instance ID</strong> をクリックする。詳細画面で <strong>Connect</strong> の右にある矢印を押し、<strong>Connect with SSM Session Manager</strong> を選ぶ。新しいタブのターミナルで下のコマンドを実行する。<code>id -un</code> でOSユーザー、<code>pwd</code> で現在のディレクトリを確認する。初期構築時に置かれた <code>/etc/jdu-web/bootstrap.json</code> の <code>role</code> が <code>web</code> なら、Webサーバーに接続できている。自分のホームディレクトリに <code>p0-connection.txt</code> を作り、<code>web</code> を1行に記録する。</p>
+<p>P0.1で確認したWebサーバーの <strong>Instance ID</strong> をクリックする。詳細画面で <strong>Connect</strong> の右にある矢印を押し、<strong>Connect with SSM Session Manager</strong> を選ぶ。新しいタブのターミナルで、下のコマンドを上から1行ずつ実行する。初期構築時に置かれた <code>/etc/jdu-web/bootstrap.json</code> を <code>cat</code> で表示し、<code>&quot;role&quot;: &quot;web&quot;</code> を探す。Webサーバーだと確認できたら、ホームディレクトリで <code>nano</code> を使って確認用ファイルを作る。</p>
 <p><img src="../../../assets/shared/ec2-session-manager-connect.png" alt="EC2の詳細画面。Connectの右の矢印からConnect with SSM Session Managerを選ぶ。Webサーバーの画面を例に示す。" width="1245" height="319" loading="lazy"></p>
 <p>EC2の詳細画面。Connectの右の矢印からConnect with SSM Session Managerを選ぶ。Webサーバーの画面を例に示す。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. この端末で操作しているOSユーザー名を表示する。
 id -un
-# 2. 作業場所を $HOME へ移す。
-cd &quot;$HOME&quot;
+# 2. 自分のホームディレクトリへ移動する。
+cd ~
 # 3. 現在の作業ディレクトリを表示する。
 pwd
-# 4. 設置済みのJSONファイルからサーバーのロールを読み出す。
-python3 -c 'import json;print(json.load(open(&quot;/etc/jdu-web/bootstrap.json&quot;))[&quot;role&quot;])'
-# 5. ホームディレクトリの確認用ファイルに web と1行書く。
-printf '%s\n' web &gt; &quot;$HOME/p0-connection.txt&quot;
-# 6. $HOME/p0-connection.txt の内容を変更せずに読む。
-cat &quot;$HOME/p0-connection.txt&quot;
+# 4. 設置済みのファイルを表示し、role が web であることを確認する。
+cat /etc/jdu-web/bootstrap.json
+# 5. web とだけ入力する。Ctrl+O、Enterで保存し、Ctrl+Xで終了する。
+nano p0-connection.txt
+# 6. p0-connection.txt の内容を変更せずに読む。
+cat p0-connection.txt
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
-<p><code>id -un</code> は <code>ssm-user</code>、ホームディレクトリへ移動した後の <code>pwd</code> は <code>/home/ssm-user</code>、ロールと作成したファイルの内容は <code>web</code> と表示される。</p>
+<p><code>id -un</code> は <code>ssm-user</code>、<code>pwd</code> は <code>/home/ssm-user</code> を表示する。JSONファイルには <code>&quot;role&quot;: &quot;web&quot;</code> が含まれ、最後の <code>cat</code> では <code>web</code> だけが1行表示される。</p>
 <p>プロンプトにユーザー名、ホスト名、現在のディレクトリが表示される。<code>~</code> はホームディレクトリを表し、<code>pwd</code> は現在地を絶対パスで表示する。セットアップが表示を自動設定できず、<code>$</code> だけが表示された場合は、次の1行を実行して現在地を常時表示する。作業が終わったら <code>exit</code> で接続を閉じる。</p>
 <pre><code class="language-bash">exec env PS1='\u@\h:\w\$ ' bash --norc -i
 </code></pre>

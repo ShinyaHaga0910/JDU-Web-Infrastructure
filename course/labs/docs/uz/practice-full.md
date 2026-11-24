@@ -112,7 +112,7 @@ Web serverning SSM terminali: ssm-user
 
 **Maqsad va amallar:**
 
-P0.1 da topilgan Web serverning **Instance ID** havolasini bosing. Tafsilotlarda **Connect** yonidagi o‘ng strelkani bosing va **Connect with SSM Session Manager** ni tanlang. Quyidagi buyruqlarni yangi varaqdagi terminalda bajaring. `id -un` OS foydalanuvchisini, `pwd` esa joriy katalogni ko‘rsatadi. `/etc/jdu-web/bootstrap.json` faylidagi `role` qiymati `web` bo‘lsa, Web serverga ulangansiz. Uy katalogingizda bir satrda `web` yozilgan `p0-connection.txt` faylini yarating.
+P0.1 da topilgan Web serverning **Instance ID** havolasini bosing. Tafsilotlarda **Connect** yonidagi o‘ng strelkani bosing va **Connect with SSM Session Manager** ni tanlang. Yangi varaqdagi terminalda quyidagi buyruqlarni bittadan bajaring. Dastlabki sozlashda yaratilgan `/etc/jdu-web/bootstrap.json` faylini `cat` bilan ko‘ring va `"role": "web"` yozuvini toping. Web serverga ulangan bo‘lsangiz, uy katalogida `nano` bilan tekshiruv faylini yarating.
 
 ![EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session Manager ni tanlang. Rasmda Web server ko‘rsatilgan.](../../assets/shared/ec2-session-manager-connect.png)
 
@@ -123,21 +123,21 @@ Buyruqlar: raqamlar shu qadam ichidagi tartib
 ```bash
 # 1. Shu terminaldagi OS user nomini ko‘rsatish.
 id -un
-# 2. Ish katalogini $HOME ga o‘zgartirish.
-cd "$HOME"
+# 2. O‘z uy katalogingizga o‘ting.
+cd ~
 # 3. Joriy ish katalogini ko‘rsatish.
 pwd
-# 4. Bootstrap dan faqat role ni o‘qib, ulangan server vazifasini tekshirish.
-python3 -c 'import json;print(json.load(open("/etc/jdu-web/bootstrap.json"))["role"])'
-# 5. Uy katalogidagi tekshiruv fayliga bitta web satrini yozish.
-printf '%s\n' web > "$HOME/p0-connection.txt"
-# 6. $HOME/p0-connection.txt mazmunini o‘zgartirmay o‘qish.
-cat "$HOME/p0-connection.txt"
+# 4. Faylni ko‘ring va role qiymati web ekanini tekshiring.
+cat /etc/jdu-web/bootstrap.json
+# 5. Faqat web deb yozing. Ctrl+O va Enter bilan saqlang, Ctrl+X bilan chiqing.
+nano p0-connection.txt
+# 6. p0-connection.txt mazmunini o‘zgartirmay o‘qish.
+cat p0-connection.txt
 ```
 
 **Kutilgan natija va ma’nosi:**
 
-`id -un` natijasi `ssm-user`, uy katalogiga o‘tgandan keyingi `pwd` natijasi `/home/ssm-user`, rol va yaratilgan fayl mazmuni esa `web` bo‘ladi.
+`id -un` buyrug‘i `ssm-user`, `pwd` esa `/home/ssm-user` ni ko‘rsatadi. JSON faylda `"role": "web"` bor va oxirgi `cat` buyrug‘i faqat bitta `web` satrini chiqaradi.
 
 Buyruq satri boshida foydalanuvchi nomi, host nomi va joriy katalogni tekshiring. `~` uy katalogini, `pwd` esa joriy katalogning to‘liq yo‘lini ko‘rsatadi. Sozlashda bu ko‘rinish yoqilmasa va faqat `$` chiqsa, quyidagi qatorni bajaring. Ish yakunida `exit` bilan ulanishni yoping.
 
@@ -277,7 +277,7 @@ nano da quyida ko‘rsatilgan bitta aniq qatorni yarating va oxiriga yangi qator
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
 ```bash
-# 1. Ish katalogini ~ ga o‘zgartirish.
+# 1. O‘z uy katalogingizga o‘ting.
 cd ~
 # 2. Mashq katalogini yaratish; mavjud bo‘lsa saqlash.
 mkdir -p jdu-web-practice/p1

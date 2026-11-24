@@ -42,11 +42,13 @@ def explanation(command, lang):
     if args[0]=='pwd':return a('現在の作業ディレクトリを表示する。','Показать текущий рабочий каталог.','Joriy ish katalogini ko‘rsatish.')
     if args[0]=='cd':
         target=args[1]
+        if target=='~':return a('自分のホームディレクトリへ移動する。','Перейти в свой домашний каталог.','O‘z uy katalogingizga o‘ting.')
         return a(f'作業場所を {target} へ移す。',f'Перейти в рабочий каталог {target}.',f'Ish katalogini {target} ga o‘zgartirish.')
     if args[0]=='mkdir':return a('練習の作業ディレクトリを作る。既存ならそのまま使う。','Создать рабочий каталог; существующий сохранить.','Mashq katalogini yaratish; mavjud bo‘lsa saqlash.')
-    if args[0]=='nano':return a('practice.txtを編集する。本文を入力し、保存して終了する。','Открыть practice.txt: ввести текст, сохранить и выйти.','Practice.txt ni ochish: matn yozish, saqlash va chiqish.')
+    if args[0]=='nano':
+        if args[1]=='p0-connection.txt':return a('web とだけ入力する。Ctrl+O、Enterで保存し、Ctrl+Xで終了する。','Введите только web. Сохраните через Ctrl+O и Enter, выйдите через Ctrl+X.','Faqat web deb yozing. Ctrl+O va Enter bilan saqlang, Ctrl+X bilan chiqing.')
+        return a('practice.txtを編集する。本文を入力し、保存して終了する。','Открыть practice.txt: ввести текст, сохранить и выйти.','Practice.txt ni ochish: matn yozish, saqlash va chiqish.')
     if args[0]=='printf':
-        if 'p0-connection.txt' in command:return a('ホームディレクトリの確認用ファイルに web と1行書く。','Записать одну строку web в проверочный файл домашнего каталога.','Uy katalogidagi tekshiruv fayliga bitta web satrini yozish.')
         return a('自分のLab IDを含む練習用marker本文を作業ファイルへ書く。','Записать учебный marker со своим Lab ID в рабочий файл.','O‘z Lab ID bilan mashq marker matnini ish fayliga yozish.')
     if args[0]=='findmnt':return a('/var/libが載っているファイルシステムを調べる。','Определить файловую систему для /var/lib.','/var/lib joylashgan filesystem ni aniqlash.')
     if args[0]=='lsblk':return a('ディスクの名前・種類・容量・マウント先・識別情報を読む。','Показать имена, типы, размеры, точки монтирования и ID дисков.','Disk nomi, turi, hajmi, mount joyi va ID sini o‘qish.')
@@ -102,6 +104,7 @@ def explanation(command, lang):
     if program=='named-checkzone':return a('lab.testのzoneファイルを検査する。','Проверить zone-файл lab.test.','Lab.test zone faylini tekshirish.')
     if program=='netplan':return a('netplan YAMLから設定を生成し、適用前の構文を検査する。','Сгенерировать конфигурацию netplan и проверить YAML перед применением.','Netplan YAML dan config yaratib, qo‘llashdan oldin sintaksisni tekshirish.') if args[1]=='generate' else a('保存したnetplan設定をネットワークへ適用する。','Применить сохранённые настройки netplan к сети.','Saqlangan netplan sozlamasini tarmoqqa qo‘llash.')
     if program=='cat':
+        if args[-1]=='/etc/jdu-web/bootstrap.json':return a('設置済みのファイルを表示し、role が web であることを確認する。','Вывести файл и проверить, что поле role имеет значение web.','Faylni ko‘ring va role qiymati web ekanini tekshiring.')
         if args[-1]=='/proc/sys/kernel/random/boot_id':return a('今回の起動を識別するboot IDを読み、停止前後の比較に使う。','Прочитать boot ID для сравнения загрузок до и после остановки.','To‘xtashdan oldin/keyin solishtirish uchun boot ID ni o‘qish.')
         return a(f'{args[-1]} の内容を変更せずに読む。',f'Прочитать {args[-1]} без изменения.',f'{args[-1]} mazmunini o‘zgartirmay o‘qish.')
     if program=='ls':return a(f'{args[-1]} に配置されたサーバー構築用ファイルを一覧する。',f'Показать файлы для настройки серверов в {args[-1]}.',f'{args[-1]} dagi serverlarni sozlash fayllarini ro‘yxatlash.')

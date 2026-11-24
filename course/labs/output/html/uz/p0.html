@@ -42,25 +42,25 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>P0.1 da topilgan Web serverning <strong>Instance ID</strong> havolasini bosing. Tafsilotlarda <strong>Connect</strong> yonidagi o‘ng strelkani bosing va <strong>Connect with SSM Session Manager</strong> ni tanlang. Quyidagi buyruqlarni yangi varaqdagi terminalda bajaring. <code>id -un</code> OS foydalanuvchisini, <code>pwd</code> esa joriy katalogni ko‘rsatadi. <code>/etc/jdu-web/bootstrap.json</code> faylidagi <code>role</code> qiymati <code>web</code> bo‘lsa, Web serverga ulangansiz. Uy katalogingizda bir satrda <code>web</code> yozilgan <code>p0-connection.txt</code> faylini yarating.</p>
+<p>P0.1 da topilgan Web serverning <strong>Instance ID</strong> havolasini bosing. Tafsilotlarda <strong>Connect</strong> yonidagi o‘ng strelkani bosing va <strong>Connect with SSM Session Manager</strong> ni tanlang. Yangi varaqdagi terminalda quyidagi buyruqlarni bittadan bajaring. Dastlabki sozlashda yaratilgan <code>/etc/jdu-web/bootstrap.json</code> faylini <code>cat</code> bilan ko‘ring va <code>&quot;role&quot;: &quot;web&quot;</code> yozuvini toping. Web serverga ulangan bo‘lsangiz, uy katalogida <code>nano</code> bilan tekshiruv faylini yarating.</p>
 <p><img src="../../../assets/shared/ec2-session-manager-connect.png" alt="EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session Manager ni tanlang. Rasmda Web server ko‘rsatilgan." width="1245" height="319" loading="lazy"></p>
 <p>EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session Manager ni tanlang. Rasmda Web server ko‘rsatilgan.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. Shu terminaldagi OS user nomini ko‘rsatish.
 id -un
-# 2. Ish katalogini $HOME ga o‘zgartirish.
-cd &quot;$HOME&quot;
+# 2. O‘z uy katalogingizga o‘ting.
+cd ~
 # 3. Joriy ish katalogini ko‘rsatish.
 pwd
-# 4. Bootstrap dan faqat role ni o‘qib, ulangan server vazifasini tekshirish.
-python3 -c 'import json;print(json.load(open(&quot;/etc/jdu-web/bootstrap.json&quot;))[&quot;role&quot;])'
-# 5. Uy katalogidagi tekshiruv fayliga bitta web satrini yozish.
-printf '%s\n' web &gt; &quot;$HOME/p0-connection.txt&quot;
-# 6. $HOME/p0-connection.txt mazmunini o‘zgartirmay o‘qish.
-cat &quot;$HOME/p0-connection.txt&quot;
+# 4. Faylni ko‘ring va role qiymati web ekanini tekshiring.
+cat /etc/jdu-web/bootstrap.json
+# 5. Faqat web deb yozing. Ctrl+O va Enter bilan saqlang, Ctrl+X bilan chiqing.
+nano p0-connection.txt
+# 6. p0-connection.txt mazmunini o‘zgartirmay o‘qish.
+cat p0-connection.txt
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p><code>id -un</code> natijasi <code>ssm-user</code>, uy katalogiga o‘tgandan keyingi <code>pwd</code> natijasi <code>/home/ssm-user</code>, rol va yaratilgan fayl mazmuni esa <code>web</code> bo‘ladi.</p>
+<p><code>id -un</code> buyrug‘i <code>ssm-user</code>, <code>pwd</code> esa <code>/home/ssm-user</code> ni ko‘rsatadi. JSON faylda <code>&quot;role&quot;: &quot;web&quot;</code> bor va oxirgi <code>cat</code> buyrug‘i faqat bitta <code>web</code> satrini chiqaradi.</p>
 <p>Buyruq satri boshida foydalanuvchi nomi, host nomi va joriy katalogni tekshiring. <code>~</code> uy katalogini, <code>pwd</code> esa joriy katalogning to‘liq yo‘lini ko‘rsatadi. Sozlashda bu ko‘rinish yoqilmasa va faqat <code>$</code> chiqsa, quyidagi qatorni bajaring. Ish yakunida <code>exit</code> bilan ulanishni yoping.</p>
 <pre><code class="language-bash">exec env PS1='\u@\h:\w\$ ' bash --norc -i
 </code></pre>

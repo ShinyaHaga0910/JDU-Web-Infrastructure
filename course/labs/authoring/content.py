@@ -36,17 +36,17 @@ step(m, T('5台のinstance IDを確認する', 'Проверить instance ID �
    'Введите EC2 в поле Search в верхней части AWS Console и откройте консоль EC2. Откройте EC2 → Instances и найдите пять серверов своей среды в столбце Name. В той же строке проверьте полный идентификатор с префиксом i- в столбце Instance ID.',
    'AWS Console tepasidagi Search maydoniga EC2 deb yozib, boshqaruv oynasini oching. EC2 → Instances ro‘yxatida Name ustunidan o‘z muhitingizdagi beshta serverni tekshiring. Shu qatordagi Instance ID ustunidan i- bilan boshlangan to‘liq ID ni ko‘ring.'), '', None, None)
 step(m, T('Session ManagerでWebサーバーに接続する', 'Подключиться к Web-серверу через Session Manager', 'Session Manager orqali Web serverga ulanish'), 'web',
- T('P0.1で確認したWebサーバーの **Instance ID** をクリックする。詳細画面で **Connect** の右にある矢印を押し、**Connect with SSM Session Manager** を選ぶ。新しいタブのターミナルで下のコマンドを実行する。`id -un` でOSユーザー、`pwd` で現在のディレクトリを確認する。初期構築時に置かれた `/etc/jdu-web/bootstrap.json` の `role` が `web` なら、Webサーバーに接続できている。自分のホームディレクトリに `p0-connection.txt` を作り、`web` を1行に記録する。',
-   'Нажмите **Instance ID** Web-сервера, найденного в P0.1. На странице сведений нажмите стрелку справа от **Connect** и выберите **Connect with SSM Session Manager**. Выполните команды ниже в терминале новой вкладки. `id -un` показывает пользователя ОС, а `pwd` — текущий каталог. Значение `web` в поле `role` файла `/etc/jdu-web/bootstrap.json` подтверждает, что открыт Web-сервер. Создайте в своём домашнем каталоге файл `p0-connection.txt` с одной строкой `web`.',
-   'P0.1 da topilgan Web serverning **Instance ID** havolasini bosing. Tafsilotlarda **Connect** yonidagi o‘ng strelkani bosing va **Connect with SSM Session Manager** ni tanlang. Quyidagi buyruqlarni yangi varaqdagi terminalda bajaring. `id -un` OS foydalanuvchisini, `pwd` esa joriy katalogni ko‘rsatadi. `/etc/jdu-web/bootstrap.json` faylidagi `role` qiymati `web` bo‘lsa, Web serverga ulangansiz. Uy katalogingizda bir satrda `web` yozilgan `p0-connection.txt` faylini yarating.'),
+ T('P0.1で確認したWebサーバーの **Instance ID** をクリックする。詳細画面で **Connect** の右にある矢印を押し、**Connect with SSM Session Manager** を選ぶ。新しいタブのターミナルで、下のコマンドを上から1行ずつ実行する。初期構築時に置かれた `/etc/jdu-web/bootstrap.json` を `cat` で表示し、`"role": "web"` を探す。Webサーバーだと確認できたら、ホームディレクトリで `nano` を使って確認用ファイルを作る。',
+   'Нажмите **Instance ID** Web-сервера, найденного в P0.1. На странице сведений нажмите стрелку справа от **Connect** и выберите **Connect with SSM Session Manager**. В терминале новой вкладки выполняйте команды по одной. Выведите файл `/etc/jdu-web/bootstrap.json`, созданный при начальной настройке, командой `cat` и найдите `"role": "web"`. Убедившись, что это Web-сервер, создайте проверочный файл в домашнем каталоге через `nano`.',
+   'P0.1 da topilgan Web serverning **Instance ID** havolasini bosing. Tafsilotlarda **Connect** yonidagi o‘ng strelkani bosing va **Connect with SSM Session Manager** ni tanlang. Yangi varaqdagi terminalda quyidagi buyruqlarni bittadan bajaring. Dastlabki sozlashda yaratilgan `/etc/jdu-web/bootstrap.json` faylini `cat` bilan ko‘ring va `"role": "web"` yozuvini toping. Web serverga ulangan bo‘lsangiz, uy katalogida `nano` bilan tekshiruv faylini yarating.'),
  r"""id -un
-cd "$HOME"
+cd ~
 pwd
-python3 -c 'import json;print(json.load(open("/etc/jdu-web/bootstrap.json"))["role"])'
-printf '%s\n' web > "$HOME/p0-connection.txt"
-cat "$HOME/p0-connection.txt"
+cat /etc/jdu-web/bootstrap.json
+nano p0-connection.txt
+cat p0-connection.txt
 """,
- T('`id -un` は `ssm-user`、ホームディレクトリへ移動した後の `pwd` は `/home/ssm-user`、ロールと作成したファイルの内容は `web` と表示される。', 'Команда `id -un` выводит `ssm-user`, команда `pwd` после перехода в домашний каталог выводит `/home/ssm-user`, а роль и содержимое файла имеют значение `web`.', '`id -un` natijasi `ssm-user`, uy katalogiga o‘tgandan keyingi `pwd` natijasi `/home/ssm-user`, rol va yaratilgan fayl mazmuni esa `web` bo‘ladi.'),
+ T('`id -un` は `ssm-user`、`pwd` は `/home/ssm-user` を表示する。JSONファイルには `"role": "web"` が含まれ、最後の `cat` では `web` だけが1行表示される。', 'Команда `id -un` выводит `ssm-user`, а `pwd` — `/home/ssm-user`. В JSON-файле есть `"role": "web"`, а последняя команда `cat` выводит только строку `web`.', '`id -un` buyrug‘i `ssm-user`, `pwd` esa `/home/ssm-user` ni ko‘rsatadi. JSON faylda `"role": "web"` bor va oxirgi `cat` buyrug‘i faqat bitta `web` satrini chiqaradi.'),
  None)
 step(m, T('RDPで踏み台のデスクトップを開く', 'Открыть рабочий стол бастиона по RDP', 'RDP orqali bastion ish stolini ochish'), 'pc',
  T('EC2で確認した現在の踏み台の公開IPv4を使う。Windowsキー＋Rを押し、mstsc /promptを入力してEnter。ComputerへそのIPを指定し、userはlabuser、passwordは本人が初期配備で設定したRDP用を使う。Windowsアカウントのpasswordではない。「資格情報を記憶する」は選ばない。青いxrdp loginが出たらSession=Xorgを確認し、labuserで入る。',

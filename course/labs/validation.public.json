@@ -37,20 +37,20 @@
     },
     "web_lab_practice_ja.pdf": {
       "pages": 43,
-      "bytes": 2003096
+      "bytes": 2002950
     },
     "web_lab_practice_ru.pdf": {
       "pages": 44,
-      "bytes": 1815820
+      "bytes": 1815775
     },
     "web_lab_practice_uz.pdf": {
       "pages": 42,
-      "bytes": 1778318
+      "bytes": 1778268
     }
   },
   "distribution_id": "web-course-class193548-20261103-r3",
   "registry_sha256": "3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33",
-  "package_sha256": "7e92f6c351b4c7ebdfaca6dbc7a1dc6fe9e491d0062cff119ba430204ce04af8",
+  "package_sha256": "9f29597173f2d80cf00d830ca7f62cecb426e1434bf49e169365109066fc3a37",
   "new_material_AWS_walkthrough": false,
   "native_language_review": false,
   "teacher_visual_review": false,

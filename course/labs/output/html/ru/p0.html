@@ -42,25 +42,25 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
-<p>Нажмите <strong>Instance ID</strong> Web-сервера, найденного в P0.1. На странице сведений нажмите стрелку справа от <strong>Connect</strong> и выберите <strong>Connect with SSM Session Manager</strong>. Выполните команды ниже в терминале новой вкладки. <code>id -un</code> показывает пользователя ОС, а <code>pwd</code> - текущий каталог. Значение <code>web</code> в поле <code>role</code> файла <code>/etc/jdu-web/bootstrap.json</code> подтверждает, что открыт Web-сервер. Создайте в своём домашнем каталоге файл <code>p0-connection.txt</code> с одной строкой <code>web</code>.</p>
+<p>Нажмите <strong>Instance ID</strong> Web-сервера, найденного в P0.1. На странице сведений нажмите стрелку справа от <strong>Connect</strong> и выберите <strong>Connect with SSM Session Manager</strong>. В терминале новой вкладки выполняйте команды по одной. Выведите файл <code>/etc/jdu-web/bootstrap.json</code>, созданный при начальной настройке, командой <code>cat</code> и найдите <code>&quot;role&quot;: &quot;web&quot;</code>. Убедившись, что это Web-сервер, создайте проверочный файл в домашнем каталоге через <code>nano</code>.</p>
 <p><img src="../../../assets/shared/ec2-session-manager-connect.png" alt="Страница EC2. Нажмите стрелку справа от Connect и выберите Connect with SSM Session Manager. На снимке показан Web-сервер." width="1245" height="319" loading="lazy"></p>
 <p>Страница EC2. Нажмите стрелку справа от Connect и выберите Connect with SSM Session Manager. На снимке показан Web-сервер.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Показать имя пользователя ОС в этом терминале.
 id -un
-# 2. Перейти в рабочий каталог $HOME.
-cd &quot;$HOME&quot;
+# 2. Перейти в свой домашний каталог.
+cd ~
 # 3. Показать текущий рабочий каталог.
 pwd
-# 4. Прочитать только role из bootstrap, чтобы проверить выбранный сервер.
-python3 -c 'import json;print(json.load(open(&quot;/etc/jdu-web/bootstrap.json&quot;))[&quot;role&quot;])'
-# 5. Записать одну строку web в проверочный файл домашнего каталога.
-printf '%s\n' web &gt; &quot;$HOME/p0-connection.txt&quot;
-# 6. Прочитать $HOME/p0-connection.txt без изменения.
-cat &quot;$HOME/p0-connection.txt&quot;
+# 4. Вывести файл и проверить, что поле role имеет значение web.
+cat /etc/jdu-web/bootstrap.json
+# 5. Введите только web. Сохраните через Ctrl+O и Enter, выйдите через Ctrl+X.
+nano p0-connection.txt
+# 6. Прочитать p0-connection.txt без изменения.
+cat p0-connection.txt
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Команда <code>id -un</code> выводит <code>ssm-user</code>, команда <code>pwd</code> после перехода в домашний каталог выводит <code>/home/ssm-user</code>, а роль и содержимое файла имеют значение <code>web</code>.</p>
+<p>Команда <code>id -un</code> выводит <code>ssm-user</code>, а <code>pwd</code> - <code>/home/ssm-user</code>. В JSON-файле есть <code>&quot;role&quot;: &quot;web&quot;</code>, а последняя команда <code>cat</code> выводит только строку <code>web</code>.</p>
 <p>В приглашении видны имя пользователя, имя узла и текущий каталог. <code>~</code> означает домашний каталог, а <code>pwd</code> показывает полный путь. Если настройка не смогла включить это отображение и видно только <code>$</code>, выполните следующую строку. Завершите сеанс командой <code>exit</code>.</p>
 <pre><code class="language-bash">exec env PS1='\u@\h:\w\$ ' bash --norc -i
 </code></pre>
