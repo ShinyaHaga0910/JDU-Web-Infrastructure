@@ -71,6 +71,8 @@ cat &quot;$HOME/p0-connection.txt&quot;
 <p>Windows PC студента (общая учётная запись)</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Используйте текущий public IPv4 бастиона из EC2. Нажмите Windows+R, введите mstsc /prompt и Enter. В Computer укажите IP, пользователь labuser, пароль - свой RDP из начальной установки, не пароль Windows. Не выбирайте сохранение credentials. Если появится синий login xrdp, выберите Session=Xorg и labuser.</p>
+<p><img src="../../../assets/shared/windows-run-rdp.png" alt="Нажмите Windows+R, чтобы открыть окно «Выполнить», и введите  в поле «Открыть»." width="643" height="1072" loading="lazy"></p>
+<p>Нажмите Windows+R, чтобы открыть окно «Выполнить», и введите <code>mstsc /prompt</code> в поле «Открыть».</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Открыть RDP Windows с запросом учётных данных.
 mstsc /prompt

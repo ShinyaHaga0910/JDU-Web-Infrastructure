@@ -159,6 +159,10 @@ Windows PC студента (общая учётная запись)
 
 Используйте текущий public IPv4 бастиона из EC2. Нажмите Windows+R, введите mstsc /prompt и Enter. В Computer укажите IP, пользователь labuser, пароль - свой RDP из начальной установки, не пароль Windows. Не выбирайте сохранение credentials. Если появится синий login xrdp, выберите Session=Xorg и labuser.
 
+![Нажмите Windows+R, чтобы открыть окно «Выполнить», и введите `mstsc /prompt` в поле «Открыть».](../../assets/shared/windows-run-rdp.png)
+
+Нажмите Windows+R, чтобы открыть окно «Выполнить», и введите `mstsc /prompt` в поле «Открыть».
+
 Команды: нумерация внутри этого шага
 
 ```bash

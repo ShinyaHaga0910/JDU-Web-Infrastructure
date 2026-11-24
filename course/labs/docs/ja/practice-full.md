@@ -159,6 +159,10 @@ Session Managerの端末。表示を変えると、移動後のディレクト�
 
 EC2で確認した現在の踏み台の公開IPv4を使う。Windowsキー＋Rを押し、mstsc /promptを入力してEnter。ComputerへそのIPを指定し、userはlabuser、passwordは本人が初期配備で設定したRDP用を使う。Windowsアカウントのpasswordではない。「資格情報を記憶する」は選ばない。青いxrdp loginが出たらSession=Xorgを確認し、labuserで入る。
 
+![Windowsキー＋Rで「ファイル名を指定して実行」を開き、「名前」欄に `mstsc /prompt` を入力する。](../../assets/shared/windows-run-rdp.png)
+
+Windowsキー＋Rで「ファイル名を指定して実行」を開き、「名前」欄に `mstsc /prompt` を入力する。
+
 入力するコマンド（番号はこの手順内の順番）
 
 ```bash

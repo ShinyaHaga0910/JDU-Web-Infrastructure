@@ -154,20 +154,20 @@ def shell_lines(source):
         out.append(line)
     return '\n'.join(out)
 
-def session_image(name, caption, lang):
+def shared_image(name, caption, lang):
     caption = caption[lang]
     return [f'![{caption}](../../assets/shared/{name}.png)', '', caption, '']
 
 
 def instance_id_guide(lang):
-    return session_image('ec2-session-manager-instances', T(
+    return shared_image('ec2-session-manager-instances', T(
         'EC2のInstances一覧。P0は名前の末尾が `-web` の行、M0は `-db` の行を選ぶ。',
         'Список Instances в EC2. Для P0 выберите строку с окончанием имени `-web`, для M0 — `-db`.',
         'EC2 dagi Instances ro‘yxati. P0 uchun nomi `-web`, M0 uchun `-db` bilan tugaydigan qatorni tanlang.'), lang)
 
 
 def session_connect_guide(lang):
-    return session_image('ec2-session-manager-connect', T(
+    return shared_image('ec2-session-manager-connect', T(
         'EC2の詳細画面。Connectの右の矢印からConnect with SSM Session Managerを選ぶ。Webサーバーの画面を例に示す。',
         'Страница EC2. Нажмите стрелку справа от Connect и выберите Connect with SSM Session Manager. На снимке показан Web-сервер.',
         'EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session Manager ni tanlang. Rasmda Web server ko‘rsatilgan.'), lang)
@@ -208,6 +208,11 @@ def make_markdown(reg, lang, kind):
                     continue
                 if step_id=='P0.2':
                     out += session_connect_guide(lang)
+                if step_id=='P0.3':
+                    out += shared_image('windows-run-rdp', T(
+                        'Windowsキー＋Rで「ファイル名を指定して実行」を開き、「名前」欄に `mstsc /prompt` を入力する。',
+                        'Нажмите Windows+R, чтобы открыть окно «Выполнить», и введите `mstsc /prompt` в поле «Открыть».',
+                        'Windows+R tugmalarini bosib Run oynasini oching va Open maydoniga `mstsc /prompt` yozing.'), lang)
                 if s['code']:
                     for fence,source in annotated_blocks(m['id'],i,s['code'],lang):
                         label=T('設定・入力データ（端末で実行するコマンドではない）','Конфигурация или данные: не выполнять как команды','Sozlama yoki ma’lumot: terminal buyrug‘i emas')[lang] if fence=='text' else T('入力するコマンド（番号はこの手順内の順番）','Команды: нумерация внутри этого шага','Buyruqlar: raqamlar shu qadam ichidagi tartib')[lang]
@@ -221,7 +226,7 @@ def make_markdown(reg, lang, kind):
                               'В приглашении видны имя пользователя, имя узла и текущий каталог. `~` означает домашний каталог, а `pwd` показывает полный путь. Если настройка не смогла включить это отображение и видно только `$`, выполните следующую строку. Завершите сеанс командой `exit`.',
                               'Buyruq satri boshida foydalanuvchi nomi, host nomi va joriy katalogni tekshiring. `~` uy katalogini, `pwd` esa joriy katalogning to‘liq yo‘lini ko‘rsatadi. Sozlashda bu ko‘rinish yoqilmasa va faqat `$` chiqsa, quyidagi qatorni bajaring. Ish yakunida `exit` bilan ulanishni yoping.')[lang],
                             '', '```bash', r"exec env PS1='\u@\h:\w\$ ' bash --norc -i", '```', '']
-                    out += session_image('session-manager-terminal', T(
+                    out += shared_image('session-manager-terminal', T(
                         'Session Managerの端末。表示を変えると、移動後のディレクトリがプロンプトに反映される。',
                         'Терминал Session Manager. После настройки приглашение обновляет текущий каталог при переходе.',
                         'Session Manager terminali. Sozlangach, katalogga o‘tganda buyruq satri yangi katalogni ko‘rsatadi.'), lang)
@@ -372,8 +377,9 @@ def make_pdf(md, lang, target):
                 for img in images:
                     source=(ROOT/'docs'/lang/img.attrGet('src')).resolve()
                     picture = Image(str(source))
-                    picture.drawWidth = width
-                    picture.drawHeight = width * picture.imageHeight / picture.imageWidth
+                    scale = min(width / picture.imageWidth, 460 / picture.imageHeight)
+                    picture.drawWidth = picture.imageWidth * scale
+                    picture.drawHeight = picture.imageHeight * scale
                     flow.extend([picture,Spacer(1,8)])
                 i+=3;continue
             value=inline(tokens[i+1])

@@ -71,6 +71,8 @@ cat &quot;$HOME/p0-connection.txt&quot;
 <p>学生のWindows PC（共有アカウント）</p>
 <p><strong>目的と操作:</strong></p>
 <p>EC2で確認した現在の踏み台の公開IPv4を使う。Windowsキー＋Rを押し、mstsc /promptを入力してEnter。ComputerへそのIPを指定し、userはlabuser、passwordは本人が初期配備で設定したRDP用を使う。Windowsアカウントのpasswordではない。「資格情報を記憶する」は選ばない。青いxrdp loginが出たらSession=Xorgを確認し、labuserで入る。</p>
+<p><img src="../../../assets/shared/windows-run-rdp.png" alt="Windowsキー＋Rで「ファイル名を指定して実行」を開き、「名前」欄に  を入力する。" width="643" height="1072" loading="lazy"></p>
+<p>Windowsキー＋Rで「ファイル名を指定して実行」を開き、「名前」欄に <code>mstsc /prompt</code> を入力する。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. WindowsのRDP接続画面を開き、資格情報の入力を求める。
 mstsc /prompt

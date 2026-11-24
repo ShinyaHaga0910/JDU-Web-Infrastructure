@@ -20,37 +20,37 @@
   "mission_tasks": 6,
   "scored_checks": 61,
   "raw_points": 61,
-  "checks_passed": 4514,
+  "checks_passed": 4538,
   "bash_blocks_syntax_checked": 32,
   "pdfs": {
     "web_lab_missions_ja.pdf": {
       "pages": 14,
-      "bytes": 1265987
+      "bytes": 1265940
     },
     "web_lab_missions_ru.pdf": {
       "pages": 15,
-      "bytes": 1093958
+      "bytes": 1093929
     },
     "web_lab_missions_uz.pdf": {
       "pages": 14,
-      "bytes": 1073681
+      "bytes": 1073652
     },
     "web_lab_practice_ja.pdf": {
-      "pages": 41,
-      "bytes": 1590923
+      "pages": 43,
+      "bytes": 2003096
     },
     "web_lab_practice_ru.pdf": {
-      "pages": 43,
-      "bytes": 1403713
+      "pages": 44,
+      "bytes": 1815820
     },
     "web_lab_practice_uz.pdf": {
-      "pages": 41,
-      "bytes": 1366573
+      "pages": 42,
+      "bytes": 1778318
     }
   },
   "distribution_id": "web-course-class193548-20261103-r3",
   "registry_sha256": "3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33",
-  "package_sha256": "8b214aeb2d7b7b908d1c447a1eb385c809b8bae1597ad5b406994720e7a92093",
+  "package_sha256": "7e92f6c351b4c7ebdfaca6dbc7a1dc6fe9e491d0062cff119ba430204ce04af8",
   "new_material_AWS_walkthrough": false,
   "native_language_review": false,
   "teacher_visual_review": false,
