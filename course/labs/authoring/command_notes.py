@@ -84,9 +84,14 @@ def explanation(command, lang):
         args=args[1:]
     program=args[0]
     if program=='apt-get':
-        if 'update' in args:return a('内部repoのパッケージ一覧を更新する。取得エラーは失敗扱いにする。','Обновить индекс пакетов внутреннего repo; считать ошибки загрузки сбоем.','Ichki repo package ro‘yxatini yangilash; yuklash xatosini xato deb olish.')
+        if 'update' in args:
+            if 'APT::Update::Error-Mode=any' in args:
+                return a('内部repoのパッケージ一覧を更新する。取得エラーは失敗扱いにする。','Обновить индекс пакетов внутреннего repo; считать ошибки загрузки сбоем.','Ichki repo package ro‘yxatini yangilash; yuklash xatosini xato deb olish.')
+            return a('配布サーバーのパッケージ一覧を更新する。','Обновить список пакетов с внутреннего сервера.','Ichki serverdagi paketlar ro‘yxatini yangilash.')
         names=' '.join(x for x in args[2:] if not x.startswith('-'))
-        return a(f'内部repoから {names} を推奨追加なしで導入する。',f'Установить {names} из внутреннего repo без рекомендуемых дополнений.',f'Ichki repo dan {names} ni tavsiya etilgan qo‘shimchalarsiz o‘rnatish.')
+        if '--no-install-recommends' in args:
+            return a(f'内部repoから {names} を推奨追加なしで導入する。',f'Установить {names} из внутреннего repo без рекомендуемых дополнений.',f'Ichki repo dan {names} ni tavsiya etilgan qo‘shimchalarsiz o‘rnatish.')
+        return a(f'配布サーバーから {names} をインストールする。',f'Установить {names} с внутреннего сервера пакетов.',f'Ichki paket serveridan {names} ni o‘rnatish.')
     if program=='systemctl':
         verb=args[1];target=args[-1]
         return {

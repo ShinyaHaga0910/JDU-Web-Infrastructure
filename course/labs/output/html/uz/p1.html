@@ -41,21 +41,19 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>P0 dagidek Web ga SSM orqali kiring va role=web ni tekshiring. APT source faqat 10.20.2.30 dagi imzolangan repo ekanini ko‘ring. update indeksni oladi, install paketni o‘rnatadi. Internet source qo‘shmang.</p>
+<p>P0 dagidek Web serverga SSM orqali ulaning va roli <code>web</code> ekanini tekshiring. Paketlar dastlabki sozlashda belgilangan ichki <code>10.20.2.30</code> serveridan olinadi.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
-<pre><code class="language-bash"># 1. /etc/apt/sources.list.d/jdu-web.sources mazmunini o‘zgartirmay o‘qish.
-cat /etc/apt/sources.list.d/jdu-web.sources
-# 2. Ichki repo package ro‘yxatini yangilash; yuklash xatosini xato deb olish.
-sudo apt-get update -o APT::Update::Error-Mode=any
-# 3. Ichki repo dan nginx ni tavsiya etilgan qo‘shimchalarsiz o‘rnatish.
-sudo apt-get install --no-install-recommends nginx
+<pre><code class="language-bash"># 1. Ichki serverdagi paketlar ro‘yxatini yangilash.
+sudo apt-get update
+# 2. Ichki paket serveridan nginx ni o‘rnatish.
+sudo apt-get install nginx
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Apt-get update package ro‘yxatini yangilaydi; install tanlangan package ni o‘rnatadi. --no-install-recommends tavsiya etilgan qo‘shimchalarni o‘rnatmaydi. Signed-By ishonchli kalitni belgilaydi: repo ga ulanish imzo tekshirilganini hali isbotlamaydi.</p>
+<p><code>apt-get update</code> mavjud paketlar ro‘yxatini yangilaydi. <code>apt-get install nginx</code> shu ro‘yxat yordamida Nginx ni o‘rnatadi.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>Source ichida ichki IP va Signed-By bor; imzo xatosisiz tugaydi. O‘rnatish tasdig‘iga Y kiriting.</p>
+<p>Ro‘yxat yangilanganda ichki server qatorida <code>Hit:</code> yoki <code>Get:</code> ko‘rinadi. <code>N: Ignoring file ... ubuntu.sources.jdu-disabled</code> xabari APT dastlabki sozlashda o‘chirilgan standart Ubuntu manbasi faylini o‘tkazib yuborganini bildiradi. Yuklash yoki imzo tekshiruvida xato bo‘lmasa, o‘rnatishni davom ettiring. Tasdiq so‘ralsa, <code>Y</code> kiriting.</p>
 <p><strong>Ishlamasa:</strong></p>
-<p>Yuklash xatosida repo running/SSM va IP ni tekshiring. --allow-unauthenticated yoki tashqi pip bilan chetlab o‘tmang.</p>
+<p>Paketlar ro‘yxatini olib bo‘lmasa, ichki paket serverining holati va IP manzilini tekshiring.</p>
 <h3>P1.2 Aniq matn yaratish va ruxsatlarni sozlash</h3>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>

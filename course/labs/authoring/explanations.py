@@ -121,9 +121,9 @@ note('P0.3',
  'RDP bastion ekrani va kiritishni uzatadi. RDP ichidagi Firefox request i Windows emas, bastiondan chiqadi. Klaviatura tartibi paroldagi belgilarga ta’sir qiladi; interfeys tili va keyboard layout alohida sozlamadir.')
 
 note('P1.1',
- 'apt-get updateは利用可能なpackage一覧を更新し、installは選んだpackageを導入する。--no-install-recommendsは推奨packageを追加しない指定。Signed-Byは許可した署名鍵の指定であり、repoへ接続できただけでは署名確認の成功にならない。',
- 'Apt-get update обновляет список пакетов, install устанавливает выбранный пакет. --no-install-recommends исключает рекомендованные дополнения. Signed-By задаёт доверенный ключ: доступ к repo ещё не доказывает успешную проверку подписи.',
- 'Apt-get update package ro‘yxatini yangilaydi; install tanlangan package ni o‘rnatadi. --no-install-recommends tavsiya etilgan qo‘shimchalarni o‘rnatmaydi. Signed-By ishonchli kalitni belgilaydi: repo ga ulanish imzo tekshirilganini hali isbotlamaydi.')
+ '`apt-get update` は利用できるパッケージの一覧を更新する。`apt-get install nginx` は、その一覧を使ってNginxをインストールする。',
+ '`apt-get update` обновляет список доступных пакетов. `apt-get install nginx` использует этот список для установки Nginx.',
+ '`apt-get update` mavjud paketlar ro‘yxatini yangilaydi. `apt-get install nginx` shu ro‘yxat yordamida Nginx ni o‘rnatadi.')
 note('P1.2',
  'nanoで編集する自分の作業fileと、Nginxが読む配信用fileを分ける。installはここではpackage導入ではなく、コピー時にroot:rootと0644を指定するコマンド。0644では所有者だけが書け、他のuserは読める。末尾の改行も本文の一部となる。',
  'Разделите рабочий файл nano и файл выдачи Nginx. Здесь install копирует файл с владельцем root:root и режимом 0644, а не устанавливает пакет. Писать может владелец, остальные могут читать. Завершающий перевод строки входит в содержимое.',

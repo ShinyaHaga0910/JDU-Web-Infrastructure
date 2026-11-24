@@ -18,7 +18,7 @@
 <p>初回セットアップで、Nginxのパッケージは <strong>配布サーバー</strong> に用意される。<strong>Webサーバー</strong> には、APTが配布サーバー（<code>10.20.2.30</code>）を使うための設定が入る。WebサーバーへのNginxのインストールは、P1で行う。</p>
 <p>パッケージ一覧が準備できていれば、Webサーバーの端末で次のコマンドを使ってインストールできる。</p>
 <pre><code>sudo apt install nginx</code></pre>
-<p>このコマンドで、APTはNginxと必要なパッケージを配布サーバーから取得し、Webサーバーにプログラムや初期設定を配置する。演習で使う一覧の更新手順と、オプション付きの導入コマンドはP1で扱う。<a href="https://ubuntu.com/server/docs/how-to/software/package-management/#install-a-package">Ubuntuのパッケージ管理</a></p>
+<p>このコマンドで、APTはNginxと必要なパッケージを配布サーバーから取得し、Webサーバーにプログラムや初期設定を配置する。P1では、パッケージ一覧の更新からインストールまでを実際に行う。<a href="https://ubuntu.com/server/docs/how-to/software/package-management/#install-a-package">Ubuntuのパッケージ管理</a></p>
 <h3 id="2-起動する">2. 起動する</h3>
 <p>Ubuntu OSでは、サービスを管理する <strong>systemd</strong> に起動を指示する。Webサーバーで次のコマンドを実行すると、systemdが現在の <code>nginx</code> サービスを起動する。インストール時にすでに起動している場合もある。現在動いているかは <code>systemctl is-active nginx</code> で確認でき、起動中なら <code>active</code> と表示される。<a href="https://www.freedesktop.org/software/systemd/man/latest/systemctl.html">systemctlのサービス管理</a></p>
 <pre><code>sudo systemctl start nginx</code></pre>

@@ -42,7 +42,7 @@ School inventory server
 sudo apt install nginx
 ```
 
-このコマンドで、APTはNginxと必要なパッケージを配布サーバーから取得し、Webサーバーにプログラムや初期設定を配置する。演習で使う一覧の更新手順と、オプション付きの導入コマンドはP1で扱う。[Ubuntuのパッケージ管理](https://ubuntu.com/server/docs/how-to/software/package-management/#install-a-package)
+このコマンドで、APTはNginxと必要なパッケージを配布サーバーから取得し、Webサーバーにプログラムや初期設定を配置する。P1では、パッケージ一覧の更新からインストールまでを実際に行う。[Ubuntuのパッケージ管理](https://ubuntu.com/server/docs/how-to/software/package-management/#install-a-package)
 
 ### 2. 起動する
 

@@ -88,12 +88,14 @@ m = module('P1', T('HTTPで静的ファイルを返す', 'Выдача стат�
  T('Nginx、保存先、待受、HTTP応答、access logを一組で確認する。', 'Связать Nginx, файл, прослушивание порта, HTTP-ответ и access log.', 'Nginx, fayl joyi, tinglash porti, HTTP javobi va access log ni bog‘lash.'),
  T('Webの/var/www/html/practice.txtから指定本文をHTTP200で返す。Web自身・踏み台・外部の三経路で確認する。', 'Файл /var/www/html/practice.txt на Web должен возвращать заданный текст с HTTP 200: локально, с бастиона и извне.', 'Web dagi /var/www/html/practice.txt belgilangan matnni HTTP 200 bilan qaytarsin: Web ichidan, bastiondan va tashqaridan tekshiring.'))
 step(m, T('内部APTからNginxを導入する', 'Установить Nginx из внутреннего APT', 'Ichki APT dan Nginx o‘rnatish'), 'web',
- T('P0と同じ方法でWebへSSM接続し、role=webを確認する。APTのsourceを読み、10.20.2.30の署名済みrepoだけを使う。updateは一覧を取得し、installはpackageを導入する。Internet用sourceを追加しない。',
-   'Подключитесь по SSM к Web как в P0 и проверьте role=web. Проверьте APT source: используется только подписанный repo 10.20.2.30. update получает индекс, install устанавливает пакет. Не добавляйте внешние источники.',
-   'P0 dagidek Web ga SSM orqali kiring va role=web ni tekshiring. APT source faqat 10.20.2.30 dagi imzolangan repo ekanini ko‘ring. update indeksni oladi, install paketni o‘rnatadi. Internet source qo‘shmang.'),
- 'cat /etc/apt/sources.list.d/jdu-web.sources\nsudo apt-get update -o APT::Update::Error-Mode=any\nsudo apt-get install --no-install-recommends nginx',
- T('sourceに内部IPとSigned-Byがあり、署名エラーなしで終了する。インストール確認にYを入力する。', 'В source указаны внутренний IP и Signed-By; установка завершается без ошибки подписи. На запрос установки ответьте Y.', 'Source ichida ichki IP va Signed-By bor; imzo xatosisiz tugaydi. O‘rnatish tasdig‘iga Y kiriting.'),
- T('取得失敗ならrepoのrunning/SSMとIPを確認。--allow-unauthenticatedや外部pipで回避しない。', 'При ошибке получения проверьте repo, его running/SSM и IP. Не обходите подпись через --allow-unauthenticated или внешний pip.', 'Yuklash xatosida repo running/SSM va IP ni tekshiring. --allow-unauthenticated yoki tashqi pip bilan chetlab o‘tmang.'))
+ T('P0と同じ方法でWebサーバーへSSMで接続し、ロールが `web` であることを確認する。初回セットアップで指定された内部の配布サーバー（`10.20.2.30`）からパッケージを取得する。',
+   'Подключитесь к Web-серверу через SSM, как в P0, и проверьте роль `web`. Пакеты загружаются с внутреннего сервера `10.20.2.30`, заданного при начальной настройке.',
+   'P0 dagidek Web serverga SSM orqali ulaning va roli `web` ekanini tekshiring. Paketlar dastlabki sozlashda belgilangan ichki `10.20.2.30` serveridan olinadi.'),
+ 'sudo apt-get update\nsudo apt-get install nginx',
+ T('一覧を更新すると、配布サーバーの行に `Hit:` または `Get:` が表示される。`N: Ignoring file ... ubuntu.sources.jdu-disabled` は、初回セットアップで無効にしたUbuntu標準の配布先設定をAPTが読み飛ばしたという通知である。取得や署名のエラーがなければインストールへ進む。確認画面が出たら `Y` を入力する。',
+   'При обновлении списка в строке внутреннего сервера появляется `Hit:` или `Get:`. Сообщение `N: Ignoring file ... ubuntu.sources.jdu-disabled` означает, что APT пропустил стандартный источник Ubuntu, отключённый при начальной настройке. Если ошибок загрузки или проверки подписи нет, продолжайте установку. Если APT запросит подтверждение, введите `Y`.',
+   'Ro‘yxat yangilanganda ichki server qatorida `Hit:` yoki `Get:` ko‘rinadi. `N: Ignoring file ... ubuntu.sources.jdu-disabled` xabari APT dastlabki sozlashda o‘chirilgan standart Ubuntu manbasi faylini o‘tkazib yuborganini bildiradi. Yuklash yoki imzo tekshiruvida xato bo‘lmasa, o‘rnatishni davom ettiring. Tasdiq so‘ralsa, `Y` kiriting.'),
+ T('パッケージ一覧の取得に失敗した場合は、配布サーバーの稼働状態とIPアドレスを確認する。', 'Если не удалось получить список пакетов, проверьте состояние и IP-адрес внутреннего сервера пакетов.', 'Paketlar ro‘yxatini olib bo‘lmasa, ichki paket serverining holati va IP manzilini tekshiring.'))
 step(m, T('正しい本文を作り、所有者と権限を揃える', 'Создать точный текст и права файла', 'Aniq matn yaratish va ruxsatlarni sozlash'), 'web',
  T('まずnanoで練習本文を編集する。表示する1行は下の指定どおりで、最後に改行を入れる。Ctrl+O→Enterで保存、Ctrl+Xで終了する。installはファイルを配置し、-o/-gは所有者、-mは権限を指定する。',
    'Создайте текст через nano: одна точная строка, указанная ниже, с переводом строки в конце. Ctrl+O → Enter сохраняет, Ctrl+X закрывает редактор. install копирует файл; -o/-g задают владельца и группу, -m — права.',
