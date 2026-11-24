@@ -175,28 +175,37 @@ STUDENT_WAIT_TEXT = {
 }
 
 
-PACKAGE_LABELS = ('package_hint', 'download_progress', 'packing', 'archive_progress', 'repo_hint', 'package_elapsed')
+PACKAGE_LABELS = ('package_hint', 'download_progress', 'packing', 'archive_progress', 'repo_hint', 'package_elapsed',
+                  'archive_reuse_check', 'archive_reused')
 PACKAGE_TEXT = {
     'en': ('Downloading and transferring packages may take about 20 minutes. Keep this terminal open.',
            'Files downloaded and verified {done}/{total}', 'Grouping verified files into archives.',
            'Archives transferred and verified {done}/{total}',
            'The package server is unpacking the archives and verifying each file. Keep this terminal open.',
-           'Working · elapsed {elapsed}'),
+           'Working · elapsed {elapsed}',
+           'Checking for previously transferred archives on the package server.',
+           'Verified and reused {count} package files in the existing archives. Download and transfer skipped.'),
     'ja': ('パッケージの取得と転送は、通信状況によって20分程度かかることがあります。この画面を開いたままお待ちください。',
            '取得・検証済みのファイル {done}/{total}', '検証済みのファイルをアーカイブにまとめています。',
            '転送・検証済みのアーカイブ {done}/{total}',
            '配布サーバーでアーカイブを展開し、ファイルを一つずつ検証しています。この画面を開いたままお待ちください。',
-           '処理中です · 経過 {elapsed}'),
+           '処理中です · 経過 {elapsed}',
+           '配布サーバーに転送済みのアーカイブを確認しています。',
+           '確認済みのアーカイブに含まれる {count} ファイルを再利用します。取得と転送を省略します。'),
     'ru': ('Загрузка и передача пакетов могут занять около 20 минут. Оставьте терминал открытым.',
            'Файлов загружено и проверено {done}/{total}', 'Проверенные файлы объединяются в архивы.',
            'Архивов передано и проверено {done}/{total}',
            'Сервер пакетов распаковывает архивы и проверяет каждый файл. Оставьте терминал открытым.',
-           'Выполняется · прошло {elapsed}'),
+           'Выполняется · прошло {elapsed}',
+           'Проверяются ранее переданные архивы на сервере пакетов.',
+           'Проверенные архивы с {count} файлами будут использованы повторно. Загрузка и передача пропущены.'),
     'uz': ('Paketlarni yuklab olish va uzatish taxminan 20 daqiqa olishi mumkin. Terminalni ochiq qoldiring.',
            'Yuklab olingan va tekshirilgan fayllar {done}/{total}', 'Tekshirilgan fayllar arxivlarga yig‘ilmoqda.',
            'Uzatilib, tekshirilgan arxivlar {done}/{total}',
            'Paket tarqatish serveri arxivlarni ochib, har bir faylni tekshirmoqda. Terminalni ochiq qoldiring.',
-           'Jarayon davom etmoqda · o‘tgan vaqt {elapsed}'),
+           'Jarayon davom etmoqda · o‘tgan vaqt {elapsed}',
+           'Paket tarqatish serveriga avval uzatilgan arxivlar tekshirilmoqda.',
+           'Tekshirilgan arxivlardagi {count} ta fayl qayta ishlatiladi. Yuklab olish va uzatish o‘tkazib yuboriladi.'),
 }
 
 
@@ -971,14 +980,20 @@ def setup_student(args, screen, session, account, config, work, teacher_account)
         progress = screen.text['archive_progress'].format(done=done, total=len(recipe['archives']))
         screen.record(progress)
 
-    with tempfile.TemporaryDirectory() as scratch, screen.aws_wait(hint='package_hint', progress=lambda: progress):
-        directory = Path(scratch)
-        sources = download_packages(index, cache, directory, download_progress)
-        progress = screen.text['packing']
-        screen.record(progress)
-        recipe['archives'] = build_archives(sources, directory)
-        archive_progress(0)
-        repo_hash = transfer(ssm, nodes['repo'], directory, recipe, archive_progress)
+    with screen.aws_wait(hint='archive_reuse_check'):
+        repo_hash = guest(ssm, nodes['repo'], {'operation': 'reuse-archives',
+                         'pinned_sha256': hashlib.sha256(encoded(recipe)).hexdigest()})['recipe_sha256']
+    if repo_hash is None:
+        with tempfile.TemporaryDirectory() as scratch, screen.aws_wait(hint='package_hint', progress=lambda: progress):
+            directory = Path(scratch)
+            sources = download_packages(index, cache, directory, download_progress)
+            progress = screen.text['packing']
+            screen.record(progress)
+            recipe['archives'] = build_archives(sources, directory)
+            archive_progress(0)
+            repo_hash = transfer(ssm, nodes['repo'], directory, recipe, archive_progress)
+    else:
+        screen.record(screen.text['archive_reused'].format(count=len(index)))
     screen.step('repo')
     with screen.aws_wait(hint='repo_hint'):
         public_key = guest(ssm, nodes['repo'], {'operation': 'repo', 'recipe_sha256': repo_hash})['key']

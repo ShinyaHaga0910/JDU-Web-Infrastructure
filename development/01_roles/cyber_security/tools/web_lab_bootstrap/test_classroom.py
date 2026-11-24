@@ -349,6 +349,34 @@ class ClassroomTests(unittest.TestCase):
             self.assertEqual({name: classroom.summary(assets / name) for name in archives}, archives)
             self.assertEqual(classroom.summary(assets / 'recipe.json'), recipe_hash)
 
+    def test_retry_reuses_only_intact_archives_for_the_same_recipe(self):
+        with tempfile.TemporaryDirectory() as scratch, patch.object(classroom_guest, 'ROOT', Path(scratch)):
+            assets = Path(scratch) / 'assets'
+            assets.mkdir()
+            archive = assets / 'jdu-dependencies-0001.tar'
+            archive.write_bytes(b'transferred archive')
+            pinned = {'assets': {'file.deb': 'a' * 64}, 'requirements': '', 'packages': ['file=1']}
+            digest = hashlib.sha256(classroom.encoded(pinned)).hexdigest()
+            self.assertIsNone(classroom_guest.reusable_recipe(digest))
+            recipe = assets / 'recipe.json'
+            recipe.write_bytes(classroom.encoded(dict(pinned, archives={archive.name: classroom.summary(archive)})))
+            self.assertEqual(classroom_guest.reusable_recipe(digest), classroom.summary(recipe))
+            self.assertIsNone(classroom_guest.reusable_recipe('0' * 64))
+            archive.write_bytes(b'damaged archive')
+            self.assertIsNone(classroom_guest.reusable_recipe(digest))
+            archive.unlink()
+            self.assertIsNone(classroom_guest.reusable_recipe(digest))
+
+    def test_web_readiness_accepts_socket_activated_ssh(self):
+        def run(args, **kwargs):
+            if args[:3] == ['systemctl', 'is-active', '--quiet'] and args[3].startswith('ssh'):
+                return Mock(returncode=0 if 'ssh.socket' in args else 3)
+            return Mock(returncode=0, stdout=b'')
+
+        with patch.object(classroom_guest.subprocess, 'run', side_effect=run):
+            result = classroom_guest.verify({'role': 'web', 'instance_id': 'web-instance'})
+        self.assertTrue(result['checks']['ssh'])
+
     def test_archive_rejection_prevents_sending_recipe(self):
         recipe = {'archives': {'jdu-dependencies-0001.tar': '0' * 64}}
         with tempfile.TemporaryDirectory() as scratch, \
@@ -394,7 +422,7 @@ class ClassroomTests(unittest.TestCase):
         }
         screen.aws_wait.side_effect = lambda **kwargs: contextlib.nullcontext()
         screen.text = dict(download_progress='{done}/{total}', archive_progress='{done}/{total}', packing='packing',
-                           wait_for_ssm='waiting', deploy_helpers='deploying')
+                           archive_reused='Reused {count}', wait_for_ssm='waiting', deploy_helpers='deploying')
         screen.servers = dict(zip(nodes, nodes))
         configure_barrier = threading.Barrier(5)
         keys_barrier = threading.Barrier(4)
@@ -404,7 +432,11 @@ class ClassroomTests(unittest.TestCase):
 
         def guest(ssm, node, request, file='classroom_guest.py'):
             operation = request.get('operation') or request['command']
+            if operation == 'reuse-archives':
+                self.assertEqual(node, nodes['repo'])
+                return {'recipe_sha256': 'existing-recipe'}
             if operation == 'repo':
+                self.assertEqual(request['recipe_sha256'], 'existing-recipe')
                 return {'key': 'repository-key'}
             if operation == 'configure':
                 self.assertEqual(request['public_key'], 'repository-key')
@@ -444,6 +476,9 @@ class ClassroomTests(unittest.TestCase):
                                stage_lessons=Mock(), register_bastion=Mock()):
             ip = classroom.setup_student(Mock(ref='a' * 40), screen, session, '012345678901', config, Path(scratch), '123456789012')
             self.assertEqual(checker.call_args.args[-1], '123456789012')
+            classroom.download_packages.assert_not_called()
+            classroom.build_archives.assert_not_called()
+            classroom.transfer.assert_not_called()
         self.assertEqual(ip, '192.0.2.20')
         session.client.return_value.describe_instances.assert_called_once_with(InstanceIds=[nodes['bastion']])
 

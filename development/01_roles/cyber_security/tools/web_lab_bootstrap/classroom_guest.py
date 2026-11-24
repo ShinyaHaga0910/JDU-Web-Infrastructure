@@ -157,6 +157,31 @@ def unpack_archives(directory, archives, inventory):
         raise ValueError('Dependency archives do not cover the entire package inventory')
 
 
+def reusable_recipe(expected):
+    recipe = ROOT / 'assets/recipe.json'
+    if not recipe.is_file() or recipe.is_symlink():
+        return None
+    raw = recipe.read_bytes()
+    try:
+        definition = json.loads(raw)
+    except ValueError:
+        return None
+    if not isinstance(definition, dict):
+        return None
+    archives = definition.pop('archives', None)
+    pinned = json.dumps(definition, sort_keys=True, separators=(',', ':')).encode()
+    if hashlib.sha256(pinned).hexdigest() != expected or not isinstance(archives, dict) or not archives:
+        return None
+    for name, digest in archives.items():
+        if not ARCHIVE.fullmatch(name) or not isinstance(digest, str) or not HEX.fullmatch(digest):
+            return None
+        path = recipe.parent / name
+        if (not path.is_file() or path.is_symlink() or not 0 < path.stat().st_size <= MAX_ASSET
+                or sha(path) != digest):
+            return None
+    return hashlib.sha256(raw).hexdigest()
+
+
 def repository(config):
     assets = ROOT / 'assets'
     # Validate the full pinned inventory before producing anything students can install.
@@ -255,8 +280,10 @@ def configure(config):
 
 def verify(config):
     role = config['role']
-    checks = {s: subprocess.run(['systemctl', 'is-active', '--quiet', s]).returncode == 0
-              for s in ('ssh', 'chrony')}
+    checks = {
+        'ssh': subprocess.run(['systemctl', 'is-active', '--quiet', 'ssh.service', 'ssh.socket']).returncode == 0,
+        'chrony': subprocess.run(['systemctl', 'is-active', '--quiet', 'chrony']).returncode == 0,
+    }
     forbidden = {'web': 'nginx', 'dns': 'bind9', 'db': 'postgresql-16'}
     if role in forbidden:
         value = subprocess.run(['dpkg-query', '-W', '-f=${db:Status-Status}', forbidden[role]], capture_output=True)
@@ -279,7 +306,9 @@ def main():
         ThreadingHTTPServer(('127.0.0.1', PORT), Receiver).serve_forever()
         return
     config = json.load(sys.stdin)
-    if config['operation'] == 'repo':
+    if config['operation'] == 'reuse-archives':
+        value = {'recipe_sha256': reusable_recipe(config['pinned_sha256'])}
+    elif config['operation'] == 'repo':
         recipe = ROOT / 'assets/recipe.json'
         if sha(recipe) != config['recipe_sha256']:
             raise ValueError('Repository recipe hash differs')
