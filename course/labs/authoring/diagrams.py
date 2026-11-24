@@ -107,7 +107,7 @@ def diagram_stem(task):
 def connection_diagram(s):
     lang=s.lang
     practice=s.task=='P0'
-    title=T('Webサーバーへの接続とサーバー構築用ファイルの配置','Подключение к Web и размещение файлов для настройки','Web serverga ulanish va sozlash fayllarini joylash') if practice else T(
+    title=T('P0で操作するWebサーバー','Web-сервер для практики P0','P0 da ishlatiladigan Web server') if practice else T(
         'M0で操作する4台のサーバー','Четыре сервера для задания M0','M0 da ishlatiladigan to‘rtta server')
     s.text(25,15,title[lang],25)
     s.rect(224,65,790,575,fill='#f1f7fc',stroke='#7e9cb3',width=2)
@@ -116,40 +116,23 @@ def connection_diagram(s):
     s.text(588,116,'VPC  10.20.0.0/16',19)
     s.simple(35,215,LABELS['pc'][lang],w=150)
     s.simple(248,215,'Session Manager',w=190)
-    s.simple(248,410,'CloudShell',w=190,ellipse=True)
     browser=T('ブラウザ','Браузер','Brauzer')[lang]
     s.path([(185,247),(248,247)],browser,(215,181))
     s.text(343,294,T('EC2の接続画面から開く','Открывается из консоли EC2','EC2 ulanish sahifasidan ochiladi')[lang],16,color=TEAL,center=True,max_width=232)
-    blue='#285da8'
-    s.path([(438,442),(612,442),(612,293),(655,293)],color=blue)
-    s.path([(612,442),(612,461),(655,461)],color=blue)
-    s.text(354,494,T('初期構築でファイルを配置','Файлы при развёртывании','Sozlashda fayllarni joylash')[lang],16,color=blue,center=True,max_width=235)
-    s.text(353,522,'SSM',16,color=blue,center=True)
     if practice:
-        s.path([(438,248),(526,248),(526,255),(655,255)], 'P0.2', (494,215))
+        s.path([(438,248),(526,248),(526,274),(655,274)], 'P0.2', (494,215))
     else:
-        s.path([(438,248),(526,248),(526,175),(655,175)], 'M0', (494,215))
-        for target_y in (343, 427, 511):
+        s.path([(438,248),(526,248),(526,190),(655,190)], 'M0', (494,215))
+        for target_y in (358, 442, 526):
             s.path([(526,248),(526,target_y),(655,target_y)])
     roles=('bastion','web','dns','db','repo')
     for i,role in enumerate(roles):
         y=155+i*84
-        receives_files=role in ('web','db')
-        fill='#edf4ff' if receives_files else '#f4f7fa'
         target = role == 'web' if practice else role != 'web'
-        stroke=TEAL if target else blue if receives_files else GRAY
-        s.rect(655,y,309,71,fill=fill,stroke=stroke,width=2)
+        s.rect(655,y,309,71,fill='#e7f4f2' if target else '#f4f7fa',stroke=TEAL if target else GRAY,width=2)
         name=LABELS[role][lang]+('ー' if lang=='ja' else '')
-        s.text(670,y+6,'EC2 '+name,18)
-        s.text(900,y+8,IPS[role],15,color=MUTED,center=True)
-        if receives_files:
-            label=(T('catalog-app.tar.gz など','catalog-app.tar.gz и другие файлы','catalog-app.tar.gz va boshqa fayllar') if practice else
-                   T('サーバー構築用ファイルの配置先','Файлы для настройки сервера','Serverni sozlash fayllari'))[lang]
-            s.text(670,y+37,label,16,color=stroke,max_width=280)
-        if practice and role=='repo':
-            s.text(670,y+37,T('Ubuntuなどのパッケージを配信','Раздача пакетов для Ubuntu','Ubuntu paketlarini tarqatish')[lang],16,color=MUTED)
-    user_label=T('接続先のOSユーザー：ssm-user','Пользователь ОС: ssm-user','OS foydalanuvchisi: ssm-user')[lang]
-    s.text(810,609,('P0.2  ' if practice else '')+user_label,17,center=True)
+        s.text(670,y+23,'EC2 '+name,18)
+        s.text(900,y+25,IPS[role],15,color=MUTED,center=True)
 
 
 def diagram_text(task,lang):
@@ -157,14 +140,14 @@ def diagram_text(task,lang):
     if n==0:
         if task=='P0':
             caption=T(
-                '緑の矢印はP0.2の端末接続。青の矢印は初期構築時のサーバー構築用ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。',
-                'Зелёная стрелка показывает подключение к терминалу в P0.2. Синие стрелки показывают размещение файлов для настройки серверов при создании среды. Repo-сервер раздаёт пакеты для Ubuntu.',
-                'Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlab serverlarni sozlash fayllarini joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi.')[lang]
+                '緑の矢印はP0.2でWebサーバーに接続する経路。',
+                'Зелёная стрелка ведёт к Web-серверу в P0.2.',
+                'Yashil strelka P0.2 da Web serverga ulanishni ko‘rsatadi.')[lang]
             return caption,caption
         caption=T(
-            '緑の矢印はM0でSession Managerから接続する4台を示す。それぞれのサーバーで確認用ファイルを作る。青の矢印は初期構築時のサーバー構築用ファイルの配置を示す。',
-            'Зелёные стрелки указывают на четыре сервера для подключения через Session Manager и создания файла. Синие стрелки показывают размещение файлов при создании среды.',
-            'Yashil strelkalar Session Manager orqali ulanib, fayl yaratiladigan to‘rtta serverni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda fayllar qayerga joylanishini ko‘rsatadi.')[lang]
+            '緑の矢印はM0で接続する4台への経路。',
+            'Зелёные стрелки ведут к четырём серверам для M0.',
+            'Yashil strelkalar M0 da ulaniladigan to‘rtta serverga olib boradi.')[lang]
         return caption,caption
     before,action,result=STAGES[n]
     caption=T('図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。','Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки.','Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir.')[lang]
@@ -182,53 +165,9 @@ def diagram_text(task,lang):
     alt=f'{task}: {before[lang]} → {action[lang]} → {result[lang]}。 '+caption
     return alt,caption
 
-RESOURCE_DIAGRAM = 'p0-lesson-files'
-RESOURCE_CAPTION = T(
-    '共通登録コードで環境を構築すると、CloudShellはGitHubからサーバー構築用ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。',
-    'При создании среды по общему коду CloudShell загружает файлы для настройки серверов с GitHub и размещает их на Web- и DB-серверах через SSM.',
-    'Muhit umumiy kod orqali yaratilganda, CloudShell serverlarni sozlash fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi.')
-
-
-def lesson_files_diagram(s):
-    lang=s.lang
-    s.text(25,20,T('サーバー構築用ファイルを取得して配置する','Загрузка и размещение файлов для настройки серверов','Sozlash fayllarini yuklab olish va joylash')[lang],26)
-    s.rect(292,92,720,488,fill='#f1f7fc',stroke='#7e9cb3',width=2)
-    s.text(314,104,'AWS',20)
-    s.rect(626,152,358,390,stroke='#7e9cb3',width=2)
-    s.text(648,165,'VPC  10.20.0.0/16',19)
-    s.simple(35,298,'GitHub',w=150)
-    s.simple(322,298,'CloudShell',w=158,ellipse=True)
-    download=T('① ダウンロード','① Загрузка','① Yuklab olish')[lang]
-    s.path([(185,330),(322,330)],download,(253,262))
-    s.text(253,291,'HTTPS',16,color=TEAL,center=True)
-    blue='#285da8'
-    placement=T('② 配置','② Размещение','② Joylash')[lang]
-    s.path([(480,330),(554,330),(554,262),(650,262)],placement,(554,210),color=blue)
-    s.path([(554,330),(554,432),(650,432)],color=blue)
-    s.text(590,337,'SSM',18,color=blue,center=True)
-    for role, y in (('web',212),('db',382)):
-        s.rect(650,y,308,100,fill='#edf4ff',stroke=blue,width=2)
-        name=LABELS[role][lang]+('ー' if lang=='ja' else '')
-        s.text(670,y+13,'EC2 '+name,21)
-        s.text(670,y+59,'catalog-app.tar.gz',18,color=blue)
-
-
-def lesson_files_markdown(lang):
-    title=T('初期構築で配置されるサーバー構築用ファイル','Файлы для настройки серверов, размещённые при создании среды','Dastlab joylanadigan serverlarni sozlash fayllari')[lang]
-    intro=T(
-        '共通登録コードで初期構築を完了すると、備品管理アプリとDB設定用のSQLが入った `catalog-app.tar.gz` は、WebサーバーとDBサーバーの `/var/lib/jdu-web/lesson-resources-r1` に配置済みです。WebサーバーからインターネットへのHTTPS接続はセキュリティのために制限されているので、構築スクリプトが下の経路でサーバー構築用ファイルを届けます。',
-        'После создания среды по общему коду архив `catalog-app.tar.gz` с приложением и SQL для настройки БД уже находится в `/var/lib/jdu-web/lesson-resources-r1` на Web- и DB-серверах. В целях безопасности исходящие HTTPS-подключения с Web-сервера к интернету ограничены, поэтому скрипт доставляет файлы по показанному маршруту.',
-        'Muhit umumiy kod bilan yaratilgach, ilova va DB uchun SQL fayllari bor `catalog-app.tar.gz` arxivi Web va DB serverlaridagi `/var/lib/jdu-web/lesson-resources-r1` katalogiga joylangan bo‘ladi. Xavfsizlik uchun Web serverdan internetga chiquvchi HTTPS ulanishlari cheklangan, shuning uchun skript fayllarni quyidagi yo‘l orqali yetkazadi.')[lang]
-    caption=RESOURCE_CAPTION[lang]
-    return ['### '+title, '', intro, '', f'![{caption}](../../assets/{lang}/{RESOURCE_DIAGRAM}.png)', '', caption, '']
-
-
 def write_diagrams(root):
     counts={}
     for lang in LANGS:
-        resources=Scene(lang,RESOURCE_DIAGRAM)
-        lesson_files_diagram(resources)
-        counts[f'{lang}/{RESOURCE_DIAGRAM}']=resources.finish(root/'assets'/lang/RESOURCE_DIAGRAM,RESOURCE_CAPTION[lang])
         for prefix in ('P','M'):
             for n in ACTIVE_NUMBERS:
                 task=prefix+str(n);s=Scene(lang,task)
@@ -305,5 +244,5 @@ def write_diagrams(root):
 def diagram_markdown(task,lang):
     alt,caption=diagram_text(task,lang)
     name=f'../../assets/{lang}/{diagram_stem(task)}'
-    title=T('操作するサーバーとサーバー構築用ファイルの配置先','Подключение к серверам и размещение файлов для настройки','Serverlarga ulanish va sozlash fayllarini joylash')[lang] if task.endswith('0') else T('今回の見取り図','Схема задания','Topshiriq diagrammasi')[lang]
+    title=T('接続するサーバー','Подключение к серверам','Ulaniladigan serverlar')[lang] if task.endswith('0') else T('今回の見取り図','Схема задания','Topshiriq diagrammasi')[lang]
     return ['### '+title,'',f'![{alt}]({name}.png)','',caption,'']

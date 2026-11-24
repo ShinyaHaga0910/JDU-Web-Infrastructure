@@ -164,9 +164,9 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tbody>
 </table>
 <p>課題画面で <strong>M0</strong> を選ぶと、4台のファイルを個別に確認できます。ファイル1つにつき1点で、満点は4点です。</p>
-<h3>操作するサーバーとサーバー構築用ファイルの配置先</h3>
-<p><img src="../../../assets/ja/m0-ssm.png" alt="緑の矢印はM0でSession Managerから接続する4台を示す。それぞれのサーバーで確認用ファイルを作る。青の矢印は初期構築時のサーバー構築用ファイルの配置を示す。" width="1040" height="680" loading="lazy"></p>
-<p>緑の矢印はM0でSession Managerから接続する4台を示す。それぞれのサーバーで確認用ファイルを作る。青の矢印は初期構築時のサーバー構築用ファイルの配置を示す。</p>
+<h3>接続するサーバー</h3>
+<p><img src="../../../assets/ja/m0-ssm.png" alt="緑の矢印はM0で接続する4台への経路。" width="1040" height="680" loading="lazy"></p>
+<p>緑の矢印はM0で接続する4台への経路。</p>
 <p><img src="../../../assets/shared/ec2-session-manager-instances.png" alt="EC2のInstances一覧。P0は名前の末尾が  の行、M0は ・・・ の行を順に選ぶ。" width="1393" height="382" loading="lazy"></p>
 <p>EC2のInstances一覧。P0は名前の末尾が <code>-web</code> の行、M0は <code>-db</code>・<code>-dns</code>・<code>-repo</code>・<code>-bastion</code> の行を順に選ぶ。</p>
 <p><img src="../../../assets/shared/ec2-session-manager-connect.png" alt="EC2の詳細画面。Connectの右の矢印からConnect with SSM Session Managerを選ぶ。Webサーバーの画面を例に示す。" width="1245" height="319" loading="lazy"></p>
@@ -175,7 +175,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <ol>
 <li>P0で使った課題画面に学校のGoogleアカウントでログインし、自分のLabと <strong>M0</strong> を選ぶ。</li>
 <li>「この課題を確認する」を押す。</li>
-<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。</li>
+<li>処理中は「結果を更新する」で完了を待ち、クリアした項目数を確認する。「要修正」の項目があれば直してからもう一度確認する。結果は自動保存される。</li>
 </ol>
 <h2 id="section-7">M1 HTTPで静的ファイルを返す (8)</h2>
 <h3>完成要件</h3>
@@ -237,7 +237,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <ol>
 <li>P0で使った課題画面に学校のGoogleアカウントでログインし、自分のLabと <strong>M1</strong> を選ぶ。</li>
 <li>「この課題を確認する」を押す。</li>
-<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。</li>
+<li>処理中は「結果を更新する」で完了を待ち、クリアした項目数を確認する。「要修正」の項目があれば直してからもう一度確認する。結果は自動保存される。</li>
 </ol>
 <h2 id="section-8">M2 内部DNSと通常の名前解決 (13)</h2>
 <h3>完成要件</h3>
@@ -350,7 +350,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <ol>
 <li>P0で使った課題画面に学校のGoogleアカウントでログインし、自分のLabと <strong>M2</strong> を選ぶ。</li>
 <li>「この課題を確認する」を押す。</li>
-<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。</li>
+<li>処理中は「結果を更新する」で完了を待ち、クリアした項目数を確認する。「要修正」の項目があれば直してからもう一度確認する。結果は自動保存される。</li>
 </ol>
 <h2 id="section-9">M4 PostgreSQLへの認証接続 (9)</h2>
 <h3>完成要件</h3>
@@ -417,7 +417,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <ol>
 <li>P0で使った課題画面に学校のGoogleアカウントでログインし、自分のLabと <strong>M4</strong> を選ぶ。</li>
 <li>「この課題を確認する」を押す。</li>
-<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。</li>
+<li>処理中は「結果を更新する」で完了を待ち、クリアした項目数を確認する。「要修正」の項目があれば直してからもう一度確認する。結果は自動保存される。</li>
 </ol>
 <h2 id="section-10">M5 教員アプリをWeb・DBへ接続する (13)</h2>
 <h3>完成要件</h3>
@@ -530,7 +530,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <ol>
 <li>P0で使った課題画面に学校のGoogleアカウントでログインし、自分のLabと <strong>M5</strong> を選ぶ。</li>
 <li>「機能・権限を含めて確認する」を選び、lab_admin の既存パスワードを「アプリ管理者の既存パスワード」に非表示入力して「このパスワードで確認する」を押す。RDP用とは別。設定だけの確認では機能の合格を確定しない。</li>
-<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。</li>
+<li>処理中は「結果を更新する」で完了を待ち、クリアした項目数を確認する。「要修正」の項目があれば直してからもう一度確認する。結果は自動保存される。</li>
 </ol>
 <h2 id="section-11">M6 最小権限と公開範囲 (16)</h2>
 <h3>完成要件</h3>
@@ -655,11 +655,11 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <ol>
 <li>P0で使った課題画面に学校のGoogleアカウントでログインし、自分のLabと <strong>M6</strong> を選ぶ。</li>
 <li>「機能・権限を含めて確認する」を選び、lab_admin の既存パスワードを「アプリ管理者の既存パスワード」に非表示入力して「このパスワードで確認する」を押す。RDP用とは別。設定だけの確認では機能の合格を確定しない。</li>
-<li>処理中は「結果を更新する」で完了を待ち、課題ID・時刻・各check・保存状態を読む。結果は自動保存され、Mの成績は「保存済み成績を見る」で確認できる。</li>
+<li>処理中は「結果を更新する」で完了を待ち、クリアした項目数を確認する。「要修正」の項目があれば直してからもう一度確認する。結果は自動保存される。</li>
 </ol>
 <h2 id="section-12">次回の再開・結果の確認</h2>
 <p>次回は本人のLabと同じ5台を起動し、running/SSM Onlineと現在の公開IPを確認する。Web Portalへ学校Googleでログインし、まずM0で準備確認する。作成・鍵生成・登録を毎回繰り返す必要はない。期限切れは教師へ更新を依頼する。</p>
-<p>結果は自動保存される。処理中は「結果を更新する」、成績確認は「保存済み成績を見る」を使う。確認対象の課題・時刻と保存状態を読む。UNKNOWNは観測不能で、合格や0点を確定した意味ではない。未確認Mの確定済み点数は保持される。最新の評価可能な結果を使い、異なる回のPASSを合算したり自動で最高点を選んだりしない。</p>
+<p>結果は自動保存される。処理中は「結果を更新する」、成績確認は「保存済み成績を見る」を使う。クリアした項目数と修正が必要な項目を見る。UNKNOWNは観測不能で、合格や0点を確定した意味ではない。未確認Mの確定済み点数は保持される。最新の評価可能な結果を使い、異なる回のPASSを合算したり自動で最高点を選んだりしない。</p>
 <p>password/token/cookie/秘密鍵/env本文を提出物や会話へ送らない。</p>
 <h2 id="section-13">参考資料</h2>
 <ul>

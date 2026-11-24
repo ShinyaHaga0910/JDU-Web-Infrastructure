@@ -58,23 +58,23 @@ step(m, T('RDPで踏み台のデスクトップを開く', 'Открыть ра�
 
 
 RDP_STEPS = (
-    ('rdp-bastion-select', T('踏み台サーバーを選ぶ', 'Выберите бастион', 'Oraliq serverni tanlang'), T(
+    ('rdp-bastion-select-highlighted', T('踏み台サーバーを選ぶ', 'Выберите бастион', 'Oraliq serverni tanlang'), T(
         'EC2 → Instancesで、自分の演習環境のうち名前の末尾が `-bastion` の行を探し、同じ行の **Instance ID** をクリックする。',
         'Откройте EC2 → Instances, найдите в своей учебной среде строку с окончанием имени `-bastion` и нажмите **Instance ID** в этой строке.',
         'EC2 → Instances bo‘limida o‘z muhitingizdagi nomi `-bastion` bilan tugaydigan qatorni toping va shu qatordagi **Instance ID** ni bosing.')),
-    ('rdp-bastion-public-ip', T('公開IPv4アドレスをコピーする', 'Скопируйте публичный IPv4-адрес', 'Ommaviy IPv4 manzilini nusxalang'), T(
+    ('rdp-bastion-public-ip-highlighted', T('公開IPv4アドレスをコピーする', 'Скопируйте публичный IPv4-адрес', 'Ommaviy IPv4 manzilini nusxalang'), T(
         'インスタンスの詳細画面で **Public IPv4 address** の横にあるコピーアイコンを押す。次に入力するのは、自分の画面に表示された現在の公開IPv4アドレス。スクリーンショットの値は例。',
         'На странице экземпляра нажмите значок копирования рядом с **Public IPv4 address**. На следующем шаге используйте текущий адрес из своей консоли. Адрес на снимке приведён для примера.',
         'Instans tafsilotlarida **Public IPv4 address** yonidagi nusxalash belgisini bosing. Keyingi qadamda o‘z oynangizdagi joriy ommaviy IPv4 manzilini ishlating. Rasmdagi manzil misol.')),
-    ('rdp-connect', T('公開IPv4アドレスを入力して接続する', 'Введите публичный IPv4-адрес и подключитесь', 'Ommaviy IPv4 manzilini kiritib ulaning'), T(
+    ('rdp-connect-highlighted', T('公開IPv4アドレスを入力して接続する', 'Введите публичный IPv4-адрес и подключитесь', 'Ommaviy IPv4 manzilini kiritib ulaning'), T(
         '「リモート デスクトップ接続」の **コンピューター** 欄に、手順2でコピーした公開IPv4アドレスを貼り付け、**接続** を押す。',
         'В окне «Подключение к удалённому рабочему столу» вставьте скопированный на шаге 2 публичный IPv4-адрес в поле **Компьютер** и нажмите **Подключить**.',
         'Remote Desktop Connection oynasidagi **Computer** maydoniga 2-qadamda nusxalangan ommaviy IPv4 manzilini qo‘ying va **Connect** tugmasini bosing.')),
-    ('rdp-certificate', T('証明書の確認画面を読む', 'Проверьте предупреждение о сертификате', 'Sertifikat ogohlantirishini tekshiring'), T(
+    ('rdp-certificate-highlighted', T('証明書の確認画面を読む', 'Проверьте предупреждение о сертификате', 'Sertifikat ogohlantirishini tekshiring'), T(
         'この画面が出た場合は、表示された接続先を手順2の公開IPv4アドレスと照合する。接続先が今回の踏み台であり、演習用の証明書だと教師に確認できたら **はい** を押す。確認できない場合は **いいえ** を押して教師に相談する。',
         'Если появилось это окно, сверьте адрес назначения с публичным IPv4 из шага 2. Нажмите **Да**, когда преподаватель подтвердит, что это ваш бастион и сертификат учебной среды. Если подтвердить это не удалось, нажмите **Нет** и обратитесь к преподавателю.',
         'Bu oyna chiqsa, ulanish manzilini 2-qadamdagi ommaviy IPv4 manzili bilan solishtiring. O‘qituvchi bu sizning oraliq serveringiz va mashq sertifikati ekanini tasdiqlasa, **Yes** ni bosing. Tasdiqlanmasa, **No** ni bosing va o‘qituvchiga murojaat qiling.')),
-    ('rdp-xrdp-login', T('踏み台サーバーにログインする', 'Войдите на бастион', 'Oraliq serverga kiring'), T(
+    ('rdp-xrdp-login-highlighted', T('踏み台サーバーにログインする', 'Войдите на бастион', 'Oraliq serverga kiring'), T(
         'xrdpのログイン画面で **Session** が `Xorg` になっていることを確かめる。**username** に `labuser`、**password** に学生用セットアップで自分が設定したRDPパスワードを入力し、**OK** を押す。',
         'В окне входа xrdp проверьте, что в поле **Session** выбрано `Xorg`. Введите `labuser` в поле **username**, свой пароль RDP из начальной настройки в поле **password** и нажмите **OK**.',
         'xrdp kirish oynasida **Session** maydonida `Xorg` tanlanganini tekshiring. **username** maydoniga `labuser`, **password** maydoniga dastlab belgilagan RDP parolingizni yozing va **OK** ni bosing.')),

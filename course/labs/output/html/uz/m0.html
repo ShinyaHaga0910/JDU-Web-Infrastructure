@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Tayyor holat talablari</a> · <a href="#section-2">Serverlarga ulanish va sozlash fayllarini joylash</a> · <a href="#section-3">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M0 Shaxsiy muhit va buyruqlarni bajarish joyi (4)</h1>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Tayyor holat talablari</a> · <a href="#section-2">Ulaniladigan serverlar</a> · <a href="#section-3">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M0 Shaxsiy muhit va buyruqlarni bajarish joyi (4)</h1>
 <p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a></p>
 <p><a href="../ja/m0.html">日本語</a> · <a href="../ru/m0.html">Русский</a> · <a href="../uz/m0.html">O‘zbekcha</a></p>
 <p>Mos topshiriq: <a href="p0.html">P0</a>.</p>
@@ -51,9 +51,9 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tbody>
 </table>
 <p>Topshiriqlar sahifasida <strong>M0</strong> ni tanlang. Har bir to‘g‘ri fayl uchun 1 ball beriladi. Jami 4 ball.</p>
-<h2 id="section-2">Serverlarga ulanish va sozlash fayllarini joylash</h2>
-<p><img src="../../../assets/uz/m0-ssm.png" alt="Yashil strelkalar Session Manager orqali ulanib, fayl yaratiladigan to‘rtta serverni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda fayllar qayerga joylanishini ko‘rsatadi." width="1040" height="680" loading="lazy"></p>
-<p>Yashil strelkalar Session Manager orqali ulanib, fayl yaratiladigan to‘rtta serverni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda fayllar qayerga joylanishini ko‘rsatadi.</p>
+<h2 id="section-2">Ulaniladigan serverlar</h2>
+<p><img src="../../../assets/uz/m0-ssm.png" alt="Yashil strelkalar M0 da ulaniladigan to‘rtta serverga olib boradi." width="1040" height="680" loading="lazy"></p>
+<p>Yashil strelkalar M0 da ulaniladigan to‘rtta serverga olib boradi.</p>
 <p><img src="../../../assets/shared/ec2-session-manager-instances.png" alt="EC2 dagi Instances ro‘yxati. P0 uchun nomi , M0 uchun , ,  va  bilan tugaydigan qatorlarni navbat bilan tanlang." width="1393" height="382" loading="lazy"></p>
 <p>EC2 dagi Instances ro‘yxati. P0 uchun nomi <code>-web</code>, M0 uchun <code>-db</code>, <code>-dns</code>, <code>-repo</code> va <code>-bastion</code> bilan tugaydigan qatorlarni navbat bilan tanlang.</p>
 <p><img src="../../../assets/shared/ec2-session-manager-connect.png" alt="EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session Manager ni tanlang. Rasmda Web server ko‘rsatilgan." width="1245" height="319" loading="lazy"></p>
@@ -62,7 +62,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <ol>
 <li>P0 da ishlatgan topshiriqlar sahifasiga ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda <strong>M0</strong> ni tanlang.</li>
 <li>Tanlangan topshiriq tekshiruvini boshlang.</li>
-<li>Ishlov davom etsa natijani yangilab kuting. Topshiriq ID, vaqt, har check va saqlash holatini o‘qing. Natija avtomatik saqlanadi; M baholari saqlangan baholar bo‘limida.</li>
+<li>Ishlov davom etsa natijani yangilab kuting. Nechta band bajarilganini ko‘ring. Tuzatish kerak bo‘lgan bandlarni tuzatib, yana tekshiring. Natija avtomatik saqlanadi.</li>
 </ol>
 <hr />
 <p><a href="p0.html">Oldingi: P0</a> · <a href="p1.html">Keyingi: P1</a></p>

@@ -179,8 +179,8 @@ test('opening a student assignment shows only its saved detail without running a
   const html=await result.text();
   assert.match(html,/<h2>M1<\/h2>/);
   assert.match(html,/8 \/ 8/);
-  assert.match(html,/公開IPで指定URL[^<]+<\/th>\s*<td><span[^>]*>基準を満たしています/);
-  assert.match(html,/指定の配信ファイル[^<]+<\/th>\s*<td><span[^>]*>基準を満たしていません/);
+  assert.match(html,/公開IPで指定URL[^<]+<\/th>\s*<td><span[^>]*>OK/);
+  assert.match(html,/指定の配信ファイル[^<]+<\/th>\s*<td><span[^>]*>要修正/);
   assert.match(html,/今回確認したリクエスト[^<]+<\/th>\s*<td><span[^>]*>未確認/);
   assert.ok(html.indexOf('data-check-id="WEB02_FILE"') < html.indexOf('data-check-id="WEB02_PUBLIC_HTTP"'));
   assert.match(html,/lang=ru&amp;task_id=M1/);

@@ -13,7 +13,7 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">操作するサーバーとサーバー構築用ファイルの配置先</a> · <a href="#section-4">初期構築で配置されるサーバー構築用ファイル</a> · <a href="#section-5">解答例（操作手順）</a> · <a href="#section-6">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>P0 サーバーの確認と接続</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">接続するサーバー</a> · <a href="#section-4">解答例（操作手順）</a> · <a href="#section-5">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>P0 サーバーの確認と接続</h1>
 <p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
 <p><a href="../ja/p0.html">日本語</a> · <a href="../ru/p0.html">Русский</a> · <a href="../uz/p0.html">O‘zbekcha</a></p>
 <p>対応する自力課題は<a href="m0.html">M0</a>。</p>
@@ -21,16 +21,12 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>EC2の一覧から正しいサーバーを選び、Session Managerで接続して、課題の結果を自分で確認できる。</p>
 <h2 id="section-2">課題</h2>
 <p>構築済みの自分の環境で、5台のインスタンスIDとロールを確認し、接続先と操作ユーザーを確かめる。</p>
-<h2 id="section-3">操作するサーバーとサーバー構築用ファイルの配置先</h2>
-<p><img src="../../../assets/ja/p0-ssm.png" alt="緑の矢印はP0.2の端末接続。青の矢印は初期構築時のサーバー構築用ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。" width="1040" height="680" loading="lazy"></p>
-<p>緑の矢印はP0.2の端末接続。青の矢印は初期構築時のサーバー構築用ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。</p>
+<h2 id="section-3">接続するサーバー</h2>
+<p><img src="../../../assets/ja/p0-ssm.png" alt="緑の矢印はP0.2でWebサーバーに接続する経路。" width="1040" height="680" loading="lazy"></p>
+<p>緑の矢印はP0.2でWebサーバーに接続する経路。</p>
 <p><strong>このPractice0で作業すること</strong></p>
 <p>自分のAWSアカウント、各サーバーのロール、コマンドを実行する環境を確認する。</p>
-<h2 id="section-4">初期構築で配置されるサーバー構築用ファイル</h2>
-<p>共通登録コードで初期構築を完了すると、備品管理アプリとDB設定用のSQLが入った <code>catalog-app.tar.gz</code> は、WebサーバーとDBサーバーの <code>/var/lib/jdu-web/lesson-resources-r1</code> に配置済みです。WebサーバーからインターネットへのHTTPS接続はセキュリティのために制限されているので、構築スクリプトが下の経路でサーバー構築用ファイルを届けます。</p>
-<p><img src="../../../assets/ja/p0-lesson-files.png" alt="共通登録コードで環境を構築すると、CloudShellはGitHubからサーバー構築用ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。" width="1040" height="680" loading="lazy"></p>
-<p>共通登録コードで環境を構築すると、CloudShellはGitHubからサーバー構築用ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。</p>
-<h2 id="section-5">解答例（操作手順）</h2>
+<h2 id="section-4">解答例（操作手順）</h2>
 <h3>P0.1 5台のinstance IDを確認する</h3>
 <p><strong>実行環境:</strong></p>
 <p>学生本人のAWSコンソール</p>
@@ -61,11 +57,6 @@ cat p0-connection.txt
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
 <p><code>id -un</code> は <code>ssm-user</code>、<code>pwd</code> は <code>/home/ssm-user</code> を表示する。JSONファイルには <code>&quot;role&quot;: &quot;web&quot;</code> が含まれ、最後の <code>cat</code> では <code>web</code> だけが1行表示される。</p>
-<p>プロンプトにユーザー名、ホスト名、現在のディレクトリが表示される。<code>~</code> はホームディレクトリを表し、<code>pwd</code> は現在地を絶対パスで表示する。セットアップが表示を自動設定できず、<code>$</code> だけが表示された場合は、次の1行を実行して現在地を常時表示する。作業が終わったら <code>exit</code> で接続を閉じる。</p>
-<pre><code class="language-bash">exec env PS1='\u@\h:\w\$ ' bash --norc -i
-</code></pre>
-<p><img src="../../../assets/shared/session-manager-terminal.png" alt="Session Managerの端末。表示を変えると、移動後のディレクトリがプロンプトに反映される。" width="930" height="184" loading="lazy"></p>
-<p>Session Managerの端末。表示を変えると、移動後のディレクトリがプロンプトに反映される。</p>
 <h3>P0.3 RDPで踏み台のデスクトップを開く</h3>
 <p><strong>実行環境:</strong></p>
 <p>学生のWindows PC（共有アカウント）</p>
@@ -73,11 +64,11 @@ cat p0-connection.txt
 <p>Windowsの「リモート デスクトップ接続」で、自分の踏み台サーバーのデスクトップを開く。</p>
 <p><strong>1. 踏み台サーバーを選ぶ</strong></p>
 <p>EC2 → Instancesで、自分の演習環境のうち名前の末尾が <code>-bastion</code> の行を探し、同じ行の <strong>Instance ID</strong> をクリックする。</p>
-<p><img src="../../../assets/shared/rdp-bastion-select.png" alt="踏み台サーバーを選ぶ" width="1920" height="1080" loading="lazy"></p>
+<p><img src="../../../assets/shared/rdp-bastion-select-highlighted.png" alt="踏み台サーバーを選ぶ" width="1920" height="1080" loading="lazy"></p>
 <p><strong>2. 公開IPv4アドレスをコピーする</strong></p>
 <p>インスタンスの詳細画面で <strong>Public IPv4 address</strong> の横にあるコピーアイコンを押す。次に入力するのは、自分の画面に表示された現在の公開IPv4アドレス。スクリーンショットの値は例。</p>
-<p><img src="../../../assets/shared/rdp-bastion-public-ip.png" alt="公開IPv4アドレスをコピーする" width="1920" height="1080" loading="lazy"></p>
-<p><img src="../../../assets/shared/windows-run-rdp.png" alt="Windowsキー＋Rで「ファイル名を指定して実行」を開く。「名前」欄に  を入力し、OK を押す。" width="643" height="1072" loading="lazy"></p>
+<p><img src="../../../assets/shared/rdp-bastion-public-ip-highlighted.png" alt="公開IPv4アドレスをコピーする" width="1920" height="1080" loading="lazy"></p>
+<p><img src="../../../assets/shared/windows-run-rdp-highlighted.png" alt="Windowsキー＋Rで「ファイル名を指定して実行」を開く。「名前」欄に  を入力し、OK を押す。" width="643" height="1072" loading="lazy"></p>
 <p>Windowsキー＋Rで「ファイル名を指定して実行」を開く。「名前」欄に <code>mstsc /prompt</code> を入力し、<strong>OK</strong> を押す。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. WindowsのRDP接続画面を開き、資格情報の入力を求める。
@@ -85,13 +76,13 @@ mstsc /prompt
 </code></pre>
 <p><strong>3. 公開IPv4アドレスを入力して接続する</strong></p>
 <p>「リモート デスクトップ接続」の <strong>コンピューター</strong> 欄に、手順2でコピーした公開IPv4アドレスを貼り付け、<strong>接続</strong> を押す。</p>
-<p><img src="../../../assets/shared/rdp-connect.png" alt="公開IPv4アドレスを入力して接続する" width="672" height="412" loading="lazy"></p>
+<p><img src="../../../assets/shared/rdp-connect-highlighted.png" alt="公開IPv4アドレスを入力して接続する" width="672" height="412" loading="lazy"></p>
 <p><strong>4. 証明書の確認画面を読む</strong></p>
 <p>この画面が出た場合は、表示された接続先を手順2の公開IPv4アドレスと照合する。接続先が今回の踏み台であり、演習用の証明書だと教師に確認できたら <strong>はい</strong> を押す。確認できない場合は <strong>いいえ</strong> を押して教師に相談する。</p>
-<p><img src="../../../assets/shared/rdp-certificate.png" alt="証明書の確認画面を読む" width="575" height="711" loading="lazy"></p>
+<p><img src="../../../assets/shared/rdp-certificate-highlighted.png" alt="証明書の確認画面を読む" width="575" height="711" loading="lazy"></p>
 <p><strong>5. 踏み台サーバーにログインする</strong></p>
 <p>xrdpのログイン画面で <strong>Session</strong> が <code>Xorg</code> になっていることを確かめる。<strong>username</strong> に <code>labuser</code>、<strong>password</strong> に学生用セットアップで自分が設定したRDPパスワードを入力し、<strong>OK</strong> を押す。</p>
-<p><img src="../../../assets/shared/rdp-xrdp-login.png" alt="踏み台サーバーにログインする" width="1069" height="930" loading="lazy"></p>
+<p><img src="../../../assets/shared/rdp-xrdp-login-highlighted.png" alt="踏み台サーバーにログインする" width="1069" height="930" loading="lazy"></p>
 <p><strong>6. デスクトップが開いたことを確認する</strong></p>
 <p>リモート デスクトップ接続のウィンドウ内に、左上の <strong>Applications</strong> メニューや <strong>Home</strong> アイコンが表示されれば、踏み台サーバーに接続できている。</p>
 <p><img src="../../../assets/shared/rdp-desktop.png" alt="デスクトップが開いたことを確認する" width="1068" height="930" loading="lazy"></p>
@@ -101,7 +92,7 @@ mstsc /prompt
 <p>踏み台サーバーのUbuntuのデスクトップ（Xfce）が表示される。左上の「Applications」からFirefoxなどを開ける。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>Login failedならuser名と日本語/英語等のkeyboard配列を確認する。passwordを会話へ送らない。到達しない場合は現在のIPと許可された接続元CIDRを教師と確認し、3389を全公開しない。終了時はRDP内の自分の作業を保存し、接続を閉じる。</p>
-<h2 id="section-6">確認・提出</h2>
+<h2 id="section-5">確認・提出</h2>
 <p>教師が案内する採点ページのURLを自分のPCのブラウザで開き、学校のGoogleアカウントでログインする。初回だけ「自分のAWS環境を登録」を選び、画面の手順で連携する。</p>
 <p>表のP0の行で <strong>この課題を確認する</strong> を押す。同じページで今回の結果を確認し、P0の行に <strong>1 / 1</strong> が保存されたことを確認する。</p>
 <hr />

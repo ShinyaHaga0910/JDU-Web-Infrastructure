@@ -70,23 +70,15 @@ EC2の一覧から正しいサーバーを選び、Session Managerで接続し�
 
 構築済みの自分の環境で、5台のインスタンスIDとロールを確認し、接続先と操作ユーザーを確かめる。
 
-### 操作するサーバーとサーバー構築用ファイルの配置先
+### 接続するサーバー
 
-![緑の矢印はP0.2の端末接続。青の矢印は初期構築時のサーバー構築用ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。](../../assets/ja/p0-ssm.png)
+![緑の矢印はP0.2でWebサーバーに接続する経路。](../../assets/ja/p0-ssm.png)
 
-緑の矢印はP0.2の端末接続。青の矢印は初期構築時のサーバー構築用ファイルの配置を示す。配布サーバーはUbuntuなどのパッケージの配信を担当する。
+緑の矢印はP0.2でWebサーバーに接続する経路。
 
 **このPractice0で作業すること**
 
 自分のAWSアカウント、各サーバーのロール、コマンドを実行する環境を確認する。
-
-### 初期構築で配置されるサーバー構築用ファイル
-
-共通登録コードで初期構築を完了すると、備品管理アプリとDB設定用のSQLが入った `catalog-app.tar.gz` は、WebサーバーとDBサーバーの `/var/lib/jdu-web/lesson-resources-r1` に配置済みです。WebサーバーからインターネットへのHTTPS接続はセキュリティのために制限されているので、構築スクリプトが下の経路でサーバー構築用ファイルを届けます。
-
-![共通登録コードで環境を構築すると、CloudShellはGitHubからサーバー構築用ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。](../../assets/ja/p0-lesson-files.png)
-
-共通登録コードで環境を構築すると、CloudShellはGitHubからサーバー構築用ファイルを取得し、SSMを使ってWebサーバーとDBサーバーに配置する。
 
 ### 解答例（操作手順）
 
@@ -139,16 +131,6 @@ cat p0-connection.txt
 
 `id -un` は `ssm-user`、`pwd` は `/home/ssm-user` を表示する。JSONファイルには `"role": "web"` が含まれ、最後の `cat` では `web` だけが1行表示される。
 
-プロンプトにユーザー名、ホスト名、現在のディレクトリが表示される。`~` はホームディレクトリを表し、`pwd` は現在地を絶対パスで表示する。セットアップが表示を自動設定できず、`$` だけが表示された場合は、次の1行を実行して現在地を常時表示する。作業が終わったら `exit` で接続を閉じる。
-
-```bash
-exec env PS1='\u@\h:\w\$ ' bash --norc -i
-```
-
-![Session Managerの端末。表示を変えると、移動後のディレクトリがプロンプトに反映される。](../../assets/shared/session-manager-terminal.png)
-
-Session Managerの端末。表示を変えると、移動後のディレクトリがプロンプトに反映される。
-
 #### P0.3 RDPで踏み台のデスクトップを開く
 
 **実行環境:**
@@ -163,15 +145,15 @@ Windowsの「リモート デスクトップ接続」で、自分の踏み台サ
 
 EC2 → Instancesで、自分の演習環境のうち名前の末尾が `-bastion` の行を探し、同じ行の **Instance ID** をクリックする。
 
-![踏み台サーバーを選ぶ](../../assets/shared/rdp-bastion-select.png)
+![踏み台サーバーを選ぶ](../../assets/shared/rdp-bastion-select-highlighted.png)
 
 **2. 公開IPv4アドレスをコピーする**
 
 インスタンスの詳細画面で **Public IPv4 address** の横にあるコピーアイコンを押す。次に入力するのは、自分の画面に表示された現在の公開IPv4アドレス。スクリーンショットの値は例。
 
-![公開IPv4アドレスをコピーする](../../assets/shared/rdp-bastion-public-ip.png)
+![公開IPv4アドレスをコピーする](../../assets/shared/rdp-bastion-public-ip-highlighted.png)
 
-![Windowsキー＋Rで「ファイル名を指定して実行」を開く。「名前」欄に `mstsc /prompt` を入力し、**OK** を押す。](../../assets/shared/windows-run-rdp.png)
+![Windowsキー＋Rで「ファイル名を指定して実行」を開く。「名前」欄に `mstsc /prompt` を入力し、**OK** を押す。](../../assets/shared/windows-run-rdp-highlighted.png)
 
 Windowsキー＋Rで「ファイル名を指定して実行」を開く。「名前」欄に `mstsc /prompt` を入力し、**OK** を押す。
 
@@ -186,19 +168,19 @@ mstsc /prompt
 
 「リモート デスクトップ接続」の **コンピューター** 欄に、手順2でコピーした公開IPv4アドレスを貼り付け、**接続** を押す。
 
-![公開IPv4アドレスを入力して接続する](../../assets/shared/rdp-connect.png)
+![公開IPv4アドレスを入力して接続する](../../assets/shared/rdp-connect-highlighted.png)
 
 **4. 証明書の確認画面を読む**
 
 この画面が出た場合は、表示された接続先を手順2の公開IPv4アドレスと照合する。接続先が今回の踏み台であり、演習用の証明書だと教師に確認できたら **はい** を押す。確認できない場合は **いいえ** を押して教師に相談する。
 
-![証明書の確認画面を読む](../../assets/shared/rdp-certificate.png)
+![証明書の確認画面を読む](../../assets/shared/rdp-certificate-highlighted.png)
 
 **5. 踏み台サーバーにログインする**
 
 xrdpのログイン画面で **Session** が `Xorg` になっていることを確かめる。**username** に `labuser`、**password** に学生用セットアップで自分が設定したRDPパスワードを入力し、**OK** を押す。
 
-![踏み台サーバーにログインする](../../assets/shared/rdp-xrdp-login.png)
+![踏み台サーバーにログインする](../../assets/shared/rdp-xrdp-login-highlighted.png)
 
 **6. デスクトップが開いたことを確認する**
 
@@ -1848,7 +1830,7 @@ setupを閉じた後、アプリも停止した。setupを再び公開するこ�
 
 次回は本人のLabと同じ5台を起動し、running/SSM Onlineと現在の公開IPを確認する。Web Portalへ学校Googleでログインし、まずM0で準備確認する。作成・鍵生成・登録を毎回繰り返す必要はない。期限切れは教師へ更新を依頼する。
 
-結果は自動保存される。処理中は「結果を更新する」、成績確認は「保存済み成績を見る」を使う。確認対象の課題・時刻と保存状態を読む。UNKNOWNは観測不能で、合格や0点を確定した意味ではない。未確認Mの確定済み点数は保持される。最新の評価可能な結果を使い、異なる回のPASSを合算したり自動で最高点を選んだりしない。
+結果は自動保存される。処理中は「結果を更新する」、成績確認は「保存済み成績を見る」を使う。クリアした項目数と修正が必要な項目を見る。UNKNOWNは観測不能で、合格や0点を確定した意味ではない。未確認Mの確定済み点数は保持される。最新の評価可能な結果を使い、異なる回のPASSを合算したり自動で最高点を選んだりしない。
 
 password/token/cookie/秘密鍵/env本文を提出物や会話へ送らない。
 

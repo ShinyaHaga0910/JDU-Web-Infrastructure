@@ -7,9 +7,9 @@ export const tasks=Object.freeze([...[0,1,2,4].flatMap(i=>[`P${i}`,`M${i}`]),'P5
 const uuid=v=>typeof v==='string' && /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(v);
 const escape=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const words={
-  ja:{title:'課題の確認',select:'確認する課題',start:'この課題を確認する',refresh:'結果を更新する',pending:'確認を実行中です。通常は1〜2分かかります。',done:'今回の確認結果',fail:'確認を完了できませんでした。Labとサーバーの状態を確認してください。',busy:'別の課題を確認中です。先ほどの確認画面へ戻ってください。',unavailable:'現在は確認できません。教師・学生のLabと5台の管理接続を確認してください。',note:'確認後、結果を成績原本へ自動保存します。未確認がある場合は確定済みの点数を維持します。P0は1点、M0は4点です。サーバーは自動起動しません。',limits:'M5・M6の機能確認には、アプリ管理者の既存パスワードを使います。',points:'今回の素点',practice:'練習・準備（成績外）',unknown:'未確認を含みます。確定点ではありません。',check:'確認項目',status:'結果',PASS:'合格',FAIL:'不合格',UNKNOWN:'未確認',back:'課題を選び直す',grades:'保存済み',home:'トップへ',denied:'本人の登録またはログインを確認してください。'},
-  ru:{title:'Проверка задания',select:'Задание для проверки',start:'Проверить это задание',refresh:'Обновить результат',pending:'Проверка выполняется. Обычно требуется 1–2 минуты.',done:'Результат этой проверки',fail:'Не удалось завершить проверку. Проверьте Lab и серверы.',busy:'Другая проверка уже выполняется. Вернитесь к её странице.',unavailable:'Проверка недоступна. Проверьте Lab преподавателя и студента и управление пятью серверами.',note:'После проверки результат автоматически сохраняется в журнале. При непроверенных пунктах прежняя оценка сохраняется. P0 — 1 балл, M0 — 4 балла. Серверы автоматически не запускаются.',limits:'Для функциональных проверок M5/M6 используется существующий пароль администратора приложения.',points:'Баллы этой проверки',practice:'Практика/подготовка (без оценки)',unknown:'Есть непроверенные пункты. Баллы не окончательные.',check:'Пункт проверки',status:'Результат',PASS:'Пройдено',FAIL:'Не пройдено',UNKNOWN:'Не проверено',back:'Выбрать задание',grades:'Сохранено',home:'На главную',denied:'Проверьте вход и регистрацию своей среды.'},
-  uz:{title:'Vazifani tekshirish',select:'Tekshiriladigan vazifa',start:'Ushbu vazifani tekshirish',refresh:'Natijani yangilash',pending:'Tekshiruv bajarilmoqda. Odatda 1–2 daqiqa davom etadi.',done:'Ushbu tekshiruv natijasi',fail:'Tekshiruv tugamadi. Lab va serverlar holatini tekshiring.',busy:'Boshqa tekshiruv bajarilmoqda. Avvalgi sahifaga qayting.',unavailable:'Hozir tekshirib bo‘lmaydi. O‘qituvchi va talaba Lab hamda besh server ulanishini tekshiring.',note:'Tekshiruvdan keyin natija asosiy jurnalga avtomatik saqlanadi. Tekshirilmagan bandlar bo‘lsa, avvalgi ball saqlanadi. P0 — 1 ball, M0 — 4 ball. Serverlar avtomatik ishga tushmaydi.',limits:'M5/M6 funksional tekshiruvlari app administratorining mavjud parolidan foydalanadi.',points:'Ushbu tekshiruv bali',practice:'Mashq/tayyorgarlik (baholanmaydi)',unknown:'Tekshirilmagan bandlar mavjud. Ball yakuniy emas.',check:'Tekshiruv bandi',status:'Natija',PASS:'O‘tdi',FAIL:'O‘tmadi',UNKNOWN:'Tekshirilmagan',back:'Vazifani tanlash',grades:'Saqlangan',home:'Bosh sahifa',denied:'Kirish va o‘z muhitingiz ro‘yxatini tekshiring.'},
+  ja:{title:'課題の確認',start:'この課題を確認する',refresh:'結果を更新する',pending:'確認を実行中です。通常は1〜2分かかります。',done:'今回の確認結果',fail:'確認を完了できませんでした。Labとサーバーの状態を確認してください。',busy:'別の課題を確認中です。先ほどの確認画面へ戻ってください。',unavailable:'現在は確認できません。教師・学生のLabと5台の管理接続を確認してください。',status:'結果',back:'課題を選び直す',home:'トップへ',denied:'本人の登録またはログインを確認してください。'},
+  ru:{title:'Проверка задания',start:'Проверить это задание',refresh:'Обновить результат',pending:'Проверка выполняется. Обычно требуется 1–2 минуты.',done:'Результат этой проверки',fail:'Не удалось завершить проверку. Проверьте Lab и серверы.',busy:'Другая проверка уже выполняется. Вернитесь к её странице.',unavailable:'Проверка недоступна. Проверьте Lab преподавателя и студента и управление пятью серверами.',status:'Результат',back:'Выбрать задание',home:'На главную',denied:'Проверьте вход и регистрацию своей среды.'},
+  uz:{title:'Vazifani tekshirish',start:'Ushbu vazifani tekshirish',refresh:'Natijani yangilash',pending:'Tekshiruv bajarilmoqda. Odatda 1–2 daqiqa davom etadi.',done:'Ushbu tekshiruv natijasi',fail:'Tekshiruv tugamadi. Lab va serverlar holatini tekshiring.',busy:'Boshqa tekshiruv bajarilmoqda. Avvalgi sahifaga qayting.',unavailable:'Hozir tekshirib bo‘lmaydi. O‘qituvchi va talaba Lab hamda besh server ulanishini tekshiring.',status:'Natija',back:'Vazifani tanlash',home:'Bosh sahifa',denied:'Kirish va o‘z muhitingiz ro‘yxatini tekshiring.'},
 };
 export function validOperation(value) {
   const mode=value?.check_mode||'read_only';
@@ -54,23 +54,22 @@ function form(lang,value,csrf,content,label,auto=false) {
   return `<form action="/checks?lang=${lang}" method="post"${auto?' data-check-progress="true"':''}><input type="hidden" name="operation" value="${value.operation}"><input type="hidden" name="job_id" value="${value.job_id}"><input type="hidden" name="csrf" value="${csrf}">${value.check_mode?`<input type="hidden" name="check_mode" value="${value.check_mode}">`:''}${content}<button type="submit">${escape(label)}</button></form>`;
 }
 const receiptWords={
-  ja:{saved:'成績原本に保存しました。',unconfirmed:'未確認を含む結果を記録しました。確定済みの成績は維持しています。',practice:'練習・準備の記録を保存しました（成績外）。',pending:'確認は完了しましたが、成績原本への保存はまだ確認できません。',retry:'同じ結果の保存を再試行する',received:'原本への保存日時'},
-  ru:{saved:'Результат сохранён в журнале оценок.',unconfirmed:'Результат с непроверенными пунктами записан. Прежняя оценка сохранена.',practice:'Результат практики/подготовки сохранён без оценки.',pending:'Проверка завершена, но сохранение в журнале пока не подтверждено.',retry:'Повторить сохранение того же результата',received:'Время сохранения в журнале'},
-  uz:{saved:'Natija asosiy baholar jurnaliga saqlandi.',unconfirmed:'Tekshirilmagan bandlari bor natija yozildi. Avvalgi baho saqlandi.',practice:'Mashq/tayyorgarlik natijasi bahosiz saqlandi.',pending:'Tekshiruv tugadi, lekin asosiy jurnalga saqlash hali tasdiqlanmadi.',retry:'Aynan shu natijani saqlashni qayta urinish',received:'Jurnalga saqlangan vaqt'},
+  ja:{pending:'結果の保存を確認できません。',retry:'保存を再試行する'},
+  ru:{pending:'Сохранение результата не подтверждено.',retry:'Повторить сохранение'},
+  uz:{pending:'Natija saqlangani tasdiqlanmadi.',retry:'Qayta saqlash'},
 };
 function submissionHtml(lang,result,selected,{config,session,token}) {
   const t=receiptWords[lang],saved=result.submission,value=result.result;
   if (saved?.status==='saved') {
     if (!uuid(saved.request_id) || saved.request_id!==value.request_id || !Number.isFinite(Date.parse(saved.received_at))
         || saved.evaluable!==value.score.evaluable || saved.counts_toward_assessment!==value.score.counts_toward_assessment) throw Error('Invalid submission receipt');
-    const message=!saved.counts_toward_assessment?t.practice:saved.evaluable?t.saved:t.unconfirmed;
-    return `<section><p role="status">${escape(message)}</p><p>${escape(t.received)}: ${escape(new Date(saved.received_at).toISOString())}</p></section>`;
+    return '';
   }
   if(saved && saved.status!=='pending')throw Error('Invalid submission state');
   const v={...selected,operation:'submit'};
   // Saving an already captured report never runs the checker again. GET only
   // displays this retry form; automatic saving happens in the finishing POST.
-  return `<section><p role="status">${escape(t.pending)}</p>${form(lang,v,checkToken(config,session,token,v),`<input type="hidden" name="task_id" value="${v.task_id}">`,t.retry)}</section>`;
+  return `<div class="check-save"><p role="alert">${escape(t.pending)}</p>${form(lang,v,checkToken(config,session,token,v),`<input type="hidden" name="task_id" value="${v.task_id}">`,t.retry)}</div>`;
 }
 export function taskActions(lang,task,{config,session,token}) {
   if(!tasks.includes(task)) throw Error('Invalid task');
@@ -84,9 +83,14 @@ export function taskActions(lang,task,{config,session,token}) {
 }
 
 const criteriaText={
-  ja:{title:'最新の確認結果',criterion:'採点基準',PASS:'基準を満たしています',FAIL:'基準を満たしていません',UNKNOWN:'未確認',NOT_APPLICABLE:'対象外',empty:'項目ごとの確認結果はまだありません。'},
-  ru:{title:'Результаты последней проверки',criterion:'Критерий оценки',PASS:'Критерий выполнен',FAIL:'Критерий не выполнен',UNKNOWN:'Не проверено',NOT_APPLICABLE:'Неприменимо',empty:'Результатов по отдельным критериям пока нет.'},
-  uz:{title:'Oxirgi tekshiruv natijalari',criterion:'Baholash mezoni',PASS:'Mezon bajarilgan',FAIL:'Mezon bajarilmagan',UNKNOWN:'Tekshirilmagan',NOT_APPLICABLE:'Tatbiq etilmaydi',empty:'Mezonlar bo‘yicha natijalar hali yo‘q.'},
+  ja:{criterion:'採点基準',PASS:'OK',FAIL:'要修正',UNKNOWN:'未確認',NOT_APPLICABLE:'対象外'},
+  ru:{criterion:'Критерий оценки',PASS:'Выполнен',FAIL:'Исправить',UNKNOWN:'Не проверен',NOT_APPLICABLE:'Неприменимо'},
+  uz:{criterion:'Baholash mezoni',PASS:'Bajarildi',FAIL:'Tuzating',UNKNOWN:'Tekshirilmagan',NOT_APPLICABLE:'Tatbiq etilmaydi'},
+};
+const outcomes={
+  ja:{pass:'合格',fix:'修正が必要',unknown:'確認できない項目があります',practice:'確認完了',count:'項目クリア'},
+  ru:{pass:'Зачтено',fix:'Нужны исправления',unknown:'Не всё удалось проверить',practice:'Проверка завершена',count:'критериев выполнено'},
+  uz:{pass:'O‘tdi',fix:'Tuzatish kerak',unknown:'Ayrim bandlarni tekshirib bo‘lmadi',practice:'Tekshiruv tugadi',count:'mezon bajarildi'},
 };
 const checkOrder=['FAIL','UNKNOWN','PASS','NOT_APPLICABLE'];
 const validCriterion=c=>c && /^WEB[A-Z0-9_]{1,60}$/.test(c.id||'') && checkOrder.includes(c.status);
@@ -104,22 +108,17 @@ function criteriaTable(lang,checks) {
 }
 
 export function taskDetailHtml(lang,task,grade,maximum,actions='') {
-  const saved=grade?.selected?.[task],latest=grade?.current?.[task];
-  const [scoreTitle,dateTitle,pending]={
-    ja:['保存済みの点数','最終確認','未採点'],
-    ru:['Сохранённые баллы','Последняя проверка','Без оценки'],
-    uz:['Saqlangan ball','Oxirgi tekshiruv','Baholanmagan'],
+  const saved=grade?.selected?.[task];
+  const [scoreTitle,pending]={
+    ja:['保存済みの点数','未採点'],
+    ru:['Сохранённые баллы','Без оценки'],
+    uz:['Saqlangan ball','Baholanmagan'],
   }[lang];
-  const latestAt=latest?.checked_at;
-  const date=typeof latestAt==='string' && latestAt.length<=40 && Number.isFinite(Date.parse(latestAt))
-    ? new Date(latestAt).toISOString().slice(0,16).replace('T',' ')+' UTC' : '—';
   const checks=(Array.isArray(grade?.task_checks)?grade.task_checks:[]).slice(0,40).filter(validCriterion);
-  const criteria=criteriaText[lang];
-  const score=saved?`${saved.raw_earned} / ${maximum}`:maximum?pending:'—';
-  return `<section class="task-detail"><h2>${escape(task)}</h2>
-    <dl><dt>${scoreTitle}</dt><dd class="num">${score}</dd><dt>${dateTitle}</dt><dd>${date}</dd></dl>
+  const score=saved?`<p class="check-count">${scoreTitle} <strong>${saved.raw_earned} / ${maximum}</strong></p>`:maximum?`<p>${pending}</p>`:'';
+  return `<section class="task-detail"><div class="check-heading"><h2>${escape(task)}</h2>${score}</div>
     ${actions?`<div class="task-actions">${actions}</div>`:''}
-    ${maximum?`<h3>${escape(criteria.title)}</h3>${checks.length?criteriaTable(lang,checks):`<p>${escape(criteria.empty)}</p>`}`:''}</section>`;
+    ${maximum && checks.length?criteriaTable(lang,checks):''}</section>`;
 }
 
 export function checkHtml(lang,{config,session,token,selected,result,grade,maxima={},blocked=false}={}) {
@@ -169,9 +168,12 @@ export function checkHtml(lang,{config,session,token,selected,result,grade,maxim
   const value=result.result,s=value?.score;
   if (!value || value.task_id!==selected.task_id || !Array.isArray(value.checks) || value.checks.length>40 || !Number.isInteger(s?.raw_earned) || !Number.isInteger(s?.raw_maximum) || s.raw_earned<0 || s.raw_earned>s.raw_maximum || !Number.isFinite(Date.parse(value.checked_at))) throw Error('Invalid result');
   if (!value.checks.every(validCriterion)) throw Error('Invalid check');
+  const outcome=!s.evaluable?'unknown':!s.counts_toward_assessment?'practice':s.raw_earned===s.raw_maximum?'pass':'fix';
+  const copy=outcomes[lang];
+  const count=s.counts_toward_assessment?`<p class="check-count"><strong>${s.raw_earned} / ${s.raw_maximum}</strong> ${escape(copy.count)}</p>`:'';
   const criteria=s.counts_toward_assessment && value.checks.length ? criteriaTable(lang,value.checks) : '';
-  content+=`<h3>${escape(t.done)}</h3><p>${escape(new Date(value.checked_at).toISOString())}</p><p class="num">${escape(s.counts_toward_assessment?`${t.points}: ${s.raw_earned} / ${s.raw_maximum}`:t.practice)}</p>${s.counts_toward_assessment && !s.evaluable?`<p role="status">${escape(t.unknown)}</p>`:''}${criteria}`;
-  return content+submissionHtml(lang,result,selected,{config,session,token});
+  return content+`<div class="check-heading check-outcome check-outcome-${outcome}"><h3>${escape(copy[outcome])}</h3>${count}</div>`
+    +submissionHtml(lang,result,selected,{config,session,token})+criteria;
 }
 export const progressScript=`const form=document.querySelector('form[data-check-progress]'); if(form){const key='jdu-check-polls:'+new FormData(form).get('job_id');let n=Number(sessionStorage.getItem(key)||0);if(n<40){setTimeout(()=>{sessionStorage.setItem(key,String(n+1));form.requestSubmit();},4000);}}`;
 

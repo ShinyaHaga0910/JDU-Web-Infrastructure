@@ -17,7 +17,7 @@ PROJECT = Path(os.environ.get('JDU_WEB_PROJECT_ROOT', str(Path(__file__).resolve
 from markdown_it import MarkdownIt
 from pages import write_pages, browser_check
 from command_notes import annotated_blocks
-from diagrams import diagram_markdown, lesson_files_markdown, write_diagrams
+from diagrams import diagram_markdown, write_diagrams
 from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE, RDP_STEPS
 from checks import CHECKS
 from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, RAW_MAXIMUM, active_registry
@@ -98,9 +98,9 @@ def emit_end(lang):
       '次回は本人のLabと同じ5台を起動し、running/SSM Onlineと現在の公開IPを確認する。Web Portalへ学校Googleでログインし、まずM0で準備確認する。作成・鍵生成・登録を毎回繰り返す必要はない。期限切れは教師へ更新を依頼する。',
       'В следующий раз запустите свой Lab и те же пять узлов, проверьте running/SSM Online и текущие public IP. Войдите в Web Portal через школьный Google и начните с готовности M0. Не повторяйте создание, ключи и регистрацию каждый раз. При истечении срока запросите обновление у преподавателя.',
       'Keyingi safar o‘z Lab va ayni besh serverni ishga tushirib, running/SSM Online va joriy public IP ni tekshiring. Web Portal ga maktab Google orqali kirib, M0 tayyorligidan boshlang. Yaratish, kalit va ro‘yxatni har safar takrorlamang. Muddat tugasa o‘qituvchidan yangilashni so‘rang.')[lang], '', T(
-      '結果は自動保存される。処理中は「結果を更新する」、成績確認は「保存済み成績を見る」を使う。確認対象の課題・時刻と保存状態を読む。UNKNOWNは観測不能で、合格や0点を確定した意味ではない。未確認Mの確定済み点数は保持される。最新の評価可能な結果を使い、異なる回のPASSを合算したり自動で最高点を選んだりしない。',
-      'Результаты сохраняются автоматически. Во время обработки обновляйте результат; оценки смотрите в разделе сохранённых оценок. Сверяйте задание, время и сохранение. UNKNOWN означает невозможность измерения, а не успех или подтверждённый ноль. Подтверждённые баллы непроверенных M сохраняются. Используется последний оцениваемый результат, без объединения PASS разных запусков и автоматического выбора максимума.',
-      'Natijalar avtomatik saqlanadi. Ishlov paytida natijani yangilang; baholarni saqlangan baholar bo‘limidan ko‘ring. Topshiriq, vaqt va saqlash holatini solishtiring. UNKNOWN o‘lchab bo‘lmagan holat, muvaffaqiyat yoki tasdiqlangan nol emas. Tekshirilmagan M ning tasdiqlangan ballari saqlanadi. Oxirgi baholanadigan natija olinadi; turli urinish PASS lari qo‘shilmaydi, maksimum avtomatik tanlanmaydi.')[lang], '',
+      '結果は自動保存される。処理中は「結果を更新する」、成績確認は「保存済み成績を見る」を使う。クリアした項目数と修正が必要な項目を見る。UNKNOWNは観測不能で、合格や0点を確定した意味ではない。未確認Mの確定済み点数は保持される。最新の評価可能な結果を使い、異なる回のPASSを合算したり自動で最高点を選んだりしない。',
+      'Результаты сохраняются автоматически. Во время обработки обновляйте результат; оценки смотрите в разделе сохранённых оценок. Смотрите, сколько критериев выполнено и что нужно исправить. UNKNOWN означает невозможность измерения, а не успех или подтверждённый ноль. Подтверждённые баллы непроверенных M сохраняются. Используется последний оцениваемый результат, без объединения PASS разных запусков и автоматического выбора максимума.',
+      'Natijalar avtomatik saqlanadi. Ishlov paytida natijani yangilang; baholarni saqlangan baholar bo‘limidan ko‘ring. Nechta band bajarilganini va nimalarni tuzatish kerakligini ko‘ring. UNKNOWN o‘lchab bo‘lmagan holat, muvaffaqiyat yoki tasdiqlangan nol emas. Tekshirilmagan M ning tasdiqlangan ballari saqlanadi. Oxirgi baholanadigan natija olinadi; turli urinish PASS lari qo‘shilmaydi, maksimum avtomatik tanlanmaydi.')[lang], '',
       T('password/token/cookie/秘密鍵/env本文を提出物や会話へ送らない。',
         'Не отправляйте пароль/token/cookie/приватный ключ/env в отчёт или чат.',
         'Parol/token/cookie/maxfiy kalit/env ni hisobot yoki chat ga yubormang.')[lang], '',
@@ -205,8 +205,6 @@ def make_markdown(reg, lang, kind):
             out += ['**' + L['work'][lang].format(number=m['id'][1:]) + '**', '', notes['after'][lang], '']
             if 'mechanism' in notes:
                 out += [notes['mechanism'][lang], '']
-            if m['id']=='P0':
-                out += lesson_files_markdown(lang)
             out += ['### ' + L['solution'][lang], '']
             for i, s in enumerate(m['steps'], 1):
                 step_id=f"{m['id']}.{i}"
@@ -219,7 +217,7 @@ def make_markdown(reg, lang, kind):
                 if step_id=='P0.3':
                     rdp_steps = list(enumerate(RDP_STEPS, 1))
                     out += illustrated_steps(lang, rdp_steps[:2])
-                    out += shared_image('windows-run-rdp', T(
+                    out += shared_image('windows-run-rdp-highlighted', T(
                         'Windowsキー＋Rで「ファイル名を指定して実行」を開く。「名前」欄に `mstsc /prompt` を入力し、**OK** を押す。',
                         'Нажмите Windows+R, чтобы открыть окно «Выполнить». Введите `mstsc /prompt` в поле «Открыть» и нажмите **OK**.',
                         'Windows+R tugmalarini bosib Run oynasini oching. Open maydoniga `mstsc /prompt` yozing va **OK** ni bosing.'), lang)
@@ -233,15 +231,6 @@ def make_markdown(reg, lang, kind):
                 if step_id in STEP_NOTES:
                     out += ['**' + LABELS['meaning'][lang] + ':** ' + STEP_NOTES[step_id][lang], '']
                 out += ['**' + L['expect'][lang] + ':** ' + s['expect'][lang], '']
-                if step_id=='P0.2':
-                    out += [T('プロンプトにユーザー名、ホスト名、現在のディレクトリが表示される。`~` はホームディレクトリを表し、`pwd` は現在地を絶対パスで表示する。セットアップが表示を自動設定できず、`$` だけが表示された場合は、次の1行を実行して現在地を常時表示する。作業が終わったら `exit` で接続を閉じる。',
-                              'В приглашении видны имя пользователя, имя узла и текущий каталог. `~` означает домашний каталог, а `pwd` показывает полный путь. Если настройка не смогла включить это отображение и видно только `$`, выполните следующую строку. Завершите сеанс командой `exit`.',
-                              'Buyruq satri boshida foydalanuvchi nomi, host nomi va joriy katalogni tekshiring. `~` uy katalogini, `pwd` esa joriy katalogning to‘liq yo‘lini ko‘rsatadi. Sozlashda bu ko‘rinish yoqilmasa va faqat `$` chiqsa, quyidagi qatorni bajaring. Ish yakunida `exit` bilan ulanishni yoping.')[lang],
-                            '', '```bash', r"exec env PS1='\u@\h:\w\$ ' bash --norc -i", '```', '']
-                    out += shared_image('session-manager-terminal', T(
-                        'Session Managerの端末。表示を変えると、移動後のディレクトリがプロンプトに反映される。',
-                        'Терминал Session Manager. После настройки приглашение обновляет текущий каталог при переходе.',
-                        'Session Manager terminali. Sozlangach, katalogga o‘tganda buyruq satri yangi katalogni ko‘rsatadi.'), lang)
                 if s['trouble'] is not None:
                     out += ['**' + L['trouble'][lang] + ':** ' + s['trouble'][lang], '']
             if m['id']=='P0':

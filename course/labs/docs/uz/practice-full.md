@@ -70,23 +70,15 @@ EC2 ro‘yxatidan kerakli serverni tanlash, Session Manager orqali ulanish va to
 
 Tayyor muhitingizda beshta serverning instance ID si va rolini tekshiring. Qaysi serverga va qaysi foydalanuvchi sifatida ulanganingizni aniqlang.
 
-### Serverlarga ulanish va sozlash fayllarini joylash
+### Ulaniladigan serverlar
 
-![Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlab serverlarni sozlash fayllarini joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi.](../../assets/uz/p0-ssm.png)
+![Yashil strelka P0.2 da Web serverga ulanishni ko‘rsatadi.](../../assets/uz/p0-ssm.png)
 
-Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlab serverlarni sozlash fayllarini joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi.
+Yashil strelka P0.2 da Web serverga ulanishni ko‘rsatadi.
 
 **Practice0 da bajariladigan ishlar**
 
 O‘z AWS hisobingizni, har bir server rolini va buyruq bajariladigan muhitni tekshiring.
-
-### Dastlab joylanadigan serverlarni sozlash fayllari
-
-Muhit umumiy kod bilan yaratilgach, ilova va DB uchun SQL fayllari bor `catalog-app.tar.gz` arxivi Web va DB serverlaridagi `/var/lib/jdu-web/lesson-resources-r1` katalogiga joylangan bo‘ladi. Xavfsizlik uchun Web serverdan internetga chiquvchi HTTPS ulanishlari cheklangan, shuning uchun skript fayllarni quyidagi yo‘l orqali yetkazadi.
-
-![Muhit umumiy kod orqali yaratilganda, CloudShell serverlarni sozlash fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi.](../../assets/uz/p0-lesson-files.png)
-
-Muhit umumiy kod orqali yaratilganda, CloudShell serverlarni sozlash fayllarini GitHub dan yuklab oladi va SSM orqali Web hamda DB serverlariga joylaydi.
 
 ### Yechim namunasi (bajarish tartibi)
 
@@ -139,16 +131,6 @@ cat p0-connection.txt
 
 `id -un` buyrug‘i `ssm-user`, `pwd` esa `/home/ssm-user` ni ko‘rsatadi. JSON faylda `"role": "web"` bor va oxirgi `cat` buyrug‘i faqat bitta `web` satrini chiqaradi.
 
-Buyruq satri boshida foydalanuvchi nomi, host nomi va joriy katalogni tekshiring. `~` uy katalogini, `pwd` esa joriy katalogning to‘liq yo‘lini ko‘rsatadi. Sozlashda bu ko‘rinish yoqilmasa va faqat `$` chiqsa, quyidagi qatorni bajaring. Ish yakunida `exit` bilan ulanishni yoping.
-
-```bash
-exec env PS1='\u@\h:\w\$ ' bash --norc -i
-```
-
-![Session Manager terminali. Sozlangach, katalogga o‘tganda buyruq satri yangi katalogni ko‘rsatadi.](../../assets/shared/session-manager-terminal.png)
-
-Session Manager terminali. Sozlangach, katalogga o‘tganda buyruq satri yangi katalogni ko‘rsatadi.
-
 #### P0.3 RDP orqali bastion ish stolini ochish
 
 **Bajarish muhiti:**
@@ -163,15 +145,15 @@ Windows dagi Remote Desktop Connection orqali o‘z oraliq serveringizning ish s
 
 EC2 → Instances bo‘limida o‘z muhitingizdagi nomi `-bastion` bilan tugaydigan qatorni toping va shu qatordagi **Instance ID** ni bosing.
 
-![Oraliq serverni tanlang](../../assets/shared/rdp-bastion-select.png)
+![Oraliq serverni tanlang](../../assets/shared/rdp-bastion-select-highlighted.png)
 
 **2. Ommaviy IPv4 manzilini nusxalang**
 
 Instans tafsilotlarida **Public IPv4 address** yonidagi nusxalash belgisini bosing. Keyingi qadamda o‘z oynangizdagi joriy ommaviy IPv4 manzilini ishlating. Rasmdagi manzil misol.
 
-![Ommaviy IPv4 manzilini nusxalang](../../assets/shared/rdp-bastion-public-ip.png)
+![Ommaviy IPv4 manzilini nusxalang](../../assets/shared/rdp-bastion-public-ip-highlighted.png)
 
-![Windows+R tugmalarini bosib Run oynasini oching. Open maydoniga `mstsc /prompt` yozing va **OK** ni bosing.](../../assets/shared/windows-run-rdp.png)
+![Windows+R tugmalarini bosib Run oynasini oching. Open maydoniga `mstsc /prompt` yozing va **OK** ni bosing.](../../assets/shared/windows-run-rdp-highlighted.png)
 
 Windows+R tugmalarini bosib Run oynasini oching. Open maydoniga `mstsc /prompt` yozing va **OK** ni bosing.
 
@@ -186,19 +168,19 @@ mstsc /prompt
 
 Remote Desktop Connection oynasidagi **Computer** maydoniga 2-qadamda nusxalangan ommaviy IPv4 manzilini qo‘ying va **Connect** tugmasini bosing.
 
-![Ommaviy IPv4 manzilini kiritib ulaning](../../assets/shared/rdp-connect.png)
+![Ommaviy IPv4 manzilini kiritib ulaning](../../assets/shared/rdp-connect-highlighted.png)
 
 **4. Sertifikat ogohlantirishini tekshiring**
 
 Bu oyna chiqsa, ulanish manzilini 2-qadamdagi ommaviy IPv4 manzili bilan solishtiring. O‘qituvchi bu sizning oraliq serveringiz va mashq sertifikati ekanini tasdiqlasa, **Yes** ni bosing. Tasdiqlanmasa, **No** ni bosing va o‘qituvchiga murojaat qiling.
 
-![Sertifikat ogohlantirishini tekshiring](../../assets/shared/rdp-certificate.png)
+![Sertifikat ogohlantirishini tekshiring](../../assets/shared/rdp-certificate-highlighted.png)
 
 **5. Oraliq serverga kiring**
 
 xrdp kirish oynasida **Session** maydonida `Xorg` tanlanganini tekshiring. **username** maydoniga `labuser`, **password** maydoniga dastlab belgilagan RDP parolingizni yozing va **OK** ni bosing.
 
-![Oraliq serverga kiring](../../assets/shared/rdp-xrdp-login.png)
+![Oraliq serverga kiring](../../assets/shared/rdp-xrdp-login-highlighted.png)
 
 **6. Ish stoli ochilganini tekshiring**
 
@@ -1848,7 +1830,7 @@ Yo‘q. Runtime config, role va kerakli table privilege ni tekshiring; normal is
 
 Keyingi safar o‘z Lab va ayni besh serverni ishga tushirib, running/SSM Online va joriy public IP ni tekshiring. Web Portal ga maktab Google orqali kirib, M0 tayyorligidan boshlang. Yaratish, kalit va ro‘yxatni har safar takrorlamang. Muddat tugasa o‘qituvchidan yangilashni so‘rang.
 
-Natijalar avtomatik saqlanadi. Ishlov paytida natijani yangilang; baholarni saqlangan baholar bo‘limidan ko‘ring. Topshiriq, vaqt va saqlash holatini solishtiring. UNKNOWN o‘lchab bo‘lmagan holat, muvaffaqiyat yoki tasdiqlangan nol emas. Tekshirilmagan M ning tasdiqlangan ballari saqlanadi. Oxirgi baholanadigan natija olinadi; turli urinish PASS lari qo‘shilmaydi, maksimum avtomatik tanlanmaydi.
+Natijalar avtomatik saqlanadi. Ishlov paytida natijani yangilang; baholarni saqlangan baholar bo‘limidan ko‘ring. Nechta band bajarilganini va nimalarni tuzatish kerakligini ko‘ring. UNKNOWN o‘lchab bo‘lmagan holat, muvaffaqiyat yoki tasdiqlangan nol emas. Tekshirilmagan M ning tasdiqlangan ballari saqlanadi. Oxirgi baholanadigan natija olinadi; turli urinish PASS lari qo‘shilmaydi, maksimum avtomatik tanlanmaydi.
 
 Parol/token/cookie/maxfiy kalit/env ni hisobot yoki chat ga yubormang.
 
