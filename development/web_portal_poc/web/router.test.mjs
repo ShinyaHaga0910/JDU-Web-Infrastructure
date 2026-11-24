@@ -172,14 +172,17 @@ test('opening a student assignment shows only its saved detail without running a
   const checkSession='a'.repeat(64);
   const cookie='__Host-jdu-session=valid; __Host-jdu-access='+checkSession;
   const app=createApp({env:{...env,PORTAL_CHECKER_ENABLED:'true'},verify:verified,sessions:{...sessions,check:async(id,token)=>id===checkSession && token==='valid'},
-    getGrade:async (...args)=>{calls.push(args);return {status:'ok',grade:{...sample,task_checks:[{id:'WEB02_PUBLIC_HTTP',status:'PASS'}]}};},
+    getGrade:async (...args)=>{calls.push(args);return {status:'ok',grade:{...sample,task_checks:[{id:'WEB02_PUBLIC_HTTP',status:'PASS'},{id:'WEB02_FILE',status:'FAIL'},{id:'WEB02_ACCESS_LOG',status:'UNKNOWN'}]}};},
     checker:async()=>{throw Error('GET must not run a checker');}});
   const result=await app(req('/checks?lang=ja&task_id=M1',{headers:{cookie}}));
   assert.equal(result.status,200);
   const html=await result.text();
   assert.match(html,/<h2>M1<\/h2>/);
   assert.match(html,/8 \/ 8/);
-  assert.match(html,/合格/);
+  assert.match(html,/公開IPで指定URL[^<]+<\/th>\s*<td><span[^>]*>基準を満たしています/);
+  assert.match(html,/指定の配信ファイル[^<]+<\/th>\s*<td><span[^>]*>基準を満たしていません/);
+  assert.match(html,/今回確認したリクエスト[^<]+<\/th>\s*<td><span[^>]*>未確認/);
+  assert.ok(html.indexOf('data-check-id="WEB02_FILE"') < html.indexOf('data-check-id="WEB02_PUBLIC_HTTP"'));
   assert.match(html,/lang=ru&amp;task_id=M1/);
   assert.doesNotMatch(html,/<h2>M2<\/h2>/);
   assert.deepEqual(calls,[[subject,'M1']]);
