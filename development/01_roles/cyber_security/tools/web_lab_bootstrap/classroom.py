@@ -48,6 +48,8 @@ IPS = dict(bastion='10.20.1.10', web='10.20.1.20', dns='10.20.2.10', db='10.20.2
 ACCOUNT = re.compile('[0-9]{12}')
 RELEASE = 'web-2026-10-r1'
 GUEST_ROOT = '/var/lib/jdu-web-classroom'
+SESSION_PREFERENCES = 'SSM-SessionManagerRunShell'
+SESSION_PROMPT = rf'''if [ -r {GUEST_ROOT}/configured.json ] && [ "$(id -un)" = ssm-user ]; then cd "$HOME" && exec env PS1='\u@\h:\w\$ ' bash --norc -i; fi'''
 PORT = 18974
 MAX_ASSET = 200 * 1024 * 1024
 ARCHIVE_TARGET = 160 * 1024 * 1024
@@ -216,6 +218,13 @@ STUDENT_SUCCESS = {
     'uz': 'Talaba muhiti sozlandi.',
 }
 
+SESSION_PROMPT_MANUAL = {
+    'en': 'Could not enable the Session Manager prompt automatically. See P0 for the terminal command to display your current directory.',
+    'ja': 'Session Managerの現在地表示を自動設定できませんでした。P0にある端末コマンドで表示できます。',
+    'ru': 'Не удалось включить автоматический показ текущего каталога в Session Manager. Команда для терминала приведена в P0.',
+    'uz': 'Session Manager’da joriy katalogni avtomatik ko‘rsatish sozlanmadi. Terminal buyrug‘i P0 da berilgan.',
+}
+
 
 STUDENT_RDP = {
     'en': ('Use Windows Remote Desktop Connection (RDP) to connect to the bastion server.',
@@ -231,6 +240,7 @@ STUDENT_RDP = {
 
 class Screen:
     def __init__(self, language, role):
+        self.language = language
         self.text = dict(zip(LABELS, TEXT[language]))
         self.text.update(zip(RESET_LABELS, RESET_TEXT[language]))
         self.text.update(zip(('wait_for_ssm', 'deploy_helpers'), STUDENT_WAIT_TEXT[language]))
@@ -933,6 +943,36 @@ def student_run(args, screen, session, account, parent):
         return setup_student(args, screen, session, account, config, work, invite['teacher_account'])
 
 
+def enable_session_prompt(ssm):
+    try:
+        result = ssm.get_document(Name=SESSION_PREFERENCES, DocumentVersion='$DEFAULT', DocumentFormat='JSON')
+    except Exception as exc:
+        code = getattr(exc, 'response', {}).get('Error', {}).get('Code')
+        if code in ('AccessDenied', 'AccessDeniedException', 'UnauthorizedOperation'):
+            return False
+        if code != 'InvalidDocument':
+            raise
+    else:
+        config = json.loads(result['Content'])
+        return config.get('inputs', {}).get('shellProfile', {}).get('linux') == SESSION_PROMPT
+
+    document = {'schemaVersion': '1.0', 'sessionType': 'Standard_Stream',
+                'description': 'Show the working directory on configured JDU Web Lab instances.',
+                'inputs': {'s3EncryptionEnabled': True, 'cloudWatchEncryptionEnabled': True,
+                           'cloudWatchStreamingEnabled': False, 'runAsEnabled': False,
+                           'shellProfile': {'linux': SESSION_PROMPT}}}
+    try:
+        ssm.create_document(Name=SESSION_PREFERENCES, DocumentType='Session', DocumentFormat='JSON',
+                            Content=encoded(document).decode())
+    except Exception as exc:
+        code = getattr(exc, 'response', {}).get('Error', {}).get('Code')
+        if code in ('AccessDenied', 'AccessDeniedException', 'UnauthorizedOperation', 'DocumentAlreadyExists',
+                    'DocumentLimitExceeded'):
+            return False
+        raise
+    return True
+
+
 def setup_student(args, screen, session, account, config, work, teacher_account):
     import install_teacher
 
@@ -1068,6 +1108,8 @@ def setup_student(args, screen, session, account, config, work, teacher_account)
     instance = ec2.describe_instances(InstanceIds=[bastion])['Reservations'][0]['Instances'][0]
     if not instance.get('PublicIpAddress'):
         raise ValueError('BASTION_PUBLIC_IP')
+    if not enable_session_prompt(ssm):
+        screen.record(SESSION_PROMPT_MANUAL[screen.language])
     shutil.rmtree(cache, ignore_errors=True)
     return instance['PublicIpAddress']
 

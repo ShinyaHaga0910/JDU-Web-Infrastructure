@@ -26,7 +26,7 @@ from content import MODULES,LANGS
 from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, active_registry
 MODULES_BY_NUMBER = {int(m["id"][1:]): m for m in MODULES}
 MODULES = [MODULES_BY_NUMBER[n] for n in ACTIVE_NUMBERS]
-from build import KIT,EXPECTED_REGISTRY,MATERIAL_REVISION,INSTANCE_ID_IMAGE,INSTANCE_ID_SOURCE
+from build import KIT,EXPECTED_REGISTRY,MATERIAL_REVISION
 from diagrams import RESOURCE_DIAGRAM, diagram_stem
 from command_notes import annotated_blocks,command_groups,executable_only,explanation,CONFIG_STEPS
 from PIL import Image
@@ -85,7 +85,7 @@ def main():
             ok(f'{lang}_{kind}_pdf_A4',all(abs(float(p.mediabox.width)-595.276)<1 and abs(float(p.mediabox.height)-841.890)<1 for p in pdf.pages))
             ok(f'{lang}_{kind}_pdf_text',len(text)>5000 and all(prefix+str(n) in text for n in ACTIVE_NUMBERS for prefix in [('P' if kind=='practice' else 'M')]) and '\ufffd' not in text and '\x00' not in text)
             images=sum(sum(obj.get_object().get('/Subtype')=='/Image' for obj in p.get('/Resources',{}).get('/XObject',{}).values()) for p in pdf.pages)
-            ok(f'{lang}_{kind}_pdf_figures',images==(8 if kind=='practice' else 7))
+            ok(f'{lang}_{kind}_pdf_figures',images==(10 if kind=='practice' else 8))
             if kind=='practice':
                 expected=sum(sum(active for active,_ in command_groups(s['code'])) for m in MODULES for i,s in enumerate(m['steps'],1) if s['code'] and (m['id'],i) not in CONFIG_STEPS)
                 ok(f'{lang}_pdf_numbered_comments',len(re.findall(r'(?:#|--) \d+\.',text))==expected)
@@ -108,12 +108,11 @@ def main():
                 else:
                     task=next(t for t in reg['tasks'] if t['id']==name)
                     ok(f'{lang}_{name}_page_checks',all(value.count(cid)==1 for cid in task['progress_scored_checks']))
-    screenshot=ROOT/'assets/shared'/INSTANCE_ID_IMAGE
-    ok('c3_instance_id_screenshot_matches', screenshot.read_bytes()==INSTANCE_ID_SOURCE.read_bytes())
     for lang in LANGS:
         for task in ('p0','m0'):
             text=(ROOT/'docs'/lang/(task+'.md')).read_text(encoding='utf-8')
-            ok(f'{lang}_{task}_c3_instance_id_screenshot',text.count(INSTANCE_ID_IMAGE)==1)
+            for filename in ('ec2-session-manager-instances.png', 'ec2-session-manager-connect.png'):
+                ok(f'{lang}_{task}_{filename}', text.count(filename)==1)
     # Check Markdown paths too: GitHub is the primary reading entrance.
     for path in [ROOT/'README.md',ROOT/'TEACHER-NOTES.md',*(ROOT/'docs').rglob('*.md')]:
         for token in parser.parse(path.read_text(encoding='utf-8')):
@@ -147,7 +146,7 @@ def main():
                 task=prefix+str(number)
                 md=(ROOT/'docs'/lang/(task.lower()+'.md')).read_text(encoding='utf-8')
                 images=[c for t in parser.parse(md) for c in t.children or [] if c.type=='image']
-                expected_images=3 if task=='P0' else (1 if number else 2)
+                expected_images={'P0': 5, 'M0': 3}.get(task, 1)
                 ok(f'{lang}_{task}_diagram_in_page',len(images)==expected_images and len(images[0].content)>60)
                 if task=='P0':
                     resource_link=f'../../assets/{lang}/{RESOURCE_DIAGRAM}.png'

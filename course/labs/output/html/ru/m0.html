@@ -18,12 +18,14 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p><a href="../ja/m0.html">日本語</a> · <a href="../ru/m0.html">Русский</a> · <a href="../uz/m0.html">O‘zbekcha</a></p>
 <p>Связанное задание: <a href="p0.html">P0</a>.</p>
 <h2 id="section-1">Требуемый результат</h2>
-<p>В P0 вы учились подключаться к Web-серверу. В M0 найдите свой DB-сервер в списке EC2 и подключитесь к нему через SSM из CloudShell по его instance ID. Проверьте роль db и пользователя ssm-user. Создайте на DB-сервере в своём домашнем каталоге файл <code>m0-connection.txt</code> с единственной строкой <code>db</code>. Выберите M0 на странице заданий. За подтверждённый файл начисляется 1 балл.</p>
+<p>В P0 вы учились подключаться к Web-серверу. В M0 найдите свой DB-сервер в списке EC2 и нажмите <strong>Instance ID</strong> в его строке. Нажмите стрелку справа от <strong>Connect</strong> и выберите <strong>Connect with SSM Session Manager</strong>. Проверьте роль <code>db</code> и пользователя <code>ssm-user</code>. Создайте в своём домашнем каталоге на DB-сервере файл <code>m0-connection.txt</code> с единственной строкой <code>db</code>. Выберите M0 на странице заданий. За подтверждённый файл начисляется 1 балл.</p>
 <h2 id="section-2">Подключение к серверам и файлы курса</h2>
-<p><img src="../../../assets/ru/m0-ssm.png" alt="Откройте CloudShell в AWS из браузера на своём PC и подключитесь к нужному EC2 через SSM. Файлы курса размещаются на Web и DB. При установке по общему коду они размещаются во время создания среды." width="1040" height="680" loading="lazy"></p>
-<p>Откройте CloudShell в AWS из браузера на своём PC и подключитесь к нужному EC2 через SSM. Файлы курса размещаются на Web и DB. При установке по общему коду они размещаются во время создания среды.</p>
-<p><img src="../../../assets/shared/ec2-instance-id-c3.png" alt="Рисунок 3-4 из главы C3. Откройте EC2 → Instances и проверьте Instance ID в строке нужного сервера." width="1239" height="404" loading="lazy"></p>
-<p>Рисунок 3-4 из главы C3. Откройте EC2 → Instances и проверьте Instance ID в строке нужного сервера.</p>
+<p><img src="../../../assets/ru/m0-ssm.png" alt="Зелёная стрелка показывает подключение к DB-серверу через Session Manager в EC2. Синие стрелки показывают размещение файлов на Web и DB из CloudShell через SSM при создании среды." width="1040" height="680" loading="lazy"></p>
+<p>Зелёная стрелка показывает подключение к DB-серверу через Session Manager в EC2. Синие стрелки показывают размещение файлов на Web и DB из CloudShell через SSM при создании среды.</p>
+<p><img src="../../../assets/shared/ec2-session-manager-instances.png" alt="Список Instances в EC2. Для P0 выберите строку с окончанием имени , для M0 - ." width="1393" height="382" loading="lazy"></p>
+<p>Список Instances в EC2. Для P0 выберите строку с окончанием имени <code>-web</code>, для M0 - <code>-db</code>.</p>
+<p><img src="../../../assets/shared/ec2-session-manager-connect.png" alt="Страница EC2. Нажмите стрелку справа от Connect и выберите Connect with SSM Session Manager. На снимке показан Web-сервер." width="1245" height="319" loading="lazy"></p>
+<p>Страница EC2. Нажмите стрелку справа от Connect и выберите Connect with SSM Session Manager. На снимке показан Web-сервер.</p>
 <h2 id="section-3">Проверка и отправка</h2>
 <ol>
 <li>Откройте страницу заданий, которую использовали в P0. Войдите через учебный аккаунт Google и выберите свой Lab и <strong>M0</strong>.</li>

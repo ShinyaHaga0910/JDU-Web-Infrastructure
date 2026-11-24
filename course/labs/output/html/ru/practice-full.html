@@ -62,7 +62,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tr>
 </tbody>
 </table>
-<p>Для входа в каждый Ubuntu выполните в CloudShell aws ssm start-session --target i-СВОЙ-ID. Проверьте подключение по шагу P0.2. Для смены сервера один exit возвращает в CloudShell; затем подключайтесь к следующему ID. Переменные CloudShell не копируются на узел. ssm-user может sudo; RDP-пользователь labuser не администратор sudo.</p>
+<p>В P0 и M0 открывайте Session Manager из списка EC2. Если в дальнейшем шаг требует подключения из CloudShell, выполните там <code>aws ssm start-session --target i-...</code>, подставив ID сервера. В обоих случаях на сервере используется <code>ssm-user</code>.</p>
 <p>Редактор nano: открыть файл → ввести текст → Ctrl+O → Enter сохранить → Ctrl+X выйти. Блок конфигурации не выполняется как shell-команда. В psql меняется prompt; SQL/\password вводятся внутри, \q возвращает в Ubuntu. Не продолжайте после ошибки без проверки результата.</p>
 <p>Нумерованные комментарии показывают порядок и цель внутри шага. # используется в shell, -- внутри psql. Комментарии менять не нужно. Выполняйте по одной команде, дожидаясь подключения, редактора и ввода пароля. Команда с продолжением строки остаётся одной командой.</p>
 <h2 id="section-3">Как читать шаги</h2>
@@ -127,7 +127,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>SSM начальной среды - отдельный путь управления из CloudShell в EC2. Он не включён в путь обычного Web-запроса. Внутренние IP и порты таблицы заданы этим Lab, а не всеми Web-системами.</p>
 <h2 id="section-5">P0 Своя среда и место выполнения команд</h2>
 <h3>Что изучаем</h3>
-<p>Различать CloudShell, Windows и пять Ubuntu-серверов; подключаться через SSM к нужному узлу и запускать самопроверку.</p>
+<p>Выбрать нужный сервер в списке EC2, подключиться через Session Manager и проверить результат задания.</p>
 <h3>Задание</h3>
 <p>В своей готовой среде проверьте идентификаторы и роли пяти серверов, затем проверьте, к какому серверу и под каким пользователем вы подключились.</p>
 <h3>Подключение к серверам и файлы курса</h3>
@@ -145,35 +145,36 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>AWS Console своего студенческого аккаунта</p>
 <p><strong>Цель и действия:</strong></p>
 <p>Введите EC2 в поле Search в верхней части AWS Console и откройте консоль EC2. Откройте EC2 → Instances и найдите пять серверов своей среды в столбце Name. В той же строке проверьте полный идентификатор с префиксом i- в столбце Instance ID.</p>
-<p><img src="../../../assets/shared/ec2-instance-id-c3.png" alt="Рисунок 3-4 из главы C3. Откройте EC2 → Instances и проверьте Instance ID в строке нужного сервера." width="1239" height="404" loading="lazy"></p>
-<p>Рисунок 3-4 из главы C3. Откройте EC2 → Instances и проверьте Instance ID в строке нужного сервера.</p>
-<h4>P0.2 Подключиться к Web-серверу через SSM из CloudShell</h4>
+<p><img src="../../../assets/shared/ec2-session-manager-instances.png" alt="Список Instances в EC2. Для P0 выберите строку с окончанием имени , для M0 - ." width="1393" height="382" loading="lazy"></p>
+<p>Список Instances в EC2. Для P0 выберите строку с окончанием имени <code>-web</code>, для M0 - <code>-db</code>.</p>
+<h4>P0.2 Подключиться к Web-серверу через Session Manager</h4>
 <p><strong>Среда выполнения:</strong></p>
-<p>CloudShell в личном AWS-аккаунте студента</p>
+<p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
-<p>В первой команде замените i-YOUR-WEB-INSTANCE-ID на Instance ID Web-сервера из P0.1 и выполните её в CloudShell. После подключения прочитайте роль из /etc/jdu-web/bootstrap.json, созданного при настройке сервера. Поле role содержит назначение сервера. Значение web подтверждает подключение к Web-серверу. В этом терминале создайте в своём домашнем каталоге p0-connection.txt с одной строкой web.</p>
+<p>Нажмите <strong>Instance ID</strong> Web-сервера, найденного в P0.1. На странице сведений нажмите стрелку справа от <strong>Connect</strong> и выберите <strong>Connect with SSM Session Manager</strong>. Выполните команды ниже в терминале новой вкладки. <code>id -un</code> показывает пользователя ОС, а <code>pwd</code> - текущий каталог. Значение <code>web</code> в поле <code>role</code> файла <code>/etc/jdu-web/bootstrap.json</code> подтверждает, что открыт Web-сервер. Создайте в своём домашнем каталоге файл <code>p0-connection.txt</code> с одной строкой <code>web</code>.</p>
+<p><img src="../../../assets/shared/ec2-session-manager-connect.png" alt="Страница EC2. Нажмите стрелку справа от Connect и выберите Connect with SSM Session Manager. На снимке показан Web-сервер." width="1245" height="319" loading="lazy"></p>
+<p>Страница EC2. Нажмите стрелку справа от Connect и выберите Connect with SSM Session Manager. На снимке показан Web-сервер.</p>
 <p>Команды: нумерация внутри этого шага</p>
-<pre><code class="language-bash"># 1. Из CloudShell открыть SSM к выбранному EC2; дождаться подключения.
-aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
-# 2. Показать имя пользователя ОС в этом терминале.
+<pre><code class="language-bash"># 1. Показать имя пользователя ОС в этом терминале.
 id -un
-# 3. Прочитать только role из bootstrap, чтобы проверить выбранный сервер.
+# 2. Перейти в рабочий каталог $HOME.
+cd &quot;$HOME&quot;
+# 3. Показать текущий рабочий каталог.
+pwd
+# 4. Прочитать только role из bootstrap, чтобы проверить выбранный сервер.
 python3 -c 'import json;print(json.load(open(&quot;/etc/jdu-web/bootstrap.json&quot;))[&quot;role&quot;])'
-# 4. Записать одну строку web в проверочный файл домашнего каталога.
+# 5. Записать одну строку web в проверочный файл домашнего каталога.
 printf '%s\n' web &gt; &quot;$HOME/p0-connection.txt&quot;
-# 5. Прочитать $HOME/p0-connection.txt без изменения.
+# 6. Прочитать $HOME/p0-connection.txt без изменения.
 cat &quot;$HOME/p0-connection.txt&quot;
-# 6. Закрыть сеанс текущего сервера и вернуться в CloudShell.
-exit
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>id -un выводит ssm-user, а роль из файла имеет значение web.</p>
-<p>Пример вывода терминала после подключения</p>
-<pre><code class="language-text">$ id -un
-ssm-user
-$ python3 -c …
-web
+<p>Команда <code>id -un</code> выводит <code>ssm-user</code>, команда <code>pwd</code> после перехода в домашний каталог выводит <code>/home/ssm-user</code>, а роль и содержимое файла имеют значение <code>web</code>.</p>
+<p>В приглашении видны имя пользователя, имя узла и текущий каталог. <code>~</code> означает домашний каталог, а <code>pwd</code> показывает полный путь. Если настройка не смогла включить это отображение и видно только <code>$</code>, выполните следующую строку. Завершите сеанс командой <code>exit</code>.</p>
+<pre><code class="language-bash">exec env PS1='\u@\h:\w\$ ' bash --norc -i
 </code></pre>
+<p><img src="../../../assets/shared/session-manager-terminal.png" alt="Терминал Session Manager. После настройки приглашение обновляет текущий каталог при переходе." width="930" height="184" loading="lazy"></p>
+<p>Терминал Session Manager. После настройки приглашение обновляет текущий каталог при переходе.</p>
 <h4>P0.3 Открыть рабочий стол бастиона по RDP</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>Windows PC студента (общая учётная запись)</p>
@@ -194,7 +195,7 @@ mstsc /prompt
 <h3>Проверка понимания (без баллов)</h3>
 <p>Какой узел изменится, если выполнить шаги DB в открытом SSM-сеансе Web?</p>
 <p><strong>Объяснение:</strong></p>
-<p>Изменится Web. Вернитесь через exit в CloudShell и подключитесь к instance ID DB.</p>
+<p>Команды выполняются на подключённом Web-сервере. Для работы с DB выберите DB-сервер в списке EC2 и откройте новый терминал через Session Manager.</p>
 <h2 id="section-6">P1 Выдача статического файла по HTTP</h2>
 <h3>Что изучаем</h3>
 <p>Связать Nginx, файл, прослушивание порта, HTTP-ответ и access log.</p>

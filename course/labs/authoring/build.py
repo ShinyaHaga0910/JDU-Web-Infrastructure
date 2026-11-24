@@ -81,9 +81,9 @@ def emit_intro(lang, kind):
       '| Role | Private IPv4 | ' + T('用途', 'Назначение', 'Vazifa')[lang] + ' |', '| --- | --- | --- |',
       '| bastion | 10.20.1.10 | RDP3389 / Firefox / SSH |', '| web | 10.20.1.20 | HTTP80 / private8080 / loopback8000 |',
       '| dns | 10.20.2.10 | BIND UDP/TCP53 |', '| db | 10.20.2.20 | PostgreSQL5432 |', '| repo | 10.20.2.30 | ' + T('事前保存した署名資源のHTTP80', 'HTTP80 с заранее сохранёнными подписанными ресурсами', 'Oldindan saqlangan imzolangan resurslar HTTP80')[lang] + ' |', '',
-      T('各Ubuntuへ入る操作：CloudShellで aws ssm start-session --target i-自分の対象ID。接続先の確認はP0.2の手順を使う。サーバーを替えるときはexitを1回でCloudShellへ戻り、次のIDでstart-sessionする。CloudShellの変数は接続先へ自動コピーされない。SSMのssm-userはsudo可能。RDPのlabuserはsudo管理者ではない。',
-        'Для входа в каждый Ubuntu выполните в CloudShell aws ssm start-session --target i-СВОЙ-ID. Проверьте подключение по шагу P0.2. Для смены сервера один exit возвращает в CloudShell; затем подключайтесь к следующему ID. Переменные CloudShell не копируются на узел. ssm-user может sudo; RDP-пользователь labuser не администратор sudo.',
-        'Har Ubuntu ga kirish uchun CloudShell da aws ssm start-session --target i-OZ-ID bajaring. Ulanishni P0.2 qadamiga muvofiq tekshiring. Server almashtirishda bitta exit bilan CloudShell ga qaytib keyingi ID ga ulang. CloudShell o‘zgaruvchilari serverga avtomatik ko‘chmaydi. ssm-user sudo qila oladi; RDP labuser sudo admin emas.')[lang], '',
+      T('P0・M0はEC2の一覧からSession Managerを開く。後の練習でCloudShellから接続するよう指定されたときは、CloudShellで `aws ssm start-session --target i-...` を実行する。`i-...` は対象のInstance IDに置き換える。どちらも接続先の `ssm-user` として操作する。',
+        'В P0 и M0 открывайте Session Manager из списка EC2. Если в дальнейшем шаг требует подключения из CloudShell, выполните там `aws ssm start-session --target i-...`, подставив ID сервера. В обоих случаях на сервере используется `ssm-user`.',
+        'P0 va M0 da Session Manager’ni EC2 ro‘yxatidan oching. Keyingi qadam CloudShell orqali ulanishni so‘rasa, u yerda `aws ssm start-session --target i-server-ID` ni bajaring. Har ikkala holatda serverda `ssm-user` sifatida ishlaysiz.')[lang], '',
       T('nanoの編集：file名を指定して開く→本文を入力→Ctrl+O→Enterで保存→Ctrl+Xで終了。設定fileの枠はshell commandではない。psqlに入るとpromptが変わる。SQL/\\passwordはその中へ入力し、\\qでUbuntuへ戻る。失敗したcommandの次へ進まず、期待結果を確認する。',
         'Редактор nano: открыть файл → ввести текст → Ctrl+O → Enter сохранить → Ctrl+X выйти. Блок конфигурации не выполняется как shell-команда. В psql меняется prompt; SQL/\\password вводятся внутри, \\q возвращает в Ubuntu. Не продолжайте после ошибки без проверки результата.',
         'Nano: faylni ochish → matn yozish → Ctrl+O → Enter bilan saqlash → Ctrl+X bilan chiqish. Sozlama bloki shell buyrug‘i emas. Psql ichida prompt o‘zgaradi; SQL/\\password shu yerga yoziladi, \\q Ubuntu ga qaytaradi. Xatodan keyin natijani tekshirmay davom etmang.')[lang], '']
@@ -154,16 +154,23 @@ def shell_lines(source):
         out.append(line)
     return '\n'.join(out)
 
-INSTANCE_ID_IMAGE = 'ec2-instance-id-c3.png'
-INSTANCE_ID_SOURCE = ROOT.parent / 'textbook/assets/figures/ch03-fig04-ec2-instance-id-highlighted.png'
+def session_image(name, caption, lang):
+    caption = caption[lang]
+    return [f'![{caption}](../../assets/shared/{name}.png)', '', caption, '']
 
 
 def instance_id_guide(lang):
-    caption = T(
-        'C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDを確認する。',
-        'Рисунок 3-4 из главы C3. Откройте EC2 → Instances и проверьте Instance ID в строке нужного сервера.',
-        'C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni tekshiring.')[lang]
-    return [f'![{caption}](../../assets/shared/{INSTANCE_ID_IMAGE})', '', caption, '']
+    return session_image('ec2-session-manager-instances', T(
+        'EC2のInstances一覧。P0は名前の末尾が `-web` の行、M0は `-db` の行を選ぶ。',
+        'Список Instances в EC2. Для P0 выберите строку с окончанием имени `-web`, для M0 — `-db`.',
+        'EC2 dagi Instances ro‘yxati. P0 uchun nomi `-web`, M0 uchun `-db` bilan tugaydigan qatorni tanlang.'), lang)
+
+
+def session_connect_guide(lang):
+    return session_image('ec2-session-manager-connect', T(
+        'EC2の詳細画面。Connectの右の矢印からConnect with SSM Session Managerを選ぶ。Webサーバーの画面を例に示す。',
+        'Страница EC2. Нажмите стрелку справа от Connect и выберите Connect with SSM Session Manager. На снимке показан Web-сервер.',
+        'EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session Manager ni tanlang. Rasmda Web server ko‘rsatilgan.'), lang)
 
 
 def make_markdown(reg, lang, kind):
@@ -199,6 +206,8 @@ def make_markdown(reg, lang, kind):
                 if step_id=='P0.1':
                     out += instance_id_guide(lang)
                     continue
+                if step_id=='P0.2':
+                    out += session_connect_guide(lang)
                 if s['code']:
                     for fence,source in annotated_blocks(m['id'],i,s['code'],lang):
                         label=T('設定・入力データ（端末で実行するコマンドではない）','Конфигурация или данные: не выполнять как команды','Sozlama yoki ma’lumot: terminal buyrug‘i emas')[lang] if fence=='text' else T('入力するコマンド（番号はこの手順内の順番）','Команды: нумерация внутри этого шага','Buyruqlar: raqamlar shu qadam ichidagi tartib')[lang]
@@ -208,8 +217,14 @@ def make_markdown(reg, lang, kind):
                     out += ['**' + LABELS['meaning'][lang] + ':** ' + STEP_NOTES[step_id][lang], '']
                 out += ['**' + L['expect'][lang] + ':** ' + s['expect'][lang], '']
                 if step_id=='P0.2':
-                    out += [T('ターミナルの表示例（接続後）','Пример вывода терминала после подключения','Ulangandan keyingi terminal ko‘rinishi')[lang],
-                            '', '```text', '$ id -un', 'ssm-user', '$ python3 -c …', 'web', '```', '']
+                    out += [T('プロンプトにユーザー名、ホスト名、現在のディレクトリが表示される。`~` はホームディレクトリを表し、`pwd` は現在地を絶対パスで表示する。セットアップが表示を自動設定できず、`$` だけが表示された場合は、次の1行を実行して現在地を常時表示する。作業が終わったら `exit` で接続を閉じる。',
+                              'В приглашении видны имя пользователя, имя узла и текущий каталог. `~` означает домашний каталог, а `pwd` показывает полный путь. Если настройка не смогла включить это отображение и видно только `$`, выполните следующую строку. Завершите сеанс командой `exit`.',
+                              'Buyruq satri boshida foydalanuvchi nomi, host nomi va joriy katalogni tekshiring. `~` uy katalogini, `pwd` esa joriy katalogning to‘liq yo‘lini ko‘rsatadi. Sozlashda bu ko‘rinish yoqilmasa va faqat `$` chiqsa, quyidagi qatorni bajaring. Ish yakunida `exit` bilan ulanishni yoping.')[lang],
+                            '', '```bash', r"exec env PS1='\u@\h:\w\$ ' bash --norc -i", '```', '']
+                    out += session_image('session-manager-terminal', T(
+                        'Session Managerの端末。表示を変えると、移動後のディレクトリがプロンプトに反映される。',
+                        'Терминал Session Manager. После настройки приглашение обновляет текущий каталог при переходе.',
+                        'Session Manager terminali. Sozlangach, katalogga o‘tganda buyruq satri yangi katalogni ko‘rsatadi.'), lang)
                 if s['trouble'] is not None:
                     out += ['**' + L['trouble'][lang] + ':** ' + s['trouble'][lang], '']
             if m['id']=='P0':
@@ -233,6 +248,7 @@ def make_markdown(reg, lang, kind):
             out += diagram_markdown(task['id'],lang)
             if number==0:
                 out += instance_id_guide(lang)
+                out += session_connect_guide(lang)
             out += task_spec(task, reg, lang)
             if task['requires_current']:
                 out += ['- ' + T('現在必要な前提', 'Текущие предпосылки', 'Joriy old shartlar')[lang] + ': ' + ', '.join(task['requires_current']), '']
@@ -277,7 +293,11 @@ def render_html(md, lang, kind):
     body = body.replace('src="../../assets/', 'src="../../../assets/').replace('href="../../assets/', 'href="../../../assets/')
     def html_image(match):
         source, alt = match.groups()
-        width, height = (1239, 404) if source.endswith(INSTANCE_ID_IMAGE) else (1040, 680)
+        width, height = 1040, 680
+        if source.startswith('../../../assets/shared/'):
+            from PIL import Image
+            with Image.open(ROOT / source.removeprefix('../../../')) as picture:
+                width, height = picture.size
         return f'<img src="{source}" alt="{alt}" width="{width}" height="{height}" loading="lazy">'
     body = re.sub(r'<img src="([^"]+)" alt="([^"]*)"\s*/?>', html_image, body)
     toc = []
@@ -407,9 +427,6 @@ def main():
     assert hashlib.sha256(reg_raw).hexdigest()==EXPECTED_REGISTRY
     reg=active_registry(json.loads(reg_raw))
     write_diagrams(ROOT)
-    shared_image = ROOT / 'assets/shared' / INSTANCE_ID_IMAGE
-    shared_image.parent.mkdir(parents=True, exist_ok=True)
-    shared_image.write_bytes(INSTANCE_ID_SOURCE.read_bytes())
     assert set(CHECKS)=={c for t in reg['tasks'] if t['category']=='automated_mission' for c in t['progress_scored_checks']}
     assert set(STEP_NOTES)=={f"{module['id']}.{i}" for module in MODULES for i in range(1,len(module['steps'])+1)} - {'P0.1', 'P0.2'}
     for m in MODULES:

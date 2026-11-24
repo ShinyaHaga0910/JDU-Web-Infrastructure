@@ -32,7 +32,7 @@ P0=1、M0=1、M1=8、M2=13、M4=9、M5=13、M6=16（計61素点）。本人実�
 | db | 10.20.2.20 | PostgreSQL5432 |
 | repo | 10.20.2.30 | 事前保存した署名資源のHTTP80 |
 
-各Ubuntuへ入る操作：CloudShellで aws ssm start-session --target i-自分の対象ID。接続先の確認はP0.2の手順を使う。サーバーを替えるときはexitを1回でCloudShellへ戻り、次のIDでstart-sessionする。CloudShellの変数は接続先へ自動コピーされない。SSMのssm-userはsudo可能。RDPのlabuserはsudo管理者ではない。
+P0・M0はEC2の一覧からSession Managerを開く。後の練習でCloudShellから接続するよう指定されたときは、CloudShellで `aws ssm start-session --target i-...` を実行する。`i-...` は対象のInstance IDに置き換える。どちらも接続先の `ssm-user` として操作する。
 
 nanoの編集：file名を指定して開く→本文を入力→Ctrl+O→Enterで保存→Ctrl+Xで終了。設定fileの枠はshell commandではない。psqlに入るとpromptが変わる。SQL/\passwordはその中へ入力し、\qでUbuntuへ戻る。失敗したcommandの次へ進まず、期待結果を確認する。
 
@@ -64,7 +64,7 @@ bash枠は表示された実行場所の端末へ入力する。text枠は設定
 
 ### 学ぶこと
 
-CloudShell、Windows、5台のUbuntuを区別し、正しいサーバーへSSMで入り、採点を自己確認できる。
+EC2の一覧から正しいサーバーを選び、Session Managerで接続して、課題の結果を自分で確認できる。
 
 ### 課題
 
@@ -100,49 +100,54 @@ CloudShell、Windows、5台のUbuntuを区別し、正しいサーバーへSSM�
 
 AWSマネジメントコンソール上部のSearch欄にEC2と入力し、EC2の管理画面を開く。EC2 → Instancesを開き、Name列で自分の演習環境の5台のサーバーを確認する。同じ行のInstance ID列からi-を含めてIDを確認する。
 
-![C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDを確認する。](../../assets/shared/ec2-instance-id-c3.png)
+![EC2のInstances一覧。P0は名前の末尾が `-web` の行、M0は `-db` の行を選ぶ。](../../assets/shared/ec2-session-manager-instances.png)
 
-C3の図3-4。EC2 → Instancesを開き、対象サーバーと同じ行のInstance IDを確認する。
+EC2のInstances一覧。P0は名前の末尾が `-web` の行、M0は `-db` の行を選ぶ。
 
-#### P0.2 CloudShellからSSMでWebサーバーに接続する
+#### P0.2 Session ManagerでWebサーバーに接続する
 
 **実行環境:**
 
-CloudShell（学生本人のAWS）
+WebサーバーのSSM端末：ssm-user
 
 **目的と操作:**
 
-次のコマンドのi-YOUR-WEB-INSTANCE-IDを、P0.1で確認したWebサーバーのInstance IDに置き換えて、CloudShellで実行する。接続が完了したら、サーバーの初期構築時に置かれた/etc/jdu-web/bootstrap.jsonからロールを読み出す。このファイルのroleには、サーバーが担当する機能が記録されている。表示がwebなら、接続先はWebサーバーと確認できる。その端末で自分のホームディレクトリに p0-connection.txt を作り、1行目に web を記録する。
+P0.1で確認したWebサーバーの **Instance ID** をクリックする。詳細画面で **Connect** の右にある矢印を押し、**Connect with SSM Session Manager** を選ぶ。新しいタブのターミナルで下のコマンドを実行する。`id -un` でOSユーザー、`pwd` で現在のディレクトリを確認する。初期構築時に置かれた `/etc/jdu-web/bootstrap.json` の `role` が `web` なら、Webサーバーに接続できている。自分のホームディレクトリに `p0-connection.txt` を作り、`web` を1行に記録する。
+
+![EC2の詳細画面。Connectの右の矢印からConnect with SSM Session Managerを選ぶ。Webサーバーの画面を例に示す。](../../assets/shared/ec2-session-manager-connect.png)
+
+EC2の詳細画面。Connectの右の矢印からConnect with SSM Session Managerを選ぶ。Webサーバーの画面を例に示す。
 
 入力するコマンド（番号はこの手順内の順番）
 
 ```bash
-# 1. CloudShellから指定EC2へSSM接続する。接続完了後に次へ進む。
-aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
-# 2. この端末で操作しているOSユーザー名を表示する。
+# 1. この端末で操作しているOSユーザー名を表示する。
 id -un
-# 3. 設置済みのJSONファイルからサーバーのロールを読み出す。
+# 2. 作業場所を $HOME へ移す。
+cd "$HOME"
+# 3. 現在の作業ディレクトリを表示する。
+pwd
+# 4. 設置済みのJSONファイルからサーバーのロールを読み出す。
 python3 -c 'import json;print(json.load(open("/etc/jdu-web/bootstrap.json"))["role"])'
-# 4. ホームディレクトリの確認用ファイルに web と1行書く。
+# 5. ホームディレクトリの確認用ファイルに web と1行書く。
 printf '%s\n' web > "$HOME/p0-connection.txt"
-# 5. $HOME/p0-connection.txt の内容を変更せずに読む。
+# 6. $HOME/p0-connection.txt の内容を変更せずに読む。
 cat "$HOME/p0-connection.txt"
-# 6. 現在のサーバーへの接続を閉じ、CloudShellへ戻る。
-exit
 ```
 
 **期待する結果と読み方:**
 
-id -unはssm-user、ファイルから読み出したロールはwebと表示される。
+`id -un` は `ssm-user`、ホームディレクトリへ移動した後の `pwd` は `/home/ssm-user`、ロールと作成したファイルの内容は `web` と表示される。
 
-ターミナルの表示例（接続後）
+プロンプトにユーザー名、ホスト名、現在のディレクトリが表示される。`~` はホームディレクトリを表し、`pwd` は現在地を絶対パスで表示する。セットアップが表示を自動設定できず、`$` だけが表示された場合は、次の1行を実行して現在地を常時表示する。作業が終わったら `exit` で接続を閉じる。
 
-```text
-$ id -un
-ssm-user
-$ python3 -c …
-web
+```bash
+exec env PS1='\u@\h:\w\$ ' bash --norc -i
 ```
+
+![Session Managerの端末。表示を変えると、移動後のディレクトリがプロンプトに反映される。](../../assets/shared/session-manager-terminal.png)
+
+Session Managerの端末。表示を変えると、移動後のディレクトリがプロンプトに反映される。
 
 #### P0.3 RDPで踏み台のデスクトップを開く
 
@@ -183,7 +188,7 @@ WebへSSM接続したままDBの手順を入力すると、どのサーバーが
 
 **考え方:**
 
-現在接続中のWebが変わる。exitでCloudShellへ戻り、DBのinstance IDへ接続し直す。
+現在接続中のWebサーバーに対してコマンドが実行される。DBを操作するときは、EC2の一覧でDBサーバーを選び、Session Managerで別の端末を開く。
 
 ## P1 HTTPで静的ファイルを返す
 

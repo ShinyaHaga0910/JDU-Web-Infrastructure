@@ -25,9 +25,9 @@ def step(m, title, place, why, code, expect, trouble):
     m['steps'].append(dict(title=title, place=place, why=why, code=code.strip(), expect=expect, trouble=trouble))
 
 m = module('P0', T('サーバーの確認と接続', 'Своя среда и место выполнения команд', 'Shaxsiy muhit va buyruqlarni bajarish joyi'),
- T('CloudShell、Windows、5台のUbuntuを区別し、正しいサーバーへSSMで入り、採点を自己確認できる。',
-   'Различать CloudShell, Windows и пять Ubuntu-серверов; подключаться через SSM к нужному узлу и запускать самопроверку.',
-   'CloudShell, Windows va beshta Ubuntu serverni farqlash; kerakli serverga SSM orqali kirish va o‘zini tekshirish.'),
+ T('EC2の一覧から正しいサーバーを選び、Session Managerで接続して、課題の結果を自分で確認できる。',
+   'Выбрать нужный сервер в списке EC2, подключиться через Session Manager и проверить результат задания.',
+   'EC2 ro‘yxatidan kerakli serverni tanlash, Session Manager orqali ulanish va topshiriq natijasini tekshirish.'),
  T('構築済みの自分の環境で、5台のインスタンスIDとロールを確認し、接続先と操作ユーザーを確かめる。',
    'В своей готовой среде проверьте идентификаторы и роли пяти серверов, затем проверьте, к какому серверу и под каким пользователем вы подключились.',
    'Tayyor muhitingizda beshta serverning instance ID si va rolini tekshiring. Qaysi serverga va qaysi foydalanuvchi sifatida ulanganingizni aniqlang.'))
@@ -35,17 +35,18 @@ step(m, T('5台のinstance IDを確認する', 'Проверить instance ID �
  T('AWSマネジメントコンソール上部のSearch欄にEC2と入力し、EC2の管理画面を開く。EC2 → Instancesを開き、Name列で自分の演習環境の5台のサーバーを確認する。同じ行のInstance ID列からi-を含めてIDを確認する。',
    'Введите EC2 в поле Search в верхней части AWS Console и откройте консоль EC2. Откройте EC2 → Instances и найдите пять серверов своей среды в столбце Name. В той же строке проверьте полный идентификатор с префиксом i- в столбце Instance ID.',
    'AWS Console tepasidagi Search maydoniga EC2 deb yozib, boshqaruv oynasini oching. EC2 → Instances ro‘yxatida Name ustunidan o‘z muhitingizdagi beshta serverni tekshiring. Shu qatordagi Instance ID ustunidan i- bilan boshlangan to‘liq ID ni ko‘ring.'), '', None, None)
-step(m, T('CloudShellからSSMでWebサーバーに接続する', 'Подключиться к Web-серверу через SSM из CloudShell', 'CloudShell dan SSM orqali Web serverga ulanish'), 'cloud',
- T('次のコマンドのi-YOUR-WEB-INSTANCE-IDを、P0.1で確認したWebサーバーのInstance IDに置き換えて、CloudShellで実行する。接続が完了したら、サーバーの初期構築時に置かれた/etc/jdu-web/bootstrap.jsonからロールを読み出す。このファイルのroleには、サーバーが担当する機能が記録されている。表示がwebなら、接続先はWebサーバーと確認できる。その端末で自分のホームディレクトリに p0-connection.txt を作り、1行目に web を記録する。',
-   'В первой команде замените i-YOUR-WEB-INSTANCE-ID на Instance ID Web-сервера из P0.1 и выполните её в CloudShell. После подключения прочитайте роль из /etc/jdu-web/bootstrap.json, созданного при настройке сервера. Поле role содержит назначение сервера. Значение web подтверждает подключение к Web-серверу. В этом терминале создайте в своём домашнем каталоге p0-connection.txt с одной строкой web.',
-   'Birinchi buyruqdagi i-YOUR-WEB-INSTANCE-ID o‘rniga P0.1 da tekshirilgan Web serverning Instance ID sini yozing va buyruqni CloudShell da bajaring. Ulangach, serverni dastlabki sozlashda joylangan /etc/jdu-web/bootstrap.json faylidan rolni o‘qing. role maydonida server vazifasi saqlanadi. web qiymati Web serverga ulanganligingizni tasdiqlaydi. Shu terminalda uy katalogingizga bitta web satri bor p0-connection.txt faylini yarating.'),
- r"""aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
-id -un
+step(m, T('Session ManagerでWebサーバーに接続する', 'Подключиться к Web-серверу через Session Manager', 'Session Manager orqali Web serverga ulanish'), 'web',
+ T('P0.1で確認したWebサーバーの **Instance ID** をクリックする。詳細画面で **Connect** の右にある矢印を押し、**Connect with SSM Session Manager** を選ぶ。新しいタブのターミナルで下のコマンドを実行する。`id -un` でOSユーザー、`pwd` で現在のディレクトリを確認する。初期構築時に置かれた `/etc/jdu-web/bootstrap.json` の `role` が `web` なら、Webサーバーに接続できている。自分のホームディレクトリに `p0-connection.txt` を作り、`web` を1行に記録する。',
+   'Нажмите **Instance ID** Web-сервера, найденного в P0.1. На странице сведений нажмите стрелку справа от **Connect** и выберите **Connect with SSM Session Manager**. Выполните команды ниже в терминале новой вкладки. `id -un` показывает пользователя ОС, а `pwd` — текущий каталог. Значение `web` в поле `role` файла `/etc/jdu-web/bootstrap.json` подтверждает, что открыт Web-сервер. Создайте в своём домашнем каталоге файл `p0-connection.txt` с одной строкой `web`.',
+   'P0.1 da topilgan Web serverning **Instance ID** havolasini bosing. Tafsilotlarda **Connect** yonidagi o‘ng strelkani bosing va **Connect with SSM Session Manager** ni tanlang. Quyidagi buyruqlarni yangi varaqdagi terminalda bajaring. `id -un` OS foydalanuvchisini, `pwd` esa joriy katalogni ko‘rsatadi. `/etc/jdu-web/bootstrap.json` faylidagi `role` qiymati `web` bo‘lsa, Web serverga ulangansiz. Uy katalogingizda bir satrda `web` yozilgan `p0-connection.txt` faylini yarating.'),
+ r"""id -un
+cd "$HOME"
+pwd
 python3 -c 'import json;print(json.load(open("/etc/jdu-web/bootstrap.json"))["role"])'
 printf '%s\n' web > "$HOME/p0-connection.txt"
 cat "$HOME/p0-connection.txt"
-exit""",
- T('id -unはssm-user、ファイルから読み出したロールはwebと表示される。', 'id -un выводит ssm-user, а роль из файла имеет значение web.', 'id -un natijasi ssm-user, fayldan o‘qilgan rol qiymati esa web bo‘ladi.'),
+""",
+ T('`id -un` は `ssm-user`、ホームディレクトリへ移動した後の `pwd` は `/home/ssm-user`、ロールと作成したファイルの内容は `web` と表示される。', 'Команда `id -un` выводит `ssm-user`, команда `pwd` после перехода в домашний каталог выводит `/home/ssm-user`, а роль и содержимое файла имеют значение `web`.', '`id -un` natijasi `ssm-user`, uy katalogiga o‘tgandan keyingi `pwd` natijasi `/home/ssm-user`, rol va yaratilgan fayl mazmuni esa `web` bo‘ladi.'),
  None)
 step(m, T('RDPで踏み台のデスクトップを開く', 'Открыть рабочий стол бастиона по RDP', 'RDP orqali bastion ish stolini ochish'), 'pc',
  T('EC2で確認した現在の踏み台の公開IPv4を使う。Windowsキー＋Rを押し、mstsc /promptを入力してEnter。ComputerへそのIPを指定し、userはlabuser、passwordは本人が初期配備で設定したRDP用を使う。Windowsアカウントのpasswordではない。「資格情報を記憶する」は選ばない。青いxrdp loginが出たらSession=Xorgを確認し、labuserで入る。',
@@ -405,9 +406,9 @@ step(m, T('正規成功と拒否を同じ確認回で送る', 'Отправит�
 # M requirements and pass-condition tables are generated from the accepted frozen registry.
 MISSION_GUIDANCE = {
  'M0': T(
-    'P0ではWebサーバーを例に接続を練習した。M0ではEC2の一覧から自分のDBサーバーを選び、そのインスタンスIDを使ってCloudShellからSSMで接続する。接続先がDBサーバー（役割はdb）、操作ユーザーがssm-userであることを確かめる。DBサーバー上の自分のホームディレクトリに `m0-connection.txt` を作り、`db` だけを1行に記録する。課題画面でM0を選び、記録が確認されると1点になる。',
-    'В P0 вы учились подключаться к Web-серверу. В M0 найдите свой DB-сервер в списке EC2 и подключитесь к нему через SSM из CloudShell по его instance ID. Проверьте роль db и пользователя ssm-user. Создайте на DB-сервере в своём домашнем каталоге файл `m0-connection.txt` с единственной строкой `db`. Выберите M0 на странице заданий. За подтверждённый файл начисляется 1 балл.',
-    'P0 da Web serverga ulanishni mashq qildingiz. M0 da EC2 ro‘yxatidan o‘z DB serveringizni toping va uning instance ID si orqali CloudShell dan SSM bilan ulaning. Rol db, foydalanuvchi ssm-user ekanini tekshiring. DB serverdagi uy katalogingizda faqat `db` satri bor `m0-connection.txt` faylini yarating. Topshiriqlar sahifasida M0 ni tanlang. Fayl tasdiqlansa 1 ball beriladi.'),
+    'P0ではWebサーバーへの接続を練習した。M0ではEC2の一覧から自分のDBサーバーを探し、同じ行の **Instance ID** をクリックする。詳細画面の **Connect** の右にある矢印から **Connect with SSM Session Manager** を選ぶ。接続先のロールが `db`、操作ユーザーが `ssm-user` であることを確かめる。DBサーバーの自分のホームディレクトリに `m0-connection.txt` を作り、`db` だけを1行に記録する。課題画面でM0を選び、記録が確認されると1点になる。',
+    'В P0 вы учились подключаться к Web-серверу. В M0 найдите свой DB-сервер в списке EC2 и нажмите **Instance ID** в его строке. Нажмите стрелку справа от **Connect** и выберите **Connect with SSM Session Manager**. Проверьте роль `db` и пользователя `ssm-user`. Создайте в своём домашнем каталоге на DB-сервере файл `m0-connection.txt` с единственной строкой `db`. Выберите M0 на странице заданий. За подтверждённый файл начисляется 1 балл.',
+    'P0 da Web serverga ulanishni mashq qildingiz. M0 da o‘z DB serveringizni EC2 ro‘yxatidan toping va o‘sha qatordagi **Instance ID** ni bosing. **Connect** yonidagi o‘ng strelkani bosib, **Connect with SSM Session Manager** ni tanlang. Rol `db`, foydalanuvchi `ssm-user` ekanini tekshiring. DB serverdagi uy katalogingizda faqat `db` satri bor `m0-connection.txt` faylini yarating. Topshiriqlar sahifasida M0 ni tanlang. Fayl tasdiqlansa 1 ball beriladi.'),
  'M1': T('P1を参考に、指定された別fileと本文を独力でHTTP配信する。P1のpractice.txtを残す。file・service・listen・local/踏み台/public HTTP・今回要求のlogが対象。', 'По навыкам P1 самостоятельно выдайте другой заданный файл и текст. Сохраните practice.txt. Проверяются файл, сервис, слушатель, local/bastion/public HTTP и журнал текущего запроса.', 'P1 ko‘nikmasi bilan belgilangan boshqa fayl va matnni mustaqil tarqating. practice.txt ni saqlang. Fayl, service, listen, local/bastion/public HTTP va joriy so‘rov log i tekshiriladi.'),
  'M2': T('同じlab.test zoneへ正式6名を設定する。P2のguide/practice-dbは保持してよい。踏み台/Webの通常resolver、名前によるM1 HTTP、DB名、UDP/TCP、外部forward、NXDOMAIN、ACL、AXFR拒否まで確認する。', 'Добавьте шесть основных имён в ту же zone lab.test. guide/practice-db можно сохранить. Нужны обычный resolver бастиона/Web, HTTP M1 по имени, имя DB, UDP/TCP, forwarding, NXDOMAIN, ACL и запрет AXFR.', 'Ayni lab.test zone ga oltita asosiy nomni qo‘shing. guide/practice-db qolishi mumkin. Bastion/Web odatiy resolver, nom orqali M1 HTTP, DB nomi, UDP/TCP, forwarding, NXDOMAIN, ACL va AXFR rad etilishi kerak.'),
  'M3': T('M専用markerを自分のLab IDで作る。P3とは別のブラウザで停止前記録→AWS Stop→ブラウザで停止完了確認→AWS Start→ブラウザで再開後確認を行う。対象は同じWebと元root volume。単なるrebootでは不可。backup/restoreとdisk追加は不要。', 'Создайте отдельный marker M со своим Lab ID. Отдельно от P3 пройдите браузер: запись до остановки → AWS Stop → браузер: подтверждение остановки → AWS Start → браузер: проверка после запуска. Нужны тот же Web и исходный root volume; reboot не подходит. Backup/restore и новый диск не нужны.', 'O‘z Lab ID bilan alohida M marker yarating. P3 dan alohida brauzerda oldingi holat → AWS Stop → brauzerda to‘xtashni tekshirish → AWS Start → brauzerda saqlanishni tekshirish ketma-ketligini bajaring. Ayni Web va asl root volume kerak; oddiy reboot yetmaydi. Backup/restore va yangi disk kerak emas.'),

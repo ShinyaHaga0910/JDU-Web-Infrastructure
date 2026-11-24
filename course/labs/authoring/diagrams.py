@@ -108,40 +108,33 @@ def connection_diagram(s):
     lang=s.lang
     practice=s.task=='P0'
     title=T('Webサーバーへの接続と教材ファイルの配置','Подключение к Web и размещение файлов','Web serverga ulanish va o‘quv fayllarini joylash') if practice else T(
-        'CloudShellから各EC2に接続する','Подключение из CloudShell к EC2','CloudShell dan EC2 serverlariga ulanish')
+        'DBサーバーへの接続と教材ファイルの配置','Подключение к DB и размещение файлов','DB serverga ulanish va o‘quv fayllarini joylash')
     s.text(25,15,title[lang],25)
     s.rect(224,65,790,575,fill='#f1f7fc',stroke='#7e9cb3',width=2)
     s.text(247,77,'AWS',20)
     s.rect(565,105,424,492,fill='white',stroke='#7e9cb3',width=2)
     s.text(588,116,'VPC  10.20.0.0/16',19)
-    s.simple(35,302,LABELS['pc'][lang],w=150)
-    s.simple(248,302,'CloudShell',w=156,ellipse=True)
+    s.simple(35,215,LABELS['pc'][lang],w=150)
+    s.simple(248,215,'Session Manager',w=190)
+    s.simple(248,410,'CloudShell',w=190,ellipse=True)
     browser=T('ブラウザ','Браузер','Brauzer')[lang]
-    s.path([(185,335),(248,335)],browser,(217,279))
+    s.path([(185,247),(248,247)],browser,(215,181))
+    s.text(343,294,T('EC2の接続画面から開く','Открывается из консоли EC2','EC2 ulanish sahifasidan ochiladi')[lang],16,color=TEAL,center=True,max_width=232)
     blue='#285da8'
-    if practice:
-        s.path([(398,318),(457,318),(457,258),(655,258)],'P0.2  SSM (Session Manager)',(497,223))
-        s.path([(398,350),(610,350),(610,290),(655,290)],color=blue)
-        copy_label=T('初期構築で教材を配置','Файлы при развёртывании','Sozlashda fayllarni joylash')[lang]
-        s.path([(610,350),(610,437),(655,437)],copy_label,(489,373),color=blue)
-        s.text(498,399,T('SSMで2台に配置','Через SSM на два узла','SSM orqali ikki serverga')[lang],16,color=blue,center=True)
-    else:
-        s.text(326,383,T('接続先をIDで指定','Выбор узла по ID','Server ID sini tanlash')[lang],17,center=True)
-        target=T('M0の接続先：DBサーバー','Цель подключения M0: DB-сервер','M0 ulanish manzili: DB server')
-        s.text(393,485,target[lang],18,color=TEAL,center=True,max_width=322)
-        s.text(490,289,'SSM',22,color=TEAL,center=True)
-        s.text(490,370,'Session Manager',16,color=TEAL,center=True)
+    s.path([(438,442),(612,442),(612,293),(655,293)],color=blue)
+    s.path([(612,442),(612,461),(655,461)],color=blue)
+    s.text(354,494,T('初期構築で教材を配置','Файлы при развёртывании','Sozlashda fayllarni joylash')[lang],16,color=blue,center=True,max_width=235)
+    s.text(353,522,'SSM',16,color=blue,center=True)
+    target_y=255 if practice else 421
+    s.path([(438,248),(526,248),(526,target_y),(655,target_y)], 'P0.2' if practice else 'M0', (494,215))
     roles=('bastion','web','dns','db','repo')
     for i,role in enumerate(roles):
         y=155+i*84
-        middle=y+30
-        if not practice:
-            s.path([(404,335),(624,335),(624,middle),(655,middle)])
         receives_files=role in ('web','db')
-        fill=('#edf4ff' if practice else '#e7f4f2') if receives_files else '#f4f7fa'
-        stroke=(blue if practice else TEAL) if receives_files else GRAY
+        fill='#edf4ff' if receives_files else '#f4f7fa'
+        stroke=TEAL if i==(1 if practice else 3) else blue if receives_files else GRAY
         s.rect(655,y,309,71,fill=fill,stroke=stroke,width=2)
-        name=LABELS[role][lang]+('ー' if practice and lang=='ja' else '')
+        name=LABELS[role][lang]+('ー' if lang=='ja' else '')
         s.text(670,y+6,'EC2 '+name,18)
         s.text(900,y+8,IPS[role],15,color=MUTED,center=True)
         if receives_files:
@@ -164,9 +157,9 @@ def diagram_text(task,lang):
                 'Yashil strelka P0.2 da terminalga ulanishni, ko‘k strelkalar dastlabki sozlashda fayllarni joylashni ko‘rsatadi. Repo server Ubuntu paketlarini tarqatadi.')[lang]
             return caption,caption
         caption=T(
-            '利用者PCのブラウザでAWSのCloudShellを開き、SSMで対象のEC2へ接続する。教材ファイルの配置先はWebサーバーとDBサーバー。共通登録コード方式では初期構築時に配置される。',
-            'Откройте CloudShell в AWS из браузера на своём PC и подключитесь к нужному EC2 через SSM. Файлы курса размещаются на Web и DB. При установке по общему коду они размещаются во время создания среды.',
-            'O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda joylanadi.')[lang]
+            '緑の矢印はEC2の画面からSession ManagerでDBサーバーへ接続する経路。青の矢印は、初期構築時にCloudShellがSSMでWebとDBへ教材ファイルを配置する経路。',
+            'Зелёная стрелка показывает подключение к DB-серверу через Session Manager в EC2. Синие стрелки показывают размещение файлов на Web и DB из CloudShell через SSM при создании среды.',
+            'Yashil strelka EC2 sahifasidan Session Manager orqali DB serverga ulanishni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda CloudShell dan SSM orqali Web va DB ga fayllarni joylashni ko‘rsatadi.')[lang]
         return caption,caption
     before,action,result=STAGES[n]
     caption=T('図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。','Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки.','Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir.')[lang]

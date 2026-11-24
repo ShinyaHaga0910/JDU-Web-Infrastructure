@@ -62,7 +62,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tr>
 </tbody>
 </table>
-<p>Har Ubuntu ga kirish uchun CloudShell da aws ssm start-session --target i-OZ-ID bajaring. Ulanishni P0.2 qadamiga muvofiq tekshiring. Server almashtirishda bitta exit bilan CloudShell ga qaytib keyingi ID ga ulang. CloudShell o‘zgaruvchilari serverga avtomatik ko‘chmaydi. ssm-user sudo qila oladi; RDP labuser sudo admin emas.</p>
+<p>P0 va M0 da Session Manager’ni EC2 ro‘yxatidan oching. Keyingi qadam CloudShell orqali ulanishni so‘rasa, u yerda <code>aws ssm start-session --target i-server-ID</code> ni bajaring. Har ikkala holatda serverda <code>ssm-user</code> sifatida ishlaysiz.</p>
 <p>Nano: faylni ochish → matn yozish → Ctrl+O → Enter bilan saqlash → Ctrl+X bilan chiqish. Sozlama bloki shell buyrug‘i emas. Psql ichida prompt o‘zgaradi; SQL/\password shu yerga yoziladi, \q Ubuntu ga qaytaradi. Xatodan keyin natijani tekshirmay davom etmang.</p>
 <p>Raqamli izohlar shu qadamdagi tartib va maqsadni bildiradi. # shell, -- psql ichidagi izohdir. Izohni o‘zgartirish shart emas. Ulanish, editor va parol kiritish tugashini kutib, bittadan bajaring. Qatorga bo‘lingan buyruq bitta buyruq bo‘lib qoladi.</p>
 <h2 id="section-3">Qadamlarni qanday o‘qish kerak</h2>
@@ -127,7 +127,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>Boshlang‘ich SSM CloudShell dan EC2 ga alohida management yo‘lidir. U oddiy Web request yo‘liga qo‘shilmaydi. Jadvaldagi ichki IP va portlar shu Lab uchun, barcha Web tizimlari uchun emas.</p>
 <h2 id="section-5">P0 Shaxsiy muhit va buyruqlarni bajarish joyi</h2>
 <h3>Nimani o‘rganamiz</h3>
-<p>CloudShell, Windows va beshta Ubuntu serverni farqlash; kerakli serverga SSM orqali kirish va o‘zini tekshirish.</p>
+<p>EC2 ro‘yxatidan kerakli serverni tanlash, Session Manager orqali ulanish va topshiriq natijasini tekshirish.</p>
 <h3>Topshiriq</h3>
 <p>Tayyor muhitingizda beshta serverning instance ID si va rolini tekshiring. Qaysi serverga va qaysi foydalanuvchi sifatida ulanganingizni aniqlang.</p>
 <h3>Serverlarga ulanish va kurs fayllari</h3>
@@ -145,35 +145,36 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>Talabaning shaxsiy AWS Console oynasi</p>
 <p><strong>Maqsad va amallar:</strong></p>
 <p>AWS Console tepasidagi Search maydoniga EC2 deb yozib, boshqaruv oynasini oching. EC2 → Instances ro‘yxatida Name ustunidan o‘z muhitingizdagi beshta serverni tekshiring. Shu qatordagi Instance ID ustunidan i- bilan boshlangan to‘liq ID ni ko‘ring.</p>
-<p><img src="../../../assets/shared/ec2-instance-id-c3.png" alt="C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni tekshiring." width="1239" height="404" loading="lazy"></p>
-<p>C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni tekshiring.</p>
-<h4>P0.2 CloudShell dan SSM orqali Web serverga ulanish</h4>
+<p><img src="../../../assets/shared/ec2-session-manager-instances.png" alt="EC2 dagi Instances ro‘yxati. P0 uchun nomi , M0 uchun  bilan tugaydigan qatorni tanlang." width="1393" height="382" loading="lazy"></p>
+<p>EC2 dagi Instances ro‘yxati. P0 uchun nomi <code>-web</code>, M0 uchun <code>-db</code> bilan tugaydigan qatorni tanlang.</p>
+<h4>P0.2 Session Manager orqali Web serverga ulanish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
-<p>Talabaning shaxsiy AWS hisobidagi CloudShell</p>
+<p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>Birinchi buyruqdagi i-YOUR-WEB-INSTANCE-ID o‘rniga P0.1 da tekshirilgan Web serverning Instance ID sini yozing va buyruqni CloudShell da bajaring. Ulangach, serverni dastlabki sozlashda joylangan /etc/jdu-web/bootstrap.json faylidan rolni o‘qing. role maydonida server vazifasi saqlanadi. web qiymati Web serverga ulanganligingizni tasdiqlaydi. Shu terminalda uy katalogingizga bitta web satri bor p0-connection.txt faylini yarating.</p>
+<p>P0.1 da topilgan Web serverning <strong>Instance ID</strong> havolasini bosing. Tafsilotlarda <strong>Connect</strong> yonidagi o‘ng strelkani bosing va <strong>Connect with SSM Session Manager</strong> ni tanlang. Quyidagi buyruqlarni yangi varaqdagi terminalda bajaring. <code>id -un</code> OS foydalanuvchisini, <code>pwd</code> esa joriy katalogni ko‘rsatadi. <code>/etc/jdu-web/bootstrap.json</code> faylidagi <code>role</code> qiymati <code>web</code> bo‘lsa, Web serverga ulangansiz. Uy katalogingizda bir satrda <code>web</code> yozilgan <code>p0-connection.txt</code> faylini yarating.</p>
+<p><img src="../../../assets/shared/ec2-session-manager-connect.png" alt="EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session Manager ni tanlang. Rasmda Web server ko‘rsatilgan." width="1245" height="319" loading="lazy"></p>
+<p>EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session Manager ni tanlang. Rasmda Web server ko‘rsatilgan.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
-<pre><code class="language-bash"># 1. CloudShell dan tanlangan EC2 ga SSM ochish; ulanishni kutish.
-aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
-# 2. Shu terminaldagi OS user nomini ko‘rsatish.
+<pre><code class="language-bash"># 1. Shu terminaldagi OS user nomini ko‘rsatish.
 id -un
-# 3. Bootstrap dan faqat role ni o‘qib, ulangan server vazifasini tekshirish.
+# 2. Ish katalogini $HOME ga o‘zgartirish.
+cd &quot;$HOME&quot;
+# 3. Joriy ish katalogini ko‘rsatish.
+pwd
+# 4. Bootstrap dan faqat role ni o‘qib, ulangan server vazifasini tekshirish.
 python3 -c 'import json;print(json.load(open(&quot;/etc/jdu-web/bootstrap.json&quot;))[&quot;role&quot;])'
-# 4. Uy katalogidagi tekshiruv fayliga bitta web satrini yozish.
+# 5. Uy katalogidagi tekshiruv fayliga bitta web satrini yozish.
 printf '%s\n' web &gt; &quot;$HOME/p0-connection.txt&quot;
-# 5. $HOME/p0-connection.txt mazmunini o‘zgartirmay o‘qish.
+# 6. $HOME/p0-connection.txt mazmunini o‘zgartirmay o‘qish.
 cat &quot;$HOME/p0-connection.txt&quot;
-# 6. Joriy server session ini yopib CloudShell ga qaytish.
-exit
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>id -un natijasi ssm-user, fayldan o‘qilgan rol qiymati esa web bo‘ladi.</p>
-<p>Ulangandan keyingi terminal ko‘rinishi</p>
-<pre><code class="language-text">$ id -un
-ssm-user
-$ python3 -c …
-web
+<p><code>id -un</code> natijasi <code>ssm-user</code>, uy katalogiga o‘tgandan keyingi <code>pwd</code> natijasi <code>/home/ssm-user</code>, rol va yaratilgan fayl mazmuni esa <code>web</code> bo‘ladi.</p>
+<p>Buyruq satri boshida foydalanuvchi nomi, host nomi va joriy katalogni tekshiring. <code>~</code> uy katalogini, <code>pwd</code> esa joriy katalogning to‘liq yo‘lini ko‘rsatadi. Sozlashda bu ko‘rinish yoqilmasa va faqat <code>$</code> chiqsa, quyidagi qatorni bajaring. Ish yakunida <code>exit</code> bilan ulanishni yoping.</p>
+<pre><code class="language-bash">exec env PS1='\u@\h:\w\$ ' bash --norc -i
 </code></pre>
+<p><img src="../../../assets/shared/session-manager-terminal.png" alt="Session Manager terminali. Sozlangach, katalogga o‘tganda buyruq satri yangi katalogni ko‘rsatadi." width="930" height="184" loading="lazy"></p>
+<p>Session Manager terminali. Sozlangach, katalogga o‘tganda buyruq satri yangi katalogni ko‘rsatadi.</p>
 <h4>P0.3 RDP orqali bastion ish stolini ochish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Talabaning Windows PC si (umumiy hisob)</p>
@@ -194,7 +195,7 @@ mstsc /prompt
 <h3>Tushunishni tekshirish (ballsiz)</h3>
 <p>Web SSM session ichida DB qadamlarini kiritsangiz, qaysi server o‘zgaradi?</p>
 <p><strong>Izoh:</strong></p>
-<p>Joriy Web o‘zgaradi. Exit bilan CloudShell ga qaytib DB instance ID ga qayta ulaning.</p>
+<p>Buyruqlar ulangan Web serverda bajariladi. DB bilan ishlash uchun EC2 ro‘yxatidan DB serverni tanlab, Session Manager orqali yangi terminal oching.</p>
 <h2 id="section-6">P1 HTTP orqali statik faylni qaytarish</h2>
 <h3>Nimani o‘rganamiz</h3>
 <p>Nginx, fayl joyi, tinglash porti, HTTP javobi va access log ni bog‘lash.</p>

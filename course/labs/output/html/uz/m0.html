@@ -18,12 +18,14 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p><a href="../ja/m0.html">日本語</a> · <a href="../ru/m0.html">Русский</a> · <a href="../uz/m0.html">O‘zbekcha</a></p>
 <p>Mos topshiriq: <a href="p0.html">P0</a>.</p>
 <h2 id="section-1">Tayyor holat talablari</h2>
-<p>P0 da Web serverga ulanishni mashq qildingiz. M0 da EC2 ro‘yxatidan o‘z DB serveringizni toping va uning instance ID si orqali CloudShell dan SSM bilan ulaning. Rol db, foydalanuvchi ssm-user ekanini tekshiring. DB serverdagi uy katalogingizda faqat <code>db</code> satri bor <code>m0-connection.txt</code> faylini yarating. Topshiriqlar sahifasida M0 ni tanlang. Fayl tasdiqlansa 1 ball beriladi.</p>
+<p>P0 da Web serverga ulanishni mashq qildingiz. M0 da o‘z DB serveringizni EC2 ro‘yxatidan toping va o‘sha qatordagi <strong>Instance ID</strong> ni bosing. <strong>Connect</strong> yonidagi o‘ng strelkani bosib, <strong>Connect with SSM Session Manager</strong> ni tanlang. Rol <code>db</code>, foydalanuvchi <code>ssm-user</code> ekanini tekshiring. DB serverdagi uy katalogingizda faqat <code>db</code> satri bor <code>m0-connection.txt</code> faylini yarating. Topshiriqlar sahifasida M0 ni tanlang. Fayl tasdiqlansa 1 ball beriladi.</p>
 <h2 id="section-2">Serverlarga ulanish va kurs fayllari</h2>
-<p><img src="../../../assets/uz/m0-ssm.png" alt="O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda joylanadi." width="1040" height="680" loading="lazy"></p>
-<p>O‘z PC brauzerida AWS CloudShell ni oching va kerakli EC2 ga SSM orqali ulaning. Kurs fayllari Web va DB serverlariga joylanadi. Umumiy kod orqali o‘rnatishda fayllar muhit yaratilganda joylanadi.</p>
-<p><img src="../../../assets/shared/ec2-instance-id-c3.png" alt="C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni tekshiring." width="1239" height="404" loading="lazy"></p>
-<p>C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni tekshiring.</p>
+<p><img src="../../../assets/uz/m0-ssm.png" alt="Yashil strelka EC2 sahifasidan Session Manager orqali DB serverga ulanishni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda CloudShell dan SSM orqali Web va DB ga fayllarni joylashni ko‘rsatadi." width="1040" height="680" loading="lazy"></p>
+<p>Yashil strelka EC2 sahifasidan Session Manager orqali DB serverga ulanishni ko‘rsatadi. Ko‘k strelkalar dastlabki sozlashda CloudShell dan SSM orqali Web va DB ga fayllarni joylashni ko‘rsatadi.</p>
+<p><img src="../../../assets/shared/ec2-session-manager-instances.png" alt="EC2 dagi Instances ro‘yxati. P0 uchun nomi , M0 uchun  bilan tugaydigan qatorni tanlang." width="1393" height="382" loading="lazy"></p>
+<p>EC2 dagi Instances ro‘yxati. P0 uchun nomi <code>-web</code>, M0 uchun <code>-db</code> bilan tugaydigan qatorni tanlang.</p>
+<p><img src="../../../assets/shared/ec2-session-manager-connect.png" alt="EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session Manager ni tanlang. Rasmda Web server ko‘rsatilgan." width="1245" height="319" loading="lazy"></p>
+<p>EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session Manager ni tanlang. Rasmda Web server ko‘rsatilgan.</p>
 <h2 id="section-3">Tekshirish va yuborish</h2>
 <ol>
 <li>P0 da ishlatgan topshiriqlar sahifasiga ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda <strong>M0</strong> ni tanlang.</li>

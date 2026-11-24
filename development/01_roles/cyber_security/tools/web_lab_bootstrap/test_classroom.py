@@ -19,6 +19,23 @@ ROOT = Path(__file__).resolve().parents[5]
 
 
 class ClassroomTests(unittest.TestCase):
+    def test_session_prompt_creates_only_a_missing_default_document(self):
+        class MissingDocument(Exception):
+            response = {'Error': {'Code': 'InvalidDocument'}}
+
+        ssm = Mock()
+        ssm.get_document.side_effect = MissingDocument
+        self.assertTrue(classroom.enable_session_prompt(ssm))
+        document = json.loads(ssm.create_document.call_args.kwargs['Content'])
+        self.assertEqual(document['inputs']['shellProfile']['linux'], classroom.SESSION_PROMPT)
+        self.assertIn('/var/lib/jdu-web-classroom/configured.json', classroom.SESSION_PROMPT)
+        ssm.reset_mock(side_effect=True)
+        ssm.get_document.return_value = {'Content': json.dumps(document)}
+        self.assertTrue(classroom.enable_session_prompt(ssm))
+        ssm.get_document.return_value = {'Content': '{"inputs":{"shellProfile":{"linux":"pwd"}}}'}
+        self.assertFalse(classroom.enable_session_prompt(ssm))
+        ssm.create_document.assert_not_called()
+
     def test_every_stage_and_server_has_a_label_in_all_four_languages(self):
         for language, messages in classroom.TEXT.items():
             with self.subTest(language=language), contextlib.redirect_stdout(io.StringIO()) as output:
@@ -473,7 +490,7 @@ class ClassroomTests(unittest.TestCase):
                                stack_setup=Mock(return_value=({'deployment_id': 'deployment', 'public_key': 'key'}, 'stack')),
                                wait_online=Mock(), deploy_guest=Mock(), download_packages=Mock(),
                                build_archives=Mock(return_value={}), transfer=Mock(), guest=guest, command=command,
-                               stage_lessons=Mock(), register_bastion=Mock()):
+                               stage_lessons=Mock(), register_bastion=Mock(), enable_session_prompt=Mock(return_value=True)):
             ip = classroom.setup_student(Mock(ref='a' * 40), screen, session, '012345678901', config, Path(scratch), '123456789012')
             self.assertEqual(checker.call_args.args[-1], '123456789012')
             classroom.download_packages.assert_not_called()

@@ -32,7 +32,7 @@ Umumiy private IP quyida; public IPv4 doimiy emas. AWS region us-east-1, Ubuntu2
 | db | 10.20.2.20 | PostgreSQL5432 |
 | repo | 10.20.2.30 | Oldindan saqlangan imzolangan resurslar HTTP80 |
 
-Har Ubuntu ga kirish uchun CloudShell da aws ssm start-session --target i-OZ-ID bajaring. Ulanishni P0.2 qadamiga muvofiq tekshiring. Server almashtirishda bitta exit bilan CloudShell ga qaytib keyingi ID ga ulang. CloudShell o‘zgaruvchilari serverga avtomatik ko‘chmaydi. ssm-user sudo qila oladi; RDP labuser sudo admin emas.
+P0 va M0 da Session Manager’ni EC2 ro‘yxatidan oching. Keyingi qadam CloudShell orqali ulanishni so‘rasa, u yerda `aws ssm start-session --target i-server-ID` ni bajaring. Har ikkala holatda serverda `ssm-user` sifatida ishlaysiz.
 
 Nano: faylni ochish → matn yozish → Ctrl+O → Enter bilan saqlash → Ctrl+X bilan chiqish. Sozlama bloki shell buyrug‘i emas. Psql ichida prompt o‘zgaradi; SQL/\password shu yerga yoziladi, \q Ubuntu ga qaytaradi. Xatodan keyin natijani tekshirmay davom etmang.
 
@@ -64,7 +64,7 @@ Boshlang‘ich SSM CloudShell dan EC2 ga alohida management yo‘lidir. U oddiy 
 
 ### Nimani o‘rganamiz
 
-CloudShell, Windows va beshta Ubuntu serverni farqlash; kerakli serverga SSM orqali kirish va o‘zini tekshirish.
+EC2 ro‘yxatidan kerakli serverni tanlash, Session Manager orqali ulanish va topshiriq natijasini tekshirish.
 
 ### Topshiriq
 
@@ -100,49 +100,54 @@ Talabaning shaxsiy AWS Console oynasi
 
 AWS Console tepasidagi Search maydoniga EC2 deb yozib, boshqaruv oynasini oching. EC2 → Instances ro‘yxatida Name ustunidan o‘z muhitingizdagi beshta serverni tekshiring. Shu qatordagi Instance ID ustunidan i- bilan boshlangan to‘liq ID ni ko‘ring.
 
-![C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni tekshiring.](../../assets/shared/ec2-instance-id-c3.png)
+![EC2 dagi Instances ro‘yxati. P0 uchun nomi `-web`, M0 uchun `-db` bilan tugaydigan qatorni tanlang.](../../assets/shared/ec2-session-manager-instances.png)
 
-C3 bobidagi 3-4-rasm. EC2 → Instances ni oching va kerakli server qatoridan Instance ID ni tekshiring.
+EC2 dagi Instances ro‘yxati. P0 uchun nomi `-web`, M0 uchun `-db` bilan tugaydigan qatorni tanlang.
 
-#### P0.2 CloudShell dan SSM orqali Web serverga ulanish
+#### P0.2 Session Manager orqali Web serverga ulanish
 
 **Bajarish muhiti:**
 
-Talabaning shaxsiy AWS hisobidagi CloudShell
+Web serverning SSM terminali: ssm-user
 
 **Maqsad va amallar:**
 
-Birinchi buyruqdagi i-YOUR-WEB-INSTANCE-ID o‘rniga P0.1 da tekshirilgan Web serverning Instance ID sini yozing va buyruqni CloudShell da bajaring. Ulangach, serverni dastlabki sozlashda joylangan /etc/jdu-web/bootstrap.json faylidan rolni o‘qing. role maydonida server vazifasi saqlanadi. web qiymati Web serverga ulanganligingizni tasdiqlaydi. Shu terminalda uy katalogingizga bitta web satri bor p0-connection.txt faylini yarating.
+P0.1 da topilgan Web serverning **Instance ID** havolasini bosing. Tafsilotlarda **Connect** yonidagi o‘ng strelkani bosing va **Connect with SSM Session Manager** ni tanlang. Quyidagi buyruqlarni yangi varaqdagi terminalda bajaring. `id -un` OS foydalanuvchisini, `pwd` esa joriy katalogni ko‘rsatadi. `/etc/jdu-web/bootstrap.json` faylidagi `role` qiymati `web` bo‘lsa, Web serverga ulangansiz. Uy katalogingizda bir satrda `web` yozilgan `p0-connection.txt` faylini yarating.
+
+![EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session Manager ni tanlang. Rasmda Web server ko‘rsatilgan.](../../assets/shared/ec2-session-manager-connect.png)
+
+EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session Manager ni tanlang. Rasmda Web server ko‘rsatilgan.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
 ```bash
-# 1. CloudShell dan tanlangan EC2 ga SSM ochish; ulanishni kutish.
-aws ssm start-session --target i-YOUR-WEB-INSTANCE-ID
-# 2. Shu terminaldagi OS user nomini ko‘rsatish.
+# 1. Shu terminaldagi OS user nomini ko‘rsatish.
 id -un
-# 3. Bootstrap dan faqat role ni o‘qib, ulangan server vazifasini tekshirish.
+# 2. Ish katalogini $HOME ga o‘zgartirish.
+cd "$HOME"
+# 3. Joriy ish katalogini ko‘rsatish.
+pwd
+# 4. Bootstrap dan faqat role ni o‘qib, ulangan server vazifasini tekshirish.
 python3 -c 'import json;print(json.load(open("/etc/jdu-web/bootstrap.json"))["role"])'
-# 4. Uy katalogidagi tekshiruv fayliga bitta web satrini yozish.
+# 5. Uy katalogidagi tekshiruv fayliga bitta web satrini yozish.
 printf '%s\n' web > "$HOME/p0-connection.txt"
-# 5. $HOME/p0-connection.txt mazmunini o‘zgartirmay o‘qish.
+# 6. $HOME/p0-connection.txt mazmunini o‘zgartirmay o‘qish.
 cat "$HOME/p0-connection.txt"
-# 6. Joriy server session ini yopib CloudShell ga qaytish.
-exit
 ```
 
 **Kutilgan natija va ma’nosi:**
 
-id -un natijasi ssm-user, fayldan o‘qilgan rol qiymati esa web bo‘ladi.
+`id -un` natijasi `ssm-user`, uy katalogiga o‘tgandan keyingi `pwd` natijasi `/home/ssm-user`, rol va yaratilgan fayl mazmuni esa `web` bo‘ladi.
 
-Ulangandan keyingi terminal ko‘rinishi
+Buyruq satri boshida foydalanuvchi nomi, host nomi va joriy katalogni tekshiring. `~` uy katalogini, `pwd` esa joriy katalogning to‘liq yo‘lini ko‘rsatadi. Sozlashda bu ko‘rinish yoqilmasa va faqat `$` chiqsa, quyidagi qatorni bajaring. Ish yakunida `exit` bilan ulanishni yoping.
 
-```text
-$ id -un
-ssm-user
-$ python3 -c …
-web
+```bash
+exec env PS1='\u@\h:\w\$ ' bash --norc -i
 ```
+
+![Session Manager terminali. Sozlangach, katalogga o‘tganda buyruq satri yangi katalogni ko‘rsatadi.](../../assets/shared/session-manager-terminal.png)
+
+Session Manager terminali. Sozlangach, katalogga o‘tganda buyruq satri yangi katalogni ko‘rsatadi.
 
 #### P0.3 RDP orqali bastion ish stolini ochish
 
@@ -183,7 +188,7 @@ Web SSM session ichida DB qadamlarini kiritsangiz, qaysi server o‘zgaradi?
 
 **Izoh:**
 
-Joriy Web o‘zgaradi. Exit bilan CloudShell ga qaytib DB instance ID ga qayta ulaning.
+Buyruqlar ulangan Web serverda bajariladi. DB bilan ishlash uchun EC2 ro‘yxatidan DB serverni tanlab, Session Manager orqali yangi terminal oching.
 
 ## P1 HTTP orqali statik faylni qaytarish
 
