@@ -84,9 +84,9 @@ export function taskActions(lang,task,{config,session,token}) {
 }
 
 const criteriaText={
-  ja:{title:'最新の確認結果',criterion:'採点・確認の基準',PASS:'基準を満たしています',FAIL:'基準を満たしていません',UNKNOWN:'未確認',NOT_APPLICABLE:'対象外',empty:'項目ごとの確認結果はまだありません。'},
-  ru:{title:'Результаты последней проверки',criterion:'Критерий проверки',PASS:'Критерий выполнен',FAIL:'Критерий не выполнен',UNKNOWN:'Не проверено',NOT_APPLICABLE:'Неприменимо',empty:'Результатов по отдельным критериям пока нет.'},
-  uz:{title:'Oxirgi tekshiruv natijalari',criterion:'Tekshiruv mezoni',PASS:'Mezon bajarilgan',FAIL:'Mezon bajarilmagan',UNKNOWN:'Tekshirilmagan',NOT_APPLICABLE:'Tatbiq etilmaydi',empty:'Mezonlar bo‘yicha natijalar hali yo‘q.'},
+  ja:{title:'最新の確認結果',criterion:'採点基準',PASS:'基準を満たしています',FAIL:'基準を満たしていません',UNKNOWN:'未確認',NOT_APPLICABLE:'対象外',empty:'項目ごとの確認結果はまだありません。'},
+  ru:{title:'Результаты последней проверки',criterion:'Критерий оценки',PASS:'Критерий выполнен',FAIL:'Критерий не выполнен',UNKNOWN:'Не проверено',NOT_APPLICABLE:'Неприменимо',empty:'Результатов по отдельным критериям пока нет.'},
+  uz:{title:'Oxirgi tekshiruv natijalari',criterion:'Baholash mezoni',PASS:'Mezon bajarilgan',FAIL:'Mezon bajarilmagan',UNKNOWN:'Tekshirilmagan',NOT_APPLICABLE:'Tatbiq etilmaydi',empty:'Mezonlar bo‘yicha natijalar hali yo‘q.'},
 };
 const checkOrder=['FAIL','UNKNOWN','PASS','NOT_APPLICABLE'];
 const validCriterion=c=>c && /^WEB[A-Z0-9_]{1,60}$/.test(c.id||'') && checkOrder.includes(c.status);
@@ -119,7 +119,7 @@ export function taskDetailHtml(lang,task,grade,maximum,actions='') {
   return `<section class="task-detail"><h2>${escape(task)}</h2>
     <dl><dt>${scoreTitle}</dt><dd class="num">${score}</dd><dt>${dateTitle}</dt><dd>${date}</dd></dl>
     ${actions?`<div class="task-actions">${actions}</div>`:''}
-    <h3>${escape(criteria.title)}</h3>${checks.length?criteriaTable(lang,checks):`<p>${escape(criteria.empty)}</p>`}</section>`;
+    ${maximum?`<h3>${escape(criteria.title)}</h3>${checks.length?criteriaTable(lang,checks):`<p>${escape(criteria.empty)}</p>`}`:''}</section>`;
 }
 
 export function checkHtml(lang,{config,session,token,selected,result,grade,maxima={},blocked=false}={}) {
@@ -169,7 +169,8 @@ export function checkHtml(lang,{config,session,token,selected,result,grade,maxim
   const value=result.result,s=value?.score;
   if (!value || value.task_id!==selected.task_id || !Array.isArray(value.checks) || value.checks.length>40 || !Number.isInteger(s?.raw_earned) || !Number.isInteger(s?.raw_maximum) || s.raw_earned<0 || s.raw_earned>s.raw_maximum || !Number.isFinite(Date.parse(value.checked_at))) throw Error('Invalid result');
   if (!value.checks.every(validCriterion)) throw Error('Invalid check');
-  content+=`<h3>${escape(t.done)}</h3><p>${escape(new Date(value.checked_at).toISOString())}</p><p class="num">${escape(s.counts_toward_assessment?`${t.points}: ${s.raw_earned} / ${s.raw_maximum}`:t.practice)}</p>${s.evaluable?'':`<p role="status">${escape(t.unknown)}</p>`}${criteriaTable(lang,value.checks)}`;
+  const criteria=s.counts_toward_assessment && value.checks.length ? criteriaTable(lang,value.checks) : '';
+  content+=`<h3>${escape(t.done)}</h3><p>${escape(new Date(value.checked_at).toISOString())}</p><p class="num">${escape(s.counts_toward_assessment?`${t.points}: ${s.raw_earned} / ${s.raw_maximum}`:t.practice)}</p>${s.counts_toward_assessment && !s.evaluable?`<p role="status">${escape(t.unknown)}</p>`:''}${criteria}`;
   return content+submissionHtml(lang,result,selected,{config,session,token});
 }
 export const progressScript=`const form=document.querySelector('form[data-check-progress]'); if(form){const key='jdu-check-polls:'+new FormData(form).get('job_id');let n=Number(sessionStorage.getItem(key)||0);if(n<40){setTimeout(()=>{sessionStorage.setItem(key,String(n+1));form.requestSubmit();},4000);}}`;

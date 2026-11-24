@@ -5,6 +5,7 @@ import re
 from functools import lru_cache
 
 import progress_api as legacy
+from grade_reader import scored_checks
 from identity_grade import resolve_student
 from identity_keys import subject_key
 from assessment_command_jobs import checked_spec, JobDenied
@@ -80,6 +81,8 @@ def serve(event, pepper, bindings, grades, client, submissions=None):
             final, _ = resolve_student(event['subject'], pepper, bindings, grades)
             if final != context:
                 return {'status': 'unauthorized'}
+        if answer['status'] == 'ok' and answer['job'].get('phase') == 'report_ready':
+            answer['result']['checks'] = scored_checks(spec['task_id'], answer['result'].get('checks'))
         return answer
     except (legacy.ApiError, JobDenied, ValueError, TypeError, KeyError):
         return {'status': 'unauthorized'}

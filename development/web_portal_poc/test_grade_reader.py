@@ -8,7 +8,7 @@ sys.path[:0] = [str(ROOT / 'web_lab_assessment'), str(ROOT / 'web_lab_teacher')]
 import progress_api as legacy
 import grading
 import registry
-from grade_reader import student_grade
+from grade_reader import project_student, student_grade
 
 
 class Store:
@@ -48,6 +48,15 @@ class GradeTest(unittest.TestCase):
         self.assertEqual(result['selected']['M5']['raw_earned'], 13)
         self.assertEqual(self.store.labs_calls, ['test-lab'])
         self.assertNotIn('token_hash', json.dumps(result))
+
+    def test_p0_detail_contains_only_the_one_point_check(self):
+        checks = [{'id': item, 'status': 'PASS'} for item in registry.canonical_checks('P0', intro=True)]
+        self.row['results'].append({'sk': grading.current_key('P0', registry.INTRO_CONTRACT_SHA256),
+            'deployment_id': 'same', 'contract_sha256': registry.INTRO_CONTRACT_SHA256, 'checks': checks})
+        self.assertEqual(project_student(self.row, 'P0')['task_checks'],
+                         [{'id': 'WEB01_WEB_MARKER', 'status': 'PASS'}])
+        self.assertEqual(len(checks), 4)
+        self.assertEqual(project_student(self.row, 'P1')['task_checks'], [])
 
     def test_other_lab_and_wrong_token_cannot_read(self):
         for event in (self.event(lab='other-lab'), self.event(token='y' * 40)):

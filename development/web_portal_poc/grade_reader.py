@@ -4,10 +4,22 @@ This is not a public endpoint or a browser login mechanism. The caller must
 invoke it inside a secured teacher-side service with an existing lab token.
 """
 import hmac
-import re
-
 import progress_api as legacy
 from grading import project_course_lab
+from registry import COURSE_GRADED_TASKS, INTRO_MARKERS, STATUSES, TASKS
+
+
+def scored_checks(task_id, checks):
+    """Return only checks that contribute to the course score."""
+    if task_id not in COURSE_GRADED_TASKS or not isinstance(checks, list):
+        return []
+    if task_id in INTRO_MARKERS:
+        scored = {INTRO_MARKERS[task_id][0]}
+    else:
+        scored = set(TASKS[task_id]['progress_scored_checks'])
+    return [{'id': item['id'], 'status': item['status']} for item in checks
+            if isinstance(item, dict) and isinstance(item.get('id'), str) and item['id'] in scored
+            and isinstance(item.get('status'), str) and item['status'] in STATUSES]
 
 
 def project_student(lab, task_id=None):
@@ -24,15 +36,7 @@ def project_student(lab, task_id=None):
 
     if task_id is not None:
         latest = projected['current'].get(task_id) or {}
-        allowed = {'PASS', 'FAIL', 'UNKNOWN', 'NOT_APPLICABLE'}
-        checks = latest.get('checks')
-        result['task_checks'] = [
-            {'id': item['id'], 'status': item['status']}
-            for item in (checks[:40] if isinstance(checks, list) else [])
-            if isinstance(item, dict) and isinstance(item.get('id'), str)
-            and re.fullmatch(r'WEB[A-Z0-9_]{1,60}', item['id'])
-            and isinstance(item.get('status'), str) and item['status'] in allowed
-        ]
+        result['task_checks'] = scored_checks(task_id, latest.get('checks'))
     return result
 
 
