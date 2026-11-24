@@ -191,7 +191,7 @@ test('opening a student assignment shows only its saved detail without running a
   assert.equal(calls.length,1);
 });
 
-test('unregistered school students see registration before any grading controls', async()=>{
+test('unregistered school students are redirected to registration before grading', async()=>{
   const access='b'.repeat(64);
   const cookie='__Host-jdu-session=valid; __Host-jdu-access='+access;
   let status='unauthorized';
@@ -201,14 +201,12 @@ test('unregistered school students see registration before any grading controls'
     getGrade:async()=>({status,grade:sample}),getStatus:async()=>({status}),
     enroll:async()=>assert.fail('Registration executes only after submission'),
     checker:async()=>assert.fail('Checking executes only after submission')});
-  for(const [lang,label] of Object.entries({ja:'初回登録を始める',ru:'Начать регистрацию',uz:'Ro‘yxatdan o‘tishni boshlash'})){
+  for(const lang of ['ja','ru','uz']){
     for(const path of ['/checks','/checks?task_id=M1','/grades','/status']){
       const url=path+(path.includes('?')?'&':'?')+'lang='+lang;
       const result=await app(req(url,{headers:{cookie}}));
-      assert.equal(result.status,200,url);
-      const html=await result.text();
-      assert.ok(html.includes(`href="/link?lang=${lang}">${label}`),url);
-      assert.doesNotMatch(html,/<table|action="\/checks/);
+      assert.equal(result.status,303,url);
+      assert.equal(result.headers.get('location'),'/link?lang='+lang,url);
     }
   }
   status='ok';
@@ -216,6 +214,6 @@ test('unregistered school students see registration before any grading controls'
   assert.match(registered,/<table/);
   assert.doesNotMatch(registered,/初回登録を始める/);
   status='unavailable';
-  const unavailable=await (await app(req('/checks',{headers:{cookie}}))).text();
-  assert.doesNotMatch(unavailable,/初回登録を始める/);
+  const unavailable=await app(req('/checks',{headers:{cookie}}));
+  assert.equal(unavailable.status,200);
 });
