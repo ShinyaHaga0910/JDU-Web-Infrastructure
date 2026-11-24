@@ -89,3 +89,15 @@ test('teacher reader client accepts only fixed same-account operations and bound
   assert.throws(()=>createTeacherClient({...config,PORTAL_AWS_ACCOUNT_ID:'000000000000'}));
   assert.equal(calls.length,1);
 });
+
+test('selected teacher task reads only the authorized student detail',async()=>{
+  const calls=[];
+  const instance=app(async e=>{calls.push(e);return {status:'ok',teacher:{class_id:'193548',student:progress.students[0]}};});
+  const result=await instance(req('/teacher/student?lang=ja&lab_id=course-student&task_id=M1'));
+  assert.equal(result.status,200);
+  assert.match(await result.text(),/<h2>M1<\/h2>/);
+  assert.equal(calls[0].task_id,'M1');
+  assert.equal(calls[0].lab_id,'course-student');
+  assert.equal((await instance(req('/teacher/student?lab_id=course-student&task_id=P1'))).status,403);
+  assert.equal(calls.length,1);
+});

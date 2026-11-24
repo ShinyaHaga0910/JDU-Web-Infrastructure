@@ -222,7 +222,7 @@ Login failed bo‘lsa user nomi va klaviatura tartibini tekshiring. Parolni chat
 
 O‘qituvchi bergan baholash manzilini o‘z kompyuteringizdagi brauzerda oching va ta’lim muassasasining Google hisobi bilan kiring. Birinchi kirishda o‘z AWS muhitingizni ro‘yxatdan o‘tkazish bo‘limini tanlang va ekrandagi ko‘rsatmalarga amal qiling.
 
-P0 kartasidagi **Ushbu vazifani tekshirish** tugmasini bosing. Shu sahifada natijani tekshirib, P0 kartasida **1 / 1** saqlanganiga ishonch hosil qiling.
+P0 qatoridagi **Ushbu vazifani tekshirish** tugmasini bosing. Shu sahifada natijani tekshirib, P0 qatorida **1 / 1** saqlanganiga ishonch hosil qiling.
 
 ## P1 HTTP orqali statik faylni qaytarish
 

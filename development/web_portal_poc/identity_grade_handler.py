@@ -12,11 +12,13 @@ import re
 import progress_api as legacy
 from identity_grade import identity_grade
 from status_gateway import student_status
+from registry import COURSE_TASKS
 from teacher_progress import read_teacher, valid as valid_teacher
 
 
 def valid(event):
     return type(event) is dict and (set(event) == {'subject'} or
+        (set(event) == {'subject', 'task_id'} and isinstance(event['task_id'], str) and event['task_id'] in COURSE_TASKS) or
         (set(event) == {'subject', 'operation'} and event['operation'] == 'status') or valid_teacher(event))
 
 
@@ -31,7 +33,7 @@ def serve(event, pepper, bindings, grades, student_lambda=None):
             if student_lambda is None:
                 return {'status': 'unavailable'}
             return student_status(event['subject'], pepper, bindings, grades, student_lambda)
-        result = identity_grade(event['subject'], pepper, bindings, grades)
+        result = identity_grade(event['subject'], pepper, bindings, grades, event.get('task_id'))
         return {'status': 'ok', 'grade': result}
     except legacy.ApiError as exc:
         return {'status': 'unauthorized' if exc.status == 401 else 'unavailable'}

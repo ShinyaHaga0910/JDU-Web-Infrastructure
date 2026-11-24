@@ -166,3 +166,24 @@ test('semester expiry blocks sign-in, grades and check POST before any backend i
   }
   assert.equal(calls,0);
 });
+
+test('opening a student assignment shows only its saved detail without running a check', async()=>{
+  const calls=[];
+  const checkSession='a'.repeat(64);
+  const cookie='__Host-jdu-session=valid; __Host-jdu-access='+checkSession;
+  const app=createApp({env:{...env,PORTAL_CHECKER_ENABLED:'true'},verify:verified,sessions:{...sessions,check:async(id,token)=>id===checkSession && token==='valid'},
+    getGrade:async (...args)=>{calls.push(args);return {status:'ok',grade:{...sample,task_checks:[{id:'WEB02_PUBLIC_HTTP',status:'PASS'}]}};},
+    checker:async()=>{throw Error('GET must not run a checker');}});
+  const result=await app(req('/checks?lang=ja&task_id=M1',{headers:{cookie}}));
+  assert.equal(result.status,200);
+  const html=await result.text();
+  assert.match(html,/<h2>M1<\/h2>/);
+  assert.match(html,/8 \/ 8/);
+  assert.match(html,/合格/);
+  assert.match(html,/lang=ru&amp;task_id=M1/);
+  assert.doesNotMatch(html,/<h2>M2<\/h2>/);
+  assert.deepEqual(calls,[[subject,'M1']]);
+  const rejected=await app(req('/checks?task_id=P3',{headers:{cookie}}));
+  assert.equal(rejected.status,403);
+  assert.equal(calls.length,1);
+});

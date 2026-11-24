@@ -72,26 +72,51 @@ function submissionHtml(lang,result,selected,{config,session,token}) {
   // displays this retry form; automatic saving happens in the finishing POST.
   return `<section><p role="status">${escape(t.pending)}</p>${form(lang,v,checkToken(config,session,token,v),`<input type="hidden" name="task_id" value="${v.task_id}">`,t.retry)}</section>`;
 }
+export function taskActions(lang,task,{config,session,token}) {
+  if(!tasks.includes(task)) throw Error('Invalid task');
+  const st=specialWords[lang];
+  const render=mode=>{
+    const value={operation:'start',task_id:task,job_id:randomUUID(),...(mode?{check_mode:mode}:{})};
+    return form(lang,value,checkToken(config,session,token,value),
+      `<input type="hidden" name="task_id" value="${task}">`,mode?st.functional:/^[PM][56]$/.test(task)?st.readOnly:words[lang].start);
+  };
+  return /^[PM][56]$/.test(task)?render('functional')+render():render();
+}
+
+export function taskDetailHtml(lang,task,grade,maximum,actions='') {
+  const t=words[lang],saved=grade?.selected?.[task],latest=grade?.current?.[task];
+  const [scoreTitle,dateTitle,pending]={
+    ja:['保存済みの点数','最終確認','未採点'],
+    ru:['Сохранённые баллы','Последняя проверка','Без оценки'],
+    uz:['Saqlangan ball','Oxirgi tekshiruv','Baholanmagan'],
+  }[lang];
+  const latestAt=latest?.checked_at;
+  const date=typeof latestAt==='string' && latestAt.length<=40 && Number.isFinite(Date.parse(latestAt))
+    ? new Date(latestAt).toISOString().slice(0,16).replace('T',' ')+' UTC' : '—';
+  const rows=(Array.isArray(grade?.task_checks)?grade.task_checks:[]).slice(0,40).map(c=>{
+    if(!c || !/^WEB[A-Z0-9_]{1,60}$/.test(c.id||'') || !['PASS','FAIL','UNKNOWN','NOT_APPLICABLE'].includes(c.status))return '';
+    return `<tr><th scope="row">${escape(labels[lang]?.[c.id]||c.id)}</th><td>${escape(t[c.status]||t.UNKNOWN)}</td></tr>`;
+  }).join('');
+  const score=saved?`${saved.raw_earned} / ${maximum}`:maximum?pending:'—';
+  return `<section class="task-detail"><h2>${escape(task)}</h2>
+    <dl><dt>${scoreTitle}</dt><dd class="num">${score}</dd><dt>${dateTitle}</dt><dd>${date}</dd></dl>
+    ${actions?`<div class="task-actions">${actions}</div>`:''}
+    ${rows?`<h3>${escape(t.check)}</h3><div class="table-wrap" role="region" aria-label="${escape(t.check)}" tabindex="0"><table>
+      <thead><tr><th scope="col">${escape(t.check)}</th><th scope="col">${escape(t.status)}</th></tr></thead><tbody>${rows}</tbody></table></div>`:''}</section>`;
+}
+
 export function checkHtml(lang,{config,session,token,selected,result,grade,maxima={},blocked=false}={}) {
   const t=words[lang];
   const st=specialWords[lang];
   if (!selected) {
-    const value={operation:'start',task_id:'P0',job_id:randomUUID()};
-    // Each task has its own action-bound token. No client script is required.
     const forms=tasks.map(task_id=>{
-      const mode=/^[PM]3$/.test(task_id)?'storage':/^[PM][56]$/.test(task_id)?'functional':null;
-      const v={...value,task_id,job_id:randomUUID(),...(mode?{check_mode:mode}:{})};
-      const normal={...value,task_id,job_id:randomUUID()};
       const saved=grade?.selected[task_id];
       const maximum=maxima[task_id];
       const score=saved?`${saved.raw_earned} / ${maximum}`:maximum?
         {ja:'未採点',ru:'Без оценки',uz:'Baholanmagan'}[lang]:'—';
       const status=saved?(saved.raw_earned===maximum?'score-full':'score-partial'):'score-empty';
-      const actions=blocked?'':form(lang,v,checkToken(config,session,token,v),
-        `<input type="hidden" name="task_id" value="${task_id}">`,mode==='storage'?st.prepare:mode==='functional'?st.functional:t.start)
-        +(mode?form(lang,normal,checkToken(config,session,token,normal),
-          `<input type="hidden" name="task_id" value="${task_id}">`,st.readOnly):'');
-      return `<tr><th scope="row">${task_id}</th><td><span class="task-score ${status}">${score}</span></td><td><div class="task-actions">${actions}</div></td></tr>`;
+      const actions=blocked?'':taskActions(lang,task_id,{config,session,token});
+      return `<tr><th scope="row"><a href="/checks?lang=${lang}&amp;task_id=${task_id}">${task_id}</a></th><td><span class="task-score ${status}">${score}</span></td><td><div class="task-actions">${actions}</div></td></tr>`;
     }).join('');
     const [taskTitle,scoreTitle,actionTitle]={
       ja:['課題','保存済みの点数','操作'],ru:['Задание','Сохранённые баллы','Действие'],

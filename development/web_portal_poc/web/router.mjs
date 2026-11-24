@@ -5,7 +5,7 @@ import { enrollmentHtml, enrollmentText, checkedEnrollment } from './enrollment-
 import { preparationText, checkPreparationToken, checkedPreparation, preparationHtml,
   preparationTemplate, createPreparationLink } from './preparation.mjs';
 import { bootstrapTemplate, createBootstrapLink } from './bootstrap-link.mjs';
-import { words as checkWords, validOperation, verifyCheckToken, checkHtml, progressScript,sealApplicationPassword } from './checks.mjs';
+import { words as checkWords, validOperation, verifyCheckToken, checkHtml, taskActions, taskDetailHtml, tasks as checkTasks, progressScript,sealApplicationPassword } from './checks.mjs';
 import { teacherText, checkedTeacher, teacherListHtml } from './teacher-progress.mjs';
 import { createInitialDelivery } from './initial-delivery.mjs';
 
@@ -50,9 +50,9 @@ const response = (body, status=200, extras={}) => new Response(body, {status, he
 const redirect = (location, values=[]) => { const h=new Headers(security); h.set('Location',location); for(const v of values) h.append('Set-Cookie',v); return new Response(null,{status:303,headers:h}); };
 
 function page(lang, title, content, selection) {
-  const tail=selection?.teacher ? Object.entries(selection.params).map(([k,v])=>`&amp;${k}=${encodeURIComponent(v)}`).join('') : selection?`&amp;task_id=${selection.task_id}&amp;job_id=${selection.job_id}${selection.check_mode?`&amp;check_mode=${selection.check_mode}`:''}`:'';
+  const tail=selection?.teacher ? Object.entries(selection.params).map(([k,v])=>`&amp;${k}=${encodeURIComponent(v)}`).join('') : selection?.task?`&amp;task_id=${selection.task}`:selection?`&amp;task_id=${selection.task_id}&amp;job_id=${selection.job_id}${selection.check_mode?`&amp;check_mode=${selection.check_mode}`:''}`:'';
   const nav = ['ja','ru','uz'].map(k => `<a href="?lang=${k}${tail}"${k===lang?' aria-current="page"':''}>${k.toUpperCase()}</a>`).join(' ');
-  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)}</title><style>body{overflow-wrap:break-word;font:1rem/1.6 system-ui,sans-serif;margin:0;background:#f5f7fa;color:#182435}main{max-width:64rem;margin:auto;padding:1.5rem}nav{display:flex;flex-wrap:wrap;gap:1rem}a,button{color:#064ca4}button{font:inherit;background:white;border:1px solid #64748b;border-radius:.35rem;padding:.65rem 1rem;cursor:pointer}a:focus-visible,button:focus-visible{outline:3px solid #d34800;outline-offset:3px}section{background:white;border:1px solid #d6dee8;border-radius:.5rem;padding:1rem;margin-block:1rem}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:44rem}th,td{padding:.6rem;text-align:left;border-bottom:1px solid #d6dee8}.num{font-size:1.6rem;font-weight:700}footer{margin-top:2rem}li[aria-current=step]{font-weight:700}fieldset{border:1px solid #a9b6c7;border-radius:.35rem;padding:1rem;margin-block:1rem}.confirm{display:flex;align-items:flex-start;gap:.5rem;min-height:48px;padding-block:.5rem}input[type=password]{display:block;font:inherit;box-sizing:border-box;inline-size:min(100%,28rem);min-block-size:48px;padding:.6rem;margin-block:.4rem 1rem;border:1px solid #64748b;border-radius:.35rem}input[type=checkbox]{width:1.25rem;height:1.25rem;margin:.2rem 0;flex-shrink:0}a.action{display:inline-flex;align-items:center;min-height:48px;padding:0 .75rem;border:1px solid #64748b;border-radius:.35rem}a.action:focus-visible,input:focus-visible{outline:3px solid #d34800;outline-offset:3px}.page-toolbar{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-block:0 1rem}.score-overview{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.4rem 1.5rem;padding:1.15rem 1.5rem;background:#173454;color:white;border-color:#173454}.score-overview h2,.score-overview p{margin:0}.score-overview h2{font-size:1.05rem}.score-overview p{font-variant-numeric:tabular-nums;line-height:1.15;white-space:nowrap}.score-overview strong{font-size:clamp(2.4rem,6vw,4rem)}.score-overview span{font-size:1.25rem;color:#dae6f2}.student-table,.teacher-table{background:white;border:1px solid #d6dee8;border-radius:.5rem}.student-table table{min-width:24rem}.student-table thead th{background:#eaf0f7}.student-table th,.student-table td{padding:.5rem .85rem}.task-score{display:inline-block;padding:.16rem .5rem;border-radius:.25rem;font-size:1.13rem;font-weight:750;font-variant-numeric:tabular-nums;white-space:nowrap}.task-score.score-empty{color:#526576;font-size:1rem;font-weight:500}.task-actions{display:flex;flex-wrap:wrap;gap:.35rem}.task-actions button{min-height:36px;padding:.3rem .75rem}.task-actions form:first-child button{background:#174f83;color:white;border-color:#174f83}.score-full{background:#e5f5ea;color:#176238}.score-partial{background:#fff1d7;color:#704900}.table-wrap:focus-visible{outline:3px solid #d34800;outline-offset:3px}summary{cursor:pointer;min-height:24px}#link-number{display:block;width:100%;box-sizing:border-box;font:1rem/1.5 monospace;padding:.6rem;margin-block:.4rem 1rem;overflow:auto}.teacher-table{max-block-size:70vh;overflow:auto}.teacher-table td{font-variant-numeric:tabular-nums}.teacher-table table{border-collapse:separate;border-spacing:0;min-width:57rem}.teacher-table .teacher-total{font-size:1.12rem;font-weight:750;color:#153d64;background:#edf4fa;white-space:nowrap}.teacher-table td:not(:first-child),.teacher-table thead th:not(:first-child){text-align:center}.teacher-table caption{text-align:left;font-weight:700;padding-block:.75rem}.teacher-table thead th{position:sticky;inset-block-start:0;background:#eaf0f7;z-index:2}.teacher-table tbody th{position:sticky;inset-inline-start:0;background:white;z-index:1}.teacher-table thead th:first-child{inset-inline-start:0;z-index:3}.teacher-table:focus-visible{outline:3px solid #d34800;outline-offset:3px}</style></head><body><main><nav aria-label="Languages">${nav}</nav><h1>${escape(title)}</h1>${content}</main></body></html>`;
+  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)}</title><style>body{overflow-wrap:break-word;font:1rem/1.6 system-ui,sans-serif;margin:0;background:#f5f7fa;color:#182435}main{max-width:64rem;margin:auto;padding:1.5rem}nav{display:flex;flex-wrap:wrap;gap:1rem}a,button{color:#064ca4}button{font:inherit;background:white;border:1px solid #64748b;border-radius:.35rem;padding:.65rem 1rem;cursor:pointer}a:focus-visible,button:focus-visible{outline:3px solid #d34800;outline-offset:3px}section{background:white;border:1px solid #d6dee8;border-radius:.5rem;padding:1rem;margin-block:1rem}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:44rem}th,td{padding:.6rem;text-align:left;border-bottom:1px solid #d6dee8}.num{font-size:1.6rem;font-weight:700}footer{margin-top:2rem}li[aria-current=step]{font-weight:700}fieldset{border:1px solid #a9b6c7;border-radius:.35rem;padding:1rem;margin-block:1rem}.confirm{display:flex;align-items:flex-start;gap:.5rem;min-height:48px;padding-block:.5rem}input[type=password]{display:block;font:inherit;box-sizing:border-box;inline-size:min(100%,28rem);min-block-size:48px;padding:.6rem;margin-block:.4rem 1rem;border:1px solid #64748b;border-radius:.35rem}input[type=checkbox]{width:1.25rem;height:1.25rem;margin:.2rem 0;flex-shrink:0}a.action{display:inline-flex;align-items:center;min-height:48px;padding:0 .75rem;border:1px solid #64748b;border-radius:.35rem}a.action:focus-visible,input:focus-visible{outline:3px solid #d34800;outline-offset:3px}.page-toolbar{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-block:0 1rem}.score-overview{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.4rem 1.5rem;padding:1.15rem 1.5rem;background:#173454;color:white;border-color:#173454}.score-overview h2,.score-overview p{margin:0}.score-overview h2{font-size:1.05rem}.score-overview p{font-variant-numeric:tabular-nums;line-height:1.15;white-space:nowrap}.score-overview strong{font-size:clamp(2.4rem,6vw,4rem)}.score-overview span{font-size:1.25rem;color:#dae6f2}.student-table,.teacher-table{background:white;border:1px solid #d6dee8;border-radius:.5rem}.student-table table{min-width:24rem}.student-table thead th{background:#eaf0f7}.student-table th,.student-table td{padding:.5rem .85rem}.task-score{display:inline-block;padding:.16rem .5rem;border-radius:.25rem;font-size:1.13rem;font-weight:750;font-variant-numeric:tabular-nums;white-space:nowrap}.task-score.score-empty{color:#526576;font-size:1rem;font-weight:500}.task-detail h2{margin-top:0}.task-detail dl{display:grid;grid-template-columns:max-content 1fr;align-items:baseline;gap:.4rem 1rem}.task-detail dd{margin:0}.task-detail table{min-width:26rem}.task-detail :is(th,td){padding:.5rem .75rem}.teacher-table td a{color:inherit;text-decoration-line:underline;text-underline-offset:.2em}.task-actions{display:flex;flex-wrap:wrap;gap:.35rem}.task-actions button{min-height:36px;padding:.3rem .75rem}.task-actions form:first-child button{background:#174f83;color:white;border-color:#174f83}.score-full{background:#e5f5ea;color:#176238}.score-partial{background:#fff1d7;color:#704900}.table-wrap:focus-visible{outline:3px solid #d34800;outline-offset:3px}summary{cursor:pointer;min-height:24px}#link-number{display:block;width:100%;box-sizing:border-box;font:1rem/1.5 monospace;padding:.6rem;margin-block:.4rem 1rem;overflow:auto}.teacher-table{max-block-size:70vh;overflow:auto}.teacher-table td{font-variant-numeric:tabular-nums}.teacher-table table{border-collapse:separate;border-spacing:0;min-width:57rem}.teacher-table .teacher-total{font-size:1.12rem;font-weight:750;color:#153d64;background:#edf4fa;white-space:nowrap}.teacher-table td:not(:first-child),.teacher-table thead th:not(:first-child){text-align:center}.teacher-table caption{text-align:left;font-weight:700;padding-block:.75rem}.teacher-table thead th{position:sticky;inset-block-start:0;background:#eaf0f7;z-index:2}.teacher-table tbody th{position:sticky;inset-inline-start:0;background:white;z-index:1}.teacher-table thead th:first-child{inset-inline-start:0;z-index:3}.teacher-table:focus-visible{outline:3px solid #d34800;outline-offset:3px}</style></head><body><main><nav aria-label="Languages">${nav}</nav><h1>${escape(title)}</h1>${content}</main></body></html>`;
 }
 
 export function portalExpired(env) {
@@ -199,12 +199,14 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
       const fail=(message,status)=>response(page(lang,tt.title,`<p role="alert">${escape(message)}</p><a href="/?lang=${lang}">${escape(tt.home)}</a>`),status);
       if(!schoolIdentity || typeof getTeacher!=='function')return fail(tt.denied,403);
       const detail=url.pathname==='/teacher/student',context=url.searchParams.get('context')||'course',after=url.searchParams.get('after')||'';
-      const fields=detail?['lang','lab_id']:['lang','context','after'];
+      const task=detail?url.searchParams.get('task_id'):null;
+      const fields=detail?['lang','lab_id','task_id']:['lang','context','after'];
       if([...url.searchParams.keys()].some(k=>!fields.includes(k)) || [...url.searchParams.keys()].some(k=>url.searchParams.getAll(k).length!==1)
           || (!detail && (!['course','verification'].includes(context) || (after!=='' && !/^[a-z0-9][a-z0-9-]{2,31}$/.test(after))))
+          || (task!==null && !Object.hasOwn(MISSION_MAXIMA,task))
           || (detail && !/^[a-z0-9][a-z0-9-]{2,31}$/.test(url.searchParams.get('lab_id')||'')))return fail(tt.denied,403);
       try {
-        const event={subject:identity.sub,email:identity.email,operation:detail?'teacher_detail':'teacher_list',...(detail?{lab_id:url.searchParams.get('lab_id')}:{context,after})};
+        const event={subject:identity.sub,email:identity.email,operation:detail?'teacher_detail':'teacher_list',...(detail?{lab_id:url.searchParams.get('lab_id'),...(task?{task_id:task}:{})}:{context,after})};
         const result=await getTeacher(event);
         if(result?.status==='unauthorized')return fail(tt.denied,403);
         if(result?.status!=='ok')throw Error('Unavailable');
@@ -214,7 +216,10 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
           if(row.lab_id!==event.lab_id)throw Error('Wrong student');
           if(row.status!=='ok')return fail(tt.error,503);
           if(row.grade?.lab_id!==row.lab_id)throw Error('Wrong grade');
-          return response(page(lang,tt.title,`<h2>${escape(row.lab_id)}</h2><p>${escape(tt[row.context])}</p>`+gradeHtml(lang,row.grade)+`<p><a href="/teacher?lang=${lang}&amp;context=${row.context}">${escape(tt.back)}</a></p>`,{teacher:true,params:{lab_id:row.lab_id}}));
+          const grade=checkedGrade(row.grade);
+          const summary=task ? taskDetailHtml(lang,task,grade,(grade.raw_maximum===59?LEGACY_MAXIMA:MISSION_MAXIMA)[task]) : gradeHtml(lang,grade);
+          return response(page(lang,tt.title,`<p class="detail-back"><a href="/teacher?lang=${lang}&amp;context=${row.context}">${escape(tt.back)}</a></p><p>${escape(row.lab_id)}</p>`
+            +summary,{teacher:true,params:{lab_id:row.lab_id,...(task?{task_id:task}:{})}}));
         }
         for(const row of value.students)if(row.status==='ok' && row.grade?.lab_id!==row.lab_id)throw Error('Wrong grade');
         return response(page(lang,tt.title,teacherListHtml(lang,value,{validateGrade:checkedGrade,maxima:MISSION_MAXIMA}),{teacher:true,params:{context,after}}),200,{'Referrer-Policy':'same-origin'});
@@ -224,9 +229,12 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
       if (!checkerEnabled) return response('Not found',404);
       const ct=checkWords[lang],extras={'Referrer-Policy':'same-origin','Content-Security-Policy':security['Content-Security-Policy']+"; script-src 'self'"};
       let selected;
+      const detailTask=!checkerPost && !url.searchParams.has('job_id') ? url.searchParams.get('task_id') : null;
       const fail=(message,status=503)=>response(page(lang,ct.title,`<p role="alert">${escape(message)}</p>${validOperation(selected)?`<p><a href="/checks?lang=${lang}&amp;task_id=${selected.task_id}&amp;job_id=${selected.job_id}${selected.check_mode?`&amp;check_mode=${selected.check_mode}`:''}">${escape(ct.refresh)}</a></p>`:''}<a href="/checks?lang=${lang}">${escape(ct.back)}</a>`),status,extras);
       try {
         let result;
+        if (detailTask!==null && (!checkTasks.includes(detailTask) || url.searchParams.getAll('task_id').length!==1
+            || [...url.searchParams.keys()].some(key=>!['lang','task_id'].includes(key)))) return fail(ct.denied,403);
         if (checkerPost) {
           if (request.headers.get('origin')!==config.origin || request.headers.get('content-type')?.split(';')[0]!=='application/x-www-form-urlencoded') return fail(ct.denied,403);
           const body=await request.text(); if(Buffer.byteLength(body)>4096)return fail(ct.denied,403);
@@ -246,7 +254,7 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
           result=await checker({subject:identity.sub,...selected,...(sealed?{sealed_password:sealed}:{})});
           if(result?.status==='ok') return redirect(`/checks?lang=${lang}&task_id=${selected.task_id}&job_id=${selected.job_id}${selected.check_mode?`&check_mode=${selected.check_mode}`:''}`);
           if(result?.status!=='ok') return fail(result?.status==='busy'?ct.busy:result?.status==='unauthorized'?ct.denied:ct.unavailable,result?.status==='unauthorized'?403:503);
-        } else if (url.searchParams.has('task_id') || url.searchParams.has('job_id')) {
+        } else if (url.searchParams.has('job_id')) {
           selected={operation:'result',task_id:url.searchParams.get('task_id'),job_id:url.searchParams.get('job_id')};
           if(url.searchParams.has('check_mode'))selected.check_mode=url.searchParams.get('check_mode');
           if(!validOperation(selected))return fail(ct.denied,403);
@@ -255,7 +263,7 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
         let grade, warning='', unbound=false;
         if (typeof getGrade==='function') {
           try {
-            const saved=await getGrade(identity.sub);
+            const saved=await getGrade(identity.sub,detailTask||undefined);
             if (saved?.status==='ok') grade=checkedGrade(saved.grade);
             else if (saved?.status==='unauthorized') { unbound=true; warning=t.unbound; }
             else warning=t.unavailable;
@@ -271,8 +279,14 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
         const accountLink=(selfLink || enrollmentEnabled) && unbound ? `<a class="action" href="${selfLink?'/link':'/enroll'}?lang=${lang}">${escape(enrollmentText(lang).title)}</a>` : '';
         const bar=`<div class="page-toolbar">${accountLink}<form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form></div>`;
         const report=selected ? `<section aria-label="${escape(ct.done)}">${checkHtml(lang,{config,session,token,selected,result})}</section>` : '';
+        const notice=warning?`<p role="status">${escape(warning)}</p>`:'';
+        if (detailTask) {
+          const actions=unbound?'':taskActions(lang,detailTask,{config,session,token});
+          const back=`<p class="detail-back"><a href="/checks?lang=${lang}">${escape(ct.back)}</a></p>`;
+          return response(page(lang,ct.title,back+accountLink+notice+taskDetailHtml(lang,detailTask,grade,maxima[detailTask],actions),{task:detailTask}),200,extras);
+        }
         const tasks=checkHtml(lang,{config,session,token,grade,maxima,blocked:unbound});
-        return response(page(lang,ct.title,total+bar+(warning?`<p role="status">${escape(warning)}</p>`:'')+report+tasks,selected),result?.status==='unauthorized'?403:result && result.status!=='ok'?503:200,extras);
+        return response(page(lang,ct.title,total+bar+notice+report+tasks,selected),result?.status==='unauthorized'?403:result && result.status!=='ok'?503:200,extras);
       } catch {return fail(ct.unavailable);}
     }
     if (url.pathname==='/prepare') {

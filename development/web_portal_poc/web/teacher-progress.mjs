@@ -11,7 +11,13 @@ export function validTeacherEvent(v) {
   if(!v || typeof v.subject!=='string' || !/^[0-9]{1,128}$/.test(v.subject) || typeof v.email!=='string' || !/^[^@\s]{1,64}@jdu\.uz$/i.test(v.email))return false;
   const fields=['subject','email','operation'];
   if(v.operation==='teacher_list')fields.push('context','after');
-  else if(v.operation==='teacher_detail')fields.push('lab_id');
+  else if(v.operation==='teacher_detail'){
+    fields.push('lab_id');
+    if(Object.hasOwn(v,'task_id')){
+      if(!/^(?:P0|M[012456])$/.test(v.task_id||''))return false;
+      fields.push('task_id');
+    }
+  }
   else if(v.operation!=='teacher_access')return false;
   return Object.keys(v).sort().join(',')===fields.sort().join(',') &&
     (v.operation!=='teacher_list' || (['course','verification'].includes(v.context) && (v.after==='' || labId(v.after)))) &&
@@ -50,8 +56,10 @@ export function teacherListHtml(lang,value,{validateGrade,maxima}) {
     const grade=validateGrade(row.grade);
     const cells=missions.map(m=>{
       const saved=grade.selected[m];
-      if (!saved) return `<td><span aria-label="${escape(t.none)}">—</span></td>`;
-      return `<td class="${saved.raw_earned===maxima[m]?'score-full':'score-partial'}">${saved.raw_earned} / ${maxima[m]}</td>`;
+      const score=saved?`${saved.raw_earned} / ${maxima[m]}`:'—';
+      const className=saved?(saved.raw_earned===maxima[m]?'score-full':'score-partial'):'';
+      return `<td class="${className}"><a href="/teacher/student?lang=${lang}&amp;lab_id=${row.lab_id}&amp;task_id=${m}"
+        aria-label="${escape(m+' '+(saved?score:t.none))}">${score}</a></td>`;
     }).join('');
     const dates=[...Object.values(grade.current||{}),...Object.values(grade.selected)].map(r=>r?.received_at).filter(v=>typeof v==='string' && Number.isFinite(Date.parse(v)));
     const latest=dates.sort((a,b)=>Date.parse(a)-Date.parse(b)).at(-1);

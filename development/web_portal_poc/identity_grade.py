@@ -88,7 +88,7 @@ def resolve_student(verified_subject, pepper, bindings, grade_store):
     return expected, latest
 
 
-def identity_grade(verified_subject, pepper, bindings, grade_store):
+def identity_grade(verified_subject, pepper, bindings, grade_store, task_id=None):
     """Read the existing grade projection for one resolved student."""
     _, latest = resolve_student(verified_subject, pepper, bindings, grade_store)
-    return project_student(latest)
+    return project_student(latest, task_id)

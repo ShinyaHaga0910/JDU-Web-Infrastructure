@@ -1,4 +1,5 @@
 import contextlib
+from datetime import datetime, timedelta
 import errno
 import hashlib
 import io
@@ -10,6 +11,7 @@ import tempfile
 import threading
 import unittest
 from unittest.mock import Mock, patch
+from zoneinfo import ZoneInfo
 
 import classroom
 import classroom_guest
@@ -174,24 +176,29 @@ class ClassroomTests(unittest.TestCase):
         self.assertEqual(teacher.install.call_args.kwargs['enrollment'],
                          ('api source', hashlib.sha256(invite['enrollment_token'].encode()).hexdigest()))
 
-    def test_teacher_console_asks_only_for_language_and_prints_code_last(self):
+    def test_teacher_console_asks_for_language_and_semester_end_and_prints_code_last(self):
         session = Mock()
         session.client.return_value.get_caller_identity.return_value = {'Account': '123456789012'}
         boto3 = Mock()
         boto3.Session.return_value = session
         instructions = ('Share this code with your students.', 'このコードを学生に伝えてください。',
                         'Передайте этот код студентам.', 'Ushbu kodni talabalarga bering.')
+        semester_end = (datetime.now(ZoneInfo('Asia/Tashkent')).date() + timedelta(days=30)).isoformat()
         for selection, instruction in zip('1234', instructions):
             output = io.StringIO()
             with self.subTest(selection=selection), tempfile.TemporaryDirectory() as temp, contextlib.redirect_stdout(output), \
                     patch.dict(sys.modules, boto3=boto3), patch.object(sys, 'path', list(sys.path)), \
                     patch.object(sys, 'argv', ['classroom.py', 'teacher', '--ref', 'a' * 40]), \
-                    patch.object(sys.stdin, 'isatty', return_value=True), patch('builtins.input', return_value=selection) as prompt, \
+                    patch.object(sys.stdin, 'isatty', return_value=True), patch('builtins.input', side_effect=[selection, semester_end]) as prompt, \
                     patch.object(classroom.Path, 'home', return_value=Path(temp)), patch.object(classroom.os, 'umask'), \
                     patch.object(classroom, 'remote_source', return_value=b'# offline fixture'), \
-                    patch.object(classroom, 'teacher_run', return_value='jdu2.offline-fixture'):
+                    patch.object(classroom, 'teacher_run', return_value='jdu2.offline-fixture'), \
+                    patch.object(classroom, 'assignment_portal_url', return_value=None), \
+                    patch.object(classroom, 'prepare_assignment_portal') as portal:
                 self.assertEqual(classroom.main(), 0)
-                prompt.assert_called_once()
+                self.assertEqual(prompt.call_count, 2)
+                portal.assert_called_once()
+                self.assertEqual(portal.call_args.args[0].expires_on, semester_end)
                 self.assertIn('[2] Japanese', output.getvalue())
                 self.assertEqual(output.getvalue().rstrip().splitlines()[-2:], [instruction, 'jdu2.offline-fixture'])
 
