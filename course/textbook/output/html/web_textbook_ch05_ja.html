@@ -14,14 +14,23 @@
 <h2 id="52-nginxをwebサーバー上で動かす">5.2 NginxをWebサーバー上で動かす</h2>
 <h3 id="ec2とnginxは何を担当するか">EC2とNginxは何を担当するか</h3>
 <p><strong>EC2 Webサーバー</strong>は、Ubuntu OSが動く仮想的なコンピューターである。<strong>Nginx</strong>は、そのUbuntu OSに導入して使うソフトウェアである。EC2が動いていても、Nginxが導入・起動されていなければ、NginxによるHTTPの受付は始まらない。</p>
-<p>今回の構成では、必要なパッケージを配布サーバーから取得する。Webサーバー上のAPTが内部の配布サーバーへ接続し、Nginxなどのパッケージを導入する。パッケージを取得する通信と、導入後のNginxがブラウザにファイルを配信する通信は、目的も相手も異なる。</p>
-<h3 id="導入、起動、自動起動を分けて考える">導入、起動、自動起動を分けて考える</h3>
-<p>パッケージを<strong>導入する</strong>と、Nginxのプログラムや初期設定などがWebサーバーへ配置される。サービスを<strong>起動する</strong>と、そのプログラムがプロセスとして動き、設定されたポートで接続を待ち受ける。<strong>自動起動を有効にする</strong>と、次回Ubuntu OSが起動したときにもサービスを起動するよう登録される。<a href="https://www.freedesktop.org/software/systemd/man/latest/systemctl.html">systemdのサービス管理</a></p>
-<p>Ubuntu OSでは、systemdが<code>nginx</code>という名前のサービスを管理する。Nginxには、設定を読み込んで全体を管理するマスタープロセスと、実際のリクエストを処理するワーカープロセスがある。ファイルを読み、ブラウザへ返す処理はワーカープロセスが担当する。<a href="https://nginx.org/en/docs/beginners_guide.html">Nginxのプロセス構成</a></p>
-<div class="table-wrap"><table><thead><tr><th scope="col">対象</th><th scope="col">確かめること</th></tr></thead><tbody><tr><td>導入したパッケージ</td><td>Nginxのプログラムや設定ファイルが配置されているか</td></tr><tr><td>サービスの現在の状態</td><td>今、Nginxが起動しているか</td></tr><tr><td>自動起動の設定</td><td>次にUbuntu OSが起動したときもNginxを起動するか</td></tr><tr><td>待受の状態</td><td>WebサーバーのどのIP・ポートで接続を受け付けているか</td></tr></tbody></table></div>
+<h3 id="1-導入する">1. 導入する</h3>
+<p>初回セットアップで、Nginxのパッケージは <strong>配布サーバー</strong> に用意される。<strong>Webサーバー</strong> には、APTが配布サーバー（<code>10.20.2.30</code>）を使うための設定が入る。WebサーバーへのNginxのインストールは、P1で行う。</p>
+<p>Webサーバーの端末で、次のコマンドを順に実行する。</p>
+<pre><code>sudo apt-get update -o APT::Update::Error-Mode=any
+sudo apt-get install --no-install-recommends nginx</code></pre>
+<p>1行目で、配布サーバーから利用できるパッケージの一覧を取得する。2行目で、APTがNginxと動作に必要なパッケージを配布サーバーから取得し、Webサーバーにプログラムや初期設定を配置する。</p>
+<h3 id="2-起動する">2. 起動する</h3>
+<p>Ubuntu OSでは、サービスを管理する <strong>systemd</strong> に起動を指示する。Webサーバーで次のコマンドを実行すると、systemdが現在の <code>nginx</code> サービスを起動する。インストール時にすでに起動している場合もある。現在動いているかは <code>systemctl is-active nginx</code> で確認でき、起動中なら <code>active</code> と表示される。<a href="https://www.freedesktop.org/software/systemd/man/latest/systemctl.html">systemctlのサービス管理</a></p>
+<pre><code>sudo systemctl start nginx</code></pre>
+<p>起動すると、Nginxのマスタープロセスが設定を読み込み、ワーカープロセスを管理する。ワーカーが設定されたポートでリクエストを受け取り、ファイルを読んでレスポンスを返す。<a href="https://nginx.org/en/docs/beginners_guide.html">Nginxのプロセス構成</a></p>
+<h3 id="3-自動起動を設定する">3. 自動起動を設定する</h3>
+<p>次のコマンドで、Nginxの自動起動を登録する。登録後は、Ubuntu OSが起動するたびにsystemdがNginxを起動するので、そのつど <code>start</code> を実行する必要はない。 <code>systemctl is-enabled nginx</code> で登録を確認でき、有効なら <code>enabled</code> と表示される。<a href="https://www.freedesktop.org/software/systemd/man/latest/systemctl.html">systemctlのenableとis-enabled</a></p>
+<pre><code>sudo systemctl enable nginx</code></pre>
+<p><code>enable</code> 単独で行うのは自動起動の登録である。P1では、<strong>今すぐ起動する操作と自動起動の登録をまとめて</strong>行う <code>sudo systemctl enable --now nginx</code> を使う。 <code>--now</code> を付けると、systemdにその場での起動も指示できる。</p>
 <h2 id="53-urlのパスとファイルの保存先を対応させる">5.3 URLのパスとファイルの保存先を対応させる</h2>
 <h3 id="設定ファイルは配信方法を決める">設定ファイルは配信方法を決める</h3>
-<p>ブラウザは、Webサーバーの保存領域から直接ファイルを探しているわけではない。例えば<code>http://10.20.1.20/example.txt</code>を開くと、HTTPのリクエストで伝わる対象のパスは<code>/example.txt</code>である。Nginxは設定に従って、このパスをWebサーバー内の保存先へ対応させる。</p>
+<p>ブラウザで <code>http://10.20.1.20/example.txt</code> を開くと、ブラウザは <code>/example.txt</code> をリクエストのパスとして送る。<strong>Webサーバー上のNginxプロセス</strong>は、設定に従ってそのパスをWebサーバーのストレージ上のファイルに対応させる。</p>
 <p>今回のUbuntuでは、中心となる設定ファイルは<code>/etc/nginx/nginx.conf</code>である。その中から別の設定ファイルも読み込む。初期のWebサイトの設定は<code>/etc/nginx/sites-available/default</code>にあり、<code>/etc/nginx/sites-enabled/default</code>から参照されることで有効になる。<code>sites-enabled</code>の参照はシンボリックリンクであり、別の設定内容をもう一組保存しているわけではない。<a href="https://ubuntu.com/server/docs/how-to/web-services/configure-nginx/">UbuntuのNginx設定</a></p>
 <h3 id="四つの設定を短い例で読む">四つの設定を短い例で読む</h3>
 <p>次は、配信方法を読むための<code>server</code>ブロックの例である。<code>nginx.conf</code>の<code>http</code>ブロック内から読み込まれる設定の一部分として示している。</p>
@@ -38,14 +47,15 @@
 <p>この例の<code>location /</code>は、<code>/</code>から始まるパスを扱う。中の<code>try_files</code>では、<code>$uri</code>に入るリクエストのパスからファイルを探し、続いて<code>$uri/</code>でディレクトリを探す。どちらも見つからなければ404を返す。例えば<code>/example.txt</code>なら、<code>root</code>の値と組み合わせた<code>/var/www/html/example.txt</code>を最初に探す。<a href="https://nginx.org/en/docs/http/ngx_http_core_module.html#root">rootと保存先の対応</a>、<a href="https://nginx.org/en/docs/http/ngx_http_core_module.html#try_files">try_files</a></p>
 <figure><img src="../../assets/figures/ch05-fig02-path-mapping.png" alt="rootの値とリクエストのパスを組み合わせ、Webサーバー内のファイルの保存先を求める。" width="1600" height="910"></figure>
 <p><strong>図5-2 URLのパスから保存先が決まる。</strong> <code>root /var/www/html</code>という設定と、<code>/example.txt</code>というリクエストのパスを組み合わせる。Nginxが読むファイルは、Webサーバー内の<code>/var/www/html/example.txt</code>である。</p>
-<p>このため、作業用ディレクトリに<code>example.txt</code>を作っただけでは、上の設定でそのファイルは配信されない。ファイルを配信用の保存先に配置し、URLのパスと対応させる必要がある。また、URLの<code>/</code>と<code>/example.txt</code>は異なる対象である。<code>/</code>を開いたときは、設定に応じて<code>index.html</code>などの初期ページが表示されることがある。</p>
+<p>作業用ディレクトリで <code>example.txt</code> を作ったら、Nginxが探す <code>/var/www/html/example.txt</code> に配置する。これでURLのパスとファイルの保存先が対応する。</p>
 <p>設定内の<code>root</code>という語は、ファイルを探す基準を表す。Linuxの管理者ユーザーである<code>root</code>とは、使われている場面と意味が異なる。</p>
-<h2 id="54-nginxがファイルを読める権限にする">5.4 Nginxがファイルを読める権限にする</h2>
-<p>Nginxは、操作している自分の権限でファイルを読むとは限らない。今回のUbuntuでは、リクエストを処理するワーカープロセスは<strong>www-data</strong>というユーザーで動く。管理者が読めるファイルでも、www-dataが読めなければ配信できない。</p>
-<p>例えば、配信用ファイルを<code>root:root</code>の所有、<code>0644</code>の権限にした場合、所有者のrootは読み書きでき、その他のユーザーは読み取りができる。www-dataはその読み取り権限で内容を取得する。配信するだけなら、www-dataに本文を書き換える権限を与える必要はない。</p>
-<p>さらに、ファイルそのものを読めるだけでは足りない。<code>/var/www/html/example.txt</code>へ到達するには、途中にある<code>/</code>、<code>/var</code>、<code>/var/www</code>、<code>/var/www/html</code>の各ディレクトリを通過する権限が必要である。ディレクトリの<code>x</code>は、このように名前を指定して中へ進むための権限を表す。ファイルをプログラムとして実行する権限とは、対象が異なる。<a href="https://man7.org/linux/man-pages/man7/path_resolution.7.html">Linuxのパス探索と権限</a></p>
-<figure><img src="../../assets/figures/ch05-fig03-permissions.png" alt="Nginxのwww-dataユーザーに、途中のディレクトリの通過と配信ファイルの読み取りを許可する。" width="1600" height="1080"></figure>
-<p><strong>図5-3 管理者が配置し、Nginxが読む。</strong> 上側は管理者による配信用ファイルの配置、下側はwww-dataによる読み取りを示す。ディレクトリの通過には<code>x</code>、本文の読み取りにはファイルの<code>r</code>が必要になる。例では、途中のディレクトリは<code>0755</code>、ファイルは<code>0644</code>である。</p>
+<h2 id="54-nginxがファイルを読めるようにosの権限を設定する">5.4 Nginxがファイルを読めるようにOSの権限を設定する</h2>
+<p>Ubuntu OSは、ファイルを開くプロセスの実行ユーザーに読み取りを許可するか判断する。自分が管理用の端末でファイルを読めても、Nginxのワーカープロセスが読めるとは限らない。この演習ではワーカーが <strong>www-data</strong> ユーザーで動く。管理者の <code>root</code> が読めるファイルでも、 <code>www-data</code> に読み取り権限がなければ配信できない。</p>
+<p>OSの授業で学んだファイルの権限を思い出そう。 <code>root:root</code> は、所有者が <code>root</code> ユーザー、所有グループが <code>root</code> グループであることを示す。 <code>0644</code> の最後の3桁は、左から <strong>所有者・所有グループ・その他のユーザー</strong> の権限を表す。読み取りの <code>r</code> は4、書き込みの <code>w</code> は2、実行の <code>x</code> は1で、許可するものの数を足す。例えば、所有者の <code>6</code> は <code>4 + 2</code> なので読み書きできる。</p>
+<p>今回の <code>www-data</code> はこのファイルの所有者でも <code>root</code> グループのメンバーでもないため、最後の桁の <code>4</code> が適用される。 <code>4</code> は読み取り（<code>r</code>）なので、ワーカーはファイルの本文を読める。</p>
+<p><code>/var/www/html/example.txt</code> を開くときは、ファイルの読み取りに加え、途中の <code>/</code>、 <code>/var</code>、 <code>/var/www</code>、 <code>/var/www/html</code> を通過する権限（<code>x</code>）も必要である。<a href="https://man7.org/linux/man-pages/man7/path_resolution.7.html">Linuxのパス探索と権限</a></p>
+<figure><img src="../../assets/figures/ch05-fig03-permissions.png" alt="Nginxのwww-dataユーザーに、途中のディレクトリの通過と配信ファイルの読み取りを許可する。" width="1600" height="610"></figure>
+<p><strong>図5-3 Nginxワーカーがファイルを読むための権限。</strong> ①途中のディレクトリを通過する。②ファイルの「その他のユーザー」の権限を使って本文を読む。</p>
 <p>配信用ファイルには読み取りを許可する一方で、パスワードや秘密鍵などを同じ公開用ディレクトリへ置かない。<code>root</code>で指定した配信範囲には、利用者へ届けるファイルだけを配置する。</p>
 <h2 id="55-保存した設定をnginxへ反映する">5.5 保存した設定をNginxへ反映する</h2>
 <h3 id="構文を調べてから再読み込みする">構文を調べてから再読み込みする</h3>
@@ -58,13 +68,12 @@ sudo systemctl reload nginx</code></pre>
 <h3 id="状態を調べるコマンドは、見る対象が違う">状態を調べるコマンドは、見る対象が違う</h3>
 <p>次の表は、Webサーバーの管理用端末で使うコマンドと、それが調べる対象の対応である。</p>
 <div class="table-wrap"><table><thead><tr><th scope="col">コマンド</th><th scope="col">調べる対象</th></tr></thead><tbody><tr><td><code>sudo nginx -T</code></td><td>検査を行い、読み込み対象となる設定ファイル全体を表示する</td></tr><tr><td><code>systemctl is-active nginx</code></td><td>Nginxサービスが現在起動しているかを調べる</td></tr><tr><td><code>sudo ss -lntp</code></td><td>TCPの待受IP、ポート番号、対応するプロセスを表示する</td></tr><tr><td><code>curl -i http://127.0.0.1/example.txt</code></td><td>Webサーバー自身の80番ポートへ接続し、HTTPレスポンスを表示する</td></tr></tbody></table></div>
-<p><code>nginx -T</code>は、現在ディスクに保存されている設定を読み込んで表示する。起動中のNginxが古い設定を使っている場合もあるため、設定を表示することとreloadで適用することを混同しない。</p>
-<p>待受が<code>0.0.0.0:80</code>なら、そのWebサーバーの各IPv4アドレスで80番ポートへの接続を受け付ける指定である。<code>127.0.0.1:80</code>だけなら、同じWebサーバー内からの接続を受け付ける。Nginxのサービス状態が<code>active</code>であっても、必要なIPとポートで待ち受けているかは別に読む。<a href="https://man7.org/linux/man-pages/man8/ss.8.html">ssの待受・プロセス表示</a></p>
 <h2 id="56-接続する場所によって確認できる範囲が違う">5.6 接続する場所によって確認できる範囲が違う</h2>
-<p>Webサーバー自身、踏み台サーバー、利用者PCでは、Webサーバーへ接続する経路が異なる。いずれも同じ<code>/example.txt</code>を取得する場合でも、どこからリクエストを送ったかによって、確かめられる範囲が変わる。</p>
+<p>利用者PC、踏み台サーバー、Webサーバー自身では、Webサーバーへ接続する経路が異なる。いずれも同じ<code>/example.txt</code>を取得する場合でも、どこからリクエストを送ったかによって、確かめられる範囲が変わる。</p>
 <figure><img src="../../assets/figures/ch05-fig04-observation-points.png" alt="利用者PCからの公開IP経由、踏み台サーバーからの内部IP経由、Webサーバー自身からのループバック接続を分ける。" width="1600" height="1120"></figure>
 <p><strong>図5-4 三つの場所からWebサーバーを見る。</strong> 上段は利用者PCからインターネットとAWSのInternet Gatewayを経由する接続、中段はVPC内の踏み台サーバーからの接続、下段はWebサーバー自身の内部で完結する接続である。どの場合も、HTTPのリクエスト先はWebサーバーの80番ポートである。</p>
-<div class="table-wrap"><table><thead><tr><th scope="col">取得する場所</th><th scope="col">接続先と確認する範囲</th></tr></thead><tbody><tr><td>Webサーバー自身のcurl</td><td><code>http://127.0.0.1/example.txt</code>。Nginxの配信を同じWebサーバー内で確かめる</td></tr><tr><td>踏み台サーバーのブラウザやcurl</td><td><code>http://10.20.1.20/example.txt</code>。VPC内からWebサーバーへ接続して配信を確かめる</td></tr><tr><td>利用者PCのブラウザ</td><td>Webサーバーの現在の公開IPを使ったURL。インターネット側からの接続と配信を確かめる</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th scope="col">取得する場所</th><th scope="col">接続先と確認する範囲</th></tr></thead><tbody><tr><td>① 利用者PCのブラウザ</td><td>Webサーバーの現在の公開IPを使ったURL。インターネット側からの接続と配信を確かめる</td></tr><tr><td>② 踏み台サーバーのブラウザやcurl</td><td><code>http://10.20.1.20/example.txt</code>。VPC内からWebサーバーへ接続して配信を確かめる</td></tr><tr><td>③ Webサーバー自身のcurl</td><td><code>http://127.0.0.1/example.txt</code>。Nginxの配信を同じWebサーバー内で確かめる</td></tr></tbody></table></div>
+<p>ページが表示されないときは、上の三つの経路を使って、どこまで通信できるかを調べる。取得できた場所とできなかった場所を比べると、次に確認する設定を絞り込める。</p>
 <p>例えばWebサーバー自身からは取得できるのに、踏み台サーバーから接続できない場合、Nginxがファイルを返す処理は動いている。次は待受IPや接続先の内部IP、SG（AWSのSecurity Group）による通信許可など、踏み台サーバーから届くまでの範囲に注目する。</p>
 <p>踏み台サーバーからは取得できるのに、利用者PCから接続できない場合は、現在の公開IPやインターネット側からの通信許可などを調べる。このように、接続できた場所とできなかった場所を比べると、調べる範囲を絞れる。</p>
 <h2 id="57-リクエストとログを結び付ける">5.7 リクエストとログを結び付ける</h2>
@@ -77,6 +86,9 @@ sudo systemctl reload nginx</code></pre>
 &quot;GET /example.txt HTTP/1.1&quot; 200 24 &quot;-&quot; &quot;curl/8.x&quot;</code></pre>
 <p>上は読みやすく2行に分けているが、実際のログでは1行に続いて記録される例である。<code>10.20.1.10</code>はリクエストの送信元である踏み台サーバー、角括弧の中は時刻、<code>GET /example.txt HTTP/1.1</code>は受け付けたリクエストを表す。続く<code>200</code>はレスポンスのステータス、<code>24</code>は送信した本文のバイト数である。この形式では末尾に、クライアントの種類などの情報も記録される。<a href="https://nginx.org/en/docs/http/ngx_http_log_module.html">Nginxのアクセスログ形式</a></p>
 <p>ブラウザやcurlでアクセスした時刻とパスを手掛かりに、その操作に対応するログを探す。同じファイルの古い記録が残っていることもあるため、パスだけでなく時刻や送信元も合わせて読む。ブラウザが画像なども取得した場合には、開いたページ以外のリクエストが記録されることもある。</p>
+<h3 id="不審なアクセスを調べる">不審なアクセスを調べる</h3>
+<p>例えば、備品一覧を配信するサーバーに、普段使われないURLへのリクエストが短時間に大量に届き、404が続いたとする。アクセスログで時刻・送信元IP・リクエスト先を見比べると、公開されている入口を探す動きの手掛かりになる。アプリの導入後は、URLに記録された入力値から、入力をSQLの命令として処理させようとする <strong>SQLインジェクション</strong> の試みが疑われることもある。</p>
+<p>実際に侵入された可能性を調べるときは、不審なリクエストがあった時間帯を起点に、OSのログイン記録やアプリ・DBの記録も照合する。アクセスログからはリクエストが届いたことと、Nginxが返した結果が分かる。どの処理や変更まで行われたかは、それを記録するログで確認する。<a href="https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html#which-events-to-log">OWASPのログ記録ガイド</a></p>
 <h3 id="エラーログでは問題の手掛かりを読む">エラーログでは問題の手掛かりを読む</h3>
 <p><strong>エラーログ</strong>には、設定やファイルへのアクセスなどで起きた問題が記録される。今回のNginxでは、<code>/var/log/nginx/error.log</code>がその保存先である。例えば<code>Permission denied</code>が含まれる場合は読み取りや通過の権限、<code>No such file or directory</code>が含まれる場合は記録された保存先とファイルの有無が手掛かりになる。<a href="https://nginx.org/en/docs/ngx_core_module.html#error_log">Nginxのエラーログ</a></p>
 <p>アクセスログは「どのリクエストを、どの結果で処理したか」、エラーログは「処理中に何が問題になったか」を読むために使う。設定でログの保存先を変えた場合は、その設定に書かれたファイルを読む。</p>
@@ -105,7 +117,7 @@ sudo systemctl reload nginx</code></pre>
 <h3 id="問5">問5</h3>
 <p>アクセスした時刻、送信元、<code>GET /example.txt</code>というリクエストのパス、レスポンスのステータスを対応させる。古い同じパスの記録と、直前の操作の記録を区別する。</p>
 <h2 id="参考資料">参考資料</h2>
-<p>確認日：2026-11-03。設定断片、ファイルの本文、レスポンスやログは仕組みを説明するための例である。</p>
+<p>確認日 2026-11-24。設定断片、ファイルの本文、レスポンスやログは仕組みを説明するための例である。</p>
 <p class="bullet">・ <a href="https://nginx.org/en/docs/beginners_guide.html">Nginx Beginner’s Guide</a></p>
 <p class="bullet">・ <a href="https://nginx.org/en/docs/http/ngx_http_core_module.html#root">Nginx root</a></p>
 <p class="bullet">・ <a href="https://nginx.org/en/docs/http/ngx_http_core_module.html#try_files">Nginx try_files</a></p>
@@ -113,6 +125,7 @@ sudo systemctl reload nginx</code></pre>
 <p class="bullet">・ <a href="https://nginx.org/en/docs/control.html">Nginx Controlling nginx</a></p>
 <p class="bullet">・ <a href="https://nginx.org/en/docs/http/ngx_http_log_module.html">Nginx access_logとログ形式</a></p>
 <p class="bullet">・ <a href="https://nginx.org/en/docs/ngx_core_module.html#error_log">Nginx error_log</a></p>
+<p class="bullet">・ <a href="https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html">OWASP Logging Cheat Sheet</a></p>
 <p class="bullet">・ <a href="https://ubuntu.com/server/docs/how-to/web-services/configure-nginx/">Ubuntu Server Nginx configuration</a></p>
 <p class="bullet">・ <a href="https://man7.org/linux/man-pages/man7/path_resolution.7.html">Linux man-pages path_resolution(7)</a></p>
 <p class="bullet">・ <a href="https://www.freedesktop.org/software/systemd/man/latest/systemctl.html">systemd systemctl</a></p>
