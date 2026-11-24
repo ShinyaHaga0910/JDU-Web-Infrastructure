@@ -211,19 +211,8 @@ mstsc /prompt
 <p><strong>うまくいかないとき:</strong></p>
 <p>Login failedならuser名と日本語/英語等のkeyboard配列を確認する。passwordを会話へ送らない。到達しない場合は現在のIPと許可された接続元CIDRを教師と確認し、3389を全公開しない。終了時はRDP内の自分の作業を保存し、接続を閉じる。</p>
 <h3>確認・提出</h3>
-<p>P0の作業を終えたら、教師がクラスごとに案内する採点ページのURLを、自分のPCのブラウザで開く。採点ページを開くためにCloudShellでコマンドを実行する必要はない。Googleのログイン画面が表示されたら、学校のGoogleアカウントでログインする。以下はサンプルデータを使った日本語の画面例。画面上部の「RU」「UZ」で表示言語を切り替えられる。</p>
-<p><strong>1. トップページで「課題の確認」を開く</strong></p>
-<p>ログイン後、「Web演習」のトップページで <strong>課題の確認</strong> をクリックする。</p>
-<p><img src="../../../assets/shared/p0-portal-home.png" alt="トップページで「課題の確認」を開く" width="1280" height="720" loading="lazy"></p>
-<p><strong>2. P0の採点を開始する</strong></p>
-<p>P0の枠にある <strong>この課題を確認する</strong> をクリックする。画面を開いたまま1〜2分を目安に待つ。「確認を実行中です」の表示が続くときは、<strong>結果を更新する</strong> をクリックする。</p>
-<p><img src="../../../assets/shared/p0-portal-pick.png" alt="P0の採点を開始する" width="1265" height="712" loading="lazy"></p>
-<p><strong>3. 今回の点数と保存状況を見る</strong></p>
-<p>Webサーバーで作った <code>p0-connection.txt</code> の内容が <code>web</code> の1行なら、「今回の素点」が <strong>1 / 1</strong> になる。「成績原本に保存しました。」と表示されたら、<strong>保存済み成績を見る</strong> をクリックする。</p>
-<p><img src="../../../assets/shared/p0-portal-result.png" alt="今回の点数と保存状況を見る" width="1265" height="712" loading="lazy"></p>
-<p><strong>4. 保存済みの成績でP0の点数を確認する</strong></p>
-<p>「保存済みの成績」の表でP0の行を見つけ、<strong>1点</strong> が保存されていることを確認する。</p>
-<p><img src="../../../assets/shared/p0-portal-saved.png" alt="保存済みの成績でP0の点数を確認する" width="1265" height="712" loading="lazy"></p>
+<p>教師が案内する採点ページのURLを自分のPCのブラウザで開き、学校のGoogleアカウントでログインする。CloudShellでの操作は不要。</p>
+<p>P0の枠で <strong>この課題を確認する</strong> を押す。同じページで今回の結果を確認し、P0の枠に <strong>1 / 1</strong> が保存されたことを確認する。</p>
 <h2 id="section-6">P1 HTTPで静的ファイルを返す</h2>
 <h3>学ぶこと</h3>
 <p>Nginx、保存先、待受、HTTP応答、access logを一組で確認する。</p>

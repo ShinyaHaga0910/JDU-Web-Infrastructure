@@ -26,6 +26,8 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
 
 **教師用Learner Lab** では上記のまま実行します。言語を選ぶと構築と確認が自動で進みます。完了画面の最後に表示される共通登録コードを、受講者だけが閲覧できる場所で共有します。
 
+[教師向けの採点ポータル設定（Google Cloud・採点URL）](development/web_portal_poc/CLASSROOM-PORTAL.md)
+
 #### 学生側のコマンド
 
 学生用Learner LabのCloudShell（`us-east-1`）で、次のコマンドをそのまま貼り付けます。

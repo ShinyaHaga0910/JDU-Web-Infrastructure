@@ -154,3 +154,15 @@ test('an expired check login offers a safe return link without executing or savi
   assert.ok(html.includes('/auth/login?next='+encodeURIComponent(path)));
   assert.doesNotMatch(html,/<input[^>]*name="password"|<form|type="submit"/);
 });
+
+
+test('semester expiry blocks sign-in, grades and check POST before any backend is called', async()=>{
+  let calls=0;
+  const app=createApp({env:{...env,PORTAL_EXPIRES_AT:'1000000000'},verify:async()=>{calls++;},
+    getGrade:async()=>{calls++;},checker:async()=>{calls++;},getTeacher:async()=>{calls++;}});
+  for (const path of ['/','/auth/login','/auth/callback','/checks','/grades','/teacher','/enroll']) {
+    const result=await app(new Request('https://portal.example'+path,{method:path==='/checks'?'POST':'GET'}));
+    assert.equal(result.status,410,path);
+  }
+  assert.equal(calls,0);
+});

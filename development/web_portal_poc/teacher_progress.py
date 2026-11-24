@@ -84,8 +84,9 @@ def read_teacher(event, pepper, bindings, grades):
         base = {'lab_id': lab_id, 'context': assigned['context'], 'status': 'unavailable'}
         try:
             meta = grades.get('LAB#' + lab_id, 'META')
-            if not meta or meta.get('active') is not True or any(meta.get(k) != v for k, v in
-                    [('lab_id', lab_id), ('deployment_id', assigned['deployment_id']), ('assessment_context', assigned['context'])]):
+            if (not meta or meta.get('active') is not True or any(meta.get(k) != v for k, v in
+                    [('lab_id', lab_id), ('deployment_id', assigned['deployment_id'])])
+                    or meta.get('assessment_context', 'course') != assigned['context']):
                 return base
             values = grades.labs(lab_id)  # Always a named permitted Lab, never a scan.
             if (len(values) != 1 or values[0].get('active') is not True

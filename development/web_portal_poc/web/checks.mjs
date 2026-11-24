@@ -3,7 +3,7 @@ import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { readFileSync } from 'node:fs';
 const labels=JSON.parse(readFileSync(new URL('./check-labels.json',import.meta.url),'utf8'));
 
-export const tasks=Object.freeze([0,1,2,4,5,6].flatMap(i=>[`P${i}`,`M${i}`]));
+export const tasks=Object.freeze([...[0,1,2,4].flatMap(i=>[`P${i}`,`M${i}`]),'P5','P6','M5','M6']);
 const uuid=v=>typeof v==='string' && /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(v);
 const escape=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const words={
@@ -72,10 +72,9 @@ function submissionHtml(lang,result,selected,{config,session,token}) {
   // displays this retry form; automatic saving happens in the finishing POST.
   return `<section><p role="status">${escape(t.pending)}</p>${form(lang,v,checkToken(config,session,token,v),`<input type="hidden" name="task_id" value="${v.task_id}">`,t.retry)}</section>`;
 }
-export function checkHtml(lang,{config,session,token,selected,result}={}) {
-  const t=words[lang],links=`<p><a href="/checks?lang=${lang}">${escape(t.back)}</a> · <a href="/grades?lang=${lang}">${escape(t.grades)}</a> · <a href="/?lang=${lang}">${escape(t.home)}</a></p>`;
+export function checkHtml(lang,{config,session,token,selected,result,grade,maxima={},blocked=false}={}) {
+  const t=words[lang];
   const st=specialWords[lang];
-  const note=`<p>${escape(t.note)}</p><p>${escape(st.overview)}</p>`;
   if (!selected) {
     const value={operation:'start',task_id:'P0',job_id:randomUUID()};
     // Each task has its own action-bound token. No client script is required.
@@ -83,12 +82,16 @@ export function checkHtml(lang,{config,session,token,selected,result}={}) {
       const mode=/^[PM]3$/.test(task_id)?'storage':/^[PM][56]$/.test(task_id)?'functional':null;
       const v={...value,task_id,job_id:randomUUID(),...(mode?{check_mode:mode}:{})};
       const normal={...value,task_id,job_id:randomUUID()};
-      return `<section><h2>${task_id}</h2>${form(lang,v,checkToken(config,session,token,v),`<input type="hidden" name="task_id" value="${task_id}">`,mode==='storage'?st.prepare:mode==='functional'?st.functional:t.start)}${mode?form(lang,normal,checkToken(config,session,token,normal),`<input type="hidden" name="task_id" value="${task_id}">`,st.readOnly):''}</section>`;
+      const saved=grade?.selected[task_id];
+      const points=Object.hasOwn(maxima,task_id) ? `<span class="task-score" aria-label="${escape(t.grades)}: ${saved?`${saved.raw_earned} / ${maxima[task_id]}`:'—'}">${saved?`${saved.raw_earned} / ${maxima[task_id]}`:'—'}</span>` : '';
+      const heading=`<div class="task-heading"><h2>${task_id}</h2>${points}</div>`;
+      if(blocked) return `<section>${heading}</section>`;
+      return `<section>${heading}${form(lang,v,checkToken(config,session,token,v),`<input type="hidden" name="task_id" value="${task_id}">`,mode==='storage'?st.prepare:mode==='functional'?st.functional:t.start)}${mode?form(lang,normal,checkToken(config,session,token,normal),`<input type="hidden" name="task_id" value="${task_id}">`,st.readOnly):''}</section>`;
     }).join('');
-    return note+'<div class="check-tasks">'+forms+'</div>'+links;
+    return '<div class="check-tasks">'+forms+'</div>';
   }
   if (!validOperation(selected)) throw Error('Invalid selection');
-  if (result?.status!=='ok') return `<p role="alert">${escape(result?.status==='busy'?t.busy:result?.status==='unauthorized'?t.denied:t.unavailable)}</p>`+links;
+  if (result?.status!=='ok') return `<p role="alert">${escape(result?.status==='busy'?t.busy:result?.status==='unauthorized'?t.denied:t.unavailable)}</p>`;
   const job=result.job;
   if (!job || job.job_id!==selected.job_id || job.task_id!==selected.task_id || !['queued','dispatching','observing','report_ready','failed','awaiting_password','awaiting_stop','awaiting_restart'].includes(job.phase)
       || selected.check_mode && job.check_mode!==selected.check_mode) throw Error('Invalid job');
@@ -97,24 +100,24 @@ export function checkHtml(lang,{config,session,token,selected,result}={}) {
     if(selected.check_mode!=='functional')throw Error('Invalid functional step');
     const v={...selected,operation:'functional_start'};
     return content+`<p>${escape(st.passwordNote)}</p>`+form(lang,v,checkToken(config,session,token,v),
-      `<input type="hidden" name="task_id" value="${v.task_id}"><label for="application-password">${escape(st.password)}</label><input id="application-password" name="password" type="password" autocomplete="current-password" minlength="1" maxlength="128" required aria-describedby="application-password-note"><p id="application-password-note">${escape(st.privatePassword)}</p>`,st.runFunctional)+links;
+      `<input type="hidden" name="task_id" value="${v.task_id}"><label for="application-password">${escape(st.password)}</label><input id="application-password" name="password" type="password" autocomplete="current-password" minlength="1" maxlength="128" required aria-describedby="application-password-note"><p id="application-password-note">${escape(st.privatePassword)}</p>`,st.runFunctional);
   }
   if(job.phase==='awaiting_stop' || job.phase==='awaiting_restart') {
     if(selected.check_mode!=='storage' || !/^i-[a-f0-9]{17}$/.test(job.web_instance_id||''))throw Error('Invalid storage step');
     const stopped=job.phase==='awaiting_restart',v={...selected,operation:stopped?'storage_resume':'storage_observe'};
     return content+`<p role="status">${escape(stopped?st.restartNote:st.stopNote)}</p><p>Web: ${escape(job.web_instance_id)}</p><p><a href="https://us-east-1.console.aws.amazon.com/ec2/home?region=us-east-1#InstanceDetails:instanceId=${job.web_instance_id}" target="_blank" rel="noopener noreferrer">${escape(st.openAws)}</a></p>`
-      +form(lang,v,checkToken(config,session,token,v),`<input type="hidden" name="task_id" value="${v.task_id}">`,stopped?st.resume:st.observe)+links;
+      +form(lang,v,checkToken(config,session,token,v),`<input type="hidden" name="task_id" value="${v.task_id}">`,stopped?st.resume:st.observe);
   }
-  if (job.phase==='failed') return content+`<p role="alert">${escape(t.fail)}</p>`+links;
+  if (job.phase==='failed') return content+`<p role="alert">${escape(t.fail)}</p>`;
   if (job.phase!=='report_ready') {
     const v={...selected,operation:'advance'};
-    return content+`<p role="status">${escape(t.pending)}</p>`+form(lang,v,checkToken(config,session,token,v),`<input type="hidden" name="task_id" value="${v.task_id}">`,t.refresh,true)+note+links+'<script src="/check-progress.js" defer></script>';
+    return content+`<p role="status">${escape(t.pending)}</p>`+form(lang,v,checkToken(config,session,token,v),`<input type="hidden" name="task_id" value="${v.task_id}">`,t.refresh,true)+'<script src="/check-progress.js" defer></script>';
   }
   const value=result.result,s=value?.score;
   if (!value || value.task_id!==selected.task_id || !Array.isArray(value.checks) || value.checks.length>40 || !Number.isInteger(s?.raw_earned) || !Number.isInteger(s?.raw_maximum) || s.raw_earned<0 || s.raw_earned>s.raw_maximum || !Number.isFinite(Date.parse(value.checked_at))) throw Error('Invalid result');
-  const rows=value.checks.map(c=>{if (!/^WEB[A-Z0-9_]{1,60}$/.test(c.id||'') || !['PASS','FAIL','UNKNOWN','NOT_APPLICABLE'].includes(c.status)) throw Error('Invalid check');return `<tr><th scope="row">${escape(c.id)}${labels[lang]?.[c.id]?`<br><small>${escape(labels[lang][c.id])}</small>`:''}</th><td>${escape(t[c.status]||t.UNKNOWN)}</td></tr>`;}).join('');
-  content+=`<h3>${escape(t.done)}</h3><p>${escape(new Date(value.checked_at).toISOString())}</p><p class="num">${escape(s.counts_toward_assessment?`${t.points}: ${s.raw_earned} / ${s.raw_maximum}`:t.practice)}</p>${s.evaluable?'':`<p role="status">${escape(t.unknown)}</p>`}<div class="table-wrap"><table><thead><tr><th>${escape(t.check)}</th><th>${escape(t.status)}</th></tr></thead><tbody>${rows}</tbody></table></div>`;
-  return content+submissionHtml(lang,result,selected,{config,session,token})+note+links;
+  const rows=value.checks.map(c=>{if (!/^WEB[A-Z0-9_]{1,60}$/.test(c.id||'') || !['PASS','FAIL','UNKNOWN','NOT_APPLICABLE'].includes(c.status)) throw Error('Invalid check');return `<tr data-check-id="${escape(c.id)}"><th scope="row">${escape(labels[lang]?.[c.id] || c.id)}</th><td>${escape(t[c.status]||t.UNKNOWN)}</td></tr>`;}).join('');
+  content+=`<h3>${escape(t.done)}</h3><p>${escape(new Date(value.checked_at).toISOString())}</p><p class="num">${escape(s.counts_toward_assessment?`${t.points}: ${s.raw_earned} / ${s.raw_maximum}`:t.practice)}</p>${s.evaluable?'':`<p role="status">${escape(t.unknown)}</p>`}<details><summary>${escape(t.check)}</summary><div class="table-wrap"><table><thead><tr><th>${escape(t.check)}</th><th>${escape(t.status)}</th></tr></thead><tbody>${rows}</tbody></table></div></details>`;
+  return content+submissionHtml(lang,result,selected,{config,session,token});
 }
 export const progressScript=`const form=document.querySelector('form[data-check-progress]'); if(form){const key='jdu-check-polls:'+new FormData(form).get('job_id');let n=Number(sessionStorage.getItem(key)||0);if(n<40){setTimeout(()=>{sessionStorage.setItem(key,String(n+1));form.requestSubmit();},4000);}}`;
 

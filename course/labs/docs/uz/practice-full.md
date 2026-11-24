@@ -220,31 +220,9 @@ Login failed bo‘lsa user nomi va klaviatura tartibini tekshiring. Parolni chat
 
 ### Tekshirish va topshirish
 
-P0 ni bajargach, o‘qituvchi guruhingizga bergan baholash sahifasi URL manzilini o‘z kompyuteringizdagi brauzerda oching. Buning uchun CloudShell da buyruq bajarish shart emas. Google kirish oynasi ochilsa, ta’lim muassasasining Google hisobi bilan kiring. Quyidagi yaponcha ekranlarda namuna ma’lumotlari ishlatilgan. Sahifa yuqorisidagi RU yoki UZ orqali tilni almashtirish mumkin.
+O‘qituvchi bergan baholash manzilini o‘z kompyuteringizdagi brauzerda oching va ta’lim muassasasining Google hisobi bilan kiring. CloudShell da buyruq bajarish shart emas.
 
-**1. «Vazifani tekshirish» bo‘limini oching**
-
-Hisobga kirgach, bosh sahifada **Vazifani tekshirish** ni bosing.
-
-![«Vazifani tekshirish» bo‘limini oching](../../assets/shared/p0-portal-home.png)
-
-**2. P0 tekshiruvini boshlang**
-
-P0 kartasidagi **Ushbu vazifani tekshirish** tugmasini bosing. Sahifani ochiq qoldirib, taxminan 1-2 daqiqa kuting. Tekshiruv hali davom etayotgan bo‘lsa, **Natijani yangilash** ni bosing.
-
-![P0 tekshiruvini boshlang](../../assets/shared/p0-portal-pick.png)
-
-**3. Joriy ball va saqlash holatini ko‘ring**
-
-Web serverda yaratilgan `p0-connection.txt` faylida bitta `web` satri bo‘lsa, «Ushbu tekshiruv bali» **1 / 1** bo‘ladi. Natija jurnalga saqlangani haqida xabar chiqqach, **Saqlangan baholar** ni bosing.
-
-![Joriy ball va saqlash holatini ko‘ring](../../assets/shared/p0-portal-result.png)
-
-**4. P0 uchun saqlangan ballni tekshiring**
-
-Saqlangan baholar jadvalidan P0 qatorini toping va **1 ball** saqlanganini tekshiring.
-
-![P0 uchun saqlangan ballni tekshiring](../../assets/shared/p0-portal-saved.png)
+P0 kartasidagi **Ushbu vazifani tekshirish** tugmasini bosing. Shu sahifada natijani tekshirib, P0 kartasida **1 / 1** saqlanganiga ishonch hosil qiling.
 
 ## P1 HTTP orqali statik faylni qaytarish
 

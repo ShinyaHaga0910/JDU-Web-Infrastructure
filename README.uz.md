@@ -12,6 +12,8 @@ Talabalar AWS VPC ichidagi EC2 instanslarida DNS, veb-server va ma’lumotlar ba
 
 AWS Academy’da o‘zingizga tegishli Learner Lab’ni ishga tushiring va quyidagi buyruqlarni Shimoliy Virjiniya (`us-east-1`) regionidagi CloudShell’ga joylang. Avval English, Japanese, Русский yoki O‘zbekcha tilini tanlang. Kiritish ko‘rsatmalari, jarayon holati, yakuniy natijalar va xatolar tanlangan tilda ko‘rsatiladi.
 
+[O‘qituvchi uchun portal sozlamalari (Google Cloud va baholash manzili, yaponcha)](development/web_portal_poc/CLASSROOM-PORTAL.md)
+
 #### O‘qituvchi uchun buyruq
 
 ```bash

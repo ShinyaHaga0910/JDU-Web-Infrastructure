@@ -10,7 +10,7 @@ if [[ -z "$ref" ]]; then
   ref=${head%%$'\t'*}
 fi
 [[ "$ref" =~ ^[a-f0-9]{40}$ ]]
-if [[ "${1:-}" == portal-prepare ]]; then
+if [[ "${1:-}" =~ ^portal-(prepare|connect|enable|approve|teacher)$ ]]; then
   portal_source=$(mktemp -d)
   trap 'rm -rf -- "$portal_source"' EXIT
   git -C "$portal_source" init -q
@@ -20,7 +20,9 @@ if [[ "${1:-}" == portal-prepare ]]; then
   git -C "$portal_source" sparse-checkout set development/web_portal_poc development/01_roles/cyber_security/tools
   git -C "$portal_source" fetch -q --depth 1 --filter=blob:none origin "$ref"
   git -C "$portal_source" checkout -q --detach FETCH_HEAD
-  npm --prefix "$portal_source/development/web_portal_poc/web" ci --omit=dev --no-audit --no-fund
+  if [[ "$1" == 'portal-prepare' || "$1" == 'portal-enable' ]]; then
+    npm --prefix "$portal_source/development/web_portal_poc/web" ci --omit=dev --no-audit --no-fund
+  fi
   python3 -B "$portal_source/development/web_portal_poc/deploy_classroom_portal.py" "$@" --ref "$ref"
   exit
 fi

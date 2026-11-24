@@ -18,7 +18,7 @@ from markdown_it import MarkdownIt
 from pages import write_pages, browser_check
 from command_notes import annotated_blocks
 from diagrams import diagram_markdown, lesson_files_markdown, write_diagrams
-from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE, RDP_STEPS, P0_GRADING_STEPS
+from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE, RDP_STEPS
 from checks import CHECKS
 from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, RAW_MAXIMUM, active_registry
 from explanations import LABELS, READING, ROUTES, MISSION_PLAN, MODULE_NOTES, STEP_NOTES, OUTPUT_EXAMPLES
@@ -246,10 +246,12 @@ def make_markdown(reg, lang, kind):
                     out += ['**' + L['trouble'][lang] + ':** ' + s['trouble'][lang], '']
             if m['id']=='P0':
                 out += ['### '+T('確認・提出','Проверка и сдача','Tekshirish va topshirish')[lang], '', T(
-                    'P0の作業を終えたら、教師がクラスごとに案内する採点ページのURLを、自分のPCのブラウザで開く。採点ページを開くためにCloudShellでコマンドを実行する必要はない。Googleのログイン画面が表示されたら、学校のGoogleアカウントでログインする。以下はサンプルデータを使った日本語の画面例。画面上部の「RU」「UZ」で表示言語を切り替えられる。',
-                    'После выполнения P0 откройте на своём компьютере в браузере адрес страницы проверки, который преподаватель сообщил вашему классу. Команды в CloudShell для этого не требуются. Если появится экран входа Google, войдите с учебной учётной записью. Ниже приведены примеры на японском с демонстрационными данными. Язык можно переключить вверху страницы кнопками RU или UZ.',
-                    'P0 ni bajargach, o‘qituvchi guruhingizga bergan baholash sahifasi URL manzilini o‘z kompyuteringizdagi brauzerda oching. Buning uchun CloudShell da buyruq bajarish shart emas. Google kirish oynasi ochilsa, ta’lim muassasasining Google hisobi bilan kiring. Quyidagi yaponcha ekranlarda namuna ma’lumotlari ishlatilgan. Sahifa yuqorisidagi RU yoki UZ orqali tilni almashtirish mumkin.')[lang], '']
-                out += illustrated_steps(lang, enumerate(P0_GRADING_STEPS, 1))
+                    '教師が案内する採点ページのURLを自分のPCのブラウザで開き、学校のGoogleアカウントでログインする。CloudShellでの操作は不要。',
+                    'Откройте адрес портала из объявления преподавателя в браузере на своём компьютере и войдите с учебным аккаунтом Google. Команды в CloudShell не нужны.',
+                    'O‘qituvchi bergan baholash manzilini o‘z kompyuteringizdagi brauzerda oching va ta’lim muassasasining Google hisobi bilan kiring. CloudShell da buyruq bajarish shart emas.')[lang], '', T(
+                    'P0の枠で **この課題を確認する** を押す。同じページで今回の結果を確認し、P0の枠に **1 / 1** が保存されたことを確認する。',
+                    'В карточке P0 нажмите **Проверить это задание**. Посмотрите результат на этой же странице и убедитесь, что в карточке P0 сохранён **1 / 1**.',
+                    'P0 kartasidagi **Ushbu vazifani tekshirish** tugmasini bosing. Shu sahifada natijani tekshirib, P0 kartasida **1 / 1** saqlanganiga ishonch hosil qiling.')[lang], '']
             if m['id'] in OUTPUT_EXAMPLES:
                 example,reading=OUTPUT_EXAMPLES[m['id']]
                 out += ['### ' + LABELS['output'][lang], '', '```text', example, '```', '', reading[lang], '']

@@ -52,7 +52,13 @@ const redirect = (location, values=[]) => { const h=new Headers(security); h.set
 function page(lang, title, content, selection) {
   const tail=selection?.teacher ? Object.entries(selection.params).map(([k,v])=>`&amp;${k}=${encodeURIComponent(v)}`).join('') : selection?`&amp;task_id=${selection.task_id}&amp;job_id=${selection.job_id}${selection.check_mode?`&amp;check_mode=${selection.check_mode}`:''}`:'';
   const nav = ['ja','ru','uz'].map(k => `<a href="?lang=${k}${tail}"${k===lang?' aria-current="page"':''}>${k.toUpperCase()}</a>`).join(' ');
-  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)}</title><style>body{font:1rem/1.6 system-ui,sans-serif;margin:0;background:#f5f7fa;color:#182435}main{max-width:64rem;margin:auto;padding:1.5rem}nav{display:flex;gap:1rem}a,button{color:#064ca4}button{font:inherit;background:white;border:1px solid #64748b;border-radius:.35rem;padding:.65rem 1rem;cursor:pointer}a:focus-visible,button:focus-visible{outline:3px solid #d34800;outline-offset:3px}section{background:white;border:1px solid #d6dee8;border-radius:.5rem;padding:1rem;margin-block:1rem}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:44rem}th,td{padding:.6rem;text-align:left;border-bottom:1px solid #d6dee8}.num{font-size:1.6rem;font-weight:700}footer{margin-top:2rem}li[aria-current=step]{font-weight:700}fieldset{border:1px solid #a9b6c7;border-radius:.35rem;padding:1rem;margin-block:1rem}.confirm{display:flex;align-items:flex-start;gap:.5rem;min-height:48px;padding-block:.5rem}input[type=password]{display:block;font:inherit;box-sizing:border-box;inline-size:min(100%,28rem);min-block-size:48px;padding:.6rem;margin-block:.4rem 1rem;border:1px solid #64748b;border-radius:.35rem}input[type=checkbox]{width:1.25rem;height:1.25rem;margin:.2rem 0;flex-shrink:0}a.action{display:inline-flex;align-items:center;min-height:48px;padding:0 .75rem;border:1px solid #64748b;border-radius:.35rem}a.action:focus-visible,input:focus-visible{outline:3px solid #d34800;outline-offset:3px}.check-tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1rem}.check-tasks section{margin:0}.teacher-table{max-block-size:70vh;overflow:auto}.teacher-table table{border-collapse:separate;border-spacing:0;min-width:68rem}.teacher-table caption{text-align:left;font-weight:700;padding-block:.75rem}.teacher-table thead th{position:sticky;inset-block-start:0;background:#eaf0f7;z-index:2}.teacher-table tbody th{position:sticky;inset-inline-start:0;background:white;z-index:1}.teacher-table thead th:first-child{inset-inline-start:0;z-index:3}.teacher-table:focus-visible{outline:3px solid #d34800;outline-offset:3px}</style></head><body><main><nav aria-label="Languages">${nav}</nav><h1>${escape(title)}</h1>${content}</main></body></html>`;
+  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)}</title><style>body{overflow-wrap:break-word;font:1rem/1.6 system-ui,sans-serif;margin:0;background:#f5f7fa;color:#182435}main{max-width:64rem;margin:auto;padding:1.5rem}nav{display:flex;flex-wrap:wrap;gap:1rem}a,button{color:#064ca4}button{font:inherit;background:white;border:1px solid #64748b;border-radius:.35rem;padding:.65rem 1rem;cursor:pointer}a:focus-visible,button:focus-visible{outline:3px solid #d34800;outline-offset:3px}section{background:white;border:1px solid #d6dee8;border-radius:.5rem;padding:1rem;margin-block:1rem}.table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:44rem}th,td{padding:.6rem;text-align:left;border-bottom:1px solid #d6dee8}.num{font-size:1.6rem;font-weight:700}footer{margin-top:2rem}li[aria-current=step]{font-weight:700}fieldset{border:1px solid #a9b6c7;border-radius:.35rem;padding:1rem;margin-block:1rem}.confirm{display:flex;align-items:flex-start;gap:.5rem;min-height:48px;padding-block:.5rem}input[type=password]{display:block;font:inherit;box-sizing:border-box;inline-size:min(100%,28rem);min-block-size:48px;padding:.6rem;margin-block:.4rem 1rem;border:1px solid #64748b;border-radius:.35rem}input[type=checkbox]{width:1.25rem;height:1.25rem;margin:.2rem 0;flex-shrink:0}a.action{display:inline-flex;align-items:center;min-height:48px;padding:0 .75rem;border:1px solid #64748b;border-radius:.35rem}a.action:focus-visible,input:focus-visible{outline:3px solid #d34800;outline-offset:3px}.check-tasks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:1rem}.check-tasks section{margin:0}.page-toolbar,.task-heading{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}.page-toolbar{margin-block:0 1rem}.saved-total{margin-inline-end:auto}.saved-total strong{font-size:1.4rem;margin-inline-start:.45rem;color:#174f83}.task-heading{justify-content:space-between;margin-block-end:.7rem}.task-heading h2{margin:0}.task-score{font-weight:700;font-variant-numeric:tabular-nums}.check-tasks section form+form{margin-top:.5rem}.check-tasks section button{width:100%;min-height:44px;text-align:start}.check-tasks section form:first-of-type button{background:#174f83;color:white;border-color:#174f83}summary{cursor:pointer;min-height:24px}.teacher-table{max-block-size:70vh;overflow:auto}.teacher-table .score-full{background:#e5f5ea;color:#176238}.teacher-table .score-partial{background:#fff1d7;color:#704900}.teacher-table td{font-variant-numeric:tabular-nums}.teacher-table table{border-collapse:separate;border-spacing:0;min-width:68rem}.teacher-table caption{text-align:left;font-weight:700;padding-block:.75rem}.teacher-table thead th{position:sticky;inset-block-start:0;background:#eaf0f7;z-index:2}.teacher-table tbody th{position:sticky;inset-inline-start:0;background:white;z-index:1}.teacher-table thead th:first-child{inset-inline-start:0;z-index:3}.teacher-table:focus-visible{outline:3px solid #d34800;outline-offset:3px}</style></head><body><main><nav aria-label="Languages">${nav}</nav><h1>${escape(title)}</h1>${content}</main></body></html>`;
+}
+
+export function portalExpired(env) {
+  const limit=env.PORTAL_EXPIRES_AT;
+  if (limit===undefined || limit==='') return false;
+  return !/^[0-9]{10}$/.test(limit) || Date.now()>=Number(limit)*1000;
 }
 
 export function checkedGrade(grade) {
@@ -97,6 +103,10 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
   return async request => {
     const url=new URL(request.url), lang=language(url), t=text[lang];
     if (url.pathname === '/healthz') return new Response('ok',{headers:{...security,'Content-Type':'text/plain; charset=utf-8'}});
+    if (portalExpired(env)) {
+      const ended={ja:'採点ポータルの利用期間は終了しました。',ru:'Период работы портала завершён.',uz:'Baholash portalidan foydalanish muddati tugadi.'}[lang];
+      return response(page(lang,t.title,`<p>${escape(ended)}</p>`),410);
+    }
     if (url.pathname==='/check-progress.js' && request.method==='GET') return new Response(progressScript,{headers:{...security,'Content-Type':'text/javascript; charset=utf-8'}});
     if (url.pathname === '/healthz/acceptance') {
       if (env.PORTAL_MODE!=='closed' || env.PORTAL_ACCEPTANCE_ENABLED!=='true' || typeof getAcceptanceHealth!=='function') return response('Not found',404);
@@ -240,7 +250,23 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
           if(!validOperation(selected))return fail(ct.denied,403);
           result=await checker({subject:identity.sub,...selected});
         }
-        return response(page(lang,ct.title,checkHtml(lang,{config,session:jar.get(ACCESS),token,selected,result}),selected),result?.status==='unauthorized'?403:result && result.status!=='ok'?503:200,extras);
+        let grade, warning='', unbound=false;
+        if (typeof getGrade==='function') {
+          try {
+            const saved=await getGrade(identity.sub);
+            if (saved?.status==='ok') grade=checkedGrade(saved.grade);
+            else if (saved?.status==='unauthorized') { unbound=true; warning=t.unbound; }
+            else warning=t.unavailable;
+          } catch { warning=t.unavailable; }
+        }
+        const session=jar.get(ACCESS);
+        const maxima=grade?.raw_maximum===59?LEGACY_MAXIMA:MISSION_MAXIMA;
+        const total=grade ? `<span class="saved-total">${escape(t.total)} <strong>${grade.raw_earned} / ${grade.raw_maximum}</strong></span>` : '';
+        const accountLink=enrollmentEnabled && unbound ? `<a class="action" href="/enroll?lang=${lang}">${escape(enrollmentText(lang).title)}</a>` : '';
+        const bar=`<div class="page-toolbar">${total}${accountLink}<a class="action" href="/status?lang=${lang}">${escape(t.status)}</a><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form></div>`;
+        const report=selected ? `<section aria-label="${escape(ct.done)}">${checkHtml(lang,{config,session,token,selected,result})}</section>` : '';
+        const tasks=checkHtml(lang,{config,session,token,grade,maxima,blocked:unbound});
+        return response(page(lang,ct.title,bar+(warning?`<p role="status">${escape(warning)}</p>`:'')+report+tasks,selected),result?.status==='unauthorized'?403:result && result.status!=='ok'?503:200,extras);
       } catch {return fail(ct.unavailable);}
     }
     if (url.pathname==='/prepare') {
@@ -341,6 +367,7 @@ export function createApp({env=process.env, verify=verifyGoogle, exchange=fetch,
       if(teacherIdentity && typeof getTeacher==='function') {
         try {const result=await getTeacher({operation:'teacher_access',subject:identity.sub,email:identity.email});if(result?.status==='ok' && /^[0-9]{1,12}$/.test(result.teacher?.class_id||''))teacherLink=`<p><a href="/teacher?lang=${lang}">${escape(teacherText[lang].title)}</a></p>`;} catch {}
       }
+      if (checkerEnabled && !preparationEnabled) return redirect(teacherLink?`/teacher?lang=${lang}`:`/checks?lang=${lang}`);
       return response(page(lang,t.title,`<section>${preparationEnabled?`<p><a href="/prepare?lang=${lang}">${escape(preparationText[lang].title)}</a></p>`:''}${enrollmentEnabled?`<p><a href="/enroll?lang=${lang}">${escape(enrollmentText(lang).title)}</a></p>`:''}<p><a href="/grades?lang=${lang}">${escape(t.grades)}</a></p><p><a href="/status?lang=${lang}">${escape(t.status)}</a></p>${checkerEnabled?`<p><a href="/checks?lang=${lang}">${escape(checkWords[lang].title)}</a></p>`:''}${teacherLink}</section>${checkerEnabled?'':`<p>${escape(t.notice)}</p>`}<p>${escape(t.shared)}</p><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form>`));
     }
     if (url.pathname !== '/grades' && url.pathname !== '/status') return response('Not found',404);

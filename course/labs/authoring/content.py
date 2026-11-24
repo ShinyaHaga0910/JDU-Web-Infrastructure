@@ -57,30 +57,6 @@ step(m, T('RDPで踏み台のデスクトップを開く', 'Открыть ра�
  T('Login failedならuser名と日本語/英語等のkeyboard配列を確認する。passwordを会話へ送らない。到達しない場合は現在のIPと許可された接続元CIDRを教師と確認し、3389を全公開しない。終了時はRDP内の自分の作業を保存し、接続を閉じる。', 'При Login failed проверьте имя и раскладку клавиатуры. Не отправляйте пароль в чат. При недоступности сверьте текущий IP и разрешённый CIDR с преподавателем; не открывайте 3389 для всех. Перед закрытием RDP сохраните работу.', 'Login failed bo‘lsa user nomi va klaviatura tartibini tekshiring. Parolni chat ga yubormang. Ulanmasa joriy IP va ruxsatli CIDR ni o‘qituvchi bilan tekshiring; 3389 ni hammaga ochmang. RDP ni yopishdan oldin ishni saqlang.'))
 
 
-P0_GRADING_STEPS = (
-    ('p0-portal-home',
-     T('トップページで「課題の確認」を開く', 'Откройте «Проверка задания»', '«Vazifani tekshirish» bo‘limini oching'),
-     T('ログイン後、「Web演習」のトップページで **課題の確認** をクリックする。',
-       'После входа на главной странице нажмите **Проверка задания**.',
-       'Hisobga kirgach, bosh sahifada **Vazifani tekshirish** ni bosing.')),
-    ('p0-portal-pick',
-     T('P0の採点を開始する', 'Запустите проверку P0', 'P0 tekshiruvini boshlang'),
-     T('P0の枠にある **この課題を確認する** をクリックする。画面を開いたまま1〜2分を目安に待つ。「確認を実行中です」の表示が続くときは、**結果を更新する** をクリックする。',
-       'В карточке P0 нажмите **Проверить это задание**. Оставьте страницу открытой и подождите примерно 1–2 минуты. Если проверка всё ещё выполняется, нажмите **Обновить результат**.',
-       'P0 kartasidagi **Ushbu vazifani tekshirish** tugmasini bosing. Sahifani ochiq qoldirib, taxminan 1–2 daqiqa kuting. Tekshiruv hali davom etayotgan bo‘lsa, **Natijani yangilash** ni bosing.')),
-    ('p0-portal-result',
-     T('今回の点数と保存状況を見る', 'Посмотрите балл и статус сохранения', 'Joriy ball va saqlash holatini ko‘ring'),
-     T('Webサーバーで作った `p0-connection.txt` の内容が `web` の1行なら、「今回の素点」が **1 / 1** になる。「成績原本に保存しました。」と表示されたら、**保存済み成績を見る** をクリックする。',
-       'Если в созданном на Web-сервере файле `p0-connection.txt` записана одна строка `web`, в поле «Баллы этой проверки» будет **1 / 1**. После сообщения о сохранении результата нажмите **Сохранённые оценки**.',
-       'Web serverda yaratilgan `p0-connection.txt` faylida bitta `web` satri bo‘lsa, «Ushbu tekshiruv bali» **1 / 1** bo‘ladi. Natija jurnalga saqlangani haqida xabar chiqqach, **Saqlangan baholar** ni bosing.')),
-    ('p0-portal-saved',
-     T('保存済みの成績でP0の点数を確認する', 'Проверьте сохранённый балл P0', 'P0 uchun saqlangan ballni tekshiring'),
-     T('「保存済みの成績」の表でP0の行を見つけ、**1点** が保存されていることを確認する。',
-       'Найдите строку P0 в таблице сохранённых оценок и убедитесь, что сохранён **1 балл**.',
-       'Saqlangan baholar jadvalidan P0 qatorini toping va **1 ball** saqlanganini tekshiring.')),
-)
-
-
 RDP_STEPS = (
     ('rdp-bastion-select', T('踏み台サーバーを選ぶ', 'Выберите бастион', 'Oraliq serverni tanlang'), T(
         'EC2 → Instancesで、自分の演習環境のうち名前の末尾が `-bastion` の行を探し、同じ行の **Instance ID** をクリックする。',

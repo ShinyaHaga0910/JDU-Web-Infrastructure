@@ -471,6 +471,9 @@ def assignment_portal_url(cfn):
     values = {row['ParameterKey']: row['ParameterValue'] for row in stack.get('Parameters', [])}
     if stack['StackStatus'] not in ('CREATE_COMPLETE', 'UPDATE_COMPLETE', 'UPDATE_ROLLBACK_COMPLETE'):
         return None
+    expiry = values.get('PortalExpiresAt', '')
+    if not re.fullmatch(r'[0-9]{10}', expiry) or time.time() >= int(expiry):
+        return None
     if values.get('PortalMode') != 'enabled' or values.get('CheckerEnabled') != 'true':
         return None
     for row in stack.get('Outputs', []):

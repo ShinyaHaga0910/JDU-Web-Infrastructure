@@ -1,6 +1,6 @@
 import { createServer } from 'node:http';
 import { Readable } from 'node:stream';
-import { createApp } from './router.mjs';
+import { createApp, portalExpired } from './router.mjs';
 import { createGradeClient, createStatusClient } from './grade-client.mjs';
 import { createSessions } from './sessions.mjs';
 import { createAcceptanceHealth } from './acceptance-health.mjs';
@@ -35,12 +35,13 @@ createServer(async (req,res) => {
     // Static liveness remains available when the Lab's secret store is offline.
     // The acceptance endpoint independently rejects enabled deployments.
     const path=new URL(request.url).pathname;
-    let env=['/healthz','/healthz/acceptance'].includes(path) ? process.env : await getRuntimeEnv();
-    if (path==='/enroll' && env.PORTAL_ENROLLMENT_ENABLED==='true') {
+    const expired=portalExpired(process.env);
+    let env=expired || ['/healthz','/healthz/acceptance'].includes(path) ? process.env : await getRuntimeEnv();
+    if (!expired && path==='/enroll' && env.PORTAL_ENROLLMENT_ENABLED==='true') {
       const bootstrap=await getBootstrapEnv();
       env={...env,PORTAL_BOOTSTRAP_TEMPLATE_URL:bootstrap.PORTAL_BOOTSTRAP_TEMPLATE_URL};
     }
-    if (path==='/prepare' && env.PORTAL_PREPARATION_ENABLED==='true') {
+    if (!expired && path==='/prepare' && env.PORTAL_PREPARATION_ENABLED==='true') {
       env={...env,PORTAL_PREPARATION_TEMPLATE_URL:(await getPreparationEnv()).PORTAL_PREPARATION_TEMPLATE_URL};
     }
     const app=createApp({env,getGrade,getStatus,sessions,getAcceptanceHealth,enroll,checker,getTeacher});
