@@ -13,69 +13,39 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения (порядок действий)</a> · <a href="#section-6">Пример чтения вывода (не вводить)</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P2 Внутренний DNS и системное разрешение имён</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Схема задания</a> · <a href="#section-2">Пример решения (порядок действий)</a> · <a href="#section-3">Пример чтения вывода (не вводить)</a></nav></header><main id="content" tabindex="-1"><h1>P2 Внутренний DNS и системное разрешение имён</h1>
 <p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M5</a></p>
 <p><a href="../ja/p2.html">日本語</a> · <a href="../ru/p2.html">Русский</a> · <a href="../uz/p2.html">O‘zbekcha</a></p>
 <p>Связанное задание: <a href="m2.html">M2</a>.</p>
-<h2 id="section-1">Что изучаем</h2>
-<p>Последовательно настроить zone, A-записи, ACL BIND и resolver клиентов.</p>
-<h2 id="section-2">Задание</h2>
-<p>Настройте guide.lab.test → 10.20.1.20 и practice-db.lab.test → 10.20.2.20; откройте HTTP из P1 по имени. Фиксированные IP не меняются.</p>
-<h2 id="section-3">Схема задания</h2>
-<p><img src="../../../assets/ru/p2.png" alt="P2: HTTP по IP уже работает → Настроить DNS и resolver → Имя ведёт к тому же Web。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер." width="1040" height="680" loading="lazy"></p>
-<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер.</p>
-<table>
-<thead>
-<tr>
-<th scope="col">DNS name</th>
-<th scope="col">A / IPv4</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>guide.lab.test</td>
-<td>10.20.1.20</td>
-</tr>
-<tr>
-<td>practice-db.lab.test</td>
-<td>10.20.2.20</td>
-</tr>
-</tbody>
-</table>
-<h2 id="section-4">Как это работает</h2>
-<p><strong>Состояние перед началом:</strong></p>
-<p>HTTP из P1 работает по IP; DNS ещё предстоит настроить.</p>
 <p><strong>Что сделать в Practice2</strong></p>
-<p>Учебные имена BIND доступны обычному резолверу бастиона и Web.</p>
-<p>DNS отвечает на запрос имени, а не выдаёт Web-страницу. BIND ведёт зону lab.test; A-запись возвращает IPv4. Различайте dig с явным сервером и getent/браузер с настройками ОС. После DNS выполняется отдельное HTTP-соединение. <a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">Документация BIND</a>.</p>
-<h2 id="section-5">Пример решения (порядок действий)</h2>
-<h3>P2.1 Установить BIND и сохранить исходные настройки</h3>
+<p>Запишите имена Web и DB во внутреннем DNS. Настройте бастион и Web на этот DNS и откройте файл P1 по имени.</p>
+<h2 id="section-1">Схема задания</h2>
+<p><img src="../../../assets/ru/p2.png" alt="Бастион и Web запрашивают внутренний DNS, который передаёт внешние имена DNS AWS." width="1040" height="680" loading="lazy"></p>
+<h2 id="section-2">Пример решения (порядок действий)</h2>
+<h3>P2.1 Установить BIND с сервера пакетов</h3>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DNS-сервера: ssm-user</p>
-<p><strong>Цель и действия:</strong></p>
-<p>Подключитесь к DNS, проверьте role=dns. cp -a сохраняет атрибуты исходного файла, -n не заменяет прежнюю копию. Это страховка при редактировании, не задание по backup/restore БД.</p>
+<p>На DNS-сервере обновите список пакетов, установите BIND и инструменты проверки. Сделайте копии двух файлов перед редактированием.</p>
 <p>Команды: нумерация внутри этого шага</p>
-<pre><code class="language-bash"># 1. Обновить индекс пакетов внутреннего repo; считать ошибки загрузки сбоем.
-sudo apt-get update -o APT::Update::Error-Mode=any
-# 2. Установить bind9 bind9-utils из внутреннего repo без рекомендуемых дополнений.
+<pre><code class="language-bash"># 1. Обновить список пакетов с внутреннего сервера.
+sudo apt-get update
+# 2. Установить bind9 bind9-utils и обязательные зависимости с сервера пакетов.
 sudo apt-get install --no-install-recommends bind9 bind9-utils
 # 3. Скопировать исходный файл в резервную копию, не затирая существующую.
 sudo cp -an /etc/bind/named.conf.options /etc/bind/named.conf.options.before-p2
 # 4. Скопировать исходный файл в резервную копию, не затирая существующую.
 sudo cp -an /etc/bind/named.conf.local /etc/bind/named.conf.local.before-p2
 </code></pre>
-<p><strong>Смысл команд и настроек:</strong></p>
-<p>Named - имя службы BIND; named-checkconf и другие команды проверяют конфигурацию. Опция -n в cp -an не перезаписывает существующую резервную копию при повторном запуске.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Установка использует внутренний repo. В M2 добавляйте записи в этот же DNS, сохраняя P2.</p>
-<p><strong>Если не получилось:</strong></p>
-<p>Не копируйте целиком named.conf из чужого Lab. Если своя zone уже есть, сначала изучите её.</p>
-<h3>P2.2 Настроить клиентов и forwarder</h3>
+<p>Установлены <code>bind9</code> и <code>bind9-utils</code>, появились две копии <code>.before-p2</code>.</p>
+<h3>P2.2 Указать, от кого DNS принимает запросы</h3>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DNS-сервера: ssm-user</p>
-<p><strong>Цель и действия:</strong></p>
-<p>Откройте sudo nano /etc/bind/named.conf.options, введите и сохраните текст ниже. acl задаёт разрешённых клиентов; listen-on - адреса DNS; forward only передаёт внешние имена AWS DNS. И query, и recursion ограничены тремя источниками. dnssec-validation no соответствует изолированной учебной схеме forwarding.</p>
-<p>Конфигурация или данные: не выполнять как команды</p>
+<p>Разрешите запросы от DNS-сервера, бастиона и Web-сервера. Имена вне учебной зоны передаются DNS AWS (<code>10.20.0.2</code>).</p>
+<p>Замените содержимое файлом настроек ниже. В nano для поиска используйте Ctrl+W, для сохранения Ctrl+O и Enter, для выхода Ctrl+X.</p>
+<pre><code class="language-bash">sudo nano /etc/bind/named.conf.options
+</code></pre>
+<p><strong>Текст для ввода в nano</strong></p>
 <pre><code class="language-text">acl &quot;jdu_clients&quot; { 127.0.0.1; 10.20.1.10; 10.20.1.20; };
 options {
     directory &quot;/var/cache/bind&quot;;
@@ -91,28 +61,30 @@ options {
     allow-transfer { none; };
 };
 </code></pre>
-<p><strong>Смысл команд и настроек:</strong></p>
-<p>Allow-query задаёт клиентов запросов, allow-recursion - клиентов рекурсивного поиска. Имена lab.test берутся из своей зоны, внешние передаются forwarder. В этом Lab клиенты ограничены бастионом, Web и localhost.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Это содержимое файла, не команды shell. 10.20.0.2 - resolver AWS, 10.20.2.10 - ваш BIND.</p>
-<p><strong>Если не получилось:</strong></p>
-<p>Точки с запятой и фигурные скобки обязательны. Не расширяйте ACL до any или 0.0.0.0/0.</p>
-<h3>P2.3 Объявить zone и создать A-записи</h3>
+<p>В <code>listen-on</code> указан внутренний IP DNS-сервера <code>10.20.2.10</code>, в <code>forwarders</code> - DNS AWS <code>10.20.0.2</code>.</p>
+<h3>P2.3 Записать имена и адреса IPv4</h3>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DNS-сервера: ssm-user</p>
-<p><strong>Цель и действия:</strong></p>
-<p>В sudo nano /etc/bind/named.conf.local запишите первый блок zone. Создайте каталог командой sudo install -d -m 0755 /etc/bind/zones, затем откройте sudo nano /etc/bind/zones/db.lab.test и запишите остальной текст. SOA - служебные данные, NS - авторитетный DNS, A - имя/IPv4. Точка в конце обозначает полное имя; увеличивайте serial при изменениях.</p>
-<p>Конфигурация или данные: не выполнять как команды</p>
-<pre><code class="language-text">// /etc/bind/named.conf.local
-zone &quot;lab.test&quot; {
+<p>В <code>named.conf.local</code> укажите BIND путь к файлу зоны <code>lab.test</code>. В <code>db.lab.test</code> запишите A-записи, связывающие имена с адресами IPv4.</p>
+<p>Добавьте этот блок в конец <code>named.conf.local</code>. Если блок <code>lab.test</code> уже есть, отредактируйте его.</p>
+<pre><code class="language-bash">sudo nano /etc/bind/named.conf.local
+</code></pre>
+<p><strong>Текст для ввода в nano</strong></p>
+<pre><code class="language-text">zone &quot;lab.test&quot; {
     type primary;
     file &quot;/etc/bind/zones/db.lab.test&quot;;
     allow-transfer { none; };
     allow-update { none; };
 };
-
-; /etc/bind/zones/db.lab.test
-$TTL 300
+</code></pre>
+<p>Откройте <code>/etc/bind/zones/db.lab.test</code> в nano, введите настройки ниже и сохраните файл.</p>
+<pre><code class="language-bash">sudo mkdir -p /etc/bind/zones
+sudo chmod 0755 /etc/bind/zones
+sudo nano /etc/bind/zones/db.lab.test
+</code></pre>
+<p><strong>Текст для ввода в nano</strong></p>
+<pre><code class="language-text">$TTL 300
 @ IN SOA dns.lab.test. hostmaster.lab.test. (
     2026102301 3600 600 604800 300 )
 @ IN NS dns.lab.test.
@@ -120,24 +92,21 @@ dns IN A 10.20.2.10
 guide IN A 10.20.1.20
 practice-db IN A 10.20.2.20
 </code></pre>
-<p><strong>Смысл команд и настроек:</strong></p>
-<p>Объявление зоны и её записи сохраняются в разные файлы. Guide дополняется до guide.lab.test; dns.lab.test. с точкой - полное имя. TTL задаёт время кеша, serial SOA - номер версии зоны, а не IP.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Сохраните как два отдельных файла. Запись dns задаёт адрес имени NS. Resolver клиентов пока не меняйте.</p>
+<p><code>guide.lab.test</code> указывает на Web <code>10.20.1.20</code>, а <code>practice-db.lab.test</code> - на DB <code>10.20.2.20</code>.</p>
 <p><strong>Если не получилось:</strong></p>
-<p>Если M2 уже настроен, добавьте две учебные записи, не заменяя zone. Не объявляйте zone дважды.</p>
-<h3>P2.4 Проверить синтаксис и локальный DNS-ответ</h3>
+<p>Если файл зоны уже существует, сохраните его имена и добавьте две учебные записи. При каждом изменении записей увеличивайте серийный номер SOA.</p>
+<h3>P2.4 Запустить BIND и сделать запрос с DNS-сервера</h3>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DNS-сервера: ssm-user</p>
-<p><strong>Цель и действия:</strong></p>
-<p>Переключение клиентов на неисправный DNS нарушит разрешение имён. Сначала добейтесь успешных named-checkconf и named-checkzone, затем проверьте UDP и TCP.</p>
+<p>Проверьте конфигурацию и файл зоны, затем запустите BIND. Команда <code>dig</code> отправляет DNS-запрос и выводит ответ. Адрес <code>127.0.0.1</code> указывает на сам DNS-сервер.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Проверить конфигурацию BIND и подключённые zone.
 sudo named-checkconf -z
 # 2. Проверить zone-файл lab.test.
 sudo named-checkzone lab.test /etc/bind/zones/db.lab.test
-# 3. Запустить named сейчас и включить автозапуск.
-sudo systemctl enable --now named
+# 3. Включить автозапуск named при загрузке ОС.
+sudo systemctl enable named
 # 4. Перезапустить named с обновлённой настройкой.
 sudo systemctl restart named
 # 5. Запросить guide.lab.test по UDP 53 и прочитать ответ.
@@ -145,17 +114,14 @@ dig @127.0.0.1 guide.lab.test A
 # 6. Запросить guide.lab.test по TCP 53 и прочитать ответ.
 dig @127.0.0.1 guide.lab.test A +tcp
 </code></pre>
-<p><strong>Смысл команд и настроек:</strong></p>
-<p>Применяйте настройку после успешной проверки синтаксиса. В dig знак @ задаёт DNS-сервер, A - тип записи IPv4. Проверка с +tcp использует TCP53 и рассматривается отдельно от UDP.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Ожидаются zone loaded/OK, NOERROR, флаг aa и A=10.20.1.20. aa означает авторитетный ответ этой zone.</p>
+<p>Проверка зоны выводит <code>OK</code>. По UDP и TCP ожидаются <code>NOERROR</code> и адрес <code>10.20.1.20</code> для <code>guide.lab.test</code>.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>При ошибке изучите sudo journalctl -u named -n 30 --no-pager, исправьте конфигурацию и проверьте снова.</p>
-<h3>P2.5 Запросить DNS с бастиона и Web</h3>
+<h3>P2.5 Проверить BIND с бастиона и Web-сервера</h3>
 <p><strong>Среда выполнения:</strong></p>
-<p>SSM-терминал бастиона: ssm-user</p>
-<p><strong>Цель и действия:</strong></p>
-<p>Выполните команды и на бастионе, и на Web. @10.20.2.10 задаёт DNS только для данного запроса. Это ещё не доказывает, что браузер и приложение используют его по умолчанию.</p>
+<p>SSM-терминалы бастиона и Web-сервера</p>
+<p>Выполните команды на обоих серверах. <code>@10.20.2.10</code> в <code>dig</code> задаёт DNS только для данного запроса. <code>AXFR</code> запрашивает передачу записей зоны целиком. Проверьте, что передача запрещена.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Запросить guide.lab.test по UDP 53 и прочитать ответ.
 dig @10.20.2.10 guide.lab.test A
@@ -168,18 +134,24 @@ dig @10.20.2.10 aws.amazon.com A
 # 5. Запросить AXFR всей zone и проверить явный отказ.
 dig @10.20.2.10 lab.test AXFR
 </code></pre>
-<p><strong>Смысл команд и настроек:</strong></p>
-<p>Отдельно проверьте существующее внутреннее имя, отсутствующее имя, внешнее имя и перенос зоны. NXDOMAIN - корректный отрицательный ответ, не timeout. AXFR запрашивает всю зону; здесь перенос должен быть запрещён.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Нужные имена дают правильные A; absent-p2 - авторитетный NXDOMAIN; внешнее имя - ответ; AXFR запрещён. Таймаут не считается доказанным отказом.</p>
-<p><strong>Если не получилось:</strong></p>
-<p>При недоступности различайте источник, UDP и TCP 53. Не добавляйте остальные private-узлы в ACL клиентов.</p>
-<h3>P2.6 Переключить системный resolver только на BIND</h3>
+<p><code>guide.lab.test</code> даёт <code>10.20.1.20</code>, <code>practice-db.lab.test</code> - <code>10.20.2.20</code>. Незарегистрированное имя даёт <code>NXDOMAIN</code>, <code>aws.amazon.com</code> возвращает IP, передача зоны отклоняется.</p>
+<h3>P2.6 Задать DNS по умолчанию в Ubuntu</h3>
 <p><strong>Среда выполнения:</strong></p>
-<p>SSM-терминал бастиона: ssm-user</p>
-<p><strong>Цель и действия:</strong></p>
-<p>На бастионе и Web по одному узлу выполните ip -br link, затем networkctl status ИМЯ для определения интерфейса и Network File. Найдите его YAML через ls /etc/netplan и сохраните копию sudo cp -an. Через sudo nano добавьте к тому же интерфейсу dhcp4-overrides/use-dns:false и nameservers. Ниже схема: имя интерфейса и имеющиеся match/set-name/renderer сохраняйте из своего файла.</p>
-<p>Конфигурация или данные: не выполнять как команды</p>
+<p>SSM-терминалы бастиона и Web-сервера</p>
+<p>Настройте бастион и Web-сервер по одному. В Netplan укажите <code>10.20.2.10</code> как DNS, которым Ubuntu пользуется для браузера и приложений.</p>
+<p>Сначала найдите имя сетевого интерфейса и имя файла Netplan.</p>
+<pre><code class="language-bash">ip -br link
+ls /etc/netplan
+</code></pre>
+<p>Подставьте фактические имена вместо <code>ens5</code> и <code>YOUR-NETPLAN-FILE.yaml</code>. Поле <code>Network File</code> команды <code>networkctl status</code> помогает найти нужный файл Netplan.</p>
+<pre><code class="language-bash">networkctl status ens5
+</code></pre>
+<p>Ниже пример правки существующего файла. В блоке своего интерфейса добавьте или исправьте <code>dhcp4-overrides</code> и <code>nameservers</code>. Сохраните имя интерфейса и остальные настройки.</p>
+<pre><code class="language-bash">sudo cp -an /etc/netplan/YOUR-NETPLAN-FILE.yaml /etc/netplan/YOUR-NETPLAN-FILE.yaml.before-p2
+sudo nano /etc/netplan/YOUR-NETPLAN-FILE.yaml
+</code></pre>
+<p><strong>Текст для ввода в nano</strong></p>
 <pre><code class="language-text">network:
   version: 2
   ethernets:
@@ -190,17 +162,14 @@ dig @10.20.2.10 lab.test AXFR
       nameservers:
         addresses: [10.20.2.10]
 </code></pre>
-<p><strong>Смысл команд и настроек:</strong></p>
-<p>Этот Netplan нужен клиентам - бастиону и Web, а не DNS-серверу. Dhcp4 сохраняет получение IP, use-dns: false отключает принятие DNS от DHCP. Адрес DNS в addresses не является адресом самого EC2.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>DHCP сохраняет IP и gateway. Не добавляйте резервный DNS, не заменяйте /etc/resolv.conf и не прописывайте имена задания в /etc/hosts. Оставьте SSM открытым.</p>
+<p>Сохраните получение IP по DHCP и отключите автоматическое получение только DNS. Выровняйте отступы YAML.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Несколько YAML одного интерфейса объединяются. Если resolvectl dns показывает ещё AWS DNS, проверьте все соответствующие YAML и действующую конфигурацию.</p>
-<h3>P2.7 После применения проверить обычный resolver и HTTP</h3>
+<h3>P2.7 Применить DNS и открыть страницу по имени</h3>
 <p><strong>Среда выполнения:</strong></p>
-<p>SSM-терминал бастиона: ssm-user</p>
-<p><strong>Цель и действия:</strong></p>
-<p>На бастионе и Web сначала создайте конфигурацию, затем примените и проверьте. Оставьте второе окно SSH/RDP; при разрыве вернитесь по SSM и сравните с сохранённой копией. Применяйте apply только после проверки файла и успешного generate.</p>
+<p>SSM-терминалы бастиона и Web-сервера</p>
+<p>Примените Netplan. В <code>resolvectl dns</code> проверьте DNS, а через <code>getent</code> - разрешение имён в Ubuntu. Затем получите файл P1 по имени.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Сгенерировать конфигурацию netplan и проверить YAML перед применением.
 sudo netplan generate
@@ -214,35 +183,24 @@ resolvectl dns
 getent ahostsv4 guide.lab.test
 # 6. Получить IPv4 practice-db.lab.test через системный resolver.
 getent ahostsv4 practice-db.lab.test
-# 7. Отправить HTTP к http://guide.lab.test/practice.txt; показать статус, заголовки и тело.
-curl --noproxy '*' -i http://guide.lab.test/practice.txt
+# 7. Отправить HTTP-запрос по адресу http://guide.lab.test/practice.txt.
+curl -i http://guide.lab.test/practice.txt
 </code></pre>
-<p><strong>Смысл команд и настроек:</strong></p>
-<p>Netplan generate формирует конфигурацию, apply применяет её. При разрыве SSM подключитесь к тому же instance. Resolvectl показывает выбранный DNS, getent использует обычный путь ОС; затем проверяется HTTP по имени.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Единственный upstream DNS - 10.20.2.10. getent выдаёт нужные IP, HTTP - 200 и текст P1. 127.0.0.53 - локальный stub; upstream смотрите в resolvectl.</p>
+<p>DNS в <code>resolvectl dns</code> - <code>10.20.2.10</code>. Имена дают <code>10.20.1.20</code> и <code>10.20.2.20</code>. HTTP возвращает <code>200</code> и <code>JDU WEB-02 practice: HTTP response verified.</code></p>
 <p><strong>Если не получилось:</strong></p>
 <p>Если dig успешен, а getent нет, проверяйте resolver клиента. Сохраняйте настройку Firefox с отключённым DoH.</p>
-<h3>P2.8 Сравнить IP и имя в браузере, затем отправить</h3>
+<h3>P2.8 Проверить страницу в браузере бастиона</h3>
 <p><strong>Среда выполнения:</strong></p>
 <p>Firefox на рабочем столе бастиона через RDP</p>
-<p><strong>Цель и действия:</strong></p>
-<p>Откройте Firefox на бастионе через RDP. Сравните http://10.20.1.20/practice.txt и http://guide.lab.test/practice.txt. lab.test разрешается внутренним DNS бастиона, а не DNS школьного PC. Затем выберите P2 в Web Portal на PC и проверьте результат.</p>
-<p><strong>Смысл команд и настроек:</strong></p>
-<p>Firefox на бастионе использует внутреннее имя guide.lab.test. Браузер Windows не настроен на тот же внутренний DNS. Сравните доступ по IP и имени и проверьте тот же файл P1 перед отправкой.</p>
+<p>Подключитесь к бастиону по RDP как в P0. В его Firefox откройте <code>http://10.20.1.20/practice.txt</code>, затем <code>http://guide.lab.test/practice.txt</code>. На своём компьютере запустите проверку P2 на странице оценок.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>13 учебных проверок; текущий P1 тоже должен работать. Перед DB/app добавьте шесть основных имён в M2.</p>
-<p><strong>Если не получилось:</strong></p>
-<p>Не считайте любую ошибку имени остановкой HTTP: сравните IP → dig → getent → HTTP.</p>
-<h2 id="section-6">Пример чтения вывода (не вводить)</h2>
+<p>По обоим адресам видно <code>JDU WEB-02 practice: HTTP response verified.</code> На странице оценок отображаются 13 критериев P2.</p>
+<h2 id="section-3">Пример чтения вывода (не вводить)</h2>
 <pre><code class="language-text">status: NOERROR
 guide.lab.test.  300  IN  A  10.20.1.20
 </code></pre>
 <p>Сокращённый пример dig: после A стоит IPv4, 300 - TTL. Отдельно проверьте, что SERVER запроса - 10.20.2.10.</p>
-<h2 id="section-7">Проверка понимания (без баллов)</h2>
-<p>dig @10.20.2.10 работает, а getent - нет. Обязательно ли ошибка в зоне?</p>
-<p><strong>Объяснение:</strong></p>
-<p>Нет. Явно выбранный DNS и обычный резолвер ОС могут различаться. Проверьте применённые настройки Netplan и resolvectl.</p>
 <hr />
 <p><a href="m1.html">Предыдущее: M1</a> · <a href="m2.html">Следующее: M2</a></p>
 </main></body></html>

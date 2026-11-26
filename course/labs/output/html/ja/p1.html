@@ -74,9 +74,9 @@ nano practice.txt
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 6. practice.txtをWebサーバーの公開ディレクトリへコピーする。
 sudo cp practice.txt /var/www/html/practice.txt
-# 7. コピー先のファイルの所有者とグループをrootに変更する。
+# 7. /var/www/html/practice.txt の所有者とグループを root:root に変更する。
 sudo chown root:root /var/www/html/practice.txt
-# 8. コピー先のファイルの権限を0644に変更する。
+# 8. /var/www/html/practice.txt の権限を 0644 に変更する。
 sudo chmod 0644 /var/www/html/practice.txt
 # 9. 指定ファイルの所有者・グループ・権限・名前を読む。
 stat -c '%U:%G %a %n' /var/www/html/practice.txt

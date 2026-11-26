@@ -165,26 +165,18 @@ def main():
                 svg=ET.parse(image_path.with_suffix('.svg')).getroot()
                 text_count=len(list(svg.iter('{http://www.w3.org/2000/svg}text')))
                 ok(f'{lang}_{task}_editable_svg',svg.attrib['viewBox']=='0 0 1040 680' and text_count>=10)
-                if task in ('P1','M1','M5','M6'):
+                if task in ('P1','P5','P6','M1','M5','M6'):
                     tags=list(svg.iter('{http://www.w3.org/2000/svg}text'))
                     ok(f'{lang}_{task}_internet_aws_boundary',
                        any(t.text=='AWS' for t in tags) and any(t.text=='VPC  10.20.0.0/16' for t in tags)
                        and any(t.text=='IGW' and float(t.attrib['x'])==386 for t in tags)
                        and all(float(t.attrib['x'])>386 for t in tags if t.text=='EC2'))
-                elif number in (1,5,6):
-                    texts=list(svg.iter('{http://www.w3.org/2000/svg}text'))
-                    boundary=440 if number==1 else 325
-                    ok(f'{lang}_{task}_internet_aws_boundary',any(t.text=='AWS / VPC 10.20.0.0/16' for t in texts)
-                        and any(t.text=='IGW' and float(t.attrib['x'])==boundary for t in texts)
-                        and all(float(t.attrib['x'])>boundary for t in texts if t.text=='EC2'))
     ok('41_detailed_steps',sum(len(m['steps']) for m in MODULES)==41)
     for module in MODULES:
         for i,step in enumerate(module['steps'],1):
-            fields = ('why','expect','trouble')
+            fields = ('why','expect')
             if module['id']=='P0' and i in (1,2):
                 fields = ('why',) if i==1 else ('why','expect')
-            if module['id']=='P1' and i==5:
-                fields = ('why','expect')
             ok(f'{module["id"]}.{i}_step_fields',all(all(step[field].values()) for field in fields))
     for info,source in code['ja','practice']+code['ja','missions']:
         if info=='bash':

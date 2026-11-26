@@ -13,63 +13,19 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения (порядок действий)</a> · <a href="#section-6">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P6 Минимальные права и границы публикации</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Схема задания</a> · <a href="#section-2">Пример решения (порядок действий)</a></nav></header><main id="content" tabindex="-1"><h1>P6 Минимальные права и границы публикации</h1>
 <p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M5</a></p>
 <p><a href="../ja/p6.html">日本語</a> · <a href="../ru/p6.html">Русский</a> · <a href="../uz/p6.html">O‘zbekcha</a></p>
 <p>Связанное задание: <a href="m5.html">M5</a>.</p>
-<h2 id="section-1">Что изучаем</h2>
-<p>Сохранить штатную работу, запретив лишние admin-маршруты, SQL-права и раскрытие секретов.</p>
-<h2 id="section-2">Задание</h2>
-<p>Используйте practice из P5. Отключите setup-role, уберите временную конфигурацию и проверьте отказы при наличии успешного контрольного login. Не расширяйте SG/IAM.</p>
-<h2 id="section-3">Схема задания</h2>
-<p><img src="../../../assets/ru/p6.png" alt="P6: Приложение уже работает → Убрать лишние права и доступ → Разрешённое работает, лишнее нет。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. 8000 доступен только внутри Web; 8080 используется для управления с бастиона. Слева Интернет, справа VPC в AWS. IGW стоит на границе VPC; все EC2, включая бастион, находятся в AWS." width="1040" height="680" loading="lazy"></p>
-<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. 8000 доступен только внутри Web; 8080 используется для управления с бастиона. Слева Интернет, справа VPC в AWS. IGW стоит на границе VPC; все EC2, включая бастион, находятся в AWS.</p>
-<ul>
-<li>Profile: practice</li>
-<li>Database: jdu_catalog_practice</li>
-<li>Setup role: catalog_practice_setup</li>
-<li>Runtime role: catalog_practice_app</li>
-<li>Application administrator: practice_admin</li>
-</ul>
-<table>
-<thead>
-<tr>
-<th scope="col">code</th>
-<th scope="col">name</th>
-<th scope="col">quantity</th>
-<th scope="col">location</th>
-<th scope="col">is_public</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>P5-PUBLIC-001</td>
-<td>Practice keyboard</td>
-<td>4</td>
-<td>Training shelf A</td>
-<td>true</td>
-</tr>
-<tr>
-<td>P5-PRIVATE-001</td>
-<td>Practice mouse</td>
-<td>2</td>
-<td>Training shelf B</td>
-<td>false</td>
-</tr>
-</tbody>
-</table>
-<h2 id="section-4">Как это работает</h2>
-<p><strong>Состояние перед началом:</strong></p>
-<p>Учебное приложение P5 работает; временный setup-доступ ещё существует.</p>
 <p><strong>Что сделать в Practice6</strong></p>
-<p>Setup завершён; нормальная работа и отказы ненужного доступа проверены вместе.</p>
-<p>Разделите временные права setup и рабочие права runtime. После NOLOGIN и удаления временной настройки приложение должно работать через runtime. Публичный 80, административный 8080 и локальный 8000 - разные границы. Проверяйте успешную разрешённую операцию вместе с отказом конкретного ненужного доступа.</p>
-<h2 id="section-5">Пример решения (порядок действий)</h2>
-<h3>P6.1 Прочитать роли и права таблиц</h3>
+<p>Отключите вход роли настройки БД. Проверьте работу приложения с обычными правами и закрытие админки и настроек с публичного входа.</p>
+<h2 id="section-1">Схема задания</h2>
+<p><img src="../../../assets/ru/p6.png" alt="Ограничения публичного и административного входов и доступа от Web к DB." width="1040" height="680" loading="lazy"></p>
+<h2 id="section-2">Пример решения (порядок действий)</h2>
+<h3>P6.1 Посмотреть, что приложение может делать в БД</h3>
 <p><strong>Среда выполнения:</strong></p>
-<p>psql на DB-сервере от имени системного postgres</p>
-<p><strong>Цель и действия:</strong></p>
-<p>Откройте psql как postgres на DB. \dp показывает права таблиц, \du - атрибуты ролей. Сверьте с SQL03: UPDATE auth_user только last_login/password, без DELETE catalog_item; lookup только чтение, django_migrations без прав. Не вызывайте nextval/setval ради проверки.</p>
+<p>SSM-терминал DB-сервера: ssm-user</p>
+<p>Откройте <code>psql</code> в терминале DB. <code>\du</code> показывает атрибуты учебных ролей, <code>\dp</code> - права по таблицам.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. В терминале DB открыть psql от postgres; следующие действия внутри psql.
 sudo -u postgres psql -X -d jdu_catalog_practice
@@ -82,17 +38,12 @@ sudo -u postgres psql -X -d jdu_catalog_practice
 -- 4. Выйти из psql в терминал ОС того же DB-сервера.
 \q
 </code></pre>
-<p><strong>Смысл команд и настроек:</strong></p>
-<p>\du показывает атрибуты ролей БД, \dp - права объектов. Это не файловые права ls -l. Сравните setup и runtime и объясните, почему рабочей роли не нужны права изменения структуры.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Runtime не владелец и не superuser. DELETE для Django session нужен, но не означает право удаления оборудования.</p>
-<p><strong>Если не получилось:</strong></p>
-<p>При лишних правах пересмотрите SQL03 с сохранением guard. Не пробуйте отказ удалением реальных строк.</p>
-<h3>P6.2 Отключить вход setup-роли</h3>
+<p>У <code>catalog_practice_app</code> есть чтение, добавление и изменение оборудования. Удаление оборудования не разрешено.</p>
+<h3>P6.2 Запретить вход роли, созданной для настройки</h3>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
-<p><strong>Цель и действия:</strong></p>
-<p>После инициализации вход setup не нужен. SQL04 задаёт NOLOGIN/password NULL и закрывает оставшиеся setup-подключения profile. Владельцем DB/table остаётся setup; роль не удаляется и владение app не передаётся.</p>
+<p>Если оставить вход для <code>catalog_practice_setup</code>, утечка его пароля даёт повышенные права. Просмотрите SQL, найдите <code>NOLOGIN</code> и примените его через <code>psql</code>.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Перейти в рабочий каталог /var/lib/jdu-web/lesson-resources-r1/app.
 cd /var/lib/jdu-web/lesson-resources-r1/app
@@ -102,17 +53,12 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql
 python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u postgres \
   psql -X -v ON_ERROR_STOP=1 -d jdu_catalog_practice
 </code></pre>
-<p><strong>Смысл команд и настроек:</strong></p>
-<p>NOLOGIN запрещает новые прямые входы setup-роли, но не удаляет БД и таблицы. Runtime остаётся. Перед применением проверьте SQL профиля practice, затем подтвердите работу обычного приложения.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>ALTER ROLE успешен, работа catalog_practice_app сохраняется.</p>
-<p><strong>Если не получилось:</strong></p>
-<p>Не включайте setup обратно для обычной работы. M4 инициализируется отдельной setup-role mission.</p>
-<h3>P6.3 Убрать временные настройки и заново выбрать runtime</h3>
+<p>Появляется <code>ALTER ROLE</code>. Вход <code>catalog_practice_setup</code> отключён, а приложение продолжает подключаться как <code>catalog_practice_app</code>.</p>
+<h3>P6.3 Убрать временные файлы настройки на Web</h3>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
-<p><strong>Цель и действия:</strong></p>
-<p>На Web проверьте только metadata. Удалите ровно два файла setup practice. app.env, practice.app.env, DB runtime, command-state, SSH-ключи и данные оценивания сохраняются. Затем остановите приложение, явно выберите существующий профиль practice и запустите приложение. Тот же порядок пригодится в M4 при выборе mission.</p>
+<p>Удалите два временных файла настройки. Остановите приложение, выберите профиль <code>practice</code> из P5 и запустите приложение. Проверьте, что пользователь ОС <code>catalog</code> не может записывать в каталог кода.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Прочитать владельца, группу, права и имя указанных файлов.
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
@@ -132,49 +78,37 @@ sudo python3 -B /opt/jdu-catalog/app/configuration.py check --phase runtime
 sudo systemctl start jdu-catalog
 # 8. Прочитать текущее состояние jdu-catalog.
 systemctl is-active jdu-catalog
+# 9. Найти файлы и каталоги приложения, доступные на запись пользователю catalog.
+sudo -u catalog find /opt/jdu-catalog/app -writable -print
 </code></pre>
-<p><strong>Смысл команд и настроек:</strong></p>
-<p>Setup.env и practice.setup.env временные; app.env и runtime-настройка DB нужны для работы. Rm относится только к двум указанным файлам. Activate выбирает сохранённый профиль для следующего запуска. Смена недоступна при работающем приложении или оставшихся временных настройках setup.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Файлы runtime имеют root:root 600. Ожидаются CATALOG_PROFILE_ACTIVATED=practice, успешная проверка и статус active. В следующем шаге проверьте записи учебной БД в списке.</p>
+<p>Появляются <code>CATALOG_PROFILE_ACTIVATED=practice</code> и <code>VALID</code>, приложение переходит в <code>active</code>. У рабочих файлов указано <code>root:root 600</code>. Последняя команда <code>find</code> ничего не выводит.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Если активен другой профиль, остановитесь. Не повторяйте удаление отсутствующих файлов. При ошибке остановки, выбора профиля или проверки выясните причину до запуска приложения.</p>
-<h3>P6.4 Проверить запрет admin и секретов на публичном 80</h3>
+<h3>P6.4 Проверить, что видно через публичный порт 80</h3>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал бастиона: ssm-user</p>
-<p><strong>Цель и действия:</strong></p>
-<p>В SSM бастиона запросите обычный список на 80, затем /admin/ и env. Отдельно подтвердите штатный admin на 8080 в Firefox через RDP. Нужны нормальный ответ и явный отказ 404/403; таймаута недостаточно.</p>
+<p>Из терминала бастиона отправьте запросы на порт 80 Web. Проверьте доступ к списку и отсутствие публичного доступа к админке и внутренним настройкам. Админку откройте на бастионе через RDP в Firefox по <code>http://admin.lab.test:8080/admin/</code>.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Отправить HTTP к http://web.lab.test/; показать статус, заголовки и тело.
-curl --noproxy '*' -i http://web.lab.test/
+curl -i http://web.lab.test/
 # 2. Отправить HTTP к http://web.lab.test/admin/; показать статус, заголовки и тело.
-curl --noproxy '*' -i http://web.lab.test/admin/
+curl -i http://web.lab.test/admin/
 # 3. Отправить HTTP к http://web.lab.test/app.env; показать статус, заголовки и тело.
-curl --noproxy '*' -i http://web.lab.test/app.env
+curl -i http://web.lab.test/app.env
 # 4. Отправить HTTP к http://web.lab.test/static/app.env; показать статус, заголовки и тело.
-curl --noproxy '*' -i http://web.lab.test/static/app.env
+curl -i http://web.lab.test/static/app.env
 </code></pre>
-<p><strong>Смысл команд и настроек:</strong></p>
-<p>Этот curl с бастиона проверяет поведение публичного порта 80. Путь / должен работать; /admin/ и секретные пути не должны раскрывать данные. Один сбой соединения не отличает правильный запрет от остановки службы.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Список - 200; admin/env отклоняются без секретов. Публичный Nginx перезаписывает X-JDU-Entry и не допускает подмену входа.</p>
+<p>Список возвращает HTTP <code>200</code>, адреса <code>/admin/</code> и файлов настроек - <code>403</code> или <code>404</code>. На 8080 видна форма входа в админку.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Если виден текст env, не распространяйте его: сообщите преподавателю и исправьте публикацию.</p>
-<h3>P6.5 Отправить успешный вход и отказы в одной проверке</h3>
+<h3>P6.5 Проверить ограничения доступа на странице оценок</h3>
 <p><strong>Среда выполнения:</strong></p>
 <p>Браузер на своём PC: Web Portal</p>
-<p><strong>Цель и действия:</strong></p>
-<p>В Web Portal выберите P6, функциональную проверку с правами и скрыто введите существующий пароль practice_admin. Успешный login служит контролем: анонимные операции и неверный пароль должны отклоняться без изменения БД. Один CSRF-403 не доказывает авторизацию. Staff имеет только view/add/change оборудования, без delete и управления пользователями.</p>
-<p><strong>Смысл команд и настроек:</strong></p>
-<p>Проверьте разрешённое управление вместе с отказами неверного пароля, setup и ненужных путей. Одних отказов недостаточно. Переходите к mission после P6; checker сам профиль назад не переключает.</p>
+<p>Откройте P6 на странице оценок и выберите проверку функций и прав. Введите пароль <code>practice_admin</code> и запустите её. Проверка сравнит успешный вход и отказ добавить или изменить оборудование без входа.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Прочитайте 16 учебных пунктов и статус сохранения. M5 проверяется отдельно в mission. Сохранённые оценки M доступны в разделе оценок.</p>
-<p><strong>Если не получилось:</strong></p>
-<p>Во время обработки обновляйте результат. Устраните причину UNKNOWN и проверьте заново. Не редактируйте grade-файлы ради баллов.</p>
-<h2 id="section-6">Проверка понимания (без баллов)</h2>
-<p>После закрытия setup приложение перестало работать. Нужно ли просто снова открыть setup?</p>
-<p><strong>Объяснение:</strong></p>
-<p>Нет. Проверьте runtime-настройку, роль и необходимые права таблиц; обычная работа должна обходиться без setup.</p>
+<p>Появляются результаты 16 критериев P6.</p>
 <hr />
 <p><a href="p5.html">Предыдущее: P5</a> · <a href="m4.html">Следующее: M4</a></p>
 </main></body></html>

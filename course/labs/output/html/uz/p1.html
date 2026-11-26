@@ -74,9 +74,9 @@ nano practice.txt
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 6. practice.txt faylini Web serverning ochiq katalogiga nusxalash.
 sudo cp practice.txt /var/www/html/practice.txt
-# 7. Nusxalangan fayl egasi va guruhini root ga o‘zgartirish.
+# 7. /var/www/html/practice.txt egasi va guruhini root:root ga o‘zgartirish.
 sudo chown root:root /var/www/html/practice.txt
-# 8. Nusxalangan faylga 0644 ruxsatlarini berish.
+# 8. /var/www/html/practice.txt huquqlarini 0644 ga o‘zgartirish.
 sudo chmod 0644 /var/www/html/practice.txt
 # 9. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
 stat -c '%U:%G %a %n' /var/www/html/practice.txt

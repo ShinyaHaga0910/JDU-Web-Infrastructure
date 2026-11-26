@@ -13,69 +13,39 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">今回の見取り図</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">解答例（操作手順）</a> · <a href="#section-6">出力の読み取り例（入力しない）</a> · <a href="#section-7">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P2 内部DNSと通常の名前解決</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">今回の見取り図</a> · <a href="#section-2">解答例（操作手順）</a> · <a href="#section-3">出力の読み取り例（入力しない）</a></nav></header><main id="content" tabindex="-1"><h1>P2 内部DNSと通常の名前解決</h1>
 <p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M5</a></p>
 <p><a href="../ja/p2.html">日本語</a> · <a href="../ru/p2.html">Русский</a> · <a href="../uz/p2.html">O‘zbekcha</a></p>
 <p>対応する自力課題は<a href="m2.html">M2</a>。</p>
-<h2 id="section-1">学ぶこと</h2>
-<p>BINDのzone・A record・問い合わせ制限と、client側resolverを順に構築する。</p>
-<h2 id="section-2">課題</h2>
-<p>guide.lab.test→10.20.1.20、practice-db.lab.test→10.20.2.20を設定する。P1のHTTPを名前で利用する。基盤の固定IPは変えない。</p>
-<h2 id="section-3">今回の見取り図</h2>
-<p><img src="../../../assets/ja/p2.png" alt="P2: IP指定のHTTPが使える → DNSとresolverを設定する → 名前でも同じWebへ届く。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。" width="1040" height="680" loading="lazy"></p>
-<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。</p>
-<table>
-<thead>
-<tr>
-<th scope="col">DNS name</th>
-<th scope="col">A / IPv4</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>guide.lab.test</td>
-<td>10.20.1.20</td>
-</tr>
-<tr>
-<td>practice-db.lab.test</td>
-<td>10.20.2.20</td>
-</tr>
-</tbody>
-</table>
-<h2 id="section-4">仕組みを理解する</h2>
-<p><strong>始める前の状態:</strong></p>
-<p>P1のHTTPがIP指定で使える。DNSはこれから設定する。</p>
 <p><strong>このPractice2で作業すること</strong></p>
-<p>BINDの練習名を、踏み台とWebの通常resolverから使える。</p>
-<p>DNSの仕事は名前への回答で、HTTP本文の配信ではない。lab.testのzoneはBINDが管理し、A recordはIPv4を返す。digで問い合わせ先を明示した確認と、getentやbrowserがOSの設定を使う確認を分ける。名前解決後のHTTP接続は別の通信である。<a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BINDの一次資料</a>。</p>
-<h2 id="section-5">解答例（操作手順）</h2>
-<h3>P2.1 BINDを導入し元設定を残す</h3>
+<p>内部DNSにWeb・DBサーバーの名前を登録する。踏み台サーバーとWebサーバーがこのDNSを使うように設定し、P1のファイルを名前で開く。</p>
+<h2 id="section-1">今回の見取り図</h2>
+<p><img src="../../../assets/ja/p2.png" alt="踏み台とWebから内部DNSへ問い合わせる。内部DNSは外部名をAWSのDNSへ転送する。" width="1040" height="680" loading="lazy"></p>
+<h2 id="section-2">解答例（操作手順）</h2>
+<h3>P2.1 配布サーバーからBINDをインストールする</h3>
 <p><strong>実行環境:</strong></p>
 <p>DNSサーバーのSSM端末：ssm-user</p>
-<p><strong>目的と操作:</strong></p>
-<p>DNSへSSMで入りrole=dnsを確認。cp -aは元fileの属性を保って控えを作る。-nは既存の控えを上書きしない。これは編集失敗への控えであり、DB backup/restore課題ではない。</p>
+<p>DNSサーバーで配布サーバーのパッケージ一覧を更新し、BINDと設定を確認するためのツールをインストールする。続けて、編集する設定ファイル2つの控えを作る。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
-<pre><code class="language-bash"># 1. 内部repoのパッケージ一覧を更新する。取得エラーは失敗扱いにする。
-sudo apt-get update -o APT::Update::Error-Mode=any
-# 2. 内部repoから bind9 bind9-utils を推奨追加なしで導入する。
+<pre><code class="language-bash"># 1. 配布サーバーのパッケージ一覧を更新する。
+sudo apt-get update
+# 2. 配布サーバーから bind9 bind9-utils と、動作に必要なパッケージをインストールする。
 sudo apt-get install --no-install-recommends bind9 bind9-utils
 # 3. 元ファイルを控えへコピーする。既存の控えは上書きしない。
 sudo cp -an /etc/bind/named.conf.options /etc/bind/named.conf.options.before-p2
 # 4. 元ファイルを控えへコピーする。既存の控えは上書きしない。
 sudo cp -an /etc/bind/named.conf.local /etc/bind/named.conf.local.before-p2
 </code></pre>
-<p><strong>コマンド・設定値の意味:</strong></p>
-<p>namedはBINDのservice名、named-checkconf等は設定を検査する道具である。cp -anの-nは同名の控えを上書きしない指定なので、再実行して最初の控えを失うことを防ぐ。</p>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>内部repoから導入される。後のM2では同じDNSにrecordを追加し、P2のrecordを消さない。</p>
-<p><strong>うまくいかないとき:</strong></p>
-<p>別Labのnamed.conf全体を流用しない。既に自分のzoneがある場合は内容を読んでから編集する。</p>
-<h3>P2.2 問い合わせ元とforwarderを設定する</h3>
+<p><code>bind9</code> と <code>bind9-utils</code> がインストールされ、2つの <code>.before-p2</code> ファイルができる。</p>
+<h3>P2.2 問い合わせを受け付けるサーバーを設定する</h3>
 <p><strong>実行環境:</strong></p>
 <p>DNSサーバーのSSM端末：ssm-user</p>
-<p><strong>目的と操作:</strong></p>
-<p>sudo nano /etc/bind/named.conf.optionsで次の内容を設定し保存する。aclは許可するclient集合、listen-onはDNS自身の待受、forward onlyは外部名をAWS DNSへ渡す指定。recursionとqueryの両方を同じ3送信元へ限定する。dnssec-validation noは閉じた学習用forward構成に合わせた設定である。</p>
-<p>設定・入力データ（端末で実行するコマンドではない）</p>
+<p>問い合わせを受け付けるのは、DNSサーバー自身、踏み台サーバー、Webサーバーの3台。演習の外の名前はAWSのDNS（<code>10.20.0.2</code>）に問い合わせる。</p>
+<p>ファイルの内容を下の設定に置き換えて保存する。検索するときはnanoの Ctrl+W、保存するときは Ctrl+O、Enter、終了は Ctrl+X を使う。</p>
+<pre><code class="language-bash">sudo nano /etc/bind/named.conf.options
+</code></pre>
+<p><strong>nanoに入力する内容</strong></p>
 <pre><code class="language-text">acl &quot;jdu_clients&quot; { 127.0.0.1; 10.20.1.10; 10.20.1.20; };
 options {
     directory &quot;/var/cache/bind&quot;;
@@ -91,28 +61,30 @@ options {
     allow-transfer { none; };
 };
 </code></pre>
-<p><strong>コマンド・設定値の意味:</strong></p>
-<p>allow-queryは問い合わせを受ける相手、allow-recursionは外部名の再帰処理を認める相手を指定する。lab.testの回答は自分のzone、外部名はforwarderへ渡す。ここでは接続元を踏み台・Web・localhostへ限定する。</p>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>これは設定fileの内容で、shellへ直接実行しない。10.20.0.2はAWS resolver、10.20.2.10は自分のBIND。</p>
-<p><strong>うまくいかないとき:</strong></p>
-<p>セミコロン・波括弧も構文。0.0.0.0/0やanyで許可を広げない。</p>
-<h3>P2.3 zoneを登録しA recordを書く</h3>
+<p><code>listen-on</code> にDNSサーバー自身の内部IP <code>10.20.2.10</code>、<code>forwarders</code> にAWSのDNS <code>10.20.0.2</code> が入る。</p>
+<h3>P2.3 名前とIPv4アドレスを登録する</h3>
 <p><strong>実行環境:</strong></p>
 <p>DNSサーバーのSSM端末：ssm-user</p>
-<p><strong>目的と操作:</strong></p>
-<p>sudo nano /etc/bind/named.conf.localで先頭のzoneブロックを記入。sudo install -d -m 0755 /etc/bind/zonesの後、sudo nano /etc/bind/zones/db.lab.testで残りを記入する。SOAは管理情報、NSは権威DNS、Aは名前とIPv4。末尾のドットは絶対名を示す。serialは編集のたびに増やす。</p>
-<p>設定・入力データ（端末で実行するコマンドではない）</p>
-<pre><code class="language-text">// /etc/bind/named.conf.local
-zone &quot;lab.test&quot; {
+<p><code>named.conf.local</code> で、<code>lab.test</code> のゾーンファイルがどこにあるかをBINDに指定する。<code>db.lab.test</code> に、一つの名前とIPv4アドレスを一組にしてAレコードを書く。</p>
+<p>既存の <code>named.conf.local</code> の末尾に次のブロックを追加する。<code>lab.test</code> のブロックが既にあれば、そのブロックを編集する。</p>
+<pre><code class="language-bash">sudo nano /etc/bind/named.conf.local
+</code></pre>
+<p><strong>nanoに入力する内容</strong></p>
+<pre><code class="language-text">zone &quot;lab.test&quot; {
     type primary;
     file &quot;/etc/bind/zones/db.lab.test&quot;;
     allow-transfer { none; };
     allow-update { none; };
 };
-
-; /etc/bind/zones/db.lab.test
-$TTL 300
+</code></pre>
+<p>nanoで <code>/etc/bind/zones/db.lab.test</code> を開き、下の設定を入力して保存する。</p>
+<pre><code class="language-bash">sudo mkdir -p /etc/bind/zones
+sudo chmod 0755 /etc/bind/zones
+sudo nano /etc/bind/zones/db.lab.test
+</code></pre>
+<p><strong>nanoに入力する内容</strong></p>
+<pre><code class="language-text">$TTL 300
 @ IN SOA dns.lab.test. hostmaster.lab.test. (
     2026102301 3600 600 604800 300 )
 @ IN NS dns.lab.test.
@@ -120,24 +92,21 @@ dns IN A 10.20.2.10
 guide IN A 10.20.1.20
 practice-db IN A 10.20.2.20
 </code></pre>
-<p><strong>コマンド・設定値の意味:</strong></p>
-<p>zone宣言とzone本文は別ファイルへ保存する。guideはzone名を補ってguide.lab.testとなり、末尾ドット付きのdns.lab.test.は完全な名前。TTLはcache時間、SOAのserialはzone更新を識別する番号で、IPアドレスではない。</p>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>二つの別fileへ分けて保存する。dnsのAはNS名の到達先。まだclientのresolverは変更しない。</p>
+<p><code>guide.lab.test</code> はWebサーバーの <code>10.20.1.20</code>、<code>practice-db.lab.test</code> はDBサーバーの <code>10.20.2.20</code> に対応する。</p>
 <p><strong>うまくいかないとき:</strong></p>
-<p>既存M2がある場合はzoneを置換せず、この練習2件を追加する。zone定義を二重登録しない。</p>
-<h3>P2.4 構文を検査してDNS自身から確認する</h3>
+<p>すでにゾーンファイルがある場合は、既存の名前を残して練習用の2件を追加する。レコードを変更するたびに、SOAのシリアル番号を現在の値より増やす。</p>
+<h3>P2.4 BINDを起動してDNSサーバー自身から問い合わせる</h3>
 <p><strong>実行環境:</strong></p>
 <p>DNSサーバーのSSM端末：ssm-user</p>
-<p><strong>目的と操作:</strong></p>
-<p>設定誤りのままclientを切り替えると名前解決が止まる。先にnamed-checkconfとnamed-checkzoneを成功させ、起動後にUDP/TCPの両方で応答を見る。</p>
+<p>設定とゾーンファイルにエラーがないことを確かめてからBINDを起動する。<code>dig</code> はDNSに問い合わせてレスポンスを表示するコマンド。ここでは自分自身を指す <code>127.0.0.1</code> を問い合わせ先にする。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. BINDの設定と参照zoneを構文検査する。
 sudo named-checkconf -z
 # 2. lab.testのzoneファイルを検査する。
 sudo named-checkzone lab.test /etc/bind/zones/db.lab.test
-# 3. named を今すぐ起動し、次回起動時も自動起動させる。
-sudo systemctl enable --now named
+# 3. named を次回のOS起動時に自動起動させる。
+sudo systemctl enable named
 # 4. named を再起動して設定を読み直す。
 sudo systemctl restart named
 # 5. UDP 53で guide.lab.test を問い合わせ、応答を読む。
@@ -145,17 +114,14 @@ dig @127.0.0.1 guide.lab.test A
 # 6. TCP 53で guide.lab.test を問い合わせ、応答を読む。
 dig @127.0.0.1 guide.lab.test A +tcp
 </code></pre>
-<p><strong>コマンド・設定値の意味:</strong></p>
-<p>構文検査が成功してからserviceへ反映する。digの@は問い合わせ先DNSを指定する記号、AはIPv4のrecord種別。+tcpを付けた確認ではTCP53を使い、UDPで成功した場合とは別に読む。</p>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>zone loaded/OK、status NOERROR、flagsにaa、A=10.20.1.20。aaはこのzoneの権威応答。</p>
+<p>ゾーンファイルの検査で <code>OK</code> が表示される。UDPとTCPのどちらでも <code>NOERROR</code> が返り、<code>guide.lab.test</code> のIPは <code>10.20.1.20</code> になる。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>失敗ならsudo journalctl -u named -n 30 --no-pagerで対象行を調べ、設定を直して再検査する。</p>
-<h3>P2.5 踏み台とWebからDNSを指定して問い合わせる</h3>
+<h3>P2.5 踏み台サーバーとWebサーバーからBINDを試す</h3>
 <p><strong>実行環境:</strong></p>
-<p>踏み台のSSM端末：ssm-user</p>
-<p><strong>目的と操作:</strong></p>
-<p>踏み台とWebの両方で下を実行する。@10.20.2.10は今回だけ問い合わせ先を指定する。この成功だけでは、普通のbrowserやアプリが同じDNSを使うとは言えない。</p>
+<p>踏み台サーバーとWebサーバーのSSM端末</p>
+<p>両方のサーバーで実行する。<code>dig</code> の <code>@10.20.2.10</code> は、その1回の問い合わせ先を指定する。<code>AXFR</code> はゾーンのレコードをまとめて転送するための指定で、この演習では拒否されることを確かめる。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. UDP 53で guide.lab.test を問い合わせ、応答を読む。
 dig @10.20.2.10 guide.lab.test A
@@ -168,18 +134,24 @@ dig @10.20.2.10 aws.amazon.com A
 # 5. zone全件の転送を要求し、明示的に拒否されるか調べる。
 dig @10.20.2.10 lab.test AXFR
 </code></pre>
-<p><strong>コマンド・設定値の意味:</strong></p>
-<p>存在する内部名・存在しない内部名・外部名・zone転送を別々に試す。存在しない名のNXDOMAINは正しい否定回答で、DNSへ届かないtimeoutとは異なる。AXFRはzone一括転送の要求で、このLabでは拒否されることを確かめる。</p>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>必要名は正しいA、absent-p2は権威NXDOMAIN、外部名は回答、AXFRは転送拒否。timeoutは意図した拒否成功としない。</p>
-<p><strong>うまくいかないとき:</strong></p>
-<p>DNSへ届かない場合は送信元とport53のUDP/TCPを区別して調べる。DNS以外のprivate台を問い合わせclientに追加しない。</p>
-<h3>P2.6 通常resolverをBINDだけへ向ける</h3>
+<p><code>guide.lab.test</code> は <code>10.20.1.20</code>、<code>practice-db.lab.test</code> は <code>10.20.2.20</code>。未登録の名前は <code>NXDOMAIN</code>、外部名 <code>aws.amazon.com</code> にはIPアドレスが返り、ゾーン転送は拒否される。</p>
+<h3>P2.6 Ubuntu OSが普段使うDNSを設定する</h3>
 <p><strong>実行環境:</strong></p>
-<p>踏み台のSSM端末：ssm-user</p>
-<p><strong>目的と操作:</strong></p>
-<p>踏み台とWebで1台ずつ実施。ip -br linkでens5等の実interface名を調べ、networkctl status その名前でNetwork Fileを読む。対応するnetplan YAMLをls /etc/netplanで探し、sudo cp -anで控えを作る。sudo nanoで既存の同じinterfaceにdhcp4-overrides/use-dns:falseとnameserversを追加する。下はファイルの構造例であり、interface名と既存match/set-name/renderer等を自分のファイルに合わせて保持する。</p>
-<p>設定・入力データ（端末で実行するコマンドではない）</p>
+<p>踏み台サーバーとWebサーバーのSSM端末</p>
+<p>踏み台サーバーとWebサーバーを1台ずつ設定する。ブラウザやアプリが名前を調べるときに使うDNSを、Ubuntu OSのNetplanで <code>10.20.2.10</code> に指定する。</p>
+<p>まずネットワークインターフェース名とNetplanのファイル名を調べる。</p>
+<pre><code class="language-bash">ip -br link
+ls /etc/netplan
+</code></pre>
+<p>例の <code>ens5</code> と <code>YOUR-NETPLAN-FILE.yaml</code> を実際の名前に置き換える。<code>networkctl status</code> の <code>Network File</code> に表示される名前も、対応するNetplanのファイルを見つける手掛かりになる。</p>
+<pre><code class="language-bash">networkctl status ens5
+</code></pre>
+<p>下は既存ファイルを編集するための例。自分のファイルのインターフェースの下に <code>dhcp4-overrides</code> と <code>nameservers</code> を追加または修正する。すでにあるインターフェース名とその他の設定は残す。</p>
+<pre><code class="language-bash">sudo cp -an /etc/netplan/YOUR-NETPLAN-FILE.yaml /etc/netplan/YOUR-NETPLAN-FILE.yaml.before-p2
+sudo nano /etc/netplan/YOUR-NETPLAN-FILE.yaml
+</code></pre>
+<p><strong>nanoに入力する内容</strong></p>
 <pre><code class="language-text">network:
   version: 2
   ethernets:
@@ -190,17 +162,14 @@ dig @10.20.2.10 lab.test AXFR
       nameservers:
         addresses: [10.20.2.10]
 </code></pre>
-<p><strong>コマンド・設定値の意味:</strong></p>
-<p>このNetplan設定はDNSサーバー側ではなく、名前を使う踏み台とWebへ入れる。dhcp4はIPの取得を継続し、use-dns: falseはDHCPからのDNS採用を止める。addressesの名前解決先と、EC2自身のIPを混同しない。</p>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>IP/gatewayを手書きせずDHCPを保持。別DNSをfallbackに加えない。/etc/resolv.confを直接置換せず、/etc/hostsへ課題名を書かない。次の手順まで同じSSM端末を開いたままにする。</p>
+<p>DHCPでIPアドレスを受け取る設定を残し、DNSに限って自動取得を止める。YAMLのインデントをそろえて保存する。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>同じinterfaceが複数YAMLにあると値がmergeされる。resolvectl dnsにAWS DNSが残る場合は、対応する全YAMLとruntimeの設定を確認する。</p>
-<h3>P2.7 適用後に通常名前解決とHTTPを見る</h3>
+<h3>P2.7 DNSの設定を反映して名前でページを開く</h3>
 <p><strong>実行環境:</strong></p>
-<p>踏み台のSSM端末：ssm-user</p>
-<p><strong>目的と操作:</strong></p>
-<p>踏み台とWebで構文生成→適用→確認の順に行う。SSH/RDPの別端末も開いておき、もし切断したらSSMで戻って控えとの差分を確認する。netplan tryの確認待ちは使わず、設定を読んでgenerate成功後にapplyする。</p>
+<p>踏み台サーバーとWebサーバーのSSM端末</p>
+<p>Netplanの設定を反映する。<code>resolvectl dns</code> で実際に使うDNSサーバーを確かめ、<code>getent</code> でUbuntu OSが名前をどう解決するかを見る。その名前を使ってP1のファイルを取得する。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. netplan YAMLから設定を生成し、適用前の構文を検査する。
 sudo netplan generate
@@ -214,35 +183,24 @@ resolvectl dns
 getent ahostsv4 guide.lab.test
 # 6. 通常のresolverで practice-db.lab.test のIPv4を調べる。
 getent ahostsv4 practice-db.lab.test
-# 7. http://guide.lab.test/practice.txt へHTTP要求し、status・header・本文を表示する。
-curl --noproxy '*' -i http://guide.lab.test/practice.txt
+# 7. http://guide.lab.test/practice.txt へHTTPリクエストを送る。
+curl -i http://guide.lab.test/practice.txt
 </code></pre>
-<p><strong>コマンド・設定値の意味:</strong></p>
-<p>netplan generateは設定の生成、applyは適用である。設定変更でSSMが切れた場合は同じinstanceへ接続し直す。resolvectlは選ばれたDNS、getentはOSの通常経路を読み、最後に名前指定のHTTPも確かめる。</p>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>実DNSの集合は10.20.2.10だけ。getentは期待IP、HTTPは200/練習本文。127.0.0.53はローカルstubであり、上流はresolvectlで確認する。</p>
+<p><code>resolvectl dns</code> のDNSは <code>10.20.2.10</code>。名前はそれぞれ <code>10.20.1.20</code> と <code>10.20.2.20</code> になり、HTTP <code>200</code> と <code>JDU WEB-02 practice: HTTP response verified.</code> が返る。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>dig成功/getent失敗ならclient resolverを調べる。FirefoxはDoH無効の教師設定を維持する。</p>
-<h3>P2.8 browserでIPと名前を比較して提出する</h3>
+<h3>P2.8 踏み台サーバーのブラウザで表示を確かめる</h3>
 <p><strong>実行環境:</strong></p>
 <p>RDP内のFirefox（踏み台）</p>
-<p><strong>目的と操作:</strong></p>
-<p>RDPで踏み台へ入りFirefoxを開く。http://10.20.1.20/practice.txt と http://guide.lab.test/practice.txt が同じ本文になることを確認する。lab.testは学校PCの通常DNSではなく踏み台の内部DNSで使う名前。その後、PCのWeb PortalでP2を選び確認する。</p>
-<p><strong>コマンド・設定値の意味:</strong></p>
-<p>Firefoxの送信元は踏み台で、内部名guide.lab.testを使う。Windows側browserは同じ内部DNSを使う設定ではない。IPでの表示と名前での表示を比較し、P1のファイルが同じことを確認してから提出する。</p>
+<p>P0の手順で踏み台サーバーへRDP接続する。踏み台サーバー上のFirefoxで <code>http://10.20.1.20/practice.txt</code>、次に <code>http://guide.lab.test/practice.txt</code> を開く。最後に自分のPCの採点ページでP2を確認する。</p>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>13項目の練習確認。P1の現在機能も必要。次のM2で正式名6件を追加してからDB/appへ進む。</p>
-<p><strong>うまくいかないとき:</strong></p>
-<p>名前が開かない原因をHTTP停止と決めつけず、IP指定→dig→getent→HTTPの順で比べる。</p>
-<h2 id="section-6">出力の読み取り例（入力しない）</h2>
+<p>どちらのURLでも <code>JDU WEB-02 practice: HTTP response verified.</code> が表示される。採点ページでP2の13項目を確認できる。</p>
+<h2 id="section-3">出力の読み取り例（入力しない）</h2>
 <pre><code class="language-text">status: NOERROR
 guide.lab.test.  300  IN  A  10.20.1.20
 </code></pre>
 <p>dig出力の説明用抜粋。Aの右が回答IPv4、300がTTL。回答が出ても、問い合わせ先SERVERが10.20.2.10かを別に確認する。</p>
-<h2 id="section-7">理解の確認（採点外）</h2>
-<p>dig @10.20.2.10は成功し、getentは失敗する。DNSのzoneだけが原因と言えるか？</p>
-<p><strong>考え方:</strong></p>
-<p>言えない。明示したDNSへの回答と、OSが通常選ぶresolverは別なので、Netplanとresolvectlの実効設定を確認する。</p>
 <hr />
 <p><a href="m1.html">前の課題: M1</a> · <a href="m2.html">次の課題: M2</a></p>
 </main></body></html>

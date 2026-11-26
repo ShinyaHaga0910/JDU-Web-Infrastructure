@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PROJECT = Path(os.environ.get('JDU_WEB_PROJECT_ROOT', str(Path(__file__).resolve().parents[3] / 'development')))
 from markdown_it import MarkdownIt
 from pages import write_pages, browser_check
-from command_notes import annotated_blocks
+from command_notes import annotated_blocks, CONFIG_STEPS
 from diagrams import diagram_markdown, write_diagrams, P1_STEP_DIAGRAMS
 from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE, RDP_STEPS
 from checks import CHECKS
@@ -209,6 +209,63 @@ def illustrated_steps(lang, steps):
     return out
 
 
+def configuration_instructions(step_id, source, lang):
+    def editor(path, body, preparation=(), directions=None):
+        if directions is None:
+            directions = T(f'nanoで `{path}` を開き、下の設定を入力して保存する。',
+                           f'Откройте `{path}` в nano, введите настройки ниже и сохраните файл.',
+                           f'`{path}` faylini nano da ochib, quyidagi sozlamani kiriting va saqlang.')
+        return [directions[lang], '', '```bash', *preparation, f'sudo nano {path}', '```', '',
+                T('**nanoに入力する内容**', '**Текст для ввода в nano**', '**nano da kiritiladigan matn**')[lang],
+                '', '```text', body, '```', '']
+
+    if step_id == 'P2.2':
+        return editor('/etc/bind/named.conf.options', source, directions=T(
+            'ファイルの内容を下の設定に置き換えて保存する。検索するときはnanoの Ctrl+W、保存するときは Ctrl+O、Enter、終了は Ctrl+X を使う。',
+            'Замените содержимое файлом настроек ниже. В nano для поиска используйте Ctrl+W, для сохранения Ctrl+O и Enter, для выхода Ctrl+X.',
+            'Fayl tarkibini quyidagi sozlama bilan almashtiring. nano da Ctrl+W qidiradi, Ctrl+O va Enter saqlaydi, Ctrl+X chiqadi.'))
+    if step_id == 'P2.3':
+        declaration, records = source.split('\n\n; /etc/bind/zones/db.lab.test\n')
+        return (editor('/etc/bind/named.conf.local', declaration.split('\n', 1)[1], directions=T(
+                    '既存の `named.conf.local` の末尾に次のブロックを追加する。`lab.test` のブロックが既にあれば、そのブロックを編集する。',
+                    'Добавьте этот блок в конец `named.conf.local`. Если блок `lab.test` уже есть, отредактируйте его.',
+                    '`named.conf.local` oxiriga blokni qo‘shing. `lab.test` bloki mavjud bo‘lsa uni tahrirlang.'))
+                + editor('/etc/bind/zones/db.lab.test', records,
+                         ('sudo mkdir -p /etc/bind/zones', 'sudo chmod 0755 /etc/bind/zones')))
+    if step_id == 'P2.6':
+        return [
+            T('まずネットワークインターフェース名とNetplanのファイル名を調べる。',
+              'Сначала найдите имя сетевого интерфейса и имя файла Netplan.',
+              'Avval tarmoq interfeysi nomini va Netplan fayli nomini toping.')[lang], '',
+            '```bash', 'ip -br link', 'ls /etc/netplan', '```', '',
+            T('例の `ens5` と `YOUR-NETPLAN-FILE.yaml` を実際の名前に置き換える。`networkctl status` の `Network File` に表示される名前も、対応するNetplanのファイルを見つける手掛かりになる。',
+              'Подставьте фактические имена вместо `ens5` и `YOUR-NETPLAN-FILE.yaml`. Поле `Network File` команды `networkctl status` помогает найти нужный файл Netplan.',
+              '`ens5` va `YOUR-NETPLAN-FILE.yaml` o‘rniga haqiqiy nomlarni yozing. `networkctl status` dagi `Network File` kerakli Netplan faylini topishga yordam beradi.')[lang], '',
+            '```bash', 'networkctl status ens5', '```', '',
+        ] + editor('/etc/netplan/YOUR-NETPLAN-FILE.yaml', source,
+                   ('sudo cp -an /etc/netplan/YOUR-NETPLAN-FILE.yaml /etc/netplan/YOUR-NETPLAN-FILE.yaml.before-p2',), T(
+            '下は既存ファイルを編集するための例。自分のファイルのインターフェースの下に `dhcp4-overrides` と `nameservers` を追加または修正する。すでにあるインターフェース名とその他の設定は残す。',
+            'Ниже пример правки существующего файла. В блоке своего интерфейса добавьте или исправьте `dhcp4-overrides` и `nameservers`. Сохраните имя интерфейса и остальные настройки.',
+            'Quyida mavjud faylni tahrirlash namunasi. O‘z interfeysingiz bo‘limida `dhcp4-overrides` va `nameservers` ni qo‘shing yoki tuzating. Interfeys nomi va boshqa sozlamalarni saqlang.'))
+    if step_id in ('P4.2', 'P4.3'):
+        name = 'postgresql.conf' if step_id == 'P4.2' else 'pg_hba.conf'
+        path = f'/etc/postgresql/16/main/{name}'
+        directions = T('該当する設定項目を探し、下の値に変更する。行頭に `#` があれば外して保存する。',
+                       'Найдите нужные параметры, задайте значения ниже и снимите `#` в начале этих строк.',
+                       'Kerakli parametrlarni topib, quyidagi qiymatlarni yozing. Qator boshidagi `#` bo‘lsa, olib tashlang.') if step_id == 'P4.2' else T(
+                       '接続ルールを下の内容に置き換えて保存する。',
+                       'Замените правила подключения приведёнными ниже и сохраните файл.',
+                       'Ulanish qoidalarini quyidagilar bilan almashtirib, faylni saqlang.')
+        return editor(path, source, (f'sudo cp -an {path} {path}.before-p4',), directions)
+    rows = [record.split(' | ') for record in source.splitlines()]
+    columns = T('コード | 名前 | 数量 | 保管場所 | 公開する',
+                'Код | Название | Количество | Место хранения | Опубликовать',
+                'Kod | Nom | Miqdor | Saqlash joyi | Ochiq')[lang]
+    states = T(('チェックを入れる', 'チェックを外す'), ('Да', 'Нет'), ('Ha', 'Yo‘q'))[lang]
+    return [f'| {columns} |', '| --- | --- | --- | --- | --- |',
+            *(f"| {' | '.join(row[:-1])} | {states[0 if row[-1].endswith('=true') else 1]} |" for row in rows), '']
+
+
 def make_markdown(reg, lang, kind):
     out = emit_intro(lang, kind)
     if kind=='practice':
@@ -224,20 +281,26 @@ def make_markdown(reg, lang, kind):
     tasks = {t['id']: t for t in reg['tasks']}
     if kind == 'practice':
         for m in MODULES:
-            out += ['## ' + m['id'] + ' ' + m['title'][lang], '', '### ' + L['goal'][lang], '', m['goals'][lang], '', '### ' + L['problem'][lang], '', m['problem'][lang], '']
-            out += diagram_markdown(m['id'],lang)
-            out += task_spec(tasks[m['id']], reg, lang)
             notes=MODULE_NOTES[m['id']]
+            out += ['## ' + m['id'] + ' ' + m['title'][lang], '']
+            if m['id'] in ('P0', 'P1'):
+                out += ['### ' + L['goal'][lang], '', m['goals'][lang], '', '### ' + L['problem'][lang], '', m['problem'][lang], '']
+                out += diagram_markdown(m['id'],lang)
+                out += task_spec(tasks[m['id']], reg, lang)
             if 'before' in notes:
                 out += ['### ' + LABELS['mechanism'][lang], '',
                         '**' + LABELS['before'][lang] + ':** ' + notes['before'][lang], '']
             out += ['**' + L['work'][lang].format(number=m['id'][1:]) + '**', '', notes['after'][lang], '']
+            if m['id'] not in ('P0', 'P1'):
+                out += diagram_markdown(m['id'], lang)
             if 'mechanism' in notes:
                 out += [notes['mechanism'][lang], '']
             out += ['### ' + L['solution'][lang], '']
             for i, s in enumerate(m['steps'], 1):
                 step_id=f"{m['id']}.{i}"
-                out += [f"#### {step_id} {s['title'][lang]}", '', '**' + L['place'][lang] + ':** ' + PLACES[s['place']][lang], '', '**' + L['why'][lang] + ':** ' + s['why'][lang], '']
+                out += [f"#### {step_id} {s['title'][lang]}", '', '**' + L['place'][lang] + ':** ' + PLACES[s['place']][lang], '']
+                out += (['**' + L['why'][lang] + ':** ' + s['why'][lang], ''] if m['id'] in ('P0', 'P1')
+                        else [s['why'][lang], ''])
                 if step_id=='P0.1':
                     out += instance_id_guide(lang)
                     continue
@@ -252,7 +315,9 @@ def make_markdown(reg, lang, kind):
                         'Windowsキー＋Rで「ファイル名を指定して実行」を開く。「名前」欄に `mstsc /prompt` を入力し、**OK** を押す。',
                         'Нажмите Windows+R, чтобы открыть окно «Выполнить». Введите `mstsc /prompt` в поле «Открыть» и нажмите **OK**.',
                         'Windows+R tugmalarini bosib Run oynasini oching. Open maydoniga `mstsc /prompt` yozing va **OK** ni bosing.'), lang)
-                if s['code']:
+                if s['code'] and (m['id'], i) in CONFIG_STEPS:
+                    out += configuration_instructions(step_id, s['code'], lang)
+                elif s['code']:
                     for block_index,(fence,source) in enumerate(annotated_blocks(m['id'],i,s['code'],lang)):
                         if block_index==1 and s['editor_input']:
                             out += [T('**nanoに入力する本文**','**Текст для ввода в nano**','**nano oynasiga yoziladigan matn**')[lang], '',
@@ -491,7 +556,7 @@ def main():
     reg=active_registry(json.loads(reg_raw))
     write_diagrams(ROOT)
     assert set(CHECKS)=={c for t in reg['tasks'] if t['category']=='automated_mission' for c in t['progress_scored_checks']}
-    assert set(STEP_NOTES)=={f"{module['id']}.{i}" for module in MODULES for i in range(1,len(module['steps'])+1)} - {'P0.1', 'P0.2'}
+    assert set(STEP_NOTES)<={f"{module['id']}.{i}" for module in MODULES for i in range(1,len(module['steps'])+1)}
     for m in MODULES:
         assert m['id'] in MODULE_NOTES
         assert all(set(p)==set(LANGS) and all(p.values()) for p in MODULE_NOTES[m['id']].values())

@@ -78,6 +78,10 @@ def explanation(command, lang):
     if command=='\\q':return a('psqlを終了し、同じDBサーバーのOS端末へ戻る。','Выйти из psql в терминал ОС того же DB-сервера.','Psql dan chiqib ayni DB server OS terminaliga qaytish.')
     # Inspect sudo operations without changing the original command.
     if args[0]=='sudo':
+        if args[:4]==['sudo','-u','catalog','find']:
+            return a('catalogユーザーが書き込めるアプリのファイルやディレクトリを調べる。',
+                     'Найти файлы и каталоги приложения, доступные на запись пользователю catalog.',
+                     'Catalog foydalanuvchisi yoza oladigan ilova fayl va kataloglarini qidirish.')
         if args[1:3]==['-u','postgres']:
             if '-c' not in args:return a('DBのOS端末からpostgresとしてpsqlを開く。以降はpsql内で操作する。','В терминале DB открыть psql от postgres; следующие действия внутри psql.','DB OS terminalida postgres sifatida psql ochish; keyingi amallar psql ichida.')
             sql=args[-1]
@@ -92,12 +96,12 @@ def explanation(command, lang):
             return a('配布サーバーのパッケージ一覧を更新する。','Обновить список пакетов с внутреннего сервера.','Ichki serverdagi paketlar ro‘yxatini yangilash.')
         names=' '.join(x for x in args[2:] if not x.startswith('-'))
         if '--no-install-recommends' in args:
-            return a(f'内部repoから {names} を推奨追加なしで導入する。',f'Установить {names} из внутреннего repo без рекомендуемых дополнений.',f'Ichki repo dan {names} ni tavsiya etilgan qo‘shimchalarsiz o‘rnatish.')
+            return a(f'配布サーバーから {names} と、動作に必要なパッケージをインストールする。',f'Установить {names} и обязательные зависимости с сервера пакетов.',f'Paketlar serveridan {names} va kerakli bog‘liqliklarni o‘rnatish.')
         return a(f'配布サーバーから {names} をインストールする。',f'Установить {names} с внутреннего сервера пакетов.',f'Ichki paket serveridan {names} ni o‘rnatish.')
     if program=='systemctl':
         verb=args[1];target=args[-1]
         return {
-         'enable':a(f'{target} を今すぐ起動し、次回起動時も自動起動させる。',f'Запустить {target} сейчас и включить автозапуск.',f'{target} ni hozir yoqish va avtomatik start ni yoqish.'),
+         'enable':a(f'{target} を今すぐ起動し、次回起動時も自動起動させる。',f'Запустить {target} сейчас и включить автозапуск.',f'{target} ni hozir yoqish va avtomatik start ni yoqish.') if '--now' in args else a(f'{target} を次回のOS起動時に自動起動させる。',f'Включить автозапуск {target} при загрузке ОС.',f'OS yuklanganda {target} avtomatik ishga tushishini yoqish.'),
          'stop':a(f'{target} を停止してから使用する設定を選ぶ。',f'Остановить {target} перед выбором настроек.',f'Sozlamani tanlashdan oldin {target} ni to‘xtatish.'),
          'start':a(f'選んだ設定で {target} を起動する。',f'Запустить {target} с выбранными настройками.',f'{target} ni tanlangan sozlama bilan ishga tushirish.'),
          'restart':a(f'{target} を再起動して設定を読み直す。',f'Перезапустить {target} с обновлённой настройкой.',f'{target} ni yangi sozlama bilan qayta ishga tushirish.'),
@@ -118,9 +122,10 @@ def explanation(command, lang):
     if program=='stat':return a('指定ファイルの所有者・グループ・権限・名前を読む。','Прочитать владельца, группу, права и имя указанных файлов.','Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.')
     if program=='cp' and args[-1]=='/var/www/html/practice.txt':
         return a('practice.txtをWebサーバーの公開ディレクトリへコピーする。','Скопировать practice.txt в каталог публикации Web-сервера.','practice.txt faylini Web serverning ochiq katalogiga nusxalash.')
-    if program=='cp':return a('元ファイルを控えへコピーする。既存の控えは上書きしない。','Скопировать исходный файл в резервную копию, не затирая существующую.','Asl fayldan nusxa olish; mavjud nusxani ustidan yozmaslik.') if '-an' in args else a('教員提供アプリを/optの運用先へ属性を保ってコピーする。','Скопировать приложение преподавателя в /opt с сохранением атрибутов.','O‘qituvchi app ini /opt ga atributlarini saqlab ko‘chirish.')
-    if program=='chown':return a('コピー先のファイルの所有者とグループをrootに変更する。','Назначить root владельцем и группой скопированного файла.','Nusxalangan fayl egasi va guruhini root ga o‘zgartirish.')
-    if program=='chmod':return a('コピー先のファイルの権限を0644に変更する。','Установить для скопированного файла права 0644.','Nusxalangan faylga 0644 ruxsatlarini berish.')
+    if program=='mkdir':return a(f'{args[-1]} ディレクトリを作る。',f'Создать каталог {args[-1]}.',f'{args[-1]} katalogini yaratish.')
+    if program=='cp':return a('元ファイルを控えへコピーする。既存の控えは上書きしない。','Скопировать исходный файл в резервную копию, не затирая существующую.','Asl fayldan nusxa olish; mavjud nusxani ustidan yozmaslik.') if '-an' in args else a(f'ファイルを {args[-1]} にコピーする。',f'Скопировать файлы в {args[-1]}.',f'Fayllarni {args[-1]} ga nusxalash.')
+    if program=='chown':return a(f'{args[-1]} の所有者とグループを {args[1]} に変更する。',f'Задать владельца и группу {args[1]} для {args[-1]}.',f'{args[-1]} egasi va guruhini {args[1]} ga o‘zgartirish.')
+    if program=='chmod':return a(f'{args[-1]} の権限を {args[1]} に変更する。',f'Задать права {args[1]} для {args[-1]}.',f'{args[-1]} huquqlarini {args[1]} ga o‘zgartirish.')
     if program=='mv':return a('既定サイトのリンクを控えへ移す。既存の控えは上書きしない。','Переместить ссылку стандартного сайта в копию без перезаписи.','Default sayt linkini nusxaga ko‘chirish; mavjud nusxani ustidan yozmaslik.')
     if program=='ln':return a('配置したアプリ用サイト設定への有効化リンクを作る。','Создать ссылку включения конфигурации сайта приложения.','App sayt sozlamasini yoqish uchun link yaratish.')
     if program=='install':
@@ -175,6 +180,11 @@ def annotated_blocks(module, index, source, lang):
             note=T('NginxがTCPの80番ポート（例 0.0.0.0:80）で待ち受けていることを確認する。',
                    'Убедиться, что Nginx слушает TCP-порт 80, например 0.0.0.0:80.',
                    'Nginx TCP 80 portini, masalan 0.0.0.0:80 manzilida tinglayotganini tekshirish.')[lang]
+        if command=='sudo ss -lntp' and (module,index) in {('P4',4),('P5',7)}:
+            service, address = ('PostgreSQL','10.20.2.20:5432') if module=='P4' else ('Gunicorn','127.0.0.1:8000')
+            note=T(f'{service} が {address} で待ち受けていることを確認する。',
+                   f'Убедиться, что {service} слушает {address}.',
+                   f'{service} {address} da tinglayotganini tekshirish.')[lang]
         parts += [f'{prefix} {number}. {note}',command]
         if (module,index)==('P1',2) and command=='nano practice.txt':
             out.append(('bash','\n'.join(parts)))
