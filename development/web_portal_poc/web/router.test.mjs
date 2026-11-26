@@ -27,8 +27,8 @@ test('saved connection grades appear in the current course total',async()=>{
   const app=createApp({env,verify:verified,sessions,getGrade:async()=>({status:'ok',grade})});
   const body=await (await app(req('/grades',{headers:{cookie:credentials}}))).text();
   assert.match(body,/36 \/ 61/);
-  assert.match(body,/>P0<\/th><td>1<\/td>/);
-  assert.match(body,/>M0<\/th><td>1<\/td>/);
+  assert.match(body,/>P0<\/th><td>1 \/ 1<\/td>/);
+  assert.match(body,/>M0<\/th><td>1 \/ 1<\/td>/);
 });
 
 test('verified user sees only the server-resolved score and current unknown',async()=>{

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createApp } from './router.mjs';
-import { checkToken,verifyCheckToken,displayTask,tasks,checkHtml,taskDetailHtml } from './checks.mjs';
+import { checkToken,verifyCheckToken,displayTask,tasks,checkHtml,taskDetailHtml,CHECK_MAXIMA } from './checks.mjs';
 import { readFileSync } from 'node:fs';
 import { configFrom } from './auth.mjs';
 import {generateKeyPairSync,privateDecrypt,constants} from 'node:crypto';
@@ -30,6 +30,17 @@ test('displayed P and M labels are consecutive and match the course',()=>{
   const policy=JSON.parse(readFileSync(new URL('../../../course/curriculum.json',import.meta.url),'utf8'));
   const labels={...policy.practice_display_ids,...policy.mission_display_ids};
   assert.deepEqual(tasks,policy.active_order);
+  const registry=JSON.parse(readFileSync(new URL('../../01_roles/cyber_security/tools/web_lab_assessment/assessment-registry.json',import.meta.url),'utf8'));
+  for(const task of tasks) {
+    const expected=policy.intro_points[task]??registry.tasks.find(t=>t.id===task).progress_points_max;
+    assert.equal(CHECK_MAXIMA[task],expected);
+    for(const lang of ['ja','ru','uz']) {
+      assert.match(taskDetailHtml(lang,task,{selected:{},current:{}}),new RegExp(`<strong>0 / ${expected}</strong>`));
+    }
+  }
+  const initial=checkHtml('ja',{grade:{selected:{},current:{}},blocked:true});
+  assert.doesNotMatch(initial,/未採点|—|undefined/);
+  assert.equal((initial.match(/class="task-score /g)||[]).length,12);
   for(const prefix of ['P','M']){
     assert.deepEqual(tasks.filter(id=>id.startsWith(prefix)).map(displayTask),
       [0,1,2,3,4,5].map(number=>prefix+number));

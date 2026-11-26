@@ -64,12 +64,14 @@ test('teacher detail respects backend authorization and preserves the Lab when s
   assert.equal((await instance(req('/teacher/student?lab_id=not-assigned'))).status,403);
 });
 
-test('unavailable and never-submitted students are distinct and never invent a failing grade',async()=>{
+test('never-submitted students show zero points while unavailable students show an error',async()=>{
   const empty={...grade,raw_earned:0,selected:{},current:{},current_unresolved:[],missing_or_unresolved:Object.keys(maxima)};
   const value={...progress,students:[{lab_id:'course-student',context:'course',status:'ok',grade:empty},{lab_id:'unavailable-lab',context:'course',status:'unavailable'}]};
   const response=await app(async()=>({status:'ok',teacher:value}))(req('/teacher'));
   assert.equal(response.status,200);const html=await response.text();
-  assert.match(html,/記録なし/);assert.match(html,/取得できません/);assert.doesNotMatch(html,/0 \/ 59/);
+  assert.match(html,/0 \/ 59/);assert.match(html,/取得できません/);
+  for(const n of [1,4,8,9,13,16]) assert.ok(html.includes(`0 / ${n}`));
+  assert.match(html,/<th scope="col">P5<\/th>/);
 });
 
 test('extra caller privileges, invalid cursors and malformed score data are rejected',async()=>{

@@ -5,7 +5,7 @@ import { enrollmentHtml, enrollmentText, checkedEnrollment } from './enrollment-
 import { preparationText, checkPreparationToken, checkedPreparation, preparationHtml,
   preparationTemplate, createPreparationLink } from './preparation.mjs';
 import { bootstrapTemplate, createBootstrapLink } from './bootstrap-link.mjs';
-import { words as checkWords, validOperation, verifyCheckToken, checkHtml, taskActions, taskDetailHtml, tasks as checkTasks, progressScript, resumeCheckLink, sealApplicationPassword, displayTask } from './checks.mjs';
+import { words as checkWords, validOperation, verifyCheckToken, checkHtml, taskActions, taskDetailHtml, tasks as checkTasks, progressScript, resumeCheckLink, sealApplicationPassword, displayTask, CHECK_MAXIMA, taskScore } from './checks.mjs';
 import { teacherText, hasTeacherScope, checkedTeacher, teacherListHtml } from './teacher-progress.mjs';
 import { createInitialDelivery } from './initial-delivery.mjs';
 
@@ -78,12 +78,13 @@ function gradeHtml(lang, grade) {
   const t=text[lang];
   checkedGrade(grade);
   const date = value => typeof value==='string' && value.length<=40 && Number.isFinite(Date.parse(value)) ? new Date(value).toISOString().slice(0,16).replace('T',' ')+' UTC' : t.noRecord;
-  const rows = Object.keys(grade.raw_maximum===59?LEGACY_MAXIMA:MISSION_MAXIMA).map(id => {
-    const saved=grade.selected[id];
-    const score=saved && Number.isInteger(saved.raw_earned) ? String(saved.raw_earned) : t.noRecord;
+  const maxima={...CHECK_MAXIMA,...(grade.raw_maximum===61?{M0:1}:{})};
+  const rows = Object.keys(maxima).map(id => {
+    const saved=taskScore(grade,id);
+    const score=`${saved?.raw_earned??0} / ${maxima[id]}`;
     return `<tr><th scope="row">${displayTask(id)}</th><td>${escape(score)}</td><td>${escape(grade.current_unresolved.includes(id) ? t.unknown : grade.current?.[id] ? t.currentOk : t.noRecord)}</td><td>${escape(date(grade.current?.[id]?.checked_at))}</td><td>${escape(date(saved?.received_at))}</td></tr>`;
   }).join('');
-  const total = Object.keys(grade.selected).length ? `${grade.raw_earned} / ${grade.raw_maximum}` : t.noRecord;
+  const total = `${grade.raw_earned} / ${grade.raw_maximum}`;
   const summary = grade.current_unresolved.length || grade.missing_or_unresolved.length ? t.unknown : t.currentOk;
   return `<section><h2>${escape(t.total)}</h2><p class="num">${escape(total)}</p><p>${escape(summary)}</p><div class="table-wrap"><table><thead><tr><th scope="col">${escape(t.mission)}</th><th scope="col">${escape(t.score)}</th><th scope="col">${escape(t.current)}</th><th scope="col">${escape(t.checked)}</th><th scope="col">${escape(t.received)}</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
 }

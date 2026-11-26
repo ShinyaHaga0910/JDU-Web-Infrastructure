@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual, randomUUID,createPublicKey,publicEncrypt,c
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { readFileSync } from 'node:fs';
 const labels=JSON.parse(readFileSync(new URL('./check-labels.json',import.meta.url),'utf8'));
+export const CHECK_MAXIMA=Object.freeze(JSON.parse(readFileSync(new URL('./check-points.json',import.meta.url),'utf8')));
 
 export const tasks=Object.freeze([...[0,1,2,4].flatMap(i=>[`P${i}`,`M${i}`]),'P5','P6','M5','M6']);
 const displayIds=Object.freeze({P4:'P3',P5:'P4',P6:'P5',M4:'M3',M5:'M4',M6:'M5'});
@@ -126,17 +127,16 @@ function practiceScore(grade,task) {
     && row.raw_maximum>0 && row.raw_maximum<=40 && row.raw_earned>=0 && row.raw_earned<=row.raw_maximum ? row : undefined;
 }
 
+export function taskScore(grade,task) {
+  return task.startsWith('P') && task!=='P0'?practiceScore(grade,task):grade?.selected?.[task];
+}
+
 export function taskDetailHtml(lang,task,grade,maximum,actions='') {
-  const practice=task.startsWith('P') && task!=='P0';
-  const saved=practice?practiceScore(grade,task):grade?.selected?.[task];
-  maximum=maximum??saved?.raw_maximum;
-  const [scoreTitle,pending]={
-    ja:['保存済みの点数','未採点'],
-    ru:['Сохранённые баллы','Без оценки'],
-    uz:['Saqlangan ball','Baholanmagan'],
-  }[lang];
+  const saved=taskScore(grade,task);
+  maximum=maximum??CHECK_MAXIMA[task];
+  const scoreTitle={ja:'点数',ru:'Баллы',uz:'Ball'}[lang];
   const checks=(Array.isArray(grade?.task_checks)?grade.task_checks:[]).slice(0,40).filter(validCriterion);
-  const score=saved?`<p class="check-count">${scoreTitle} <strong>${saved.raw_earned} / ${maximum}</strong></p>`:maximum?`<p>${pending}</p>`:'';
+  const score=`<p class="check-count">${scoreTitle} <strong>${saved?.raw_earned??0} / ${maximum}</strong></p>`;
   return `<section class="task-detail"><div class="check-heading"><h2>${escape(displayTask(task))}</h2>${score}</div>
     ${actions?`<div class="task-actions">${actions}</div>`:''}
     ${checks.length?criteriaTable(lang,checks):''}</section>`;
@@ -147,18 +147,16 @@ export function checkHtml(lang,{config,session,token,selected,result,grade,maxim
   const st=specialWords[lang];
   if (!selected) {
     const forms=tasks.map(task_id=>{
-      const practice=task_id.startsWith('P') && task_id!=='P0';
-      const saved=practice?practiceScore(grade,task_id):grade?.selected[task_id];
-      const maximum=maxima[task_id]??saved?.raw_maximum;
-      const score=saved?`${saved.raw_earned} / ${maximum}`:maximum?
-        {ja:'未採点',ru:'Без оценки',uz:'Baholanmagan'}[lang]:'—';
+      const saved=taskScore(grade,task_id);
+      const maximum=maxima[task_id]??CHECK_MAXIMA[task_id];
+      const score=`${saved?.raw_earned??0} / ${maximum}`;
       const status=saved?(saved.raw_earned===maximum?'score-full':'score-partial'):'score-empty';
       const actions=blocked?'':taskActions(lang,task_id,{config,session,token});
       return `<tr><th scope="row"><a href="/checks?lang=${lang}&amp;task_id=${task_id}">${displayTask(task_id)}</a></th><td><span class="task-score ${status}">${score}</span></td><td><div class="task-actions">${actions}</div></td></tr>`;
     }).join('');
     const [taskTitle,scoreTitle,actionTitle]={
-      ja:['課題','保存済みの点数','操作'],ru:['Задание','Сохранённые баллы','Действие'],
-      uz:['Vazifa','Saqlangan ball','Amal'],
+      ja:['課題','点数','操作'],ru:['Задание','Баллы','Действие'],
+      uz:['Vazifa','Ball','Amal'],
     }[lang];
     return `<div class="table-wrap student-table" role="region" aria-label="${escape(t.title)}" tabindex="0">
       <table><thead><tr><th scope="col">${taskTitle}</th><th scope="col">${scoreTitle}</th><th scope="col">${actionTitle}</th></tr></thead>
