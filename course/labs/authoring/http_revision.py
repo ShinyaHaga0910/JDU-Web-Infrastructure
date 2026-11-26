@@ -20,6 +20,27 @@ def revise_content(modules, guidance, T):
         '`sudo nano /etc/nginx/sites-available/default` bilan sozlamani oching. Quyidagi blokni `listen 80` mavjud `server { ... }` ichiga, boshqa `location` bloklaridan tashqariga qo‘shing. `/practice.txt` so‘ralganda Nginx yo‘lni root ga qo‘shib, `/var/www/jdu-practice/practice.txt` ni o‘qiydi. Saqlang, sintaksisni tekshiring va sozlamani qayta yuklang.')
     config['code'] = 'sudo nano /etc/nginx/sites-available/default\n' + config['code']
     config['editor_input'] = 'location = /practice.txt {\n    root /var/www/jdu-practice;\n}'
+    config['editor_before'] = T(
+        '''**追加する位置**
+
+![nanoで開いたNginxの既存設定。location / の閉じ括弧の直後に新しいブロックを追加する。](../../assets/shared/nginx-default-location-before.png)
+
+nanoで `location / {` を探す。Ctrl+Wで `location /` を検索してもよい。画面の `try_files $uri $uri/ =404;` と、その次の `}` は削除しない。この `}` が既存の `location /` の終わりである。その下の空行へカーソルを移し、次の3行を追加する。`try_files` の直下、つまり `}` より手前には入れない。''',
+        '''**Место добавления**
+
+![Исходные настройки Nginx в nano. Новый блок добавляется сразу после закрывающей скобки location /.](../../assets/shared/nginx-default-location-before.png)
+
+Найдите `location / {` в nano. Можно нажать Ctrl+W и найти `location /`. Не удаляйте строку `try_files $uri $uri/ =404;` и следующую `}`: эта скобка завершает существующий блок `location /`. Переместите курсор на пустую строку ниже этой скобки и добавьте следующие три строки. Не вставляйте их между `try_files` и закрывающей скобкой.''',
+        '''**Qo‘shish joyi**
+
+![nano dagi Nginx ning mavjud sozlamasi. Yangi blok location / ni yopuvchi qavsdan keyin qo‘shiladi.](../../assets/shared/nginx-default-location-before.png)
+
+nano da `location / {` ni toping. Ctrl+W orqali `location /` ni qidirish mumkin. `try_files $uri $uri/ =404;` qatorini ham, undan keyingi `}` ni ham o‘chirmang. Bu qavs mavjud `location /` blokini yopadi. Kursorni shu qavs ostidagi bo‘sh qatorga olib, quyidagi uch qatorni qo‘shing. Ularni `try_files` bilan yopuvchi qavs orasiga yozmang.''')
+    placement = 'location / {\n    try_files $uri $uri/ =404;\n}\n\nlocation = /practice.txt {\n    root /var/www/jdu-practice;\n}'
+    config['editor_after'] = T(
+        '**追加後の配置（一部抜粋）**\n\n既存のブロックと追加するブロックは、次のように並ぶ。どちらも既存の `server { ... }` の中に置く。ファイル全体をこの例へ置き換えず、ほかの設定と上側の `root /var/www/html;` はそのまま残す。\n\n```text\n' + placement + '\n```\n\n`location = /practice.txt` は、リクエストのパスが `/practice.txt` と完全に一致するときの設定である。その場合だけ追加したrootを使い、`/var/www/jdu-practice/practice.txt` を読む。',
+        '**Расположение после добавления (фрагмент)**\n\nСуществующий и новый блоки должны стоять рядом, как ниже. Оба находятся внутри существующего `server { ... }`. Не заменяйте весь файл этим примером: сохраните остальные настройки и расположенную выше строку `root /var/www/html;`.\n\n```text\n' + placement + '\n```\n\n`location = /practice.txt` применяется при точном совпадении пути запроса с `/practice.txt`. Только в этом случае используется новый root и читается `/var/www/jdu-practice/practice.txt`.',
+        '**Qo‘shilgandan keyingi joylashuv (parcha)**\n\nMavjud va yangi bloklar quyidagidek yonma-yon turadi. Ikkalasi ham mavjud `server { ... }` ichida bo‘ladi. Butun faylni bu misol bilan almashtirmang: boshqa sozlamalar va yuqoridagi `root /var/www/html;` qatori saqlansin.\n\n```text\n' + placement + '\n```\n\n`location = /practice.txt` so‘rov yo‘li `/practice.txt` ga aynan mos kelganda ishlaydi. Faqat shu holatda yangi root ishlatiladi va `/var/www/jdu-practice/practice.txt` o‘qiladi.')
     guidance['M1'] = T(
         '''P1と同じWebサーバーで、`/var/www/jdu-mission/mission.txt` をTCPの80番ポートから `/mission.txt` として配信する。P1のファイルと設定も残し、`/practice.txt` を引き続き開けるようにする。
 

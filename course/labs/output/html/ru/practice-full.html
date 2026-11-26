@@ -288,11 +288,25 @@ sudo cat /var/www/jdu-practice/practice.txt
 <pre><code class="language-bash"># 1. Открыть /etc/nginx/sites-available/default в nano.
 sudo nano /etc/nginx/sites-available/default
 </code></pre>
+<p><strong>Место добавления</strong></p>
+<p><img src="../../../assets/shared/nginx-default-location-before.png" alt="Исходные настройки Nginx в nano. Новый блок добавляется сразу после закрывающей скобки location /." width="767" height="699" loading="lazy"></p>
+<p>Найдите <code>location / {</code> в nano. Можно нажать Ctrl+W и найти <code>location /</code>. Не удаляйте строку <code>try_files $uri $uri/ =404;</code> и следующую <code>}</code>: эта скобка завершает существующий блок <code>location /</code>. Переместите курсор на пустую строку ниже этой скобки и добавьте следующие три строки. Не вставляйте их между <code>try_files</code> и закрывающей скобкой.</p>
 <p><strong>Настройки для nano</strong></p>
 <pre><code class="language-text">location = /practice.txt {
     root /var/www/jdu-practice;
 }
 </code></pre>
+<p><strong>Расположение после добавления (фрагмент)</strong></p>
+<p>Существующий и новый блоки должны стоять рядом, как ниже. Оба находятся внутри существующего <code>server { ... }</code>. Не заменяйте весь файл этим примером: сохраните остальные настройки и расположенную выше строку <code>root /var/www/html;</code>.</p>
+<pre><code class="language-text">location / {
+    try_files $uri $uri/ =404;
+}
+
+location = /practice.txt {
+    root /var/www/jdu-practice;
+}
+</code></pre>
+<p><code>location = /practice.txt</code> применяется при точном совпадении пути запроса с <code>/practice.txt</code>. Только в этом случае используется новый root и читается <code>/var/www/jdu-practice/practice.txt</code>.</p>
 <p>Сохраните настройки через Ctrl+O, Enter и выйдите через Ctrl+X. В терминале выполните следующие команды.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 2. Вывести полную конфигурацию Nginx и посмотреть, как она записана.

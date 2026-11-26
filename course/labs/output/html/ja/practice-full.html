@@ -288,11 +288,25 @@ sudo cat /var/www/jdu-practice/practice.txt
 <pre><code class="language-bash"># 1. /etc/nginx/sites-available/default をnanoで編集する。
 sudo nano /etc/nginx/sites-available/default
 </code></pre>
+<p><strong>追加する位置</strong></p>
+<p><img src="../../../assets/shared/nginx-default-location-before.png" alt="nanoで開いたNginxの既存設定。location / の閉じ括弧の直後に新しいブロックを追加する。" width="767" height="699" loading="lazy"></p>
+<p>nanoで <code>location / {</code> を探す。Ctrl+Wで <code>location /</code> を検索してもよい。画面の <code>try_files $uri $uri/ =404;</code> と、その次の <code>}</code> は削除しない。この <code>}</code> が既存の <code>location /</code> の終わりである。その下の空行へカーソルを移し、次の3行を追加する。<code>try_files</code> の直下、つまり <code>}</code> より手前には入れない。</p>
 <p><strong>nanoで設定する内容</strong></p>
 <pre><code class="language-text">location = /practice.txt {
     root /var/www/jdu-practice;
 }
 </code></pre>
+<p><strong>追加後の配置（一部抜粋）</strong></p>
+<p>既存のブロックと追加するブロックは、次のように並ぶ。どちらも既存の <code>server { ... }</code> の中に置く。ファイル全体をこの例へ置き換えず、ほかの設定と上側の <code>root /var/www/html;</code> はそのまま残す。</p>
+<pre><code class="language-text">location / {
+    try_files $uri $uri/ =404;
+}
+
+location = /practice.txt {
+    root /var/www/jdu-practice;
+}
+</code></pre>
+<p><code>location = /practice.txt</code> は、リクエストのパスが <code>/practice.txt</code> と完全に一致するときの設定である。その場合だけ追加したrootを使い、<code>/var/www/jdu-practice/practice.txt</code> を読む。</p>
 <p>設定を入力したらCtrl+O、Enterで保存し、Ctrl+Xで終了する。端末に戻って、続きのコマンドを実行する。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 2. Nginxの設定全体を表示し、どのように記載されているか確認する。

@@ -288,11 +288,25 @@ sudo cat /var/www/jdu-practice/practice.txt
 <pre><code class="language-bash"># 1. /etc/nginx/sites-available/default faylini nano da tahrirlash.
 sudo nano /etc/nginx/sites-available/default
 </code></pre>
+<p><strong>Qo‘shish joyi</strong></p>
+<p><img src="../../../assets/shared/nginx-default-location-before.png" alt="nano dagi Nginx ning mavjud sozlamasi. Yangi blok location / ni yopuvchi qavsdan keyin qo‘shiladi." width="767" height="699" loading="lazy"></p>
+<p>nano da <code>location / {</code> ni toping. Ctrl+W orqali <code>location /</code> ni qidirish mumkin. <code>try_files $uri $uri/ =404;</code> qatorini ham, undan keyingi <code>}</code> ni ham o‘chirmang. Bu qavs mavjud <code>location /</code> blokini yopadi. Kursorni shu qavs ostidagi bo‘sh qatorga olib, quyidagi uch qatorni qo‘shing. Ularni <code>try_files</code> bilan yopuvchi qavs orasiga yozmang.</p>
 <p><strong>nano da yoziladigan sozlama</strong></p>
 <pre><code class="language-text">location = /practice.txt {
     root /var/www/jdu-practice;
 }
 </code></pre>
+<p><strong>Qo‘shilgandan keyingi joylashuv (parcha)</strong></p>
+<p>Mavjud va yangi bloklar quyidagidek yonma-yon turadi. Ikkalasi ham mavjud <code>server { ... }</code> ichida bo‘ladi. Butun faylni bu misol bilan almashtirmang: boshqa sozlamalar va yuqoridagi <code>root /var/www/html;</code> qatori saqlansin.</p>
+<pre><code class="language-text">location / {
+    try_files $uri $uri/ =404;
+}
+
+location = /practice.txt {
+    root /var/www/jdu-practice;
+}
+</code></pre>
+<p><code>location = /practice.txt</code> so‘rov yo‘li <code>/practice.txt</code> ga aynan mos kelganda ishlaydi. Faqat shu holatda yangi root ishlatiladi va <code>/var/www/jdu-practice/practice.txt</code> o‘qiladi.</p>
 <p>Sozlamani Ctrl+O, Enter bilan saqlang, Ctrl+X bilan chiqing. Terminalda keyingi buyruqlarni bajaring.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 2. Nginx ning to‘liq sozlamasini chiqarib, qanday yozilganini tekshirish.
