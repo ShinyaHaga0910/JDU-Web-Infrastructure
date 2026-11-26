@@ -1,0 +1,78 @@
+{
+  "date": "2026-11-26",
+  "scope": "P1/M1 custom Nginx document roots and group read permissions",
+  "source_commit": "aed2a4996827b23295d679266dca41482ea69055",
+  "requirements": {
+    "P1": "/var/www/jdu-practice/practice.txt",
+    "M1": "/var/www/jdu-mission/mission.txt",
+    "owner": "root",
+    "group": "www-data",
+    "mode": "0640",
+    "port": 80,
+    "urls_retained": [
+      "/practice.txt",
+      "/mission.txt"
+    ],
+    "mission_preserves_practice": true,
+    "points_per_task": 8
+  },
+  "deployment": {
+    "student_checker": "code SHA-256 and installation-check verified",
+    "teacher_portal_services": "portal-refresh completed",
+    "teacher_portal_checker": "portal-refresh completed",
+    "teacher_web": "portal-refresh completed",
+    "teacher_grading_api": "code SHA-256 verified",
+    "exercise_configuration_modified": false,
+    "stacks_recreated": false
+  },
+  "live_checks": {
+    "P1": {
+      "score": 6,
+      "maximum": 8,
+      "unknown": 0,
+      "failed": [
+        "WEB02_CONFIG_VALID",
+        "WEB02_FILE"
+      ]
+    },
+    "M1": {
+      "score": 6,
+      "maximum": 8,
+      "unknown": 0,
+      "failed": [
+        "WEB02_CONFIG_VALID",
+        "WEB02_FILE"
+      ]
+    },
+    "selected_course_total": 11,
+    "course_maximum": 64,
+    "old_reports_shown_as_old_rubric": true,
+    "student_languages_verified": [
+      "ja",
+      "ru",
+      "uz"
+    ],
+    "isolated_real_nginx_test": "1 passed: both roots serve unchanged URLs, 0644 and wrong group rejected; wrong group also prevents HTTP reading"
+  },
+  "local_checks": {
+    "targeted_browser_and_grading_python": 43,
+    "linux_assessment_and_http_roots": 20,
+    "web_node": 91,
+    "web_package": 3,
+    "teaching_checks": 4537,
+    "bash_blocks": 42,
+    "pdf_pages_rendered": 156,
+    "pdf_words_out_of_bounds": 0
+  },
+  "ci": {
+    "workflow": "Classroom build",
+    "conclusion": "success",
+    "url": "https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/actions/runs/45801746990"
+  },
+  "limitations": [
+    "Main student exercise was not solved under the new rubric; current 6/8 is expected for its unchanged old-root setup.",
+    "Native language review and teacher visual approval are not performed.",
+    "Full P2-M5 walkthrough is not covered."
+  ],
+  "legacy_signed_registry_and_archives_changed": false
+}
