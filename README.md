@@ -20,6 +20,8 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
 
 AWSの画面からURLを探す場合は、教師用Learner Labの **CloudFormation → Stacks → `jdu-web-infrastructure-portal` → Outputs → `PortalUrl`** を開きます。コマンドでURLが表示されないときは、教師用Learner Labで実行しているか、採点ポータルが有効化されているか、利用期限内かを確認してください。 [教師向けの設定手順](development/web_portal_poc/CLASSROOM-PORTAL.md)
 
+教師用の成績一覧を直接開くには、表示されたURLの末尾に `/teacher?lang=ja` を付け、閲覧権限のある学校Googleアカウントでログインします。学生の課題確認画面は同じポータルの `/checks?lang=ja` にあります。
+
 **学生**は、自分のクラスのLMSで教師が共有した採点ページのURLを開きます。教師側のスタックにあるURLなので、学生用CloudShellでは `portal-url` で取得できません。LMSの案内に見当たらない場合は、教師に確認してください。
 
 ## AWS演習環境の構築

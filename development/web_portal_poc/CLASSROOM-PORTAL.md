@@ -61,6 +61,8 @@ bash "$setup" portal-url --lang ja
 
 有効化した採点ページのURLが1行で表示されます。教師用AWSの **CloudFormation → Stacks → `jdu-web-infrastructure-portal` → Outputs → `PortalUrl`** でもURLを確認できます。
 
+教師用の成績一覧を直接開くには、取得したURLの末尾に `/teacher?lang=ja` を付けます。学生の課題確認画面は同じポータルの `/checks?lang=ja` にあります。
+
 学校Googleでログインし、P0の採点結果と保存済みの点数が表示されるところまで確認してから、同じURLをクラスのLMSで共有します。学生はLMSのURLを使い、最初だけ「本人AWSとの連携」を済ませます。
 
 
