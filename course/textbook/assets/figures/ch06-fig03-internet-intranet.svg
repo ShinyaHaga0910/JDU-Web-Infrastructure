@@ -12,21 +12,18 @@
 <text x="850" y="100" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">境界</text>
 <rect x="80" y="340" width="670" height="210" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
 <text x="415" y="365" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="middle">スマートフォン</text>
-<text x="415" y="425" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">普段の回線・DNS設定で利用</text>
-<text x="415" y="483" fill="#a54035" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">web.lab.test は解決できない</text>
+<text x="415" y="440" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">回線から案内されたDNSを使う例</text>
 <polyline points="415,550 415,700" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="415,700 408.0405514542203,685.5928463623571 421.9594485457797,685.5928463623571" fill="#2165a7"/>
 <text x="450" y="585" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">名前解決を依頼する</text>
 <text x="450" y="635" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="23" dominant-baseline="text-before-edge" text-anchor="start">DNS：UDP/TCP・53番ポート</text>
 <rect x="80" y="700" width="670" height="210" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
-<text x="415" y="725" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">普段使うDNS（問い合わせ先）</text>
+<text x="415" y="725" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">回線から案内されたDNSサーバー</text>
 <text x="415" y="790" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">公開された名前の情報を調べる</text>
-<text x="415" y="850" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">今回の内部DNSへの登録とは別</text>
 <polyline points="415,910 415,1040" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="415,1040 408.0405514542203,1025.5928463623572 421.9594485457797,1025.5928463623572" fill="#2165a7"/>
 <text x="450" y="947" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">公開DNSへ問い合わせる</text>
 <rect x="80" y="1040" width="670" height="180" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
 <text x="415" y="1061" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">インターネットの公開DNS</text>
 <text x="415" y="1120" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">公開した名前の情報を持つ</text>
-<text x="415" y="1170" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">今回の lab.test の情報はない</text>
 <rect x="1060" y="340" width="550" height="180" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
 <text x="1335" y="358" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
 <text x="1335" y="403" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="middle">踏み台サーバー</text>
@@ -45,5 +42,5 @@
 <text x="1335" y="1043" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">lab.test の名前を管理する</text>
 <text x="1335" y="1170" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">この登録はシステム内だけで使う</text>
 <text x="55" y="1315" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="start">内部DNSの登録は、インターネットの公開DNSへ自動では伝わらない。</text>
-<text x="55" y="1380" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">スマートフォンは普段のDNSを使うため、今回の web.lab.test は名前解決できない。</text>
+<text x="55" y="1380" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">このスマートフォンは左側のDNSを使うため、今回の web.lab.test は名前解決できない。</text>
 </svg>

@@ -1,46 +1,54 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1740" viewBox="0 0 1800 1740" role="img">
-<title>今回のAWS VPCとインターネットの境界を分け、内部DNSからAWS提供DNSを使って公開DNSの情報を調べる流れ</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1550" viewBox="0 0 1800 1550" role="img">
+<title>内部DNSから公開DNSへ名前を調べ、回答後のGoogleへのHTTPS接続が踏み台のSG境界で遮断される流れ</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図6-6  VPC内の問い合わせと、インターネットの公開DNS</text>
-<rect x="35" y="125" width="1730" height="1235" rx="18" fill="#f6f8fb" stroke="#7991aa" stroke-width="2"/>
-<text x="60" y="145" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">AWS（今回利用する環境）</text>
-<rect x="70" y="215" width="1660" height="1010" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
-<text x="100" y="240" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="34" dominant-baseline="text-before-edge" text-anchor="start">今回のVPC：10.20.0.0/16</text>
-<rect x="110" y="390" width="400" height="210" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
-<text x="310" y="411" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
-<text x="310" y="462" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">踏み台サーバー</text>
-<text x="310" y="532" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">10.20.1.10</text>
-<rect x="830" y="340" width="800" height="425" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
-<text x="1230" y="360" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
-<text x="1230" y="409" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="34" dominant-baseline="text-before-edge" text-anchor="middle">DNSサーバー（内部DNS）</text>
-<text x="1230" y="471" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">10.20.2.10</text>
-<text x="1230" y="552" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">内部名：自分の登録情報から答える</text>
-<text x="1230" y="614" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">web.lab.test → 10.20.1.20</text>
-<text x="1230" y="693" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">外部名：キャッシュ、または転送先を使う</text>
-<polyline points="510,475 830,475" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="830,475 815.5928463623571,481.9594485457797 815.5928463623571,468.0405514542203" fill="#16745b"/>
-<polyline points="830,555 510,555" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="510,555 524.4071536376429,548.0405514542203 524.4071536376429,561.9594485457797" fill="#16745b"/>
-<text x="538" y="351" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">DNS：UDP/TCP</text>
-<text x="538" y="405" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">53番ポート</text>
-<text x="100" y="832" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">google.com を調べるとき</text>
-<text x="100" y="903" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">① 踏み台から内部DNSへ尋ねる</text>
-<text x="100" y="968" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">② 内部DNSがAWSのDNSを使う</text>
-<text x="100" y="1033" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">③ 得られたIPを踏み台へ返す</text>
-<text x="100" y="1133" fill="#9d651a" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">WebサイトへのHTTPS接続は別の通信</text>
-<circle cx="1230" cy="1020" r="160" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
-<text x="1230" y="916" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">AWS提供の</text>
-<text x="1230" y="972" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="middle">DNS機能</text>
-<text x="1230" y="1035" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">10.20.0.2</text>
-<text x="1230" y="1095" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">転送先DNS</text>
-<polyline points="1180,765 1180,868" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1180,868 1173.0405514542203,853.5928463623571 1186.9594485457797,853.5928463623571" fill="#2165a7"/>
-<polyline points="1280,868 1280,765" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1280,765 1286.9594485457797,779.4071536376429 1273.0405514542203,779.4071536376429" fill="#2165a7"/>
-<text x="742" y="790" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">DNS：53番ポート</text>
-<text x="742" y="843" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">UDP/TCP</text>
-<rect x="70" y="1435" width="1660" height="220" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
-<text x="900" y="1453" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="37" dominant-baseline="text-before-edge" text-anchor="middle">インターネット</text>
-<text x="900" y="1525" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">公開DNS：google.com などの公開名の情報</text>
-<text x="900" y="1590" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">AWSのDNS機能が、必要な公開情報を調べる</text>
-<polyline points="1150,1159 1150,1435" fill="none" stroke="#2165a7" stroke-width="4" stroke-dasharray="13 9"/><polygon points="1150,1435 1143.0405514542203,1420.5928463623572 1156.9594485457797,1420.5928463623572" fill="#2165a7"/>
-<polyline points="1350,1435 1350,1120" fill="none" stroke="#2165a7" stroke-width="4" stroke-dasharray="13 9"/><polygon points="1350,1120 1356.9594485457797,1134.4071536376428 1343.0405514542203,1134.4071536376428" fill="#2165a7"/>
-<text x="75" y="1270" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">破線：AWSのDNS機能による、公開DNSへの問い合わせと回答</text>
-<text x="55" y="1685" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="start">名前解決に成功しても、得たIPへのHTTP・HTTPS接続が許可されるとは限らない。</text>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="36" dominant-baseline="text-before-edge" text-anchor="start">図6-6  名前解決と、その後のHTTPS接続は別の通信</text>
+<rect x="35" y="125" width="1255" height="1210" rx="18" fill="#f6f8fb" stroke="#7991aa" stroke-width="2"/>
+<text x="60" y="145" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="start">AWS</text>
+<rect x="65" y="215" width="1200" height="1080" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
+<text x="95" y="238" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="start">今回のVPC：10.20.0.0/16</text>
+<rect x="1320" y="125" width="445" height="1210" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
+<text x="1542" y="162" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="34" dominant-baseline="text-before-edge" text-anchor="middle">インターネット</text>
+<rect x="90" y="340" width="460" height="330" rx="18" fill="#fff2ee" stroke="#b73535" stroke-width="2"/>
+<text x="112" y="357" fill="#b73535" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">SG（AWSのSecurity Group）</text>
+<rect x="110" y="400" width="400" height="210" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
+<text x="310" y="414" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
+<text x="310" y="456" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">踏み台サーバー</text>
+<text x="310" y="514" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">10.20.1.10</text>
+<text x="310" y="558" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">ブラウザ</text>
+<rect x="1370" y="390" width="350" height="210" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
+<text x="1545" y="415" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">Googleの</text>
+<text x="1545" y="468" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">Webサーバー</text>
+<text x="1545" y="535" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">HTTPS：443番ポート</text>
+<text x="930" y="320" fill="#b73535" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">④ 得たIPへHTTPS接続を試みる</text>
+<polyline points="510,445 550,445" fill="none" stroke="#b73535" stroke-width="4"/><polygon points="550,445 535.5928463623571,451.9594485457797 535.5928463623571,438.0405514542203" fill="#b73535"/>
+<polyline points="580,445 1370,445" fill="none" stroke="#b73535" stroke-width="4" stroke-dasharray="13 9"/><polygon points="1370,445 1355.5928463623572,451.9594485457797 1355.5928463623572,438.0405514542203" fill="#b73535"/>
+<path d="M535 430 L565 460 M535 460 L565 430" stroke="#b73535" stroke-width="7"/>
+<text x="930" y="490" fill="#b73535" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">SGで遮断 → 通常はタイムアウト</text>
+<rect x="740" y="650" width="440" height="210" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
+<text x="960" y="669" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
+<text x="960" y="715" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">DNSサーバー（内部DNS）</text>
+<text x="960" y="782" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">10.20.2.10</text>
+<polyline points="510,555 610,555 610,715 740,715" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="740,715 725.5928463623571,721.9594485457797 725.5928463623571,708.0405514542203" fill="#16745b"/>
+<text x="640" y="600" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">① google.com のIPv4は？</text>
+<polyline points="740,800 590,800 310,800 310,670" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="310,670 316.9594485457797,684.4071536376429 303.0405514542203,684.4071536376429" fill="#16745b"/>
+<text x="110" y="858" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">③ 得られたIPを踏み台へ回答</text>
+<text x="110" y="914" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">DNS：UDP/TCP・53番ポート</text>
+<circle cx="970" cy="1110" r="160" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
+<text x="970" y="1000" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">AWS提供の</text>
+<text x="970" y="1054" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">DNS機能</text>
+<text x="970" y="1122" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">10.20.0.2</text>
+<text x="970" y="1182" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">転送先DNS</text>
+<polyline points="915,860 915,959" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="915,959 908.0405514542203,944.5928463623571 921.9594485457797,944.5928463623571" fill="#2165a7"/>
+<polyline points="1025,959 1025,860" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1025,860 1031.9594485457797,874.4071536376429 1018.0405514542203,874.4071536376429" fill="#2165a7"/>
+<text x="565" y="966" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">② 転送先へ依頼</text>
+<text x="525" y="1020" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="23" dominant-baseline="text-before-edge" text-anchor="start">DNS：UDP/TCP・53番ポート</text>
+<rect x="1370" y="990" width="350" height="235" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
+<text x="1545" y="1018" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">公開DNSサーバー</text>
+<text x="1545" y="1085" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">google.com の</text>
+<text x="1545" y="1140" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">公開情報を調べる</text>
+<polyline points="1124,1065 1370,1065" fill="none" stroke="#2165a7" stroke-width="4" stroke-dasharray="13 9"/><polygon points="1370,1065 1355.5928463623572,1071.9594485457797 1355.5928463623572,1058.0405514542203" fill="#2165a7"/>
+<polyline points="1370,1160 1124,1160" fill="none" stroke="#2165a7" stroke-width="4" stroke-dasharray="13 9"/><polygon points="1124,1160 1138.4071536376428,1153.0405514542203 1138.4071536376428,1166.9594485457797" fill="#2165a7"/>
+<text x="1040" y="913" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="24" dominant-baseline="text-before-edge" text-anchor="start">公開DNSへ問い合わせ・回答</text>
+<text x="55" y="1390" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">緑・青：名前解決　　赤：名前解決の後に試みるHTTPS接続</text>
+<text x="55" y="1455" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">SGの赤い×で接続を遮断する。×より先の破線の通信は、GoogleのWebサーバーに届かない。</text>
 </svg>

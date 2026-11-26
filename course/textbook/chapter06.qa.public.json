@@ -1,0 +1,17 @@
+{
+  "date": "2026-11-26",
+  "chapter": 6,
+  "pages": 15,
+  "rendered_pages": 15,
+  "pdf_words_within_page": 710,
+  "diagram_text_boxes_checked": 127,
+  "diagram_text_overlaps": 0,
+  "local_references_checked": 16,
+  "questions_and_answers": 6,
+  "removed_text_absent": true,
+  "network_behavior_basis": "Current CloudFormation generator and AWS official DNS documentation; no live Google connection test",
+  "sha256": "61bf8224d2d2fca825e16ff38ee940e33d8d313d44864a5cd84fe60571caa67a",
+  "teacher_visual_review": "not performed",
+  "student_trial": "not performed",
+  "aws_operations": "none"
+}

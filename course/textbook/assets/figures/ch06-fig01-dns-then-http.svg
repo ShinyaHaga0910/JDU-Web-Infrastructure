@@ -4,16 +4,17 @@
 <text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図6-1  DNSでIPを調べてから、HTTPでページを取得する</text>
 <rect x="40" y="115" width="400" height="170" rx="18" fill="#f7f9fc" stroke="#2165a7" stroke-width="2"/>
 <text x="240.0" y="132" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
-<text x="240.0" y="176" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">踏み台サーバー</text>
-<text x="240.0" y="238" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">10.20.1.10</text>
+<text x="240.0" y="166" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">踏み台サーバー</text>
+<text x="240.0" y="210" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">ブラウザ</text>
+<text x="240.0" y="252" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">10.20.1.10</text>
 <rect x="600" y="115" width="400" height="170" rx="18" fill="#f7f9fc" stroke="#16745b" stroke-width="2"/>
 <text x="800.0" y="132" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
-<text x="800.0" y="176" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">DNSサーバー</text>
-<text x="800.0" y="238" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">10.20.2.10</text>
+<text x="800.0" y="166" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">DNSサーバー</text>
+<text x="800.0" y="252" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">10.20.2.10</text>
 <rect x="1160" y="115" width="400" height="170" rx="18" fill="#f7f9fc" stroke="#2165a7" stroke-width="2"/>
 <text x="1360.0" y="132" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
-<text x="1360.0" y="176" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">Webサーバー</text>
-<text x="1360.0" y="238" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">10.20.1.20</text>
+<text x="1360.0" y="166" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">Webサーバー</text>
+<text x="1360.0" y="252" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="middle">10.20.1.20</text>
 <polyline points="240,285 240,1090" fill="none" stroke="#9babbc" stroke-width="2" stroke-dasharray="13 9"/><polygon points="240,1090 233.04055145422032,1075.5928463623572 246.95944854577968,1075.5928463623572" fill="#9babbc"/>
 <polyline points="800,285 800,650" fill="none" stroke="#9babbc" stroke-width="2" stroke-dasharray="13 9"/><polygon points="800,650 793.0405514542203,635.5928463623571 806.9594485457797,635.5928463623571" fill="#9babbc"/>
 <polyline points="1360,285 1360,1090" fill="none" stroke="#9babbc" stroke-width="2" stroke-dasharray="13 9"/><polygon points="1360,1090 1353.0405514542203,1075.5928463623572 1366.9594485457797,1075.5928463623572" fill="#9babbc"/>
