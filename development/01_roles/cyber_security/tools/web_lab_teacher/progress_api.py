@@ -130,6 +130,37 @@ class DynamoStore:
             return False
         return True
 
+    def record_classroom_lab(self, scope, lab_id, token_hash):
+        """Index an enrolled Lab under the code that authorized its enrollment."""
+        try:
+            self.client.transact_write_items(TransactItems=[
+                {"Update": {"TableName": self.table, "Key": self.pack({"pk": "LAB#" + lab_id, "sk": "META"}),
+                            "UpdateExpression": "SET classroom_scope=:scope",
+                            "ConditionExpression": "token_hash=:token AND #active=:active AND (attribute_not_exists(classroom_scope) OR classroom_scope=:scope)",
+                            "ExpressionAttributeNames": {"#active": "active"},
+                            "ExpressionAttributeValues": self.pack({":scope": scope, ":token": token_hash, ":active": True})}},
+                {"Put": {"TableName": self.table, "Item": self.pack({"pk": "CLASSROOM#" + scope, "sk": "LAB#" + lab_id})}},
+            ])
+        except self.client.exceptions.TransactionCanceledException:
+            raise ApiError(409, "classroom enrollment conflict")
+
+    def classroom_members(self, scope, after=""):
+        cursor = None
+        while True:
+            args = dict(TableName=self.table, KeyConditionExpression="pk=:pk AND sk>:after",
+                        ExpressionAttributeValues=self.pack({":pk": "CLASSROOM#" + scope, ":after": "LAB#" + after}),
+                        ConsistentRead=True)
+            if cursor:
+                args["ExclusiveStartKey"] = cursor
+            result = self.client.query(**args)
+            for item in result.get("Items", []):
+                key = self.deserializer.deserialize(item["sk"])
+                if key.startswith("LAB#") and LAB_RE.fullmatch(key[4:]):
+                    yield key[4:]
+            cursor = result.get("LastEvaluatedKey")
+            if not cursor:
+                return
+
     def bind(self, pk, token_hash, release_id, deployment_id, instances):
         try:
             self.client.update_item(TableName=self.table, Key=self.pack({"pk": pk, "sk": "META"}),
@@ -241,7 +272,10 @@ class ProgressService:
         body = parse_body(event)
         if body.get("lab_token") == token:
             raise ApiError(400, "an individual token is required")
-        return self.create_lab(body)
+        result = self.create_lab(body)
+        scope = digest("classroom-v1:" + self.enrollment_hash)
+        self.store.record_classroom_lab(scope, body["lab_id"], digest(body["lab_token"]))
+        return result
 
     def create_lab(self, body):
         require_keys(body, ("lab_id", "release_id", "lab_token"))

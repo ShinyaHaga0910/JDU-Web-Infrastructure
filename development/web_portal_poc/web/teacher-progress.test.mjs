@@ -13,7 +13,7 @@ const maxima={M1:8,M2:13,M4:9,M5:13,M6:16};
 const grade={lab_id:'course-student',raw_earned:59,raw_maximum:59,current_unresolved:['M5'],missing_or_unresolved:[],
   current:{M5:{evaluable:false,checked_at:'2026-10-30T04:00:00Z',received_at:'2026-10-30T04:01:00Z'}},
   selected:Object.fromEntries(Object.entries(maxima).map(([m,n])=>[m,{raw_earned:n,received_at:'2026-10-23T00:00:00Z'}]))};
-const progress={class_id:'193548',context:'course',students:[{lab_id:'course-student',context:'course',status:'ok',grade}],next_after:null};
+const progress={classroom:true,context:'course',students:[{lab_id:'course-student',context:'course',status:'ok',grade}],next_after:null};
 function app(getTeacher,extra={}){return createApp({env,verify,sessions,getTeacher,...extra});}
 
 test('teacher list uses only verified claims and canonical selected grades',async()=>{
@@ -24,7 +24,7 @@ test('teacher list uses only verified claims and canonical selected grades',asyn
   assert.match(html,/59 \/ 59/);assert.match(html,/13 \/ 13/);assert.match(html,/M5/);assert.match(html,/2026-10-30 04:01 UTC/);
   assert.doesNotMatch(html,/teacher@jdu|attacker@jdu|1234567890/);
   assert.match(html,/tabindex="0" role="region" aria-labelledby="teacher-caption"/);
-  assert.match(html,/<caption id="teacher-caption">Class 193548/);assert.match(html,/<th scope="col">M1/);
+  assert.match(html,/<caption id="teacher-caption">授業用/);assert.match(html,/<th scope="col">M1/);
   assert.match(response.headers.get('cache-control'),/no-store/);
 });
 

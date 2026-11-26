@@ -189,16 +189,17 @@ class ClassroomTests(unittest.TestCase):
             with self.subTest(selection=selection), tempfile.TemporaryDirectory() as temp, contextlib.redirect_stdout(output), \
                     patch.dict(sys.modules, boto3=boto3), patch.object(sys, 'path', list(sys.path)), \
                     patch.object(sys, 'argv', ['classroom.py', 'teacher', '--ref', 'a' * 40]), \
-                    patch.object(sys.stdin, 'isatty', return_value=True), patch('builtins.input', side_effect=[selection, semester_end]) as prompt, \
+                    patch.object(sys.stdin, 'isatty', return_value=True), patch('builtins.input', side_effect=[selection, semester_end, 'teacher@jdu.uz']) as prompt, \
                     patch.object(classroom.Path, 'home', return_value=Path(temp)), patch.object(classroom.os, 'umask'), \
                     patch.object(classroom, 'remote_source', return_value=b'# offline fixture'), \
                     patch.object(classroom, 'teacher_run', return_value='jdu2.offline-fixture'), \
                     patch.object(classroom, 'assignment_portal_url', return_value=None), \
                     patch.object(classroom, 'prepare_assignment_portal') as portal:
                 self.assertEqual(classroom.main(), 0)
-                self.assertEqual(prompt.call_count, 2)
+                self.assertEqual(prompt.call_count, 3)
                 portal.assert_called_once()
                 self.assertEqual(portal.call_args.args[0].expires_on, semester_end)
+                self.assertEqual(portal.call_args.args[0].teacher_email, 'teacher@jdu.uz')
                 self.assertIn('[2] Japanese', output.getvalue())
                 self.assertEqual(output.getvalue().rstrip().splitlines()[-2:], [instruction, 'jdu2.offline-fixture'])
 

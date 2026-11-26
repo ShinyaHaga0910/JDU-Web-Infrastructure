@@ -35,8 +35,11 @@ export function createTeacherClient(env=process.env,client=new LambdaClient({reg
     return value;
   };
 }
+export function hasTeacherScope(value) {
+  return value?.classroom===true || (typeof value?.class_id==='string' && /^[0-9]{1,12}$/.test(value.class_id));
+}
 export function checkedTeacher(value,{detail=false,context,after='' }={}) {
-  if(!value || typeof value.class_id!=='string' || !/^[0-9]{1,12}$/.test(value.class_id))throw Error('Invalid class');
+  if(!hasTeacherScope(value))throw Error('Invalid class');
   const rows=detail?[value.student]:value.students;
   if(!Array.isArray(rows) || rows.length>10 || (!detail && value.context!==context))throw Error('Invalid progress');
   const ids=new Set();
@@ -66,7 +69,7 @@ export function teacherListHtml(lang,value,{validateGrade,maxima}) {
     return `<tr>${name}<td class="teacher-total">${Object.keys(grade.selected).length?`${grade.raw_earned} / ${grade.raw_maximum}`:escape(t.none)}</td>${cells}<td>${escape(grade.current_unresolved.length?grade.current_unresolved.join(', '):t.ok)}</td><td>${escape(stamp(latest))}</td></tr>`;
   }).join('');
   const tabs=`<div class="page-toolbar">${['course','verification'].map(key=>`<a class="action" href="/teacher?lang=${lang}&amp;context=${key}"${key===context?' aria-current="page"':''}>${escape(t[key])}</a>`).join('')}<a class="action" href="/checks?lang=${lang}">${{ja:'学生用の課題',ru:'Задания студента',uz:'Talaba vazifalari'}[lang]}</a><form action="/auth/logout" method="post"><button type="submit">${{ja:'ログアウト',ru:'Выйти',uz:'Chiqish'}[lang]}</button></form></div>`;
-  const table=rows?`<div class="table-wrap teacher-table" tabindex="0" role="region" aria-labelledby="teacher-caption"><table><caption id="teacher-caption">Class ${escape(value.class_id)} — ${escape(t[context])}</caption><thead><tr><th scope="col">${escape(t.lab)}</th><th scope="col">${escape(t.total)}</th>${missions.map(m=>`<th scope="col">${m}</th>`).join('')}<th scope="col">${escape(t.unknown)}</th><th scope="col">${escape(t.latest)}</th></tr></thead><tbody>${rows}</tbody></table></div>`:`<p>${escape(t.empty)}</p>`;
+  const table=rows?`<div class="table-wrap teacher-table" tabindex="0" role="region" aria-labelledby="teacher-caption"><table><caption id="teacher-caption">${escape(t[context])}</caption><thead><tr><th scope="col">${escape(t.lab)}</th><th scope="col">${escape(t.total)}</th>${missions.map(m=>`<th scope="col">${m}</th>`).join('')}<th scope="col">${escape(t.unknown)}</th><th scope="col">${escape(t.latest)}</th></tr></thead><tbody>${rows}</tbody></table></div>`:`<p>${escape(t.empty)}</p>`;
   const next=value.next_after?`<p><a href="/teacher?lang=${lang}&amp;context=${context}&amp;after=${value.next_after}">${escape(t.next)}</a></p>`:'';
   return tabs+table+next;
 }

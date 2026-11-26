@@ -250,20 +250,15 @@ def activate(session, account, revision, origin, google_source, students, expire
     google_test_arn, test_access = google_test_access(sm, account, google_test_source, expires, oauth['client_id'])
     refs = backend(session, account, test_access)
     digest = publish_link(session, account, origin, students, expires) if students else 'disabled'
-    bucket = outputs(read_stack(cfn, STACK + '-artifacts'))['BucketName']
-    with TemporaryDirectory() as work:
-        archive = Path(work) / 'portal-web.zip'
-        build(archive)
-        code = publish(session.client('s3'), account, bucket, 'portal', archive.name, archive.read_bytes(), 'application/zip')
-    apply_stack(cfn, STACK, template('web/portal-web.template.json'), {
-        **code, 'WebFunctionName': FUNCTION, 'ReleaseId': revision, 'LabRoleArn': f'arn:aws:iam::{account}:role/LabRole',
+    publish_web(session, account, revision, {
+        'WebFunctionName': FUNCTION, 'LabRoleArn': f'arn:aws:iam::{account}:role/LabRole',
         'PortalMode': 'enabled', 'PortalExpiresAt': expires, 'PublicOrigin': origin, 'GoogleOAuthSecretArn': target,
         'GoogleTestSecretArn': google_test_arn,
         'BindingTableName': refs['BindingTableName'], 'GradeReaderFunctionArn': refs['GradeReaderArn'],
         'CheckerFunctionArn': refs['CheckerArn'], 'CheckerEnabled': 'true', 'SelfLinkEnabled': 'true',
         'EnrollmentEnabled': 'true' if students else 'false',
         'EnrollmentFunctionArn': refs['EnrollmentArn'], 'BootstrapTemplateDigest': digest,
-    }, update=True)
+    })
     if get_portal_url(read_stack(cfn, STACK)) != origin:
         raise ValueError('Unexpected portal endpoint after update')
 
@@ -351,11 +346,63 @@ def approve_teacher(session, class_id, labs):
                             ClientRequestToken=revision)
     print(f'Teacher access granted for {len(labs)} Lab(s).')
 
+
+def approve_classroom_teacher(session, email, scope):
+    from datetime import datetime, timezone
+
+    from portal_enrollment import encoded
+    from prepare_teacher_access import get
+    from teacher_progress import teacher_key
+
+    if not re.fullmatch(r'[a-f0-9]{64}', scope or ''):
+        raise ValueError('Invalid classroom scope')
+    cfn, db = session.client('cloudformation'), session.client('dynamodb')
+    bindings = outputs(read_stack(cfn, STACK + '-bindings'))['TableName']
+    services = outputs(read_stack(cfn, STACK + '-services'))
+    pepper = session.client('secretsmanager').get_secret_value(
+        SecretId=services['SubjectKeySecretArn'], VersionStage='AWSCURRENT')['SecretString']
+    pk = teacher_key(email, bytes.fromhex(pepper))
+    sk = 'CLASSROOM_ACCESS'
+    existing = get(db, bindings, pk, sk)
+    if existing:
+        if existing.get('active') is True and existing.get('classroom_scope') == scope:
+            return
+        raise ValueError('Teacher already has a classroom assignment. Review its scope before replacing it.')
+    row = {'pk': pk, 'sk': sk, 'active': True, 'classroom_scope': scope,
+           'updated_at': datetime.now(timezone.utc).isoformat()}
+    db.put_item(TableName=bindings, Item=encoded(row), ConditionExpression='attribute_not_exists(pk)')
+
+
+def publish_web(session, account, revision, values):
+    cfn = session.client('cloudformation')
+    bucket = outputs(read_stack(cfn, STACK + '-artifacts'))['BucketName']
+    definition = template('web/portal-web.template.json')
+    with TemporaryDirectory() as work:
+        archive = Path(work) / 'portal-web.zip'
+        build(archive)
+        artifacts = publish(session.client('s3'), account, bucket, 'portal', archive.name,
+                            archive.read_bytes(), 'application/zip')
+    current = {key: value for key, value in values.items() if key in definition['Parameters']}
+    apply_stack(cfn, STACK, definition, {**current, **artifacts, 'ReleaseId': revision}, update=True)
+
+
+def refresh_enabled_portal(session, account, revision):
+    """Publish matching teacher views while retaining live OAuth and portal parameters."""
+    cfn = session.client('cloudformation')
+    values = stack_parameters(read_stack(cfn, STACK))
+    if values.get('PortalMode') != 'enabled':
+        raise ValueError('Portal is not enabled')
+    services = read_stack(cfn, STACK + '-services')
+    backend(session, account, stack_parameters(services).get('GoogleTestAccess', ''))
+    publish_web(session, account, revision, values)
+
+
 def main():
     import boto3
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('phase', choices=('portal-prepare', 'portal-init', 'portal-connect', 'portal-enable', 'portal-approve', 'portal-teacher', 'portal-secret'))
+    parser.add_argument('phase', choices=('portal-prepare', 'portal-init', 'portal-connect', 'portal-enable',
+                                          'portal-approve', 'portal-teacher', 'portal-classroom-teacher', 'portal-secret'))
     parser.add_argument('--google-secret', default=GOOGLE_SECRET_NAME)
     parser.add_argument('--google-test-secret', default='disabled',
                         help='Optional same-account Secrets Manager secret for one short-lived Google test student')
@@ -365,10 +412,18 @@ def main():
     parser.add_argument('--student-account', action='append', default=[])
     parser.add_argument('--lab-id', action='append', default=[])
     parser.add_argument('--class-id')
+    parser.add_argument('--teacher-email')
+    parser.add_argument('--classroom-scope')
     parser.add_argument('--ref', required=True)
     args = parser.parse_args()
     if not re.fullmatch(r'[a-f0-9]{40}', args.ref):
         raise ValueError('Expected a Git commit')
+    if bool(args.teacher_email) != bool(args.classroom_scope):
+        parser.error('Specify teacher email and classroom scope together')
+    if args.phase == 'portal-classroom-teacher' and not args.teacher_email:
+        parser.error('Teacher email is required')
+    if args.teacher_email and args.phase not in ('portal-init', 'portal-classroom-teacher'):
+        parser.error('Teacher email is only used during classroom setup')
     session = boto3.Session(region_name=REGION)
     account = session.client('sts').get_caller_identity()['Account']
     if not re.fullmatch(r'[0-9]{12}', account):
@@ -378,6 +433,8 @@ def main():
         origin = prepare(session, account, args.ref, expires)
         if expires:
             backend(session, account)
+            if args.teacher_email:
+                approve_classroom_teacher(session, args.teacher_email, args.classroom_scope)
             messages = {
                 'en': 'Add the redirect URI in Google Cloud, then run portal-enable.',
                 'ja': 'Google CloudにリダイレクトURIを追加した後、portal-enable を実行してください。',
@@ -408,6 +465,9 @@ def main():
         if len(args.student_account) != 1 or len(args.lab_id) != 1:
             parser.error('One --student-account and --lab-id are required')
         approve_student(session, args.student_account[0], args.lab_id[0])
+    elif args.phase == 'portal-classroom-teacher':
+        refresh_enabled_portal(session, account, args.ref)
+        approve_classroom_teacher(session, args.teacher_email, args.classroom_scope)
     else:
         approve_teacher(session, args.class_id, args.lab_id)
 

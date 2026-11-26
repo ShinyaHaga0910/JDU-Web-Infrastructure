@@ -42,6 +42,16 @@ def checked_assignment(row):
     return row
 
 
+def classroom_assignment(scope, lab_id, grades):
+    meta = grades.get('LAB#' + lab_id, 'META')
+    if (not meta or meta.get('active') is not True or meta.get('lab_id') != lab_id
+            or meta.get('classroom_scope') != scope or not meta.get('deployment_id')
+            or meta.get('assessment_context', 'course') not in CONTEXTS):
+        return None
+    return {'lab_id': lab_id, 'deployment_id': meta['deployment_id'],
+            'context': meta.get('assessment_context', 'course')}
+
+
 def valid(event):
     if type(event) is not dict:
         return False
@@ -70,19 +80,30 @@ def read_teacher(event, pepper, bindings, grades):
     if not valid(event):
         raise legacy.ApiError(401, 'unauthorized')
     pk = teacher_key(event['email'], pepper)
-    row = checked_assignment(bindings.get(pk, 'ACCESS'))
+    key = 'CLASSROOM_ACCESS'
+    row = bindings.get(pk, key)
+    if row is None:
+        key = 'ACCESS'
+        row = checked_assignment(bindings.get(pk, key))
+        scope = None
+        label = {'class_id': row['class_id']}
+    else:
+        scope = row.get('classroom_scope')
+        if row.get('active') is not True or not isinstance(scope, str) or not re.fullmatch(r'[a-f0-9]{64}', scope):
+            raise legacy.ApiError(401, 'unauthorized')
+        label = {'classroom': True}
     # Optional subject pin is set by the existing-bound-identity operator path.
     # A generic teacher email grant still requires the verified Google email.
     if row.get('subject_pk') is not None and row['subject_pk'] != subject_key(event['subject'], pepper):
         raise legacy.ApiError(401, 'unauthorized')
 
     def finish(value):
-        if bindings.get(pk, 'ACCESS') != row:
+        if bindings.get(pk, key) != row:
             raise legacy.ApiError(401, 'unauthorized')
         return value
 
     if event['operation'] == 'teacher_access':
-        return finish({'class_id': row['class_id']})
+        return finish(label)
 
     def project(assigned):
         lab_id = assigned['lab_id']
@@ -91,33 +112,52 @@ def read_teacher(event, pepper, bindings, grades):
             meta = grades.get('LAB#' + lab_id, 'META')
             if (not meta or meta.get('active') is not True or any(meta.get(k) != v for k, v in
                     [('lab_id', lab_id), ('deployment_id', assigned['deployment_id'])])
-                    or meta.get('assessment_context', 'course') != assigned['context']):
+                    or meta.get('assessment_context', 'course') != assigned['context']
+                    or (scope and meta.get('classroom_scope') != scope)):
                 return base
             values = grades.labs(lab_id)  # Always a named permitted Lab, never a scan.
             if (len(values) != 1 or values[0].get('active') is not True
-                    or any(values[0].get(k) != meta.get(k) for k in ('lab_id', 'deployment_id', 'assessment_context'))):
+                    or any(values[0].get(k) != meta.get(k)
+                           for k in ('lab_id', 'deployment_id', 'assessment_context', 'classroom_scope'))):
                 return base
             grade = project_student(values[0], event.get('task_id'))
             current = grades.get('LAB#' + lab_id, 'META')
             if not current or current.get('active') is not True or any(current.get(k) != meta.get(k)
-                    for k in ('lab_id', 'deployment_id', 'assessment_context')):
+                    for k in ('lab_id', 'deployment_id', 'assessment_context', 'classroom_scope')):
                 return base
             return {**base, 'status': 'ok', 'grade': grade}
         except Exception:
             return base  # Unavailable is not an invented zero or missing submission.
+
+    if scope:
+        if event['operation'] == 'teacher_detail':
+            selected = classroom_assignment(scope, event['lab_id'], grades)
+            if selected is None:
+                raise legacy.ApiError(401, 'unauthorized')
+            return finish({**label, 'student': project(selected)})
+        page = []
+        for lab_id in grades.classroom_members(scope, event['after']):
+            selected = classroom_assignment(scope, lab_id, grades)
+            if selected and selected['context'] == event['context']:
+                page.append(selected)
+                if len(page) > PAGE_SIZE:
+                    break
+        return finish({**label, 'context': event['context'],
+                       'students': [project(r) for r in page[:PAGE_SIZE]],
+                       'next_after': page[PAGE_SIZE - 1]['lab_id'] if len(page) > PAGE_SIZE else None})
 
     assigned = sorted(row['labs'], key=lambda r: r['lab_id'])
     if event['operation'] == 'teacher_detail':
         selected = next((r for r in assigned if r['lab_id'] == event['lab_id']), None)
         if selected is None:
             raise legacy.ApiError(401, 'unauthorized')
-        return finish({'class_id': row['class_id'], 'student': project(selected)})
+        return finish({**label, 'student': project(selected)})
     selected = [r for r in assigned if r['context'] == event['context']]
     after = event['after']
     if after and after not in {r['lab_id'] for r in selected}:
         raise legacy.ApiError(401, 'unauthorized')
     remaining = [r for r in selected if r['lab_id'] > after]
     page = remaining[:PAGE_SIZE]
-    return finish({'class_id': row['class_id'], 'context': event['context'],
+    return finish({**label, 'context': event['context'],
                    'students': [project(r) for r in page],
                    'next_after': page[-1]['lab_id'] if len(remaining) > PAGE_SIZE else None})

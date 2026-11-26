@@ -10,7 +10,7 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
   bash "$setup" teacher
 ```
 
-言語を選び、タシケント時間での学期最終日を入力します。既存の教師環境にポータルだけを追加する場合は、同じスクリプトを `bash "$setup" portal-init --expires-on YYYY-MM-DD` で実行します。
+言語を選び、タシケント時間での学期最終日と、教師用ポータルで使う学校のGoogleメールアドレス（`@jdu.uz`）を入力します。既存の教師環境にポータルと教師の閲覧許可を追加する場合も、同じ教師用セットアップを実行します。
 
 画面に `PortalUrl` と `Google OAuth redirect URI` が表示されます。この時点のURLはGoogle設定用です。終わった後も同じCloudShellで `"$setup"` を使います。変数が残っていなければ、最初の2行でスクリプトを再取得できます。
 
@@ -45,11 +45,9 @@ bash "$setup" portal-enable --google-secret GOOGLE-SECRET-NAME
 
 ### 教師用の成績一覧を設定する
 
-教師用の成績一覧は、閲覧を許可するクラスとLabを指定します。複数の場合は `--lab-id` をLabごとに繰り返します。続く入力欄には教師の学校Googleメールを入れます。
+初回セットアップで入力した学校Googleアカウントでログインすると、教師用の成績一覧を開けます。今回の共通登録コードで登録した学生が一覧に自動で追加されます。クラスIDと学生のLab IDの入力は不要です。
 
-```bash
-bash "$setup" portal-teacher --class-id CLASS-ID --lab-id STUDENT-LAB-ID
-```
+更新前に作成した演習環境をこの一覧に追加する場合は、教師用セットアップを更新したあと、学生が同じ共通登録コードで学生用セットアップを再実行します。既存の演習環境を使って再登録します。
 
 ## 5. URLを確認して共有する
 

@@ -8,11 +8,11 @@ from identity_grade_handler import serve
 
 
 class Bindings:
-    def __init__(self, pk, row):
-        self.pk, self.row = pk, row
+    def __init__(self, pk, row, sk='ACCESS'):
+        self.pk, self.row, self.sk = pk, row, sk
 
     def get(self, pk, sk):
-        return copy.deepcopy(self.row) if (pk, sk) == (self.pk, 'ACCESS') else None
+        return copy.deepcopy(self.row) if (pk, sk) == (self.pk, self.sk) else None
 
 
 class Grades:
@@ -27,6 +27,9 @@ class Grades:
         if self.hook:
             self.hook()
         return [copy.deepcopy(self.rows[lab])]
+
+    def classroom_members(self, scope, after):
+        return (lab for lab, row in sorted(self.rows.items()) if lab > after and row.get('classroom_scope') == scope)
 
 
 class TeacherProgressTest(unittest.TestCase):
@@ -77,6 +80,17 @@ class TeacherProgressTest(unittest.TestCase):
         self.assertEqual(self.grades.reads, [])
         result = read_teacher(self.event('teacher_detail', lab_id='test-lab'), self.pepper, self.bindings, self.grades)
         self.assertEqual(result['student']['context'], 'verification')
+
+    def test_classroom_grant_includes_only_registered_members_as_they_arrive(self):
+        scope = 'a' * 64
+        self.bindings = Bindings(self.bindings.pk, {'active': True, 'classroom_scope': scope}, 'CLASSROOM_ACCESS')
+        self.assertEqual(self.call(operation='teacher_access'), {'classroom': True})
+        self.assertEqual(self.call()['students'], [])
+        self.grades.rows['course-student']['classroom_scope'] = scope
+        self.grades.rows['not-assigned']['classroom_scope'] = 'b' * 64
+        self.assertEqual([r['lab_id'] for r in self.call()['students']], ['course-student'])
+        self.assertEqual(serve(self.event('teacher_detail', lab_id='not-assigned'),
+                               self.pepper, self.bindings, self.grades), {'status': 'unauthorized'})
 
     def test_revocation_during_read_prevents_return_of_the_page(self):
         self.grades.hook = lambda: self.grant.update(active=False)

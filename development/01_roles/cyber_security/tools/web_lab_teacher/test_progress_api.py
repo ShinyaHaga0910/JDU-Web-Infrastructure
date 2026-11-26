@@ -25,6 +25,12 @@ class MemoryStore:
         self.rows[key] = copy.deepcopy(row)
         return True
 
+    def record_classroom_lab(self, scope, lab_id, token_hash):
+        row = self.rows[("LAB#" + lab_id, "META")]
+        if row["token_hash"] != token_hash or not row["active"] or row.get("classroom_scope", scope) != scope:
+            raise api.ApiError(409, "classroom enrollment conflict")
+        row["classroom_scope"] = scope
+
     def bind(self, pk, token_hash, release_id, deployment_id, instances):
         row = self.rows[(pk, "META")]
         if row["token_hash"] != token_hash or row["release_id"] != release_id or not row["active"]:

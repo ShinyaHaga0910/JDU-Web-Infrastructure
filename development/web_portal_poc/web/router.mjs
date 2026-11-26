@@ -6,7 +6,7 @@ import { preparationText, checkPreparationToken, checkedPreparation, preparation
   preparationTemplate, createPreparationLink } from './preparation.mjs';
 import { bootstrapTemplate, createBootstrapLink } from './bootstrap-link.mjs';
 import { words as checkWords, validOperation, verifyCheckToken, checkHtml, taskActions, taskDetailHtml, tasks as checkTasks, progressScript,sealApplicationPassword } from './checks.mjs';
-import { teacherText, checkedTeacher, teacherListHtml } from './teacher-progress.mjs';
+import { teacherText, hasTeacherScope, checkedTeacher, teacherListHtml } from './teacher-progress.mjs';
 import { createInitialDelivery } from './initial-delivery.mjs';
 
 const security = {
@@ -482,7 +482,7 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
     if (url.pathname === '/') {
       let teacherLink='';
       if(schoolIdentity && typeof getTeacher==='function') {
-        try {const result=await getTeacher({operation:'teacher_access',subject:identity.sub,email:identity.email});if(result?.status==='ok' && /^[0-9]{1,12}$/.test(result.teacher?.class_id||''))teacherLink=`<p><a href="/teacher?lang=${lang}">${escape(teacherText[lang].title)}</a></p>`;} catch {}
+        try {const result=await getTeacher({operation:'teacher_access',subject:identity.sub,email:identity.email});if(result?.status==='ok' && hasTeacherScope(result.teacher))teacherLink=`<p><a href="/teacher?lang=${lang}">${escape(teacherText[lang].title)}</a></p>`;} catch {}
       }
       if (checkerEnabled && !preparationEnabled) return redirect(teacherLink?`/teacher?lang=${lang}`:`/checks?lang=${lang}`);
       return response(page(lang,t.title,`<section>${preparationEnabled?`<p><a href="/prepare?lang=${lang}">${escape(preparationText[lang].title)}</a></p>`:''}${enrollmentEnabled?`<p><a href="/enroll?lang=${lang}">${escape(enrollmentText(lang).title)}</a></p>`:''}<p><a href="/grades?lang=${lang}">${escape(t.grades)}</a></p><p><a href="/status?lang=${lang}">${escape(t.status)}</a></p>${checkerEnabled?`<p><a href="/checks?lang=${lang}">${escape(checkWords[lang].title)}</a></p>`:''}${teacherLink}</section>${checkerEnabled?'':`<p>${escape(t.notice)}</p>`}<p>${escape(t.shared)}</p><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form>`));

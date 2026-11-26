@@ -42,7 +42,7 @@ curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastruc
 
 構築・採点コードをmainに反映すると、GitHub Actionsが構築スクリプトとブラウザ採点用の配布物を同じ版で作ります。[ビルドと成果物の取得方法](development/README.md#採点を変更したときのビルド)
 
-**教師用Learner Lab** では上記のまま実行します。言語を選び、学期最終日を入力すると、教師基盤と採点ポータルの準備が進みます。共通登録コードは受講者だけが見られる場所で共有します。表示されたリダイレクトURIをGoogle Cloudに登録し、採点ポータルを有効にします。
+**教師用Learner Lab** では上記のまま実行します。言語を選び、学期最終日と教師用ポータルで使う学校のGoogleメールアドレス（`@jdu.uz`）を入力します。そのメールアドレスでポータルへログインすると、今回の共通登録コードで参加した学生の成績を確認できます。共通登録コードは受講者だけが見られる場所で共有します。表示されたリダイレクトURIをGoogle Cloudに登録し、採点ポータルを有効にします。
 
 [教師向けの採点ポータル設定（Google Cloud・採点URL）](development/web_portal_poc/CLASSROOM-PORTAL.md)
 

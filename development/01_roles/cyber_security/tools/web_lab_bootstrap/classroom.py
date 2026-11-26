@@ -464,17 +464,24 @@ SEMESTER_PROMPT = {
     'ru': 'Последний день семестра (ГГГГ-ММ-ДД, время Ташкента)',
     'uz': 'Semestrning oxirgi kuni (YYYY-MM-DD, Toshkent vaqti)',
 }
+TEACHER_EMAIL_PROMPT = {
+    'en': 'Enter your school Google email address (@jdu.uz) for the teacher portal',
+    'ja': '教師用ポータルで使う学校の Google メールアドレス（@jdu.uz）を入力してください',
+    'ru': 'Введите адрес школьного аккаунта Google (@jdu.uz) для портала преподавателя',
+    'uz': 'O‘qituvchi portali uchun maktab Google hisobingiz manzilini (@jdu.uz) kiriting',
+}
 
 
-def prepare_assignment_portal(args, directory):
+def prepare_assignment_portal(args, directory, enabled=False):
     launcher = remote_source(args.ref, 'development/setup-classroom.sh')
     marker = b"\nref=''\n"
     if launcher.count(marker) != 1:
         raise ValueError('PORTAL_LAUNCHER_REVISION')
     path = Path(directory, 'setup-assignment-portal.sh')
     path.write_bytes(launcher.replace(marker, f"\nref='{args.ref}'\n".encode()))
-    subprocess.run(['bash', str(path), 'portal-init', '--expires-on', args.expires_on,
-                    '--lang', args.lang], check=True)
+    options = ['portal-classroom-teacher'] if enabled else ['portal-init', '--expires-on', args.expires_on]
+    subprocess.run(['bash', str(path), *options, '--lang', args.lang,
+                    '--teacher-email', args.teacher_email, '--classroom-scope', args.classroom_scope], check=True)
 
 
 def assignment_portal_url(cfn):
@@ -514,6 +521,7 @@ def teacher_run(args, screen, session, account, work):
     if not re.fullmatch(r'[A-Za-z0-9_-]{43}', token):
         raise ValueError('ENROLLMENT_KEY')
     enrollment = (assessment_api_source(args.ref), hashlib.sha256(token.encode()).hexdigest())
+    args.classroom_scope = hashlib.sha256(('classroom-v1:' + enrollment[1]).encode()).hexdigest()
     screen.step('stack')
     name = TEACHER_STACK
     with screen.aws_wait():
@@ -1408,6 +1416,9 @@ def run_cli():
             if (not re.fullmatch(r'[0-9]{4}-[0-9]{2}-[0-9]{2}', args.expires_on)
                     or date.fromisoformat(args.expires_on) < datetime.now(ZoneInfo('Asia/Tashkent')).date()):
                 raise ValueError('SEMESTER_END_DATE')
+            args.teacher_email = input(TEACHER_EMAIL_PROMPT[args.lang] + ': ').strip().lower()
+            while not args.teacher_email.isascii() or not re.fullmatch(r'[^@\s]{1,64}@jdu\.uz', args.teacher_email):
+                args.teacher_email = input(TEACHER_EMAIL_PROMPT[args.lang] + ': ').strip().lower()
         screen.step('aws')
         if not re.fullmatch('[a-f0-9]{40}', args.ref):
             raise ValueError('SOURCE_REVISION')
@@ -1444,20 +1455,18 @@ def run_cli():
             else:
                 reset_rdp(args, screen, session, account, work)
                 return 0
-        screen.step('done')
-        screen.record(screen.text['notice'])
         if args.role == 'teacher':
-            print(f'\n{screen.text["invite"]}\n{screen.text["share_code"]}\n{enrollment_code}', flush=True)
-            try:
-                url = assignment_portal_url(session.client('cloudformation'))
-            except Exception:
-                url = None
+            url = assignment_portal_url(session.client('cloudformation'))
+            with tempfile.TemporaryDirectory() as portal_directory:
+                prepare_assignment_portal(args, portal_directory, enabled=bool(url))
+            screen.step('done')
+            screen.record(screen.text['notice'])
             if url:
                 screen.record(f'PortalUrl: {url}')
-            else:
-                with tempfile.TemporaryDirectory() as portal_directory:
-                    prepare_assignment_portal(args, portal_directory)
+            print(f'\n{screen.text["invite"]}\n{screen.text["share_code"]}\n{enrollment_code}', flush=True)
         else:
+            screen.step('done')
+            screen.record(screen.text['notice'])
             screen.record('✓  ' + screen.text['student_success'])
             screen.record(screen.text['rdp_instruction'])
             screen.record(screen.text['rdp_details'].format(ip=bastion_ip))
