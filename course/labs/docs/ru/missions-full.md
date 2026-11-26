@@ -82,7 +82,7 @@ JDU WEB-02 mission: independent HTTP delivery.
 | 2 | nginx -t проходит; location /mission.txt задаёт root /var/www/jdu-mission. В M1 также сохранена конфигурация P1. |
 | 3 | Порт 80 слушает private IP/все интерфейсы, не только loopback. |
 | 4 | /var/www/jdu-mission/mission.txt: обычный файл, точный текст, владелец root, группа www-data, права 0640. |
-| 5 | Сам Web получает HTTP 200 и нужный текст; в M1 также доступен /practice.txt. |
+| 5 | Сам Web получает HTTP 200 и нужный текст. |
 | 6 | Бастион получает HTTP 200 и точный текст через private IP. |
 | 7 | CloudShell получает HTTP 200 и точный текст через public IP. |
 | 8 | Access log содержит запрос с nonce именно этой проверки. |

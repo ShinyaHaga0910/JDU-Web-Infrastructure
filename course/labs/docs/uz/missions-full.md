@@ -82,7 +82,7 @@ Har bir mezon 1 ball.
 | 2 | nginx -t muvaffaqiyatli; /mission.txt location ichida root /var/www/jdu-mission. M1 da P1 sozlamasi ham saqlangan. |
 | 3 | 80 port private IP/barcha interface da tinglaydi, faqat loopback emas. |
 | 4 | /var/www/jdu-mission/mission.txt: oddiy fayl, belgilangan matn, egasi root, guruhi www-data, ruxsati 0640. |
-| 5 | Web serverning o‘zi HTTP 200 va belgilangan matnni oladi; M1 da /practice.txt ham ochiladi. |
+| 5 | Web serverning o‘zi HTTP 200 va belgilangan matnni oladi. |
 | 6 | Bastion private IP orqali HTTP 200 va aniq matn oladi. |
 | 7 | CloudShell public IP orqali HTTP 200 va aniq matn oladi. |
 | 8 | Access log aynan shu tekshiruv nonce li so‘rovni saqlaydi. |
