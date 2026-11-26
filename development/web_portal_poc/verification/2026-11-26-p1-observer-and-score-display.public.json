@@ -1,0 +1,44 @@
+{
+  "date": "2026-11-26",
+  "scope": "Live P1 observer repair and all-task score presentation",
+  "cause": "classroom bootstrap metadata omitted private_ip; legacy Web HTTP observer raised KeyError before returning its five scored checks",
+  "repair": "initial setup now retains the role private IP; only missing metadata was repaired on five verified existing nodes",
+  "lesson_configuration_modified": false,
+  "p1": {
+    "after": {
+      "unknown": 0,
+      "maximum": 8,
+      "passed": 8
+    },
+    "before": {
+      "unknown": 5,
+      "maximum": 8,
+      "passed": 3
+    },
+    "portal_and_list_verified": true
+  },
+  "display": {
+    "tasks": "P0-P5 and M0-M5",
+    "existing_course_total_policy_preserved": true,
+    "student_live_languages": [
+      "ja",
+      "ru",
+      "uz"
+    ],
+    "initial": "0 / task maximum",
+    "teacher_local_verified": true,
+    "unavailable_data_not_converted_to_zero": true,
+    "teacher_live_visual_check": false
+  },
+  "tests": {
+    "web_package": 3,
+    "bootstrap": 25,
+    "web": 39
+  },
+  "commits": [
+    "2294384",
+    "a941104"
+  ],
+  "deployment": "portal-refresh completed on existing teacher portal; existing student exercise stack retained",
+  "other_exercises": "Not completed or graded by this verification"
+}
