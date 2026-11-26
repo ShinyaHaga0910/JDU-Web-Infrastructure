@@ -2,9 +2,25 @@
 
 **日本語** · [Русский](README.ru.md) · [O‘zbekcha](README.uz.md)
 
+[採点ページのURLを確認する](#採点ページのurlを確認する)
+
 JDUのWebインフラストラクチャー構築教材です。今セミスターは`Introduction-CyberSecurity`という統合科目の後半で使用します。将来は、この教材を独立した科目の入口として使用できる構成にします。
 
 学生はAWSのVPC内でEC2上のDNS・Web・DBを構築し、教員提供アプリをWebとDBへ接続します。通信経路、公開範囲、service、port、log、保存と復旧を確認します。学生がアプリケーションをプログラミングする授業ではありません。
+
+## 採点ページのURLを確認する
+
+**教師**は、採点ポータルを構築した教師用Learner LabのCloudShell（`us-east-1`）に、次を貼り付けます。有効化済みで利用期限内の採点ページのURLが1行で表示されます。
+
+```bash
+setup=$(mktemp)
+curl -q -fsS https://raw.githubusercontent.com/ShinyaHaga0910/JDU-Web-Infrastructure/refs/heads/main/development/setup-classroom.sh -o "$setup" &&
+  bash "$setup" portal-url --lang ja
+```
+
+AWSの画面からURLを探す場合は、教師用Learner Labの **CloudFormation → Stacks → `jdu-web-infrastructure-portal` → Outputs → `PortalUrl`** を開きます。コマンドでURLが表示されないときは、教師用Learner Labで実行しているか、採点ポータルが有効化されているか、利用期限内かを確認してください。 [教師向けの設定手順](development/web_portal_poc/CLASSROOM-PORTAL.md)
+
+**学生**は、自分のクラスのLMSで教師が共有した採点ページのURLを開きます。教師側のスタックにあるURLなので、学生用CloudShellでは `portal-url` で取得できません。LMSの案内に見当たらない場合は、教師に確認してください。
 
 ## AWS演習環境の構築
 

@@ -2,6 +2,8 @@
 
 [日本語](README.md) · [Русский](README.ru.md) · **O‘zbekcha**
 
+**Baholash portali manzili.** O‘qituvchi o‘z Learner Lab’ining CloudShell terminalida (`us-east-1`) `portal-url --lang uz` buyrug‘i orqali manzilni oladi va uni kurs LMS’ida ulashadi. Talabalar LMS’dagi havolani ochadi. [Nusxalash uchun buyruq](README.md#採点ページのurlを確認する)
+
 JDUning veb-infratuzilmani yaratish bo‘yicha o‘quv materiallari. Bu semestrda ular `Introduction-CyberSecurity` fanining ikkinchi yarmida ishlatiladi. Kelajakda bu materiallardan alohida kurs uchun ham foydalanish mumkin.
 
 Talabalar AWS VPC ichidagi EC2 instanslarida DNS, veb-server va ma’lumotlar bazasini sozlaydi. Ular o‘qituvchi taqdim etgan ilovani veb-server va ma’lumotlar bazasiga ulaydi. Amaliyotda tarmoq yo‘nalishlari, xizmatlarga kirish, portlar, loglar, ma’lumotlarni saqlash va tiklash tekshiriladi. Kursda ilovani dasturlash talab qilinmaydi.

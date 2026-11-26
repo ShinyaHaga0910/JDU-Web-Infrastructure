@@ -51,13 +51,17 @@ bash "$setup" portal-enable --google-secret GOOGLE-SECRET-NAME
 bash "$setup" portal-teacher --class-id CLASS-ID --lab-id STUDENT-LAB-ID
 ```
 
-## 5. URLを共有する
+## 5. URLを確認して共有する
+
+教師用CloudShell（`us-east-1`）で、次を実行します。別のセッションを開いた場合は、[トップページのコマンド](../../README.md#採点ページのurlを確認する)を使うとスクリプトの取得からやり直せます。
 
 ```bash
-bash "$setup" portal-url
+bash "$setup" portal-url --lang ja
 ```
 
-有効化した採点ページのURLが1行で表示されます。教師セットアップの完了画面でも確認できます。学校Googleでログインし、学生は最初だけ「本人AWSとの連携」を済ませます。P0の採点結果と保存済みの点数が表示されるところまで確認してから、同じURLをクラスのLMSで共有します。
+有効化した採点ページのURLが1行で表示されます。教師用AWSの **CloudFormation → Stacks → `jdu-web-infrastructure-portal` → Outputs → `PortalUrl`** でもURLを確認できます。
+
+学校Googleでログインし、P0の採点結果と保存済みの点数が表示されるところまで確認してから、同じURLをクラスのLMSで共有します。学生はLMSのURLを使い、最初だけ「本人AWSとの連携」を済ませます。
 
 
 ## 学期が終わったら
