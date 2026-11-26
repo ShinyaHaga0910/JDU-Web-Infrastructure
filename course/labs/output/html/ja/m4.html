@@ -14,16 +14,16 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
 </style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">完成要件</a> · <a href="#section-2">今回の見取り図</a> · <a href="#section-3">採点基準</a> · <a href="#section-4">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M4 教員アプリをWeb・DBへ接続する (13)</h1>
-<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M5</a></p>
+<p><a href="practice.html">練習 P0〜P5</a> · <a href="missions.html">課題 M0〜M5</a></p>
 <p><a href="../ja/m4.html">日本語</a> · <a href="../ru/m4.html">Русский</a> · <a href="../uz/m4.html">O‘zbekcha</a></p>
-<p>対応する詳しい練習は<a href="p5.html">P5</a>。</p>
+<p>対応する詳しい練習は<a href="p4.html">P4</a>。</p>
 <h2 id="section-1">完成要件</h2>
 <p>始める前に、採点ページで <a href="m2.html">M2</a>、<a href="m3.html">M3</a> が満点になっていることを確認する。</p>
-<p>P5で動かした備品管理アプリを、M3で構築した課題用DBにつなぐ。P6で練習用の設定を仕上げてから始める。</p>
+<p>P4で動かした備品管理アプリを、M3で構築した課題用DBにつなぐ。P5で練習用の設定を仕上げてから始める。</p>
 <ol>
-<li><strong>Webサーバー（P6.3、P5.4〜P5.5）</strong>　アプリを停止し、使用する設定を <code>mission</code> に切り替える。配備済みのアプリを使い、課題用DBにテーブルと初期データを用意し、アプリ管理者を作る。</li>
-<li><strong>DBサーバーとWebサーバー（P5.6〜P5.8）</strong>　通常運用用ロールに権限を付け、アプリを起動する。公開ページと管理画面の両方を開き、<code>/practice.txt</code> と <code>/mission.txt</code> も引き続き開けることを確かめる。</li>
-<li><strong>踏み台サーバー（P5.9）</strong>　<code>http://admin.lab.test:8080/admin/</code> に <code>lab_admin</code> で入り、下の2件を登録する。一般ページでは公開にした備品を確認する。</li>
+<li><strong>Webサーバー（P5.3、P4.4〜P4.5）</strong>　アプリを停止し、使用する設定を <code>mission</code> に切り替える。配備済みのアプリを使い、課題用DBにテーブルと初期データを用意し、アプリ管理者を作る。</li>
+<li><strong>DBサーバーとWebサーバー（P4.6〜P4.8）</strong>　通常運用用ロールに権限を付け、アプリを起動する。公開ページと管理画面の両方を開き、<code>/practice.txt</code> と <code>/mission.txt</code> も引き続き開けることを確かめる。</li>
+<li><strong>踏み台サーバー（P4.9）</strong>　<code>http://admin.lab.test:8080/admin/</code> に <code>lab_admin</code> で入り、下の2件を登録する。一般ページでは公開にした備品を確認する。</li>
 </ol>
 <h2 id="section-2">今回の見取り図</h2>
 <p><img src="../../../assets/ja/m4.png" alt="一般利用者と管理者がそれぞれの入口から同じ備品管理アプリを利用する。" width="1040" height="680" loading="lazy"></p>
@@ -125,5 +125,5 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <li>確認が終わると、満たした項目数と項目ごとの結果が表示される。「要修正」は該当する設定を直して再度確認する。「未確認」は、その項目を判定できなかった状態を表す。点数は課題一覧で確認する。</li>
 </ol>
 <hr />
-<p><a href="p6.html">前の課題: P6</a> · <a href="m5.html">次の課題: M5</a></p>
+<p><a href="p5.html">前の課題: P5</a> · <a href="m5.html">次の課題: M5</a></p>
 </main></body></html>

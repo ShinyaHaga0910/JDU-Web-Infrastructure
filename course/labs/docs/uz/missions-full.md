@@ -6,15 +6,15 @@ Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga 
 
 [日本語](../ja/missions-full.md) · [Русский](../ru/missions-full.md) · [O‘zbekcha](../uz/missions-full.md)
 
-[Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M5](missions.md)
+[Mashqlar P0–P5](practice.md) · [Topshiriqlar M0–M5](missions.md)
 
 ## Qo‘llanmadan foydalanish
 
 P da mashq qilingan usul bilan shu muhitga topshiriq fayllari va sozlamalarini qo‘shing. Har bir M dagi qiymatlar va mos P qadamlariga qarang.
 
-P0 → M0 → P1 → M1 → P2 → M2 → P4 → M3 → P5 → P6 → M4 → M5
+P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → P5 → M4 → M5
 
-P6 da mashq sozlamalarini yakunlang. Keyin M4 da ayni ilovani topshiriq bazasiga ulang.
+P5 da mashq sozlamalarini yakunlang. Keyin M4 da ayni ilovani topshiriq bazasiga ulang.
 
 ## M0 Shaxsiy muhit va buyruqlarni bajarish joyi (4)
 
@@ -148,10 +148,10 @@ Har bir mezon 1 ball.
 
 Boshlashdan oldin baholash sahifasida [M2](m2.md) uchun to‘liq ball olinganini tekshiring.
 
-P4 dagi PostgreSQL da quyida ko‘rsatilgan topshiriq ma’lumotlar bazasi va ikkita rolni yarating. Ilova jadvallari M4 da yaratiladi.
+P3 dagi PostgreSQL da quyida ko‘rsatilgan topshiriq ma’lumotlar bazasi va ikkita rolni yarating. Ilova jadvallari M4 da yaratiladi.
 
-1. **DB server (P4.2-P4.6).** Baza va rollarni yarating. Tegishli bazaga ko‘rsatilgan rollar bilan faqat Web serverdan (`10.20.1.20/32`) ulanishga ruxsat bering. P4 dagidek SCRAM ishlating.
-2. **Web server (P4.7-P4.8).** Oddiy ish rejimi roli bilan `db.lab.test` ga ulanib, SELECT bajarilishini tekshiring. Mavjud parolni P4.8 dagi usul bilan `mission` profili uchun saqlang.
+1. **DB server (P3.2-P3.6).** Baza va rollarni yarating. Tegishli bazaga ko‘rsatilgan rollar bilan faqat Web serverdan (`10.20.1.20/32`) ulanishga ruxsat bering. P3 dagidek SCRAM ishlating.
+2. **Web server (P3.7-P3.8).** Oddiy ish rejimi roli bilan `db.lab.test` ga ulanib, SELECT bajarilishini tekshiring. Mavjud parolni P3.8 dagi usul bilan `mission` profili uchun saqlang.
 
 ### Topshiriq diagrammasi
 
@@ -191,11 +191,11 @@ Har bir mezon 1 ball.
 
 Boshlashdan oldin baholash sahifasida [M2](m2.md), [M3](m3.md) uchun to‘liq ball olinganini tekshiring.
 
-P5 dagi jihozlar ilovasini M3 da tayyorlangan topshiriq bazasiga ulang. Profilni almashtirishdan oldin P6 da mashq sozlamasini yakunlang.
+P4 dagi jihozlar ilovasini M3 da tayyorlangan topshiriq bazasiga ulang. Profilni almashtirishdan oldin P5 da mashq sozlamasini yakunlang.
 
-1. **Web server (P6.3, P5.4-P5.5).** Ilovani to‘xtating va `mission` profilini tanlang. Mavjud ilovadan foydalanib, topshiriq bazasida jadvallar, boshlang‘ich ma’lumotlar va administratorni yarating.
-2. **DB va Web serverlari (P5.6-P5.8).** Oddiy ish rejimi roliga huquqlarni bering va ilovani ishga tushiring. Ochiq sahifa hamda boshqaruv sahifasini oching. `/practice.txt` va `/mission.txt` ham ochilishini tekshiring.
-3. **Bastion serveri (P5.9).** `http://admin.lab.test:8080/admin/` manziliga `lab_admin` bilan kiring va jadvaldagi ikki yozuvni kiriting. Ochiq sahifada e’lon qilingan yozuvni tekshiring.
+1. **Web server (P5.3, P4.4-P4.5).** Ilovani to‘xtating va `mission` profilini tanlang. Mavjud ilovadan foydalanib, topshiriq bazasida jadvallar, boshlang‘ich ma’lumotlar va administratorni yarating.
+2. **DB va Web serverlari (P4.6-P4.8).** Oddiy ish rejimi roliga huquqlarni bering va ilovani ishga tushiring. Ochiq sahifa hamda boshqaruv sahifasini oching. `/practice.txt` va `/mission.txt` ham ochilishini tekshiring.
+3. **Bastion serveri (P4.9).** `http://admin.lab.test:8080/admin/` manziliga `lab_admin` bilan kiring va jadvaldagi ikki yozuvni kiriting. Ochiq sahifada e’lon qilingan yozuvni tekshiring.
 
 ### Topshiriq diagrammasi
 
@@ -238,11 +238,11 @@ Har bir mezon 1 ball.
 
 Boshlashdan oldin baholash sahifasida [M4](m4.md) uchun to‘liq ball olinganini tekshiring.
 
-M4 ilovasini P6 dagi usul bilan oddiy ish rejimiga o‘tkazing. Faqat sozlashda kerak bo‘lgan kirishni yoping, ilova va administrator uchun zarur huquqlarni qoldiring.
+M4 ilovasini P5 dagi usul bilan oddiy ish rejimiga o‘tkazing. Faqat sozlashda kerak bo‘lgan kirishni yoping, ilova va administrator uchun zarur huquqlarni qoldiring.
 
-1. **DB server (P6.1-P6.2).** `catalog_app` huquqlarini tekshiring. Sozlash roli `catalog_setup` uchun kirishni yoping, parolini olib tashlang va qolgan ulanishlarini yakunlang.
-2. **Web server (P6.3-P6.4).** Vaqtinchalik sozlamalarni (`/etc/jdu-catalog/setup.env` va `/etc/jdu-catalog/profiles/mission.setup.env`) olib tashlang va ilovani oddiy ish uchun `mission` profili bilan ishga tushiring. Xizmat foydalanuvchisi kodni o‘zgartira olmasin. Maxfiy sozlamalar `root:root` ga tegishli bo‘lsin va `0600` ruxsatiga ega bo‘lsin.
-3. **Ochiq va boshqaruv sahifalari (P6.4-P6.5).** 80-portda M4 dagi faqat ochiq yozuv ko‘rinsin. Bastion orqali 8080-portdagi boshqaruv sahifasini oching. `lab_admin` jihozlarni ko‘rishi, qo‘shishi va o‘zgartirishi mumkinligini tekshiring.
+1. **DB server (P5.1-P5.2).** `catalog_app` huquqlarini tekshiring. Sozlash roli `catalog_setup` uchun kirishni yoping, parolini olib tashlang va qolgan ulanishlarini yakunlang.
+2. **Web server (P5.3-P5.4).** Vaqtinchalik sozlamalarni (`/etc/jdu-catalog/setup.env` va `/etc/jdu-catalog/profiles/mission.setup.env`) olib tashlang va ilovani oddiy ish uchun `mission` profili bilan ishga tushiring. Xizmat foydalanuvchisi kodni o‘zgartira olmasin. Maxfiy sozlamalar `root:root` ga tegishli bo‘lsin va `0600` ruxsatiga ega bo‘lsin.
+3. **Ochiq va boshqaruv sahifalari (P5.4-P5.5).** 80-portda M4 dagi faqat ochiq yozuv ko‘rinsin. Bastion orqali 8080-portdagi boshqaruv sahifasini oching. `lab_admin` jihozlarni ko‘rishi, qo‘shishi va o‘zgartirishi mumkinligini tekshiring.
 
 ### Topshiriq diagrammasi
 

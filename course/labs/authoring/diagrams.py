@@ -1,4 +1,4 @@
-from curriculum import ACTIVE_NUMBERS, display_task
+from curriculum import ACTIVE_NUMBERS, display_task, display_task_references
 """Editable vector scenes and matching PNGs for every P/M task in JA/RU/UZ."""
 import html
 import json
@@ -65,7 +65,7 @@ class Scene:
         for i,a in enumerate(self.text_bounds):
             for b in self.text_bounds[i+1:]:
                 assert not (min(a[2],b[2])-max(a[0],b[0])>1 and min(a[3],b[3])-max(a[1],b[1])>1),(self.task,self.lang,'overlapping text',a[4],b[4])
-        svg=f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img"><title>{html.escape(self.task)}</title><desc>{html.escape(alt)}</desc><rect width="{W}" height="{H}" fill="white"/>'+''.join(self.parts)+'</svg>\n'
+        svg=f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img"><title>{html.escape(display_task_references(self.task))}</title><desc>{html.escape(alt)}</desc><rect width="{W}" height="{H}" fill="white"/>'+''.join(self.parts)+'</svg>\n'
         target.parent.mkdir(parents=True,exist_ok=True)
         target.with_suffix('.svg').write_text(svg,encoding='utf-8',newline='\n')
         self.image.save(target.with_suffix('.png'),optimize=True)

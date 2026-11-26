@@ -185,4 +185,4 @@ Webサーバーの80番ポート、8080番ポート、127.0.0.1の8000番ポー�
 - [Nginx proxy_pass](https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass)
 - [Django管理画面](https://docs.djangoproject.com/en/5.2/ref/contrib/admin/)
 - [提供アプリ](../../../../development/01_roles/cyber_security/tools/web_lab_catalog/README.md)
-- [練習P5](../../../labs/docs/ja/p5.md)
+- [練習P4](../../../labs/docs/ja/p4.md)

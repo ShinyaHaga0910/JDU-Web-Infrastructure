@@ -1,4 +1,4 @@
-# Web演習：練習P0〜P6と詳しい操作例
+# Web演習：練習P0〜P5と詳しい操作例
 
 教材初版・教師確認用。学生の最初からの通し試読は未実施。
 
@@ -6,15 +6,15 @@
 
 [日本語](../ja/practice-full.md) · [Русский](../ru/practice-full.md) · [O‘zbekcha](../uz/practice-full.md)
 
-[練習 P0〜P6](practice.md) · [課題 M0〜M5](missions.md)
+[練習 P0〜P5](practice.md) · [課題 M0〜M5](missions.md)
 
 ## 使い方と共通の約束
 
 まず各Pの課題文を読み、必要なら詳しい操作例を一段ずつ使う。Pは手順付きの練習である。Mは別の対象・値で自分で構築する。課題は授業回番号ではなく、自分の進度で進める。Pの完了はMの合格に置き換わらない。
 
-P0 → M0 → P1 → M1 → P2 → M2 → P4 → M3 → P5 → P6 → M4 → M5
+P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → P5 → M4 → M5
 
-P5にもM2のDNSが必要。P4ではIPと名前を使ったDB接続を練習する。アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。
+P4にもM2のDNSが必要。P3ではIPと名前を使ったDB接続を練習する。アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP5でsetupを終了する。
 
 P0=1、M0=4、M1=8、M2=13、M3=9、M4=13、M5=16（計64素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。
 
@@ -765,19 +765,19 @@ guide.lab.test.  300  IN  A  10.20.1.20
 
 dig出力の説明用抜粋。Aの右が回答IPv4、300がTTL。回答が出ても、問い合わせ先SERVERが10.20.2.10かを別に確認する。
 
-## P4 PostgreSQLへの認証接続
+## P3 PostgreSQLへの認証接続
 
-**このPractice4で作業すること**
+**このPractice3で作業すること**
 
 DBサーバーにPostgreSQLを設定し、Webサーバーから練習用DBへパスワードで接続する。
 
 ### 今回の見取り図
 
-![WebサーバーがDBサーバーの名前を解決し、PostgreSQLへ接続する。](../../assets/ja/p4.png)
+![WebサーバーがDBサーバーの名前を解決し、PostgreSQLへ接続する。](../../assets/ja/p3.png)
 
 ### 解答例（操作手順）
 
-#### P4.1 配布サーバーからPostgreSQLをインストールする
+#### P3.1 配布サーバーからPostgreSQLをインストールする
 
 **実行環境:**
 
@@ -804,7 +804,7 @@ sudo -u postgres psql -X -d postgres -c "SHOW data_directory;"
 
 `pg_lsclusters` にバージョン `16` とクラスタ名 `main` が表示される。データの保存先は `/var/lib/postgresql/16/main`。
 
-#### P4.2 PostgreSQLの待受アドレス・ポートを設定する
+#### P3.2 PostgreSQLの待受アドレス・ポートを設定する
 
 **実行環境:**
 
@@ -829,9 +829,9 @@ password_encryption = 'scram-sha-256'
 
 **期待する結果と読み方:**
 
-下の3項目を同じ設定ファイルに保存する。再起動は接続許可を設定した後のP4.4で行う。
+下の3項目を同じ設定ファイルに保存する。再起動は接続許可を設定した後のP3.4で行う。
 
-#### P4.3 WebサーバーからのDB接続を許可する
+#### P3.3 WebサーバーからのDB接続を許可する
 
 **実行環境:**
 
@@ -863,7 +863,7 @@ host all all ::/0 reject
 
 PostgreSQLは上から読んで最初に一致した行を使う。許可する行を先に置き、その他の接続は末尾の `reject` で拒否する。
 
-#### P4.4 PostgreSQLを再起動して設定を確認する
+#### P3.4 PostgreSQLを再起動して設定を確認する
 
 **実行環境:**
 
@@ -891,7 +891,7 @@ sudo -u postgres psql -X -d postgres -c \
 
 サービスは `active`。待受は `10.20.2.20:5432`、パスワードの保存方式は `scram-sha-256`、接続許可ファイルのエラーは `(0 rows)`。
 
-#### P4.5 練習用のDBと2つのロールを作る
+#### P3.5 練習用のDBと2つのロールを作る
 
 **実行環境:**
 
@@ -922,13 +922,13 @@ python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u pos
 
 already existsなら成功済みの可能性。DROPで消さず\duと\lで対応を確認する。パイプ右側psqlにSQL errorがないことを確認する。
 
-#### P4.6 それぞれのDBロールにパスワードを設定する
+#### P3.6 それぞれのDBロールにパスワードを設定する
 
 **実行環境:**
 
 DBサーバーのSSM端末：ssm-user
 
-DBサーバーの端末で `psql` を開く。`\password` を1行ずつ実行し、ロールごとに決めたパスワードを確認のため2回入力する。入力した文字は画面に表示されない。2つのパスワードはP5でも使う。 それぞれ16文字以上で異なるものを設定する。
+DBサーバーの端末で `psql` を開く。`\password` を1行ずつ実行し、ロールごとに決めたパスワードを確認のため2回入力する。入力した文字は画面に表示されない。2つのパスワードはP4でも使う。 それぞれ16文字以上で異なるものを設定する。
 
 入力するコマンド（番号はこの手順内の順番）
 
@@ -954,13 +954,13 @@ sudo -u postgres psql -X -d postgres
 
 `\du` に `catalog_practice_setup` と `catalog_practice_app` が表示される。
 
-#### P4.7 Webサーバーから練習用DBに接続する
+#### P3.7 Webサーバーから練習用DBに接続する
 
 **実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
-P0と同じ方法でWebサーバーのSession Managerを開く。`psql` で最初はDBサーバーの内部IP、次はP2で登録した `practice-db.lab.test` を指定する。パスワードを聞かれたら、P4.6で `catalog_practice_app` に設定したものを入力する。
+P0と同じ方法でWebサーバーのSession Managerを開く。`psql` で最初はDBサーバーの内部IP、次はP2で登録した `practice-db.lab.test` を指定する。パスワードを聞かれたら、P3.6で `catalog_practice_app` に設定したものを入力する。
 
 入力するコマンド（番号はこの手順内の順番）
 
@@ -985,13 +985,13 @@ psql -X -h practice-db.lab.test -U catalog_practice_app -d jdu_catalog_practice 
 
 内部IPで成功し、名前で失敗する場合は、P2で設定した通常の名前解決と練習用のDB名を確認する。認証が拒否される場合は接続元・DB・ロール・パスワードを確認する。DBをInternetへ公開して試さない。
 
-#### P4.8 採点に使うDBパスワードをWebサーバーに保存する
+#### P3.8 採点に使うDBパスワードをWebサーバーに保存する
 
 **実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
-コマンドを実行し、`catalog_practice_app` に設定したパスワードを2回入力する。入力は画面に表示されず、採点で接続を確認できるようWebサーバーの保護されたファイルに保存される。自分のPCの採点ページでP4を確認する。
+コマンドを実行し、`catalog_practice_app` に設定したパスワードを2回入力する。入力は画面に表示されず、採点で接続を確認できるようWebサーバーの保護されたファイルに保存される。自分のPCの採点ページでP3を確認する。
 
 入力するコマンド（番号はこの手順内の順番）
 
@@ -1003,11 +1003,11 @@ sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/database_secret.py --profil
 
 **期待する結果と読み方:**
 
-端末に `D11_EXISTING_DB_PASSWORD_STORED_LOCALLY` が表示され、採点ページでP4の9項目を確認できる。
+端末に `D11_EXISTING_DB_PASSWORD_STORED_LOCALLY` が表示され、採点ページでP3の9項目を確認できる。
 
 **うまくいかないとき:**
 
-既存fileありなら再生成しない。P5では同じDB passwordをapp設定にも入力する。M3はmission用の別DB/roleで構築する。
+既存fileありなら再生成しない。P4では同じDB passwordをapp設定にも入力する。M3はmission用の別DB/roleで構築する。
 
 ### 出力の読み取り例（入力しない）
 
@@ -1018,19 +1018,19 @@ jdu_catalog_practice | catalog_practice_app | 1
 
 SELECT結果の読み方の例。列の幅や罫線は実際と異なってよい。DB名・role名・value=1を確認する。table編集の許可を証明する結果ではない。
 
-## P5 教員アプリをWeb・DBへ接続する
+## P4 教員アプリをWeb・DBへ接続する
 
-**このPractice5で作業すること**
+**このPractice4で作業すること**
 
 Webサーバーで備品管理アプリを起動し、DBサーバーにつなぐ。公開の一覧と、踏み台サーバーから使う管理画面を用意する。
 
 ### 今回の見取り図
 
-![一般利用者と管理者がそれぞれの入口から同じ備品管理アプリを利用する。](../../assets/ja/p5.png)
+![一般利用者と管理者がそれぞれの入口から同じ備品管理アプリを利用する。](../../assets/ja/p4.png)
 
 ### 解答例（操作手順）
 
-#### P5.1 アプリに必要な名前解決とPythonパッケージを準備する
+#### P4.1 アプリに必要な名前解決とPythonパッケージを準備する
 
 **実行環境:**
 
@@ -1059,7 +1059,7 @@ ls /var/lib/jdu-web/lesson-resources-r1/wheels
 
 `db.lab.test` は `10.20.2.20`、`admin.lab.test` は `10.20.1.20`。端末に `PUBLIC_APP_RESOURCES_VERIFIED` と `SIGNED_OFFLINE_WHEELS_READY=7` が表示される。
 
-#### P5.2 アプリのファイルを配置して専用のPython環境を作る
+#### P4.2 アプリのファイルを配置して専用のPython環境を作る
 
 **実行環境:**
 
@@ -1093,7 +1093,7 @@ sudo /opt/jdu-catalog/venv/bin/python -m pip check
 
 最後の `pip check` で `No broken requirements found.` と表示される。
 
-#### P5.3 アプリを実行するOSユーザーを作る
+#### P4.3 アプリを実行するOSユーザーを作る
 
 **実行環境:**
 
@@ -1133,13 +1133,13 @@ getent passwd catalog
 
 権限errorをchmod -R 777やcatalogのsudo追加で解決しない。対象directoryとownerを照合する。
 
-#### P5.4 アプリの通常のDB接続を設定する
+#### P4.4 アプリの通常のDB接続を設定する
 
 **実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
-AWSコンソールでWebサーバーの現在の公開IPv4アドレスを確認し、`YOUR-CURRENT-WEB-PUBLIC-IP` と置き換える。設定コマンドで入力を求められたら、P4で `catalog_practice_app` に設定したパスワードを入力する。作成した練習用の設定をアプリで使うように選ぶ。 入力した文字は画面に表示されない。
+AWSコンソールでWebサーバーの現在の公開IPv4アドレスを確認し、`YOUR-CURRENT-WEB-PUBLIC-IP` と置き換える。設定コマンドで入力を求められたら、P3で `catalog_practice_app` に設定したパスワードを入力する。作成した練習用の設定をアプリで使うように選ぶ。 入力した文字は画面に表示されない。
 
 入力するコマンド（番号はこの手順内の順番）
 
@@ -1161,13 +1161,13 @@ sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
 
 `CATALOG_ENV_CREATED=practice`、`CATALOG_PROFILE_ACTIVATED=practice`、`VALID` が表示される。`app.env` の所有者は `root:root`、権限は `600`。
 
-#### P5.5 備品管理アプリのテーブルと管理者を用意する
+#### P4.5 備品管理アプリのテーブルと管理者を用意する
 
 **実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
-一時設定の作成時に、P4の `catalog_practice_setup` のパスワードを入力する。コマンドを1行ずつ実行して、テーブルを作り、見本の備品を登録する。最後に `practice_admin` のパスワードを自分で決めて入力する。 入力した文字は画面に表示されない。
+一時設定の作成時に、P3の `catalog_practice_setup` のパスワードを入力する。コマンドを1行ずつ実行して、テーブルを作り、見本の備品を登録する。最後に `practice_admin` のパスワードを自分で決めて入力する。 入力した文字は画面に表示されない。
 
 入力するコマンド（番号はこの手順内の順番）
 
@@ -1192,7 +1192,7 @@ sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
 
 アプリ用テーブルが11個、見本の備品が3件作られる。管理画面では今回設定した `practice_admin` でログインする。
 
-#### P5.6 アプリのDBロールに必要な権限を付ける
+#### P4.6 アプリのDBロールに必要な権限を付ける
 
 **実行環境:**
 
@@ -1216,7 +1216,7 @@ python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u pos
 
 `COMMIT` が表示される。備品テーブル `catalog_item` では読み取り・追加・変更が許可される。
 
-#### P5.7 アプリをsystemdサービスとして起動する
+#### P4.7 アプリをsystemdサービスとして起動する
 
 **実行環境:**
 
@@ -1257,7 +1257,7 @@ sudo ss -lntp
 
 起動errorはjournalctl -u jdu-catalogを見る。秘密設定本文をlogへ貼らず、configuration.py checkで形式を確認する。
 
-#### P5.8 Nginxに公開用と管理用の入口を設定する
+#### P4.8 Nginxに公開用と管理用の入口を設定する
 
 **実行環境:**
 
@@ -1293,13 +1293,13 @@ curl -i http://127.0.0.1/practice.txt
 
 `nginx -t` が成功する。 `/practice.txt` にはHTTP `200` と `JDU WEB-02 practice: HTTP response verified.` が返る。同じ方法で `http://127.0.0.1/mission.txt` を開き、M1の本文も返ることを確かめる。
 
-#### P5.9 管理画面から公開・非公開の備品を1件ずつ登録する
+#### P4.9 管理画面から公開・非公開の備品を1件ずつ登録する
 
 **実行環境:**
 
 RDP内のFirefox（踏み台）
 
-踏み台サーバーへRDP接続し、その中のFirefoxで `http://admin.lab.test:8080/admin/` を開く。P5.5で設定した `practice_admin` でログインする。「備品管理」の「備品」から追加画面を開き、下の表に従って1件ずつ保存する。登録後は公開備品を開いて数量を変更して保存し、表の数量4に戻す。
+踏み台サーバーへRDP接続し、その中のFirefoxで `http://admin.lab.test:8080/admin/` を開く。P4.5で設定した `practice_admin` でログインする。「備品管理」の「備品」から追加画面を開き、下の表に従って1件ずつ保存する。登録後は公開備品を開いて数量を変更して保存し、表の数量4に戻す。
 
 | コード | 名前 | 数量 | 保管場所 | 公開する |
 | --- | --- | --- | --- | --- |
@@ -1310,13 +1310,13 @@ RDP内のFirefox（踏み台）
 
 管理画面には `P5-PUBLIC-001` と `P5-PRIVATE-001` が表示される。Webサーバーの公開一覧で新しく表示されるのは `P5-PUBLIC-001`。
 
-#### P5.10 登録した2件がDBに保存されたことを確かめる
+#### P4.10 登録した2件がDBに保存されたことを確かめる
 
 **実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
-Webサーバーの端末で `psql` を使い、管理画面から登録した2件をDBから読み出す。パスワードを聞かれたらP4.6で設定した `catalog_practice_app` のものを使う。
+Webサーバーの端末で `psql` を使い、管理画面から登録した2件をDBから読み出す。パスワードを聞かれたらP3.6で設定した `catalog_practice_app` のものを使う。
 
 入力するコマンド（番号はこの手順内の順番）
 
@@ -1332,33 +1332,33 @@ psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c "$Q
 
 **期待する結果と読み方:**
 
-`P5-PUBLIC-001` の数量は `4`、公開設定は `t`。`P5-PRIVATE-001` の数量は `2`、公開設定は `f`。名前と保管場所もP5.9の表と照合する。
+`P5-PUBLIC-001` の数量は `4`、公開設定は `t`。`P5-PRIVATE-001` の数量は `2`、公開設定は `f`。名前と保管場所もP4.9の表と照合する。
 
-#### P5.11 採点ページでアプリの動作を確かめる
+#### P4.11 採点ページでアプリの動作を確かめる
 
 **実行環境:**
 
 自分のPCのブラウザ：Web Portal
 
-自分のPCの採点ページでP5を開き、**機能・権限を含めて確認する** を選ぶ。`practice_admin` のパスワードを入力し、**このパスワードで確認する** を押す。採点では管理画面から確認用の備品を1件登録し、数量の変更も確かめる。
+自分のPCの採点ページでP4を開き、**機能・権限を含めて確認する** を選ぶ。`practice_admin` のパスワードを入力し、**このパスワードで確認する** を押す。採点では管理画面から確認用の備品を1件登録し、数量の変更も確かめる。
 
 **期待する結果と読み方:**
 
-P5の13項目の結果が表示される。採点で登録した確認用の備品は管理画面に残る。
+P4の13項目の結果が表示される。採点で登録した確認用の備品は管理画面に残る。
 
-## P6 最小権限と公開範囲
+## P5 最小権限と公開範囲
 
-**このPractice6で作業すること**
+**このPractice5で作業すること**
 
 DBの初期設定用ロールのログインを止める。アプリが通常の権限で動き、公開側から管理画面や内部設定を開けないことを確かめる。
 
 ### 今回の見取り図
 
-![公開・管理の入口とWebからDBへの接続で、許可する範囲を制限する。](../../assets/ja/p6.png)
+![公開・管理の入口とWebからDBへの接続で、許可する範囲を制限する。](../../assets/ja/p5.png)
 
 ### 解答例（操作手順）
 
-#### P6.1 アプリがDBでできる操作を調べる
+#### P5.1 アプリがDBでできる操作を調べる
 
 **実行環境:**
 
@@ -1388,7 +1388,7 @@ sudo -u postgres psql -X -d jdu_catalog_practice
 
 `catalog_practice_app` に備品を読み取る・追加する・変更する権限がある。備品を削除する権限は付いていない。
 
-#### P6.2 初期設定用のDBロールでログインできないようにする
+#### P5.2 初期設定用のDBロールでログインできないようにする
 
 **実行環境:**
 
@@ -1412,13 +1412,13 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 
 `ALTER ROLE` が表示される。`catalog_practice_setup` のログインが無効になり、アプリは通常用の `catalog_practice_app` で引き続き接続できる。
 
-#### P6.3 Webサーバーの初期設定用ファイルを片付ける
+#### P5.3 Webサーバーの初期設定用ファイルを片付ける
 
 **実行環境:**
 
 WebサーバーのSSM端末：ssm-user
 
-練習用の初期設定ファイル2つを削除する。次にアプリを停止し、P5で作った通常用の設定 `practice` を選んでから起動する。最後に、アプリのOSユーザー `catalog` がコードを書き換えられないことを確かめる。
+練習用の初期設定ファイル2つを削除する。次にアプリを停止し、P4で作った通常用の設定 `practice` を選んでから起動する。最後に、アプリのOSユーザー `catalog` がコードを書き換えられないことを確かめる。
 
 入力するコマンド（番号はこの手順内の順番）
 
@@ -1453,7 +1453,7 @@ sudo -u catalog find /opt/jdu-catalog/app -writable -print
 
 練習用以外の設定が有効なら、ここで止める。既に削除済みのファイルは削除し直さない。停止・設定の選択・設定チェックが失敗したら、原因を確認してからアプリを起動する。
 
-#### P6.4 公開用の80番ポートから見える範囲を確かめる
+#### P5.4 公開用の80番ポートから見える範囲を確かめる
 
 **実行環境:**
 
@@ -1482,17 +1482,17 @@ curl -i http://web.lab.test/static/app.env
 
 もしenv本文が見えたら共有せず、その場で教師へ知らせ公開設定を修正する。
 
-#### P6.5 採点ページでアクセス制御を確かめる
+#### P5.5 採点ページでアクセス制御を確かめる
 
 **実行環境:**
 
 自分のPCのブラウザ：Web Portal
 
-採点ページでP6を開き、**機能・権限を含めて確認する** を選ぶ。`practice_admin` のパスワードを入力して確認を実行する。採点では、正しいパスワードで管理画面に入れることと、ログインしていない状態では備品を追加・変更できないことを確認する。
+採点ページでP5を開き、**機能・権限を含めて確認する** を選ぶ。`practice_admin` のパスワードを入力して確認を実行する。採点では、正しいパスワードで管理画面に入れることと、ログインしていない状態では備品を追加・変更できないことを確認する。
 
 **期待する結果と読み方:**
 
-P6の16項目の結果が表示される。
+P5の16項目の結果が表示される。
 
 ## 次回の再開・結果の確認
 

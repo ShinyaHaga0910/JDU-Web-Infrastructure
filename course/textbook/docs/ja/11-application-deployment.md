@@ -136,7 +136,7 @@ EnvironmentFile=/etc/jdu-catalog/app.env
 
 設定ファイルを切り替えても、既に動いているプロセスへ起動時に渡した値は、その操作だけでは変わらない。そのため、サービスを停止して使用するprofileを明示的に切り替え、新しい設定で起動する。DB名とロールの組をそろえることで、意図した側のデータへ、意図した権限で接続できる。
 
-現行の演習は、P5で練習アプリを動かした後、P6で練習側の構築用接続を終了してからM4へ進む。順序は**P5 → P6 → M4 → M5**である。前の構築用設定と次の設定を混在させないよう、練習側の準備を終えてから本課題用のprofileへ切り替える。
+現行の演習は、P4で練習アプリを動かした後、P5で練習側の構築用接続を終了してからM4へ進む。順序は**P4 → P5 → M4 → M5**である。前の構築用設定と次の設定を混在させないよう、練習側の準備を終えてから本課題用のprofileへ切り替える。
 
 練習・課題5では、コード、依存、設定、DBの準備とサービスを一組にする。次の第12章では、必要な動作を保ちながら公開範囲と権限を絞る。
 
@@ -178,11 +178,11 @@ DBパスワードなどが、意図しないDB接続に利用されることを�
 
 ## 参考資料
 
-確認日：2026-11-13。配置・profile・権限の説明は提供アプリと現行P5/P6の構成に基づく。
+確認日：2026-11-13。配置・profile・権限の説明は提供アプリと現行P4/P5の構成に基づく。
 
 - [Python venv](https://docs.python.org/3/library/venv.html)
 - [Djangoマイグレーション](https://docs.djangoproject.com/en/5.2/topics/migrations/)
 - [systemdの実行環境](https://www.freedesktop.org/software/systemd/man/latest/systemd.exec.html)
 - [提供アプリ](../../../../development/01_roles/cyber_security/tools/web_lab_catalog/README.md)
+- [練習P4](../../../labs/docs/ja/p4.md)
 - [練習P5](../../../labs/docs/ja/p5.md)
-- [練習P6](../../../labs/docs/ja/p6.md)

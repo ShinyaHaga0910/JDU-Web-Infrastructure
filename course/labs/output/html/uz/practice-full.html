@@ -1,4 +1,4 @@
-<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Web Infrastructure: P0-P6 mashqlar va batafsil qadamlar</title><style>
+<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Web Infrastructure: P0-P5 mashqlar va batafsil qadamlar</title><style>
 :root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
 *{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
 header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
@@ -13,15 +13,15 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Qo‘llanmadan foydalanish</a> · <a href="#section-2">Muhit va tayyorgarlik</a> · <a href="#section-3">Qadamlarni qanday o‘qish kerak</a> · <a href="#section-4">Tayyor tizim va ulanish yo‘llari</a> · <a href="#section-5">P0 Shaxsiy muhit va buyruqlarni bajarish joyi</a> · <a href="#section-6">P1 HTTP orqali statik faylni qaytarish</a> · <a href="#section-7">P2 Ichki DNS va odatiy nom yechimi</a> · <a href="#section-8">P4 PostgreSQL ga autentifikatsiya bilan ulanish</a> · <a href="#section-9">P5 Berilgan app ni Web va DB bilan bog‘lash</a> · <a href="#section-10">P6 Eng kam huquq va ochiq kirish chegarasi</a> · <a href="#section-11">Davom ettirish va natijalar</a> · <a href="#section-12">Ma’lumot manbalari</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: P0-P6 mashqlar va batafsil qadamlar</h1>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Qo‘llanmadan foydalanish</a> · <a href="#section-2">Muhit va tayyorgarlik</a> · <a href="#section-3">Qadamlarni qanday o‘qish kerak</a> · <a href="#section-4">Tayyor tizim va ulanish yo‘llari</a> · <a href="#section-5">P0 Shaxsiy muhit va buyruqlarni bajarish joyi</a> · <a href="#section-6">P1 HTTP orqali statik faylni qaytarish</a> · <a href="#section-7">P2 Ichki DNS va odatiy nom yechimi</a> · <a href="#section-8">P3 PostgreSQL ga autentifikatsiya bilan ulanish</a> · <a href="#section-9">P4 Berilgan app ni Web va DB bilan bog‘lash</a> · <a href="#section-10">P5 Eng kam huquq va ochiq kirish chegarasi</a> · <a href="#section-11">Davom ettirish va natijalar</a> · <a href="#section-12">Ma’lumot manbalari</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: P0-P5 mashqlar va batafsil qadamlar</h1>
 <p>O‘qituvchi tekshiruvi uchun birinchi nashr. Talabaning qo‘llanma bo‘yicha boshidan oxirigacha o‘tishi hali tekshirilmagan.</p>
 <p>Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga ega. Ona tili mutaxassisi tahriri hali bajarilmagan.</p>
 <p><a href="../ja/practice-full.html">日本語</a> · <a href="../ru/practice-full.html">Русский</a> · <a href="../uz/practice-full.html">O‘zbekcha</a></p>
-<p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M5</a></p>
+<p><a href="practice.html">Mashqlar P0–P5</a> · <a href="missions.html">Topshiriqlar M0–M5</a></p>
 <h2 id="section-1">Qo‘llanmadan foydalanish</h2>
 <p>Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P - batafsil qadamli mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.</p>
-<p>P0 → M0 → P1 → M1 → P2 → M2 → P4 → M3 → P5 → P6 → M4 → M5</p>
-<p>P5 uchun ham M2 DNS kerak. P4 da DB ga IP va nom orqali ulanishni mashq qiling. Ilova db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating.</p>
+<p>P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → P5 → M4 → M5</p>
+<p>P4 uchun ham M2 DNS kerak. P3 da DB ga IP va nom orqali ulanishni mashq qiling. Ilova db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P5 da setup ni tugating.</p>
 <p>P0=1, M0=4, M1=8, M2=13, M3=9, M4=13, M5=16: jami 64 xom ball. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.</p>
 <h2 id="section-2">Muhit va tayyorgarlik</h2>
 <p>Avval boshlang‘ich tarqatma imzosi, yangi beshta server yoki mavjud muhitga install, ichki SSH va shaxsiy ro‘yxatni tugating. Yo‘riqnoma zip dagi distribution/STUDENT.md da. Maxfiy kalitni umumiy Windows ga saqlamang; shaxsiy Academy hisobining CloudShell idan foydalaning. O‘qituvchi anonim Lab ID, fingerprint va muddatni beradi.</p>
@@ -544,13 +544,13 @@ curl -i http://guide.lab.test/practice.txt
 guide.lab.test.  300  IN  A  10.20.1.20
 </code></pre>
 <p>Dig ning qisqa namunasi: A dan keyin IPv4, 300 esa TTL. So‘rov SERVER i 10.20.2.10 ekanini alohida tekshiring.</p>
-<h2 id="section-8">P4 PostgreSQL ga autentifikatsiya bilan ulanish</h2>
-<p><strong>Practice4 da bajariladigan ishlar</strong></p>
+<h2 id="section-8">P3 PostgreSQL ga autentifikatsiya bilan ulanish</h2>
+<p><strong>Practice3 da bajariladigan ishlar</strong></p>
 <p>DB serverda PostgreSQL ni sozlab, Web serverdan mashq DB siga parol bilan ulaning.</p>
 <h3>Topshiriq diagrammasi</h3>
-<p><img src="../../../assets/uz/p4.png" alt="Web server DB server nomini aniqlaydi va PostgreSQL ga ulanadi." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/uz/p3.png" alt="Web server DB server nomini aniqlaydi va PostgreSQL ga ulanadi." width="1040" height="680" loading="lazy"></p>
 <h3>Yechim namunasi (bajarish tartibi)</h3>
-<h4>P4.1 Paketlar serveridan PostgreSQL o‘rnatish</h4>
+<h4>P3.1 Paketlar serveridan PostgreSQL o‘rnatish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p>DB serverda PostgreSQL 16 ni o‘rnating. Keyingi qadamlar uchun SQL fayllarini arxivdan chiqaring.</p>
@@ -568,7 +568,7 @@ sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
 <p><code>pg_lsclusters</code> da <code>16</code> versiya va <code>main</code> klasteri chiqadi. Ma’lumot katalogi <code>/var/lib/postgresql/16/main</code>.</p>
-<h4>P4.2 PostgreSQL manzili va portini sozlash</h4>
+<h4>P3.2 PostgreSQL manzili va portini sozlash</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p><code>postgresql.conf</code> da DB serverning ichki IP manzili <code>10.20.2.20</code> va 5432-portni belgilang. Parollar uchun SCRAM-SHA-256 ni tanlang.</p>
@@ -582,8 +582,8 @@ port = 5432
 password_encryption = 'scram-sha-256'
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>Uchta parametrni bitta faylga saqlang. Qayta ishga tushirish kirish sozlangach P4.4 da bajariladi.</p>
-<h4>P4.3 Web serveridan DB ulanishiga ruxsat berish</h4>
+<p>Uchta parametrni bitta faylga saqlang. Qayta ishga tushirish kirish sozlangach P3.4 da bajariladi.</p>
+<h4>P3.3 Web serveridan DB ulanishiga ruxsat berish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p><code>pg_hba.conf</code> da manba, DB va rollarni belgilang. Web serverning <code>10.20.1.20</code> ichki manzilidan mashq va topshiriq uchun ko‘rsatilgan DB va rol juftliklariga ruxsat bering.</p>
@@ -603,7 +603,7 @@ host all all ::/0 reject
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
 <p>PostgreSQL yuqoridan birinchi mos qatorni ishlatadi. Avval ruxsat qatorlari, oxirida qolgan ulanishlar uchun <code>reject</code> turadi.</p>
-<h4>P4.4 PostgreSQL ni qayta ishga tushirib sozlamani tekshirish</h4>
+<h4>P3.4 PostgreSQL ni qayta ishga tushirib sozlamani tekshirish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p>Saqlangan parametr va kirish qoidalarini qo‘llash uchun PostgreSQL ni qayta ishga tushiring.</p>
@@ -622,7 +622,7 @@ sudo -u postgres psql -X -d postgres -c \
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
 <p>Xizmat <code>active</code>, manzil va port <code>10.20.2.20:5432</code>, parol saqlash usuli <code>scram-sha-256</code>, kirish xatolari <code>(0 rows)</code>.</p>
-<h4>P4.5 Mashq DB va ikkita rolini yaratish</h4>
+<h4>P3.5 Mashq DB va ikkita rolini yaratish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p>Tayyor SQL <code>jdu_catalog_practice</code> DB sini yaratadi. <code>catalog_practice_setup</code> jadval tayyorlashga, <code>catalog_practice_app</code> odatiy ishlashga xizmat qiladi. Avval SQL ni ko‘ring, so‘ng <code>psql</code> orqali bajaring.</p>
@@ -642,10 +642,10 @@ python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u pos
 <p><code>CREATE ROLE</code> ikki marta, <code>CREATE DATABASE</code> bir marta chiqadi.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>already exists oldin bajarilganini anglatishi mumkin. DROP qilmang; \du va \l orqali solishtiring. Pipe o‘ngidagi psql SQL error bermaganini tekshiring.</p>
-<h4>P4.6 Har bir DB roliga parol belgilash</h4>
+<h4>P3.6 Har bir DB roliga parol belgilash</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
-<p>DB serverda <code>psql</code> ni oching. <code>\password</code> ni bittadan bajaring va har rol uchun tanlagan parolni ikki marta kiriting. Belgilar ko‘rinmaydi. Ikkala parol P5 da ham kerak. Kamida 16 belgili turli parollarni tanlang.</p>
+<p>DB serverda <code>psql</code> ni oching. <code>\password</code> ni bittadan bajaring va har rol uchun tanlagan parolni ikki marta kiriting. Belgilar ko‘rinmaydi. Ikkala parol P4 da ham kerak. Kamida 16 belgili turli parollarni tanlang.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. DB OS terminalida postgres sifatida psql ochish; keyingi amallar psql ichida.
 sudo -u postgres psql -X -d postgres
@@ -662,10 +662,10 @@ sudo -u postgres psql -X -d postgres
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
 <p><code>\du</code> chiqishida <code>catalog_practice_setup</code> va <code>catalog_practice_app</code> ko‘rinadi.</p>
-<h4>P4.7 Web serveridan mashq DB ga ulanish</h4>
+<h4>P3.7 Web serveridan mashq DB ga ulanish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
-<p>P0 dagidek Web server uchun Session Manager ni oching. <code>psql</code> da avval DB ichki IP manzilini, keyin P2 dagi <code>practice-db.lab.test</code> nomini kiriting. Har ikki ulanishda P4.6 dagi <code>catalog_practice_app</code> parolini ishlating.</p>
+<p>P0 dagidek Web server uchun Session Manager ni oching. <code>psql</code> da avval DB ichki IP manzilini, keyin P2 dagi <code>practice-db.lab.test</code> nomini kiriting. Har ikki ulanishda P3.6 dagi <code>catalog_practice_app</code> parolini ishlating.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. Paketlar serveridan postgresql-client-16 va kerakli bog‘liqliklarni o‘rnatish.
 sudo apt-get install --no-install-recommends postgresql-client-16
@@ -682,31 +682,31 @@ psql -X -h practice-db.lab.test -U catalog_practice_app -d jdu_catalog_practice 
 <p>Ikkala ulanishda <code>jdu_catalog_practice</code> DB si, <code>catalog_practice_app</code> roli va <code>1</code> qiymati chiqadi.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>IP orqali ulanish ishlasa, nom orqali esa ishlamasa, P2 dagi tizim DNS i va mashq DB nomini tekshiring. Autentifikatsiya rad etilsa, manba, DB, rol va parolni tekshiring. Sinash uchun DB ni Internet ga ochmang.</p>
-<h4>P4.8 Baholash uchun DB parolini Web serverda saqlash</h4>
+<h4>P3.8 Baholash uchun DB parolini Web serverda saqlash</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
-<p>Buyruqni bajarib <code>catalog_practice_app</code> parolini ikki marta kiriting. Kiritish yashirin, parol ulanishni tekshirish uchun Web serverdagi himoyalangan faylga yoziladi. O‘z kompyuteringizdagi baholash sahifasida P4 ni tekshiring.</p>
+<p>Buyruqni bajarib <code>catalog_practice_app</code> parolini ikki marta kiriting. Kiritish yashirin, parol ulanishni tekshirish uchun Web serverdagi himoyalangan faylga yoziladi. O‘z kompyuteringizdagi baholash sahifasida P3 ni tekshiring.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. Mavjud mashq DB parolini yashirin kiritib, faqat Web da saqlash.
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/database_secret.py --profile \
   practice
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>Terminalda <code>D11_EXISTING_DB_PASSWORD_STORED_LOCALLY</code> chiqadi. Baholash sahifasida P4 ning to‘qqiz mezoni ko‘rinadi.</p>
+<p>Terminalda <code>D11_EXISTING_DB_PASSWORD_STORED_LOCALLY</code> chiqadi. Baholash sahifasida P3 ning to‘qqiz mezoni ko‘rinadi.</p>
 <p><strong>Ishlamasa:</strong></p>
-<p>Fayl mavjud bo‘lsa qayta yaratmang. P5 da ayni DB paroli app sozlamasiga kiritiladi. M3 alohida mission DB/rollaridan foydalanadi.</p>
+<p>Fayl mavjud bo‘lsa qayta yaratmang. P4 da ayni DB paroli app sozlamasiga kiritiladi. M3 alohida mission DB/rollaridan foydalanadi.</p>
 <h3>Natijani o‘qish namunasi (kiritmang)</h3>
 <pre><code class="language-text">current_database    | current_user         | value
 jdu_catalog_practice | catalog_practice_app | 1
 </code></pre>
 <p>SELECT natijasini o‘qish namunasi; ustun kengligi boshqacha bo‘lishi mumkin. DB, role va value=1 ni tekshiring. Bu table o‘zgartirish huquqini isbotlamaydi.</p>
-<h2 id="section-9">P5 Berilgan app ni Web va DB bilan bog‘lash</h2>
-<p><strong>Practice5 da bajariladigan ishlar</strong></p>
+<h2 id="section-9">P4 Berilgan app ni Web va DB bilan bog‘lash</h2>
+<p><strong>Practice4 da bajariladigan ishlar</strong></p>
 <p>Web serverda jihozlar ilovasini ishga tushirib DB ga ulang. Ochiq ro‘yxat va Bastiondan boshqaruvni sozlang.</p>
 <h3>Topshiriq diagrammasi</h3>
-<p><img src="../../../assets/uz/p5.png" alt="Oddiy foydalanuvchi va administrator bir ilovaga alohida kirish yo‘llaridan ulanadi." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/uz/p4.png" alt="Oddiy foydalanuvchi va administrator bir ilovaga alohida kirish yo‘llaridan ulanadi." width="1040" height="680" loading="lazy"></p>
 <h3>Yechim namunasi (bajarish tartibi)</h3>
-<h4>P5.1 DNS ni tekshirish va Python paketlarini tayyorlash</h4>
+<h4>P4.1 DNS ni tekshirish va Python paketlarini tayyorlash</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p>Avval Web serverdan DB va boshqaruv sahifasi nomlarini yeching. So‘ng paketlar serveridan Python vositalarini o‘rnating, ilova va Python paketlarini oching.</p>
@@ -726,7 +726,7 @@ ls /var/lib/jdu-web/lesson-resources-r1/wheels
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
 <p><code>db.lab.test</code> uchun <code>10.20.2.20</code>, <code>admin.lab.test</code> uchun <code>10.20.1.20</code> chiqadi. Terminalda <code>PUBLIC_APP_RESOURCES_VERIFIED</code> va <code>SIGNED_OFFLINE_WHEELS_READY=7</code> ko‘rinadi.</p>
-<h4>P5.2 Ilovani joylab unga alohida Python muhiti yaratish</h4>
+<h4>P4.2 Ilovani joylab unga alohida Python muhiti yaratish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p>Fayllarni <code>/opt/jdu-catalog/app</code> ga nusxalang. <code>venv</code> orqali ilova muhitini yaratib, tayyor paketlarni o‘rnating. <code>pip</code> tashqi saytga murojaat qilmasdan fayllar xeshlarini tekshiradi.</p>
@@ -751,7 +751,7 @@ sudo /opt/jdu-catalog/venv/bin/python -m pip check
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
 <p>Oxirgi <code>pip check</code> natijasida <code>No broken requirements found.</code> chiqadi.</p>
-<h4>P5.3 Ilovani ishga tushiradigan OS foydalanuvchisini yaratish</h4>
+<h4>P4.3 Ilovani ishga tushiradigan OS foydalanuvchisini yaratish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p>Web serverda ilovani ishlatuvchi <code>catalog</code> OS foydalanuvchisini yarating. CSS va boshqa fayllar katalogini yaratib, <code>catalog</code> ga yozish huquqini bering.</p>
@@ -780,10 +780,10 @@ getent passwd catalog
 <p>Natijada <code>catalog</code> foydalanuvchisi va <code>/usr/sbin/nologin</code> ko‘rinadi. <code>/var/lib/jdu-catalog/static</code> egasi va guruhi <code>catalog</code>.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Ruxsat xatosini chmod -R 777 yoki catalog ga sudo berish bilan hal qilmang. Aniq katalog va egasini solishtiring.</p>
-<h4>P5.4 Ilovaning odatiy DB ulanishini sozlash</h4>
+<h4>P4.4 Ilovaning odatiy DB ulanishini sozlash</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
-<p><code>YOUR-CURRENT-WEB-PUBLIC-IP</code> o‘rniga AWS Console dagi Web serverning joriy ochiq IPv4 manzilini yozing. So‘ralganda P4 dagi <code>catalog_practice_app</code> parolini kiriting. Yaratilgan mashq sozlamasini ilova uchun tanlang. Kiritilgan belgilar ekranda ko‘rinmaydi.</p>
+<p><code>YOUR-CURRENT-WEB-PUBLIC-IP</code> o‘rniga AWS Console dagi Web serverning joriy ochiq IPv4 manzilini yozing. So‘ralganda P3 dagi <code>catalog_practice_app</code> parolini kiriting. Yaratilgan mashq sozlamasini ilova uchun tanlang. Kiritilgan belgilar ekranda ko‘rinmaydi.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. AWS Console dagi joriy Web public IPv4 ni belgilash.
 PUBLIC_WEB_IPV4='YOUR-CURRENT-WEB-PUBLIC-IP'
@@ -799,10 +799,10 @@ sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
 <p><code>CATALOG_ENV_CREATED=practice</code>, <code>CATALOG_PROFILE_ACTIVATED=practice</code> va <code>VALID</code> chiqadi. <code>app.env</code> egasi va guruhi <code>root:root</code>, huquqi <code>600</code>.</p>
-<h4>P5.5 Ilova jadvallari va administratorini tayyorlash</h4>
+<h4>P4.5 Ilova jadvallari va administratorini tayyorlash</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
-<p>Vaqtinchalik sozlama yaratishda P4 dagi <code>catalog_practice_setup</code> parolini kiriting. Jadvallar va namunaviy jihozlarni yaratish uchun buyruqlarni bittadan bajaring. Oxirida <code>practice_admin</code> parolini o‘zingiz tanlab kiriting. Kiritilgan belgilar ekranda ko‘rinmaydi.</p>
+<p>Vaqtinchalik sozlama yaratishda P3 dagi <code>catalog_practice_setup</code> parolini kiriting. Jadvallar va namunaviy jihozlarni yaratish uchun buyruqlarni bittadan bajaring. Oxirida <code>practice_admin</code> parolini o‘zingiz tanlab kiriting. Kiritilgan belgilar ekranda ko‘rinmaydi.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. Mavjud setup parolini yashirin kiritib, vaqtinchalik config yaratish.
 sudo python3 -B /opt/jdu-catalog/app/configuration.py create-setup --profile practice
@@ -821,7 +821,7 @@ sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
 <p>11 ta ilova jadvali va uchta namunaviy jihoz yaratiladi. Boshqaruv sahifasiga <code>practice_admin</code> bilan kirasiz.</p>
-<h4>P5.6 Ilovaning DB roliga kerakli huquqlarni berish</h4>
+<h4>P4.6 Ilovaning DB roliga kerakli huquqlarni berish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p>DB server uchun Session Manager ni oching. <code>catalog_practice_app</code> roliga mavjud jadvallar bilan ishlash huquqlarini bering. Avval SQL ni ko‘ring, keyingi buyruq bilan uni qo‘llang.</p>
@@ -836,7 +836,7 @@ python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u pos
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
 <p><code>COMMIT</code> chiqadi. <code>catalog_item</code> jadvalida o‘qish, qo‘shish va o‘zgartirish mumkin.</p>
-<h4>P5.7 Ilovani systemd xizmati sifatida ishga tushirish</h4>
+<h4>P4.7 Ilovani systemd xizmati sifatida ishga tushirish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p>Web serverda CSS va boshqa fayllarni Nginx katalogiga yig‘ing. Xizmat ta’rifini <code>/etc/systemd/system</code> ga nusxalab, systemd ga yuklang. <code>enable --now</code> xizmatni hozir ishga tushiradi va OS yuklanganda avtomatik startni sozlaydi.</p>
@@ -866,7 +866,7 @@ sudo ss -lntp
 <p>Xizmat <code>active</code>. Gunicorn shu Web serverdagi Nginx ulanishi uchun <code>127.0.0.1:8000</code> da tinglaydi.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Xatoda journalctl -u jdu-catalog ni o‘qing. Env mazmunini log ga qo‘ymang; formatni configuration.py check bilan tekshiring.</p>
-<h4>P5.8 Nginx ning ochiq va boshqaruv kirishlarini sozlash</h4>
+<h4>P4.8 Nginx ning ochiq va boshqaruv kirishlarini sozlash</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p>Sozlamani nusxalang va <code>sites-enabled</code> ichida ramziy havola yarating. Sozlamadan so‘ng 80-port ro‘yxatni, Bastiondan 8080-port boshqaruv sahifasini ochadi. Nginx ilova so‘rovlarini Gunicorn ga yuboradi.</p>
@@ -893,10 +893,10 @@ curl -i http://127.0.0.1/practice.txt
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
 <p><code>nginx -t</code> muvaffaqiyatli. <code>/practice.txt</code> HTTP <code>200</code> va <code>JDU WEB-02 practice: HTTP response verified.</code> qaytaradi. Shu usulda <code>http://127.0.0.1/mission.txt</code> ni ochib M1 matnini tekshiring.</p>
-<h4>P5.9 Boshqaruv sahifasida bittadan ochiq va yopiq jihoz qo‘shish</h4>
+<h4>P4.9 Boshqaruv sahifasida bittadan ochiq va yopiq jihoz qo‘shish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>RDP orqali bastiondagi Firefox</p>
-<p>Bastion serveriga RDP orqali ulanib, Firefox da <code>http://admin.lab.test:8080/admin/</code> ni oching. P5.5 dagi parol bilan <code>practice_admin</code> sifatida kiring. «備品» (jihozlar) bo‘limida jadvaldagi ikki yozuvni bittadan qo‘shing. Ochiq yozuv miqdorini o‘zgartirib saqlang, so‘ng 4 ga qaytaring.</p>
+<p>Bastion serveriga RDP orqali ulanib, Firefox da <code>http://admin.lab.test:8080/admin/</code> ni oching. P4.5 dagi parol bilan <code>practice_admin</code> sifatida kiring. «備品» (jihozlar) bo‘limida jadvaldagi ikki yozuvni bittadan qo‘shing. Ochiq yozuv miqdorini o‘zgartirib saqlang, so‘ng 4 ga qaytaring.</p>
 <table>
 <thead>
 <tr>
@@ -926,10 +926,10 @@ curl -i http://127.0.0.1/practice.txt
 </table>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
 <p>Boshqaruv sahifasida <code>P5-PUBLIC-001</code> va <code>P5-PRIVATE-001</code> ko‘rinadi. Ochiq ro‘yxatda yangi yozuvlardan <code>P5-PUBLIC-001</code> chiqadi.</p>
-<h4>P5.10 Ikkala yozuv DB ga saqlanganini tekshirish</h4>
+<h4>P4.10 Ikkala yozuv DB ga saqlanganini tekshirish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
-<p>Web terminalida <code>psql</code> orqali boshqaruv sahifasida qo‘shilgan ikki yozuvni o‘qing. P4.6 dagi <code>catalog_practice_app</code> parolini ishlating.</p>
+<p>Web terminalida <code>psql</code> orqali boshqaruv sahifasida qo‘shilgan ikki yozuvni o‘qing. P3.6 dagi <code>catalog_practice_app</code> parolini ishlating.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. Belgilangan ikki yozuv uchun SELECT ni saqlash; hali DB ga yubormaslik.
 QUERY=&quot;SELECT code,name,quantity,location,is_public
@@ -940,20 +940,20 @@ ORDER BY code;&quot;
 psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &quot;$QUERY&quot;
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p><code>P5-PUBLIC-001</code> miqdori <code>4</code>, ochiqligi <code>t</code>. <code>P5-PRIVATE-001</code> miqdori <code>2</code>, ochiqligi <code>f</code>. Nom va saqlash joyini ham P5.9 jadvali bilan solishtiring.</p>
-<h4>P5.11 Baholash sahifasida ilova ishini tekshirish</h4>
+<p><code>P5-PUBLIC-001</code> miqdori <code>4</code>, ochiqligi <code>t</code>. <code>P5-PRIVATE-001</code> miqdori <code>2</code>, ochiqligi <code>f</code>. Nom va saqlash joyini ham P4.9 jadvali bilan solishtiring.</p>
+<h4>P4.11 Baholash sahifasida ilova ishini tekshirish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Shaxsiy PC brauzeri: Web Portal</p>
-<p>O‘z kompyuteringizdan baholash sahifasida P5 ni ochib, funksiya va huquqlarni tekshirishni tanlang. <code>practice_admin</code> parolini kiritib tekshiruvni boshlang. Tekshiruv bitta nazorat yozuvini yaratadi va miqdor o‘zgarishini tekshiradi.</p>
+<p>O‘z kompyuteringizdan baholash sahifasida P4 ni ochib, funksiya va huquqlarni tekshirishni tanlang. <code>practice_admin</code> parolini kiritib tekshiruvni boshlang. Tekshiruv bitta nazorat yozuvini yaratadi va miqdor o‘zgarishini tekshiradi.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>P5 ning 13 mezoni chiqadi. Nazorat jihozi boshqaruv sahifasida qoladi.</p>
-<h2 id="section-10">P6 Eng kam huquq va ochiq kirish chegarasi</h2>
-<p><strong>Practice6 da bajariladigan ishlar</strong></p>
+<p>P4 ning 13 mezoni chiqadi. Nazorat jihozi boshqaruv sahifasida qoladi.</p>
+<h2 id="section-10">P5 Eng kam huquq va ochiq kirish chegarasi</h2>
+<p><strong>Practice5 da bajariladigan ishlar</strong></p>
 <p>DB sozlash roliga kirishni yoping. Ilovaning odatiy huquqlar bilan ishlashini va ochiq tomondan boshqaruv hamda sozlamalar yopilganini tekshiring.</p>
 <h3>Topshiriq diagrammasi</h3>
-<p><img src="../../../assets/uz/p6.png" alt="Ochiq va boshqaruv kirishlari hamda Web dan DB ga ulanish cheklovlari." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/uz/p5.png" alt="Ochiq va boshqaruv kirishlari hamda Web dan DB ga ulanish cheklovlari." width="1040" height="680" loading="lazy"></p>
 <h3>Yechim namunasi (bajarish tartibi)</h3>
-<h4>P6.1 Ilova DB da bajara oladigan amallarni ko‘rish</h4>
+<h4>P5.1 Ilova DB da bajara oladigan amallarni ko‘rish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p>DB terminalida <code>psql</code> ni oching. <code>\du</code> mashq rollari atributlarini, <code>\dp</code> jadval huquqlarini ko‘rsatadi.</p>
@@ -971,7 +971,7 @@ sudo -u postgres psql -X -d jdu_catalog_practice
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
 <p><code>catalog_practice_app</code> jihozni o‘qishi, qo‘shishi va o‘zgartirishi mumkin. Jihozni o‘chirish huquqi berilmagan.</p>
-<h4>P6.2 Boshlang‘ich sozlama uchun DB roli kirishini yopish</h4>
+<h4>P5.2 Boshlang‘ich sozlama uchun DB roli kirishini yopish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>DB serverning SSM terminali: ssm-user</p>
 <p><code>catalog_practice_setup</code> ochiq qolsa, uning parolini bilgan kishi yuqori huquqlarni ishlatishi mumkin. SQL da <code>NOLOGIN</code> ni topib, uni <code>psql</code> orqali qo‘llang.</p>
@@ -986,10 +986,10 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
 <p><code>ALTER ROLE</code> chiqadi. <code>catalog_practice_setup</code> kirishi yopiladi, ilova esa <code>catalog_practice_app</code> bilan ulana oladi.</p>
-<h4>P6.3 Web serverdagi vaqtinchalik sozlama fayllarini olib tashlash</h4>
+<h4>P5.3 Web serverdagi vaqtinchalik sozlama fayllarini olib tashlash</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
-<p>Ikkita vaqtinchalik sozlama faylini o‘chiring. Ilovani to‘xtating, P5 dagi <code>practice</code> sozlamasini tanlang va ilovani ishga tushiring. <code>catalog</code> OS foydalanuvchisi ilova kodiga yoza olmasligini tekshiring.</p>
+<p>Ikkita vaqtinchalik sozlama faylini o‘chiring. Ilovani to‘xtating, P4 dagi <code>practice</code> sozlamasini tanlang va ilovani ishga tushiring. <code>catalog</code> OS foydalanuvchisi ilova kodiga yoza olmasligini tekshiring.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
@@ -1016,7 +1016,7 @@ sudo -u catalog find /opt/jdu-catalog/app -writable -print
 <p><code>CATALOG_PROFILE_ACTIVATED=practice</code> va <code>VALID</code> chiqadi. Ilova <code>active</code> holatida bo‘ladi. Oddiy ish fayllari <code>root:root 600</code>. Oxirgi <code>find</code> natija chiqarmaydi.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Boshqa profil faol bo‘lsa, to‘xtang. O‘chirilgan fayllarni qayta o‘chirmang. To‘xtatish, profilni tanlash yoki tekshirishda xato bo‘lsa, ilovani ishga tushirishdan oldin sababini aniqlang.</p>
-<h4>P6.4 Ochiq 80-portdan nimalar ko‘rinishini tekshirish</h4>
+<h4>P5.4 Ochiq 80-portdan nimalar ko‘rinishini tekshirish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Bastionning SSM terminali: ssm-user</p>
 <p>Bastion terminalidan Web ning 80-portiga HTTP so‘rovlarini yuboring. Ro‘yxat ochilishini, boshqaruv sahifasi va ichki sozlamalar yopiq ekanini tekshiring. Boshqaruv sahifasini RDP orqali Bastion Firefox brauzerida <code>http://admin.lab.test:8080/admin/</code> bilan oching.</p>
@@ -1034,12 +1034,12 @@ curl -i http://web.lab.test/static/app.env
 <p>Ro‘yxat HTTP <code>200</code> qaytaradi. <code>/admin/</code> va sozlama fayli URL manzillari uchun <code>403</code> yoki <code>404</code> qaytadi. 8080-portda boshqaruv tizimiga kirish sahifasi chiqadi.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Env matni ko‘rinsa uni ulashmang; o‘qituvchiga aytib ochiq sozlamani tuzating.</p>
-<h4>P6.5 Baholash sahifasida kirish cheklovlarini tekshirish</h4>
+<h4>P5.5 Baholash sahifasida kirish cheklovlarini tekshirish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Shaxsiy PC brauzeri: Web Portal</p>
-<p>Baholash sahifasida P6 ni ochib, funksiya va huquqlarni tekshirishni tanlang. <code>practice_admin</code> parolini kiriting. Tekshiruv muvaffaqiyatli kirish va tizimga kirmasdan jihozni qo‘shish yoki o‘zgartirish rad etilishini solishtiradi.</p>
+<p>Baholash sahifasida P5 ni ochib, funksiya va huquqlarni tekshirishni tanlang. <code>practice_admin</code> parolini kiriting. Tekshiruv muvaffaqiyatli kirish va tizimga kirmasdan jihozni qo‘shish yoki o‘zgartirish rad etilishini solishtiradi.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>P6 ning 16 mezoni natijalari ko‘rinadi.</p>
+<p>P5 ning 16 mezoni natijalari ko‘rinadi.</p>
 <h2 id="section-11">Davom ettirish va natijalar</h2>
 <p>Keyingi safar o‘z Lab va ayni besh serverni ishga tushirib, running/SSM Online va joriy public IP ni tekshiring. Web Portal ga maktab Google orqali kirib, M0 tayyorligidan boshlang. Yaratish, kalit va ro‘yxatni har safar takrorlamang. Muddat tugasa o‘qituvchidan yangilashni so‘rang.</p>
 <p>Natijalar avtomatik saqlanadi. Ishlov paytida natijani yangilang; baholarni saqlangan baholar bo‘limidan ko‘ring. Nechta band bajarilganini va nimalarni tuzatish kerakligini ko‘ring. UNKNOWN o‘lchab bo‘lmagan holat, muvaffaqiyat yoki tasdiqlangan nol emas. Tekshirilmagan M ning tasdiqlangan ballari saqlanadi. Oxirgi baholanadigan natija olinadi; turli urinish PASS lari qo‘shilmaydi, maksimum avtomatik tanlanmaydi.</p>

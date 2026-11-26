@@ -1,4 +1,4 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Web Infrastructure: практика P0-P6 с подробными шагами</title><style>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Web Infrastructure: практика P0-P5 с подробными шагами</title><style>
 :root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
 *{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
 header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
@@ -13,15 +13,15 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Как пользоваться пособием</a> · <a href="#section-2">Среда и подготовка</a> · <a href="#section-3">Как читать шаги</a> · <a href="#section-4">Система и пути соединений</a> · <a href="#section-5">P0 Своя среда и место выполнения команд</a> · <a href="#section-6">P1 Выдача статического файла по HTTP</a> · <a href="#section-7">P2 Внутренний DNS и системное разрешение имён</a> · <a href="#section-8">P4 Подключение к PostgreSQL с аутентификацией</a> · <a href="#section-9">P5 Соединить предоставленное приложение с Web и DB</a> · <a href="#section-10">P6 Минимальные права и границы публикации</a> · <a href="#section-11">Продолжение и результаты</a> · <a href="#section-12">Справочные материалы</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: практика P0-P6 с подробными шагами</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Как пользоваться пособием</a> · <a href="#section-2">Среда и подготовка</a> · <a href="#section-3">Как читать шаги</a> · <a href="#section-4">Система и пути соединений</a> · <a href="#section-5">P0 Своя среда и место выполнения команд</a> · <a href="#section-6">P1 Выдача статического файла по HTTP</a> · <a href="#section-7">P2 Внутренний DNS и системное разрешение имён</a> · <a href="#section-8">P3 Подключение к PostgreSQL с аутентификацией</a> · <a href="#section-9">P4 Соединить предоставленное приложение с Web и DB</a> · <a href="#section-10">P5 Минимальные права и границы публикации</a> · <a href="#section-11">Продолжение и результаты</a> · <a href="#section-12">Справочные материалы</a></nav></header><main id="content" tabindex="-1"><h1>Web Infrastructure: практика P0-P5 с подробными шагами</h1>
 <p>Первая редакция для проверки преподавателем. Полное прохождение по пособию студентом ещё не проверено.</p>
 <p>Русский и узбекский тексты синхронизированы с японским оригиналом. Редактура носителями языка ещё не выполнена.</p>
 <p><a href="../ja/practice-full.html">日本語</a> · <a href="../ru/practice-full.html">Русский</a> · <a href="../uz/practice-full.html">O‘zbekcha</a></p>
-<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M5</a></p>
+<p><a href="practice.html">Практика P0–P5</a> · <a href="missions.html">Задания M0–M5</a></p>
 <h2 id="section-1">Как пользоваться пособием</h2>
 <p>Сначала прочитайте задание P; при необходимости проходите подробный пример по шагам. P - тренировка с подробными шагами. В M самостоятельно используйте другие объекты/значения. Номера заданий не являются номерами занятий; идите в своём темпе. Выполнение P не означает выполнение M.</p>
-<p>P0 → M0 → P1 → M1 → P2 → M2 → P4 → M3 → P5 → P6 → M4 → M5</p>
-<p>P5 требует DNS из M2. В P4 потренируйтесь подключаться к БД по IP и имени. Приложение использует db.lab.test. Перед переключением practice → mission завершите setup в P6.</p>
+<p>P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → P5 → M4 → M5</p>
+<p>P4 требует DNS из M2. В P3 потренируйтесь подключаться к БД по IP и имени. Приложение использует db.lab.test. Перед переключением practice → mission завершите setup в P5.</p>
 <p>P0=1, M0=4, M1=8, M2=13, M3=9, M4=13, M5=16: всего 64 балла. Нет личной демонстрации, backup/restore, дополнительных дисков и разработки приложения. Пересчёт в 25 баллов делает преподаватель отдельно. Повторные отправки возможны до объявленного срока. PASS разных попыток не объединяются; максимум автоматически не выбирается.</p>
 <h2 id="section-2">Среда и подготовка</h2>
 <p>Сначала завершите проверку подписи начального комплекта, создание пяти узлов либо install в существующую среду, внутренний SSH и личную регистрацию. Инструкция - distribution/STUDENT.md в zip. Не храните приватные ключи в общем Windows; используйте CloudShell личного Academy account. Преподаватель выдаёт личный анонимный Lab ID, fingerprint и срок действия.</p>
@@ -544,13 +544,13 @@ curl -i http://guide.lab.test/practice.txt
 guide.lab.test.  300  IN  A  10.20.1.20
 </code></pre>
 <p>Сокращённый пример dig: после A стоит IPv4, 300 - TTL. Отдельно проверьте, что SERVER запроса - 10.20.2.10.</p>
-<h2 id="section-8">P4 Подключение к PostgreSQL с аутентификацией</h2>
-<p><strong>Что сделать в Practice4</strong></p>
+<h2 id="section-8">P3 Подключение к PostgreSQL с аутентификацией</h2>
+<p><strong>Что сделать в Practice3</strong></p>
 <p>Настройте PostgreSQL на DB-сервере и подключитесь к учебной БД с Web по паролю.</p>
 <h3>Схема задания</h3>
-<p><img src="../../../assets/ru/p4.png" alt="Web разрешает имя DB-сервера и подключается к PostgreSQL." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ru/p3.png" alt="Web разрешает имя DB-сервера и подключается к PostgreSQL." width="1040" height="680" loading="lazy"></p>
 <h3>Пример решения (порядок действий)</h3>
-<h4>P4.1 Установить PostgreSQL с сервера пакетов</h4>
+<h4>P3.1 Установить PostgreSQL с сервера пакетов</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p>Установите PostgreSQL 16 на DB-сервере. Затем распакуйте файлы SQL для следующих шагов.</p>
@@ -568,7 +568,7 @@ sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p>В <code>pg_lsclusters</code> видны версия <code>16</code> и кластер <code>main</code>. Каталог данных - <code>/var/lib/postgresql/16/main</code>.</p>
-<h4>P4.2 Настроить адрес и порт PostgreSQL</h4>
+<h4>P3.2 Настроить адрес и порт PostgreSQL</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p>В <code>postgresql.conf</code> укажите внутренний IP DB <code>10.20.2.20</code> и порт 5432. Для паролей задайте SCRAM-SHA-256.</p>
@@ -582,8 +582,8 @@ port = 5432
 password_encryption = 'scram-sha-256'
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Сохраните три параметра в одном файле. Перезапуск выполняется в P4.4 после настройки доступа.</p>
-<h4>P4.3 Разрешить соединения с БД от Web-сервера</h4>
+<p>Сохраните три параметра в одном файле. Перезапуск выполняется в P3.4 после настройки доступа.</p>
+<h4>P3.3 Разрешить соединения с БД от Web-сервера</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p>В <code>pg_hba.conf</code> задайте источники, БД и роли. Разрешите указанные пары БД и ролей для практики и задания с внутреннего IP Web <code>10.20.1.20</code>.</p>
@@ -603,7 +603,7 @@ host all all ::/0 reject
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p>PostgreSQL применяет первую совпавшую строку сверху. Сначала расположены разрешения, затем строки <code>reject</code> для остальных соединений.</p>
-<h4>P4.4 Перезапустить PostgreSQL и проверить настройки</h4>
+<h4>P3.4 Перезапустить PostgreSQL и проверить настройки</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p>Перезапустите PostgreSQL, чтобы применить сохранённые параметры и правила доступа.</p>
@@ -622,7 +622,7 @@ sudo -u postgres psql -X -d postgres -c \
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p>Служба - <code>active</code>, адрес и порт - <code>10.20.2.20:5432</code>, способ хранения пароля - <code>scram-sha-256</code>, ошибки правил доступа - <code>(0 rows)</code>.</p>
-<h4>P4.5 Создать учебную БД и две роли</h4>
+<h4>P3.5 Создать учебную БД и две роли</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p>Готовые SQL создают БД <code>jdu_catalog_practice</code>. Роль <code>catalog_practice_setup</code> подготавливает таблицы, <code>catalog_practice_app</code> нужна для обычной работы. Сначала выведите SQL, затем передайте его в <code>psql</code>.</p>
@@ -642,10 +642,10 @@ python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u pos
 <p><code>CREATE ROLE</code> появляется дважды, <code>CREATE DATABASE</code> - один раз.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>При already exists возможен повторный запуск. Не используйте DROP; проверьте роли и БД через \du и \l. Убедитесь, что psql справа от pipe не сообщил SQL error.</p>
-<h4>P4.6 Задать пароль каждой роли БД</h4>
+<h4>P3.6 Задать пароль каждой роли БД</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
-<p>Откройте <code>psql</code> на DB-сервере. Выполняйте <code>\password</code> по одной строке и дважды введите выбранный пароль каждой роли. Символы скрыты. Оба пароля понадобятся в P5. Задайте разные пароли длиной не менее 16 символов.</p>
+<p>Откройте <code>psql</code> на DB-сервере. Выполняйте <code>\password</code> по одной строке и дважды введите выбранный пароль каждой роли. Символы скрыты. Оба пароля понадобятся в P4. Задайте разные пароли длиной не менее 16 символов.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. В терминале DB открыть psql от postgres; следующие действия внутри psql.
 sudo -u postgres psql -X -d postgres
@@ -662,10 +662,10 @@ sudo -u postgres psql -X -d postgres
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p>В выводе <code>\du</code> есть <code>catalog_practice_setup</code> и <code>catalog_practice_app</code>.</p>
-<h4>P4.7 Подключиться к учебной БД с Web-сервера</h4>
+<h4>P3.7 Подключиться к учебной БД с Web-сервера</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
-<p>Откройте Session Manager для Web-сервера как в P0. В <code>psql</code> сначала укажите внутренний IP DB, затем имя <code>practice-db.lab.test</code> из P2. В обоих случаях используйте пароль <code>catalog_practice_app</code> из P4.6.</p>
+<p>Откройте Session Manager для Web-сервера как в P0. В <code>psql</code> сначала укажите внутренний IP DB, затем имя <code>practice-db.lab.test</code> из P2. В обоих случаях используйте пароль <code>catalog_practice_app</code> из P3.6.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Установить postgresql-client-16 и обязательные зависимости с сервера пакетов.
 sudo apt-get install --no-install-recommends postgresql-client-16
@@ -682,31 +682,31 @@ psql -X -h practice-db.lab.test -U catalog_practice_app -d jdu_catalog_practice 
 <p>В обоих случаях результат показывает БД <code>jdu_catalog_practice</code>, роль <code>catalog_practice_app</code> и значение <code>1</code>.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Если по IP подключение работает, а по имени нет, проверьте системный DNS и учебное имя DB из P2. При отказе аутентификации проверьте источник, БД, роль и пароль. Не публикуйте DB в Internet для диагностики.</p>
-<h4>P4.8 Сохранить пароль БД для проверки на Web-сервере</h4>
+<h4>P3.8 Сохранить пароль БД для проверки на Web-сервере</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
-<p>Запустите команду и дважды введите пароль <code>catalog_practice_app</code>. Ввод скрыт, пароль сохраняется на Web в защищённом файле для проверки подключения. Откройте страницу оценок на своём компьютере и проверьте P4.</p>
+<p>Запустите команду и дважды введите пароль <code>catalog_practice_app</code>. Ввод скрыт, пароль сохраняется на Web в защищённом файле для проверки подключения. Откройте страницу оценок на своём компьютере и проверьте P3.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Скрыто ввести существующий пароль учебной БД и сохранить только на Web.
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/database_secret.py --profile \
   practice
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Терминал выводит <code>D11_EXISTING_DB_PASSWORD_STORED_LOCALLY</code>. На странице оценок видны девять критериев P4.</p>
+<p>Терминал выводит <code>D11_EXISTING_DB_PASSWORD_STORED_LOCALLY</code>. На странице оценок видны девять критериев P3.</p>
 <p><strong>Если не получилось:</strong></p>
-<p>Если файл уже есть, не создавайте заново. В P5 тот же пароль вводится в настройку приложения. M3 использует отдельные БД/роли mission.</p>
+<p>Если файл уже есть, не создавайте заново. В P4 тот же пароль вводится в настройку приложения. M3 использует отдельные БД/роли mission.</p>
 <h3>Пример чтения вывода (не вводить)</h3>
 <pre><code class="language-text">current_database    | current_user         | value
 jdu_catalog_practice | catalog_practice_app | 1
 </code></pre>
 <p>Пример чтения SELECT; ширина столбцов может отличаться. Сверьте БД, роль и value=1. Это не доказательство права менять таблицы.</p>
-<h2 id="section-9">P5 Соединить предоставленное приложение с Web и DB</h2>
-<p><strong>Что сделать в Practice5</strong></p>
+<h2 id="section-9">P4 Соединить предоставленное приложение с Web и DB</h2>
+<p><strong>Что сделать в Practice4</strong></p>
 <p>Запустите приложение на Web и подключите его к DB. Настройте публичный список и управление с бастиона.</p>
 <h3>Схема задания</h3>
-<p><img src="../../../assets/ru/p5.png" alt="Посетитель и администратор входят в одно приложение по разным путям." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ru/p4.png" alt="Посетитель и администратор входят в одно приложение по разным путям." width="1040" height="680" loading="lazy"></p>
 <h3>Пример решения (порядок действий)</h3>
-<h4>P5.1 Проверить DNS и подготовить пакеты Python</h4>
+<h4>P4.1 Проверить DNS и подготовить пакеты Python</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p>Сначала разрешите имена БД и админки с Web-сервера. Затем установите инструменты Python с сервера пакетов и распакуйте приложение и пакеты Python.</p>
@@ -726,7 +726,7 @@ ls /var/lib/jdu-web/lesson-resources-r1/wheels
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p><code>db.lab.test</code> даёт <code>10.20.2.20</code>, <code>admin.lab.test</code> - <code>10.20.1.20</code>. В терминале появляются <code>PUBLIC_APP_RESOURCES_VERIFIED</code> и <code>SIGNED_OFFLINE_WHEELS_READY=7</code>.</p>
-<h4>P5.2 Разместить приложение и создать его окружение Python</h4>
+<h4>P4.2 Разместить приложение и создать его окружение Python</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p>Скопируйте файлы в <code>/opt/jdu-catalog/app</code>. Создайте окружение приложения через <code>venv</code> и установите подготовленные пакеты. <code>pip</code> проверяет хеши файлов и работает без обращения к внешнему сайту.</p>
@@ -751,7 +751,7 @@ sudo /opt/jdu-catalog/venv/bin/python -m pip check
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p>Последний <code>pip check</code> выводит <code>No broken requirements found.</code>.</p>
-<h4>P5.3 Создать системного пользователя приложения</h4>
+<h4>P4.3 Создать системного пользователя приложения</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p>Создайте на Web системного пользователя <code>catalog</code> для запуска приложения. Подготовьте каталог для CSS и других файлов и дайте <code>catalog</code> право записи в него.</p>
@@ -780,10 +780,10 @@ getent passwd catalog
 <p>Вывод показывает пользователя <code>catalog</code> и оболочку <code>/usr/sbin/nologin</code>. Владелец и группа <code>/var/lib/jdu-catalog/static</code> - <code>catalog</code>.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Не исправляйте права через chmod -R 777 или добавление catalog в sudo. Проверьте конкретный каталог и владельца.</p>
-<h4>P5.4 Настроить обычное подключение приложения к БД</h4>
+<h4>P4.4 Настроить обычное подключение приложения к БД</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
-<p>Замените <code>YOUR-CURRENT-WEB-PUBLIC-IP</code> на текущий публичный IPv4 Web из AWS Console. При запросе введите пароль <code>catalog_practice_app</code> из P4. Выберите созданные учебные настройки для приложения. Вводимые символы скрыты.</p>
+<p>Замените <code>YOUR-CURRENT-WEB-PUBLIC-IP</code> на текущий публичный IPv4 Web из AWS Console. При запросе введите пароль <code>catalog_practice_app</code> из P3. Выберите созданные учебные настройки для приложения. Вводимые символы скрыты.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Указать текущий public IPv4 Web из AWS Console.
 PUBLIC_WEB_IPV4='YOUR-CURRENT-WEB-PUBLIC-IP'
@@ -799,10 +799,10 @@ sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p>Вывод содержит <code>CATALOG_ENV_CREATED=practice</code>, <code>CATALOG_PROFILE_ACTIVATED=practice</code> и <code>VALID</code>. Для <code>app.env</code> ожидаются <code>root:root</code> и <code>600</code>.</p>
-<h4>P5.5 Подготовить таблицы и администратора приложения</h4>
+<h4>P4.5 Подготовить таблицы и администратора приложения</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
-<p>При создании временных настроек введите пароль <code>catalog_practice_setup</code> из P4. Выполняйте команды по одной, чтобы создать таблицы и примеры оборудования. В конце выберите и введите пароль <code>practice_admin</code>. Вводимые символы скрыты.</p>
+<p>При создании временных настроек введите пароль <code>catalog_practice_setup</code> из P3. Выполняйте команды по одной, чтобы создать таблицы и примеры оборудования. В конце выберите и введите пароль <code>practice_admin</code>. Вводимые символы скрыты.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Скрыто ввести существующий пароль setup и создать временную настройку.
 sudo python3 -B /opt/jdu-catalog/app/configuration.py create-setup --profile practice
@@ -821,7 +821,7 @@ sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p>Создаются 11 таблиц приложения и три примера. Для входа в админку используется <code>practice_admin</code>.</p>
-<h4>P5.6 Выдать роли приложения необходимые права в БД</h4>
+<h4>P4.6 Выдать роли приложения необходимые права в БД</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p>Откройте Session Manager на DB-сервере. Выдайте <code>catalog_practice_app</code> права для работы с уже созданными таблицами. Сначала просмотрите SQL, затем примените его следующей командой.</p>
@@ -836,7 +836,7 @@ python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u pos
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p>Вывод заканчивается <code>COMMIT</code>. Для <code>catalog_item</code> разрешены чтение, добавление и изменение.</p>
-<h4>P5.7 Запустить приложение как службу systemd</h4>
+<h4>P4.7 Запустить приложение как службу systemd</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p>На Web соберите CSS и другие файлы в каталог для Nginx. Скопируйте описание службы в <code>/etc/systemd/system</code> и загрузите его в systemd. <code>enable --now</code> запускает службу сейчас и настраивает запуск при загрузке ОС.</p>
@@ -866,7 +866,7 @@ sudo ss -lntp
 <p>Служба - <code>active</code>. Gunicorn слушает <code>127.0.0.1:8000</code> для соединений от Nginx на том же Web-сервере.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>При ошибке смотрите journalctl -u jdu-catalog. Не копируйте env в журнал; формат проверяется configuration.py check.</p>
-<h4>P5.8 Настроить публичный и административный входы Nginx</h4>
+<h4>P4.8 Настроить публичный и административный входы Nginx</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p>Скопируйте конфигурацию и добавьте символическую ссылку в <code>sites-enabled</code>. После применения порт 80 открывает список, а порт 8080 с бастиона - админку. Nginx передаёт запросы приложения в Gunicorn.</p>
@@ -893,10 +893,10 @@ curl -i http://127.0.0.1/practice.txt
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p><code>nginx -t</code> проходит. <code>/practice.txt</code> возвращает HTTP <code>200</code> и <code>JDU WEB-02 practice: HTTP response verified.</code> Тем же способом откройте <code>http://127.0.0.1/mission.txt</code> и проверьте текст M1.</p>
-<h4>P5.9 Добавить через админку открытую и скрытую записи</h4>
+<h4>P4.9 Добавить через админку открытую и скрытую записи</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>Firefox на рабочем столе бастиона через RDP</p>
-<p>Подключитесь к бастиону по RDP и откройте в его Firefox <code>http://admin.lab.test:8080/admin/</code>. Войдите как <code>practice_admin</code> с паролем из P5.5. Откройте «備品» (оборудование) и сохраните две записи по таблице. У опубликованной записи измените количество, сохраните и верните его к 4.</p>
+<p>Подключитесь к бастиону по RDP и откройте в его Firefox <code>http://admin.lab.test:8080/admin/</code>. Войдите как <code>practice_admin</code> с паролем из P4.5. Откройте «備品» (оборудование) и сохраните две записи по таблице. У опубликованной записи измените количество, сохраните и верните его к 4.</p>
 <table>
 <thead>
 <tr>
@@ -926,10 +926,10 @@ curl -i http://127.0.0.1/practice.txt
 </table>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p>В админке видны <code>P5-PUBLIC-001</code> и <code>P5-PRIVATE-001</code>. В публичном списке из новых записей появляется <code>P5-PUBLIC-001</code>.</p>
-<h4>P5.10 Проверить сохранение обеих записей в БД</h4>
+<h4>P4.10 Проверить сохранение обеих записей в БД</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
-<p>В терминале Web прочитайте через <code>psql</code> две записи, добавленные в админке. Используйте пароль <code>catalog_practice_app</code> из P4.6.</p>
+<p>В терминале Web прочитайте через <code>psql</code> две записи, добавленные в админке. Используйте пароль <code>catalog_practice_app</code> из P3.6.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Сохранить SELECT двух заданных записей; пока не отправлять в БД.
 QUERY=&quot;SELECT code,name,quantity,location,is_public
@@ -940,20 +940,20 @@ ORDER BY code;&quot;
 psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &quot;$QUERY&quot;
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>У <code>P5-PUBLIC-001</code> количество <code>4</code> и признак <code>t</code>, у <code>P5-PRIVATE-001</code> - <code>2</code> и <code>f</code>. Сверьте также название и место хранения с таблицей P5.9.</p>
-<h4>P5.11 Проверить работу приложения на странице оценок</h4>
+<p>У <code>P5-PUBLIC-001</code> количество <code>4</code> и признак <code>t</code>, у <code>P5-PRIVATE-001</code> - <code>2</code> и <code>f</code>. Сверьте также название и место хранения с таблицей P4.9.</p>
+<h4>P4.11 Проверить работу приложения на странице оценок</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>Браузер на своём PC: Web Portal</p>
-<p>На своём компьютере откройте P5 на странице оценок и выберите проверку функций и прав. Введите пароль <code>practice_admin</code> и запустите проверку. Она создаёт одну контрольную запись и проверяет изменение количества.</p>
+<p>На своём компьютере откройте P4 на странице оценок и выберите проверку функций и прав. Введите пароль <code>practice_admin</code> и запустите проверку. Она создаёт одну контрольную запись и проверяет изменение количества.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Появятся результаты 13 критериев P5. Контрольная запись остаётся в админке.</p>
-<h2 id="section-10">P6 Минимальные права и границы публикации</h2>
-<p><strong>Что сделать в Practice6</strong></p>
+<p>Появятся результаты 13 критериев P4. Контрольная запись остаётся в админке.</p>
+<h2 id="section-10">P5 Минимальные права и границы публикации</h2>
+<p><strong>Что сделать в Practice5</strong></p>
 <p>Отключите вход роли настройки БД. Проверьте работу приложения с обычными правами и закрытие админки и настроек с публичного входа.</p>
 <h3>Схема задания</h3>
-<p><img src="../../../assets/ru/p6.png" alt="Ограничения публичного и административного входов и доступа от Web к DB." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ru/p5.png" alt="Ограничения публичного и административного входов и доступа от Web к DB." width="1040" height="680" loading="lazy"></p>
 <h3>Пример решения (порядок действий)</h3>
-<h4>P6.1 Посмотреть, что приложение может делать в БД</h4>
+<h4>P5.1 Посмотреть, что приложение может делать в БД</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p>Откройте <code>psql</code> в терминале DB. <code>\du</code> показывает атрибуты учебных ролей, <code>\dp</code> - права по таблицам.</p>
@@ -971,7 +971,7 @@ sudo -u postgres psql -X -d jdu_catalog_practice
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p>У <code>catalog_practice_app</code> есть чтение, добавление и изменение оборудования. Удаление оборудования не разрешено.</p>
-<h4>P6.2 Запретить вход роли, созданной для настройки</h4>
+<h4>P5.2 Запретить вход роли, созданной для настройки</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p>Если оставить вход для <code>catalog_practice_setup</code>, утечка его пароля даёт повышенные права. Просмотрите SQL, найдите <code>NOLOGIN</code> и примените его через <code>psql</code>.</p>
@@ -986,10 +986,10 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p>Появляется <code>ALTER ROLE</code>. Вход <code>catalog_practice_setup</code> отключён, а приложение продолжает подключаться как <code>catalog_practice_app</code>.</p>
-<h4>P6.3 Убрать временные файлы настройки на Web</h4>
+<h4>P5.3 Убрать временные файлы настройки на Web</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
-<p>Удалите два временных файла настройки. Остановите приложение, выберите профиль <code>practice</code> из P5 и запустите приложение. Проверьте, что пользователь ОС <code>catalog</code> не может записывать в каталог кода.</p>
+<p>Удалите два временных файла настройки. Остановите приложение, выберите профиль <code>practice</code> из P4 и запустите приложение. Проверьте, что пользователь ОС <code>catalog</code> не может записывать в каталог кода.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Прочитать владельца, группу, права и имя указанных файлов.
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
@@ -1016,7 +1016,7 @@ sudo -u catalog find /opt/jdu-catalog/app -writable -print
 <p>Появляются <code>CATALOG_PROFILE_ACTIVATED=practice</code> и <code>VALID</code>, приложение переходит в <code>active</code>. У рабочих файлов указано <code>root:root 600</code>. Последняя команда <code>find</code> ничего не выводит.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Если активен другой профиль, остановитесь. Не повторяйте удаление отсутствующих файлов. При ошибке остановки, выбора профиля или проверки выясните причину до запуска приложения.</p>
-<h4>P6.4 Проверить, что видно через публичный порт 80</h4>
+<h4>P5.4 Проверить, что видно через публичный порт 80</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал бастиона: ssm-user</p>
 <p>Из терминала бастиона отправьте запросы на порт 80 Web. Проверьте доступ к списку и отсутствие публичного доступа к админке и внутренним настройкам. Админку откройте на бастионе через RDP в Firefox по <code>http://admin.lab.test:8080/admin/</code>.</p>
@@ -1034,12 +1034,12 @@ curl -i http://web.lab.test/static/app.env
 <p>Список возвращает HTTP <code>200</code>, адреса <code>/admin/</code> и файлов настроек - <code>403</code> или <code>404</code>. На 8080 видна форма входа в админку.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Если виден текст env, не распространяйте его: сообщите преподавателю и исправьте публикацию.</p>
-<h4>P6.5 Проверить ограничения доступа на странице оценок</h4>
+<h4>P5.5 Проверить ограничения доступа на странице оценок</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>Браузер на своём PC: Web Portal</p>
-<p>Откройте P6 на странице оценок и выберите проверку функций и прав. Введите пароль <code>practice_admin</code> и запустите её. Проверка сравнит успешный вход и отказ добавить или изменить оборудование без входа.</p>
+<p>Откройте P5 на странице оценок и выберите проверку функций и прав. Введите пароль <code>practice_admin</code> и запустите её. Проверка сравнит успешный вход и отказ добавить или изменить оборудование без входа.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Появляются результаты 16 критериев P6.</p>
+<p>Появляются результаты 16 критериев P5.</p>
 <h2 id="section-11">Продолжение и результаты</h2>
 <p>В следующий раз запустите свой Lab и те же пять узлов, проверьте running/SSM Online и текущие public IP. Войдите в Web Portal через школьный Google и начните с готовности M0. Не повторяйте создание, ключи и регистрацию каждый раз. При истечении срока запросите обновление у преподавателя.</p>
 <p>Результаты сохраняются автоматически. Во время обработки обновляйте результат; оценки смотрите в разделе сохранённых оценок. Смотрите, сколько критериев выполнено и что нужно исправить. UNKNOWN означает невозможность измерения, а не успех или подтверждённый ноль. Подтверждённые баллы непроверенных M сохраняются. Используется последний оцениваемый результат, без объединения PASS разных запусков и автоматического выбора максимума.</p>

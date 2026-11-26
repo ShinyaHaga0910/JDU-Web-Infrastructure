@@ -20,7 +20,7 @@ from command_notes import annotated_blocks, CONFIG_STEPS
 from diagrams import diagram_markdown, write_diagrams, P1_STEP_DIAGRAMS
 from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE, RDP_STEPS
 from checks import CHECKS
-from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, RAW_MAXIMUM, active_registry, display_missions, task_page
+from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, RAW_MAXIMUM, active_registry, display_task, display_task_references, task_page
 from explanations import LABELS, READING, ROUTES, MODULE_NOTES, STEP_NOTES, OUTPUT_EXAMPLES
 MODULES_BY_NUMBER = {int(m['id'][1:]): m for m in MODULES}
 MODULES = [MODULES_BY_NUMBER[n] for n in ACTIVE_NUMBERS]
@@ -290,7 +290,7 @@ def make_markdown(reg, lang, kind):
             if 'before' in notes:
                 out += ['### ' + LABELS['mechanism'][lang], '',
                         '**' + LABELS['before'][lang] + ':** ' + notes['before'][lang], '']
-            out += ['**' + L['work'][lang].format(number=m['id'][1:]) + '**', '', notes['after'][lang], '']
+            out += ['**' + L['work'][lang].format(number=display_task(m['id'])[1:]) + '**', '', notes['after'][lang], '']
             if m['id'] not in ('P0', 'P1'):
                 out += diagram_markdown(m['id'], lang)
             if 'mechanism' in notes:
@@ -379,7 +379,7 @@ def make_markdown(reg, lang, kind):
             out += ['### ' + L['submit'][lang], '', browser_check(task['id'], lang), '']
     if kind=='practice':
         out += emit_end(lang)
-    text = display_missions('\n'.join(out)).replace('\u2013', '-').replace('\u2014', '-')
+    text = display_task_references('\n'.join(out)).replace('\u2013', '-').replace('\u2014', '-')
     # Labels form their own paragraphs so commands, explanations and results scan separately.
     return re.sub(r'^(\*\*[^\n]+?:\*\*) (.+)$', r'\1\n\n\2', text, flags=re.M)
 
@@ -603,7 +603,7 @@ def main():
     links=[]
     for lang in LANGS:
         label={'ja':'日本語','ru':'Русский','uz':'O‘zbekcha'}[lang]
-        links.append(f'<article><h2>{label}</h2><p><a href="{lang}/practice.html">P0–P6</a> · <a href="{lang}/missions.html">M0–M5</a></p><p><a href="../pdf/web_lab_practice_{lang}.pdf">P PDF</a> · <a href="../pdf/web_lab_missions_{lang}.pdf">M PDF</a></p></article>')
+        links.append(f'<article><h2>{label}</h2><p><a href="{lang}/practice.html">P0–P5</a> · <a href="{lang}/missions.html">M0–M5</a></p><p><a href="../pdf/web_lab_practice_{lang}.pdf">P PDF</a> · <a href="../pdf/web_lab_missions_{lang}.pdf">M PDF</a></p></article>')
     (ROOT/'output/html/index.html').write_text('<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JDU Web P/M 教材</title><style>'+CSS+'</style></head><body><main><h1>Web Infrastructure · P / M</h1><p>手順付き練習と自力課題 / Практика и задания / Mashqlar va topshiriqlar</p>'+''.join(links)+'</main></body></html>',encoding='utf-8',newline='\n')
     package=ROOT/'output/web-lab-pm-r1.zip'
     members=[p for folder in ('docs','assets','resources','distribution','output/html','output/pdf') for p in (ROOT/folder).rglob('*') if p.is_file()]

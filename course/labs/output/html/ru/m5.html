@@ -14,16 +14,16 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
 </style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Требуемый результат</a> · <a href="#section-2">Схема задания</a> · <a href="#section-3">Критерии оценки</a> · <a href="#section-4">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M5 Минимальные права и границы публикации (16)</h1>
-<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M5</a></p>
+<p><a href="practice.html">Практика P0–P5</a> · <a href="missions.html">Задания M0–M5</a></p>
 <p><a href="../ja/m5.html">日本語</a> · <a href="../ru/m5.html">Русский</a> · <a href="../uz/m5.html">O‘zbekcha</a></p>
-<p>Связанное задание: <a href="p6.html">P6</a>.</p>
+<p>Связанное задание: <a href="p5.html">P5</a>.</p>
 <h2 id="section-1">Требуемый результат</h2>
 <p>Перед началом убедитесь на странице оценок, что за <a href="m4.html">M4</a> получен полный балл.</p>
-<p>Переведите приложение M4 в обычный режим работы способом из P6. Закройте доступ, нужный только при настройке, и сохраните необходимые права приложения и администратора.</p>
+<p>Переведите приложение M4 в обычный режим работы способом из P5. Закройте доступ, нужный только при настройке, и сохраните необходимые права приложения и администратора.</p>
 <ol>
-<li><strong>DB-сервер (P6.1-P6.2).</strong> Проверьте права <code>catalog_app</code>. Запретите вход для роли настройки <code>catalog_setup</code>, удалите её пароль и завершите оставшиеся соединения.</li>
-<li><strong>Web-сервер (P6.3-P6.4).</strong> Уберите временные настройки (<code>/etc/jdu-catalog/setup.env</code> и <code>/etc/jdu-catalog/profiles/mission.setup.env</code>) и запустите приложение с рабочим профилем <code>mission</code>. Пользователь сервиса не должен менять код. Файлы с секретами принадлежат <code>root:root</code> и имеют права <code>0600</code>.</li>
-<li><strong>Открытая и административная страницы (P6.4-P6.5).</strong> На порту 80 должна отображаться только публичная запись из M4. Откройте панель управления с бастиона на порту 8080 и проверьте, что <code>lab_admin</code> может просматривать, добавлять и изменять предметы.</li>
+<li><strong>DB-сервер (P5.1-P5.2).</strong> Проверьте права <code>catalog_app</code>. Запретите вход для роли настройки <code>catalog_setup</code>, удалите её пароль и завершите оставшиеся соединения.</li>
+<li><strong>Web-сервер (P5.3-P5.4).</strong> Уберите временные настройки (<code>/etc/jdu-catalog/setup.env</code> и <code>/etc/jdu-catalog/profiles/mission.setup.env</code>) и запустите приложение с рабочим профилем <code>mission</code>. Пользователь сервиса не должен менять код. Файлы с секретами принадлежат <code>root:root</code> и имеют права <code>0600</code>.</li>
+<li><strong>Открытая и административная страницы (P5.4-P5.5).</strong> На порту 80 должна отображаться только публичная запись из M4. Откройте панель управления с бастиона на порту 8080 и проверьте, что <code>lab_admin</code> может просматривать, добавлять и изменять предметы.</li>
 </ol>
 <h2 id="section-2">Схема задания</h2>
 <p><img src="../../../assets/ru/m5.png" alt="Ограничения публичного и административного входов и доступа от Web к DB." width="1040" height="680" loading="lazy"></p>

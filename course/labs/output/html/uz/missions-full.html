@@ -17,11 +17,11 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>O‘qituvchi tekshiruvi uchun birinchi nashr. Talabaning qo‘llanma bo‘yicha boshidan oxirigacha o‘tishi hali tekshirilmagan.</p>
 <p>Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga ega. Ona tili mutaxassisi tahriri hali bajarilmagan.</p>
 <p><a href="../ja/missions-full.html">日本語</a> · <a href="../ru/missions-full.html">Русский</a> · <a href="../uz/missions-full.html">O‘zbekcha</a></p>
-<p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M5</a></p>
+<p><a href="practice.html">Mashqlar P0–P5</a> · <a href="missions.html">Topshiriqlar M0–M5</a></p>
 <h2 id="section-1">Qo‘llanmadan foydalanish</h2>
 <p>P da mashq qilingan usul bilan shu muhitga topshiriq fayllari va sozlamalarini qo‘shing. Har bir M dagi qiymatlar va mos P qadamlariga qarang.</p>
-<p>P0 → M0 → P1 → M1 → P2 → M2 → P4 → M3 → P5 → P6 → M4 → M5</p>
-<p>P6 da mashq sozlamalarini yakunlang. Keyin M4 da ayni ilovani topshiriq bazasiga ulang.</p>
+<p>P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → P5 → M4 → M5</p>
+<p>P5 da mashq sozlamalarini yakunlang. Keyin M4 da ayni ilovani topshiriq bazasiga ulang.</p>
 <h2 id="section-2">M0 Shaxsiy muhit va buyruqlarni bajarish joyi (4)</h2>
 <h3>Tayyor holat talablari</h3>
 <p>P0 dagi ulanish tartibini qo‘llab, to‘rtta server uchun Session Manager’ni oching. EC2 ro‘yxatida kerakli serverning <strong>Instance ID</strong> sini, so‘ng <strong>Connect</strong> yonidagi strelkani va <strong>Connect with SSM Session Manager</strong> bandini bosing. Har bir serverga <code>ssm-user</code> sifatida ulanib, uy katalogingizda <code>m0-connection.txt</code> faylini yarating va jadvaldagi qiymatni bitta qatorga yozing.</p>
@@ -252,10 +252,10 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-5">M3 PostgreSQL ga autentifikatsiya bilan ulanish (9)</h2>
 <h3>Tayyor holat talablari</h3>
 <p>Boshlashdan oldin baholash sahifasida <a href="m2.html">M2</a> uchun to‘liq ball olinganini tekshiring.</p>
-<p>P4 dagi PostgreSQL da quyida ko‘rsatilgan topshiriq ma’lumotlar bazasi va ikkita rolni yarating. Ilova jadvallari M4 da yaratiladi.</p>
+<p>P3 dagi PostgreSQL da quyida ko‘rsatilgan topshiriq ma’lumotlar bazasi va ikkita rolni yarating. Ilova jadvallari M4 da yaratiladi.</p>
 <ol>
-<li><strong>DB server (P4.2-P4.6).</strong> Baza va rollarni yarating. Tegishli bazaga ko‘rsatilgan rollar bilan faqat Web serverdan (<code>10.20.1.20/32</code>) ulanishga ruxsat bering. P4 dagidek SCRAM ishlating.</li>
-<li><strong>Web server (P4.7-P4.8).</strong> Oddiy ish rejimi roli bilan <code>db.lab.test</code> ga ulanib, SELECT bajarilishini tekshiring. Mavjud parolni P4.8 dagi usul bilan <code>mission</code> profili uchun saqlang.</li>
+<li><strong>DB server (P3.2-P3.6).</strong> Baza va rollarni yarating. Tegishli bazaga ko‘rsatilgan rollar bilan faqat Web serverdan (<code>10.20.1.20/32</code>) ulanishga ruxsat bering. P3 dagidek SCRAM ishlating.</li>
+<li><strong>Web server (P3.7-P3.8).</strong> Oddiy ish rejimi roli bilan <code>db.lab.test</code> ga ulanib, SELECT bajarilishini tekshiring. Mavjud parolni P3.8 dagi usul bilan <code>mission</code> profili uchun saqlang.</li>
 </ol>
 <h3>Topshiriq diagrammasi</h3>
 <p><img src="../../../assets/uz/m3.png" alt="Web server DB server nomini aniqlaydi va PostgreSQL ga ulanadi." width="1040" height="680" loading="lazy"></p>
@@ -338,11 +338,11 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-6">M4 Berilgan app ni Web va DB bilan bog‘lash (13)</h2>
 <h3>Tayyor holat talablari</h3>
 <p>Boshlashdan oldin baholash sahifasida <a href="m2.html">M2</a>, <a href="m3.html">M3</a> uchun to‘liq ball olinganini tekshiring.</p>
-<p>P5 dagi jihozlar ilovasini M3 da tayyorlangan topshiriq bazasiga ulang. Profilni almashtirishdan oldin P6 da mashq sozlamasini yakunlang.</p>
+<p>P4 dagi jihozlar ilovasini M3 da tayyorlangan topshiriq bazasiga ulang. Profilni almashtirishdan oldin P5 da mashq sozlamasini yakunlang.</p>
 <ol>
-<li><strong>Web server (P6.3, P5.4-P5.5).</strong> Ilovani to‘xtating va <code>mission</code> profilini tanlang. Mavjud ilovadan foydalanib, topshiriq bazasida jadvallar, boshlang‘ich ma’lumotlar va administratorni yarating.</li>
-<li><strong>DB va Web serverlari (P5.6-P5.8).</strong> Oddiy ish rejimi roliga huquqlarni bering va ilovani ishga tushiring. Ochiq sahifa hamda boshqaruv sahifasini oching. <code>/practice.txt</code> va <code>/mission.txt</code> ham ochilishini tekshiring.</li>
-<li><strong>Bastion serveri (P5.9).</strong> <code>http://admin.lab.test:8080/admin/</code> manziliga <code>lab_admin</code> bilan kiring va jadvaldagi ikki yozuvni kiriting. Ochiq sahifada e’lon qilingan yozuvni tekshiring.</li>
+<li><strong>Web server (P5.3, P4.4-P4.5).</strong> Ilovani to‘xtating va <code>mission</code> profilini tanlang. Mavjud ilovadan foydalanib, topshiriq bazasida jadvallar, boshlang‘ich ma’lumotlar va administratorni yarating.</li>
+<li><strong>DB va Web serverlari (P4.6-P4.8).</strong> Oddiy ish rejimi roliga huquqlarni bering va ilovani ishga tushiring. Ochiq sahifa hamda boshqaruv sahifasini oching. <code>/practice.txt</code> va <code>/mission.txt</code> ham ochilishini tekshiring.</li>
+<li><strong>Bastion serveri (P4.9).</strong> <code>http://admin.lab.test:8080/admin/</code> manziliga <code>lab_admin</code> bilan kiring va jadvaldagi ikki yozuvni kiriting. Ochiq sahifada e’lon qilingan yozuvni tekshiring.</li>
 </ol>
 <h3>Topshiriq diagrammasi</h3>
 <p><img src="../../../assets/uz/m4.png" alt="Oddiy foydalanuvchi va administrator bir ilovaga alohida kirish yo‘llaridan ulanadi." width="1040" height="680" loading="lazy"></p>
@@ -446,11 +446,11 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-7">M5 Eng kam huquq va ochiq kirish chegarasi (16)</h2>
 <h3>Tayyor holat talablari</h3>
 <p>Boshlashdan oldin baholash sahifasida <a href="m4.html">M4</a> uchun to‘liq ball olinganini tekshiring.</p>
-<p>M4 ilovasini P6 dagi usul bilan oddiy ish rejimiga o‘tkazing. Faqat sozlashda kerak bo‘lgan kirishni yoping, ilova va administrator uchun zarur huquqlarni qoldiring.</p>
+<p>M4 ilovasini P5 dagi usul bilan oddiy ish rejimiga o‘tkazing. Faqat sozlashda kerak bo‘lgan kirishni yoping, ilova va administrator uchun zarur huquqlarni qoldiring.</p>
 <ol>
-<li><strong>DB server (P6.1-P6.2).</strong> <code>catalog_app</code> huquqlarini tekshiring. Sozlash roli <code>catalog_setup</code> uchun kirishni yoping, parolini olib tashlang va qolgan ulanishlarini yakunlang.</li>
-<li><strong>Web server (P6.3-P6.4).</strong> Vaqtinchalik sozlamalarni (<code>/etc/jdu-catalog/setup.env</code> va <code>/etc/jdu-catalog/profiles/mission.setup.env</code>) olib tashlang va ilovani oddiy ish uchun <code>mission</code> profili bilan ishga tushiring. Xizmat foydalanuvchisi kodni o‘zgartira olmasin. Maxfiy sozlamalar <code>root:root</code> ga tegishli bo‘lsin va <code>0600</code> ruxsatiga ega bo‘lsin.</li>
-<li><strong>Ochiq va boshqaruv sahifalari (P6.4-P6.5).</strong> 80-portda M4 dagi faqat ochiq yozuv ko‘rinsin. Bastion orqali 8080-portdagi boshqaruv sahifasini oching. <code>lab_admin</code> jihozlarni ko‘rishi, qo‘shishi va o‘zgartirishi mumkinligini tekshiring.</li>
+<li><strong>DB server (P5.1-P5.2).</strong> <code>catalog_app</code> huquqlarini tekshiring. Sozlash roli <code>catalog_setup</code> uchun kirishni yoping, parolini olib tashlang va qolgan ulanishlarini yakunlang.</li>
+<li><strong>Web server (P5.3-P5.4).</strong> Vaqtinchalik sozlamalarni (<code>/etc/jdu-catalog/setup.env</code> va <code>/etc/jdu-catalog/profiles/mission.setup.env</code>) olib tashlang va ilovani oddiy ish uchun <code>mission</code> profili bilan ishga tushiring. Xizmat foydalanuvchisi kodni o‘zgartira olmasin. Maxfiy sozlamalar <code>root:root</code> ga tegishli bo‘lsin va <code>0600</code> ruxsatiga ega bo‘lsin.</li>
+<li><strong>Ochiq va boshqaruv sahifalari (P5.4-P5.5).</strong> 80-portda M4 dagi faqat ochiq yozuv ko‘rinsin. Bastion orqali 8080-portdagi boshqaruv sahifasini oching. <code>lab_admin</code> jihozlarni ko‘rishi, qo‘shishi va o‘zgartirishi mumkinligini tekshiring.</li>
 </ol>
 <h3>Topshiriq diagrammasi</h3>
 <p><img src="../../../assets/uz/m5.png" alt="Ochiq va boshqaruv kirishlari hamda Web dan DB ga ulanish cheklovlari." width="1040" height="680" loading="lazy"></p>

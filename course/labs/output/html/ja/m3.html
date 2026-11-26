@@ -14,15 +14,15 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
 </style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">完成要件</a> · <a href="#section-2">今回の見取り図</a> · <a href="#section-3">採点基準</a> · <a href="#section-4">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M3 PostgreSQLへの認証接続 (9)</h1>
-<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M5</a></p>
+<p><a href="practice.html">練習 P0〜P5</a> · <a href="missions.html">課題 M0〜M5</a></p>
 <p><a href="../ja/m3.html">日本語</a> · <a href="../ru/m3.html">Русский</a> · <a href="../uz/m3.html">O‘zbekcha</a></p>
-<p>対応する詳しい練習は<a href="p4.html">P4</a>。</p>
+<p>対応する詳しい練習は<a href="p3.html">P3</a>。</p>
 <h2 id="section-1">完成要件</h2>
 <p>始める前に、採点ページで <a href="m2.html">M2</a> が満点になっていることを確認する。</p>
-<p>P4で使ったPostgreSQLに、下の課題用データベースと2つのロールを作る。アプリのテーブルはM4で用意する。</p>
+<p>P3で使ったPostgreSQLに、下の課題用データベースと2つのロールを作る。アプリのテーブルはM4で用意する。</p>
 <ol>
-<li><strong>DBサーバー（P4.2〜P4.6）</strong>　課題用DBとロールを作り、Webサーバー（<code>10.20.1.20/32</code>）から指定のDB・ロールで接続できるようにする。認証方式にはP4と同じSCRAMを使う。</li>
-<li><strong>Webサーバー（P4.7〜P4.8）</strong>　<code>db.lab.test</code> に通常運用用ロールで接続し、SELECTが成功することを確かめる。P4.8と同じ方法で、既存パスワードを課題用（<code>mission</code>）として保存する。</li>
+<li><strong>DBサーバー（P3.2〜P3.6）</strong>　課題用DBとロールを作り、Webサーバー（<code>10.20.1.20/32</code>）から指定のDB・ロールで接続できるようにする。認証方式にはP3と同じSCRAMを使う。</li>
+<li><strong>Webサーバー（P3.7〜P3.8）</strong>　<code>db.lab.test</code> に通常運用用ロールで接続し、SELECTが成功することを確かめる。P3.8と同じ方法で、既存パスワードを課題用（<code>mission</code>）として保存する。</li>
 </ol>
 <h2 id="section-2">今回の見取り図</h2>
 <p><img src="../../../assets/ja/m3.png" alt="WebサーバーがDBサーバーの名前を解決し、PostgreSQLへ接続する。" width="1040" height="680" loading="lazy"></p>
@@ -103,5 +103,5 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <li>確認が終わると、満たした項目数と項目ごとの結果が表示される。「要修正」は該当する設定を直して再度確認する。「未確認」は、その項目を判定できなかった状態を表す。点数は課題一覧で確認する。</li>
 </ol>
 <hr />
-<p><a href="p4.html">前の課題: P4</a> · <a href="p5.html">次の課題: P5</a></p>
+<p><a href="p3.html">前の課題: P3</a> · <a href="p4.html">次の課題: P4</a></p>
 </main></body></html>

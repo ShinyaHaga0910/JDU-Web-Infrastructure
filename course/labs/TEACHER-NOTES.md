@@ -5,7 +5,7 @@ P0はWebサーバーで1点、M0はDB・DNS・配布・踏み台の4台で各1�
 
 ## 現行の課題番号
 
-通常の自力課題はM1〜M5。旧M4・M5・M6は、教材とポータルでそれぞれM3・M4・M5と表示する。保存済み成績、集計用の内部ID、署名済み配布物は従来の番号を使う。P0とM0を含む合計は64素点。練習の番号はP3を飛ばす。
+教材とポータルでは、旧P4・P5・P6をP3・P4・P5、旧M4・M5・M6をM3・M4・M5と表示する。保存済み成績、集計用の内部ID、署名済み配布物は従来の番号を使う。P0とM0を含む合計は64素点。
 
 停止・再開の旧P3・M3のコードは履歴とともに保持する。[発展課題案](docs/ja/optional-backup-restore.md)から参照できる。
 
@@ -23,7 +23,7 @@ SGは初期CloudFormationで設定済みの基盤であり、現行62点に学�
 3. 旧署名付き配布を使う場合の配置手順は[初回ワークフロー](INITIAL-WORKFLOW.md#5-サーバー構築用ファイルとブラウザへの初回連携)を参照する。stage_resources.pyは署名版/本人binding/元5台/SG/SSMを照合後、WebとDBの固定directoryへサーバー構築用ファイル（アプリ、SQL、補助スクリプト）だけを配置する。package・service・DB・role・password・鍵・採点認証を作らない。異なる既存資源は上書きしない。
 4. Web/DB内のoffline_assets.pyは受入済みapp hashと全fileを照合してサーバー構築用ファイルのディレクトリへ展開する。Webの--wheelsだけが既存署名manifestから7 wheel/lockを取得する。pip/サービス設定は学生が各Pの手順で行う。
 5. 初期配布参照はdistribution/STUDENT.md、foundation/STUDENT.md。実行場所は展開した署名版jdu-web-course/以下。今回のr3と教材配置helperは対応済みで、期限は**2027-01-31末（UZT）**。旧r2は書き換えず保存した。起動計画に指定する教師の価格台帳は7日以内のものを使う。
-6. RDPは確認済み50 CIDRと既存password、内部SSHは踏み台、各台管理はCloudShellからSSM。初回password/権限と各段階の失敗を教師が確認する。学生全員に同じ到達時刻を要求しない。P5の前にM2、profile切替前にP6を扱う。
+6. RDPは確認済み50 CIDRと既存password、内部SSHは踏み台、各台管理はCloudShellからSSM。初回password/権限と各段階の失敗を教師が確認する。学生全員に同じ到達時刻を要求しない。P4の前にM2、profile切替前にP5を扱う。
 
 ## 正本と生成
 

@@ -14,16 +14,16 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
 </style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">完成要件</a> · <a href="#section-2">今回の見取り図</a> · <a href="#section-3">採点基準</a> · <a href="#section-4">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M5 最小権限と公開範囲 (16)</h1>
-<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M5</a></p>
+<p><a href="practice.html">練習 P0〜P5</a> · <a href="missions.html">課題 M0〜M5</a></p>
 <p><a href="../ja/m5.html">日本語</a> · <a href="../ru/m5.html">Русский</a> · <a href="../uz/m5.html">O‘zbekcha</a></p>
-<p>対応する詳しい練習は<a href="p6.html">P6</a>。</p>
+<p>対応する詳しい練習は<a href="p5.html">P5</a>。</p>
 <h2 id="section-1">完成要件</h2>
 <p>始める前に、採点ページで <a href="m4.html">M4</a> が満点になっていることを確認する。</p>
-<p>P6で練習した方法で、M4の備品管理アプリを通常運用に切り替える。構築時だけ使った接続を閉じ、アプリと管理者に必要な権限を残す。</p>
+<p>P5で練習した方法で、M4の備品管理アプリを通常運用に切り替える。構築時だけ使った接続を閉じ、アプリと管理者に必要な権限を残す。</p>
 <ol>
-<li><strong>DBサーバー（P6.1〜P6.2）</strong>　<code>catalog_app</code> の権限を確認する。構築用の <code>catalog_setup</code> はログイン不可にし、パスワードと既存の接続を残さない。</li>
-<li><strong>Webサーバー（P6.3〜P6.4）</strong>　課題用の一時設定（<code>/etc/jdu-catalog/setup.env</code> と <code>/etc/jdu-catalog/profiles/mission.setup.env</code>）を片付け、通常運用用の <code>mission</code> 設定で起動する。実行ユーザーによるコードの書き換えを防ぎ、秘密を含む設定は <code>root:root</code>、<code>0600</code> にする。</li>
-<li><strong>一般ページと管理画面（P6.4〜P6.5）</strong>　公開の80番ポートではM4の公開備品だけを表示する。踏み台から8080番ポートの管理画面に入り、<code>lab_admin</code> が備品を閲覧・追加・変更できることを確認する。</li>
+<li><strong>DBサーバー（P5.1〜P5.2）</strong>　<code>catalog_app</code> の権限を確認する。構築用の <code>catalog_setup</code> はログイン不可にし、パスワードと既存の接続を残さない。</li>
+<li><strong>Webサーバー（P5.3〜P5.4）</strong>　課題用の一時設定（<code>/etc/jdu-catalog/setup.env</code> と <code>/etc/jdu-catalog/profiles/mission.setup.env</code>）を片付け、通常運用用の <code>mission</code> 設定で起動する。実行ユーザーによるコードの書き換えを防ぎ、秘密を含む設定は <code>root:root</code>、<code>0600</code> にする。</li>
+<li><strong>一般ページと管理画面（P5.4〜P5.5）</strong>　公開の80番ポートではM4の公開備品だけを表示する。踏み台から8080番ポートの管理画面に入り、<code>lab_admin</code> が備品を閲覧・追加・変更できることを確認する。</li>
 </ol>
 <h2 id="section-2">今回の見取り図</h2>
 <p><img src="../../../assets/ja/m5.png" alt="公開・管理の入口とWebからDBへの接続で、許可する範囲を制限する。" width="1040" height="680" loading="lazy"></p>

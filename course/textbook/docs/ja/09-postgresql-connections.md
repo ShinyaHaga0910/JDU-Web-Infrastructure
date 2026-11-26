@@ -147,4 +147,4 @@ listen_addressesはDBサーバー自身が待ち受けるIP、HBAの送信元は
 - [待受設定](https://www.postgresql.org/docs/16/runtime-config-connection.html)
 - [HBA](https://www.postgresql.org/docs/16/auth-pg-hba-conf.html)
 - [psql](https://www.postgresql.org/docs/16/app-psql.html)
-- [練習P4](../../../labs/docs/ja/p4.md)
+- [練習P3](../../../labs/docs/ja/p3.md)

@@ -1,4 +1,4 @@
-# Web Infrastructure: P0-P6 mashqlar va batafsil qadamlar
+# Web Infrastructure: P0-P5 mashqlar va batafsil qadamlar
 
 O‘qituvchi tekshiruvi uchun birinchi nashr. Talabaning qo‘llanma bo‘yicha boshidan oxirigacha o‘tishi hali tekshirilmagan.
 
@@ -6,15 +6,15 @@ Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga 
 
 [日本語](../ja/practice-full.md) · [Русский](../ru/practice-full.md) · [O‘zbekcha](../uz/practice-full.md)
 
-[Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M5](missions.md)
+[Mashqlar P0–P5](practice.md) · [Topshiriqlar M0–M5](missions.md)
 
 ## Qo‘llanmadan foydalanish
 
 Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P - batafsil qadamli mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.
 
-P0 → M0 → P1 → M1 → P2 → M2 → P4 → M3 → P5 → P6 → M4 → M5
+P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → P5 → M4 → M5
 
-P5 uchun ham M2 DNS kerak. P4 da DB ga IP va nom orqali ulanishni mashq qiling. Ilova db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating.
+P4 uchun ham M2 DNS kerak. P3 da DB ga IP va nom orqali ulanishni mashq qiling. Ilova db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P5 da setup ni tugating.
 
 P0=1, M0=4, M1=8, M2=13, M3=9, M4=13, M5=16: jami 64 xom ball. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.
 
@@ -765,19 +765,19 @@ guide.lab.test.  300  IN  A  10.20.1.20
 
 Dig ning qisqa namunasi: A dan keyin IPv4, 300 esa TTL. So‘rov SERVER i 10.20.2.10 ekanini alohida tekshiring.
 
-## P4 PostgreSQL ga autentifikatsiya bilan ulanish
+## P3 PostgreSQL ga autentifikatsiya bilan ulanish
 
-**Practice4 da bajariladigan ishlar**
+**Practice3 da bajariladigan ishlar**
 
 DB serverda PostgreSQL ni sozlab, Web serverdan mashq DB siga parol bilan ulaning.
 
 ### Topshiriq diagrammasi
 
-![Web server DB server nomini aniqlaydi va PostgreSQL ga ulanadi.](../../assets/uz/p4.png)
+![Web server DB server nomini aniqlaydi va PostgreSQL ga ulanadi.](../../assets/uz/p3.png)
 
 ### Yechim namunasi (bajarish tartibi)
 
-#### P4.1 Paketlar serveridan PostgreSQL o‘rnatish
+#### P3.1 Paketlar serveridan PostgreSQL o‘rnatish
 
 **Bajarish muhiti:**
 
@@ -804,7 +804,7 @@ sudo -u postgres psql -X -d postgres -c "SHOW data_directory;"
 
 `pg_lsclusters` da `16` versiya va `main` klasteri chiqadi. Ma’lumot katalogi `/var/lib/postgresql/16/main`.
 
-#### P4.2 PostgreSQL manzili va portini sozlash
+#### P3.2 PostgreSQL manzili va portini sozlash
 
 **Bajarish muhiti:**
 
@@ -829,9 +829,9 @@ password_encryption = 'scram-sha-256'
 
 **Kutilgan natija va ma’nosi:**
 
-Uchta parametrni bitta faylga saqlang. Qayta ishga tushirish kirish sozlangach P4.4 da bajariladi.
+Uchta parametrni bitta faylga saqlang. Qayta ishga tushirish kirish sozlangach P3.4 da bajariladi.
 
-#### P4.3 Web serveridan DB ulanishiga ruxsat berish
+#### P3.3 Web serveridan DB ulanishiga ruxsat berish
 
 **Bajarish muhiti:**
 
@@ -863,7 +863,7 @@ host all all ::/0 reject
 
 PostgreSQL yuqoridan birinchi mos qatorni ishlatadi. Avval ruxsat qatorlari, oxirida qolgan ulanishlar uchun `reject` turadi.
 
-#### P4.4 PostgreSQL ni qayta ishga tushirib sozlamani tekshirish
+#### P3.4 PostgreSQL ni qayta ishga tushirib sozlamani tekshirish
 
 **Bajarish muhiti:**
 
@@ -891,7 +891,7 @@ sudo -u postgres psql -X -d postgres -c \
 
 Xizmat `active`, manzil va port `10.20.2.20:5432`, parol saqlash usuli `scram-sha-256`, kirish xatolari `(0 rows)`.
 
-#### P4.5 Mashq DB va ikkita rolini yaratish
+#### P3.5 Mashq DB va ikkita rolini yaratish
 
 **Bajarish muhiti:**
 
@@ -922,13 +922,13 @@ python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u pos
 
 already exists oldin bajarilganini anglatishi mumkin. DROP qilmang; \du va \l orqali solishtiring. Pipe o‘ngidagi psql SQL error bermaganini tekshiring.
 
-#### P4.6 Har bir DB roliga parol belgilash
+#### P3.6 Har bir DB roliga parol belgilash
 
 **Bajarish muhiti:**
 
 DB serverning SSM terminali: ssm-user
 
-DB serverda `psql` ni oching. `\password` ni bittadan bajaring va har rol uchun tanlagan parolni ikki marta kiriting. Belgilar ko‘rinmaydi. Ikkala parol P5 da ham kerak. Kamida 16 belgili turli parollarni tanlang.
+DB serverda `psql` ni oching. `\password` ni bittadan bajaring va har rol uchun tanlagan parolni ikki marta kiriting. Belgilar ko‘rinmaydi. Ikkala parol P4 da ham kerak. Kamida 16 belgili turli parollarni tanlang.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
@@ -954,13 +954,13 @@ Bundan keyin psql ichida kiriting
 
 `\du` chiqishida `catalog_practice_setup` va `catalog_practice_app` ko‘rinadi.
 
-#### P4.7 Web serveridan mashq DB ga ulanish
+#### P3.7 Web serveridan mashq DB ga ulanish
 
 **Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
-P0 dagidek Web server uchun Session Manager ni oching. `psql` da avval DB ichki IP manzilini, keyin P2 dagi `practice-db.lab.test` nomini kiriting. Har ikki ulanishda P4.6 dagi `catalog_practice_app` parolini ishlating.
+P0 dagidek Web server uchun Session Manager ni oching. `psql` da avval DB ichki IP manzilini, keyin P2 dagi `practice-db.lab.test` nomini kiriting. Har ikki ulanishda P3.6 dagi `catalog_practice_app` parolini ishlating.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
@@ -985,13 +985,13 @@ Ikkala ulanishda `jdu_catalog_practice` DB si, `catalog_practice_app` roli va `1
 
 IP orqali ulanish ishlasa, nom orqali esa ishlamasa, P2 dagi tizim DNS i va mashq DB nomini tekshiring. Autentifikatsiya rad etilsa, manba, DB, rol va parolni tekshiring. Sinash uchun DB ni Internet ga ochmang.
 
-#### P4.8 Baholash uchun DB parolini Web serverda saqlash
+#### P3.8 Baholash uchun DB parolini Web serverda saqlash
 
 **Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
-Buyruqni bajarib `catalog_practice_app` parolini ikki marta kiriting. Kiritish yashirin, parol ulanishni tekshirish uchun Web serverdagi himoyalangan faylga yoziladi. O‘z kompyuteringizdagi baholash sahifasida P4 ni tekshiring.
+Buyruqni bajarib `catalog_practice_app` parolini ikki marta kiriting. Kiritish yashirin, parol ulanishni tekshirish uchun Web serverdagi himoyalangan faylga yoziladi. O‘z kompyuteringizdagi baholash sahifasida P3 ni tekshiring.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
@@ -1003,11 +1003,11 @@ sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/database_secret.py --profil
 
 **Kutilgan natija va ma’nosi:**
 
-Terminalda `D11_EXISTING_DB_PASSWORD_STORED_LOCALLY` chiqadi. Baholash sahifasida P4 ning to‘qqiz mezoni ko‘rinadi.
+Terminalda `D11_EXISTING_DB_PASSWORD_STORED_LOCALLY` chiqadi. Baholash sahifasida P3 ning to‘qqiz mezoni ko‘rinadi.
 
 **Ishlamasa:**
 
-Fayl mavjud bo‘lsa qayta yaratmang. P5 da ayni DB paroli app sozlamasiga kiritiladi. M3 alohida mission DB/rollaridan foydalanadi.
+Fayl mavjud bo‘lsa qayta yaratmang. P4 da ayni DB paroli app sozlamasiga kiritiladi. M3 alohida mission DB/rollaridan foydalanadi.
 
 ### Natijani o‘qish namunasi (kiritmang)
 
@@ -1018,19 +1018,19 @@ jdu_catalog_practice | catalog_practice_app | 1
 
 SELECT natijasini o‘qish namunasi; ustun kengligi boshqacha bo‘lishi mumkin. DB, role va value=1 ni tekshiring. Bu table o‘zgartirish huquqini isbotlamaydi.
 
-## P5 Berilgan app ni Web va DB bilan bog‘lash
+## P4 Berilgan app ni Web va DB bilan bog‘lash
 
-**Practice5 da bajariladigan ishlar**
+**Practice4 da bajariladigan ishlar**
 
 Web serverda jihozlar ilovasini ishga tushirib DB ga ulang. Ochiq ro‘yxat va Bastiondan boshqaruvni sozlang.
 
 ### Topshiriq diagrammasi
 
-![Oddiy foydalanuvchi va administrator bir ilovaga alohida kirish yo‘llaridan ulanadi.](../../assets/uz/p5.png)
+![Oddiy foydalanuvchi va administrator bir ilovaga alohida kirish yo‘llaridan ulanadi.](../../assets/uz/p4.png)
 
 ### Yechim namunasi (bajarish tartibi)
 
-#### P5.1 DNS ni tekshirish va Python paketlarini tayyorlash
+#### P4.1 DNS ni tekshirish va Python paketlarini tayyorlash
 
 **Bajarish muhiti:**
 
@@ -1059,7 +1059,7 @@ ls /var/lib/jdu-web/lesson-resources-r1/wheels
 
 `db.lab.test` uchun `10.20.2.20`, `admin.lab.test` uchun `10.20.1.20` chiqadi. Terminalda `PUBLIC_APP_RESOURCES_VERIFIED` va `SIGNED_OFFLINE_WHEELS_READY=7` ko‘rinadi.
 
-#### P5.2 Ilovani joylab unga alohida Python muhiti yaratish
+#### P4.2 Ilovani joylab unga alohida Python muhiti yaratish
 
 **Bajarish muhiti:**
 
@@ -1093,7 +1093,7 @@ sudo /opt/jdu-catalog/venv/bin/python -m pip check
 
 Oxirgi `pip check` natijasida `No broken requirements found.` chiqadi.
 
-#### P5.3 Ilovani ishga tushiradigan OS foydalanuvchisini yaratish
+#### P4.3 Ilovani ishga tushiradigan OS foydalanuvchisini yaratish
 
 **Bajarish muhiti:**
 
@@ -1133,13 +1133,13 @@ Natijada `catalog` foydalanuvchisi va `/usr/sbin/nologin` ko‘rinadi. `/var/lib
 
 Ruxsat xatosini chmod -R 777 yoki catalog ga sudo berish bilan hal qilmang. Aniq katalog va egasini solishtiring.
 
-#### P5.4 Ilovaning odatiy DB ulanishini sozlash
+#### P4.4 Ilovaning odatiy DB ulanishini sozlash
 
 **Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
-`YOUR-CURRENT-WEB-PUBLIC-IP` o‘rniga AWS Console dagi Web serverning joriy ochiq IPv4 manzilini yozing. So‘ralganda P4 dagi `catalog_practice_app` parolini kiriting. Yaratilgan mashq sozlamasini ilova uchun tanlang. Kiritilgan belgilar ekranda ko‘rinmaydi.
+`YOUR-CURRENT-WEB-PUBLIC-IP` o‘rniga AWS Console dagi Web serverning joriy ochiq IPv4 manzilini yozing. So‘ralganda P3 dagi `catalog_practice_app` parolini kiriting. Yaratilgan mashq sozlamasini ilova uchun tanlang. Kiritilgan belgilar ekranda ko‘rinmaydi.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
@@ -1161,13 +1161,13 @@ sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
 
 `CATALOG_ENV_CREATED=practice`, `CATALOG_PROFILE_ACTIVATED=practice` va `VALID` chiqadi. `app.env` egasi va guruhi `root:root`, huquqi `600`.
 
-#### P5.5 Ilova jadvallari va administratorini tayyorlash
+#### P4.5 Ilova jadvallari va administratorini tayyorlash
 
 **Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
-Vaqtinchalik sozlama yaratishda P4 dagi `catalog_practice_setup` parolini kiriting. Jadvallar va namunaviy jihozlarni yaratish uchun buyruqlarni bittadan bajaring. Oxirida `practice_admin` parolini o‘zingiz tanlab kiriting. Kiritilgan belgilar ekranda ko‘rinmaydi.
+Vaqtinchalik sozlama yaratishda P3 dagi `catalog_practice_setup` parolini kiriting. Jadvallar va namunaviy jihozlarni yaratish uchun buyruqlarni bittadan bajaring. Oxirida `practice_admin` parolini o‘zingiz tanlab kiriting. Kiritilgan belgilar ekranda ko‘rinmaydi.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
@@ -1192,7 +1192,7 @@ sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
 
 11 ta ilova jadvali va uchta namunaviy jihoz yaratiladi. Boshqaruv sahifasiga `practice_admin` bilan kirasiz.
 
-#### P5.6 Ilovaning DB roliga kerakli huquqlarni berish
+#### P4.6 Ilovaning DB roliga kerakli huquqlarni berish
 
 **Bajarish muhiti:**
 
@@ -1216,7 +1216,7 @@ python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u pos
 
 `COMMIT` chiqadi. `catalog_item` jadvalida o‘qish, qo‘shish va o‘zgartirish mumkin.
 
-#### P5.7 Ilovani systemd xizmati sifatida ishga tushirish
+#### P4.7 Ilovani systemd xizmati sifatida ishga tushirish
 
 **Bajarish muhiti:**
 
@@ -1257,7 +1257,7 @@ Xizmat `active`. Gunicorn shu Web serverdagi Nginx ulanishi uchun `127.0.0.1:800
 
 Xatoda journalctl -u jdu-catalog ni o‘qing. Env mazmunini log ga qo‘ymang; formatni configuration.py check bilan tekshiring.
 
-#### P5.8 Nginx ning ochiq va boshqaruv kirishlarini sozlash
+#### P4.8 Nginx ning ochiq va boshqaruv kirishlarini sozlash
 
 **Bajarish muhiti:**
 
@@ -1293,13 +1293,13 @@ curl -i http://127.0.0.1/practice.txt
 
 `nginx -t` muvaffaqiyatli. `/practice.txt` HTTP `200` va `JDU WEB-02 practice: HTTP response verified.` qaytaradi. Shu usulda `http://127.0.0.1/mission.txt` ni ochib M1 matnini tekshiring.
 
-#### P5.9 Boshqaruv sahifasida bittadan ochiq va yopiq jihoz qo‘shish
+#### P4.9 Boshqaruv sahifasida bittadan ochiq va yopiq jihoz qo‘shish
 
 **Bajarish muhiti:**
 
 RDP orqali bastiondagi Firefox
 
-Bastion serveriga RDP orqali ulanib, Firefox da `http://admin.lab.test:8080/admin/` ni oching. P5.5 dagi parol bilan `practice_admin` sifatida kiring. «備品» (jihozlar) bo‘limida jadvaldagi ikki yozuvni bittadan qo‘shing. Ochiq yozuv miqdorini o‘zgartirib saqlang, so‘ng 4 ga qaytaring.
+Bastion serveriga RDP orqali ulanib, Firefox da `http://admin.lab.test:8080/admin/` ni oching. P4.5 dagi parol bilan `practice_admin` sifatida kiring. «備品» (jihozlar) bo‘limida jadvaldagi ikki yozuvni bittadan qo‘shing. Ochiq yozuv miqdorini o‘zgartirib saqlang, so‘ng 4 ga qaytaring.
 
 | Kod | Nom | Miqdor | Saqlash joyi | Ochiq |
 | --- | --- | --- | --- | --- |
@@ -1310,13 +1310,13 @@ Bastion serveriga RDP orqali ulanib, Firefox da `http://admin.lab.test:8080/admi
 
 Boshqaruv sahifasida `P5-PUBLIC-001` va `P5-PRIVATE-001` ko‘rinadi. Ochiq ro‘yxatda yangi yozuvlardan `P5-PUBLIC-001` chiqadi.
 
-#### P5.10 Ikkala yozuv DB ga saqlanganini tekshirish
+#### P4.10 Ikkala yozuv DB ga saqlanganini tekshirish
 
 **Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
-Web terminalida `psql` orqali boshqaruv sahifasida qo‘shilgan ikki yozuvni o‘qing. P4.6 dagi `catalog_practice_app` parolini ishlating.
+Web terminalida `psql` orqali boshqaruv sahifasida qo‘shilgan ikki yozuvni o‘qing. P3.6 dagi `catalog_practice_app` parolini ishlating.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
@@ -1332,33 +1332,33 @@ psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c "$Q
 
 **Kutilgan natija va ma’nosi:**
 
-`P5-PUBLIC-001` miqdori `4`, ochiqligi `t`. `P5-PRIVATE-001` miqdori `2`, ochiqligi `f`. Nom va saqlash joyini ham P5.9 jadvali bilan solishtiring.
+`P5-PUBLIC-001` miqdori `4`, ochiqligi `t`. `P5-PRIVATE-001` miqdori `2`, ochiqligi `f`. Nom va saqlash joyini ham P4.9 jadvali bilan solishtiring.
 
-#### P5.11 Baholash sahifasida ilova ishini tekshirish
+#### P4.11 Baholash sahifasida ilova ishini tekshirish
 
 **Bajarish muhiti:**
 
 Shaxsiy PC brauzeri: Web Portal
 
-O‘z kompyuteringizdan baholash sahifasida P5 ni ochib, funksiya va huquqlarni tekshirishni tanlang. `practice_admin` parolini kiritib tekshiruvni boshlang. Tekshiruv bitta nazorat yozuvini yaratadi va miqdor o‘zgarishini tekshiradi.
+O‘z kompyuteringizdan baholash sahifasida P4 ni ochib, funksiya va huquqlarni tekshirishni tanlang. `practice_admin` parolini kiritib tekshiruvni boshlang. Tekshiruv bitta nazorat yozuvini yaratadi va miqdor o‘zgarishini tekshiradi.
 
 **Kutilgan natija va ma’nosi:**
 
-P5 ning 13 mezoni chiqadi. Nazorat jihozi boshqaruv sahifasida qoladi.
+P4 ning 13 mezoni chiqadi. Nazorat jihozi boshqaruv sahifasida qoladi.
 
-## P6 Eng kam huquq va ochiq kirish chegarasi
+## P5 Eng kam huquq va ochiq kirish chegarasi
 
-**Practice6 da bajariladigan ishlar**
+**Practice5 da bajariladigan ishlar**
 
 DB sozlash roliga kirishni yoping. Ilovaning odatiy huquqlar bilan ishlashini va ochiq tomondan boshqaruv hamda sozlamalar yopilganini tekshiring.
 
 ### Topshiriq diagrammasi
 
-![Ochiq va boshqaruv kirishlari hamda Web dan DB ga ulanish cheklovlari.](../../assets/uz/p6.png)
+![Ochiq va boshqaruv kirishlari hamda Web dan DB ga ulanish cheklovlari.](../../assets/uz/p5.png)
 
 ### Yechim namunasi (bajarish tartibi)
 
-#### P6.1 Ilova DB da bajara oladigan amallarni ko‘rish
+#### P5.1 Ilova DB da bajara oladigan amallarni ko‘rish
 
 **Bajarish muhiti:**
 
@@ -1388,7 +1388,7 @@ Bundan keyin psql ichida kiriting
 
 `catalog_practice_app` jihozni o‘qishi, qo‘shishi va o‘zgartirishi mumkin. Jihozni o‘chirish huquqi berilmagan.
 
-#### P6.2 Boshlang‘ich sozlama uchun DB roli kirishini yopish
+#### P5.2 Boshlang‘ich sozlama uchun DB roli kirishini yopish
 
 **Bajarish muhiti:**
 
@@ -1412,13 +1412,13 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 
 `ALTER ROLE` chiqadi. `catalog_practice_setup` kirishi yopiladi, ilova esa `catalog_practice_app` bilan ulana oladi.
 
-#### P6.3 Web serverdagi vaqtinchalik sozlama fayllarini olib tashlash
+#### P5.3 Web serverdagi vaqtinchalik sozlama fayllarini olib tashlash
 
 **Bajarish muhiti:**
 
 Web serverning SSM terminali: ssm-user
 
-Ikkita vaqtinchalik sozlama faylini o‘chiring. Ilovani to‘xtating, P5 dagi `practice` sozlamasini tanlang va ilovani ishga tushiring. `catalog` OS foydalanuvchisi ilova kodiga yoza olmasligini tekshiring.
+Ikkita vaqtinchalik sozlama faylini o‘chiring. Ilovani to‘xtating, P4 dagi `practice` sozlamasini tanlang va ilovani ishga tushiring. `catalog` OS foydalanuvchisi ilova kodiga yoza olmasligini tekshiring.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
@@ -1453,7 +1453,7 @@ sudo -u catalog find /opt/jdu-catalog/app -writable -print
 
 Boshqa profil faol bo‘lsa, to‘xtang. O‘chirilgan fayllarni qayta o‘chirmang. To‘xtatish, profilni tanlash yoki tekshirishda xato bo‘lsa, ilovani ishga tushirishdan oldin sababini aniqlang.
 
-#### P6.4 Ochiq 80-portdan nimalar ko‘rinishini tekshirish
+#### P5.4 Ochiq 80-portdan nimalar ko‘rinishini tekshirish
 
 **Bajarish muhiti:**
 
@@ -1482,17 +1482,17 @@ Ro‘yxat HTTP `200` qaytaradi. `/admin/` va sozlama fayli URL manzillari uchun 
 
 Env matni ko‘rinsa uni ulashmang; o‘qituvchiga aytib ochiq sozlamani tuzating.
 
-#### P6.5 Baholash sahifasida kirish cheklovlarini tekshirish
+#### P5.5 Baholash sahifasida kirish cheklovlarini tekshirish
 
 **Bajarish muhiti:**
 
 Shaxsiy PC brauzeri: Web Portal
 
-Baholash sahifasida P6 ni ochib, funksiya va huquqlarni tekshirishni tanlang. `practice_admin` parolini kiriting. Tekshiruv muvaffaqiyatli kirish va tizimga kirmasdan jihozni qo‘shish yoki o‘zgartirish rad etilishini solishtiradi.
+Baholash sahifasida P5 ni ochib, funksiya va huquqlarni tekshirishni tanlang. `practice_admin` parolini kiriting. Tekshiruv muvaffaqiyatli kirish va tizimga kirmasdan jihozni qo‘shish yoki o‘zgartirish rad etilishini solishtiradi.
 
 **Kutilgan natija va ma’nosi:**
 
-P6 ning 16 mezoni natijalari ko‘rinadi.
+P5 ning 16 mezoni natijalari ko‘rinadi.
 
 ## Davom ettirish va natijalar
 

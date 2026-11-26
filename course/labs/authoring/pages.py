@@ -1,4 +1,4 @@
-from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, display_task, display_missions, task_page
+from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, display_task, task_page
 """Task-sized student pages derived from the complete handbooks, without duplicating steps."""
 from pathlib import Path
 import re
@@ -41,7 +41,7 @@ def browser_check(task, lang):
     return out
 
 WORDS = {
- 'practice': T('練習 P0〜P6', 'Практика P0–P6', 'Mashqlar P0–P6'),
+ 'practice': T('練習 P0〜P5', 'Практика P0–P5', 'Mashqlar P0–P5'),
  'missions': T('課題 M0〜M5', 'Задания M0–M5', 'Topshiriqlar M0–M5'),
  'full': T('一冊で読む・印刷する', 'Полная версия и печать', 'To‘liq o‘qish va chop etish'),
  'topic': T('テーマ', 'Тема', 'Mavzu'),
@@ -82,13 +82,14 @@ def write_pages(root, lang, registry, render_html, labels, modules):
         for module in modules:
             n = int(module['id'][1:])
             points = tasks[f'M{n}']['raw_points_max']
+            practice=f'P{n}'
             mission=f'M{n}'
-            index.append(f'| [P{n}](p{n}.md) | [{display_task(mission)}]({task_page(mission)}) | {module["title"][lang]} | {points} |')
+            index.append(f'| [{display_task(practice)}]({task_page(practice)}) | [{display_task(mission)}]({task_page(mission)}) | {module["title"][lang]} | {points} |')
         index += ['', T('おすすめの順序', 'Рекомендуемый порядок', 'Tavsiya etilgan tartib')[lang]+':', '',
             ' → '.join(f'[{display_task(task)}]({task_page(task)})' for task in ORDER), '',
-            T('P5の前にM2、練習から本課題へ切り替える前にP6を終える。',
-              'Завершите M2 до P5 и P6 перед переключением practice → mission.',
-              'P5 dan oldin M2 ni, practice → mission almashishdan oldin P6 ni tugating.')[lang], '',
+            T('P4の前にM2、練習から本課題へ切り替える前にP5を終える。',
+              'Завершите M2 до P4 и P5 перед переключением practice → mission.',
+              'P4 dan oldin M2 ni, practice → mission almashishdan oldin P5 ni tugating.')[lang], '',
             '## '+WORDS['full'][lang], '', f'- [Markdown]({kind}-full.md)', f'- [PDF](../../output/pdf/web_lab_{kind}_{lang}.pdf)', '']
         write(kind,'\n'.join(index))
         # Cross-language links in the complete handbook must keep the reader in that format.

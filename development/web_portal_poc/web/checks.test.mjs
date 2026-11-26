@@ -13,17 +13,25 @@ const headers={cookie,origin:env.PUBLIC_ORIGIN,'content-type':'application/x-www
 const credentials={env,verify:async t=>{if(t!==token)throw Error();return{sub:'1234567890'};},sessions:{check:async s=>s===session}};
 const request=(path,options={})=>new Request(env.PUBLIC_ORIGIN+path,{headers:{cookie},...options});
 function body(v=value){return new URLSearchParams({...v,csrf:checkToken(configFrom(env),session,token,v)}).toString();}
-test('displayed M1–M5 labels match the course, with stable grading IDs in form requests',()=>{
+test('displayed P and M labels are consecutive and match the course',()=>{
   const policy=JSON.parse(readFileSync(new URL('../../../course/curriculum.json',import.meta.url),'utf8'));
-  const missions=tasks.filter(id=>id.startsWith('M'));
-  assert.deepEqual(missions.map(displayTask),['M0','M1','M2','M3','M4','M5']);
-  for(const id of missions) assert.equal(displayTask(id),policy.mission_display_ids[id]??id);
+  const labels={...policy.practice_display_ids,...policy.mission_display_ids};
+  assert.deepEqual(tasks,policy.active_order);
+  for(const prefix of ['P','M']){
+    assert.deepEqual(tasks.filter(id=>id.startsWith(prefix)).map(displayTask),
+      [0,1,2,3,4,5].map(number=>prefix+number));
+  }
+  for(const id of tasks) assert.equal(displayTask(id),labels[id]??id);
 });
 test('GET lists fixed tasks without invoking a checker; POST uses verified subject and redirects',async()=>{
   const calls=[];const app=createApp({...credentials,checker:async event=>{calls.push(event);return {status:'ok'};}});
   const get=await app(request('/checks'));assert.equal(get.status,200);assert.equal(calls.length,0);
   assert.equal(get.headers.get('referrer-policy'),'same-origin');
   const html=await get.text();
+  assert.match(html,/task_id=P4">P3<\/a>/);
+  assert.match(html,/task_id=P5">P4<\/a>/);
+  assert.match(html,/task_id=P6">P5<\/a>/);
+  assert.doesNotMatch(html,/>P6<\/a>/);
   assert.match(html,/task_id=M4">M3<\/a>/);
   assert.match(html,/task_id=M5">M4<\/a>/);
   assert.match(html,/task_id=M6">M5<\/a>/);

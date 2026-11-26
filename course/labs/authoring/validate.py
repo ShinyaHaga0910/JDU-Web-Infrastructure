@@ -23,7 +23,7 @@ PROJECT=Path(os.environ.get('JDU_WEB_PROJECT_ROOT', str(Path(__file__).resolve()
 from markdown_it import MarkdownIt
 from pypdf import PdfReader
 from content import MODULES,LANGS
-from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, active_registry, display_task, display_missions, task_page
+from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, active_registry, display_task, display_task_references, task_page
 MODULES_BY_NUMBER = {int(m["id"][1:]): m for m in MODULES}
 MODULES = [MODULES_BY_NUMBER[n] for n in ACTIVE_NUMBERS]
 from build import KIT,EXPECTED_REGISTRY,MATERIAL_REVISION
@@ -52,7 +52,7 @@ class Page(HTMLParser):
 def main():
     checks=[]
     def published(text):
-        return display_missions(text).replace('\u2013','-').replace('\u2014','-')
+        return display_task_references(text).replace('\u2013','-').replace('\u2014','-')
     def ok(name,condition):
         if not condition:raise AssertionError(name)
         checks.append(name)
@@ -82,7 +82,7 @@ def main():
                 for module in MODULES:
                     for i,step in enumerate(module['steps'],1):
                         key=f"{module['id']}.{i}"
-                        block=re.search(r'^#### '+re.escape(key)+r'\b(.*?)(?=^#### |^## |\Z)',value,re.M|re.S)
+                        block=re.search(r'^#### '+re.escape(published(key))+r'\b(.*?)(?=^#### |^## |\Z)',value,re.M|re.S)
                         ok(f'{lang}_explains_{key}',block is not None and (key not in STEP_NOTES or published(STEP_NOTES[key][lang]) in block[0]))
                     ok(f'{lang}_understanding_{module["id"]}',all(published(note[lang]) in value for note in MODULE_NOTES[module['id']].values()))
             pdf=PdfReader(ROOT/'output/pdf'/f'web_lab_{kind}_{lang}.pdf')
@@ -109,7 +109,7 @@ def main():
                 if prefix=='P':
                     for step in range(1,len(MODULES_BY_NUMBER[number]['steps'])+1):
                         key=f'{name}.{step}'
-                        ok(f'{lang}_{key}_page_step',f'### {key} ' in value and (key not in STEP_NOTES or published(STEP_NOTES[key][lang]) in value))
+                        ok(f'{lang}_{key}_page_step',f'### {published(key)} ' in value and (key not in STEP_NOTES or published(STEP_NOTES[key][lang]) in value))
                 else:
                     task=next(t for t in reg['tasks'] if t['id']==name)
                     criteria=task['progress_scored_checks']

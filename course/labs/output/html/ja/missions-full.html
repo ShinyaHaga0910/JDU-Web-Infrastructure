@@ -17,11 +17,11 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>教材初版・教師確認用。学生の最初からの通し試読は未実施。</p>
 <p>ロシア語・ウズベク語は日本語原稿と同じ手順・条件の翻訳初稿。母語話者校閲は未実施。</p>
 <p><a href="../ja/missions-full.html">日本語</a> · <a href="../ru/missions-full.html">Русский</a> · <a href="../uz/missions-full.html">O‘zbekcha</a></p>
-<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M5</a></p>
+<p><a href="practice.html">練習 P0〜P5</a> · <a href="missions.html">課題 M0〜M5</a></p>
 <h2 id="section-1">使い方と共通の約束</h2>
 <p>Pで練習した方法を使い、同じ演習環境に課題用のファイルや設定を追加します。各Mで指定された値と、対応するPの手順を確認して作業を進めてください。</p>
-<p>P0 → M0 → P1 → M1 → P2 → M2 → P4 → M3 → P5 → P6 → M4 → M5</p>
-<p>P6で練習用アプリの設定を仕上げてから、M4で同じアプリを課題用DBに切り替えます。</p>
+<p>P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → P5 → M4 → M5</p>
+<p>P5で練習用アプリの設定を仕上げてから、M4で同じアプリを課題用DBに切り替えます。</p>
 <h2 id="section-2">M0 サーバーの確認と接続 (4)</h2>
 <h3>完成要件</h3>
 <p>P0で練習したSession Managerの接続手順を使い、今回はDB・DNS・配布・踏み台の4台を操作します。EC2の一覧で対象の行の <strong>Instance ID</strong> をクリックし、<strong>Connect</strong> の右にある矢印から <strong>Connect with SSM Session Manager</strong> を選びます。各サーバーで <code>ssm-user</code> として接続し、自分のホームディレクトリに <code>m0-connection.txt</code> を作って、下の表にある文字だけを1行で保存してください。</p>
@@ -252,10 +252,10 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-5">M3 PostgreSQLへの認証接続 (9)</h2>
 <h3>完成要件</h3>
 <p>始める前に、採点ページで <a href="m2.html">M2</a> が満点になっていることを確認する。</p>
-<p>P4で使ったPostgreSQLに、下の課題用データベースと2つのロールを作る。アプリのテーブルはM4で用意する。</p>
+<p>P3で使ったPostgreSQLに、下の課題用データベースと2つのロールを作る。アプリのテーブルはM4で用意する。</p>
 <ol>
-<li><strong>DBサーバー（P4.2〜P4.6）</strong>　課題用DBとロールを作り、Webサーバー（<code>10.20.1.20/32</code>）から指定のDB・ロールで接続できるようにする。認証方式にはP4と同じSCRAMを使う。</li>
-<li><strong>Webサーバー（P4.7〜P4.8）</strong>　<code>db.lab.test</code> に通常運用用ロールで接続し、SELECTが成功することを確かめる。P4.8と同じ方法で、既存パスワードを課題用（<code>mission</code>）として保存する。</li>
+<li><strong>DBサーバー（P3.2〜P3.6）</strong>　課題用DBとロールを作り、Webサーバー（<code>10.20.1.20/32</code>）から指定のDB・ロールで接続できるようにする。認証方式にはP3と同じSCRAMを使う。</li>
+<li><strong>Webサーバー（P3.7〜P3.8）</strong>　<code>db.lab.test</code> に通常運用用ロールで接続し、SELECTが成功することを確かめる。P3.8と同じ方法で、既存パスワードを課題用（<code>mission</code>）として保存する。</li>
 </ol>
 <h3>今回の見取り図</h3>
 <p><img src="../../../assets/ja/m3.png" alt="WebサーバーがDBサーバーの名前を解決し、PostgreSQLへ接続する。" width="1040" height="680" loading="lazy"></p>
@@ -338,11 +338,11 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-6">M4 教員アプリをWeb・DBへ接続する (13)</h2>
 <h3>完成要件</h3>
 <p>始める前に、採点ページで <a href="m2.html">M2</a>、<a href="m3.html">M3</a> が満点になっていることを確認する。</p>
-<p>P5で動かした備品管理アプリを、M3で構築した課題用DBにつなぐ。P6で練習用の設定を仕上げてから始める。</p>
+<p>P4で動かした備品管理アプリを、M3で構築した課題用DBにつなぐ。P5で練習用の設定を仕上げてから始める。</p>
 <ol>
-<li><strong>Webサーバー（P6.3、P5.4〜P5.5）</strong>　アプリを停止し、使用する設定を <code>mission</code> に切り替える。配備済みのアプリを使い、課題用DBにテーブルと初期データを用意し、アプリ管理者を作る。</li>
-<li><strong>DBサーバーとWebサーバー（P5.6〜P5.8）</strong>　通常運用用ロールに権限を付け、アプリを起動する。公開ページと管理画面の両方を開き、<code>/practice.txt</code> と <code>/mission.txt</code> も引き続き開けることを確かめる。</li>
-<li><strong>踏み台サーバー（P5.9）</strong>　<code>http://admin.lab.test:8080/admin/</code> に <code>lab_admin</code> で入り、下の2件を登録する。一般ページでは公開にした備品を確認する。</li>
+<li><strong>Webサーバー（P5.3、P4.4〜P4.5）</strong>　アプリを停止し、使用する設定を <code>mission</code> に切り替える。配備済みのアプリを使い、課題用DBにテーブルと初期データを用意し、アプリ管理者を作る。</li>
+<li><strong>DBサーバーとWebサーバー（P4.6〜P4.8）</strong>　通常運用用ロールに権限を付け、アプリを起動する。公開ページと管理画面の両方を開き、<code>/practice.txt</code> と <code>/mission.txt</code> も引き続き開けることを確かめる。</li>
+<li><strong>踏み台サーバー（P4.9）</strong>　<code>http://admin.lab.test:8080/admin/</code> に <code>lab_admin</code> で入り、下の2件を登録する。一般ページでは公開にした備品を確認する。</li>
 </ol>
 <h3>今回の見取り図</h3>
 <p><img src="../../../assets/ja/m4.png" alt="一般利用者と管理者がそれぞれの入口から同じ備品管理アプリを利用する。" width="1040" height="680" loading="lazy"></p>
@@ -446,11 +446,11 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-7">M5 最小権限と公開範囲 (16)</h2>
 <h3>完成要件</h3>
 <p>始める前に、採点ページで <a href="m4.html">M4</a> が満点になっていることを確認する。</p>
-<p>P6で練習した方法で、M4の備品管理アプリを通常運用に切り替える。構築時だけ使った接続を閉じ、アプリと管理者に必要な権限を残す。</p>
+<p>P5で練習した方法で、M4の備品管理アプリを通常運用に切り替える。構築時だけ使った接続を閉じ、アプリと管理者に必要な権限を残す。</p>
 <ol>
-<li><strong>DBサーバー（P6.1〜P6.2）</strong>　<code>catalog_app</code> の権限を確認する。構築用の <code>catalog_setup</code> はログイン不可にし、パスワードと既存の接続を残さない。</li>
-<li><strong>Webサーバー（P6.3〜P6.4）</strong>　課題用の一時設定（<code>/etc/jdu-catalog/setup.env</code> と <code>/etc/jdu-catalog/profiles/mission.setup.env</code>）を片付け、通常運用用の <code>mission</code> 設定で起動する。実行ユーザーによるコードの書き換えを防ぎ、秘密を含む設定は <code>root:root</code>、<code>0600</code> にする。</li>
-<li><strong>一般ページと管理画面（P6.4〜P6.5）</strong>　公開の80番ポートではM4の公開備品だけを表示する。踏み台から8080番ポートの管理画面に入り、<code>lab_admin</code> が備品を閲覧・追加・変更できることを確認する。</li>
+<li><strong>DBサーバー（P5.1〜P5.2）</strong>　<code>catalog_app</code> の権限を確認する。構築用の <code>catalog_setup</code> はログイン不可にし、パスワードと既存の接続を残さない。</li>
+<li><strong>Webサーバー（P5.3〜P5.4）</strong>　課題用の一時設定（<code>/etc/jdu-catalog/setup.env</code> と <code>/etc/jdu-catalog/profiles/mission.setup.env</code>）を片付け、通常運用用の <code>mission</code> 設定で起動する。実行ユーザーによるコードの書き換えを防ぎ、秘密を含む設定は <code>root:root</code>、<code>0600</code> にする。</li>
+<li><strong>一般ページと管理画面（P5.4〜P5.5）</strong>　公開の80番ポートではM4の公開備品だけを表示する。踏み台から8080番ポートの管理画面に入り、<code>lab_admin</code> が備品を閲覧・追加・変更できることを確認する。</li>
 </ol>
 <h3>今回の見取り図</h3>
 <p><img src="../../../assets/ja/m5.png" alt="公開・管理の入口とWebからDBへの接続で、許可する範囲を制限する。" width="1040" height="680" loading="lazy"></p>

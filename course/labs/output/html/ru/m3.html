@@ -14,15 +14,15 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
 </style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Требуемый результат</a> · <a href="#section-2">Схема задания</a> · <a href="#section-3">Критерии оценки</a> · <a href="#section-4">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M3 Подключение к PostgreSQL с аутентификацией (9)</h1>
-<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M5</a></p>
+<p><a href="practice.html">Практика P0–P5</a> · <a href="missions.html">Задания M0–M5</a></p>
 <p><a href="../ja/m3.html">日本語</a> · <a href="../ru/m3.html">Русский</a> · <a href="../uz/m3.html">O‘zbekcha</a></p>
-<p>Связанное задание: <a href="p4.html">P4</a>.</p>
+<p>Связанное задание: <a href="p3.html">P3</a>.</p>
 <h2 id="section-1">Требуемый результат</h2>
 <p>Перед началом убедитесь на странице оценок, что за <a href="m2.html">M2</a> получен полный балл.</p>
-<p>В PostgreSQL из P4 создайте основную БД и две роли, указанные ниже. Таблицы приложения создаются в M4.</p>
+<p>В PostgreSQL из P3 создайте основную БД и две роли, указанные ниже. Таблицы приложения создаются в M4.</p>
 <ol>
-<li><strong>DB-сервер (P4.2-P4.6).</strong> Создайте БД и роли и разрешите подключение к нужной БД с указанными ролями только с Web-сервера (<code>10.20.1.20/32</code>). Используйте SCRAM, как в P4.</li>
-<li><strong>Web-сервер (P4.7-P4.8).</strong> Подключитесь к <code>db.lab.test</code> под рабочей ролью и выполните SELECT. Сохраните существующий пароль для профиля <code>mission</code> тем же способом, что и в P4.8.</li>
+<li><strong>DB-сервер (P3.2-P3.6).</strong> Создайте БД и роли и разрешите подключение к нужной БД с указанными ролями только с Web-сервера (<code>10.20.1.20/32</code>). Используйте SCRAM, как в P3.</li>
+<li><strong>Web-сервер (P3.7-P3.8).</strong> Подключитесь к <code>db.lab.test</code> под рабочей ролью и выполните SELECT. Сохраните существующий пароль для профиля <code>mission</code> тем же способом, что и в P3.8.</li>
 </ol>
 <h2 id="section-2">Схема задания</h2>
 <p><img src="../../../assets/ru/m3.png" alt="Web разрешает имя DB-сервера и подключается к PostgreSQL." width="1040" height="680" loading="lazy"></p>
@@ -103,5 +103,5 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <li>По завершении появятся число выполненных критериев и результат каждого. Исправьте пункты с пометкой «Исправить» и запустите проверку снова. «Не проверен» означает, что результат определить не удалось. Баллы отображаются в списке заданий.</li>
 </ol>
 <hr />
-<p><a href="p4.html">Предыдущее: P4</a> · <a href="p5.html">Следующее: P5</a></p>
+<p><a href="p3.html">Предыдущее: P3</a> · <a href="p4.html">Следующее: P4</a></p>
 </main></body></html>

@@ -167,5 +167,5 @@ Nginxが、受け付けた入口に合わせてヘッダーを設定し直す。
 - [GRANT](https://www.postgresql.org/docs/16/sql-grant.html)
 - [ALTER ROLE](https://www.postgresql.org/docs/16/sql-alterrole.html)
 - [psql](https://www.postgresql.org/docs/16/app-psql.html)
-- [練習P6](../../../labs/docs/ja/p6.md)
-- [課題M6](../../../labs/docs/ja/m6.md)
+- [練習P5](../../../labs/docs/ja/p5.md)
+- [課題M5](../../../labs/docs/ja/m5.md)

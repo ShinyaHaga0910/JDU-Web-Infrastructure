@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Web演習：練習P0〜P6と詳しい操作例</title><style>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Web演習：練習P0〜P5と詳しい操作例</title><style>
 :root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
 *{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
 header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
@@ -13,15 +13,15 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">使い方と共通の約束</a> · <a href="#section-2">対象・前提・準備</a> · <a href="#section-3">操作例の読み方</a> · <a href="#section-4">完成像と通信経路</a> · <a href="#section-5">P0 サーバーの確認と接続</a> · <a href="#section-6">P1 HTTPで静的ファイルを返す</a> · <a href="#section-7">P2 内部DNSと通常の名前解決</a> · <a href="#section-8">P4 PostgreSQLへの認証接続</a> · <a href="#section-9">P5 教員アプリをWeb・DBへ接続する</a> · <a href="#section-10">P6 最小権限と公開範囲</a> · <a href="#section-11">次回の再開・結果の確認</a> · <a href="#section-12">参考資料</a></nav></header><main id="content" tabindex="-1"><h1>Web演習：練習P0〜P6と詳しい操作例</h1>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">使い方と共通の約束</a> · <a href="#section-2">対象・前提・準備</a> · <a href="#section-3">操作例の読み方</a> · <a href="#section-4">完成像と通信経路</a> · <a href="#section-5">P0 サーバーの確認と接続</a> · <a href="#section-6">P1 HTTPで静的ファイルを返す</a> · <a href="#section-7">P2 内部DNSと通常の名前解決</a> · <a href="#section-8">P3 PostgreSQLへの認証接続</a> · <a href="#section-9">P4 教員アプリをWeb・DBへ接続する</a> · <a href="#section-10">P5 最小権限と公開範囲</a> · <a href="#section-11">次回の再開・結果の確認</a> · <a href="#section-12">参考資料</a></nav></header><main id="content" tabindex="-1"><h1>Web演習：練習P0〜P5と詳しい操作例</h1>
 <p>教材初版・教師確認用。学生の最初からの通し試読は未実施。</p>
 <p>ロシア語・ウズベク語は日本語原稿と同じ手順・条件の翻訳初稿。母語話者校閲は未実施。</p>
 <p><a href="../ja/practice-full.html">日本語</a> · <a href="../ru/practice-full.html">Русский</a> · <a href="../uz/practice-full.html">O‘zbekcha</a></p>
-<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M5</a></p>
+<p><a href="practice.html">練習 P0〜P5</a> · <a href="missions.html">課題 M0〜M5</a></p>
 <h2 id="section-1">使い方と共通の約束</h2>
 <p>まず各Pの課題文を読み、必要なら詳しい操作例を一段ずつ使う。Pは手順付きの練習である。Mは別の対象・値で自分で構築する。課題は授業回番号ではなく、自分の進度で進める。Pの完了はMの合格に置き換わらない。</p>
-<p>P0 → M0 → P1 → M1 → P2 → M2 → P4 → M3 → P5 → P6 → M4 → M5</p>
-<p>P5にもM2のDNSが必要。P4ではIPと名前を使ったDB接続を練習する。アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。</p>
+<p>P0 → M0 → P1 → M1 → P2 → M2 → P3 → M3 → P4 → P5 → M4 → M5</p>
+<p>P4にもM2のDNSが必要。P3ではIPと名前を使ったDB接続を練習する。アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP5でsetupを終了する。</p>
 <p>P0=1、M0=4、M1=8、M2=13、M3=9、M4=13、M5=16（計64素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。</p>
 <h2 id="section-2">対象・前提・準備</h2>
 <p>初期配布の署名確認、新規5台または既存環境へのinstall、内部SSHと個別採点登録までを先に完了する。初期配布の手順は教材zipのdistribution/STUDENT.mdを読む。秘密鍵を共有Windowsへ置かず、CloudShellは本人Academy accountの中で使う。教師は本人用の匿名Lab ID・署名fingerprint・有効期限を案内する。</p>
@@ -544,13 +544,13 @@ curl -i http://guide.lab.test/practice.txt
 guide.lab.test.  300  IN  A  10.20.1.20
 </code></pre>
 <p>dig出力の説明用抜粋。Aの右が回答IPv4、300がTTL。回答が出ても、問い合わせ先SERVERが10.20.2.10かを別に確認する。</p>
-<h2 id="section-8">P4 PostgreSQLへの認証接続</h2>
-<p><strong>このPractice4で作業すること</strong></p>
+<h2 id="section-8">P3 PostgreSQLへの認証接続</h2>
+<p><strong>このPractice3で作業すること</strong></p>
 <p>DBサーバーにPostgreSQLを設定し、Webサーバーから練習用DBへパスワードで接続する。</p>
 <h3>今回の見取り図</h3>
-<p><img src="../../../assets/ja/p4.png" alt="WebサーバーがDBサーバーの名前を解決し、PostgreSQLへ接続する。" width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ja/p3.png" alt="WebサーバーがDBサーバーの名前を解決し、PostgreSQLへ接続する。" width="1040" height="680" loading="lazy"></p>
 <h3>解答例（操作手順）</h3>
-<h4>P4.1 配布サーバーからPostgreSQLをインストールする</h4>
+<h4>P3.1 配布サーバーからPostgreSQLをインストールする</h4>
 <p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p>DBサーバーにPostgreSQL 16をインストールする。続けて後の手順で使うSQLファイルを展開する。</p>
@@ -568,7 +568,7 @@ sudo -u postgres psql -X -d postgres -c &quot;SHOW data_directory;&quot;
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
 <p><code>pg_lsclusters</code> にバージョン <code>16</code> とクラスタ名 <code>main</code> が表示される。データの保存先は <code>/var/lib/postgresql/16/main</code>。</p>
-<h4>P4.2 PostgreSQLの待受アドレス・ポートを設定する</h4>
+<h4>P3.2 PostgreSQLの待受アドレス・ポートを設定する</h4>
 <p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><code>postgresql.conf</code> で、DBサーバーの内部IP <code>10.20.2.20</code> の5432番ポートで受け付けるようにする。パスワード認証にはSCRAM-SHA-256を使う。</p>
@@ -582,8 +582,8 @@ port = 5432
 password_encryption = 'scram-sha-256'
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>下の3項目を同じ設定ファイルに保存する。再起動は接続許可を設定した後のP4.4で行う。</p>
-<h4>P4.3 WebサーバーからのDB接続を許可する</h4>
+<p>下の3項目を同じ設定ファイルに保存する。再起動は接続許可を設定した後のP3.4で行う。</p>
+<h4>P3.3 WebサーバーからのDB接続を許可する</h4>
 <p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><code>pg_hba.conf</code> では、どのサーバーから、どのDBに、どのロールで接続できるかを指定する。Webサーバーの内部IP <code>10.20.1.20</code> を送信元にし、練習用と課題用のDB・ロールの組み合わせを許可する。</p>
@@ -603,7 +603,7 @@ host all all ::/0 reject
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
 <p>PostgreSQLは上から読んで最初に一致した行を使う。許可する行を先に置き、その他の接続は末尾の <code>reject</code> で拒否する。</p>
-<h4>P4.4 PostgreSQLを再起動して設定を確認する</h4>
+<h4>P3.4 PostgreSQLを再起動して設定を確認する</h4>
 <p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p>再起動して、保存した待受設定と接続許可を反映する。</p>
@@ -622,7 +622,7 @@ sudo -u postgres psql -X -d postgres -c \
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
 <p>サービスは <code>active</code>。待受は <code>10.20.2.20:5432</code>、パスワードの保存方式は <code>scram-sha-256</code>、接続許可ファイルのエラーは <code>(0 rows)</code>。</p>
-<h4>P4.5 練習用のDBと2つのロールを作る</h4>
+<h4>P3.5 練習用のDBと2つのロールを作る</h4>
 <p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p>付属のSQLで、練習用DB <code>jdu_catalog_practice</code> を作る。テーブルを準備するロールは <code>catalog_practice_setup</code>、通常のアプリ接続に使うロールは <code>catalog_practice_app</code>。最初にSQLの内容を表示し、その後 <code>psql</code> に渡して実行する。</p>
@@ -642,10 +642,10 @@ python3 -B profile_sql.py --profile practice 02_prepare_schema.sql | sudo -u pos
 <p><code>CREATE ROLE</code> が2回、<code>CREATE DATABASE</code> が1回表示される。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>already existsなら成功済みの可能性。DROPで消さず\duと\lで対応を確認する。パイプ右側psqlにSQL errorがないことを確認する。</p>
-<h4>P4.6 それぞれのDBロールにパスワードを設定する</h4>
+<h4>P3.6 それぞれのDBロールにパスワードを設定する</h4>
 <p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
-<p>DBサーバーの端末で <code>psql</code> を開く。<code>\password</code> を1行ずつ実行し、ロールごとに決めたパスワードを確認のため2回入力する。入力した文字は画面に表示されない。2つのパスワードはP5でも使う。 それぞれ16文字以上で異なるものを設定する。</p>
+<p>DBサーバーの端末で <code>psql</code> を開く。<code>\password</code> を1行ずつ実行し、ロールごとに決めたパスワードを確認のため2回入力する。入力した文字は画面に表示されない。2つのパスワードはP4でも使う。 それぞれ16文字以上で異なるものを設定する。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. DBのOS端末からpostgresとしてpsqlを開く。以降はpsql内で操作する。
 sudo -u postgres psql -X -d postgres
@@ -662,10 +662,10 @@ sudo -u postgres psql -X -d postgres
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
 <p><code>\du</code> に <code>catalog_practice_setup</code> と <code>catalog_practice_app</code> が表示される。</p>
-<h4>P4.7 Webサーバーから練習用DBに接続する</h4>
+<h4>P3.7 Webサーバーから練習用DBに接続する</h4>
 <p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
-<p>P0と同じ方法でWebサーバーのSession Managerを開く。<code>psql</code> で最初はDBサーバーの内部IP、次はP2で登録した <code>practice-db.lab.test</code> を指定する。パスワードを聞かれたら、P4.6で <code>catalog_practice_app</code> に設定したものを入力する。</p>
+<p>P0と同じ方法でWebサーバーのSession Managerを開く。<code>psql</code> で最初はDBサーバーの内部IP、次はP2で登録した <code>practice-db.lab.test</code> を指定する。パスワードを聞かれたら、P3.6で <code>catalog_practice_app</code> に設定したものを入力する。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. 配布サーバーから postgresql-client-16 と、動作に必要なパッケージをインストールする。
 sudo apt-get install --no-install-recommends postgresql-client-16
@@ -682,31 +682,31 @@ psql -X -h practice-db.lab.test -U catalog_practice_app -d jdu_catalog_practice 
 <p>どちらの接続でもDBは <code>jdu_catalog_practice</code>、ロールは <code>catalog_practice_app</code>、SQLの結果は <code>1</code> と表示される。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>内部IPで成功し、名前で失敗する場合は、P2で設定した通常の名前解決と練習用のDB名を確認する。認証が拒否される場合は接続元・DB・ロール・パスワードを確認する。DBをInternetへ公開して試さない。</p>
-<h4>P4.8 採点に使うDBパスワードをWebサーバーに保存する</h4>
+<h4>P3.8 採点に使うDBパスワードをWebサーバーに保存する</h4>
 <p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
-<p>コマンドを実行し、<code>catalog_practice_app</code> に設定したパスワードを2回入力する。入力は画面に表示されず、採点で接続を確認できるようWebサーバーの保護されたファイルに保存される。自分のPCの採点ページでP4を確認する。</p>
+<p>コマンドを実行し、<code>catalog_practice_app</code> に設定したパスワードを2回入力する。入力は画面に表示されず、採点で接続を確認できるようWebサーバーの保護されたファイルに保存される。自分のPCの採点ページでP3を確認する。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. 既存の練習用DBパスワードを非表示入力し、Web内だけに保存する。
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/database_secret.py --profile \
   practice
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>端末に <code>D11_EXISTING_DB_PASSWORD_STORED_LOCALLY</code> が表示され、採点ページでP4の9項目を確認できる。</p>
+<p>端末に <code>D11_EXISTING_DB_PASSWORD_STORED_LOCALLY</code> が表示され、採点ページでP3の9項目を確認できる。</p>
 <p><strong>うまくいかないとき:</strong></p>
-<p>既存fileありなら再生成しない。P5では同じDB passwordをapp設定にも入力する。M3はmission用の別DB/roleで構築する。</p>
+<p>既存fileありなら再生成しない。P4では同じDB passwordをapp設定にも入力する。M3はmission用の別DB/roleで構築する。</p>
 <h3>出力の読み取り例（入力しない）</h3>
 <pre><code class="language-text">current_database    | current_user         | value
 jdu_catalog_practice | catalog_practice_app | 1
 </code></pre>
 <p>SELECT結果の読み方の例。列の幅や罫線は実際と異なってよい。DB名・role名・value=1を確認する。table編集の許可を証明する結果ではない。</p>
-<h2 id="section-9">P5 教員アプリをWeb・DBへ接続する</h2>
-<p><strong>このPractice5で作業すること</strong></p>
+<h2 id="section-9">P4 教員アプリをWeb・DBへ接続する</h2>
+<p><strong>このPractice4で作業すること</strong></p>
 <p>Webサーバーで備品管理アプリを起動し、DBサーバーにつなぐ。公開の一覧と、踏み台サーバーから使う管理画面を用意する。</p>
 <h3>今回の見取り図</h3>
-<p><img src="../../../assets/ja/p5.png" alt="一般利用者と管理者がそれぞれの入口から同じ備品管理アプリを利用する。" width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ja/p4.png" alt="一般利用者と管理者がそれぞれの入口から同じ備品管理アプリを利用する。" width="1040" height="680" loading="lazy"></p>
 <h3>解答例（操作手順）</h3>
-<h4>P5.1 アプリに必要な名前解決とPythonパッケージを準備する</h4>
+<h4>P4.1 アプリに必要な名前解決とPythonパッケージを準備する</h4>
 <p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p>初めにWebサーバーからDBと管理画面の名前を解決する。続けて、配布サーバーからPython環境を作るためのツールをインストールし、備品管理アプリとPythonパッケージを展開する。</p>
@@ -726,7 +726,7 @@ ls /var/lib/jdu-web/lesson-resources-r1/wheels
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
 <p><code>db.lab.test</code> は <code>10.20.2.20</code>、<code>admin.lab.test</code> は <code>10.20.1.20</code>。端末に <code>PUBLIC_APP_RESOURCES_VERIFIED</code> と <code>SIGNED_OFFLINE_WHEELS_READY=7</code> が表示される。</p>
-<h4>P5.2 アプリのファイルを配置して専用のPython環境を作る</h4>
+<h4>P4.2 アプリのファイルを配置して専用のPython環境を作る</h4>
 <p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p>アプリのファイルを <code>/opt/jdu-catalog/app</code> にコピーする。<code>venv</code> で専用のPython環境を作り、展開済みのパッケージを入れる。<code>pip</code> は外部サイトに接続せず、ファイルが指定のハッシュ値と一致することを確認してからインストールする。</p>
@@ -751,7 +751,7 @@ sudo /opt/jdu-catalog/venv/bin/python -m pip check
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
 <p>最後の <code>pip check</code> で <code>No broken requirements found.</code> と表示される。</p>
-<h4>P5.3 アプリを実行するOSユーザーを作る</h4>
+<h4>P4.3 アプリを実行するOSユーザーを作る</h4>
 <p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p>Webサーバーでアプリを動かすOSユーザー <code>catalog</code> を作る。続けて、CSSなどのファイルを集めるディレクトリを作り、<code>catalog</code> がその中に書き込めるように設定する。</p>
@@ -780,10 +780,10 @@ getent passwd catalog
 <p>ユーザー <code>catalog</code> とログインシェル <code>/usr/sbin/nologin</code> が表示される。<code>/var/lib/jdu-catalog/static</code> の所有者とグループは <code>catalog</code>。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>権限errorをchmod -R 777やcatalogのsudo追加で解決しない。対象directoryとownerを照合する。</p>
-<h4>P5.4 アプリの通常のDB接続を設定する</h4>
+<h4>P4.4 アプリの通常のDB接続を設定する</h4>
 <p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
-<p>AWSコンソールでWebサーバーの現在の公開IPv4アドレスを確認し、<code>YOUR-CURRENT-WEB-PUBLIC-IP</code> と置き換える。設定コマンドで入力を求められたら、P4で <code>catalog_practice_app</code> に設定したパスワードを入力する。作成した練習用の設定をアプリで使うように選ぶ。 入力した文字は画面に表示されない。</p>
+<p>AWSコンソールでWebサーバーの現在の公開IPv4アドレスを確認し、<code>YOUR-CURRENT-WEB-PUBLIC-IP</code> と置き換える。設定コマンドで入力を求められたら、P3で <code>catalog_practice_app</code> に設定したパスワードを入力する。作成した練習用の設定をアプリで使うように選ぶ。 入力した文字は画面に表示されない。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. AWS画面で確認した現在のWeb公開IPv4を変数へ入れる。
 PUBLIC_WEB_IPV4='YOUR-CURRENT-WEB-PUBLIC-IP'
@@ -799,10 +799,10 @@ sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/app.env
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
 <p><code>CATALOG_ENV_CREATED=practice</code>、<code>CATALOG_PROFILE_ACTIVATED=practice</code>、<code>VALID</code> が表示される。<code>app.env</code> の所有者は <code>root:root</code>、権限は <code>600</code>。</p>
-<h4>P5.5 備品管理アプリのテーブルと管理者を用意する</h4>
+<h4>P4.5 備品管理アプリのテーブルと管理者を用意する</h4>
 <p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
-<p>一時設定の作成時に、P4の <code>catalog_practice_setup</code> のパスワードを入力する。コマンドを1行ずつ実行して、テーブルを作り、見本の備品を登録する。最後に <code>practice_admin</code> のパスワードを自分で決めて入力する。 入力した文字は画面に表示されない。</p>
+<p>一時設定の作成時に、P3の <code>catalog_practice_setup</code> のパスワードを入力する。コマンドを1行ずつ実行して、テーブルを作り、見本の備品を登録する。最後に <code>practice_admin</code> のパスワードを自分で決めて入力する。 入力した文字は画面に表示されない。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. 既存構築用パスワードを非表示入力し、一時setup設定を作る。
 sudo python3 -B /opt/jdu-catalog/app/configuration.py create-setup --profile practice
@@ -821,7 +821,7 @@ sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
 <p>アプリ用テーブルが11個、見本の備品が3件作られる。管理画面では今回設定した <code>practice_admin</code> でログインする。</p>
-<h4>P5.6 アプリのDBロールに必要な権限を付ける</h4>
+<h4>P4.6 アプリのDBロールに必要な権限を付ける</h4>
 <p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p>DBサーバーのSession Managerを開く。通常の備品管理で使う <code>catalog_practice_app</code> に、作成済みのテーブルを読み書きするための権限を付ける。先にSQLを表示し、次のコマンドで適用する。</p>
@@ -836,7 +836,7 @@ python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u pos
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
 <p><code>COMMIT</code> が表示される。備品テーブル <code>catalog_item</code> では読み取り・追加・変更が許可される。</p>
-<h4>P5.7 アプリをsystemdサービスとして起動する</h4>
+<h4>P4.7 アプリをsystemdサービスとして起動する</h4>
 <p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p>WebサーバーでCSSなどをNginxが配信するディレクトリに集める。サービス定義を <code>/etc/systemd/system</code> にコピーし、systemdに読み込ませる。<code>enable --now</code> で現在の起動と、次回のOS起動時の自動起動を設定する。</p>
@@ -866,7 +866,7 @@ sudo ss -lntp
 <p>サービスは <code>active</code>。Gunicornは同じWebサーバーのNginxから接続できる <code>127.0.0.1:8000</code> で待ち受ける。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>起動errorはjournalctl -u jdu-catalogを見る。秘密設定本文をlogへ貼らず、configuration.py checkで形式を確認する。</p>
-<h4>P5.8 Nginxに公開用と管理用の入口を設定する</h4>
+<h4>P4.8 Nginxに公開用と管理用の入口を設定する</h4>
 <p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p>設定ファイルをコピーして、<code>sites-enabled</code> からシンボリックリンクを作る。設定を反映すると、80番ポートで公開一覧、踏み台サーバーからの8080番ポートで管理画面を開ける。Nginxはアプリ宛てのリクエストをGunicornへ転送する。</p>
@@ -893,10 +893,10 @@ curl -i http://127.0.0.1/practice.txt
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
 <p><code>nginx -t</code> が成功する。 <code>/practice.txt</code> にはHTTP <code>200</code> と <code>JDU WEB-02 practice: HTTP response verified.</code> が返る。同じ方法で <code>http://127.0.0.1/mission.txt</code> を開き、M1の本文も返ることを確かめる。</p>
-<h4>P5.9 管理画面から公開・非公開の備品を1件ずつ登録する</h4>
+<h4>P4.9 管理画面から公開・非公開の備品を1件ずつ登録する</h4>
 <p><strong>実行環境:</strong></p>
 <p>RDP内のFirefox（踏み台）</p>
-<p>踏み台サーバーへRDP接続し、その中のFirefoxで <code>http://admin.lab.test:8080/admin/</code> を開く。P5.5で設定した <code>practice_admin</code> でログインする。「備品管理」の「備品」から追加画面を開き、下の表に従って1件ずつ保存する。登録後は公開備品を開いて数量を変更して保存し、表の数量4に戻す。</p>
+<p>踏み台サーバーへRDP接続し、その中のFirefoxで <code>http://admin.lab.test:8080/admin/</code> を開く。P4.5で設定した <code>practice_admin</code> でログインする。「備品管理」の「備品」から追加画面を開き、下の表に従って1件ずつ保存する。登録後は公開備品を開いて数量を変更して保存し、表の数量4に戻す。</p>
 <table>
 <thead>
 <tr>
@@ -926,10 +926,10 @@ curl -i http://127.0.0.1/practice.txt
 </table>
 <p><strong>期待する結果と読み方:</strong></p>
 <p>管理画面には <code>P5-PUBLIC-001</code> と <code>P5-PRIVATE-001</code> が表示される。Webサーバーの公開一覧で新しく表示されるのは <code>P5-PUBLIC-001</code>。</p>
-<h4>P5.10 登録した2件がDBに保存されたことを確かめる</h4>
+<h4>P4.10 登録した2件がDBに保存されたことを確かめる</h4>
 <p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
-<p>Webサーバーの端末で <code>psql</code> を使い、管理画面から登録した2件をDBから読み出す。パスワードを聞かれたらP4.6で設定した <code>catalog_practice_app</code> のものを使う。</p>
+<p>Webサーバーの端末で <code>psql</code> を使い、管理画面から登録した2件をDBから読み出す。パスワードを聞かれたらP3.6で設定した <code>catalog_practice_app</code> のものを使う。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. 指定した2件を読むSQLを変数へ保存する。まだDBへ送らない。
 QUERY=&quot;SELECT code,name,quantity,location,is_public
@@ -940,20 +940,20 @@ ORDER BY code;&quot;
 psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &quot;$QUERY&quot;
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
-<p><code>P5-PUBLIC-001</code> の数量は <code>4</code>、公開設定は <code>t</code>。<code>P5-PRIVATE-001</code> の数量は <code>2</code>、公開設定は <code>f</code>。名前と保管場所もP5.9の表と照合する。</p>
-<h4>P5.11 採点ページでアプリの動作を確かめる</h4>
+<p><code>P5-PUBLIC-001</code> の数量は <code>4</code>、公開設定は <code>t</code>。<code>P5-PRIVATE-001</code> の数量は <code>2</code>、公開設定は <code>f</code>。名前と保管場所もP4.9の表と照合する。</p>
+<h4>P4.11 採点ページでアプリの動作を確かめる</h4>
 <p><strong>実行環境:</strong></p>
 <p>自分のPCのブラウザ：Web Portal</p>
-<p>自分のPCの採点ページでP5を開き、<strong>機能・権限を含めて確認する</strong> を選ぶ。<code>practice_admin</code> のパスワードを入力し、<strong>このパスワードで確認する</strong> を押す。採点では管理画面から確認用の備品を1件登録し、数量の変更も確かめる。</p>
+<p>自分のPCの採点ページでP4を開き、<strong>機能・権限を含めて確認する</strong> を選ぶ。<code>practice_admin</code> のパスワードを入力し、<strong>このパスワードで確認する</strong> を押す。採点では管理画面から確認用の備品を1件登録し、数量の変更も確かめる。</p>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>P5の13項目の結果が表示される。採点で登録した確認用の備品は管理画面に残る。</p>
-<h2 id="section-10">P6 最小権限と公開範囲</h2>
-<p><strong>このPractice6で作業すること</strong></p>
+<p>P4の13項目の結果が表示される。採点で登録した確認用の備品は管理画面に残る。</p>
+<h2 id="section-10">P5 最小権限と公開範囲</h2>
+<p><strong>このPractice5で作業すること</strong></p>
 <p>DBの初期設定用ロールのログインを止める。アプリが通常の権限で動き、公開側から管理画面や内部設定を開けないことを確かめる。</p>
 <h3>今回の見取り図</h3>
-<p><img src="../../../assets/ja/p6.png" alt="公開・管理の入口とWebからDBへの接続で、許可する範囲を制限する。" width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ja/p5.png" alt="公開・管理の入口とWebからDBへの接続で、許可する範囲を制限する。" width="1040" height="680" loading="lazy"></p>
 <h3>解答例（操作手順）</h3>
-<h4>P6.1 アプリがDBでできる操作を調べる</h4>
+<h4>P5.1 アプリがDBでできる操作を調べる</h4>
 <p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p>DBサーバーの端末で <code>psql</code> を開く。<code>\du</code> で練習用ロールの属性、<code>\dp</code> でテーブルごとのアクセス権限を確認する。</p>
@@ -971,7 +971,7 @@ sudo -u postgres psql -X -d jdu_catalog_practice
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
 <p><code>catalog_practice_app</code> に備品を読み取る・追加する・変更する権限がある。備品を削除する権限は付いていない。</p>
-<h4>P6.2 初期設定用のDBロールでログインできないようにする</h4>
+<h4>P5.2 初期設定用のDBロールでログインできないようにする</h4>
 <p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p>テーブル作成に使った <code>catalog_practice_setup</code> でログインできる状態を残すと、そのパスワードを知られたときに高い権限を使われるおそれがある。SQLを表示して <code>NOLOGIN</code> の指定を確認し、<code>psql</code> で適用する。</p>
@@ -986,10 +986,10 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
 <p><code>ALTER ROLE</code> が表示される。<code>catalog_practice_setup</code> のログインが無効になり、アプリは通常用の <code>catalog_practice_app</code> で引き続き接続できる。</p>
-<h4>P6.3 Webサーバーの初期設定用ファイルを片付ける</h4>
+<h4>P5.3 Webサーバーの初期設定用ファイルを片付ける</h4>
 <p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
-<p>練習用の初期設定ファイル2つを削除する。次にアプリを停止し、P5で作った通常用の設定 <code>practice</code> を選んでから起動する。最後に、アプリのOSユーザー <code>catalog</code> がコードを書き換えられないことを確かめる。</p>
+<p>練習用の初期設定ファイル2つを削除する。次にアプリを停止し、P4で作った通常用の設定 <code>practice</code> を選んでから起動する。最後に、アプリのOSユーザー <code>catalog</code> がコードを書き換えられないことを確かめる。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. 指定ファイルの所有者・グループ・権限・名前を読む。
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
@@ -1016,7 +1016,7 @@ sudo -u catalog find /opt/jdu-catalog/app -writable -print
 <p><code>CATALOG_PROFILE_ACTIVATED=practice</code> と <code>VALID</code> が表示され、アプリは <code>active</code> になる。通常用の設定ファイルは <code>root:root 600</code>。最後の <code>find</code> では何も表示されない。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>練習用以外の設定が有効なら、ここで止める。既に削除済みのファイルは削除し直さない。停止・設定の選択・設定チェックが失敗したら、原因を確認してからアプリを起動する。</p>
-<h4>P6.4 公開用の80番ポートから見える範囲を確かめる</h4>
+<h4>P5.4 公開用の80番ポートから見える範囲を確かめる</h4>
 <p><strong>実行環境:</strong></p>
 <p>踏み台のSSM端末：ssm-user</p>
 <p>踏み台サーバーの端末からWebサーバーの80番ポートへHTTPリクエストを送る。備品一覧が表示され、管理画面や内部設定ファイルが公開されていないことを確かめる。管理画面は、RDPで開いた踏み台サーバーのFirefoxから <code>http://admin.lab.test:8080/admin/</code> で確認する。</p>
@@ -1034,12 +1034,12 @@ curl -i http://web.lab.test/static/app.env
 <p>一覧はHTTP <code>200</code>。<code>/admin/</code> と設定ファイルのURLには <code>403</code> や <code>404</code> が返る。8080番ポートでは管理画面のログインページが表示される。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>もしenv本文が見えたら共有せず、その場で教師へ知らせ公開設定を修正する。</p>
-<h4>P6.5 採点ページでアクセス制御を確かめる</h4>
+<h4>P5.5 採点ページでアクセス制御を確かめる</h4>
 <p><strong>実行環境:</strong></p>
 <p>自分のPCのブラウザ：Web Portal</p>
-<p>採点ページでP6を開き、<strong>機能・権限を含めて確認する</strong> を選ぶ。<code>practice_admin</code> のパスワードを入力して確認を実行する。採点では、正しいパスワードで管理画面に入れることと、ログインしていない状態では備品を追加・変更できないことを確認する。</p>
+<p>採点ページでP5を開き、<strong>機能・権限を含めて確認する</strong> を選ぶ。<code>practice_admin</code> のパスワードを入力して確認を実行する。採点では、正しいパスワードで管理画面に入れることと、ログインしていない状態では備品を追加・変更できないことを確認する。</p>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>P6の16項目の結果が表示される。</p>
+<p>P5の16項目の結果が表示される。</p>
 <h2 id="section-11">次回の再開・結果の確認</h2>
 <p>次回は本人のLabと同じ5台を起動し、running/SSM Onlineと現在の公開IPを確認する。Web Portalへ学校Googleでログインし、まずM0で準備確認する。作成・鍵生成・登録を毎回繰り返す必要はない。期限切れは教師へ更新を依頼する。</p>
 <p>結果は自動保存される。処理中は「結果を更新する」、成績確認は「保存済み成績を見る」を使う。クリアした項目数と修正が必要な項目を見る。UNKNOWNは観測不能で、合格や0点を確定した意味ではない。未確認Mの確定済み点数は保持される。最新の評価可能な結果を使い、異なる回のPASSを合算したり自動で最高点を選んだりしない。</p>
