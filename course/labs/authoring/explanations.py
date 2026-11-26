@@ -142,3 +142,6 @@ OUTPUT_EXAMPLES = {
     'Пример чтения SELECT; ширина столбцов может отличаться. Сверьте БД, роль и value=1. Это не доказательство права менять таблицы.',
     'SELECT natijasini o‘qish namunasi; ustun kengligi boshqacha bo‘lishi mumkin. DB, role va value=1 ni tekshiring. Bu table o‘zgartirish huquqini isbotlamaydi.')),
 }
+
+from http_revision import revise_notes
+revise_notes(STEP_NOTES, T)

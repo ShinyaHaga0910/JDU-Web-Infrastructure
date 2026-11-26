@@ -55,16 +55,17 @@ EC2の詳細画面。Connectの右の矢印からConnect with SSM Session Manage
 
 ### 完成要件
 
-P1と同じWebサーバーで、TCPの80番ポートから `/mission.txt` を配信する。P1で作った `/practice.txt` も引き続き開けるようにする。
+P1と同じWebサーバーで、`/var/www/jdu-mission/mission.txt` をTCPの80番ポートから `/mission.txt` として配信する。P1のファイルと設定も残し、`/practice.txt` を引き続き開けるようにする。
 
-1. **Webサーバー（P1.2〜P1.3）**　下の本文を使って課題用ファイルを作る。所有者とグループを `root:root`、権限を `0644` にする。
-2. **Webサーバーと踏み台サーバー（P1.4〜P1.6）**　curlで `/mission.txt` にアクセスする。Webサーバー自身では `127.0.0.1`、踏み台からは `10.20.1.20` を指定し、両方でHTTP 200と下の本文が返ることを確認する。Webサーバーのアクセスログでリクエストを探す。
+1. **配信ファイル（P1.2）**　`/var/www/jdu-mission` を作り、下の本文で `mission.txt` を配置する。所有者を `root`、所有グループを `www-data`、権限を `0640` にする。
+2. **Nginxの設定（P1.3）**　`/etc/nginx/sites-available/default` の80番ポートを受け付ける既存の `server` 内に、`/mission.txt` と完全一致する `location` を追加し、その `root` に `/var/www/jdu-mission` を指定する。P1の設定を残し、構文検査に成功してから再読み込みする。
+3. **HTTPとログ（P1.4〜P1.6）**　Webサーバー自身と踏み台サーバーから `/mission.txt` を開き、HTTP 200と下の本文を確認する。`/practice.txt` も開けることと、リクエストがアクセスログに残ることを確認する。
 
 ### 今回の見取り図
 
 ![学生PCと踏み台サーバーからWebサーバーのmission.txtへのHTTP経路。](../../assets/ja/m1.png)
 
-- **配信ファイル** `/var/www/html/mission.txt`
+- **配信ファイル** `/var/www/jdu-mission/mission.txt`
 - **URLのパス** `/mission.txt`
 
 ```text
@@ -78,10 +79,10 @@ JDU WEB-02 mission: independent HTTP delivery.
 | № | 満たす条件 |
 | --- | --- |
 | 1 | WebサーバーでNginxが起動している。 |
-| 2 | Nginxの設定が構文検査に通る。 |
+| 2 | Nginxの構文検査に通り、/mission.txtのlocationでrootが/var/www/jdu-missionに設定されている。M1ではP1の配信設定も残っている。 |
 | 3 | NginxがWebサーバーの内部IPでTCPの80番ポートへの接続を受け付ける。 |
-| 4 | 配信用の `/var/www/html/mission.txt` が通常のファイルで、本文・所有者・権限が指定どおりになっている。 |
-| 5 | Webサーバー自身から `127.0.0.1` の `/mission.txt` を開くと、HTTP 200と指定の本文が返る。 |
+| 4 | /var/www/jdu-mission/mission.txt が通常のファイルで、本文が指定どおり、所有者がroot、所有グループがwww-data、権限が0640である。 |
+| 5 | Webサーバー自身から指定URLを開くとHTTP 200と指定の本文が返る。M1では /practice.txt も引き続き開ける。 |
 | 6 | 踏み台サーバーから `10.20.1.20` の `/mission.txt` を開くと、HTTP 200と指定の本文が返る。 |
 | 7 | Webサーバーの公開IPで `/mission.txt` を開くと、HTTP 200と指定の本文が返る。 |
 | 8 | 確認時の `/mission.txt` へのリクエストがNginxのアクセスログに残る。 |

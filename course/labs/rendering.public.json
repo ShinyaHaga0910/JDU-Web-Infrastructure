@@ -1,58 +1,58 @@
 {
   "scope": "D12_P_M_all_page_render_and_bounds_not_visual_approval",
-  "checked_on": "2026-11-20",
+  "checked_on": "2026-11-26",
   "pdfs": [
     {
       "file": "web_lab_missions_ja.pdf",
-      "sha256": "936d6b80c531c8a238a7e61b1efb43ed9bbdb101bea6279e6a0e3af157422c6c",
-      "pages": 14,
-      "rendered_pages": 14,
+      "sha256": "53d4ca5cceacf8dac6694efee5bf81863acedbfd4bc5b2775eafb5cf68db6c7d",
+      "pages": 12,
+      "rendered_pages": 12,
       "out_of_bounds_words": 0,
       "issues": []
     },
     {
       "file": "web_lab_missions_ru.pdf",
-      "sha256": "b738a2ca51cce91bf07dd7a07b1177777af152ed784ead9a281737700f5e1bab",
-      "pages": 15,
-      "rendered_pages": 15,
+      "sha256": "551bb916c7177be7f17414446ec61cfd19747ebb96f39cc471fbdd3448b7d45b",
+      "pages": 12,
+      "rendered_pages": 12,
       "out_of_bounds_words": 0,
       "issues": []
     },
     {
       "file": "web_lab_missions_uz.pdf",
-      "sha256": "7d6b28a689ddec1436fde1c7850a00995d1994d2bdf2d5986f88802b899a9e16",
-      "pages": 14,
-      "rendered_pages": 14,
+      "sha256": "9389f63b0a1899d08e527ea759b93a1c58f6bed810d98527b6f1be52c0f21871",
+      "pages": 12,
+      "rendered_pages": 12,
       "out_of_bounds_words": 0,
       "issues": []
     },
     {
       "file": "web_lab_practice_ja.pdf",
-      "sha256": "66bcc09cb444cba4d504e42e1df71f8ae3c4a776d71c146d93a1c0f65dd2b75c",
+      "sha256": "6c4990468e7b317c4718b3f6c7c9ecc3d7583be713fa3a9b7d0149efb7eb4d0a",
+      "pages": 40,
+      "rendered_pages": 40,
+      "out_of_bounds_words": 0,
+      "issues": []
+    },
+    {
+      "file": "web_lab_practice_ru.pdf",
+      "sha256": "12d756f8001a05e921abcf9f8e498e63b433ac5a90cc1667fefad66d944d3d4b",
       "pages": 41,
       "rendered_pages": 41,
       "out_of_bounds_words": 0,
       "issues": []
     },
     {
-      "file": "web_lab_practice_ru.pdf",
-      "sha256": "125ec144a6f96ec7c2f2e4563ff676f0f78089348455eec991a68f7bfa920109",
-      "pages": 43,
-      "rendered_pages": 43,
-      "out_of_bounds_words": 0,
-      "issues": []
-    },
-    {
       "file": "web_lab_practice_uz.pdf",
-      "sha256": "140a3691e7ae21b4111488bb59a4c1df2ddd4c09c993020778afa2a1f21a714f",
-      "pages": 40,
-      "rendered_pages": 40,
+      "sha256": "33ce7ec4e6e45f99184915e38f21456715a3c7ea2397dcea6bcceb76fa9833aa",
+      "pages": 39,
+      "rendered_pages": 39,
       "out_of_bounds_words": 0,
       "issues": []
     }
   ],
-  "pdf_pages_checked": 167,
-  "rendered_pages": 167,
+  "pdf_pages_checked": 156,
+  "rendered_pages": 156,
   "out_of_bounds_words": 0,
   "teacher_visual_review": false,
   "native_language_review": false,

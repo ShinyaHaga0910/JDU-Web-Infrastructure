@@ -160,7 +160,7 @@ python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u pos
 <pre><code class="language-bash"># 1. runtime設定でCSS等の静的ファイルを配信先へ集める。
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase runtime collectstatic
-# 2. /opt/jdu-catalog/app/config/jdu-catalog.service の内容を変更せずに読む。
+# 2. 管理者権限で /opt/jdu-catalog/app/config/jdu-catalog.service の内容を読む。
 cat /opt/jdu-catalog/app/config/jdu-catalog.service
 # 3. ファイルを /etc/systemd/system/jdu-catalog.service にコピーする。
 sudo cp /opt/jdu-catalog/app/config/jdu-catalog.service \
@@ -186,8 +186,9 @@ sudo ss -lntp
 <p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p>設定ファイルをコピーして、<code>sites-enabled</code> からシンボリックリンクを作る。設定を反映すると、80番ポートで公開一覧、踏み台サーバーからの8080番ポートで管理画面を開ける。Nginxはアプリ宛てのリクエストをGunicornへ転送する。</p>
+<p>コピーした設定の <code>/practice.txt</code> と <code>/mission.txt</code> の2つのlocationを、下の内容へ置き換える。P1・M1の配信ディレクトリを引き継ぐための変更である。他の設定は保持する。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
-<pre><code class="language-bash"># 1. /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf の内容を変更せずに読む。
+<pre><code class="language-bash"># 1. 管理者権限で /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf の内容を読む。
 cat /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf
 # 2. ファイルを /etc/nginx/sites-available/jdu-catalog にコピーする。
 sudo cp /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf \
@@ -200,11 +201,20 @@ sudo chmod 0644 /etc/nginx/sites-available/jdu-catalog
 sudo mv -n /etc/nginx/sites-enabled/default /etc/nginx/default-site.before-p5
 # 6. 配置したアプリ用サイト設定への有効化リンクを作る。
 sudo ln -s /etc/nginx/sites-available/jdu-catalog /etc/nginx/sites-enabled/jdu-catalog
-# 7. Nginx設定の構文と参照ファイルを検査する。
+# 7. /etc/nginx/sites-available/jdu-catalog をnanoで編集する。
+sudo nano /etc/nginx/sites-available/jdu-catalog
+</code></pre>
+<p><strong>nanoで設定する内容</strong></p>
+<pre><code class="language-text">location = /practice.txt { root /var/www/jdu-practice; try_files $uri =404; }
+location = /mission.txt { root /var/www/jdu-mission; try_files $uri =404; }
+</code></pre>
+<p>設定を入力したらCtrl+O、Enterで保存し、Ctrl+Xで終了する。端末に戻って、続きのコマンドを実行する。</p>
+<p>入力するコマンド（番号はこの手順内の順番）</p>
+<pre><code class="language-bash"># 8. Nginx設定の構文と参照ファイルを検査する。
 sudo nginx -t
-# 8. nginx を止めずに設定を再読込する。
+# 9. nginx を止めずに設定を再読込する。
 sudo systemctl reload nginx
-# 9. http://127.0.0.1/practice.txt へHTTPリクエストを送る。
+# 10. http://127.0.0.1/practice.txt へHTTPリクエストを送る。
 curl -i http://127.0.0.1/practice.txt
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>

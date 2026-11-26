@@ -117,7 +117,8 @@ class SubmissionTest(unittest.TestCase):
             self.spec = self.new_spec(task)
             self.assertFalse(self.save(self.report(task))['counts_toward_assessment'])
         lab = self.grades.labs(self.meta['lab_id'])[0]
-        self.assertEqual(project_course_lab(lab)['raw_earned'], 64)
+        # Old-root M1 remains historical; the new rubric needs a fresh result.
+        self.assertEqual(project_course_lab(lab)['raw_earned'], 56)
         self.assertEqual(project_lab(lab)['raw_earned'], 62)
 
     def test_retry_returns_first_receipt_without_reordering_a_newer_lower_grade(self):

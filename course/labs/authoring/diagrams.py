@@ -187,6 +187,7 @@ def p1_diagram(s,step=None):
         route = 'HTTP / TCP 80' if step is None else 'curl / HTTP / TCP 80'
         s.path([(536,347),(536,313),(714,313)],route,(611,278))
         s.text(834,319,'Nginx /practice.txt',18,center=True)
+        s.text(834,345,'/var/www/jdu-practice',13,center=True)
     elif step==1:
         s.path([(834,501),(834,376)])
         package=T('Nginxパッケージ','Пакет Nginx','Nginx paketi')[lang]
@@ -224,8 +225,9 @@ def mission_diagram(s):
                'HTTP / TCP 80' if n==1 else 'HTTP / TCP 8080',(586,345))
         if n==1:
             s.node('web',720,209,True,w=239)
-            s.text(840,330,'Nginx /mission.txt',19,center=True)
-            s.text(840,368,'127.0.0.1:80',17,color=MUTED,center=True)
+            s.text(840,319,'Nginx /mission.txt',19,center=True)
+            s.text(840,350,'/var/www/jdu-mission',13,center=True)
+            s.text(840,382,'127.0.0.1:80',17,color=MUTED,center=True)
         else:
             s.rect(720,195,239,199,fill='#e7f4f2',stroke=TEAL,width=2)
             s.text(736,205,'EC2 '+LABELS['web'][lang]+('ー' if lang=='ja' else ''),18)

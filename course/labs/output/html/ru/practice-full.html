@@ -157,11 +157,11 @@ id -un
 cd ~
 # 3. Показать текущий рабочий каталог.
 pwd
-# 4. Вывести файл и проверить, что поле role имеет значение web.
+# 4. Прочитать /etc/jdu-web/bootstrap.json с правами администратора.
 cat /etc/jdu-web/bootstrap.json
 # 5. Введите только web. Сохраните через Ctrl+O и Enter, выйдите через Ctrl+X.
 nano p0-connection.txt
-# 6. Прочитать p0-connection.txt без изменения.
+# 6. Прочитать p0-connection.txt с правами администратора.
 cat p0-connection.txt
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
@@ -208,11 +208,11 @@ mstsc /prompt
 <h3>Что изучаем</h3>
 <p>Связать Nginx, файл, прослушивание порта, HTTP-ответ и access log.</p>
 <h3>Задание</h3>
-<p>Настройте выдачу файла /var/www/html/practice.txt с ответом HTTP 200.</p>
+<p>Настройте Nginx для выдачи <code>/var/www/jdu-practice/practice.txt</code> по HTTP.</p>
 <h3>Схема задания</h3>
 <p><img src="../../../assets/ru/p1.png" alt="В публичной подсети VPC находятся Web-сервер и бастион, в приватной - сервер пакетов. Стрелки показывают маршруты HTTP." width="1040" height="680" loading="lazy"></p>
 <ul>
-<li>File: /var/www/html/practice.txt</li>
+<li>File: /var/www/jdu-practice/practice.txt</li>
 <li>URL path: /practice.txt</li>
 </ul>
 <pre><code class="language-text">JDU WEB-02 practice: HTTP response verified.
@@ -260,40 +260,52 @@ nano practice.txt
 </code></pre>
 <p>Введите в nano ровно эту строку и нажмите Enter в конце. Сохраните файл клавишами Ctrl+O, затем Enter, и выйдите через Ctrl+X. В терминале продолжите с шага 6.</p>
 <p>Команды: нумерация внутри этого шага</p>
-<pre><code class="language-bash"># 6. Скопировать practice.txt в каталог публикации Web-сервера.
-sudo cp practice.txt /var/www/html/practice.txt
-# 7. Задать владельца и группу root:root для /var/www/html/practice.txt.
-sudo chown root:root /var/www/html/practice.txt
-# 8. Задать права 0644 для /var/www/html/practice.txt.
-sudo chmod 0644 /var/www/html/practice.txt
-# 9. Прочитать владельца, группу, права и имя указанных файлов.
-stat -c '%U:%G %a %n' /var/www/html/practice.txt
-# 10. Прочитать /var/www/html/practice.txt без изменения.
-cat /var/www/html/practice.txt
+<pre><code class="language-bash"># 6. Создать каталог /var/www/jdu-practice.
+sudo mkdir -p /var/www/jdu-practice
+# 7. Скопировать файлы в /var/www/jdu-practice/practice.txt.
+sudo cp practice.txt /var/www/jdu-practice/practice.txt
+# 8. Задать владельца и группу root:www-data для /var/www/jdu-practice/practice.txt.
+sudo chown root:www-data /var/www/jdu-practice/practice.txt
+# 9. Задать права 0640 для /var/www/jdu-practice/practice.txt.
+sudo chmod 0640 /var/www/jdu-practice/practice.txt
+# 10. Прочитать владельца, группу, права и имя указанных файлов.
+stat -c '%U:%G %a %n' /var/www/jdu-practice/practice.txt
+# 11. Прочитать /var/www/jdu-practice/practice.txt с правами администратора.
+sudo cat /var/www/jdu-practice/practice.txt
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
-<p><code>cp</code> копирует текст в файл для публикации. <code>chown root:root</code> назначает root владельцем и группой копии. <code>chmod 0644</code> даёт владельцу право чтения и записи, а группе и остальным - право чтения.</p>
+<p><code>chown root:www-data</code> задаёт владельца root и группу www-data. <code>chmod 0640</code> разрешает владельцу читать и писать, группе - читать, остальным доступ закрыт. Рабочие процессы Nginx работают от www-data и читают файл с правами этой группы.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Отображаются владелец, группа и права <code>root:root 644</code> и строка <code>JDU WEB-02 practice: HTTP response verified.</code>.</p>
+<p>Показано <code>root:www-data 640 /var/www/jdu-practice/practice.txt</code>; текст - одна строка <code>JDU WEB-02 practice: HTTP response verified.</code>.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Если nano ещё открыт, сохраните файл и выйдите перед следующей командой.</p>
-<h4>P1.3 Проверить Web root и запустить сервис</h4>
+<h4>P1.3 Настроить каталог выдачи в Nginx</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
-<p>Выведите действующую конфигурацию командой <code>nginx -T</code> и найдите <code>root /var/www/html</code> и <code>listen 80</code> в <code>/etc/nginx/sites-enabled/default</code>. При необходимости отредактируйте файл в <code>sudo nano</code> и перечитайте настройки после успешной проверки синтаксиса.</p>
+<p>Откройте настройки командой <code>sudo nano /etc/nginx/sites-available/default</code>. Добавьте блок ниже внутрь существующего <code>server { ... }</code> с <code>listen 80</code>, вне других блоков <code>location</code>. Для запроса <code>/practice.txt</code> Nginx добавляет путь к root и читает <code>/var/www/jdu-practice/practice.txt</code>. Сохраните файл, проверьте синтаксис и перечитайте настройки.</p>
 <p>Команды: нумерация внутри этого шага</p>
-<pre><code class="language-bash"># 1. Вывести полную конфигурацию Nginx и посмотреть, как она записана.
+<pre><code class="language-bash"># 1. Открыть /etc/nginx/sites-available/default в nano.
+sudo nano /etc/nginx/sites-available/default
+</code></pre>
+<p><strong>Настройки для nano</strong></p>
+<pre><code class="language-text">location = /practice.txt {
+    root /var/www/jdu-practice;
+}
+</code></pre>
+<p>Сохраните настройки через Ctrl+O, Enter и выйдите через Ctrl+X. В терминале выполните следующие команды.</p>
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 2. Вывести полную конфигурацию Nginx и посмотреть, как она записана.
 sudo nginx -T
-# 2. Проверить синтаксис и файлы конфигурации Nginx.
+# 3. Проверить синтаксис и файлы конфигурации Nginx.
 sudo nginx -t
-# 3. Запустить nginx сейчас и включить автозапуск.
+# 4. Запустить nginx сейчас и включить автозапуск.
 sudo systemctl enable --now nginx
-# 4. Перечитать настройки nginx без остановки.
+# 5. Перечитать настройки nginx без остановки.
 sudo systemctl reload nginx
-# 5. Прочитать текущее состояние nginx.
+# 6. Прочитать текущее состояние nginx.
 systemctl is-active nginx
-# 6. Убедиться, что Nginx слушает TCP-порт 80, например 0.0.0.0:80.
+# 7. Убедиться, что Nginx слушает TCP-порт 80, например 0.0.0.0:80.
 sudo ss -lntp
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
@@ -844,7 +856,7 @@ python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u pos
 <pre><code class="language-bash"># 1. Собрать CSS и другую статику в каталог выдачи с runtime-настройкой.
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase runtime collectstatic
-# 2. Прочитать /opt/jdu-catalog/app/config/jdu-catalog.service без изменения.
+# 2. Прочитать /opt/jdu-catalog/app/config/jdu-catalog.service с правами администратора.
 cat /opt/jdu-catalog/app/config/jdu-catalog.service
 # 3. Скопировать файлы в /etc/systemd/system/jdu-catalog.service.
 sudo cp /opt/jdu-catalog/app/config/jdu-catalog.service \
@@ -870,8 +882,9 @@ sudo ss -lntp
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p>Скопируйте конфигурацию и добавьте символическую ссылку в <code>sites-enabled</code>. После применения порт 80 открывает список, а порт 8080 с бастиона - админку. Nginx передаёт запросы приложения в Gunicorn.</p>
+<p>В скопированной конфигурации замените два location для <code>/practice.txt</code> и <code>/mission.txt</code> на блоки ниже. Так сохраняются каталоги P1 и M1. Остальные настройки оставьте.</p>
 <p>Команды: нумерация внутри этого шага</p>
-<pre><code class="language-bash"># 1. Прочитать /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf без изменения.
+<pre><code class="language-bash"># 1. Прочитать /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf с правами администратора.
 cat /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf
 # 2. Скопировать файлы в /etc/nginx/sites-available/jdu-catalog.
 sudo cp /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf \
@@ -884,11 +897,20 @@ sudo chmod 0644 /etc/nginx/sites-available/jdu-catalog
 sudo mv -n /etc/nginx/sites-enabled/default /etc/nginx/default-site.before-p5
 # 6. Создать ссылку включения конфигурации сайта приложения.
 sudo ln -s /etc/nginx/sites-available/jdu-catalog /etc/nginx/sites-enabled/jdu-catalog
-# 7. Проверить синтаксис и файлы конфигурации Nginx.
+# 7. Открыть /etc/nginx/sites-available/jdu-catalog в nano.
+sudo nano /etc/nginx/sites-available/jdu-catalog
+</code></pre>
+<p><strong>Настройки для nano</strong></p>
+<pre><code class="language-text">location = /practice.txt { root /var/www/jdu-practice; try_files $uri =404; }
+location = /mission.txt { root /var/www/jdu-mission; try_files $uri =404; }
+</code></pre>
+<p>Сохраните настройки через Ctrl+O, Enter и выйдите через Ctrl+X. В терминале выполните следующие команды.</p>
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 8. Проверить синтаксис и файлы конфигурации Nginx.
 sudo nginx -t
-# 8. Перечитать настройки nginx без остановки.
+# 9. Перечитать настройки nginx без остановки.
 sudo systemctl reload nginx
-# 9. Отправить HTTP-запрос по адресу http://127.0.0.1/practice.txt.
+# 10. Отправить HTTP-запрос по адресу http://127.0.0.1/practice.txt.
 curl -i http://127.0.0.1/practice.txt
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>

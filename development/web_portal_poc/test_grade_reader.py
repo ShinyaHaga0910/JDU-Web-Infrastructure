@@ -35,6 +35,9 @@ class GradeTest(unittest.TestCase):
                 'received_at': '2026-10-23T00:00:00Z'})
         self.row['results'].append({'sk': grading.current_key('M5'), 'contract_sha256': registry.CONTRACT_SHA256,
                                     'evaluable': False, 'unresolved': 1})
+        self.row['results'].append({'sk': grading.grade_key('M1', registry.HTTP_CONTRACT_SHA256),
+            'deployment_id': 'same', 'contract_sha256': registry.HTTP_CONTRACT_SHA256,
+            'raw_earned': 8, 'raw_maximum': 8})
         self.store = Store(self.row)
         self.service = legacy.ProgressService(self.store, 'unused', 'unused')
 
@@ -61,8 +64,8 @@ class GradeTest(unittest.TestCase):
     def test_p1_detail_shows_eight_practice_checks_without_readiness_or_points(self):
         checks = [{'id': item, 'status': 'FAIL' if item == 'WEB02_FILE' else 'PASS'}
                   for item in registry.canonical_checks('P1')]
-        self.row['results'].append({'sk': grading.current_key('P1'),
-            'deployment_id': 'same', 'contract_sha256': registry.CONTRACT_SHA256, 'checks': checks})
+        self.row['results'].append({'sk': grading.current_key('P1', registry.HTTP_CONTRACT_SHA256),
+            'deployment_id': 'same', 'contract_sha256': registry.HTTP_CONTRACT_SHA256, 'checks': checks})
         result = project_student(self.row, 'P1')
         self.assertEqual(len(result['task_checks']), 8)
         self.assertIn({'id': 'WEB02_FILE', 'status': 'FAIL'}, result['task_checks'])

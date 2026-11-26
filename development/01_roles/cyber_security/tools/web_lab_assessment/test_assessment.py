@@ -17,7 +17,7 @@ import progress_api as legacy
 from test_progress_api import MemoryStore
 from grading import export_labs, grade_key, current_key, project_lab
 from progress_api_v2 import AssessmentService
-from registry import build_report, canonical_checks, score, TASKS, CONTRACT_ID, CONTRACT_SHA256, COURSE_INTRO_MARKERS, COURSE_POINTS
+from registry import build_report, canonical_checks, score, TASKS, CONTRACT_ID, CONTRACT_SHA256, COURSE_INTRO_MARKERS, COURSE_POINTS, HTTP_CONTRACT_ID, HTTP_CONTRACT_SHA256
 
 
 @unittest.skipUnless(os.name == 'posix', 'Linux filesystem observation')
@@ -110,7 +110,10 @@ class AssessmentTests(unittest.TestCase):
         self.assertEqual(self.call('POST /api/web/register', self.identity)['statusCode'], 200)
         self.assertEqual(self.call('POST /api/web/submit', self.report(), shared)['statusCode'], 401)
         for task in ('M1', 'M2', 'M4', 'M5', 'M6'):
-            self.submit(self.report(task))
+            report = self.report(task)
+            if task == 'M1':
+                report.update(contract_id=HTTP_CONTRACT_ID, contract_sha256=HTTP_CONTRACT_SHA256)
+            self.submit(report)
         for task, markers in COURSE_INTRO_MARKERS.items():
             missing = self.report(task, {marker: False for marker, _, _ in markers}, mode='read_only', intro=True)
             self.assertEqual(score(missing)['raw_earned'], 0)

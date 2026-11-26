@@ -71,7 +71,7 @@ class Observation:
         self.spec = checked_spec(trusted_spec)
         self.snapshot = checked_snapshot(self.spec, trusted_snapshot)
         if http_probe is None:
-            from http_task import http_probe
+            from http_task_current import http_probe
         if http is None:
             from network_checks import http
         self.http_probe, self.http = http_probe, http
@@ -103,7 +103,7 @@ class Observation:
     def http_command(self):
         from http_guest_v2 import LEGACY_SHA256, CONTRACT_SHA256
         original = (TEACHER / 'http_task_guest.py').read_bytes()
-        contract = (TEACHER / 'http_task.py').read_bytes()
+        contract = (ASSESSMENT / 'http_task_current.py').read_bytes()
         if hashlib.sha256(original).hexdigest() != LEGACY_SHA256 or hashlib.sha256(contract).hexdigest() != CONTRACT_SHA256:
             raise JobDenied('Original HTTP observer and contract must be retained')
         guest = ('LEGACY_SOURCE_B64=' + repr(base64.b64encode(original).decode()) + '\n').encode()
@@ -143,7 +143,7 @@ class Observation:
         return {'report':report,**{k:value[k] for k in ('storage_evidence','functional_recipient') if k in value}}
 
     def http_report(self, observed):
-        from http_task import contract
+        from http_task_current import contract
         spec, snapshot = self.spec, self.snapshot
         if (any(observed.get(k) != spec[k] for k in ('lab_id', 'deployment_id'))
                 or observed.get('mission_id') != spec['task_id']
@@ -158,7 +158,7 @@ class Observation:
         checks['WEB02_PUBLIC_HTTP'] = self.http_probe(public, expected['path'], expected['body'],
             spec['run_id'].replace('-', '')) if public else None
         identity = {k: spec[k] for k in ('lab_id', 'release_id', 'deployment_id', 'instances')}
-        return build_report(spec['task_id'], identity, checks, spec['run_id'], checked_at=observed['checked_at'])
+        return build_report(spec['task_id'], identity, checks, spec['run_id'], checked_at=observed['checked_at'], http_revision=True)
 
     def public_denials(self, report):
         # Same external-entry confirmation as assessment_check.py. Unknown never

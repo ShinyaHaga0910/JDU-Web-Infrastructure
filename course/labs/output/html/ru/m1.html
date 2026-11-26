@@ -18,15 +18,16 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p><a href="../ja/m1.html">日本語</a> · <a href="../ru/m1.html">Русский</a> · <a href="../uz/m1.html">O‘zbekcha</a></p>
 <p>Связанное задание: <a href="p1.html">P1</a>.</p>
 <h2 id="section-1">Требуемый результат</h2>
-<p>На том же Web-сервере настройте выдачу <code>/mission.txt</code> по HTTP на TCP-порту 80. Сохраните доступ к <code>/practice.txt</code>.</p>
+<p>На том же Web-сервере выдавайте <code>/var/www/jdu-mission/mission.txt</code> по TCP-порту 80 как <code>/mission.txt</code>. Сохраните файл и настройки P1: <code>/practice.txt</code> должен оставаться доступным.</p>
 <ol>
-<li><strong>Web-сервер (P1.2-P1.3).</strong> Создайте файл с указанным ниже текстом. Задайте владельца и группу <code>root:root</code> и права <code>0644</code>.</li>
-<li><strong>Web-сервер и бастион (P1.4-P1.6).</strong> Запросите <code>/mission.txt</code> через curl. На самом Web используйте <code>127.0.0.1</code>, а на бастионе - <code>10.20.1.20</code>. В обоих случаях проверьте HTTP 200 и указанный ниже текст. Найдите запросы в журнале доступа Web-сервера.</li>
+<li><strong>Файл (P1.2).</strong> Создайте <code>/var/www/jdu-mission</code> и разместите <code>mission.txt</code> с текстом ниже. Владелец - <code>root</code>, группа - <code>www-data</code>, права - <code>0640</code>.</li>
+<li><strong>Настройки Nginx (P1.3).</strong> В существующий <code>server</code> для порта 80 в <code>/etc/nginx/sites-available/default</code> добавьте <code>location</code> с точным совпадением <code>/mission.txt</code> и root <code>/var/www/jdu-mission</code>. Сохраните блок P1, проверьте синтаксис и перечитайте настройки.</li>
+<li><strong>HTTP и журнал (P1.4-P1.6).</strong> Откройте <code>/mission.txt</code> с Web и бастиона: должны вернуться HTTP 200 и текст ниже. Проверьте доступность <code>/practice.txt</code> и записи запросов в access log.</li>
 </ol>
 <h2 id="section-2">Схема задания</h2>
 <p><img src="../../../assets/ru/m1.png" alt="Пути HTTP от компьютера и бастиона к mission.txt на Web." width="1040" height="680" loading="lazy"></p>
 <ul>
-<li><strong>Файл для публикации</strong> <code>/var/www/html/mission.txt</code></li>
+<li><strong>Файл для публикации</strong> <code>/var/www/jdu-mission/mission.txt</code></li>
 <li><strong>Путь URL</strong> <code>/mission.txt</code></li>
 </ul>
 <pre><code class="language-text">JDU WEB-02 mission: independent HTTP delivery.
@@ -47,7 +48,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tr>
 <tr>
 <td>2</td>
-<td>nginx -t успешно проверяет конфигурацию.</td>
+<td>nginx -t проходит; location /mission.txt задаёт root /var/www/jdu-mission. В M1 также сохранена конфигурация P1.</td>
 </tr>
 <tr>
 <td>3</td>
@@ -55,11 +56,11 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tr>
 <tr>
 <td>4</td>
-<td>Обычный файл содержит точный текст, владелец root:root, права 0644.</td>
+<td>/var/www/jdu-mission/mission.txt: обычный файл, точный текст, владелец root, группа www-data, права 0640.</td>
 </tr>
 <tr>
 <td>5</td>
-<td>Web получает HTTP 200 и точный текст через loopback.</td>
+<td>Сам Web получает HTTP 200 и нужный текст; в M1 также доступен /practice.txt.</td>
 </tr>
 <tr>
 <td>6</td>

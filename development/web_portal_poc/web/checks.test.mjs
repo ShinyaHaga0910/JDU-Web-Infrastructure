@@ -47,6 +47,15 @@ test('displayed P and M labels are consecutive and match the course',()=>{
   }
   for(const id of tasks) assert.equal(displayTask(id),labels[id]??id);
 });
+
+test('old HTTP reports cannot appear as passes under the custom-root rubric',()=>{
+  const selected={...value,task_id:'P1'};
+  const html=checkHtml('ja',{config:configFrom(env),session,token,selected,
+    result:{status:'ok',job:{...selected,phase:'report_ready'},result:{task_id:'P1',current_rubric:false}}});
+  assert.match(html,/変更前の採点結果/);
+  assert.doesNotMatch(html,/8 \/ 8|check-status/);
+  assert.match(html,/name="operation" value="start"/);
+});
 test('GET lists fixed tasks without invoking a checker; POST uses verified subject and redirects',async()=>{
   const calls=[];const app=createApp({...credentials,checker:async event=>{calls.push(event);return {status:'ok'};}});
   const get=await app(request('/checks'));assert.equal(get.status,200);assert.equal(calls.length,0);

@@ -18,15 +18,16 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p><a href="../ja/m1.html">日本語</a> · <a href="../ru/m1.html">Русский</a> · <a href="../uz/m1.html">O‘zbekcha</a></p>
 <p>対応する詳しい練習は<a href="p1.html">P1</a>。</p>
 <h2 id="section-1">完成要件</h2>
-<p>P1と同じWebサーバーで、TCPの80番ポートから <code>/mission.txt</code> を配信する。P1で作った <code>/practice.txt</code> も引き続き開けるようにする。</p>
+<p>P1と同じWebサーバーで、<code>/var/www/jdu-mission/mission.txt</code> をTCPの80番ポートから <code>/mission.txt</code> として配信する。P1のファイルと設定も残し、<code>/practice.txt</code> を引き続き開けるようにする。</p>
 <ol>
-<li><strong>Webサーバー（P1.2〜P1.3）</strong>　下の本文を使って課題用ファイルを作る。所有者とグループを <code>root:root</code>、権限を <code>0644</code> にする。</li>
-<li><strong>Webサーバーと踏み台サーバー（P1.4〜P1.6）</strong>　curlで <code>/mission.txt</code> にアクセスする。Webサーバー自身では <code>127.0.0.1</code>、踏み台からは <code>10.20.1.20</code> を指定し、両方でHTTP 200と下の本文が返ることを確認する。Webサーバーのアクセスログでリクエストを探す。</li>
+<li><strong>配信ファイル（P1.2）</strong>　<code>/var/www/jdu-mission</code> を作り、下の本文で <code>mission.txt</code> を配置する。所有者を <code>root</code>、所有グループを <code>www-data</code>、権限を <code>0640</code> にする。</li>
+<li><strong>Nginxの設定（P1.3）</strong>　<code>/etc/nginx/sites-available/default</code> の80番ポートを受け付ける既存の <code>server</code> 内に、<code>/mission.txt</code> と完全一致する <code>location</code> を追加し、その <code>root</code> に <code>/var/www/jdu-mission</code> を指定する。P1の設定を残し、構文検査に成功してから再読み込みする。</li>
+<li><strong>HTTPとログ（P1.4〜P1.6）</strong>　Webサーバー自身と踏み台サーバーから <code>/mission.txt</code> を開き、HTTP 200と下の本文を確認する。<code>/practice.txt</code> も開けることと、リクエストがアクセスログに残ることを確認する。</li>
 </ol>
 <h2 id="section-2">今回の見取り図</h2>
 <p><img src="../../../assets/ja/m1.png" alt="学生PCと踏み台サーバーからWebサーバーのmission.txtへのHTTP経路。" width="1040" height="680" loading="lazy"></p>
 <ul>
-<li><strong>配信ファイル</strong> <code>/var/www/html/mission.txt</code></li>
+<li><strong>配信ファイル</strong> <code>/var/www/jdu-mission/mission.txt</code></li>
 <li><strong>URLのパス</strong> <code>/mission.txt</code></li>
 </ul>
 <pre><code class="language-text">JDU WEB-02 mission: independent HTTP delivery.
@@ -47,7 +48,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tr>
 <tr>
 <td>2</td>
-<td>Nginxの設定が構文検査に通る。</td>
+<td>Nginxの構文検査に通り、/mission.txtのlocationでrootが/var/www/jdu-missionに設定されている。M1ではP1の配信設定も残っている。</td>
 </tr>
 <tr>
 <td>3</td>
@@ -55,11 +56,11 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tr>
 <tr>
 <td>4</td>
-<td>配信用の <code>/var/www/html/mission.txt</code> が通常のファイルで、本文・所有者・権限が指定どおりになっている。</td>
+<td>/var/www/jdu-mission/mission.txt が通常のファイルで、本文が指定どおり、所有者がroot、所有グループがwww-data、権限が0640である。</td>
 </tr>
 <tr>
 <td>5</td>
-<td>Webサーバー自身から <code>127.0.0.1</code> の <code>/mission.txt</code> を開くと、HTTP 200と指定の本文が返る。</td>
+<td>Webサーバー自身から指定URLを開くとHTTP 200と指定の本文が返る。M1では /practice.txt も引き続き開ける。</td>
 </tr>
 <tr>
 <td>6</td>

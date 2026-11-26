@@ -1,6 +1,6 @@
 """Fixed-denominator views; latest evaluable attempt is separate from current health."""
 from registry import (CONTRACT_ID, CONTRACT_SHA256, INTRO_CONTRACT_SHA256, M0_CONTRACT_SHA256, INTRO_MARKERS, MAXIMUM, MISSIONS, TASKS,
-                      COURSE_ID, COURSE_TASKS, COURSE_GRADED_TASKS, COURSE_MAXIMUM, COURSE_POINTS)
+                      COURSE_ID, COURSE_TASKS, COURSE_GRADED_TASKS, COURSE_MAXIMUM, COURSE_POINTS, HTTP_CONTRACT_SHA256)
 
 
 def grade_key(mission_id, contract=CONTRACT_SHA256):
@@ -39,6 +39,20 @@ def project_course_lab(lab):
     view = project_lab(lab)
     current = {key: row for key, row in view['current'].items() if key in COURSE_TASKS and key not in INTRO_MARKERS}
     selected = {key: row for key, row in view['selected'].items() if key in COURSE_GRADED_TASKS}
+    # A result under the old document-root rubric remains history, not a pass
+    # under the custom-root/group-permission requirements.
+    http_rows = {r['sk']: r for r in lab.get('results', [])
+                 if r.get('contract_sha256') == HTTP_CONTRACT_SHA256
+                 and r.get('deployment_id') == lab.get('deployment_id')}
+    for task in ('P1', 'M1'):
+        current.pop(task, None)
+        selected.pop(task, None)
+        latest = http_rows.get(current_key(task, HTTP_CONTRACT_SHA256))
+        grade = http_rows.get(grade_key(task, HTTP_CONTRACT_SHA256))
+        if latest:
+            current[task] = latest
+        if grade and task == 'M1':
+            selected[task] = grade
     intro_rows = {r['sk']: r for r in lab.get('results', []) if r.get('contract_sha256') in (INTRO_CONTRACT_SHA256, M0_CONTRACT_SHA256)
                   and r.get('deployment_id') == lab.get('deployment_id')}
     for task in INTRO_MARKERS:

@@ -109,11 +109,15 @@ const outcomes={
 const checkOrder=['FAIL','UNKNOWN','PASS','NOT_APPLICABLE'];
 const validCriterion=c=>c && /^WEB[A-Z0-9_]{1,60}$/.test(c.id||'') && checkOrder.includes(c.status);
 
-function criteriaTable(lang,checks) {
+function criteriaTable(lang,checks,task) {
   const t=criteriaText[lang];
   const rows=[...checks].sort((a,b)=>checkOrder.indexOf(a.status)-checkOrder.indexOf(b.status)).map(c=>{
     const style={FAIL:'score-unmet',PASS:'score-full',UNKNOWN:'score-partial'}[c.status]||'score-empty';
-    return `<tr data-check-id="${escape(c.id)}"><th scope="row">${escape(labels[lang][c.id]||c.id)}</th>
+    const file=task==='P1'?'/var/www/jdu-practice/practice.txt':'/var/www/jdu-mission/mission.txt';
+    const root=task==='P1'?'/var/www/jdu-practice':'/var/www/jdu-mission';
+    const path=task==='P1'?'/practice.txt':'/mission.txt';
+    const label=(labels[lang][c.id]||c.id).replaceAll('{file}',file).replaceAll('{root}',root).replaceAll('{path}',path);
+    return `<tr data-check-id="${escape(c.id)}"><th scope="row">${escape(label)}</th>
       <td><span class="check-status ${style}">${escape(t[c.status])}</span></td></tr>`;
   }).join('');
   return `<div class="table-wrap" role="region" aria-label="${escape(t.criterion)}" tabindex="0"><table class="criteria-table">
@@ -139,7 +143,7 @@ export function taskDetailHtml(lang,task,grade,maximum,actions='') {
   const score=`<p class="check-count">${scoreTitle} <strong>${saved?.raw_earned??0} / ${maximum}</strong></p>`;
   return `<section class="task-detail"><div class="check-heading"><h2>${escape(displayTask(task))}</h2>${score}</div>
     ${actions?`<div class="task-actions">${actions}</div>`:''}
-    ${checks.length?criteriaTable(lang,checks):''}</section>`;
+    ${checks.length?criteriaTable(lang,checks,task):''}</section>`;
 }
 
 export function checkHtml(lang,{config,session,token,selected,result,grade,maxima={},blocked=false}={}) {
@@ -187,6 +191,10 @@ export function checkHtml(lang,{config,session,token,selected,result,grade,maxim
       +form(lang,v,checkToken(config,session,token,v),`<input type="hidden" name="task_id" value="${v.task_id}">`,t.refresh,true);
   }
   const value=result.result,s=value?.score;
+  if (value?.current_rubric===false && ['P1','M1'].includes(selected.task_id)) {
+    const note={ja:'これは変更前の採点結果です。現在の課題をもう一度確認してください。',ru:'Это результат по прежним критериям. Проверьте задание ещё раз.',uz:'Bu oldingi mezonlar bo‘yicha natija. Vazifani yana tekshiring.'}[lang];
+    return content+`<p role="status">${escape(note)}</p>`+taskActions(lang,selected.task_id,{config,session,token});
+  }
   if (!value || value.task_id!==selected.task_id || !Array.isArray(value.checks) || value.checks.length>40 || !Number.isInteger(s?.raw_earned) || !Number.isInteger(s?.raw_maximum) || s.raw_earned<0 || s.raw_earned>s.raw_maximum || !Number.isFinite(Date.parse(value.checked_at))) throw Error('Invalid result');
   if (!value.checks.every(validCriterion)) throw Error('Invalid check');
   const showCriteria=s.counts_toward_assessment || selected.task_id==='P1';
@@ -194,7 +202,7 @@ export function checkHtml(lang,{config,session,token,selected,result,grade,maxim
     :s.counts_toward_assessment?'pass':'practice';
   const copy=outcomes[lang];
   const count=showCriteria?`<p class="check-count"><strong>${s.raw_earned} / ${s.raw_maximum}</strong> ${escape(copy.count)}</p>`:'';
-  const criteria=showCriteria && value.checks.length ? criteriaTable(lang,value.checks) : '';
+  const criteria=showCriteria && value.checks.length ? criteriaTable(lang,value.checks,selected.task_id) : '';
   return content+`<div class="check-heading check-outcome check-outcome-${outcome}"><h3>${escape(copy[outcome])}</h3>${count}</div>`
     +submissionHtml(lang,result,selected,{config,session,token})+criteria;
 }

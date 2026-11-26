@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parent
 FILES = ('registry.py', 'grading.py', 'dashboard.py', 'progress_api_v2.py', 'network_checks.py', 'db_observer.py',
          'system_observer.py', 'app_probe.py', 'remote_guest.py', 'transport.py', 'aws_readiness.py',
          'assessment_check.py', 'database_secret.py', 'build_teacher.py', 'upgrade_teacher.py', 'README.md',
-         'assessment-registry.json', 'candidate_install.py', 'teacher_cli.py', 'http_guest_v2.py')
+         'assessment-registry.json', 'candidate_install.py', 'teacher_cli.py', 'http_guest_v2.py', 'http_task_current.py')
 TEACHER = ('progress_api.py', 'build_template.py', 'web_progress.py', 'check_http.py', 'http_task.py',
            'http_task_guest.py', 'bootstrap_submission_guest.py', 'check_bootstrap.py', 'submit_five_node_bootstrap.py')
 BOOTSTRAP = ('setup_internal_ssh.py', 'internal_ssh_guest.py', 'release_validation.py', 'payload_runtime.py')

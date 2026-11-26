@@ -119,11 +119,11 @@ id -un
 cd ~
 # 3. 現在の作業ディレクトリを表示する。
 pwd
-# 4. 設置済みのファイルを表示し、role が web であることを確認する。
+# 4. 管理者権限で /etc/jdu-web/bootstrap.json の内容を読む。
 cat /etc/jdu-web/bootstrap.json
 # 5. web とだけ入力する。Ctrl+O、Enterで保存し、Ctrl+Xで終了する。
 nano p0-connection.txt
-# 6. p0-connection.txt の内容を変更せずに読む。
+# 6. 管理者権限で p0-connection.txt の内容を読む。
 cat p0-connection.txt
 ```
 
@@ -214,13 +214,13 @@ Nginx、保存先、待受、HTTP応答、access logを一組で確認する。
 
 ### 課題
 
-Webサーバーの /var/www/html/practice.txt を HTTP 200 で配信する。
+Nginxを設定し、`/var/www/jdu-practice/practice.txt` をHTTPで配信する。
 
 ### 今回の見取り図
 
 ![VPCの公開サブネットにWebサーバーと踏み台サーバー、非公開サブネットに配布サーバーがあり、HTTPの経路を示す。](../../assets/ja/p1.png)
 
-- File: /var/www/html/practice.txt
+- File: /var/www/jdu-practice/practice.txt
 - URL path: /practice.txt
 
 ```text
@@ -302,31 +302,33 @@ nanoの画面に上の1行をそのまま入力し、行末で Enter を押す�
 入力するコマンド（番号はこの手順内の順番）
 
 ```bash
-# 6. practice.txtをWebサーバーの公開ディレクトリへコピーする。
-sudo cp practice.txt /var/www/html/practice.txt
-# 7. /var/www/html/practice.txt の所有者とグループを root:root に変更する。
-sudo chown root:root /var/www/html/practice.txt
-# 8. /var/www/html/practice.txt の権限を 0644 に変更する。
-sudo chmod 0644 /var/www/html/practice.txt
-# 9. 指定ファイルの所有者・グループ・権限・名前を読む。
-stat -c '%U:%G %a %n' /var/www/html/practice.txt
-# 10. /var/www/html/practice.txt の内容を変更せずに読む。
-cat /var/www/html/practice.txt
+# 6. /var/www/jdu-practice ディレクトリを作る。
+sudo mkdir -p /var/www/jdu-practice
+# 7. ファイルを /var/www/jdu-practice/practice.txt にコピーする。
+sudo cp practice.txt /var/www/jdu-practice/practice.txt
+# 8. /var/www/jdu-practice/practice.txt の所有者とグループを root:www-data に変更する。
+sudo chown root:www-data /var/www/jdu-practice/practice.txt
+# 9. /var/www/jdu-practice/practice.txt の権限を 0640 に変更する。
+sudo chmod 0640 /var/www/jdu-practice/practice.txt
+# 10. 指定ファイルの所有者・グループ・権限・名前を読む。
+stat -c '%U:%G %a %n' /var/www/jdu-practice/practice.txt
+# 11. 管理者権限で /var/www/jdu-practice/practice.txt の内容を読む。
+sudo cat /var/www/jdu-practice/practice.txt
 ```
 
 **コマンド・設定値の意味:**
 
-`cp` は本文を配信用ファイルへコピーする。`chown root:root` はコピー先の所有者とグループを root に変更する。`chmod 0644` は所有者に読み書き、グループとその他のユーザーに読み取りを許可する。
+`chown root:www-data` で所有者をroot、所有グループをwww-dataにする。`chmod 0640` は所有者に読み書き、グループに読み取りを許可し、その他のユーザーには許可しない。Nginxのワーカープロセスはwww-dataとして動くため、このグループの権限でファイルを読める。
 
 **期待する結果と読み方:**
 
-所有者・グループと権限は `root:root 644` と表示される。本文は `JDU WEB-02 practice: HTTP response verified.` の1行である。
+`root:www-data 640 /var/www/jdu-practice/practice.txt` と表示され、本文は `JDU WEB-02 practice: HTTP response verified.` の1行である。
 
 **うまくいかないとき:**
 
 nanoが開いている場合は、保存して終了してから次のコマンドを実行する。
 
-#### P1.3 Web rootとportを確認して起動する
+#### P1.3 Nginxに配信先を設定する
 
 **実行環境:**
 
@@ -334,22 +336,39 @@ WebサーバーのSSM端末：ssm-user
 
 **目的と操作:**
 
-`nginx -T` で有効な設定を表示し、`/etc/nginx/sites-enabled/default` に `root /var/www/html` と `listen 80` の指定があることを確認する。変更が必要なら `sudo nano` で編集し、構文検査に成功してから設定を再読み込みする。
+`sudo nano /etc/nginx/sites-available/default` で設定を開く。`listen 80` がある既存の `server { ... }` の中へ、下の設定を追加する。別の `location` の中には入れない。`/practice.txt` をリクエストされたとき、Nginxは指定したrootにパスをつなげて `/var/www/jdu-practice/practice.txt` を読む。保存後、構文検査に成功したら設定を再読み込みする。
 
 入力するコマンド（番号はこの手順内の順番）
 
 ```bash
-# 1. Nginxの設定全体を表示し、どのように記載されているか確認する。
+# 1. /etc/nginx/sites-available/default をnanoで編集する。
+sudo nano /etc/nginx/sites-available/default
+```
+
+**nanoで設定する内容**
+
+```text
+location = /practice.txt {
+    root /var/www/jdu-practice;
+}
+```
+
+設定を入力したらCtrl+O、Enterで保存し、Ctrl+Xで終了する。端末に戻って、続きのコマンドを実行する。
+
+入力するコマンド（番号はこの手順内の順番）
+
+```bash
+# 2. Nginxの設定全体を表示し、どのように記載されているか確認する。
 sudo nginx -T
-# 2. Nginx設定の構文と参照ファイルを検査する。
+# 3. Nginx設定の構文と参照ファイルを検査する。
 sudo nginx -t
-# 3. nginx を今すぐ起動し、次回起動時も自動起動させる。
+# 4. nginx を今すぐ起動し、次回起動時も自動起動させる。
 sudo systemctl enable --now nginx
-# 4. nginx を止めずに設定を再読込する。
+# 5. nginx を止めずに設定を再読込する。
 sudo systemctl reload nginx
-# 5. nginx の現在の起動状態を読む。
+# 6. nginx の現在の起動状態を読む。
 systemctl is-active nginx
-# 6. NginxがTCPの80番ポート（例 0.0.0.0:80）で待ち受けていることを確認する。
+# 7. NginxがTCPの80番ポート（例 0.0.0.0:80）で待ち受けていることを確認する。
 sudo ss -lntp
 ```
 
@@ -1230,7 +1249,7 @@ WebサーバーでCSSなどをNginxが配信するディレクトリに集める
 # 1. runtime設定でCSS等の静的ファイルを配信先へ集める。
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase runtime collectstatic
-# 2. /opt/jdu-catalog/app/config/jdu-catalog.service の内容を変更せずに読む。
+# 2. 管理者権限で /opt/jdu-catalog/app/config/jdu-catalog.service の内容を読む。
 cat /opt/jdu-catalog/app/config/jdu-catalog.service
 # 3. ファイルを /etc/systemd/system/jdu-catalog.service にコピーする。
 sudo cp /opt/jdu-catalog/app/config/jdu-catalog.service \
@@ -1265,10 +1284,12 @@ WebサーバーのSSM端末：ssm-user
 
 設定ファイルをコピーして、`sites-enabled` からシンボリックリンクを作る。設定を反映すると、80番ポートで公開一覧、踏み台サーバーからの8080番ポートで管理画面を開ける。Nginxはアプリ宛てのリクエストをGunicornへ転送する。
 
+コピーした設定の `/practice.txt` と `/mission.txt` の2つのlocationを、下の内容へ置き換える。P1・M1の配信ディレクトリを引き継ぐための変更である。他の設定は保持する。
+
 入力するコマンド（番号はこの手順内の順番）
 
 ```bash
-# 1. /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf の内容を変更せずに読む。
+# 1. 管理者権限で /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf の内容を読む。
 cat /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf
 # 2. ファイルを /etc/nginx/sites-available/jdu-catalog にコピーする。
 sudo cp /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf \
@@ -1281,11 +1302,27 @@ sudo chmod 0644 /etc/nginx/sites-available/jdu-catalog
 sudo mv -n /etc/nginx/sites-enabled/default /etc/nginx/default-site.before-p5
 # 6. 配置したアプリ用サイト設定への有効化リンクを作る。
 sudo ln -s /etc/nginx/sites-available/jdu-catalog /etc/nginx/sites-enabled/jdu-catalog
-# 7. Nginx設定の構文と参照ファイルを検査する。
+# 7. /etc/nginx/sites-available/jdu-catalog をnanoで編集する。
+sudo nano /etc/nginx/sites-available/jdu-catalog
+```
+
+**nanoで設定する内容**
+
+```text
+location = /practice.txt { root /var/www/jdu-practice; try_files $uri =404; }
+location = /mission.txt { root /var/www/jdu-mission; try_files $uri =404; }
+```
+
+設定を入力したらCtrl+O、Enterで保存し、Ctrl+Xで終了する。端末に戻って、続きのコマンドを実行する。
+
+入力するコマンド（番号はこの手順内の順番）
+
+```bash
+# 8. Nginx設定の構文と参照ファイルを検査する。
 sudo nginx -t
-# 8. nginx を止めずに設定を再読込する。
+# 9. nginx を止めずに設定を再読込する。
 sudo systemctl reload nginx
-# 9. http://127.0.0.1/practice.txt へHTTPリクエストを送る。
+# 10. http://127.0.0.1/practice.txt へHTTPリクエストを送る。
 curl -i http://127.0.0.1/practice.txt
 ```
 

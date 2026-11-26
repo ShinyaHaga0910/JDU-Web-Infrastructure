@@ -8,7 +8,7 @@ from unittest.mock import Mock, patch
 TOOLS = Path(__file__).resolve().parents[1] / '01_roles/cyber_security/tools'
 sys.path[:0] = [str(TOOLS / 'web_lab_assessment'), str(TOOLS / 'web_lab_teacher')]
 from registry import (CONTRACT_SHA256, INTRO_CONTRACT_SHA256, M0_CONTRACT_SHA256, MISSIONS, TASKS, COURSE_ID, COURSE_TASKS,
-                      COURSE_MISSIONS, COURSE_MAXIMUM, COURSE_POINTS, INTRO_MARKERS)
+                      COURSE_MISSIONS, COURSE_MAXIMUM, COURSE_POINTS, INTRO_MARKERS, HTTP_CONTRACT_SHA256)
 from grading import grade_key, current_key, project_lab, project_course_lab
 from portal_checker_handler import serve
 
@@ -19,7 +19,22 @@ class RetirementTest(unittest.TestCase):
             row = {'contract_sha256': CONTRACT_SHA256, 'deployment_id': 'same',
                    'raw_earned': TASKS[mid]['raw_points_max'], 'evaluable': True, 'complete': True}
             lab['results'] += [dict(row, sk=grade_key(mid)), dict(row, sk=current_key(mid))]
+        http = {'contract_sha256': HTTP_CONTRACT_SHA256, 'deployment_id': 'same',
+                'raw_earned': 8, 'raw_maximum': 8, 'evaluable': True, 'complete': True}
+        lab['results'] += [dict(http, sk=grade_key('M1', HTTP_CONTRACT_SHA256)),
+                           dict(http, sk=current_key('M1', HTTP_CONTRACT_SHA256))]
         return lab
+
+    def test_old_http_scores_remain_history_without_passing_the_new_rubric(self):
+        lab = self.full_history()
+        lab['results'] = [row for row in lab['results'] if row['contract_sha256'] != HTTP_CONTRACT_SHA256]
+        before = copy.deepcopy(lab)
+        view = project_course_lab(lab)
+        self.assertEqual(view['raw_earned'], 51)
+        self.assertNotIn('M1', view['selected'])
+        self.assertIn('M1', view['missing_or_unresolved'])
+        self.assertEqual(project_lab(lab)['raw_earned'], 62)
+        self.assertEqual(lab, before)
 
     def add_connection_grades(self, lab, *, legacy=False):
         for task in INTRO_MARKERS:

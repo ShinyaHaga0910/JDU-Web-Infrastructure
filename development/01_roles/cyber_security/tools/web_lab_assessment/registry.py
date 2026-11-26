@@ -43,6 +43,10 @@ COURSE_POINTS = {tid: len(markers) for tid, markers in COURSE_INTRO_MARKERS.item
 COURSE_GRADED_TASKS = tuple(COURSE_POINTS)
 COURSE_MAXIMUM = sum(COURSE_POINTS.values())
 STATUSES = {'PASS', 'FAIL', 'UNKNOWN', 'NOT_APPLICABLE'}
+HTTP_CONTRACT_ID = CONTRACT_ID + '-custom-roots-v1'
+HTTP_CONTRACT_SHA256 = hashlib.sha256(json.dumps([CONTRACT_SHA256, HTTP_CONTRACT_ID,
+    {'P1': '/var/www/jdu-practice/practice.txt', 'M1': '/var/www/jdu-mission/mission.txt'},
+    'root:www-data', '0640', 'exact-location-root', 'M1-preserves-P1'], sort_keys=True).encode()).hexdigest()
 
 
 def canonical_checks(task_id, *, intro=False, legacy_intro=False):
@@ -64,7 +68,8 @@ def validate_report(report, instances):
     legacy_intro = (contract == (INTRO_CONTRACT_ID, INTRO_CONTRACT_SHA256)
                     and report['mission_id'] in INTRO_MARKERS)
     intro = legacy_intro or (contract == (M0_CONTRACT_ID, M0_CONTRACT_SHA256) and report['mission_id'] == 'M0')
-    if not intro and contract != (CONTRACT_ID, CONTRACT_SHA256):
+    http_revision = contract == (HTTP_CONTRACT_ID, HTTP_CONTRACT_SHA256) and report['mission_id'] in ('P1', 'M1')
+    if not intro and not http_revision and contract != (CONTRACT_ID, CONTRACT_SHA256):
         raise ValueError('Unsupported assessment contract')
     for name in ('request_id', 'run_id', 'deployment_id'):
         parsed = uuid.UUID(report[name])
@@ -114,9 +119,13 @@ def score(report):
                 counts_toward_assessment=intro or task['category'] == 'automated_mission')
 
 
-def build_report(task_id, identity, observations, run_id, *, mode='read_only', checked_at, intro=False):
+def build_report(task_id, identity, observations, run_id, *, mode='read_only', checked_at, intro=False, http_revision=False):
     report = {k: identity[k] for k in ('lab_id', 'release_id', 'deployment_id')}
     contract_id, contract_hash = CONTRACT_ID, CONTRACT_SHA256
+    if http_revision:
+        if task_id not in ('P1', 'M1') or intro:
+            raise ValueError('Custom roots are only for P1/M1')
+        contract_id, contract_hash = HTTP_CONTRACT_ID, HTTP_CONTRACT_SHA256
     if intro:
         contract_id, contract_hash = ((M0_CONTRACT_ID, M0_CONTRACT_SHA256) if task_id == 'M0'
                                      else (INTRO_CONTRACT_ID, INTRO_CONTRACT_SHA256))

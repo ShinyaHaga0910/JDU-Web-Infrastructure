@@ -45,7 +45,7 @@ def build(output):
 
     grade_sources = ('registry.py', 'assessment-registry.json', 'grading.py', 'progress_api_v2.py')
     for filename, sources in (
-        ('checker.zip', grade_sources + ('remote_guest.py', 'system_observer.py', 'transport.py')),
+        ('checker.zip', grade_sources + ('remote_guest.py', 'system_observer.py', 'transport.py', 'http_guest_v2.py', 'http_task_current.py')),
         ('portal-services.zip', grade_sources),
     ):
         with ZipFile(output / filename) as package:

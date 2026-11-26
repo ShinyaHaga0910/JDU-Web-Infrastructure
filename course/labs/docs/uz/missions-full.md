@@ -55,16 +55,17 @@ EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session
 
 ### Tayyor holat talablari
 
-Ayni Web serverda TCP 80 porti orqali `/mission.txt` faylini HTTP da tarqating. `/practice.txt` ham ochiq qolsin.
+P1 dagi Web serverda `/var/www/jdu-mission/mission.txt` ni TCP 80 orqali `/mission.txt` sifatida tarqating. P1 fayli va sozlamasini saqlang: `/practice.txt` ham ochilsin.
 
-1. **Web server (P1.2-P1.3).** Quyidagi matn bilan topshiriq faylini yarating. Egasi va guruhini `root:root`, ruxsatlarini `0644` qiling.
-2. **Web va Bastion serverlari (P1.4-P1.6).** curl bilan `/mission.txt` ni so‘rang. Web serverning o‘zida `127.0.0.1`, Bastion serverida `10.20.1.20` ni ishlating. Har ikkala joyda HTTP 200 va quyidagi matn qaytishini tekshiring. So‘rovlarni Web serverning access log faylidan toping.
+1. **Fayl (P1.2).** `/var/www/jdu-mission` katalogini yarating va quyidagi matnli `mission.txt` ni joylang. Egasi `root`, guruhi `www-data`, ruxsati `0640` bo‘lsin.
+2. **Nginx sozlamasi (P1.3).** `/etc/nginx/sites-available/default` ichidagi 80-portni qabul qiladigan mavjud `server` ga `/mission.txt` bilan aniq mos keladigan `location` qo‘shing. Uning root qiymati `/var/www/jdu-mission` bo‘lsin. P1 blokini saqlang, sintaksisni tekshiring va sozlamani qayta yuklang.
+3. **HTTP va log (P1.4-P1.6).** Web va Bastiondan `/mission.txt` ni oching: HTTP 200 va quyidagi matn qaytsin. `/practice.txt` ham ochilishini va so‘rovlar access log ga yozilishini tekshiring.
 
 ### Topshiriq diagrammasi
 
 ![Kompyuter va Bastiondan Web serverdagi mission.txt ga HTTP yo‘llari.](../../assets/uz/m1.png)
 
-- **Tarqatiladigan fayl** `/var/www/html/mission.txt`
+- **Tarqatiladigan fayl** `/var/www/jdu-mission/mission.txt`
 - **URL yo‘li** `/mission.txt`
 
 ```text
@@ -78,10 +79,10 @@ Har bir mezon 1 ball.
 | № | Shart |
 | --- | --- |
 | 1 | Nginx ishlaydi (active). |
-| 2 | nginx -t sozlamani muvaffaqiyatli tekshiradi. |
+| 2 | nginx -t muvaffaqiyatli; /mission.txt location ichida root /var/www/jdu-mission. M1 da P1 sozlamasi ham saqlangan. |
 | 3 | 80 port private IP/barcha interface da tinglaydi, faqat loopback emas. |
-| 4 | Oddiy faylda aniq matn bor, egasi root:root, ruxsat 0644. |
-| 5 | Web loopback orqali HTTP 200 va aniq matn oladi. |
+| 4 | /var/www/jdu-mission/mission.txt: oddiy fayl, belgilangan matn, egasi root, guruhi www-data, ruxsati 0640. |
+| 5 | Web serverning o‘zi HTTP 200 va belgilangan matnni oladi; M1 da /practice.txt ham ochiladi. |
 | 6 | Bastion private IP orqali HTTP 200 va aniq matn oladi. |
 | 7 | CloudShell public IP orqali HTTP 200 va aniq matn oladi. |
 | 8 | Access log aynan shu tekshiruv nonce li so‘rovni saqlaydi. |

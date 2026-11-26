@@ -20,11 +20,11 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-1">Nimani o‘rganamiz</h2>
 <p>Nginx, fayl joyi, tinglash porti, HTTP javobi va access log ni bog‘lash.</p>
 <h2 id="section-2">Topshiriq</h2>
-<p>Web serverdagi /var/www/html/practice.txt faylini HTTP 200 bilan qaytaring.</p>
+<p>Nginx ni sozlab, <code>/var/www/jdu-practice/practice.txt</code> faylini HTTP orqali tarqating.</p>
 <h2 id="section-3">Topshiriq diagrammasi</h2>
 <p><img src="../../../assets/uz/p1.png" alt="VPC ochiq subnetida Web va Bastion serverlari, yopiq subnetida paketlar serveri joylashgan. Strelkalar HTTP yo‘llarini ko‘rsatadi." width="1040" height="680" loading="lazy"></p>
 <ul>
-<li>File: /var/www/html/practice.txt</li>
+<li>File: /var/www/jdu-practice/practice.txt</li>
 <li>URL path: /practice.txt</li>
 </ul>
 <pre><code class="language-text">JDU WEB-02 practice: HTTP response verified.
@@ -72,40 +72,52 @@ nano practice.txt
 </code></pre>
 <p>nano oynasiga yuqoridagi qatorni aynan yozing va oxirida Enter tugmasini bosing. Ctrl+O va Enter orqali saqlang, Ctrl+X orqali chiqing. Terminalga qaytgach, 6-qadamdan davom eting.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
-<pre><code class="language-bash"># 6. practice.txt faylini Web serverning ochiq katalogiga nusxalash.
-sudo cp practice.txt /var/www/html/practice.txt
-# 7. /var/www/html/practice.txt egasi va guruhini root:root ga o‘zgartirish.
-sudo chown root:root /var/www/html/practice.txt
-# 8. /var/www/html/practice.txt huquqlarini 0644 ga o‘zgartirish.
-sudo chmod 0644 /var/www/html/practice.txt
-# 9. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
-stat -c '%U:%G %a %n' /var/www/html/practice.txt
-# 10. /var/www/html/practice.txt mazmunini o‘zgartirmay o‘qish.
-cat /var/www/html/practice.txt
+<pre><code class="language-bash"># 6. /var/www/jdu-practice katalogini yaratish.
+sudo mkdir -p /var/www/jdu-practice
+# 7. Fayllarni /var/www/jdu-practice/practice.txt ga nusxalash.
+sudo cp practice.txt /var/www/jdu-practice/practice.txt
+# 8. /var/www/jdu-practice/practice.txt egasi va guruhini root:www-data ga o‘zgartirish.
+sudo chown root:www-data /var/www/jdu-practice/practice.txt
+# 9. /var/www/jdu-practice/practice.txt huquqlarini 0640 ga o‘zgartirish.
+sudo chmod 0640 /var/www/jdu-practice/practice.txt
+# 10. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
+stat -c '%U:%G %a %n' /var/www/jdu-practice/practice.txt
+# 11. Administrator huquqi bilan /var/www/jdu-practice/practice.txt mazmunini o‘qish.
+sudo cat /var/www/jdu-practice/practice.txt
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p><code>cp</code> matnni tarqatiladigan faylga nusxalaydi. <code>chown root:root</code> nusxaning egasi va guruhini root ga o‘zgartiradi. <code>chmod 0644</code> egaga o‘qish va yozish, guruh va boshqa foydalanuvchilarga o‘qish huquqini beradi.</p>
+<p><code>chown root:www-data</code> egani root, guruhni www-data qiladi. <code>chmod 0640</code> egaga o‘qish/yozish, guruhga o‘qish huquqini beradi; boshqalarga ruxsat yo‘q. Nginx worker process lari www-data sifatida ishlaydi va guruh huquqi bilan faylni o‘qiydi.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p><code>root:root 644</code> egasi, guruhi va ruxsatlari hamda <code>JDU WEB-02 practice: HTTP response verified.</code> qatori ko‘rinadi.</p>
+<p><code>root:www-data 640 /var/www/jdu-practice/practice.txt</code> ko‘rinadi. Matn bitta qator: <code>JDU WEB-02 practice: HTTP response verified.</code>.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Nano hali ochiq bo‘lsa, keyingi buyruqdan oldin faylni saqlab chiqing.</p>
-<h3>P1.3 Web root ni tekshirish va service ni ishga tushirish</h3>
+<h3>P1.3 Nginx da tarqatish katalogini sozlash</h3>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p><code>nginx -T</code> bilan amaldagi sozlamani chiqaring. <code>/etc/nginx/sites-enabled/default</code> ichidan <code>root /var/www/html</code> va <code>listen 80</code> ni toping. Kerak bo‘lsa <code>sudo nano</code> bilan tahrirlang va sintaksis tekshiruvidan keyin sozlamani qayta yuklang.</p>
+<p><code>sudo nano /etc/nginx/sites-available/default</code> bilan sozlamani oching. Quyidagi blokni <code>listen 80</code> mavjud <code>server { ... }</code> ichiga, boshqa <code>location</code> bloklaridan tashqariga qo‘shing. <code>/practice.txt</code> so‘ralganda Nginx yo‘lni root ga qo‘shib, <code>/var/www/jdu-practice/practice.txt</code> ni o‘qiydi. Saqlang, sintaksisni tekshiring va sozlamani qayta yuklang.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
-<pre><code class="language-bash"># 1. Nginx ning to‘liq sozlamasini chiqarib, qanday yozilganini tekshirish.
+<pre><code class="language-bash"># 1. /etc/nginx/sites-available/default faylini nano da tahrirlash.
+sudo nano /etc/nginx/sites-available/default
+</code></pre>
+<p><strong>nano da yoziladigan sozlama</strong></p>
+<pre><code class="language-text">location = /practice.txt {
+    root /var/www/jdu-practice;
+}
+</code></pre>
+<p>Sozlamani Ctrl+O, Enter bilan saqlang, Ctrl+X bilan chiqing. Terminalda keyingi buyruqlarni bajaring.</p>
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 2. Nginx ning to‘liq sozlamasini chiqarib, qanday yozilganini tekshirish.
 sudo nginx -T
-# 2. Nginx config sintaksisi va fayllarini tekshirish.
+# 3. Nginx config sintaksisi va fayllarini tekshirish.
 sudo nginx -t
-# 3. nginx ni hozir yoqish va avtomatik start ni yoqish.
+# 4. nginx ni hozir yoqish va avtomatik start ni yoqish.
 sudo systemctl enable --now nginx
-# 4. nginx ni to‘xtatmay sozlamani qayta o‘qish.
+# 5. nginx ni to‘xtatmay sozlamani qayta o‘qish.
 sudo systemctl reload nginx
-# 5. nginx joriy ish holatini o‘qish.
+# 6. nginx joriy ish holatini o‘qish.
 systemctl is-active nginx
-# 6. Nginx TCP 80 portini, masalan 0.0.0.0:80 manzilida tinglayotganini tekshirish.
+# 7. Nginx TCP 80 portini, masalan 0.0.0.0:80 manzilida tinglayotganini tekshirish.
 sudo ss -lntp
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>

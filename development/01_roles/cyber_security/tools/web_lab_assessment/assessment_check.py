@@ -49,10 +49,10 @@ def invoke(ssm, instance, request):
 
 def http_report(task_id, identity, pending, nodes, ssm, enrollment):
     from setup_internal_ssh import remote
-    from http_task import contract, http_probe
+    from http_task_current import contract, http_probe
     from http_guest_v2 import LEGACY_SHA256, CONTRACT_SHA256 as HTTP_SHA256
     original = (LEGACY / 'http_task_guest.py').read_bytes()
-    source = (LEGACY / 'http_task.py').read_bytes()
+    source = (ROOT / 'http_task_current.py').read_bytes()
     if hashlib.sha256(original).hexdigest() != LEGACY_SHA256 or hashlib.sha256(source).hexdigest() != HTTP_SHA256:
         raise ValueError('Original HTTP checks and expectations must be retained')
     guest = ('LEGACY_SOURCE_B64=' + repr(base64.b64encode(original).decode()) + '\n').encode() + (ROOT / 'http_guest_v2.py').read_bytes()
@@ -68,7 +68,7 @@ def http_report(task_id, identity, pending, nodes, ssm, enrollment):
     web = boto3.client('ec2', region_name='us-east-1').describe_instances(InstanceIds=[nodes['web']['instance_id']])['Reservations'][0]['Instances'][0]
     address = web.get('PublicIpAddress')
     observed['checks']['WEB02_PUBLIC_HTTP'] = http_probe(address, spec['path'], spec['body'], nonce.hex) if address else None
-    report = build_report(task_id, identity, observed['checks'], str(nonce), checked_at=observed['checked_at'])
+    report = build_report(task_id, identity, observed['checks'], str(nonce), checked_at=observed['checked_at'], http_revision=True)
     save_once(pending / (report['request_id'] + '.observation.json'), observed)
     return report
 

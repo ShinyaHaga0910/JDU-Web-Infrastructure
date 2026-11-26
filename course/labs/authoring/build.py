@@ -320,11 +320,12 @@ def make_markdown(reg, lang, kind):
                 elif s['code']:
                     for block_index,(fence,source) in enumerate(annotated_blocks(m['id'],i,s['code'],lang)):
                         if block_index==1 and s['editor_input']:
-                            out += [T('**nanoに入力する本文**','**Текст для ввода в nano**','**nano oynasiga yoziladigan matn**')[lang], '',
+                            configuration = '\n' in s['editor_input']
+                            out += [(T('**nanoで設定する内容**','**Настройки для nano**','**nano da yoziladigan sozlama**') if configuration else T('**nanoに入力する本文**','**Текст для ввода в nano**','**nano oynasiga yoziladigan matn**'))[lang], '',
                                     '```text', s['editor_input'], '```', '',
-                                    T('nanoの画面に上の1行をそのまま入力し、行末で Enter を押す。Ctrl+O、Enter の順に押して保存し、Ctrl+X で終了する。端末に戻ったら、手順6から続ける。',
+                                    (T('設定を入力したらCtrl+O、Enterで保存し、Ctrl+Xで終了する。端末に戻って、続きのコマンドを実行する。', 'Сохраните настройки через Ctrl+O, Enter и выйдите через Ctrl+X. В терминале выполните следующие команды.', 'Sozlamani Ctrl+O, Enter bilan saqlang, Ctrl+X bilan chiqing. Terminalda keyingi buyruqlarni bajaring.') if configuration else T('nanoの画面に上の1行をそのまま入力し、行末で Enter を押す。Ctrl+O、Enter の順に押して保存し、Ctrl+X で終了する。端末に戻ったら、手順6から続ける。',
                                       'Введите в nano ровно эту строку и нажмите Enter в конце. Сохраните файл клавишами Ctrl+O, затем Enter, и выйдите через Ctrl+X. В терминале продолжите с шага 6.',
-                                      'nano oynasiga yuqoridagi qatorni aynan yozing va oxirida Enter tugmasini bosing. Ctrl+O va Enter orqali saqlang, Ctrl+X orqali chiqing. Terminalga qaytgach, 6-qadamdan davom eting.')[lang], '']
+                                      'nano oynasiga yuqoridagi qatorni aynan yozing va oxirida Enter tugmasini bosing. Ctrl+O va Enter orqali saqlang, Ctrl+X orqali chiqing. Terminalga qaytgach, 6-qadamdan davom eting.'))[lang], '']
                         label=T('設定・入力データ（端末で実行するコマンドではない）','Конфигурация или данные: не выполнять как команды','Sozlama yoki ma’lumot: terminal buyrug‘i emas')[lang] if fence=='text' else T('入力するコマンド（番号はこの手順内の順番）','Команды: нумерация внутри этого шага','Buyruqlar: raqamlar shu qadam ichidagi tartib')[lang]
                         if fence=='sql':label=T('ここからはpsql内で入力する','Далее вводить внутри psql','Bundan keyin psql ichida kiriting')[lang]
                         out += [label, '', '```' + fence, shell_lines(source) if fence=='bash' else source, '```', '']

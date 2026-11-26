@@ -72,15 +72,16 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </ol>
 <h2 id="section-3">M1 HTTP orqali statik faylni qaytarish (8)</h2>
 <h3>Tayyor holat talablari</h3>
-<p>Ayni Web serverda TCP 80 porti orqali <code>/mission.txt</code> faylini HTTP da tarqating. <code>/practice.txt</code> ham ochiq qolsin.</p>
+<p>P1 dagi Web serverda <code>/var/www/jdu-mission/mission.txt</code> ni TCP 80 orqali <code>/mission.txt</code> sifatida tarqating. P1 fayli va sozlamasini saqlang: <code>/practice.txt</code> ham ochilsin.</p>
 <ol>
-<li><strong>Web server (P1.2-P1.3).</strong> Quyidagi matn bilan topshiriq faylini yarating. Egasi va guruhini <code>root:root</code>, ruxsatlarini <code>0644</code> qiling.</li>
-<li><strong>Web va Bastion serverlari (P1.4-P1.6).</strong> curl bilan <code>/mission.txt</code> ni so‘rang. Web serverning o‘zida <code>127.0.0.1</code>, Bastion serverida <code>10.20.1.20</code> ni ishlating. Har ikkala joyda HTTP 200 va quyidagi matn qaytishini tekshiring. So‘rovlarni Web serverning access log faylidan toping.</li>
+<li><strong>Fayl (P1.2).</strong> <code>/var/www/jdu-mission</code> katalogini yarating va quyidagi matnli <code>mission.txt</code> ni joylang. Egasi <code>root</code>, guruhi <code>www-data</code>, ruxsati <code>0640</code> bo‘lsin.</li>
+<li><strong>Nginx sozlamasi (P1.3).</strong> <code>/etc/nginx/sites-available/default</code> ichidagi 80-portni qabul qiladigan mavjud <code>server</code> ga <code>/mission.txt</code> bilan aniq mos keladigan <code>location</code> qo‘shing. Uning root qiymati <code>/var/www/jdu-mission</code> bo‘lsin. P1 blokini saqlang, sintaksisni tekshiring va sozlamani qayta yuklang.</li>
+<li><strong>HTTP va log (P1.4-P1.6).</strong> Web va Bastiondan <code>/mission.txt</code> ni oching: HTTP 200 va quyidagi matn qaytsin. <code>/practice.txt</code> ham ochilishini va so‘rovlar access log ga yozilishini tekshiring.</li>
 </ol>
 <h3>Topshiriq diagrammasi</h3>
 <p><img src="../../../assets/uz/m1.png" alt="Kompyuter va Bastiondan Web serverdagi mission.txt ga HTTP yo‘llari." width="1040" height="680" loading="lazy"></p>
 <ul>
-<li><strong>Tarqatiladigan fayl</strong> <code>/var/www/html/mission.txt</code></li>
+<li><strong>Tarqatiladigan fayl</strong> <code>/var/www/jdu-mission/mission.txt</code></li>
 <li><strong>URL yo‘li</strong> <code>/mission.txt</code></li>
 </ul>
 <pre><code class="language-text">JDU WEB-02 mission: independent HTTP delivery.
@@ -101,7 +102,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tr>
 <tr>
 <td>2</td>
-<td>nginx -t sozlamani muvaffaqiyatli tekshiradi.</td>
+<td>nginx -t muvaffaqiyatli; /mission.txt location ichida root /var/www/jdu-mission. M1 da P1 sozlamasi ham saqlangan.</td>
 </tr>
 <tr>
 <td>3</td>
@@ -109,11 +110,11 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tr>
 <tr>
 <td>4</td>
-<td>Oddiy faylda aniq matn bor, egasi root:root, ruxsat 0644.</td>
+<td>/var/www/jdu-mission/mission.txt: oddiy fayl, belgilangan matn, egasi root, guruhi www-data, ruxsati 0640.</td>
 </tr>
 <tr>
 <td>5</td>
-<td>Web loopback orqali HTTP 200 va aniq matn oladi.</td>
+<td>Web serverning o‘zi HTTP 200 va belgilangan matnni oladi; M1 da /practice.txt ham ochiladi.</td>
 </tr>
 <tr>
 <td>6</td>

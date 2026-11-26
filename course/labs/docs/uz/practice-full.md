@@ -119,11 +119,11 @@ id -un
 cd ~
 # 3. Joriy ish katalogini ko‘rsatish.
 pwd
-# 4. Faylni ko‘ring va role qiymati web ekanini tekshiring.
+# 4. Administrator huquqi bilan /etc/jdu-web/bootstrap.json mazmunini o‘qish.
 cat /etc/jdu-web/bootstrap.json
 # 5. Faqat web deb yozing. Ctrl+O va Enter bilan saqlang, Ctrl+X bilan chiqing.
 nano p0-connection.txt
-# 6. p0-connection.txt mazmunini o‘zgartirmay o‘qish.
+# 6. Administrator huquqi bilan p0-connection.txt mazmunini o‘qish.
 cat p0-connection.txt
 ```
 
@@ -214,13 +214,13 @@ Nginx, fayl joyi, tinglash porti, HTTP javobi va access log ni bog‘lash.
 
 ### Topshiriq
 
-Web serverdagi /var/www/html/practice.txt faylini HTTP 200 bilan qaytaring.
+Nginx ni sozlab, `/var/www/jdu-practice/practice.txt` faylini HTTP orqali tarqating.
 
 ### Topshiriq diagrammasi
 
 ![VPC ochiq subnetida Web va Bastion serverlari, yopiq subnetida paketlar serveri joylashgan. Strelkalar HTTP yo‘llarini ko‘rsatadi.](../../assets/uz/p1.png)
 
-- File: /var/www/html/practice.txt
+- File: /var/www/jdu-practice/practice.txt
 - URL path: /practice.txt
 
 ```text
@@ -302,31 +302,33 @@ nano oynasiga yuqoridagi qatorni aynan yozing va oxirida Enter tugmasini bosing.
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
 ```bash
-# 6. practice.txt faylini Web serverning ochiq katalogiga nusxalash.
-sudo cp practice.txt /var/www/html/practice.txt
-# 7. /var/www/html/practice.txt egasi va guruhini root:root ga o‘zgartirish.
-sudo chown root:root /var/www/html/practice.txt
-# 8. /var/www/html/practice.txt huquqlarini 0644 ga o‘zgartirish.
-sudo chmod 0644 /var/www/html/practice.txt
-# 9. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
-stat -c '%U:%G %a %n' /var/www/html/practice.txt
-# 10. /var/www/html/practice.txt mazmunini o‘zgartirmay o‘qish.
-cat /var/www/html/practice.txt
+# 6. /var/www/jdu-practice katalogini yaratish.
+sudo mkdir -p /var/www/jdu-practice
+# 7. Fayllarni /var/www/jdu-practice/practice.txt ga nusxalash.
+sudo cp practice.txt /var/www/jdu-practice/practice.txt
+# 8. /var/www/jdu-practice/practice.txt egasi va guruhini root:www-data ga o‘zgartirish.
+sudo chown root:www-data /var/www/jdu-practice/practice.txt
+# 9. /var/www/jdu-practice/practice.txt huquqlarini 0640 ga o‘zgartirish.
+sudo chmod 0640 /var/www/jdu-practice/practice.txt
+# 10. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
+stat -c '%U:%G %a %n' /var/www/jdu-practice/practice.txt
+# 11. Administrator huquqi bilan /var/www/jdu-practice/practice.txt mazmunini o‘qish.
+sudo cat /var/www/jdu-practice/practice.txt
 ```
 
 **Buyruq va sozlamalar ma’nosi:**
 
-`cp` matnni tarqatiladigan faylga nusxalaydi. `chown root:root` nusxaning egasi va guruhini root ga o‘zgartiradi. `chmod 0644` egaga o‘qish va yozish, guruh va boshqa foydalanuvchilarga o‘qish huquqini beradi.
+`chown root:www-data` egani root, guruhni www-data qiladi. `chmod 0640` egaga o‘qish/yozish, guruhga o‘qish huquqini beradi; boshqalarga ruxsat yo‘q. Nginx worker process lari www-data sifatida ishlaydi va guruh huquqi bilan faylni o‘qiydi.
 
 **Kutilgan natija va ma’nosi:**
 
-`root:root 644` egasi, guruhi va ruxsatlari hamda `JDU WEB-02 practice: HTTP response verified.` qatori ko‘rinadi.
+`root:www-data 640 /var/www/jdu-practice/practice.txt` ko‘rinadi. Matn bitta qator: `JDU WEB-02 practice: HTTP response verified.`.
 
 **Ishlamasa:**
 
 Nano hali ochiq bo‘lsa, keyingi buyruqdan oldin faylni saqlab chiqing.
 
-#### P1.3 Web root ni tekshirish va service ni ishga tushirish
+#### P1.3 Nginx da tarqatish katalogini sozlash
 
 **Bajarish muhiti:**
 
@@ -334,22 +336,39 @@ Web serverning SSM terminali: ssm-user
 
 **Maqsad va amallar:**
 
-`nginx -T` bilan amaldagi sozlamani chiqaring. `/etc/nginx/sites-enabled/default` ichidan `root /var/www/html` va `listen 80` ni toping. Kerak bo‘lsa `sudo nano` bilan tahrirlang va sintaksis tekshiruvidan keyin sozlamani qayta yuklang.
+`sudo nano /etc/nginx/sites-available/default` bilan sozlamani oching. Quyidagi blokni `listen 80` mavjud `server { ... }` ichiga, boshqa `location` bloklaridan tashqariga qo‘shing. `/practice.txt` so‘ralganda Nginx yo‘lni root ga qo‘shib, `/var/www/jdu-practice/practice.txt` ni o‘qiydi. Saqlang, sintaksisni tekshiring va sozlamani qayta yuklang.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
 ```bash
-# 1. Nginx ning to‘liq sozlamasini chiqarib, qanday yozilganini tekshirish.
+# 1. /etc/nginx/sites-available/default faylini nano da tahrirlash.
+sudo nano /etc/nginx/sites-available/default
+```
+
+**nano da yoziladigan sozlama**
+
+```text
+location = /practice.txt {
+    root /var/www/jdu-practice;
+}
+```
+
+Sozlamani Ctrl+O, Enter bilan saqlang, Ctrl+X bilan chiqing. Terminalda keyingi buyruqlarni bajaring.
+
+Buyruqlar: raqamlar shu qadam ichidagi tartib
+
+```bash
+# 2. Nginx ning to‘liq sozlamasini chiqarib, qanday yozilganini tekshirish.
 sudo nginx -T
-# 2. Nginx config sintaksisi va fayllarini tekshirish.
+# 3. Nginx config sintaksisi va fayllarini tekshirish.
 sudo nginx -t
-# 3. nginx ni hozir yoqish va avtomatik start ni yoqish.
+# 4. nginx ni hozir yoqish va avtomatik start ni yoqish.
 sudo systemctl enable --now nginx
-# 4. nginx ni to‘xtatmay sozlamani qayta o‘qish.
+# 5. nginx ni to‘xtatmay sozlamani qayta o‘qish.
 sudo systemctl reload nginx
-# 5. nginx joriy ish holatini o‘qish.
+# 6. nginx joriy ish holatini o‘qish.
 systemctl is-active nginx
-# 6. Nginx TCP 80 portini, masalan 0.0.0.0:80 manzilida tinglayotganini tekshirish.
+# 7. Nginx TCP 80 portini, masalan 0.0.0.0:80 manzilida tinglayotganini tekshirish.
 sudo ss -lntp
 ```
 
@@ -1230,7 +1249,7 @@ Buyruqlar: raqamlar shu qadam ichidagi tartib
 # 1. Runtime config bilan CSS va static fayllarni tarqatish katalogiga yig‘ish.
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase runtime collectstatic
-# 2. /opt/jdu-catalog/app/config/jdu-catalog.service mazmunini o‘zgartirmay o‘qish.
+# 2. Administrator huquqi bilan /opt/jdu-catalog/app/config/jdu-catalog.service mazmunini o‘qish.
 cat /opt/jdu-catalog/app/config/jdu-catalog.service
 # 3. Fayllarni /etc/systemd/system/jdu-catalog.service ga nusxalash.
 sudo cp /opt/jdu-catalog/app/config/jdu-catalog.service \
@@ -1265,10 +1284,12 @@ Web serverning SSM terminali: ssm-user
 
 Sozlamani nusxalang va `sites-enabled` ichida ramziy havola yarating. Sozlamadan so‘ng 80-port ro‘yxatni, Bastiondan 8080-port boshqaruv sahifasini ochadi. Nginx ilova so‘rovlarini Gunicorn ga yuboradi.
 
+Nusxalangan sozlamada `/practice.txt` va `/mission.txt` uchun ikkita location ni quyidagi bloklarga almashtiring. Bu P1 va M1 kataloglarini saqlaydi. Qolgan sozlamalar o‘zgarmasin.
+
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
 ```bash
-# 1. /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf mazmunini o‘zgartirmay o‘qish.
+# 1. Administrator huquqi bilan /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf mazmunini o‘qish.
 cat /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf
 # 2. Fayllarni /etc/nginx/sites-available/jdu-catalog ga nusxalash.
 sudo cp /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf \
@@ -1281,11 +1302,27 @@ sudo chmod 0644 /etc/nginx/sites-available/jdu-catalog
 sudo mv -n /etc/nginx/sites-enabled/default /etc/nginx/default-site.before-p5
 # 6. App sayt sozlamasini yoqish uchun link yaratish.
 sudo ln -s /etc/nginx/sites-available/jdu-catalog /etc/nginx/sites-enabled/jdu-catalog
-# 7. Nginx config sintaksisi va fayllarini tekshirish.
+# 7. /etc/nginx/sites-available/jdu-catalog faylini nano da tahrirlash.
+sudo nano /etc/nginx/sites-available/jdu-catalog
+```
+
+**nano da yoziladigan sozlama**
+
+```text
+location = /practice.txt { root /var/www/jdu-practice; try_files $uri =404; }
+location = /mission.txt { root /var/www/jdu-mission; try_files $uri =404; }
+```
+
+Sozlamani Ctrl+O, Enter bilan saqlang, Ctrl+X bilan chiqing. Terminalda keyingi buyruqlarni bajaring.
+
+Buyruqlar: raqamlar shu qadam ichidagi tartib
+
+```bash
+# 8. Nginx config sintaksisi va fayllarini tekshirish.
 sudo nginx -t
-# 8. nginx ni to‘xtatmay sozlamani qayta o‘qish.
+# 9. nginx ni to‘xtatmay sozlamani qayta o‘qish.
 sudo systemctl reload nginx
-# 9. http://127.0.0.1/practice.txt manziliga HTTP so‘rov yuborish.
+# 10. http://127.0.0.1/practice.txt manziliga HTTP so‘rov yuborish.
 curl -i http://127.0.0.1/practice.txt
 ```
 

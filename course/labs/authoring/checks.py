@@ -131,3 +131,11 @@ JA = {
 
 for check_id, description in JA.items():
     CHECKS[check_id]['ja'] = description
+
+# Use the current portal's HTTP criteria for the current handbooks as well.
+import json as _json
+from pathlib import Path as _Path
+_http_labels = _json.loads((_Path(__file__).resolve().parents[3] / 'development/web_portal_poc/web/check-labels.json').read_text(encoding='utf-8'))
+for _lang in ('ja', 'ru', 'uz'):
+    for _cid in ('WEB02_CONFIG_VALID', 'WEB02_FILE', 'WEB02_LOCAL_HTTP'):
+        CHECKS[_cid][_lang] = _http_labels[_lang][_cid].replace('{file}', '/var/www/jdu-mission/mission.txt').replace('{root}', '/var/www/jdu-mission').replace('{path}', '/mission.txt')

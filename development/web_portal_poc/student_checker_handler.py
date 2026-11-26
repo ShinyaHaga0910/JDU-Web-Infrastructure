@@ -107,6 +107,9 @@ class StudentChecker:
                 answer['result'] = {'task_id': spec['task_id'], 'checked_at': report['checked_at'],
                     'request_id': report['request_id'], 'checks': [{'id': c['id'], 'status': c['status']} for c in report['checks']],
                     'score': score(report), 'saved_grade_changed': False}
+                if spec['task_id'] in ('P1', 'M1'):
+                    from registry import HTTP_CONTRACT_SHA256
+                    answer['result']['current_rubric'] = report['contract_sha256'] == HTTP_CONTRACT_SHA256
             return answer
         except JobBusy:
             return {'status': 'busy'}

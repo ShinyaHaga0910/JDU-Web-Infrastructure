@@ -10,7 +10,7 @@ FILES = {**SERVICES, **{n: HERE / n for n in ('assessment_command_jobs.py', 'ass
     'student_checker_handler.py', 'portal_checker_handler.py', 'portal_submission.py','special_checks.py','browser_check_guest.py')}}
 FILES['index.py'] = HERE / 'student_checker_entry.py'
 for name in ('transport.py', 'network_checks.py', 'db_observer.py', 'system_observer.py',
-             'app_probe.py', 'remote_guest.py', 'http_guest_v2.py', 'aws_readiness.py'):
+             'app_probe.py', 'remote_guest.py', 'http_guest_v2.py', 'http_task_current.py', 'aws_readiness.py'):
     FILES[name] = TOOLS / 'web_lab_assessment' / name
 for name in ('http_task_guest.py', 'http_task.py'):
     FILES[name] = TOOLS / 'web_lab_teacher' / name

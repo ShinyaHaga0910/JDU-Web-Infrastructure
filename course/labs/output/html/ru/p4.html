@@ -160,7 +160,7 @@ python3 -B profile_sql.py --profile practice 03_runtime_grants.sql | sudo -u pos
 <pre><code class="language-bash"># 1. Собрать CSS и другую статику в каталог выдачи с runtime-настройкой.
 sudo /opt/jdu-catalog/venv/bin/python -B /opt/jdu-catalog/app/manage_secure.py \
   --phase runtime collectstatic
-# 2. Прочитать /opt/jdu-catalog/app/config/jdu-catalog.service без изменения.
+# 2. Прочитать /opt/jdu-catalog/app/config/jdu-catalog.service с правами администратора.
 cat /opt/jdu-catalog/app/config/jdu-catalog.service
 # 3. Скопировать файлы в /etc/systemd/system/jdu-catalog.service.
 sudo cp /opt/jdu-catalog/app/config/jdu-catalog.service \
@@ -186,8 +186,9 @@ sudo ss -lntp
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p>Скопируйте конфигурацию и добавьте символическую ссылку в <code>sites-enabled</code>. После применения порт 80 открывает список, а порт 8080 с бастиона - админку. Nginx передаёт запросы приложения в Gunicorn.</p>
+<p>В скопированной конфигурации замените два location для <code>/practice.txt</code> и <code>/mission.txt</code> на блоки ниже. Так сохраняются каталоги P1 и M1. Остальные настройки оставьте.</p>
 <p>Команды: нумерация внутри этого шага</p>
-<pre><code class="language-bash"># 1. Прочитать /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf без изменения.
+<pre><code class="language-bash"># 1. Прочитать /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf с правами администратора.
 cat /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf
 # 2. Скопировать файлы в /etc/nginx/sites-available/jdu-catalog.
 sudo cp /opt/jdu-catalog/app/config/jdu-catalog.nginx.conf \
@@ -200,11 +201,20 @@ sudo chmod 0644 /etc/nginx/sites-available/jdu-catalog
 sudo mv -n /etc/nginx/sites-enabled/default /etc/nginx/default-site.before-p5
 # 6. Создать ссылку включения конфигурации сайта приложения.
 sudo ln -s /etc/nginx/sites-available/jdu-catalog /etc/nginx/sites-enabled/jdu-catalog
-# 7. Проверить синтаксис и файлы конфигурации Nginx.
+# 7. Открыть /etc/nginx/sites-available/jdu-catalog в nano.
+sudo nano /etc/nginx/sites-available/jdu-catalog
+</code></pre>
+<p><strong>Настройки для nano</strong></p>
+<pre><code class="language-text">location = /practice.txt { root /var/www/jdu-practice; try_files $uri =404; }
+location = /mission.txt { root /var/www/jdu-mission; try_files $uri =404; }
+</code></pre>
+<p>Сохраните настройки через Ctrl+O, Enter и выйдите через Ctrl+X. В терминале выполните следующие команды.</p>
+<p>Команды: нумерация внутри этого шага</p>
+<pre><code class="language-bash"># 8. Проверить синтаксис и файлы конфигурации Nginx.
 sudo nginx -t
-# 8. Перечитать настройки nginx без остановки.
+# 9. Перечитать настройки nginx без остановки.
 sudo systemctl reload nginx
-# 9. Отправить HTTP-запрос по адресу http://127.0.0.1/practice.txt.
+# 10. Отправить HTTP-запрос по адресу http://127.0.0.1/practice.txt.
 curl -i http://127.0.0.1/practice.txt
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>

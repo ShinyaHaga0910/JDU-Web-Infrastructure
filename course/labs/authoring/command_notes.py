@@ -89,6 +89,10 @@ def explanation(command, lang):
             return a(f'postgresとしてDB設定を読む：{sql}',f'Прочитать настройку БД от postgres: {sql}',f'Postgres sifatida DB sozlamasini o‘qish: {sql}')
         args=args[1:]
     program=args[0]
+    if program=='nano':
+        return a(f'{args[-1]} をnanoで編集する。',f'Открыть {args[-1]} в nano.',f'{args[-1]} faylini nano da tahrirlash.')
+    if program=='cat':
+        return a(f'管理者権限で {args[-1]} の内容を読む。',f'Прочитать {args[-1]} с правами администратора.',f'Administrator huquqi bilan {args[-1]} mazmunini o‘qish.')
     if program=='apt-get':
         if 'update' in args:
             if 'APT::Update::Error-Mode=any' in args:
@@ -186,7 +190,8 @@ def annotated_blocks(module, index, source, lang):
                    f'Убедиться, что {service} слушает {address}.',
                    f'{service} {address} da tinglayotganini tekshirish.')[lang]
         parts += [f'{prefix} {number}. {note}',command]
-        if (module,index)==('P1',2) and command=='nano practice.txt':
+        if ((module,index)==('P1',2) and command=='nano practice.txt'
+                or (module,index) in {('P1',3),('P5',8)} and command.startswith('sudo nano ')):
             out.append(('bash','\n'.join(parts)))
             parts=[]
     out.append(('sql' if psql else ('powershell' if (module,index)==('P0',5) else 'bash'),'\n'.join(parts)))
