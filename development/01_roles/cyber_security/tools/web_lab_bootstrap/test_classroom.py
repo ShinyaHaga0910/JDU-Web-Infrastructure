@@ -21,6 +21,18 @@ ROOT = Path(__file__).resolve().parents[5]
 
 
 class ClassroomTests(unittest.TestCase):
+    def test_bootstrap_preserves_private_ip_for_each_observer(self):
+        ips = {'bastion': '10.20.1.10', 'web': '10.20.1.20', 'dns': '10.20.2.10',
+               'db': '10.20.2.20', 'repo': '10.20.2.30'}
+        config = dict(lab_id='test', deployment_id='test-deployment', instance_id='i-test',
+                      release_id='test-release', instances={}, grading_api_url='https://example.test',
+                      grading_ipv4='192.0.2.1')
+        for role, address in ips.items():
+            state = classroom_guest.bootstrap_state(dict(config, role=role), ips)
+            self.assertEqual(state['private_ip'], address)
+            self.assertEqual(state['role'], role)
+            self.assertEqual(state['deployment_id'], config['deployment_id'])
+
     def test_session_prompt_creates_only_a_missing_default_document(self):
         class MissingDocument(Exception):
             response = {'Error': {'Code': 'InvalidDocument'}}

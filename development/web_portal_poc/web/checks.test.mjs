@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createApp } from './router.mjs';
-import { checkToken,verifyCheckToken,displayTask,tasks } from './checks.mjs';
+import { checkToken,verifyCheckToken,displayTask,tasks,checkHtml,taskDetailHtml } from './checks.mjs';
 import { readFileSync } from 'node:fs';
 import { configFrom } from './auth.mjs';
 import {generateKeyPairSync,privateDecrypt,constants} from 'node:crypto';
@@ -12,6 +12,19 @@ const value={operation:'start',task_id:'M1',job_id:'11111111-1111-4111-8111-1111
 const headers={cookie,origin:env.PUBLIC_ORIGIN,'content-type':'application/x-www-form-urlencoded'};
 const credentials={env,verify:async t=>{if(t!==token)throw Error();return{sub:'1234567890'};},sessions:{check:async s=>s===session}};
 const request=(path,options={})=>new Request(env.PUBLIC_ORIGIN+path,{headers:{cookie},...options});
+test('practice list and detail retain partial points without adding them to the course total',()=>{
+  const grade={raw_earned:5,raw_maximum:64,selected:{P0:{raw_earned:1},M0:{raw_earned:4}},
+    current:{P1:{raw_earned:3,raw_maximum:8,evaluable:false}}};
+  for(const lang of ['ja','ru','uz']) {
+    const list=checkHtml(lang,{grade,maxima:{P0:1,M0:4},blocked:true});
+    assert.match(list,/task_id=P1[\s\S]*?3 \/ 8/);
+    assert.match(taskDetailHtml(lang,'P1',grade),/<strong>3 \/ 8<\/strong>/);
+  }
+  assert.equal(grade.raw_earned,5);
+  assert.deepEqual(Object.keys(grade.selected),['P0','M0']);
+  grade.current.P1.raw_earned='<script>';
+  assert.doesNotMatch(checkHtml('ja',{grade,blocked:true}),/<script>/);
+});
 function body(v=value){return new URLSearchParams({...v,csrf:checkToken(configFrom(env),session,token,v)}).toString();}
 test('displayed P and M labels are consecutive and match the course',()=>{
   const policy=JSON.parse(readFileSync(new URL('../../../course/curriculum.json',import.meta.url),'utf8'));

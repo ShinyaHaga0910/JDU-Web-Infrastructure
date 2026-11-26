@@ -270,12 +270,18 @@ def configure(config):
         distribution = Path('/opt/firefox/distribution')
         distribution.mkdir(exist_ok=True)
         shutil.copyfile(policies, distribution / 'policies.json')
-    state = {k: config[k] for k in ('lab_id', 'deployment_id', 'instance_id', 'role', 'release_id',
-                                   'instances', 'grading_api_url', 'grading_ipv4')}
+    state = bootstrap_state(config, node_bootstrap.IPS)
     (Path('/etc/jdu-web') / 'bootstrap.json').write_text(json.dumps(state))
     Path('/var/lib/jdu-web/bootstrap').mkdir(parents=True, exist_ok=True)
     (Path('/usr/local/lib/jdu-web') / RELEASE).mkdir(parents=True, exist_ok=True)
     return verify(config)
+
+
+def bootstrap_state(config, private_ips):
+    """Retain the node address required by the existing HTTP observer."""
+    return {**{k: config[k] for k in ('lab_id', 'deployment_id', 'instance_id', 'role', 'release_id',
+                                    'instances', 'grading_api_url', 'grading_ipv4')},
+            'private_ip': private_ips[config['role']]}
 
 
 def verify(config):

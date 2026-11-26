@@ -120,8 +120,16 @@ function criteriaTable(lang,checks) {
     <tbody>${rows}</tbody></table></div>`;
 }
 
+function practiceScore(grade,task) {
+  const row=grade?.current?.[task];
+  return Number.isInteger(row?.raw_earned) && Number.isInteger(row?.raw_maximum)
+    && row.raw_maximum>0 && row.raw_maximum<=40 && row.raw_earned>=0 && row.raw_earned<=row.raw_maximum ? row : undefined;
+}
+
 export function taskDetailHtml(lang,task,grade,maximum,actions='') {
-  const saved=grade?.selected?.[task];
+  const practice=task.startsWith('P') && task!=='P0';
+  const saved=practice?practiceScore(grade,task):grade?.selected?.[task];
+  maximum=maximum??saved?.raw_maximum;
   const [scoreTitle,pending]={
     ja:['保存済みの点数','未採点'],
     ru:['Сохранённые баллы','Без оценки'],
@@ -139,8 +147,9 @@ export function checkHtml(lang,{config,session,token,selected,result,grade,maxim
   const st=specialWords[lang];
   if (!selected) {
     const forms=tasks.map(task_id=>{
-      const saved=grade?.selected[task_id];
-      const maximum=maxima[task_id];
+      const practice=task_id.startsWith('P') && task_id!=='P0';
+      const saved=practice?practiceScore(grade,task_id):grade?.selected[task_id];
+      const maximum=maxima[task_id]??saved?.raw_maximum;
       const score=saved?`${saved.raw_earned} / ${maximum}`:maximum?
         {ja:'未採点',ru:'Без оценки',uz:'Baholanmagan'}[lang]:'—';
       const status=saved?(saved.raw_earned===maximum?'score-full':'score-partial'):'score-empty';
