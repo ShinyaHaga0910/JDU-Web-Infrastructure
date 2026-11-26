@@ -282,7 +282,7 @@ Web serverning SSM terminali: ssm-user
 
 **Maqsad va amallar:**
 
-nano da quyida ko‘rsatilgan bitta aniq qatorni yarating va oxiriga yangi qator qo‘ying. Ctrl+O → Enter saqlaydi, Ctrl+X yopadi. install faylni joylaydi; -o/-g egasi va guruhni, -m ruxsatni belgilaydi.
+Matnni ish fayliga yozing, keyin uni Nginx fayllarni tarqatadigan katalogga nusxalang.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
@@ -297,18 +297,34 @@ cd jdu-web-practice/p1
 pwd
 # 5. Practice.txt ni ochish: matn yozish, saqlash va chiqish.
 nano practice.txt
-# File content: JDU WEB-02 practice: HTTP response verified.
-# 6. Faylni joylab owner, guruh va permission ni belgilash.
-sudo install -o root -g root -m 0644 practice.txt /var/www/html/practice.txt
-# 7. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
+```
+
+**nano oynasiga yoziladigan matn**
+
+```text
+JDU WEB-02 practice: HTTP response verified.
+```
+
+nano oynasiga yuqoridagi qatorni aynan yozing va oxirida Enter tugmasini bosing. Ctrl+O va Enter orqali saqlang, Ctrl+X orqali chiqing. Terminalga qaytgach, 6-qadamdan davom eting.
+
+Buyruqlar: raqamlar shu qadam ichidagi tartib
+
+```bash
+# 6. practice.txt faylini Web serverning ochiq katalogiga nusxalash.
+sudo cp practice.txt /var/www/html/practice.txt
+# 7. Nusxalangan fayl egasi va guruhini root ga o‘zgartirish.
+sudo chown root:root /var/www/html/practice.txt
+# 8. Nusxalangan faylga 0644 ruxsatlarini berish.
+sudo chmod 0644 /var/www/html/practice.txt
+# 9. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
 stat -c '%U:%G %a %n' /var/www/html/practice.txt
-# 8. /var/www/html/practice.txt mazmunini o‘zgartirmay o‘qish.
+# 10. /var/www/html/practice.txt mazmunini o‘zgartirmay o‘qish.
 cat /var/www/html/practice.txt
 ```
 
 **Buyruq va sozlamalar ma’nosi:**
 
-Nano dagi ish fayli va Nginx o‘qiydigan faylni ajrating. Bu yerda install package o‘rnatmaydi: faylni root:root va 0644 bilan nusxalaydi. Faqat owner yozadi, boshqalar o‘qiydi. Oxirgi newline ham mazmunning qismidir.
+`cp` matnni tarqatiladigan faylga nusxalaydi. `chown root:root` nusxaning egasi va guruhini root ga o‘zgartiradi. `chmod 0644` egaga o‘qish va yozish, guruh va boshqa foydalanuvchilarga o‘qish huquqini beradi.
 
 **Kutilgan natija va ma’nosi:**
 

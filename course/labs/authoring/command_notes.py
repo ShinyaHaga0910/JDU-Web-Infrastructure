@@ -114,7 +114,11 @@ def explanation(command, lang):
         return a(f'{args[-1]} の内容を変更せずに読む。',f'Прочитать {args[-1]} без изменения.',f'{args[-1]} mazmunini o‘zgartirmay o‘qish.')
     if program=='ls':return a(f'{args[-1]} に配置されたサーバー構築用ファイルを一覧する。',f'Показать файлы для настройки серверов в {args[-1]}.',f'{args[-1]} dagi serverlarni sozlash fayllarini ro‘yxatlash.')
     if program=='stat':return a('指定ファイルの所有者・グループ・権限・名前を読む。','Прочитать владельца, группу, права и имя указанных файлов.','Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.')
+    if program=='cp' and args[-1]=='/var/www/html/practice.txt':
+        return a('practice.txtをWebサーバーの公開ディレクトリへコピーする。','Скопировать practice.txt в каталог публикации Web-сервера.','practice.txt faylini Web serverning ochiq katalogiga nusxalash.')
     if program=='cp':return a('元ファイルを控えへコピーする。既存の控えは上書きしない。','Скопировать исходный файл в резервную копию, не затирая существующую.','Asl fayldan nusxa olish; mavjud nusxani ustidan yozmaslik.') if '-an' in args else a('教員提供アプリを/optの運用先へ属性を保ってコピーする。','Скопировать приложение преподавателя в /opt с сохранением атрибутов.','O‘qituvchi app ini /opt ga atributlarini saqlab ko‘chirish.')
+    if program=='chown':return a('コピー先のファイルの所有者とグループをrootに変更する。','Назначить root владельцем и группой скопированного файла.','Nusxalangan fayl egasi va guruhini root ga o‘zgartirish.')
+    if program=='chmod':return a('コピー先のファイルの権限を0644に変更する。','Установить для скопированного файла права 0644.','Nusxalangan faylga 0644 ruxsatlarini berish.')
     if program=='mv':return a('既定サイトのリンクを控えへ移す。既存の控えは上書きしない。','Переместить ссылку стандартного сайта в копию без перезаписи.','Default sayt linkini nusxaga ko‘chirish; mavjud nusxani ustidan yozmaslik.')
     if program=='ln':return a('配置したアプリ用サイト設定への有効化リンクを作る。','Создать ссылку включения конфигурации сайта приложения.','App sayt sozlamasini yoqish uchun link yaratish.')
     if program=='install':
@@ -165,6 +169,9 @@ def annotated_blocks(module, index, source, lang):
             out.append(('bash','\n'.join(parts)));parts=[];psql=True
         prefix='--' if psql else '#'
         parts += [f'{prefix} {number}. {explanation(command,lang)}',command]
+        if (module,index)==('P1',2) and command=='nano practice.txt':
+            out.append(('bash','\n'.join(parts)))
+            parts=[]
     out.append(('sql' if psql else ('powershell' if (module,index)==('P0',5) else 'bash'),'\n'.join(parts)))
     return out
 

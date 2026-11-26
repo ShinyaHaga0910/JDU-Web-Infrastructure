@@ -125,9 +125,9 @@ note('P1.1',
  '`apt-get update` обновляет список доступных пакетов. `apt-get install nginx` использует этот список для установки Nginx.',
  '`apt-get update` mavjud paketlar ro‘yxatini yangilaydi. `apt-get install nginx` shu ro‘yxat yordamida Nginx ni o‘rnatadi.')
 note('P1.2',
- 'nanoで編集する自分の作業fileと、Nginxが読む配信用fileを分ける。installはここではpackage導入ではなく、コピー時にroot:rootと0644を指定するコマンド。0644では所有者だけが書け、他のuserは読める。末尾の改行も本文の一部となる。',
- 'Разделите рабочий файл nano и файл выдачи Nginx. Здесь install копирует файл с владельцем root:root и режимом 0644, а не устанавливает пакет. Писать может владелец, остальные могут читать. Завершающий перевод строки входит в содержимое.',
- 'Nano dagi ish fayli va Nginx o‘qiydigan faylni ajrating. Bu yerda install package o‘rnatmaydi: faylni root:root va 0644 bilan nusxalaydi. Faqat owner yozadi, boshqalar o‘qiydi. Oxirgi newline ham mazmunning qismidir.')
+ '`cp` は本文を配信用ファイルへコピーする。`chown root:root` はコピー先の所有者とグループを root に変更する。`chmod 0644` は所有者に読み書き、グループとその他のユーザーに読み取りを許可する。',
+ '`cp` копирует текст в файл для публикации. `chown root:root` назначает root владельцем и группой копии. `chmod 0644` даёт владельцу право чтения и записи, а группе и остальным — право чтения.',
+ '`cp` matnni tarqatiladigan faylga nusxalaydi. `chown root:root` nusxaning egasi va guruhini root ga o‘zgartiradi. `chmod 0644` egaga o‘qish va yozish, guruh va boshqa foydalanuvchilarga o‘qish huquqini beradi.')
 note('P1.3',
  'nginx -Tは読込対象の設定を表示し、-tは構文を検査する。systemctlのenableは次回起動時、--nowは現在の起動を指定する。設定ファイルの保存だけで終わらず、reload後のserviceと待受portを読む。',
  'Nginx -T выводит конфигурацию, -t проверяет синтаксис. В systemctl enable включает запуск при загрузке, --now запускает сейчас. После сохранения файла проверьте reload, состояние службы и порт.',

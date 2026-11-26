@@ -21,8 +21,9 @@ def module(id, title, goals, problem):
     value = dict(id=id, title=title, goals=goals, problem=problem, steps=[])
     MODULES.append(value)
     return value
-def step(m, title, place, why, code, expect, trouble):
-    m['steps'].append(dict(title=title, place=place, why=why, code=code.strip(), expect=expect, trouble=trouble))
+def step(m, title, place, why, code, expect, trouble, *, editor_input=None):
+    m['steps'].append(dict(title=title, place=place, why=why, code=code.strip(), expect=expect,
+                           trouble=trouble, editor_input=editor_input))
 
 m = module('P0', T('サーバーの確認と接続', 'Своя среда и место выполнения команд', 'Shaxsiy muhit va buyruqlarni bajarish joyi'),
  T('EC2の一覧から正しいサーバーを選び、Session Managerで接続して、課題の結果を自分で確認できる。',
@@ -97,20 +98,22 @@ step(m, T('内部APTからNginxを導入する', 'Установить Nginx и�
    'Ro‘yxat yangilanganda ichki server qatorida `Hit:` yoki `Get:` ko‘rinadi. `N: Ignoring file ... ubuntu.sources.jdu-disabled` xabari APT dastlabki sozlashda o‘chirilgan standart Ubuntu manbasi faylini o‘tkazib yuborganini bildiradi. Yuklash yoki imzo tekshiruvida xato bo‘lmasa, o‘rnatishni davom ettiring. Tasdiq so‘ralsa, `Y` kiriting.'),
  T('パッケージ一覧の取得に失敗した場合は、配布サーバーの稼働状態とIPアドレスを確認する。', 'Если не удалось получить список пакетов, проверьте состояние и IP-адрес внутреннего сервера пакетов.', 'Paketlar ro‘yxatini olib bo‘lmasa, ichki paket serverining holati va IP manzilini tekshiring.'))
 step(m, T('正しい本文を作り、所有者と権限を揃える', 'Создать точный текст и права файла', 'Aniq matn yaratish va ruxsatlarni sozlash'), 'web',
- T('まずnanoで練習本文を編集する。表示する1行は下の指定どおりで、最後に改行を入れる。Ctrl+O→Enterで保存、Ctrl+Xで終了する。installはファイルを配置し、-o/-gは所有者、-mは権限を指定する。',
-   'Создайте текст через nano: одна точная строка, указанная ниже, с переводом строки в конце. Ctrl+O → Enter сохраняет, Ctrl+X закрывает редактор. install копирует файл; -o/-g задают владельца и группу, -m — права.',
-   'nano da quyida ko‘rsatilgan bitta aniq qatorni yarating va oxiriga yangi qator qo‘ying. Ctrl+O → Enter saqlaydi, Ctrl+X yopadi. install faylni joylaydi; -o/-g egasi va guruhni, -m ruxsatni belgilaydi.'),
+ T('作業用のファイルに本文を書き、Nginxが配信するディレクトリへコピーする。',
+   'Запишите текст в рабочий файл, затем скопируйте его в каталог, из которого Nginx выдаёт файлы.',
+   'Matnni ish fayliga yozing, keyin uni Nginx fayllarni tarqatadigan katalogga nusxalang.'),
  """cd ~
 mkdir -p jdu-web-practice/p1
 cd jdu-web-practice/p1
 pwd
 nano practice.txt
-# File content: JDU WEB-02 practice: HTTP response verified.
-sudo install -o root -g root -m 0644 practice.txt /var/www/html/practice.txt
+sudo cp practice.txt /var/www/html/practice.txt
+sudo chown root:root /var/www/html/practice.txt
+sudo chmod 0644 /var/www/html/practice.txt
 stat -c '%U:%G %a %n' /var/www/html/practice.txt
 cat /var/www/html/practice.txt""",
  T('root:root 644。本文は JDU WEB-02 practice: HTTP response verified. の1行である。大文字、小文字、空白、句点も判定対象。', 'Ожидается root:root 644 и ровно строка JDU WEB-02 practice: HTTP response verified. Регистр, пробелы, точка и конечный перевод строки важны.', 'root:root 644 va aynan JDU WEB-02 practice: HTTP response verified. qatori chiqadi. Harf registri, bo‘shliq, nuqta va oxirgi yangi qator muhim.'),
- T('空白画面ならまだnano内。保存して終了してから次のcommandを実行する。既存のmission.txtは変更しない。', 'Если вы ещё в nano, сначала сохраните и выйдите. Не меняйте существующий mission.txt.', 'Hali nano ichida bo‘lsangiz, avval saqlab chiqing. Mavjud mission.txt ni o‘zgartirmang.'))
+ T('空白画面ならまだnano内。保存して終了してから次のcommandを実行する。既存のmission.txtは変更しない。', 'Если вы ещё в nano, сначала сохраните и выйдите. Не меняйте существующий mission.txt.', 'Hali nano ichida bo‘lsangiz, avval saqlab chiqing. Mavjud mission.txt ni o‘zgartirmang.'),
+ editor_input='JDU WEB-02 practice: HTTP response verified.')
 step(m, T('Web rootとportを確認して起動する', 'Проверить Web root и запустить сервис', 'Web root ni tekshirish va service ni ishga tushirish'), 'web',
  T('Ubuntuの初期siteは/var/www/htmlをrootにする。nginx -Tで実効設定を読み、/etc/nginx/sites-enabled/defaultが有効でrootとlisten 80があることを確認する。変更が必要ならsudo nanoで編集し、構文検査に成功してからreloadする。enable --nowは今起動し、次のOS起動時も起動させる。',
    'Начальный сайт Ubuntu использует root /var/www/html. Через nginx -T найдите включённый /etc/nginx/sites-enabled/default, root и listen 80. При необходимости редактируйте sudo nano; reload выполняйте после успешной проверки. enable --now запускает сейчас и включает автозапуск.',

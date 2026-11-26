@@ -282,7 +282,7 @@ WebサーバーのSSM端末：ssm-user
 
 **目的と操作:**
 
-まずnanoで練習本文を編集する。表示する1行は下の指定どおりで、最後に改行を入れる。Ctrl+O→Enterで保存、Ctrl+Xで終了する。installはファイルを配置し、-o/-gは所有者、-mは権限を指定する。
+作業用のファイルに本文を書き、Nginxが配信するディレクトリへコピーする。
 
 入力するコマンド（番号はこの手順内の順番）
 
@@ -297,18 +297,34 @@ cd jdu-web-practice/p1
 pwd
 # 5. practice.txtを編集する。本文を入力し、保存して終了する。
 nano practice.txt
-# File content: JDU WEB-02 practice: HTTP response verified.
-# 6. 指定ファイルを配置し、所有者・グループ・権限を揃える。
-sudo install -o root -g root -m 0644 practice.txt /var/www/html/practice.txt
-# 7. 指定ファイルの所有者・グループ・権限・名前を読む。
+```
+
+**nanoに入力する本文**
+
+```text
+JDU WEB-02 practice: HTTP response verified.
+```
+
+nanoの画面に上の1行をそのまま入力し、行末で Enter を押す。Ctrl+O、Enter の順に押して保存し、Ctrl+X で終了する。端末に戻ったら、手順6から続ける。
+
+入力するコマンド（番号はこの手順内の順番）
+
+```bash
+# 6. practice.txtをWebサーバーの公開ディレクトリへコピーする。
+sudo cp practice.txt /var/www/html/practice.txt
+# 7. コピー先のファイルの所有者とグループをrootに変更する。
+sudo chown root:root /var/www/html/practice.txt
+# 8. コピー先のファイルの権限を0644に変更する。
+sudo chmod 0644 /var/www/html/practice.txt
+# 9. 指定ファイルの所有者・グループ・権限・名前を読む。
 stat -c '%U:%G %a %n' /var/www/html/practice.txt
-# 8. /var/www/html/practice.txt の内容を変更せずに読む。
+# 10. /var/www/html/practice.txt の内容を変更せずに読む。
 cat /var/www/html/practice.txt
 ```
 
 **コマンド・設定値の意味:**
 
-nanoで編集する自分の作業fileと、Nginxが読む配信用fileを分ける。installはここではpackage導入ではなく、コピー時にroot:rootと0644を指定するコマンド。0644では所有者だけが書け、他のuserは読める。末尾の改行も本文の一部となる。
+`cp` は本文を配信用ファイルへコピーする。`chown root:root` はコピー先の所有者とグループを root に変更する。`chmod 0644` は所有者に読み書き、グループとその他のユーザーに読み取りを許可する。
 
 **期待する結果と読み方:**
 

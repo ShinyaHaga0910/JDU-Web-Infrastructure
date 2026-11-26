@@ -58,7 +58,7 @@ sudo apt-get install nginx
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>nano da quyida ko‘rsatilgan bitta aniq qatorni yarating va oxiriga yangi qator qo‘ying. Ctrl+O → Enter saqlaydi, Ctrl+X yopadi. install faylni joylaydi; -o/-g egasi va guruhni, -m ruxsatni belgilaydi.</p>
+<p>Matnni ish fayliga yozing, keyin uni Nginx fayllarni tarqatadigan katalogga nusxalang.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. O‘z uy katalogingizga o‘ting.
 cd ~
@@ -70,16 +70,25 @@ cd jdu-web-practice/p1
 pwd
 # 5. Practice.txt ni ochish: matn yozish, saqlash va chiqish.
 nano practice.txt
-# File content: JDU WEB-02 practice: HTTP response verified.
-# 6. Faylni joylab owner, guruh va permission ni belgilash.
-sudo install -o root -g root -m 0644 practice.txt /var/www/html/practice.txt
-# 7. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
+</code></pre>
+<p><strong>nano oynasiga yoziladigan matn</strong></p>
+<pre><code class="language-text">JDU WEB-02 practice: HTTP response verified.
+</code></pre>
+<p>nano oynasiga yuqoridagi qatorni aynan yozing va oxirida Enter tugmasini bosing. Ctrl+O va Enter orqali saqlang, Ctrl+X orqali chiqing. Terminalga qaytgach, 6-qadamdan davom eting.</p>
+<p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
+<pre><code class="language-bash"># 6. practice.txt faylini Web serverning ochiq katalogiga nusxalash.
+sudo cp practice.txt /var/www/html/practice.txt
+# 7. Nusxalangan fayl egasi va guruhini root ga o‘zgartirish.
+sudo chown root:root /var/www/html/practice.txt
+# 8. Nusxalangan faylga 0644 ruxsatlarini berish.
+sudo chmod 0644 /var/www/html/practice.txt
+# 9. Ko‘rsatilgan fayl owner, guruh, permission va nomini o‘qish.
 stat -c '%U:%G %a %n' /var/www/html/practice.txt
-# 8. /var/www/html/practice.txt mazmunini o‘zgartirmay o‘qish.
+# 10. /var/www/html/practice.txt mazmunini o‘zgartirmay o‘qish.
 cat /var/www/html/practice.txt
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Nano dagi ish fayli va Nginx o‘qiydigan faylni ajrating. Bu yerda install package o‘rnatmaydi: faylni root:root va 0644 bilan nusxalaydi. Faqat owner yozadi, boshqalar o‘qiydi. Oxirgi newline ham mazmunning qismidir.</p>
+<p><code>cp</code> matnni tarqatiladigan faylga nusxalaydi. <code>chown root:root</code> nusxaning egasi va guruhini root ga o‘zgartiradi. <code>chmod 0644</code> egaga o‘qish va yozish, guruh va boshqa foydalanuvchilarga o‘qish huquqini beradi.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
 <p>root:root 644 va aynan JDU WEB-02 practice: HTTP response verified. qatori chiqadi. Harf registri, bo‘shliq, nuqta va oxirgi yangi qator muhim.</p>
 <p><strong>Ishlamasa:</strong></p>
