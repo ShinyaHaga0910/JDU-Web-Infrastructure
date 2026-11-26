@@ -58,6 +58,17 @@ class GradeTest(unittest.TestCase):
         self.assertEqual(len(checks), 4)
         self.assertEqual(project_student(self.row, 'P1')['task_checks'], [])
 
+    def test_p1_detail_shows_eight_practice_checks_without_readiness_or_points(self):
+        checks = [{'id': item, 'status': 'FAIL' if item == 'WEB02_FILE' else 'PASS'}
+                  for item in registry.canonical_checks('P1')]
+        self.row['results'].append({'sk': grading.current_key('P1'),
+            'deployment_id': 'same', 'contract_sha256': registry.CONTRACT_SHA256, 'checks': checks})
+        result = project_student(self.row, 'P1')
+        self.assertEqual(len(result['task_checks']), 8)
+        self.assertIn({'id': 'WEB02_FILE', 'status': 'FAIL'}, result['task_checks'])
+        self.assertTrue(all(c['id'].startswith('WEB02_') for c in result['task_checks']))
+        self.assertNotIn('P1', result['selected'])
+
     def test_other_lab_and_wrong_token_cannot_read(self):
         for event in (self.event(lab='other-lab'), self.event(token='y' * 40)):
             with self.assertRaises(legacy.ApiError):

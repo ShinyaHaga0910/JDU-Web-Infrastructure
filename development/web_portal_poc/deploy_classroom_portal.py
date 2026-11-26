@@ -401,7 +401,7 @@ def main():
     import boto3
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('phase', choices=('portal-prepare', 'portal-init', 'portal-connect', 'portal-enable',
+    parser.add_argument('phase', choices=('portal-prepare', 'portal-init', 'portal-connect', 'portal-enable', 'portal-refresh',
                                           'portal-approve', 'portal-teacher', 'portal-classroom-teacher', 'portal-secret'))
     parser.add_argument('--google-secret', default=GOOGLE_SECRET_NAME)
     parser.add_argument('--google-test-secret', default='disabled',
@@ -456,6 +456,9 @@ def main():
         activate(session, account, args.ref, origin, args.google_secret, args.student_account, expires,
                  args.google_test_secret)
         print(f'PortalUrl: {origin}')
+    elif args.phase == 'portal-refresh':
+        refresh_enabled_portal(session, account, args.ref)
+        print(f'PortalUrl: {get_portal_url(read_stack(session.client("cloudformation"), STACK))}')
     elif args.phase == 'portal-secret':
         if not args.google_client_id:
             parser.error('--google-client-id is required')

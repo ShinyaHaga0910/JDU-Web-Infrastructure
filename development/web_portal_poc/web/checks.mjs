@@ -51,7 +51,16 @@ export function createCheckerClient(env=process.env,client=new LambdaClient({reg
   };
 }
 function form(lang,value,csrf,content,label,auto=false) {
-  return `<form action="/checks?lang=${lang}" method="post"${auto?' data-check-progress="true"':''}><input type="hidden" name="operation" value="${value.operation}"><input type="hidden" name="job_id" value="${value.job_id}"><input type="hidden" name="csrf" value="${csrf}">${value.check_mode?`<input type="hidden" name="check_mode" value="${value.check_mode}">`:''}${content}<button type="submit">${escape(label)}</button></form>`;
+  return `<form action="/checks?lang=${lang}" method="post" data-check-form${auto?' data-check-progress="true"':''}><input type="hidden" name="operation" value="${value.operation}"><input type="hidden" name="job_id" value="${value.job_id}"><input type="hidden" name="csrf" value="${csrf}">${value.check_mode?`<input type="hidden" name="check_mode" value="${value.check_mode}">`:''}${content}<button type="submit">${escape(label)}</button><span class="check-sending" data-check-sending hidden>${spinner(words[lang].pending)}</span></form>`;
+}
+
+function spinner(label) {
+  return `<progress class="check-spinner" aria-label="${escape(label)}"></progress>`;
+}
+
+export function resumeCheckLink(lang) {
+  const label={ja:'確認中の課題へ戻る',ru:'Вернуться к текущей проверке',uz:'Joriy tekshiruvga qaytish'}[lang];
+  return `<p data-check-resume hidden><a href="/checks?lang=${lang}">${label}</a></p>`;
 }
 const receiptWords={
   ja:{pending:'結果の保存を確認できません。',retry:'保存を再試行する'},
@@ -118,7 +127,7 @@ export function taskDetailHtml(lang,task,grade,maximum,actions='') {
   const score=saved?`<p class="check-count">${scoreTitle} <strong>${saved.raw_earned} / ${maximum}</strong></p>`:maximum?`<p>${pending}</p>`:'';
   return `<section class="task-detail"><div class="check-heading"><h2>${escape(task)}</h2>${score}</div>
     ${actions?`<div class="task-actions">${actions}</div>`:''}
-    ${maximum && checks.length?criteriaTable(lang,checks):''}</section>`;
+    ${checks.length?criteriaTable(lang,checks):''}</section>`;
 }
 
 export function checkHtml(lang,{config,session,token,selected,result,grade,maxima={},blocked=false}={}) {
@@ -163,19 +172,114 @@ export function checkHtml(lang,{config,session,token,selected,result,grade,maxim
   if (job.phase==='failed') return content+`<p role="alert">${escape(t.fail)}</p>`;
   if (job.phase!=='report_ready') {
     const v={...selected,operation:'advance'};
-    return content+`<p role="status">${escape(t.pending)}</p>`+form(lang,v,checkToken(config,session,token,v),`<input type="hidden" name="task_id" value="${v.task_id}">`,t.refresh,true)+'<script src="/check-progress.js" defer></script>';
+    return content+`<p class="check-pending" role="status">${spinner(t.pending)}<span>${escape(t.pending)}</span></p><p><a href="/checks?lang=${lang}">${escape(t.back)}</a></p>`
+      +form(lang,v,checkToken(config,session,token,v),`<input type="hidden" name="task_id" value="${v.task_id}">`,t.refresh,true);
   }
   const value=result.result,s=value?.score;
   if (!value || value.task_id!==selected.task_id || !Array.isArray(value.checks) || value.checks.length>40 || !Number.isInteger(s?.raw_earned) || !Number.isInteger(s?.raw_maximum) || s.raw_earned<0 || s.raw_earned>s.raw_maximum || !Number.isFinite(Date.parse(value.checked_at))) throw Error('Invalid result');
   if (!value.checks.every(validCriterion)) throw Error('Invalid check');
-  const outcome=!s.evaluable?'unknown':!s.counts_toward_assessment?'practice':s.raw_earned===s.raw_maximum?'pass':'fix';
+  const showCriteria=s.counts_toward_assessment || selected.task_id==='P1';
+  const outcome=!s.evaluable?'unknown':showCriteria && s.raw_earned<s.raw_maximum?'fix'
+    :s.counts_toward_assessment?'pass':'practice';
   const copy=outcomes[lang];
-  const count=s.counts_toward_assessment?`<p class="check-count"><strong>${s.raw_earned} / ${s.raw_maximum}</strong> ${escape(copy.count)}</p>`:'';
-  const criteria=s.counts_toward_assessment && value.checks.length ? criteriaTable(lang,value.checks) : '';
+  const count=showCriteria?`<p class="check-count"><strong>${s.raw_earned} / ${s.raw_maximum}</strong> ${escape(copy.count)}</p>`:'';
+  const criteria=showCriteria && value.checks.length ? criteriaTable(lang,value.checks) : '';
   return content+`<div class="check-heading check-outcome check-outcome-${outcome}"><h3>${escape(copy[outcome])}</h3>${count}</div>`
     +submissionHtml(lang,result,selected,{config,session,token})+criteria;
 }
-export const progressScript=`const form=document.querySelector('form[data-check-progress]'); if(form){const key='jdu-check-polls:'+new FormData(form).get('job_id');let n=Number(sessionStorage.getItem(key)||0);if(n<40){setTimeout(()=>{sessionStorage.setItem(key,String(n+1));form.requestSubmit();},4000);}}`;
+export const progressScript=`
+const pending = document.querySelector('[data-check-progress]');
+const resume = document.querySelector('[data-check-resume]');
+const storageKey = 'jdu-check-in-progress';
+const current = new URL(location.href);
+let timer, attempts = 0, request;
+try {
+  if (pending) sessionStorage.setItem(storageKey, current.search);
+  const saved = new URLSearchParams(sessionStorage.getItem(storageKey) || '');
+  const job = saved.get('job_id');
+  if (!pending && job && job === current.searchParams.get('job_id')) sessionStorage.removeItem(storageKey);
+  if (resume && !current.searchParams.has('job_id') && /^[PM][0-6]$/.test(saved.get('task_id') || '')
+      && /^[0-9a-f-]{36}$/.test(job || '')) {
+    saved.set('lang', document.documentElement.lang);
+    resume.querySelector('a').href = '/checks?' + saved;
+    resume.hidden = false;
+  }
+} catch {}
+
+function schedule() {
+  clearTimeout(timer);
+  if (pending && attempts < 40) timer = setTimeout(poll, 4000);
+}
+
+async function poll() {
+  if (request) return;
+  const active = new AbortController();
+  request = active;
+  const button = pending.querySelector('button');
+  button.disabled = true;
+  attempts += 1;
+  try {
+    const response = await fetch(pending.action, {method:'POST', body:new URLSearchParams(new FormData(pending)),
+      credentials:'same-origin', signal:active.signal});
+    const destination = new URL(response.url);
+    if (!response.ok || destination.origin !== current.origin || destination.pathname !== current.pathname
+        || destination.searchParams.get('job_id') !== current.searchParams.get('job_id')) return;
+    const page = new DOMParser().parseFromString(await response.text(), 'text/html');
+    if (!active.signal.aborted && !page.querySelector('[data-check-progress]')) {
+      location.replace(destination.href);
+      return;
+    }
+  } catch {}
+  finally {
+    if (request === active) {
+      request = undefined;
+      button.disabled = false;
+    }
+    if (!active.signal.aborted) schedule();
+  }
+}
+
+document.addEventListener('submit', event => {
+  const form = event.target;
+  if (!form.matches('[data-check-form]')) return;
+  if (form === pending) {
+    event.preventDefault();
+    clearTimeout(timer);
+    poll();
+    return;
+  }
+  if (form.dataset.sending === 'true') {
+    event.preventDefault();
+    return;
+  }
+  form.dataset.sending = 'true';
+  if (form.elements.operation.value === 'start') {
+    try {
+      const data = new FormData(form);
+      const query = new URLSearchParams({task_id:data.get('task_id'),job_id:data.get('job_id')});
+      if (data.has('check_mode')) query.set('check_mode', data.get('check_mode'));
+      sessionStorage.setItem(storageKey, query.toString());
+    } catch {}
+  }
+  form.querySelector('[data-check-sending]').hidden = false;
+  form.querySelector('button').disabled = true;
+});
+addEventListener('pagehide', () => {
+  clearTimeout(timer);
+  request?.abort();
+  request = undefined;
+});
+addEventListener('pageshow', event => {
+  if (!event.persisted) return;
+  for (const form of document.querySelectorAll('[data-check-form]')) {
+    delete form.dataset.sending;
+    form.querySelector('[data-check-sending]').hidden = true;
+    form.querySelector('button').disabled = false;
+  }
+  schedule();
+});
+schedule();
+`;
 
 const specialWords={
   ja:{overview:'P5/M5・P6/M6は既存パスワードを使い、アプリの機能・権限を確認します。',prepare:'停止前の状態を記録する',functional:'機能・権限を含めて確認する',readOnly:'現在の設定だけ確認する',password:'アプリ管理者の既存パスワード',passwordNote:'アプリへのログイン、確認専用の架空データの作成・編集・公開反映、ログアウトとアクセス拒否を確認します。',privatePassword:'パスワードはこの確認だけに使います。確認結果やコマンド履歴に平文で保存しません。',runFunctional:'このパスワードで確認する',stopNote:'停止前の状態を記録しました。AWSでこのWebだけを停止し、停止完了後に下のボタンを押してください。',restartNote:'同じWebの停止を確認しました。AWSでこのWebを開始し、起動後に下のボタンを押してください。',openAws:'AWSでこのWebを開く',observe:'停止完了を確認する',resume:'再開後の保持を確認する'},

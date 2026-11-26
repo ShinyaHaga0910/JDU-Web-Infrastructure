@@ -11,7 +11,7 @@ from registry import COURSE_GRADED_TASKS, COURSE_INTRO_MARKERS, STATUSES, TASKS
 
 def scored_checks(task_id, checks):
     """Return only checks that contribute to the course score."""
-    if task_id not in COURSE_GRADED_TASKS or not isinstance(checks, list):
+    if (task_id not in COURSE_GRADED_TASKS and task_id != 'P1') or not isinstance(checks, list):
         return []
     if task_id in COURSE_INTRO_MARKERS:
         scored = {cid for cid, _, _ in COURSE_INTRO_MARKERS[task_id]}

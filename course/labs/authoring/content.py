@@ -87,11 +87,11 @@ RDP_STEPS = (
 
 m = module('P1', T('HTTPで静的ファイルを返す', 'Выдача статического файла по HTTP', 'HTTP orqali statik faylni qaytarish'),
  T('Nginx、保存先、待受、HTTP応答、access logを一組で確認する。', 'Связать Nginx, файл, прослушивание порта, HTTP-ответ и access log.', 'Nginx, fayl joyi, tinglash porti, HTTP javobi va access log ni bog‘lash.'),
- T('Webの/var/www/html/practice.txtから指定本文をHTTP200で返す。Web自身・踏み台・外部の三経路で確認する。', 'Файл /var/www/html/practice.txt на Web должен возвращать заданный текст с HTTP 200: локально, с бастиона и извне.', 'Web dagi /var/www/html/practice.txt belgilangan matnni HTTP 200 bilan qaytarsin: Web ichidan, bastiondan va tashqaridan tekshiring.'))
+ T('Webサーバーの /var/www/html/practice.txt を HTTP 200 で配信する。', 'Настройте выдачу файла /var/www/html/practice.txt с ответом HTTP 200.', 'Web serverdagi /var/www/html/practice.txt faylini HTTP 200 bilan qaytaring.'))
 step(m, T('内部APTからNginxを導入する', 'Установить Nginx из внутреннего APT', 'Ichki APT dan Nginx o‘rnatish'), 'web',
- T('P0と同じ方法でWebサーバーへSSMで接続し、ロールが `web` であることを確認する。初回セットアップで指定された内部の配布サーバー（`10.20.2.30`）からパッケージを取得する。',
-   'Подключитесь к Web-серверу через SSM, как в P0, и проверьте роль `web`. Пакеты загружаются с внутреннего сервера `10.20.2.30`, заданного при начальной настройке.',
-   'P0 dagidek Web serverga SSM orqali ulaning va roli `web` ekanini tekshiring. Paketlar dastlabki sozlashda belgilangan ichki `10.20.2.30` serveridan olinadi.'),
+ T('P0と同じ方法でWebサーバーへSSMで接続する。内部の配布サーバー（`10.20.2.30`）からNginxのパッケージをダウンロードし、Webサーバーにインストールする。',
+   'Подключитесь к Web-серверу через SSM, как в P0. Скачайте пакет Nginx с внутреннего Repo-сервера (`10.20.2.30`) и установите его на Web-сервере.',
+   'P0 dagidek Web serverga SSM orqali ulaning. Nginx paketini ichki Repo serveridan (`10.20.2.30`) yuklab olib, Web serverga o‘rnating.'),
  'sudo apt-get update\nsudo apt-get install nginx',
  T('一覧を更新すると、配布サーバーの行に `Hit:` または `Get:` が表示される。`N: Ignoring file ... ubuntu.sources.jdu-disabled` は、初回セットアップで無効にしたUbuntu標準の配布先設定をAPTが読み飛ばしたという通知である。取得や署名のエラーがなければインストールへ進む。確認画面が出たら `Y` を入力する。',
    'При обновлении списка в строке внутреннего сервера появляется `Hit:` или `Get:`. Сообщение `N: Ignoring file ... ubuntu.sources.jdu-disabled` означает, что APT пропустил стандартный источник Ubuntu, отключённый при начальной настройке. Если ошибок загрузки или проверки подписи нет, продолжайте установку. Если APT запросит подтверждение, введите `Y`.',
@@ -111,34 +111,34 @@ sudo chown root:root /var/www/html/practice.txt
 sudo chmod 0644 /var/www/html/practice.txt
 stat -c '%U:%G %a %n' /var/www/html/practice.txt
 cat /var/www/html/practice.txt""",
- T('root:root 644。本文は JDU WEB-02 practice: HTTP response verified. の1行である。大文字、小文字、空白、句点も判定対象。', 'Ожидается root:root 644 и ровно строка JDU WEB-02 practice: HTTP response verified. Регистр, пробелы, точка и конечный перевод строки важны.', 'root:root 644 va aynan JDU WEB-02 practice: HTTP response verified. qatori chiqadi. Harf registri, bo‘shliq, nuqta va oxirgi yangi qator muhim.'),
- T('空白画面ならまだnano内。保存して終了してから次のcommandを実行する。既存のmission.txtは変更しない。', 'Если вы ещё в nano, сначала сохраните и выйдите. Не меняйте существующий mission.txt.', 'Hali nano ichida bo‘lsangiz, avval saqlab chiqing. Mavjud mission.txt ni o‘zgartirmang.'),
+ T('所有者・グループと権限は `root:root 644` と表示される。本文は `JDU WEB-02 practice: HTTP response verified.` の1行である。', 'Отображаются владелец, группа и права `root:root 644` и строка `JDU WEB-02 practice: HTTP response verified.`.', '`root:root 644` egasi, guruhi va ruxsatlari hamda `JDU WEB-02 practice: HTTP response verified.` qatori ko‘rinadi.'),
+ T('nanoが開いている場合は、保存して終了してから次のコマンドを実行する。', 'Если nano ещё открыт, сохраните файл и выйдите перед следующей командой.', 'Nano hali ochiq bo‘lsa, keyingi buyruqdan oldin faylni saqlab chiqing.'),
  editor_input='JDU WEB-02 practice: HTTP response verified.')
 step(m, T('Web rootとportを確認して起動する', 'Проверить Web root и запустить сервис', 'Web root ni tekshirish va service ni ishga tushirish'), 'web',
- T('Ubuntuの初期siteは/var/www/htmlをrootにする。nginx -Tで実効設定を読み、/etc/nginx/sites-enabled/defaultが有効でrootとlisten 80があることを確認する。変更が必要ならsudo nanoで編集し、構文検査に成功してからreloadする。enable --nowは今起動し、次のOS起動時も起動させる。',
-   'Начальный сайт Ubuntu использует root /var/www/html. Через nginx -T найдите включённый /etc/nginx/sites-enabled/default, root и listen 80. При необходимости редактируйте sudo nano; reload выполняйте после успешной проверки. enable --now запускает сейчас и включает автозапуск.',
-   'Ubuntu boshlang‘ich sayti root sifatida /var/www/html dan foydalanadi. nginx -T da /etc/nginx/sites-enabled/default, root va listen 80 ni toping. Kerak bo‘lsa sudo nano bilan tahrirlang; tekshiruvdan keyin reload qiling. enable --now hozir ishga tushiradi va keyingi OS yuklanishiga yoqadi.'),
+ T('`nginx -T` で有効な設定を表示し、`/etc/nginx/sites-enabled/default` に `root /var/www/html` と `listen 80` の指定があることを確認する。変更が必要なら `sudo nano` で編集し、構文検査に成功してから設定を再読み込みする。',
+   'Выведите действующую конфигурацию командой `nginx -T` и найдите `root /var/www/html` и `listen 80` в `/etc/nginx/sites-enabled/default`. При необходимости отредактируйте файл в `sudo nano` и перечитайте настройки после успешной проверки синтаксиса.',
+   '`nginx -T` bilan amaldagi sozlamani chiqaring. `/etc/nginx/sites-enabled/default` ichidan `root /var/www/html` va `listen 80` ni toping. Kerak bo‘lsa `sudo nano` bilan tahrirlang va sintaksis tekshiruvidan keyin sozlamani qayta yuklang.'),
  'sudo nginx -T\nsudo nginx -t\nsudo systemctl enable --now nginx\nsudo systemctl reload nginx\nsystemctl is-active nginx\nsudo ss -lntp',
- T('syntax is ok/test is successful、active、0.0.0.0:80等の待受。127.0.0.1:80だけでは他のサーバーから利用できない。', 'Ожидаются успешный синтаксис, active и слушатель вроде 0.0.0.0:80. Только 127.0.0.1:80 недоступен другим узлам.', 'Sintaksis muvaffaqiyatli, active va 0.0.0.0:80 kabi tinglash bor. Faqat 127.0.0.1:80 bo‘lsa, boshqa server foydalana olmaydi.'),
- T('失敗時はnginx -tのfile名・行番号を確認し、そのfileを直す。SGを変更しても構文エラーは直らない。', 'При ошибке используйте имя файла и строку из nginx -t. Изменение SG не исправит синтаксис.', 'Xatoda nginx -t ko‘rsatgan fayl va qatorni tuzating. SG ni o‘zgartirish sintaksis xatosini tuzatmaydi.'))
+ T('構文検査で `syntax is ok` と `test is successful`、起動状態で `active` が表示される。最後に、NginxがTCPの80番ポート（例 `0.0.0.0:80`）で待ち受けていることを確認する。', 'Проверка синтаксиса выводит `syntax is ok` и `test is successful`, а служба показывает `active`. Проверьте, что Nginx слушает TCP-порт 80, например `0.0.0.0:80`.', 'Sintaksis tekshiruvida `syntax is ok` va `test is successful`, xizmat holatida `active` chiqadi. Nginx TCP 80 portini, masalan `0.0.0.0:80` manzilida tinglayotganini tekshiring.'),
+ T('構文検査に失敗した場合は、`nginx -t` に表示されたファイル名と行番号を確認して修正する。', 'При ошибке синтаксиса исправьте файл и строку, указанные в выводе `nginx -t`.', 'Sintaksis xatosida `nginx -t` ko‘rsatgan fayl va qatorni tuzating.'))
 step(m, T('Web自身から応答を見る', 'Посмотреть ответ на самом Web', 'Web ichidan javobni ko‘rish'), 'web',
- T('curlはHTTP client。-iはstatus/headerと本文を表示する。127.0.0.1は今のWeb自身で、public IPではない。表示を読み、端末のcommandが成功しただけで合格としない。',
-   'curl — HTTP-клиент; -i показывает статус, заголовки и тело. 127.0.0.1 означает этот Web-сервер, не его public IP. Сравните ответ, а не только код завершения команды.',
-   'curl HTTP client; -i status, header va body ni ko‘rsatadi. 127.0.0.1 shu Web serverning o‘zi, public IP emas. Faqat buyruq tugaganini emas, javobni solishtiring.'),
- 'curl --noproxy \'*\' -i http://127.0.0.1/practice.txt',
- T('HTTP200と指定本文。404はfile/root/URLの関係、connection refusedはservice/listenを調べる。', 'HTTP 200 и заданный текст. При 404 проверяйте файл/root/URL; при connection refused — сервис и слушатель.', 'HTTP 200 va belgilangan matn. 404 bo‘lsa fayl/root/URL, connection refused bo‘lsa service va tinglashni tekshiring.'),
- T('Welcome to nginxが出るなら/ではなく/practice.txtを要求したか確認する。', 'При Welcome to nginx проверьте, что запросили /practice.txt, а не /.', 'Welcome to nginx chiqsa, / emas, /practice.txt so‘ralganini tekshiring.'))
-step(m, T('踏み台と外部から同じファイルを見る', 'Проверить тот же файл с бастиона и извне', 'Bastiondan va tashqaridan shu faylni tekshirish'), 'bst',
- T('Web端末をexitで閉じ、CloudShellから踏み台へSSM接続して下のURLを要求する。その後exitでCloudShellへ戻り、EC2に表示された現在のWeb公開IPv4を使って同じpathをcurl -iで要求する。内部の10.20.1.20と公開IPv4を混同しない。',
-   'Выйдите из Web через exit, откройте SSM бастиона из CloudShell и запросите URL ниже. Затем exit возвращает в CloudShell; там запросите тот же путь командой curl -i по текущему public IPv4 Web из EC2. Не путайте private 10.20.1.20 с public IPv4.',
-   'Web dan exit bilan chiqing, CloudShell dan bastion SSM terminalini ochib quyidagi URL ni so‘rang. Keyin exit bilan CloudShell ga qayting; EC2 dagi hozirgi Web public IPv4 orqali shu path ni curl -i bilan so‘rang. 10.20.1.20 private IP va public IPv4 ni adashtirmang.'),
- 'curl --noproxy \'*\' -i http://10.20.1.20/practice.txt',
- T('両経路とも200/同じ本文。InternetからのHTTP80は公開、管理8080とDB5432は公開しない。', 'На обоих маршрутах 200 и одинаковый текст. HTTP 80 открыт, управляющий 8080 и DB 5432 не публикуются.', 'Ikkala yo‘lda ham 200 va bir xil matn. HTTP 80 ochiq, boshqaruv 8080 va DB 5432 tashqariga ochilmaydi.'),
- T('内部成功/外部失敗なら現在のpublic IPとLab稼働を確認する。教師の基盤SGを無断で緩めない。', 'Если внутренний запрос успешен, а внешний нет, проверьте текущий public IP и Lab. Не ослабляйте базовые SG.', 'Ichki so‘rov o‘tib tashqi so‘rov o‘tmasa, public IP va Lab holatini tekshiring. Asosiy SG ni o‘zboshimchalik bilan kengaytirmang.'))
+ T('Webサーバーの端末で `curl` を使い、HTTPリクエストを送る。宛先の `127.0.0.1` は、コマンドを実行しているWebサーバー自身を指す。',
+   'Отправьте HTTP-запрос командой `curl` в терминале Web-сервера. Адрес `127.0.0.1` указывает на этот же сервер.',
+   'Web server terminalida `curl` bilan HTTP so‘rov yuboring. `127.0.0.1` buyruq bajarilayotgan Web serverning o‘zini bildiradi.'),
+ 'curl -i http://127.0.0.1/practice.txt',
+ T('HTTP 200と、practice.txtに書いた `JDU WEB-02 practice: HTTP response verified.` が表示される。', 'Отображаются HTTP 200 и строка из practice.txt: `JDU WEB-02 practice: HTTP response verified.`', 'HTTP 200 va practice.txt ichidagi `JDU WEB-02 practice: HTTP response verified.` qatori chiqadi.'),
+ T('「Welcome to nginx」が表示されたら、curlで `/practice.txt` を指定したか確認する。`http://127.0.0.1/` を開くとNginxの初期ページが返ることがある。', 'Если показано «Welcome to nginx», проверьте путь `/practice.txt` в команде curl. По адресу `http://127.0.0.1/` может открыться начальная страница Nginx.', '«Welcome to nginx» chiqsa, curl buyrug‘ida `/practice.txt` ko‘rsatilganini tekshiring. `http://127.0.0.1/` manzili Nginx bosh sahifasini qaytarishi mumkin.'))
+step(m, T('踏み台サーバーから同じファイルを見る', 'Проверить тот же файл с бастиона', 'Ayni faylni Bastion serveridan tekshirish'), 'bst',
+ T('踏み台サーバーへSSMで接続し、`curl` でWebサーバーにHTTPリクエストを送る。イントラネット（内部ネットワーク）から接続するので、宛先にはWebサーバーの内部IPアドレス `10.20.1.20` を指定する。',
+   'Подключитесь к бастиону через SSM и отправьте HTTP-запрос к Web-серверу командой `curl`. Из внутренней сети используйте внутренний IP Web-сервера `10.20.1.20`.',
+   'Bastion serverga SSM orqali ulaning va `curl` bilan Web serverga HTTP so‘rov yuboring. Ichki tarmoqdan Web serverning ichki IP manzili `10.20.1.20` ni kiriting.'),
+ 'curl -i http://10.20.1.20/practice.txt',
+ T('HTTP 200と、`JDU WEB-02 practice: HTTP response verified.` が表示される。', 'Отображаются HTTP 200 и строка `JDU WEB-02 practice: HTTP response verified.`', 'HTTP 200 va `JDU WEB-02 practice: HTTP response verified.` qatori chiqadi.'),
+ None)
 step(m, T('要求とlogを結び付けて提出する', 'Связать запрос с журналом и отправить', 'So‘rovni log bilan bog‘lash va yuborish'), 'web',
  T('Webへ戻り、access logの時刻・client IP・path・statusを見る。logは実際に要求を処理した証拠で、fileがある証拠とは別。exitでCloudShellへ戻ったら、PCのWeb PortalでP1を選び「この課題を確認する」を押す。', 'Вернитесь на Web. В access log найдите время, IP клиента, путь и статус. Это доказательство обработки запроса, не только наличия файла. После exit в CloudShell выберите P1 в Web Portal на PC и запустите проверку.', 'Web ga qayting. Access log da vaqt, client IP, path va statusni ko‘ring. Bu fayl borligidan tashqari so‘rov ishlanganining dalilidir. Exit bilan CloudShell ga qaytgach, PC dagi Web Portal da P1 ni tekshiring.'),
  'sudo tail -n 20 /var/log/nginx/access.log\nexit',
- T('練習8項目と準備確認の結果が表示・保存される。P1は成績0点。M1は別file/本文で自分で構成する。', 'Результаты восьми учебных проверок и готовности показаны и сохранены. P1 не даёт оценочных баллов; M1 требует другого файла и текста.', 'Sakkizta mashq va tayyorlik tekshiruvi natijalari ko‘rinib saqlanadi. P1 bahoga ball qo‘shmaydi; M1 boshqa fayl va matn bilan bajariladi.'),
+ T('確認画面に8項目の結果と、クリアした項目数が表示される。公開IPからのHTTPアクセスは採点システムが自動で確認する。', 'На экране показываются результаты восьми проверок и число выполненных критериев. Система автоматически проверяет HTTP-доступ по публичному IP.', 'Ekranda sakkizta tekshiruv natijasi va bajarilgan mezonlar soni ko‘rinadi. Tizim ochiq IP orqali HTTP ulanishini avtomatik tekshiradi.'),
  T('処理中なら結果を更新する。保存に失敗していれば表示された理由を確認する。checkerの期待本文を書き換えない。', 'Если идёт обработка, обновите результат. При ошибке сохранения прочитайте причину. Не меняйте ожидаемый текст checker.', 'Ishlov davom etsa natijani yangilang. Saqlash xatosida sababni o‘qing. Checker kutgan matnni o‘zgartirmang.'))
 
 m = module('P2', T('内部DNSと通常の名前解決', 'Внутренний DNS и системное разрешение имён', 'Ichki DNS va odatiy nom yechimi'),

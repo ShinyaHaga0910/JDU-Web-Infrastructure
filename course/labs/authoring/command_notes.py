@@ -66,6 +66,8 @@ def explanation(command, lang):
         return a(f'{transport} 53で {target} を問い合わせ、応答を読む。',f'Запросить {target} по {transport} 53 и прочитать ответ.',f'{transport} 53 orqali {target} ni so‘rab javobini o‘qish.')
     if args[0]=='curl':
         url=args[-1]
+        if args[1:2]==['-i'] and url.endswith('/practice.txt'):
+            return a(f'{url} へHTTPリクエストを送る。',f'Отправить HTTP-запрос по адресу {url}.',f'{url} manziliga HTTP so‘rov yuborish.')
         return a(f'{url} へHTTP要求し、status・header・本文を表示する。',f'Отправить HTTP к {url}; показать статус, заголовки и тело.',f'{url} ga HTTP yuborib status, header va matnni ko‘rsatish.')
     if args[0]=='psql':return a('Webから指定DBへ既存パスワードで接続し、SELECT結果を読む。','Подключиться с Web к нужной БД с существующим паролем и выполнить SELECT.','Web dan kerakli DB ga mavjud parol bilan ulanib SELECT natijasini o‘qish.')
     if command.startswith('\\password '):
@@ -104,7 +106,7 @@ def explanation(command, lang):
          'daemon-reload':a('配置したsystemd unitファイルを管理機能へ読み込ませる。','Перечитать установленные unit-файлы systemd.','Joylangan systemd unit fayllarini qayta o‘qitish.')
         }[verb]
     if program=='ss':return a('TCP待受のIP・port・対応プロセスを表示する。','Показать IP, порты и процессы слушающих TCP-сокетов.','TCP listen IP, port va jarayonlarini ko‘rsatish.')
-    if program=='nginx':return a('Nginxの設定全体を表示する（秘密の値は共有しない）。','Показать полную конфигурацию Nginx; не передавать секреты.','Nginx to‘liq sozlamasini ko‘rsatish; maxfiy qiymatlarni ulashmaslik.') if '-T' in args else a('Nginx設定の構文と参照ファイルを検査する。','Проверить синтаксис и файлы конфигурации Nginx.','Nginx config sintaksisi va fayllarini tekshirish.')
+    if program=='nginx':return a('Nginxの設定全体を表示し、どのように記載されているか確認する。','Вывести полную конфигурацию Nginx и посмотреть, как она записана.','Nginx ning to‘liq sozlamasini chiqarib, qanday yozilganini tekshirish.') if '-T' in args else a('Nginx設定の構文と参照ファイルを検査する。','Проверить синтаксис и файлы конфигурации Nginx.','Nginx config sintaksisi va fayllarini tekshirish.')
     if program=='named-checkconf':return a('BINDの設定と参照zoneを構文検査する。','Проверить конфигурацию BIND и подключённые zone.','BIND config va ulangan zone sintaksisini tekshirish.')
     if program=='named-checkzone':return a('lab.testのzoneファイルを検査する。','Проверить zone-файл lab.test.','Lab.test zone faylini tekshirish.')
     if program=='netplan':return a('netplan YAMLから設定を生成し、適用前の構文を検査する。','Сгенерировать конфигурацию netplan и проверить YAML перед применением.','Netplan YAML dan config yaratib, qo‘llashdan oldin sintaksisni tekshirish.') if args[1]=='generate' else a('保存したnetplan設定をネットワークへ適用する。','Применить сохранённые настройки netplan к сети.','Saqlangan netplan sozlamasini tarmoqqa qo‘llash.')
@@ -168,7 +170,12 @@ def annotated_blocks(module, index, source, lang):
         if (module,index) in PSQL_STEPS and command.startswith('\\') and not psql:
             out.append(('bash','\n'.join(parts)));parts=[];psql=True
         prefix='--' if psql else '#'
-        parts += [f'{prefix} {number}. {explanation(command,lang)}',command]
+        note=explanation(command,lang)
+        if (module,index)==('P1',3) and command=='sudo ss -lntp':
+            note=T('NginxがTCPの80番ポート（例 0.0.0.0:80）で待ち受けていることを確認する。',
+                   'Убедиться, что Nginx слушает TCP-порт 80, например 0.0.0.0:80.',
+                   'Nginx TCP 80 portini, masalan 0.0.0.0:80 manzilida tinglayotganini tekshirish.')[lang]
+        parts += [f'{prefix} {number}. {note}',command]
         if (module,index)==('P1',2) and command=='nano practice.txt':
             out.append(('bash','\n'.join(parts)))
             parts=[]

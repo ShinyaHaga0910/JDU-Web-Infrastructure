@@ -17,7 +17,7 @@ PROJECT = Path(os.environ.get('JDU_WEB_PROJECT_ROOT', str(Path(__file__).resolve
 from markdown_it import MarkdownIt
 from pages import write_pages, browser_check
 from command_notes import annotated_blocks
-from diagrams import diagram_markdown, write_diagrams
+from diagrams import diagram_markdown, write_diagrams, P1_STEP_DIAGRAMS
 from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE, RDP_STEPS
 from checks import CHECKS
 from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, RAW_MAXIMUM, active_registry
@@ -214,6 +214,8 @@ def make_markdown(reg, lang, kind):
                     continue
                 if step_id=='P0.2':
                     out += session_connect_guide(lang)
+                if m['id']=='P1' and i in P1_STEP_DIAGRAMS:
+                    out += [f'![{P1_STEP_DIAGRAMS[i][lang]}](../../assets/{lang}/p1-step-{i}.png)', '']
                 if step_id=='P0.3':
                     rdp_steps = list(enumerate(RDP_STEPS, 1))
                     out += illustrated_steps(lang, rdp_steps[:2])

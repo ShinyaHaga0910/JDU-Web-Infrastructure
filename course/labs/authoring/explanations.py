@@ -61,11 +61,9 @@ MODULE_NOTES = {
    'Проверьте свой AWS-аккаунт, роль каждого сервера и среду выполнения команд.',
    'O‘z AWS hisobingizni, har bir server rolini va buyruq bajariladigan muhitni tekshiring.')),
  'P1': dict(
-  before=T('Webは提供済みだが、練習用ファイルはまだ配信していない。', 'Web уже создан, но учебный файл ещё не выдаётся.', 'Web yaratilgan, ammo mashq fayli hali qaytarilmayapti.'),
-  after=T('Nginxが公開80番でpractice.txtを返し、要求をlogへ残す。', 'Nginx выдаёт practice.txt на порту 80 и записывает запрос в журнал.', 'Nginx 80 portda practice.txt qaytarib, request ni log ga yozadi.'),
-  mechanism=T('この練習では、URLの/practice.txtをWeb内の/var/www/html/practice.txtへ対応させる。最初の127.0.0.1での成功はWeb内部の確認で、踏み台やWindowsから届く証明にはならない。同じ本文を三つの位置から読み、どの経路まで正常かを切り分ける。[Nginxの一次資料](https://nginx.org/en/docs/beginners_guide.html)も参照。',
-   'Путь URL /practice.txt соответствует файлу /var/www/html/practice.txt на Web. Успех через 127.0.0.1 проверяет только сам Web. Чтение того же текста с бастиона и Windows проверяет другие участки пути. См. [документацию Nginx](https://nginx.org/en/docs/beginners_guide.html).',
-   'URL dagi /practice.txt Web ichidagi /var/www/html/practice.txt ga mos. 127.0.0.1 orqali muvaffaqiyat faqat Web ichini tekshiradi. Ayni matnni bastion va Windows dan o‘qish yo‘lning boshqa qismlarini tekshiradi. [Nginx hujjati](https://nginx.org/en/docs/beginners_guide.html).'),
+  after=T('NginxでTCPの80番ポートにHTTPを公開し、`/practice.txt` のリクエストにファイルの本文を返す。Webサーバー自身の端末と踏み台サーバーの端末からアクセスし、そのリクエストがNginxのアクセスログに残ることを確かめる。',
+   'Настройте Nginx для выдачи текста файла по HTTP на TCP-порту 80 по пути `/practice.txt`. Выполните запросы из терминалов Web-сервера и бастиона, затем найдите их в журнале доступа Nginx.',
+   'Nginx da HTTP uchun TCP 80 portini oching va `/practice.txt` so‘roviga fayl matnini qaytaring. Web serverning o‘z terminalidan va Bastion terminalidan so‘rov yuboring, so‘ng ularni Nginx access log ida tekshiring.'),
   question=T('Web自身では200、踏み台からは接続失敗。本文を作り直す前に何を確認するか？', 'На Web ответ 200, а с бастиона соединение не проходит. Что проверить до изменения файла?', 'Web ichida 200, bastiondan ulanish ishlamaydi. Faylni qayta yozishdan oldin nimani tekshirasiz?'),
   answer=T('要求先IP・待受アドレスとport・踏み台からWebへの通信許可を調べる。本文の正否と到達性を分ける。', 'Адрес назначения, адрес/порт прослушивания и разрешение пути bastion → Web. Содержимое файла и доступность - разные проверки.', 'Manzil IP, listen address/port va bastion → Web ruxsatini tekshiring. Fayl mazmuni va yetib borish alohida tekshiruvdir.')),
  'P2': dict(
@@ -133,13 +131,13 @@ note('P1.3',
  'Nginx -T выводит конфигурацию, -t проверяет синтаксис. В systemctl enable включает запуск при загрузке, --now запускает сейчас. После сохранения файла проверьте reload, состояние службы и порт.',
  'Nginx -T config ni ko‘rsatadi; -t sintaksisni tekshiradi. Systemctl enable keyingi boot da ishga tushishni, --now hozir ishga tushishni belgilaydi. Fayl saqlangach reload, service holati va portni tekshiring.')
 note('P1.4',
- 'curl -iは本文に加えてHTTP headerを表示する。127.0.0.1はこのWeb自身なので、この要求はInternetを通らない。HTTP200と指定本文の両方を読み、別ページの200を成功と取り違えない。',
- 'Curl -i показывает HTTP-заголовки вместе с телом. Адрес 127.0.0.1 означает сам Web, запрос не идёт через Internet. Проверяйте и код 200, и заданный текст; ответ другой страницы не подходит.',
- 'Curl -i body bilan HTTP header ni ham ko‘rsatadi. 127.0.0.1 ayni Web bo‘lib, request Internetdan o‘tmaydi. 200 kodi bilan belgilangan matnni birga tekshiring; boshqa sahifaning 200 javobi mos emas.')
+ '`127.0.0.1` はループバックアドレスで、リクエストは同じWebサーバー内のNginxに届く。',
+ '`127.0.0.1` — адрес обратной петли. Запрос приходит в Nginx на том же Web-сервере.',
+ '`127.0.0.1` — loopback manzili. So‘rov shu Web server ichidagi Nginx ga yetib boradi.')
 note('P1.5',
- '同じcurlでも踏み台から実行すれば内部通信の検査になる。WindowsのbrowserからはWebの現在の公開IPを使う。10.20.1.20をWindows側へ入力して到達できないことと、Webの停止を同一視しない。',
- 'Тот же curl с бастиона проверяет внутренний путь. В браузере Windows нужен текущий public IP Web. Недоступность 10.20.1.20 с Windows сама по себе не означает остановку Web.',
- 'Ayni curl bastiondan bajarilsa ichki yo‘l tekshiriladi. Windows browser ida Web ning joriy public IP si kerak. Windows dan 10.20.1.20 ga yetib bo‘lmasligi Web to‘xtaganini anglatmaydi.')
+ '宛先はWebサーバーの内部IPに変わる。リクエストするファイルのパスはP1.4と同じ `/practice.txt` を使う。',
+ 'Адрес назначения меняется на внутренний IP Web-сервера. Путь к файлу остаётся тем же, что и в P1.4, — `/practice.txt`.',
+ 'Manzil Web serverning ichki IP siga o‘zgaradi. Fayl yo‘li P1.4 dagidek `/practice.txt` bo‘lib qoladi.')
 note('P1.6',
  'access logでは時刻・要求path・statusを直前のcurlと対応させる。tailは末尾を読む操作で、logを書き換えない。exitで接続を終えたら、PCのブラウザでP1を確認する。',
  'Сопоставьте время, путь и статус в access log с недавним curl. Tail читает последние строки и не меняет журнал. После exit проверьте P1 в браузере PC.',

@@ -214,13 +214,13 @@ Nginx、保存先、待受、HTTP応答、access logを一組で確認する。
 
 ### 課題
 
-Webの/var/www/html/practice.txtから指定本文をHTTP200で返す。Web自身・踏み台・外部の三経路で確認する。
+Webサーバーの /var/www/html/practice.txt を HTTP 200 で配信する。
 
 ### 今回の見取り図
 
-![P1: Webの練習配信は未完成 → Web内の配信を設定する → 本文とログを照合する。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 左はインターネット側、右の枠はAWSのVPCです。IGWはVPCの境界に置き、踏み台を含む全EC2はAWS側にあります。](../../assets/ja/p1.png)
+![AWS内のIGW、Webサーバー、踏み台サーバー、配布サーバーとHTTPの経路。](../../assets/ja/p1.png)
 
-図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 左はインターネット側、右の枠はAWSのVPCです。IGWはVPCの境界に置き、踏み台を含む全EC2はAWS側にあります。
+
 
 - File: /var/www/html/practice.txt
 - URL path: /practice.txt
@@ -229,17 +229,9 @@ Webの/var/www/html/practice.txtから指定本文をHTTP200で返す。Web自�
 JDU WEB-02 practice: HTTP response verified.
 ```
 
-### 仕組みを理解する
-
-**始める前の状態:**
-
-Webは提供済みだが、練習用ファイルはまだ配信していない。
-
 **このPractice1で作業すること**
 
-Nginxが公開80番でpractice.txtを返し、要求をlogへ残す。
-
-この練習では、URLの/practice.txtをWeb内の/var/www/html/practice.txtへ対応させる。最初の127.0.0.1での成功はWeb内部の確認で、踏み台やWindowsから届く証明にはならない。同じ本文を三つの位置から読み、どの経路まで正常かを切り分ける。[Nginxの一次資料](https://nginx.org/en/docs/beginners_guide.html)も参照。
+NginxでTCPの80番ポートにHTTPを公開し、`/practice.txt` のリクエストにファイルの本文を返す。Webサーバー自身の端末と踏み台サーバーの端末からアクセスし、そのリクエストがNginxのアクセスログに残ることを確かめる。
 
 ### 解答例（操作手順）
 
@@ -251,7 +243,9 @@ WebサーバーのSSM端末：ssm-user
 
 **目的と操作:**
 
-P0と同じ方法でWebサーバーへSSMで接続し、ロールが `web` であることを確認する。初回セットアップで指定された内部の配布サーバー（`10.20.2.30`）からパッケージを取得する。
+P0と同じ方法でWebサーバーへSSMで接続する。内部の配布サーバー（`10.20.2.30`）からNginxのパッケージをダウンロードし、Webサーバーにインストールする。
+
+![配布サーバーからWebサーバーへNginxのパッケージをダウンロードする。](../../assets/ja/p1-step-1.png)
 
 入力するコマンド（番号はこの手順内の順番）
 
@@ -328,11 +322,11 @@ cat /var/www/html/practice.txt
 
 **期待する結果と読み方:**
 
-root:root 644。本文は JDU WEB-02 practice: HTTP response verified. の1行である。大文字、小文字、空白、句点も判定対象。
+所有者・グループと権限は `root:root 644` と表示される。本文は `JDU WEB-02 practice: HTTP response verified.` の1行である。
 
 **うまくいかないとき:**
 
-空白画面ならまだnano内。保存して終了してから次のcommandを実行する。既存のmission.txtは変更しない。
+nanoが開いている場合は、保存して終了してから次のコマンドを実行する。
 
 #### P1.3 Web rootとportを確認して起動する
 
@@ -342,12 +336,12 @@ WebサーバーのSSM端末：ssm-user
 
 **目的と操作:**
 
-Ubuntuの初期siteは/var/www/htmlをrootにする。nginx -Tで実効設定を読み、/etc/nginx/sites-enabled/defaultが有効でrootとlisten 80があることを確認する。変更が必要ならsudo nanoで編集し、構文検査に成功してからreloadする。enable --nowは今起動し、次のOS起動時も起動させる。
+`nginx -T` で有効な設定を表示し、`/etc/nginx/sites-enabled/default` に `root /var/www/html` と `listen 80` の指定があることを確認する。変更が必要なら `sudo nano` で編集し、構文検査に成功してから設定を再読み込みする。
 
 入力するコマンド（番号はこの手順内の順番）
 
 ```bash
-# 1. Nginxの設定全体を表示する（秘密の値は共有しない）。
+# 1. Nginxの設定全体を表示し、どのように記載されているか確認する。
 sudo nginx -T
 # 2. Nginx設定の構文と参照ファイルを検査する。
 sudo nginx -t
@@ -357,7 +351,7 @@ sudo systemctl enable --now nginx
 sudo systemctl reload nginx
 # 5. nginx の現在の起動状態を読む。
 systemctl is-active nginx
-# 6. TCP待受のIP・port・対応プロセスを表示する。
+# 6. NginxがTCPの80番ポート（例 0.0.0.0:80）で待ち受けていることを確認する。
 sudo ss -lntp
 ```
 
@@ -367,11 +361,11 @@ nginx -Tは読込対象の設定を表示し、-tは構文を検査する。syst
 
 **期待する結果と読み方:**
 
-syntax is ok/test is successful、active、0.0.0.0:80等の待受。127.0.0.1:80だけでは他のサーバーから利用できない。
+構文検査で `syntax is ok` と `test is successful`、起動状態で `active` が表示される。最後に、NginxがTCPの80番ポート（例 `0.0.0.0:80`）で待ち受けていることを確認する。
 
 **うまくいかないとき:**
 
-失敗時はnginx -tのfile名・行番号を確認し、そのfileを直す。SGを変更しても構文エラーは直らない。
+構文検査に失敗した場合は、`nginx -t` に表示されたファイル名と行番号を確認して修正する。
 
 #### P1.4 Web自身から応答を見る
 
@@ -381,28 +375,30 @@ WebサーバーのSSM端末：ssm-user
 
 **目的と操作:**
 
-curlはHTTP client。-iはstatus/headerと本文を表示する。127.0.0.1は今のWeb自身で、public IPではない。表示を読み、端末のcommandが成功しただけで合格としない。
+Webサーバーの端末で `curl` を使い、HTTPリクエストを送る。宛先の `127.0.0.1` は、コマンドを実行しているWebサーバー自身を指す。
+
+![同じWebサーバー内でcurlから127.0.0.1のNginxへリクエストを送る。](../../assets/ja/p1-step-4.png)
 
 入力するコマンド（番号はこの手順内の順番）
 
 ```bash
-# 1. http://127.0.0.1/practice.txt へHTTP要求し、status・header・本文を表示する。
-curl --noproxy '*' -i http://127.0.0.1/practice.txt
+# 1. http://127.0.0.1/practice.txt へHTTPリクエストを送る。
+curl -i http://127.0.0.1/practice.txt
 ```
 
 **コマンド・設定値の意味:**
 
-curl -iは本文に加えてHTTP headerを表示する。127.0.0.1はこのWeb自身なので、この要求はInternetを通らない。HTTP200と指定本文の両方を読み、別ページの200を成功と取り違えない。
+`127.0.0.1` はループバックアドレスで、リクエストは同じWebサーバー内のNginxに届く。
 
 **期待する結果と読み方:**
 
-HTTP200と指定本文。404はfile/root/URLの関係、connection refusedはservice/listenを調べる。
+HTTP 200と、practice.txtに書いた `JDU WEB-02 practice: HTTP response verified.` が表示される。
 
 **うまくいかないとき:**
 
-Welcome to nginxが出るなら/ではなく/practice.txtを要求したか確認する。
+「Welcome to nginx」が表示されたら、curlで `/practice.txt` を指定したか確認する。`http://127.0.0.1/` を開くとNginxの初期ページが返ることがある。
 
-#### P1.5 踏み台と外部から同じファイルを見る
+#### P1.5 踏み台サーバーから同じファイルを見る
 
 **実行環境:**
 
@@ -410,26 +406,24 @@ Welcome to nginxが出るなら/ではなく/practice.txtを要求したか確�
 
 **目的と操作:**
 
-Web端末をexitで閉じ、CloudShellから踏み台へSSM接続して下のURLを要求する。その後exitでCloudShellへ戻り、EC2に表示された現在のWeb公開IPv4を使って同じpathをcurl -iで要求する。内部の10.20.1.20と公開IPv4を混同しない。
+踏み台サーバーへSSMで接続し、`curl` でWebサーバーにHTTPリクエストを送る。イントラネット（内部ネットワーク）から接続するので、宛先にはWebサーバーの内部IPアドレス `10.20.1.20` を指定する。
+
+![踏み台サーバーのcurlがWebサーバーの内部IPアドレスへリクエストを送る。](../../assets/ja/p1-step-5.png)
 
 入力するコマンド（番号はこの手順内の順番）
 
 ```bash
-# 1. http://10.20.1.20/practice.txt へHTTP要求し、status・header・本文を表示する。
-curl --noproxy '*' -i http://10.20.1.20/practice.txt
+# 1. http://10.20.1.20/practice.txt へHTTPリクエストを送る。
+curl -i http://10.20.1.20/practice.txt
 ```
 
 **コマンド・設定値の意味:**
 
-同じcurlでも踏み台から実行すれば内部通信の検査になる。WindowsのbrowserからはWebの現在の公開IPを使う。10.20.1.20をWindows側へ入力して到達できないことと、Webの停止を同一視しない。
+宛先はWebサーバーの内部IPに変わる。リクエストするファイルのパスはP1.4と同じ `/practice.txt` を使う。
 
 **期待する結果と読み方:**
 
-両経路とも200/同じ本文。InternetからのHTTP80は公開、管理8080とDB5432は公開しない。
-
-**うまくいかないとき:**
-
-内部成功/外部失敗なら現在のpublic IPとLab稼働を確認する。教師の基盤SGを無断で緩めない。
+HTTP 200と、`JDU WEB-02 practice: HTTP response verified.` が表示される。
 
 #### P1.6 要求とlogを結び付けて提出する
 
@@ -456,7 +450,7 @@ access logでは時刻・要求path・statusを直前のcurlと対応させる�
 
 **期待する結果と読み方:**
 
-練習8項目と準備確認の結果が表示・保存される。P1は成績0点。M1は別file/本文で自分で構成する。
+確認画面に8項目の結果と、クリアした項目数が表示される。公開IPからのHTTPアクセスは採点システムが自動で確認する。
 
 **うまくいかないとき:**
 

@@ -13,35 +13,31 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения (порядок действий)</a> · <a href="#section-6">Пример чтения вывода (не вводить)</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P1 Выдача статического файла по HTTP</h1>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Пример решения (порядок действий)</a> · <a href="#section-5">Пример чтения вывода (не вводить)</a> · <a href="#section-6">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P1 Выдача статического файла по HTTP</h1>
 <p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
 <p><a href="../ja/p1.html">日本語</a> · <a href="../ru/p1.html">Русский</a> · <a href="../uz/p1.html">O‘zbekcha</a></p>
 <p>Связанное задание: <a href="m1.html">M1</a>.</p>
 <h2 id="section-1">Что изучаем</h2>
 <p>Связать Nginx, файл, прослушивание порта, HTTP-ответ и access log.</p>
 <h2 id="section-2">Задание</h2>
-<p>Файл /var/www/html/practice.txt на Web должен возвращать заданный текст с HTTP 200: локально, с бастиона и извне.</p>
+<p>Настройте выдачу файла /var/www/html/practice.txt с ответом HTTP 200.</p>
 <h2 id="section-3">Схема задания</h2>
-<p><img src="../../../assets/ru/p1.png" alt="P1: HTTP-задание ещё не готово → Настроить выдачу на Web → Сверить ответ и журнал。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Слева Интернет, справа VPC в AWS. IGW стоит на границе VPC; все EC2, включая бастион, находятся в AWS." width="1040" height="680" loading="lazy"></p>
-<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Слева Интернет, справа VPC в AWS. IGW стоит на границе VPC; все EC2, включая бастион, находятся в AWS.</p>
+<p><img src="../../../assets/ru/p1.png" alt="IGW в AWS, Web-сервер, бастион, Repo-сервер и маршруты HTTP." width="1040" height="680" loading="lazy"></p>
 <ul>
 <li>File: /var/www/html/practice.txt</li>
 <li>URL path: /practice.txt</li>
 </ul>
 <pre><code class="language-text">JDU WEB-02 practice: HTTP response verified.
 </code></pre>
-<h2 id="section-4">Как это работает</h2>
-<p><strong>Состояние перед началом:</strong></p>
-<p>Web уже создан, но учебный файл ещё не выдаётся.</p>
 <p><strong>Что сделать в Practice1</strong></p>
-<p>Nginx выдаёт practice.txt на порту 80 и записывает запрос в журнал.</p>
-<p>Путь URL /practice.txt соответствует файлу /var/www/html/practice.txt на Web. Успех через 127.0.0.1 проверяет только сам Web. Чтение того же текста с бастиона и Windows проверяет другие участки пути. См. <a href="https://nginx.org/en/docs/beginners_guide.html">документацию Nginx</a>.</p>
-<h2 id="section-5">Пример решения (порядок действий)</h2>
+<p>Настройте Nginx для выдачи текста файла по HTTP на TCP-порту 80 по пути <code>/practice.txt</code>. Выполните запросы из терминалов Web-сервера и бастиона, затем найдите их в журнале доступа Nginx.</p>
+<h2 id="section-4">Пример решения (порядок действий)</h2>
 <h3>P1.1 Установить Nginx из внутреннего APT</h3>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
-<p>Подключитесь к Web-серверу через SSM, как в P0, и проверьте роль <code>web</code>. Пакеты загружаются с внутреннего сервера <code>10.20.2.30</code>, заданного при начальной настройке.</p>
+<p>Подключитесь к Web-серверу через SSM, как в P0. Скачайте пакет Nginx с внутреннего Repo-сервера (<code>10.20.2.30</code>) и установите его на Web-сервере.</p>
+<p><img src="../../../assets/ru/p1-step-1.png" alt="Пакет Nginx загружается с Repo-сервера на Web-сервер." width="1040" height="680" loading="lazy"></p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Обновить список пакетов с внутреннего сервера.
 sudo apt-get update
@@ -90,16 +86,16 @@ cat /var/www/html/practice.txt
 <p><strong>Смысл команд и настроек:</strong></p>
 <p><code>cp</code> копирует текст в файл для публикации. <code>chown root:root</code> назначает root владельцем и группой копии. <code>chmod 0644</code> даёт владельцу право чтения и записи, а группе и остальным - право чтения.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Ожидается root:root 644 и ровно строка JDU WEB-02 practice: HTTP response verified. Регистр, пробелы, точка и конечный перевод строки важны.</p>
+<p>Отображаются владелец, группа и права <code>root:root 644</code> и строка <code>JDU WEB-02 practice: HTTP response verified.</code>.</p>
 <p><strong>Если не получилось:</strong></p>
-<p>Если вы ещё в nano, сначала сохраните и выйдите. Не меняйте существующий mission.txt.</p>
+<p>Если nano ещё открыт, сохраните файл и выйдите перед следующей командой.</p>
 <h3>P1.3 Проверить Web root и запустить сервис</h3>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
-<p>Начальный сайт Ubuntu использует root /var/www/html. Через nginx -T найдите включённый /etc/nginx/sites-enabled/default, root и listen 80. При необходимости редактируйте sudo nano; reload выполняйте после успешной проверки. enable --now запускает сейчас и включает автозапуск.</p>
+<p>Выведите действующую конфигурацию командой <code>nginx -T</code> и найдите <code>root /var/www/html</code> и <code>listen 80</code> в <code>/etc/nginx/sites-enabled/default</code>. При необходимости отредактируйте файл в <code>sudo nano</code> и перечитайте настройки после успешной проверки синтаксиса.</p>
 <p>Команды: нумерация внутри этого шага</p>
-<pre><code class="language-bash"># 1. Показать полную конфигурацию Nginx; не передавать секреты.
+<pre><code class="language-bash"># 1. Вывести полную конфигурацию Nginx и посмотреть, как она записана.
 sudo nginx -T
 # 2. Проверить синтаксис и файлы конфигурации Nginx.
 sudo nginx -t
@@ -109,45 +105,45 @@ sudo systemctl enable --now nginx
 sudo systemctl reload nginx
 # 5. Прочитать текущее состояние nginx.
 systemctl is-active nginx
-# 6. Показать IP, порты и процессы слушающих TCP-сокетов.
+# 6. Убедиться, что Nginx слушает TCP-порт 80, например 0.0.0.0:80.
 sudo ss -lntp
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
 <p>Nginx -T выводит конфигурацию, -t проверяет синтаксис. В systemctl enable включает запуск при загрузке, --now запускает сейчас. После сохранения файла проверьте reload, состояние службы и порт.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Ожидаются успешный синтаксис, active и слушатель вроде 0.0.0.0:80. Только 127.0.0.1:80 недоступен другим узлам.</p>
+<p>Проверка синтаксиса выводит <code>syntax is ok</code> и <code>test is successful</code>, а служба показывает <code>active</code>. Проверьте, что Nginx слушает TCP-порт 80, например <code>0.0.0.0:80</code>.</p>
 <p><strong>Если не получилось:</strong></p>
-<p>При ошибке используйте имя файла и строку из nginx -t. Изменение SG не исправит синтаксис.</p>
+<p>При ошибке синтаксиса исправьте файл и строку, указанные в выводе <code>nginx -t</code>.</p>
 <h3>P1.4 Посмотреть ответ на самом Web</h3>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
-<p>curl - HTTP-клиент; -i показывает статус, заголовки и тело. 127.0.0.1 означает этот Web-сервер, не его public IP. Сравните ответ, а не только код завершения команды.</p>
+<p>Отправьте HTTP-запрос командой <code>curl</code> в терминале Web-сервера. Адрес <code>127.0.0.1</code> указывает на этот же сервер.</p>
+<p><img src="../../../assets/ru/p1-step-4.png" alt="Внутри одного Web-сервера curl отправляет запрос в Nginx по адресу 127.0.0.1." width="1040" height="680" loading="lazy"></p>
 <p>Команды: нумерация внутри этого шага</p>
-<pre><code class="language-bash"># 1. Отправить HTTP к http://127.0.0.1/practice.txt; показать статус, заголовки и тело.
-curl --noproxy '*' -i http://127.0.0.1/practice.txt
+<pre><code class="language-bash"># 1. Отправить HTTP-запрос по адресу http://127.0.0.1/practice.txt.
+curl -i http://127.0.0.1/practice.txt
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
-<p>Curl -i показывает HTTP-заголовки вместе с телом. Адрес 127.0.0.1 означает сам Web, запрос не идёт через Internet. Проверяйте и код 200, и заданный текст; ответ другой страницы не подходит.</p>
+<p><code>127.0.0.1</code> - адрес обратной петли. Запрос приходит в Nginx на том же Web-сервере.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>HTTP 200 и заданный текст. При 404 проверяйте файл/root/URL; при connection refused - сервис и слушатель.</p>
+<p>Отображаются HTTP 200 и строка из practice.txt: <code>JDU WEB-02 practice: HTTP response verified.</code></p>
 <p><strong>Если не получилось:</strong></p>
-<p>При Welcome to nginx проверьте, что запросили /practice.txt, а не /.</p>
-<h3>P1.5 Проверить тот же файл с бастиона и извне</h3>
+<p>Если показано «Welcome to nginx», проверьте путь <code>/practice.txt</code> в команде curl. По адресу <code>http://127.0.0.1/</code> может открыться начальная страница Nginx.</p>
+<h3>P1.5 Проверить тот же файл с бастиона</h3>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал бастиона: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
-<p>Выйдите из Web через exit, откройте SSM бастиона из CloudShell и запросите URL ниже. Затем exit возвращает в CloudShell; там запросите тот же путь командой curl -i по текущему public IPv4 Web из EC2. Не путайте private 10.20.1.20 с public IPv4.</p>
+<p>Подключитесь к бастиону через SSM и отправьте HTTP-запрос к Web-серверу командой <code>curl</code>. Из внутренней сети используйте внутренний IP Web-сервера <code>10.20.1.20</code>.</p>
+<p><img src="../../../assets/ru/p1-step-5.png" alt="Curl на бастионе посылает запрос на внутренний IP Web-сервера." width="1040" height="680" loading="lazy"></p>
 <p>Команды: нумерация внутри этого шага</p>
-<pre><code class="language-bash"># 1. Отправить HTTP к http://10.20.1.20/practice.txt; показать статус, заголовки и тело.
-curl --noproxy '*' -i http://10.20.1.20/practice.txt
+<pre><code class="language-bash"># 1. Отправить HTTP-запрос по адресу http://10.20.1.20/practice.txt.
+curl -i http://10.20.1.20/practice.txt
 </code></pre>
 <p><strong>Смысл команд и настроек:</strong></p>
-<p>Тот же curl с бастиона проверяет внутренний путь. В браузере Windows нужен текущий public IP Web. Недоступность 10.20.1.20 с Windows сама по себе не означает остановку Web.</p>
+<p>Адрес назначения меняется на внутренний IP Web-сервера. Путь к файлу остаётся тем же, что и в P1.4, - <code>/practice.txt</code>.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>На обоих маршрутах 200 и одинаковый текст. HTTP 80 открыт, управляющий 8080 и DB 5432 не публикуются.</p>
-<p><strong>Если не получилось:</strong></p>
-<p>Если внутренний запрос успешен, а внешний нет, проверьте текущий public IP и Lab. Не ослабляйте базовые SG.</p>
+<p>Отображаются HTTP 200 и строка <code>JDU WEB-02 practice: HTTP response verified.</code></p>
 <h3>P1.6 Связать запрос с журналом и отправить</h3>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
@@ -162,16 +158,16 @@ exit
 <p><strong>Смысл команд и настроек:</strong></p>
 <p>Сопоставьте время, путь и статус в access log с недавним curl. Tail читает последние строки и не меняет журнал. После exit проверьте P1 в браузере PC.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Результаты восьми учебных проверок и готовности показаны и сохранены. P1 не даёт оценочных баллов; M1 требует другого файла и текста.</p>
+<p>На экране показываются результаты восьми проверок и число выполненных критериев. Система автоматически проверяет HTTP-доступ по публичному IP.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Если идёт обработка, обновите результат. При ошибке сохранения прочитайте причину. Не меняйте ожидаемый текст checker.</p>
-<h2 id="section-6">Пример чтения вывода (не вводить)</h2>
+<h2 id="section-5">Пример чтения вывода (не вводить)</h2>
 <pre><code class="language-text">HTTP/1.1 200 OK
 
 JDU WEB-02 practice: HTTP response verified.
 </code></pre>
 <p>Показаны только нужные строки; реальный ответ содержит и другие заголовки. Проверьте 200, текст и путь/статус в access log.</p>
-<h2 id="section-7">Проверка понимания (без баллов)</h2>
+<h2 id="section-6">Проверка понимания (без баллов)</h2>
 <p>На Web ответ 200, а с бастиона соединение не проходит. Что проверить до изменения файла?</p>
 <p><strong>Объяснение:</strong></p>
 <p>Адрес назначения, адрес/порт прослушивания и разрешение пути bastion → Web. Содержимое файла и доступность - разные проверки.</p>

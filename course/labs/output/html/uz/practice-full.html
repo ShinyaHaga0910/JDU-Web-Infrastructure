@@ -208,28 +208,24 @@ mstsc /prompt
 <h3>Nimani o‘rganamiz</h3>
 <p>Nginx, fayl joyi, tinglash porti, HTTP javobi va access log ni bog‘lash.</p>
 <h3>Topshiriq</h3>
-<p>Web dagi /var/www/html/practice.txt belgilangan matnni HTTP 200 bilan qaytarsin: Web ichidan, bastiondan va tashqaridan tekshiring.</p>
+<p>Web serverdagi /var/www/html/practice.txt faylini HTTP 200 bilan qaytaring.</p>
 <h3>Topshiriq diagrammasi</h3>
-<p><img src="../../../assets/uz/p1.png" alt="P1: HTTP topshirig‘i hali tayyor emas → Web ichida tarqatishni sozlash → Javob va log ni solishtirish。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida." width="1040" height="680" loading="lazy"></p>
-<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida.</p>
+<p><img src="../../../assets/uz/p1.png" alt="AWS ichidagi IGW, Web server, Bastion va Repo serverlari hamda HTTP yo‘llari." width="1040" height="680" loading="lazy"></p>
 <ul>
 <li>File: /var/www/html/practice.txt</li>
 <li>URL path: /practice.txt</li>
 </ul>
 <pre><code class="language-text">JDU WEB-02 practice: HTTP response verified.
 </code></pre>
-<h3>Bu qanday ishlaydi</h3>
-<p><strong>Boshlashdan oldingi holat:</strong></p>
-<p>Web yaratilgan, ammo mashq fayli hali qaytarilmayapti.</p>
 <p><strong>Practice1 da bajariladigan ishlar</strong></p>
-<p>Nginx 80 portda practice.txt qaytarib, request ni log ga yozadi.</p>
-<p>URL dagi /practice.txt Web ichidagi /var/www/html/practice.txt ga mos. 127.0.0.1 orqali muvaffaqiyat faqat Web ichini tekshiradi. Ayni matnni bastion va Windows dan o‘qish yo‘lning boshqa qismlarini tekshiradi. <a href="https://nginx.org/en/docs/beginners_guide.html">Nginx hujjati</a>.</p>
+<p>Nginx da HTTP uchun TCP 80 portini oching va <code>/practice.txt</code> so‘roviga fayl matnini qaytaring. Web serverning o‘z terminalidan va Bastion terminalidan so‘rov yuboring, so‘ng ularni Nginx access log ida tekshiring.</p>
 <h3>Yechim namunasi (bajarish tartibi)</h3>
 <h4>P1.1 Ichki APT dan Nginx o‘rnatish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>P0 dagidek Web serverga SSM orqali ulaning va roli <code>web</code> ekanini tekshiring. Paketlar dastlabki sozlashda belgilangan ichki <code>10.20.2.30</code> serveridan olinadi.</p>
+<p>P0 dagidek Web serverga SSM orqali ulaning. Nginx paketini ichki Repo serveridan (<code>10.20.2.30</code>) yuklab olib, Web serverga o‘rnating.</p>
+<p><img src="../../../assets/uz/p1-step-1.png" alt="Nginx paketi Repo serveridan Web serverga yuklab olinadi." width="1040" height="680" loading="lazy"></p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. Ichki serverdagi paketlar ro‘yxatini yangilash.
 sudo apt-get update
@@ -278,16 +274,16 @@ cat /var/www/html/practice.txt
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
 <p><code>cp</code> matnni tarqatiladigan faylga nusxalaydi. <code>chown root:root</code> nusxaning egasi va guruhini root ga o‘zgartiradi. <code>chmod 0644</code> egaga o‘qish va yozish, guruh va boshqa foydalanuvchilarga o‘qish huquqini beradi.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>root:root 644 va aynan JDU WEB-02 practice: HTTP response verified. qatori chiqadi. Harf registri, bo‘shliq, nuqta va oxirgi yangi qator muhim.</p>
+<p><code>root:root 644</code> egasi, guruhi va ruxsatlari hamda <code>JDU WEB-02 practice: HTTP response verified.</code> qatori ko‘rinadi.</p>
 <p><strong>Ishlamasa:</strong></p>
-<p>Hali nano ichida bo‘lsangiz, avval saqlab chiqing. Mavjud mission.txt ni o‘zgartirmang.</p>
+<p>Nano hali ochiq bo‘lsa, keyingi buyruqdan oldin faylni saqlab chiqing.</p>
 <h4>P1.3 Web root ni tekshirish va service ni ishga tushirish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>Ubuntu boshlang‘ich sayti root sifatida /var/www/html dan foydalanadi. nginx -T da /etc/nginx/sites-enabled/default, root va listen 80 ni toping. Kerak bo‘lsa sudo nano bilan tahrirlang; tekshiruvdan keyin reload qiling. enable --now hozir ishga tushiradi va keyingi OS yuklanishiga yoqadi.</p>
+<p><code>nginx -T</code> bilan amaldagi sozlamani chiqaring. <code>/etc/nginx/sites-enabled/default</code> ichidan <code>root /var/www/html</code> va <code>listen 80</code> ni toping. Kerak bo‘lsa <code>sudo nano</code> bilan tahrirlang va sintaksis tekshiruvidan keyin sozlamani qayta yuklang.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
-<pre><code class="language-bash"># 1. Nginx to‘liq sozlamasini ko‘rsatish; maxfiy qiymatlarni ulashmaslik.
+<pre><code class="language-bash"># 1. Nginx ning to‘liq sozlamasini chiqarib, qanday yozilganini tekshirish.
 sudo nginx -T
 # 2. Nginx config sintaksisi va fayllarini tekshirish.
 sudo nginx -t
@@ -297,45 +293,45 @@ sudo systemctl enable --now nginx
 sudo systemctl reload nginx
 # 5. nginx joriy ish holatini o‘qish.
 systemctl is-active nginx
-# 6. TCP listen IP, port va jarayonlarini ko‘rsatish.
+# 6. Nginx TCP 80 portini, masalan 0.0.0.0:80 manzilida tinglayotganini tekshirish.
 sudo ss -lntp
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
 <p>Nginx -T config ni ko‘rsatadi; -t sintaksisni tekshiradi. Systemctl enable keyingi boot da ishga tushishni, --now hozir ishga tushishni belgilaydi. Fayl saqlangach reload, service holati va portni tekshiring.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>Sintaksis muvaffaqiyatli, active va 0.0.0.0:80 kabi tinglash bor. Faqat 127.0.0.1:80 bo‘lsa, boshqa server foydalana olmaydi.</p>
+<p>Sintaksis tekshiruvida <code>syntax is ok</code> va <code>test is successful</code>, xizmat holatida <code>active</code> chiqadi. Nginx TCP 80 portini, masalan <code>0.0.0.0:80</code> manzilida tinglayotganini tekshiring.</p>
 <p><strong>Ishlamasa:</strong></p>
-<p>Xatoda nginx -t ko‘rsatgan fayl va qatorni tuzating. SG ni o‘zgartirish sintaksis xatosini tuzatmaydi.</p>
+<p>Sintaksis xatosida <code>nginx -t</code> ko‘rsatgan fayl va qatorni tuzating.</p>
 <h4>P1.4 Web ichidan javobni ko‘rish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>curl HTTP client; -i status, header va body ni ko‘rsatadi. 127.0.0.1 shu Web serverning o‘zi, public IP emas. Faqat buyruq tugaganini emas, javobni solishtiring.</p>
+<p>Web server terminalida <code>curl</code> bilan HTTP so‘rov yuboring. <code>127.0.0.1</code> buyruq bajarilayotgan Web serverning o‘zini bildiradi.</p>
+<p><img src="../../../assets/uz/p1-step-4.png" alt="Bitta Web server ichida curl 127.0.0.1 manzilidagi Nginx ga so‘rov yuboradi." width="1040" height="680" loading="lazy"></p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
-<pre><code class="language-bash"># 1. http://127.0.0.1/practice.txt ga HTTP yuborib status, header va matnni ko‘rsatish.
-curl --noproxy '*' -i http://127.0.0.1/practice.txt
+<pre><code class="language-bash"># 1. http://127.0.0.1/practice.txt manziliga HTTP so‘rov yuborish.
+curl -i http://127.0.0.1/practice.txt
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Curl -i body bilan HTTP header ni ham ko‘rsatadi. 127.0.0.1 ayni Web bo‘lib, request Internetdan o‘tmaydi. 200 kodi bilan belgilangan matnni birga tekshiring; boshqa sahifaning 200 javobi mos emas.</p>
+<p><code>127.0.0.1</code> - loopback manzili. So‘rov shu Web server ichidagi Nginx ga yetib boradi.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>HTTP 200 va belgilangan matn. 404 bo‘lsa fayl/root/URL, connection refused bo‘lsa service va tinglashni tekshiring.</p>
+<p>HTTP 200 va practice.txt ichidagi <code>JDU WEB-02 practice: HTTP response verified.</code> qatori chiqadi.</p>
 <p><strong>Ishlamasa:</strong></p>
-<p>Welcome to nginx chiqsa, / emas, /practice.txt so‘ralganini tekshiring.</p>
-<h4>P1.5 Bastiondan va tashqaridan shu faylni tekshirish</h4>
+<p>«Welcome to nginx» chiqsa, curl buyrug‘ida <code>/practice.txt</code> ko‘rsatilganini tekshiring. <code>http://127.0.0.1/</code> manzili Nginx bosh sahifasini qaytarishi mumkin.</p>
+<h4>P1.5 Ayni faylni Bastion serveridan tekshirish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Bastionning SSM terminali: ssm-user</p>
 <p><strong>Maqsad va amallar:</strong></p>
-<p>Web dan exit bilan chiqing, CloudShell dan bastion SSM terminalini ochib quyidagi URL ni so‘rang. Keyin exit bilan CloudShell ga qayting; EC2 dagi hozirgi Web public IPv4 orqali shu path ni curl -i bilan so‘rang. 10.20.1.20 private IP va public IPv4 ni adashtirmang.</p>
+<p>Bastion serverga SSM orqali ulaning va <code>curl</code> bilan Web serverga HTTP so‘rov yuboring. Ichki tarmoqdan Web serverning ichki IP manzili <code>10.20.1.20</code> ni kiriting.</p>
+<p><img src="../../../assets/uz/p1-step-5.png" alt="Bastion serveridagi curl Web serverning ichki IP manziliga so‘rov yuboradi." width="1040" height="680" loading="lazy"></p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
-<pre><code class="language-bash"># 1. http://10.20.1.20/practice.txt ga HTTP yuborib status, header va matnni ko‘rsatish.
-curl --noproxy '*' -i http://10.20.1.20/practice.txt
+<pre><code class="language-bash"># 1. http://10.20.1.20/practice.txt manziliga HTTP so‘rov yuborish.
+curl -i http://10.20.1.20/practice.txt
 </code></pre>
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
-<p>Ayni curl bastiondan bajarilsa ichki yo‘l tekshiriladi. Windows browser ida Web ning joriy public IP si kerak. Windows dan 10.20.1.20 ga yetib bo‘lmasligi Web to‘xtaganini anglatmaydi.</p>
+<p>Manzil Web serverning ichki IP siga o‘zgaradi. Fayl yo‘li P1.4 dagidek <code>/practice.txt</code> bo‘lib qoladi.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>Ikkala yo‘lda ham 200 va bir xil matn. HTTP 80 ochiq, boshqaruv 8080 va DB 5432 tashqariga ochilmaydi.</p>
-<p><strong>Ishlamasa:</strong></p>
-<p>Ichki so‘rov o‘tib tashqi so‘rov o‘tmasa, public IP va Lab holatini tekshiring. Asosiy SG ni o‘zboshimchalik bilan kengaytirmang.</p>
+<p>HTTP 200 va <code>JDU WEB-02 practice: HTTP response verified.</code> qatori chiqadi.</p>
 <h4>P1.6 So‘rovni log bilan bog‘lash va yuborish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Web serverning SSM terminali: ssm-user</p>
@@ -350,7 +346,7 @@ exit
 <p><strong>Buyruq va sozlamalar ma’nosi:</strong></p>
 <p>Access log dagi vaqt, path va status ni oldingi curl bilan solishtiring. Tail oxirgi qatorlarni o‘qiydi, log ni o‘zgartirmaydi. Exit dan keyin PC brauzerida P1 ni tekshiring.</p>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
-<p>Sakkizta mashq va tayyorlik tekshiruvi natijalari ko‘rinib saqlanadi. P1 bahoga ball qo‘shmaydi; M1 boshqa fayl va matn bilan bajariladi.</p>
+<p>Ekranda sakkizta tekshiruv natijasi va bajarilgan mezonlar soni ko‘rinadi. Tizim ochiq IP orqali HTTP ulanishini avtomatik tekshiradi.</p>
 <p><strong>Ishlamasa:</strong></p>
 <p>Ishlov davom etsa natijani yangilang. Saqlash xatosida sababni o‘qing. Checker kutgan matnni o‘zgartirmang.</p>
 <h3>Natijani o‘qish namunasi (kiritmang)</h3>

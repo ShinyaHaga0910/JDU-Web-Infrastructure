@@ -85,7 +85,7 @@ def main():
             ok(f'{lang}_{kind}_pdf_A4',all(abs(float(p.mediabox.width)-595.276)<1 and abs(float(p.mediabox.height)-841.890)<1 for p in pdf.pages))
             ok(f'{lang}_{kind}_pdf_text',len(text)>5000 and all(prefix+str(n) in text for n in ACTIVE_NUMBERS for prefix in [('P' if kind=='practice' else 'M')]) and '\ufffd' not in text and '\x00' not in text)
             images=sum(sum(obj.get_object().get('/Subtype')=='/Image' for obj in p.get('/Resources',{}).get('/XObject',{}).values()) for p in pdf.pages)
-            ok(f'{lang}_{kind}_pdf_figures',images==(15 if kind=='practice' else 8))
+            ok(f'{lang}_{kind}_pdf_figures',images==(18 if kind=='practice' else 8))
             if kind=='practice':
                 expected=sum(sum(active for active,_ in command_groups(s['code'])) for m in MODULES for i,s in enumerate(m['steps'],1) if s['code'] and (m['id'],i) not in CONFIG_STEPS)
                 ok(f'{lang}_pdf_numbered_comments',len(re.findall(r'(?:#|--) \d+\.',text))==expected)
@@ -146,7 +146,7 @@ def main():
                 task=prefix+str(number)
                 md=(ROOT/'docs'/lang/(task.lower()+'.md')).read_text(encoding='utf-8')
                 images=[c for t in parser.parse(md) for c in t.children or [] if c.type=='image']
-                expected_images={'P0': 10, 'M0': 3}.get(task, 1)
+                expected_images={'P0': 10, 'M0': 3, 'P1': 4}.get(task, 1)
                 diagram_link=f'../../assets/{lang}/{diagram_stem(task)}.png'
                 ok(f'{lang}_{task}_diagram_in_page',len(images)==expected_images
                    and images[0].attrGet('src')==diagram_link and bool(images[0].content.strip()))
@@ -156,7 +156,13 @@ def main():
                 with Image.open(image_path) as img:ok(f'{lang}_{task}_diagram_size',img.size==(2080,1360))
                 svg=ET.parse(image_path.with_suffix('.svg')).getroot()
                 ok(f'{lang}_{task}_editable_svg',svg.attrib['viewBox']=='0 0 1040 680' and len(list(svg.iter('{http://www.w3.org/2000/svg}text')))>15)
-                if number in (1,5,6):
+                if task=='P1':
+                    tags=list(svg.iter('{http://www.w3.org/2000/svg}text'))
+                    ok(f'{lang}_{task}_internet_aws_boundary',
+                       any(t.text=='AWS' for t in tags) and any(t.text=='VPC  10.20.0.0/16' for t in tags)
+                       and any(t.text=='IGW' and float(t.attrib['x'])==386 for t in tags)
+                       and all(float(t.attrib['x'])>386 for t in tags if t.text=='EC2'))
+                elif number in (1,5,6):
                     texts=list(svg.iter('{http://www.w3.org/2000/svg}text'))
                     boundary=440 if number==1 else 325
                     ok(f'{lang}_{task}_internet_aws_boundary',any(t.text=='AWS / VPC 10.20.0.0/16' for t in texts)
@@ -168,6 +174,8 @@ def main():
             fields = ('why','expect','trouble')
             if module['id']=='P0' and i in (1,2):
                 fields = ('why',) if i==1 else ('why','expect')
+            if module['id']=='P1' and i==5:
+                fields = ('why','expect')
             ok(f'{module["id"]}.{i}_step_fields',all(all(step[field].values()) for field in fields))
     for info,source in code['ja','practice']+code['ja','missions']:
         if info=='bash':

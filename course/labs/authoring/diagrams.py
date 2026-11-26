@@ -149,6 +149,10 @@ def diagram_text(task,lang):
             'Зелёные стрелки ведут к четырём серверам для M0.',
             'Yashil strelkalar M0 da ulaniladigan to‘rtta serverga olib boradi.')[lang]
         return caption,caption
+    if task=='P1':
+        return T('AWS内のIGW、Webサーバー、踏み台サーバー、配布サーバーとHTTPの経路。',
+                 'IGW в AWS, Web-сервер, бастион, Repo-сервер и маршруты HTTP.',
+                 'AWS ichidagi IGW, Web server, Bastion va Repo serverlari hamda HTTP yo‘llari.')[lang],''
     before,action,result=STAGES[n]
     caption=T('図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。','Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки.','Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir.')[lang]
     caption+=' '+T('SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。','Разрешения SG заданы начальным комплектом; здесь настраивается сервер.','SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz.')[lang]
@@ -165,14 +169,80 @@ def diagram_text(task,lang):
     alt=f'{task}: {before[lang]} → {action[lang]} → {result[lang]}。 '+caption
     return alt,caption
 
+P1_STEP_DIAGRAMS={
+    1:T('配布サーバーからWebサーバーへNginxのパッケージをダウンロードする。',
+        'Пакет Nginx загружается с Repo-сервера на Web-сервер.',
+        'Nginx paketi Repo serveridan Web serverga yuklab olinadi.'),
+    4:T('同じWebサーバー内でcurlから127.0.0.1のNginxへリクエストを送る。',
+        'Внутри одного Web-сервера curl отправляет запрос в Nginx по адресу 127.0.0.1.',
+        'Bitta Web server ichida curl 127.0.0.1 manzilidagi Nginx ga so‘rov yuboradi.'),
+    5:T('踏み台サーバーのcurlがWebサーバーの内部IPアドレスへリクエストを送る。',
+        'Curl на бастионе посылает запрос на внутренний IP Web-сервера.',
+        'Bastion serveridagi curl Web serverning ichki IP manziliga so‘rov yuboradi.'),
+}
+
+
+def p1_overview(s):
+    lang=s.lang
+    s.text(25,15,T('P1で使うサーバーと通信経路','Серверы и маршруты в P1','P1 serverlari va aloqa yo‘llari')[lang],25)
+    s.rect(224,65,790,575,fill='#f1f7fc',stroke='#7e9cb3',width=2)
+    s.text(247,77,'AWS',20)
+    s.rect(386,120,603,477,stroke='#7e9cb3',width=2)
+    s.text(417,135,'VPC  10.20.0.0/16',19)
+    s.simple(35,222,LABELS['pc'][lang],w=150)
+    s.simple(341,222,'IGW',w=90)
+    s.node('web',714,215,True,w=239)
+    s.node('bastion',428,402,w=216)
+    s.node('repo',714,438,w=239)
+    s.path([(185,254),(341,254)])
+    s.path([(431,254),(714,254)],'HTTP / TCP 80',(565,220))
+    s.path([(536,402),(536,290),(714,290)],'HTTP / TCP 80',(592,337))
+    s.path([(834,301),(834,438)],'APT / HTTP',(834,355))
+    s.text(834,525,T('Nginxパッケージ','Пакет Nginx','Nginx paketi')[lang],16,center=True,color=MUTED)
+
+
+def p1_step_diagram(s,step):
+    lang=s.lang
+    s.rect(75,100,890,480,fill='#f1f7fc',stroke='#7e9cb3',width=2)
+    s.text(98,112,'AWS',20)
+    s.rect(102,151,836,399,stroke='#7e9cb3',width=2)
+    s.text(124,164,'VPC  10.20.0.0/16',19)
+    if step==1:
+        s.node('repo',155,270,w=215)
+        s.node('web',668,270,True,w=215)
+        s.path([(370,313),(668,313)],T('Nginxパッケージ','Пакет Nginx','Nginx paketi')[lang],(519,272))
+        s.text(775,380,T('APTでインストール','Установка через APT','APT orqali o‘rnatish')[lang],19,center=True)
+    elif step==4:
+        s.rect(152,222,735,260,fill='#e7f4f2',stroke=TEAL,width=2)
+        s.text(176,234,'EC2 '+LABELS['web'][lang]+('ー' if lang=='ja' else ''),20)
+        s.simple(190,331,'curl',w=150)
+        s.simple(699,331,'Nginx',w=150)
+        s.path([(340,363),(699,363)],'HTTP → 127.0.0.1:80',(519,325))
+        s.text(519,405,'/practice.txt',19,center=True)
+    else:
+        s.node('bastion',155,270,w=215)
+        s.node('web',668,270,True,w=215)
+        s.path([(370,313),(668,313)],'HTTP / TCP 80',(519,272))
+        s.text(262,375,'curl',19,center=True)
+        s.text(775,375,'Nginx /practice.txt',19,center=True)
+
 def write_diagrams(root):
     counts={}
     for lang in LANGS:
+        for step,labels in P1_STEP_DIAGRAMS.items():
+            s=Scene(lang,f'P1.{step}')
+            p1_step_diagram(s,step)
+            s.finish(root/'assets'/lang/f'p1-step-{step}',labels[lang])
         for prefix in ('P','M'):
             for n in ACTIVE_NUMBERS:
                 task=prefix+str(n);s=Scene(lang,task)
                 if n==0:
                     connection_diagram(s)
+                    alt,_=diagram_text(task,lang)
+                    counts[f'{lang}/{task}']=s.finish(root/'assets'/lang/diagram_stem(task),alt)
+                    continue
+                if task=='P1':
+                    p1_overview(s)
                     alt,_=diagram_text(task,lang)
                     counts[f'{lang}/{task}']=s.finish(root/'assets'/lang/diagram_stem(task),alt)
                     continue
