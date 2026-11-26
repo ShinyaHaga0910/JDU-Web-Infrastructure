@@ -1,0 +1,107 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M3 Подключение к PostgreSQL с аутентификацией (9)</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Требуемый результат</a> · <a href="#section-2">Схема задания</a> · <a href="#section-3">Критерии оценки</a> · <a href="#section-4">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M3 Подключение к PostgreSQL с аутентификацией (9)</h1>
+<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M5</a></p>
+<p><a href="../ja/m3.html">日本語</a> · <a href="../ru/m3.html">Русский</a> · <a href="../uz/m3.html">O‘zbekcha</a></p>
+<p>Связанное задание: <a href="p4.html">P4</a>.</p>
+<h2 id="section-1">Требуемый результат</h2>
+<p>Перед началом убедитесь на странице оценок, что за <a href="m2.html">M2</a> получен полный балл.</p>
+<p>В PostgreSQL из P4 создайте основную БД и две роли, указанные ниже. Таблицы приложения создаются в M4.</p>
+<ol>
+<li><strong>DB-сервер (P4.2-P4.6).</strong> Создайте БД и роли и разрешите подключение к нужной БД с указанными ролями только с Web-сервера (<code>10.20.1.20/32</code>). Используйте SCRAM, как в P4.</li>
+<li><strong>Web-сервер (P4.7-P4.8).</strong> Подключитесь к <code>db.lab.test</code> под рабочей ролью и выполните SELECT. Сохраните существующий пароль для профиля <code>mission</code> тем же способом, что и в P4.8.</li>
+</ol>
+<h2 id="section-2">Схема задания</h2>
+<p><img src="../../../assets/ru/m3.png" alt="Web разрешает имя DB-сервера и подключается к PostgreSQL." width="1040" height="680" loading="lazy"></p>
+<table>
+<thead>
+<tr>
+<th scope="col">Настройка</th>
+<th scope="col">Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Имя базы данных</td>
+<td><code>jdu_catalog</code></td>
+</tr>
+<tr>
+<td>Роль настройки</td>
+<td><code>catalog_setup</code></td>
+</tr>
+<tr>
+<td>Рабочая роль</td>
+<td><code>catalog_app</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="section-3">Критерии оценки</h2>
+<p>Каждый критерий даёт 1 балл.</p>
+<table>
+<thead>
+<tr>
+<th scope="col">№</th>
+<th scope="col">Условие</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>PostgreSQL 16/main работает (active).</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Настройки 16/main, стандартный data directory и socket/peer для OS postgres корректны.</td>
+</tr>
+<tr>
+<td>3</td>
+<td>PostgreSQL слушает 10.20.2.20:5432.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Владельцем БД и schema public является соответствующая setup-role.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Runtime LOGIN; нет superuser/CREATEDB/CREATEROLE/REPLICATION/BYPASSRLS и повышающих membership. Setup LOGIN при сборке или NOLOGIN после неё.</td>
+</tr>
+<tr>
+<td>6</td>
+<td>HBA допускает SCRAM лишь для перечисленных DB/role с Web /32, без широких разрешений.</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Новый аутентифицированный SELECT с Web возвращает нужные DB/user/значение; P по IP, M через обычный DNS.</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Один неверный пароль явно отклонён в том же запуске, где правильный работает.</td>
+</tr>
+<tr>
+<td>9</td>
+<td>С Web запрещены postgres-role, посторонняя DB и чужой profile; ещё не созданная practice DB не обязательна.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="section-4">Проверка и отправка</h2>
+<ol>
+<li>Откройте страницу оценок и выберите <strong>M3</strong>.</li>
+<li>Запустите проверку выбранного задания.</li>
+<li>По завершении появятся число выполненных критериев и результат каждого. Исправьте пункты с пометкой «Исправить» и запустите проверку снова. «Не проверен» означает, что результат определить не удалось. Баллы отображаются в списке заданий.</li>
+</ol>
+<hr />
+<p><a href="p4.html">Предыдущее: P4</a> · <a href="p5.html">Следующее: P5</a></p>
+</main></body></html>

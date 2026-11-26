@@ -5,7 +5,7 @@ import { enrollmentHtml, enrollmentText, checkedEnrollment } from './enrollment-
 import { preparationText, checkPreparationToken, checkedPreparation, preparationHtml,
   preparationTemplate, createPreparationLink } from './preparation.mjs';
 import { bootstrapTemplate, createBootstrapLink } from './bootstrap-link.mjs';
-import { words as checkWords, validOperation, verifyCheckToken, checkHtml, taskActions, taskDetailHtml, tasks as checkTasks, progressScript, resumeCheckLink, sealApplicationPassword } from './checks.mjs';
+import { words as checkWords, validOperation, verifyCheckToken, checkHtml, taskActions, taskDetailHtml, tasks as checkTasks, progressScript, resumeCheckLink, sealApplicationPassword, displayTask } from './checks.mjs';
 import { teacherText, hasTeacherScope, checkedTeacher, teacherListHtml } from './teacher-progress.mjs';
 import { createInitialDelivery } from './initial-delivery.mjs';
 
@@ -81,7 +81,7 @@ function gradeHtml(lang, grade) {
   const rows = Object.keys(grade.raw_maximum===59?LEGACY_MAXIMA:MISSION_MAXIMA).map(id => {
     const saved=grade.selected[id];
     const score=saved && Number.isInteger(saved.raw_earned) ? String(saved.raw_earned) : t.noRecord;
-    return `<tr><th scope="row">${id}</th><td>${escape(score)}</td><td>${escape(grade.current_unresolved.includes(id) ? t.unknown : grade.current?.[id] ? t.currentOk : t.noRecord)}</td><td>${escape(date(grade.current?.[id]?.checked_at))}</td><td>${escape(date(saved?.received_at))}</td></tr>`;
+    return `<tr><th scope="row">${displayTask(id)}</th><td>${escape(score)}</td><td>${escape(grade.current_unresolved.includes(id) ? t.unknown : grade.current?.[id] ? t.currentOk : t.noRecord)}</td><td>${escape(date(grade.current?.[id]?.checked_at))}</td><td>${escape(date(saved?.received_at))}</td></tr>`;
   }).join('');
   const total = Object.keys(grade.selected).length ? `${grade.raw_earned} / ${grade.raw_maximum}` : t.noRecord;
   const summary = grade.current_unresolved.length || grade.missing_or_unresolved.length ? t.unknown : t.currentOk;

@@ -1,4 +1,4 @@
-"""Russian and Uzbek explanations of the fixed 62 scored checks; JA comes from registry."""
+"""Student-facing descriptions of canonical assessment criteria."""
 CHECKS = {}
 def C(suffix, ru, uz):
     CHECKS[suffix] = {'ru': ru, 'uz': uz}
@@ -65,3 +65,69 @@ C('WEB07_ADMIN_PERMISSIONS', 'Активный staff, не superuser: тольк
 C('WEB07_ANONYMOUS_DENIED', 'Анонимные добавление/изменение отклонены без изменения БД при успешном контрольном login; одного CSRF-403 мало.', 'Nazorat login o‘tgan holda anonim add/change DB ni o‘zgartirmay rad etiladi; faqat CSRF-403 yetmaydi.')
 C('WEB07_BAD_PASSWORD_DENIED', 'Один неверный пароль приложения отклонён, при этом правильный login работает.', 'Bitta noto‘g‘ri app paroli rad etiladi, ayni paytda to‘g‘ri login ishlaydi.')
 C('WEB07_PRIVATE_DATA_HIDDEN', 'Все найденные непубличные коды скрыты на публичной странице при доступной БД.', 'DB ishlagan holda topilgan barcha yopiq kodlar ochiq sahifada ko‘rinmaydi.')
+
+# Student-facing descriptions. Keys are the canonical checks used by the portal.
+JA = {
+    'WEB02_NGINX_ACTIVE': 'WebサーバーでNginxが起動している。',
+    'WEB02_CONFIG_VALID': 'Nginxの設定が構文検査に通る。',
+    'WEB02_LISTEN_80': 'NginxがWebサーバーの内部IPでTCPの80番ポートへの接続を受け付ける。',
+    'WEB02_FILE': '配信用の `/var/www/html/mission.txt` が通常のファイルで、本文・所有者・権限が指定どおりになっている。',
+    'WEB02_LOCAL_HTTP': 'Webサーバー自身から `127.0.0.1` の `/mission.txt` を開くと、HTTP 200と指定の本文が返る。',
+    'WEB02_BASTION_HTTP': '踏み台サーバーから `10.20.1.20` の `/mission.txt` を開くと、HTTP 200と指定の本文が返る。',
+    'WEB02_PUBLIC_HTTP': 'Webサーバーの公開IPで `/mission.txt` を開くと、HTTP 200と指定の本文が返る。',
+    'WEB02_ACCESS_LOG': '確認時の `/mission.txt` へのリクエストがNginxのアクセスログに残る。',
+    'WEB03_SERVICE': 'DNSサーバーでBINDが起動している。',
+    'WEB03_CONFIG_VALID': 'BINDの設定と `lab.test` のゾーンファイルが構文検査に通る。',
+    'WEB03_ZONE_AUTHORITY': '内部DNSが `lab.test` の情報を保持し、指定どおりのSOA・NSレコードを返す。',
+    'WEB03_REQUIRED_RECORDS': '表の6件の名前が、すべて指定の内部IPアドレスになる。',
+    'WEB03_UDP_RESPONSE': '踏み台サーバーとWebサーバーの両方が、UDPの53番ポートでDNSの回答を得られる。',
+    'WEB03_TCP_RESPONSE': '踏み台サーバーとWebサーバーの両方が、TCPの53番ポートでDNSの回答を得られる。',
+    'WEB03_NORMAL_RESOLVER': '踏み台サーバーとWebサーバーが通常の名前解決で内部DNSだけを使う。',
+    'WEB03_NAMED_HTTP': '踏み台サーバーから `http://web.lab.test/mission.txt` を開くと、HTTP 200とM1の本文が返る。',
+    'WEB03_DB_NAME': 'Webサーバーの通常の名前解決で、`db.lab.test` が `10.20.2.20` になる。',
+    'WEB03_FORWARD_ONLY': '外部の名前は `10.20.0.2` だけに転送して解決できる。',
+    'WEB03_NXDOMAIN': '`lab.test` の未登録名を問い合わせると、存在しないことを示す `NXDOMAIN` が返る。',
+    'WEB03_CLIENT_ACL': 'BINDが問い合わせ・再帰問い合わせ・キャッシュの利用を、DNSサーバー自身・踏み台・Webサーバーに限って許可する。',
+    'WEB03_AXFR_DENIED': '踏み台・Webサーバーからの通常の問い合わせは成功し、ゾーンの一括転送（AXFR）は明示的に拒否される。',
+    'WEB05_CLUSTER_ACTIVE': 'DBサーバーでPostgreSQLの `16/main` が動作している。',
+    'WEB05_CLUSTER_CONFIG': '`16/main` が標準のデータ保存先を使い、サーバー内ではOSユーザー `postgres` がローカル接続して管理できる。',
+    'WEB05_LISTEN_5432': 'PostgreSQLが `10.20.2.20:5432` で接続を待ち受けている。',
+    'WEB05_DATABASE_OWNER': '課題用DBとその `public` スキーマの所有者が `catalog_setup` になっている。',
+    'WEB05_ROLE_ATTRIBUTES': '`catalog_app` はログインできる。両ロールに管理者権限や、ロールの所属を通じた権限昇格がない。',
+    'WEB05_HBA_SCRAM': 'Webサーバーから課題用DBと指定ロールへの接続だけを、SCRAM認証で許可する。',
+    'WEB05_WEB_SQL': 'Webサーバーから `db.lab.test` に `catalog_app` で接続し、課題用DBで指定のSELECTが成功する。',
+    'WEB05_BAD_PASSWORD_DENIED': '正しいパスワードで接続でき、誤ったパスワードは拒否される。',
+    'WEB05_WRONG_TARGET_DENIED': 'Webサーバーから許可外のデータベースやロールで接続しようとすると拒否される。',
+    'WEB06_ARTIFACTS': '配備済みのアプリ本体と指定バージョンの依存パッケージを使用している。',
+    'WEB06_SERVICE': 'アプリが専用のOSユーザー `catalog` で動作し、OS起動時の自動起動が有効になっている。',
+    'WEB06_LOOPBACK': 'GunicornはWebサーバー内の `127.0.0.1:8000` だけで接続を受け付ける。',
+    'WEB06_PROFILE_DATABASE': 'アプリが `db.lab.test` を使い、`catalog_app` で課題用DBに接続している。',
+    'WEB06_MIGRATIONS': '配布されたマイグレーションを適用し、課題用DBに11個のテーブルと必要な採番の仕組みがある。',
+    'WEB06_REQUIRED_RECORDS': '表の備品2件が、すべて指定された値で課題用DBに保存されている。',
+    'WEB06_PUBLIC_DATA': '一般ページがHTTP 200を返し、公開備品の表示がDBの内容と一致する。',
+    'WEB06_ADMIN_ENTRY': '踏み台サーバーから `http://admin.lab.test:8080/admin/` を開くと、管理画面のログインページが表示される。',
+    'WEB06_STATIC': '一般ページと管理画面に必要なCSSなどが、それぞれの入口から取得できる。',
+    'WEB06_PASSWORD_LOGIN': '指定のアプリ管理者が、管理画面にパスワードでログインできる。',
+    'WEB06_CREATE_REFLECT': '管理画面で登録した確認用の備品がDBに保存され、一般ページにも反映される。',
+    'WEB06_EDIT_REFLECT': '確認用備品の数量を管理画面から変更すると、DBと一般ページの表示が更新される。',
+    'WEB06_LOGOUT': 'ログアウト後に管理画面を開き直すと、再びログインを求められる。',
+    'WEB07_PUBLIC_ADMIN_DENIED': '公開の80番ポートでは管理用URLへのアクセスが拒否され、踏み台から8080番ポートの管理画面を開ける。',
+    'WEB07_SECRET_PERMISSIONS': '秘密を含む設定ファイルは通常のファイルで、`root:root`・`0600` に設定されている。',
+    'WEB07_CODE_PROTECTED': 'アプリの実行ユーザーは、コード・Python環境・親ディレクトリを変更できず、ログインやsudoもできない。',
+    'WEB07_SECRET_HTTP_DENIED': '公開ページから、秘密を含むファイルをHTTPで取得できない。',
+    'WEB07_SETUP_RETIRED': '構築用ロールはログイン不可で、パスワード・既存の接続・一時設定が残っていない。',
+    'WEB07_ITEM_PRIVILEGES': '通常運用用ロールは備品を読める・追加できる・更新できる。削除と権限委譲は許可されていない。',
+    'WEB07_AUTH_USER_PRIVILEGES': 'アカウントの表は読み取りと、最終ログイン・パスワードの列の更新だけが許可されている。',
+    'WEB07_AUTH_LOOKUP_PRIVILEGES': 'グループや権限などを参照する表は、読み取りだけが許可されている。',
+    'WEB07_SESSION_PRIVILEGES': 'ログイン状態を管理する表は、読み取り・追加・更新・削除が許可されている。',
+    'WEB07_AUDIT_PRIVILEGES': '管理操作を記録する表は、読み取りと追加だけが許可されている。',
+    'WEB07_MIGRATION_PRIVILEGES': '通常運用用ロールには、構造の適用履歴の表への権限、スキーマ内にオブジェクトを作る権限、アプリのDBオブジェクトの所有権がない。',
+    'WEB07_SEQUENCE_PRIVILEGES': '備品と管理ログの採番に必要なシーケンスに、使用権限（USAGE）だけがある。',
+    'WEB07_ADMIN_PERMISSIONS': 'アプリ管理者は備品を閲覧・追加・変更できる。備品の削除やユーザー・グループの管理はできない。',
+    'WEB07_ANONYMOUS_DENIED': 'ログインしていない利用者による備品の登録・編集が拒否される。',
+    'WEB07_BAD_PASSWORD_DENIED': '正しいパスワードでログインでき、誤ったパスワードではログインできない。',
+    'WEB07_PRIVATE_DATA_HIDDEN': '一般ページには公開備品が表示され、非公開備品は表示されない。',
+}
+
+for check_id, description in JA.items():
+    CHECKS[check_id]['ja'] = description

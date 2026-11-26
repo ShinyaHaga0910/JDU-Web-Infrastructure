@@ -13,70 +13,73 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Требуемый результат</a> · <a href="#section-2">Схема задания</a> · <a href="#section-3">Условия: 1 исходный балл за проверку</a> · <a href="#section-4">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M1 Выдача статического файла по HTTP (8)</h1>
-<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Требуемый результат</a> · <a href="#section-2">Схема задания</a> · <a href="#section-3">Критерии оценки</a> · <a href="#section-4">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M1 Выдача статического файла по HTTP (8)</h1>
+<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M5</a></p>
 <p><a href="../ja/m1.html">日本語</a> · <a href="../ru/m1.html">Русский</a> · <a href="../uz/m1.html">O‘zbekcha</a></p>
 <p>Связанное задание: <a href="p1.html">P1</a>.</p>
 <h2 id="section-1">Требуемый результат</h2>
-<p>По навыкам P1 самостоятельно выдайте другой заданный файл и текст. Сохраните practice.txt. Проверяются файл, сервис, слушатель, local/bastion/public HTTP и журнал текущего запроса.</p>
+<p>На том же Web-сервере настройте выдачу <code>/mission.txt</code> по HTTP на TCP-порту 80. Сохраните доступ к <code>/practice.txt</code>.</p>
+<ol>
+<li><strong>Web-сервер (P1.2-P1.3).</strong> Создайте файл с указанным ниже текстом. Задайте владельца и группу <code>root:root</code> и права <code>0644</code>.</li>
+<li><strong>Web-сервер и бастион (P1.4-P1.6).</strong> Запросите <code>/mission.txt</code> через curl. На самом Web используйте <code>127.0.0.1</code>, а на бастионе - <code>10.20.1.20</code>. В обоих случаях проверьте HTTP 200 и указанный ниже текст. Найдите запросы в журнале доступа Web-сервера.</li>
+</ol>
 <h2 id="section-2">Схема задания</h2>
-<p><img src="../../../assets/ru/m1.png" alt="M1: HTTP-задание ещё не готово → Настроить выдачу на Web → Сверить ответ и журнал。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Слева Интернет, справа VPC в AWS. IGW стоит на границе VPC; все EC2, включая бастион, находятся в AWS. По схеме самостоятельно выберите настройки из требований." width="1040" height="680" loading="lazy"></p>
-<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. Слева Интернет, справа VPC в AWS. IGW стоит на границе VPC; все EC2, включая бастион, находятся в AWS. По схеме самостоятельно выберите настройки из требований.</p>
+<p><img src="../../../assets/ru/m1.png" alt="Пути HTTP от компьютера и бастиона к mission.txt на Web." width="1040" height="680" loading="lazy"></p>
 <ul>
-<li>File: /var/www/html/mission.txt</li>
-<li>URL path: /mission.txt</li>
+<li><strong>Файл для публикации</strong> <code>/var/www/html/mission.txt</code></li>
+<li><strong>Путь URL</strong> <code>/mission.txt</code></li>
 </ul>
 <pre><code class="language-text">JDU WEB-02 mission: independent HTTP delivery.
 </code></pre>
-<h2 id="section-3">Условия: 1 исходный балл за проверку</h2>
+<h2 id="section-3">Критерии оценки</h2>
+<p>Каждый критерий даёт 1 балл.</p>
 <table>
 <thead>
 <tr>
-<th scope="col">check ID (не менять)</th>
+<th scope="col">№</th>
 <th scope="col">Условие</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>WEB02_NGINX_ACTIVE</td>
+<td>1</td>
 <td>Nginx работает (active).</td>
 </tr>
 <tr>
-<td>WEB02_CONFIG_VALID</td>
+<td>2</td>
 <td>nginx -t успешно проверяет конфигурацию.</td>
 </tr>
 <tr>
-<td>WEB02_LISTEN_80</td>
+<td>3</td>
 <td>Порт 80 слушает private IP/все интерфейсы, не только loopback.</td>
 </tr>
 <tr>
-<td>WEB02_FILE</td>
+<td>4</td>
 <td>Обычный файл содержит точный текст, владелец root:root, права 0644.</td>
 </tr>
 <tr>
-<td>WEB02_LOCAL_HTTP</td>
+<td>5</td>
 <td>Web получает HTTP 200 и точный текст через loopback.</td>
 </tr>
 <tr>
-<td>WEB02_BASTION_HTTP</td>
+<td>6</td>
 <td>Бастион получает HTTP 200 и точный текст через private IP.</td>
 </tr>
 <tr>
-<td>WEB02_PUBLIC_HTTP</td>
+<td>7</td>
 <td>CloudShell получает HTTP 200 и точный текст через public IP.</td>
 </tr>
 <tr>
-<td>WEB02_ACCESS_LOG</td>
+<td>8</td>
 <td>Access log содержит запрос с nonce именно этой проверки.</td>
 </tr>
 </tbody>
 </table>
-<p>Проверки identity/управления/repo/сети/зависимостей не добавляют баллов. Частичные баллы не означают готовность следующего этапа при неисправных предпосылках.</p>
 <h2 id="section-4">Проверка и отправка</h2>
 <ol>
-<li>Откройте страницу заданий, которую использовали в P0. Войдите через учебный аккаунт Google и выберите свой Lab и <strong>M1</strong>.</li>
+<li>Откройте страницу оценок и выберите <strong>M1</strong>.</li>
 <li>Запустите проверку выбранного задания.</li>
-<li>Во время обработки обновляйте результат. Посмотрите, сколько критериев выполнено. Внесите нужные исправления и проверьте снова. Результат сохраняется автоматически.</li>
+<li>По завершении появятся число выполненных критериев и результат каждого. Исправьте пункты с пометкой «Исправить» и запустите проверку снова. «Не проверен» означает, что результат определить не удалось. Баллы отображаются в списке заданий.</li>
 </ol>
 <hr />
 <p><a href="p1.html">Предыдущее: P1</a> · <a href="p2.html">Следующее: P2</a></p>

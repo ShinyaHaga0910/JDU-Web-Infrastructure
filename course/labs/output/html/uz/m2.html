@@ -13,15 +13,19 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Tayyor holat talablari</a> · <a href="#section-2">Topshiriq diagrammasi</a> · <a href="#section-3">Shartlar: har tekshiruvga 1 xom ball</a> · <a href="#section-4">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M2 Ichki DNS va odatiy nom yechimi (13)</h1>
-<p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a></p>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Tayyor holat talablari</a> · <a href="#section-2">Topshiriq diagrammasi</a> · <a href="#section-3">Baholash mezonlari</a> · <a href="#section-4">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M2 Ichki DNS va odatiy nom yechimi (13)</h1>
+<p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M5</a></p>
 <p><a href="../ja/m2.html">日本語</a> · <a href="../ru/m2.html">Русский</a> · <a href="../uz/m2.html">O‘zbekcha</a></p>
 <p>Mos topshiriq: <a href="p2.html">P2</a>.</p>
 <h2 id="section-1">Tayyor holat talablari</h2>
-<p>Ayni lab.test zone ga oltita asosiy nomni qo‘shing. guide/practice-db qolishi mumkin. Bastion/Web odatiy resolver, nom orqali M1 HTTP, DB nomi, UDP/TCP, forwarding, NXDOMAIN, ACL va AXFR rad etilishi kerak.</p>
+<p>Boshlashdan oldin baholash sahifasida <a href="m1.html">M1</a> uchun to‘liq ball olinganini tekshiring.</p>
+<p>P2 da sozlangan ichki DNS ga jadvaldagi oltita nomni qo‘shing. Bastion serveridan <code>http://web.lab.test/mission.txt</code> ochilsin.</p>
+<ol>
+<li><strong>DNS server (P2.2-P2.4).</strong> Mavjud <code>lab.test</code> zonasiga A yozuvlarini qo‘shing. Zona seriya raqamini oshiring, sintaksisni tekshiring va sozlamani qayta yuklang. P2 nomlarini saqlash mumkin.</li>
+<li><strong>Bastion va Web serverlari (P2.5-P2.8).</strong> Ichki DNS ga to‘g‘ridan to‘g‘ri so‘rovni va OS ning odatiy nom yechimini tekshiring. Bastionda <code>web.lab.test</code> orqali M1 matnini oching. Web serverda <code>db.lab.test</code> manzili <code>10.20.2.20</code> bo‘lishini tekshiring.</li>
+</ol>
 <h2 id="section-2">Topshiriq diagrammasi</h2>
-<p><img src="../../../assets/uz/m2.png" alt="M2: IP orqali HTTP ishlaydi → DNS va resolver ni sozlash → Nom ham ayni Web ga olib boradi。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
-<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
+<p><img src="../../../assets/uz/m2.png" alt="Bastion va Web ichki DNS ga murojaat qiladi. Bastion Web ga nomi bilan ulanadi." width="1040" height="680" loading="lazy"></p>
 <table>
 <thead>
 <tr>
@@ -56,78 +60,75 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tr>
 </tbody>
 </table>
-<ul>
-<li>Joriy old shartlar: M1</li>
-</ul>
-<h2 id="section-3">Shartlar: har tekshiruvga 1 xom ball</h2>
+<h2 id="section-3">Baholash mezonlari</h2>
+<p>Har bir mezon 1 ball.</p>
 <table>
 <thead>
 <tr>
-<th scope="col">check ID (o‘zgartirmang)</th>
+<th scope="col">№</th>
 <th scope="col">Shart</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>WEB03_SERVICE</td>
+<td>1</td>
 <td>BIND/named ishlaydi (active).</td>
 </tr>
 <tr>
-<td>WEB03_CONFIG_VALID</td>
+<td>2</td>
 <td>Named va lab.test zone tekshiruvlari muvaffaqiyatli.</td>
 </tr>
 <tr>
-<td>WEB03_ZONE_AUTHORITY</td>
+<td>3</td>
 <td>Lab.test SOA/NS va vakolatli javob tuzilmaga mos; NS - dns.lab.test.</td>
 </tr>
 <tr>
-<td>WEB03_REQUIRED_RECORDS</td>
+<td>4</td>
 <td>Profile dagi barcha A record kerakli private IP beradi; bu bitta band.</td>
 </tr>
 <tr>
-<td>WEB03_UDP_RESPONSE</td>
+<td>5</td>
 <td>Bastion ham, Web ham UDP 53 orqali to‘g‘ri javob oladi.</td>
 </tr>
 <tr>
-<td>WEB03_TCP_RESPONSE</td>
+<td>6</td>
 <td>Bastion ham, Web ham TCP 53 orqali to‘g‘ri javob oladi.</td>
 </tr>
 <tr>
-<td>WEB03_NORMAL_RESOLVER</td>
+<td>7</td>
 <td>Bastion/Web odatiy resolver faqat BIND dan foydalanadi; hosts yoki Firefox DoH bilan almashtirilmaydi.</td>
 </tr>
 <tr>
-<td>WEB03_NAMED_HTTP</td>
+<td>8</td>
 <td>Bastiondan profile nomi va belgilangan path orqali HTTP 200 hamda to‘g‘ri matn qaytadi.</td>
 </tr>
 <tr>
-<td>WEB03_DB_NAME</td>
+<td>9</td>
 <td>Web odatiy resolver profile DB nomini 10.20.2.20 ga yechadi.</td>
 </tr>
 <tr>
-<td>WEB03_FORWARD_ONLY</td>
+<td>10</td>
 <td>Forward only faqat 10.20.0.2 ga yo‘naltirilgan; tashqi DNS nomi yechiladi. Tashqi HTTP shart emas.</td>
 </tr>
 <tr>
-<td>WEB03_NXDOMAIN</td>
+<td>11</td>
 <td>Shu ishga tushirishdagi yangi mavjud bo‘lmagan nom vakolatli NXDOMAIN oladi.</td>
 </tr>
 <tr>
-<td>WEB03_CLIENT_ACL</td>
+<td>12</td>
 <td>BIND query/recursion/cache faqat localhost, bastion va Web ga ruxsat; SG ning o‘zi yetmaydi.</td>
 </tr>
 <tr>
-<td>WEB03_AXFR_DENIED</td>
+<td>13</td>
 <td>Ayni tekshiruv oddiy so‘rovlari o‘tgan holda bastion/Web AXFR aniq rad etiladi; timeout yetmaydi.</td>
 </tr>
 </tbody>
 </table>
-<p>Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.</p>
 <h2 id="section-4">Tekshirish va yuborish</h2>
 <ol>
-<li>P0 da ishlatgan topshiriqlar sahifasiga ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda <strong>M2</strong> ni tanlang.</li>
+<li>Baholash sahifasini oching va <strong>M2</strong> ni tanlang.</li>
 <li>Tanlangan topshiriq tekshiruvini boshlang.</li>
-<li>Ishlov davom etsa natijani yangilab kuting. Nechta band bajarilganini ko‘ring. Tuzatish kerak bo‘lgan bandlarni tuzatib, yana tekshiring. Natija avtomatik saqlanadi.</li>
+<li>Tekshiruv tugagach, bajarilgan mezonlar soni va har bir natija chiqadi. «Tuzating» deb belgilangan sozlamani to‘g‘rilab, yana tekshiring. «Tekshirilmagan» band natijasi aniqlanmagan. Ballarni topshiriqlar ro‘yxatidan ko‘ring.</li>
 </ol>
 <hr />
 <p><a href="p2.html">Oldingi: P2</a> · <a href="p4.html">Keyingi: P4</a></p>

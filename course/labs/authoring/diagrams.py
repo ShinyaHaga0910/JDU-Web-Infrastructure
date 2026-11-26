@@ -1,4 +1,4 @@
-from curriculum import ACTIVE_NUMBERS
+from curriculum import ACTIVE_NUMBERS, display_task
 """Editable vector scenes and matching PNGs for every P/M task in JA/RU/UZ."""
 import html
 import json
@@ -101,7 +101,7 @@ class Scene:
         return len(self.text_bounds)
 
 def diagram_stem(task):
-    return task.lower()+'-ssm' if task.endswith('0') else task.lower()
+    return task.lower()+'-ssm' if task.endswith('0') else display_task(task).lower()
 
 
 def connection_diagram(s):
@@ -153,6 +153,24 @@ def diagram_text(task,lang):
         return T('AWS内のIGW、Webサーバー、踏み台サーバー、配布サーバーとHTTPの経路。',
                  'IGW в AWS, Web-сервер, бастион, Repo-сервер и маршруты HTTP.',
                  'AWS ichidagi IGW, Web server, Bastion va Repo serverlari hamda HTTP yo‘llari.')[lang],''
+    if task.startswith('M'):
+        return {
+            1:T('学生PCと踏み台サーバーからWebサーバーのmission.txtへのHTTP経路。',
+                'Пути HTTP от компьютера и бастиона к mission.txt на Web.',
+                'Kompyuter va Bastiondan Web serverdagi mission.txt ga HTTP yo‘llari.'),
+            2:T('踏み台とWebから内部DNSへ問い合わせ、踏み台からWebへ名前で接続する。',
+                'Бастион и Web обращаются к внутреннему DNS. Бастион открывает Web по имени.',
+                'Bastion va Web ichki DNS ga murojaat qiladi. Bastion Web ga nomi bilan ulanadi.'),
+            4:T('WebサーバーがDBサーバーの名前を解決し、PostgreSQLへ接続する。',
+                'Web разрешает имя DB-сервера и подключается к PostgreSQL.',
+                'Web server DB server nomini aniqlaydi va PostgreSQL ga ulanadi.'),
+            5:T('一般利用者と管理者がそれぞれの入口から同じ備品管理アプリを利用する。',
+                'Посетитель и администратор входят в одно приложение по разным путям.',
+                'Oddiy foydalanuvchi va administrator bir ilovaga alohida kirish yo‘llaridan ulanadi.'),
+            6:T('公開・管理の入口とWebからDBへの接続で、許可する範囲を制限する。',
+                'Ограничения публичного и административного входов и доступа от Web к DB.',
+                'Ochiq va boshqaruv kirishlari hamda Web dan DB ga ulanish cheklovlari.'),
+        }[n][lang],''
     before,action,result=STAGES[n]
     caption=T('図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。','Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки.','Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir.')[lang]
     caption+=' '+T('SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。','Разрешения SG заданы начальным комплектом; здесь настраивается сервер.','SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz.')[lang]
@@ -226,6 +244,54 @@ def p1_step_diagram(s,step):
         s.text(262,375,'curl',19,center=True)
         s.text(775,375,'Nginx /practice.txt',19,center=True)
 
+
+def mission_diagram(s):
+    lang=s.lang
+    n=int(s.task[1:])
+    s.rect(224,65,790,575,fill='#f1f7fc',stroke='#7e9cb3',width=2)
+    s.text(247,77,'AWS',20)
+    s.rect(386,120,603,477,stroke='#7e9cb3',width=2)
+    s.text(417,135,'VPC  10.20.0.0/16',19)
+    if n==1 or n in (5,6):
+        s.simple(35,221,LABELS['pc'][lang],w=150)
+        s.simple(341,221,'IGW',w=90)
+        s.path([(185,253),(341,253)])
+        s.path([(431,253),(720,253)],'HTTP / TCP 80',(565,214))
+        s.node('bastion',417,412,w=210)
+        s.path([(522,412),(522,295),(720,295)],
+               'HTTP / TCP 80' if n==1 else 'HTTP / TCP 8080',(586,345))
+        if n==1:
+            s.node('web',720,209,True,w=239)
+            s.text(840,330,'Nginx /mission.txt',19,center=True)
+            s.text(840,368,'127.0.0.1:80',17,color=MUTED,center=True)
+        else:
+            s.rect(720,195,239,199,fill='#e7f4f2',stroke=TEAL,width=2)
+            s.text(736,205,'EC2 '+LABELS['web'][lang]+('ー' if lang=='ja' else ''),18)
+            s.text(736,236,'Nginx',18)
+            s.path([(840,269),(840,326)],'127.0.0.1:8000',(846,278))
+            s.text(736,335,'Gunicorn / Django',17)
+            s.node('db',720,481,True,w=239)
+            s.path([(840,394),(840,481)],'SQL / TCP 5432',(840,428))
+            if n==6:
+                s.text(563,266,T('公開側の管理URLを拒否','Admin закрыт снаружи','Ochiq admin yopiq')[lang],15,center=True,color=RED,max_width=225)
+                s.text(840,570,'catalog_setup: NOLOGIN',15,center=True,color=RED)
+    elif n==2:
+        s.node('bastion',410,225,w=210)
+        s.node('web',410,434,w=210)
+        s.node('dns',737,225,True,w=224)
+        s.path([(620,265),(737,265)],'DNS 53',(677,230))
+        s.path([(620,476),(849,476),(849,311)],'DNS / UDP + TCP 53',(802,436))
+        s.path([(515,311),(515,434)],'HTTP 80',(515,361))
+        s.text(742,327,'lab.test',17)
+    else:
+        s.node('web',410,225,True,w=210)
+        s.node('db',737,225,True,w=224)
+        s.node('dns',737,434,w=224)
+        s.path([(620,265),(737,265)],'TCP 5432',(677,230))
+        s.path([(515,311),(515,476),(737,476)],'DNS 53',(519,363))
+        s.text(849,330,'db.lab.test',19,center=True)
+        s.text(849,363,'jdu_catalog',17,center=True)
+
 def write_diagrams(root):
     counts={}
     for lang in LANGS:
@@ -243,6 +309,11 @@ def write_diagrams(root):
                     continue
                 if task=='P1':
                     p1_overview(s)
+                    alt,_=diagram_text(task,lang)
+                    counts[f'{lang}/{task}']=s.finish(root/'assets'/lang/diagram_stem(task),alt)
+                    continue
+                if prefix=='M':
+                    mission_diagram(s)
                     alt,_=diagram_text(task,lang)
                     counts[f'{lang}/{task}']=s.finish(root/'assets'/lang/diagram_stem(task),alt)
                     continue
@@ -305,7 +376,7 @@ def write_diagrams(root):
                         s.text(62,559,'setup: NOLOGIN',18,color=RED)
                 from pages import ORDER
                 pos=ORDER.index(task)
-                next_task=ORDER[pos+1] if pos+1<len(ORDER) else T('M成績の確認','Проверка оценок M','M baholarini ko‘rish')[lang]
+                next_task=display_task(ORDER[pos+1]) if pos+1<len(ORDER) else T('M成績の確認','Проверка оценок M','M baholarini ko‘rish')[lang]
                 s.text(26,638,T('次に進む先：','Далее: ','Keyingi: ')[lang]+next_task,20,color=TEAL)
                 alt,_=diagram_text(task,lang)
                 counts[f'{lang}/{task}']=s.finish(root/'assets'/lang/diagram_stem(task),alt)
@@ -315,4 +386,5 @@ def diagram_markdown(task,lang):
     alt,caption=diagram_text(task,lang)
     name=f'../../assets/{lang}/{diagram_stem(task)}'
     title=T('接続するサーバー','Подключение к серверам','Ulaniladigan serverlar')[lang] if task.endswith('0') else T('今回の見取り図','Схема задания','Topshiriq diagrammasi')[lang]
-    return ['### '+title,'',f'![{alt}]({name}.png)','',caption,'']
+    lines = ['### '+title,'',f'![{alt}]({name}.png)','']
+    return lines if task.startswith('M') and not caption else lines + [caption,'']

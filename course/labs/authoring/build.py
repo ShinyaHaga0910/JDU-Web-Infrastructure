@@ -20,8 +20,8 @@ from command_notes import annotated_blocks
 from diagrams import diagram_markdown, write_diagrams, P1_STEP_DIAGRAMS
 from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE, RDP_STEPS
 from checks import CHECKS
-from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, RAW_MAXIMUM, active_registry
-from explanations import LABELS, READING, ROUTES, MISSION_PLAN, MODULE_NOTES, STEP_NOTES, OUTPUT_EXAMPLES
+from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, RAW_MAXIMUM, active_registry, display_missions, task_page
+from explanations import LABELS, READING, ROUTES, MODULE_NOTES, STEP_NOTES, OUTPUT_EXAMPLES
 MODULES_BY_NUMBER = {int(m['id'][1:]): m for m in MODULES}
 MODULES = [MODULES_BY_NUMBER[n] for n in ACTIVE_NUMBERS]
 STEP_NOTES = {k: v for k, v in STEP_NOTES.items() if k.split('.')[0] in ACTIVE_ORDER}
@@ -45,9 +45,8 @@ L = {
  'intro': T('使い方と共通の約束', 'Как пользоваться пособием', 'Qo‘llanmadan foydalanish'),
  'targets': T('対象・前提・準備', 'Среда и подготовка', 'Muhit va tayyorgarlik'),
  'requirements': T('完成要件', 'Требуемый результат', 'Tayyor holat talablari'),
- 'checks': T('合格条件：採点check各1素点', 'Условия: 1 исходный балл за проверку', 'Shartlar: har tekshiruvga 1 xom ball'),
- 'checkid': T('check ID（変更しない）', 'check ID (не менять)', 'check ID (o‘zgartirmang)'),
- 'condition': T('満たすこと', 'Условие', 'Shart'),
+ 'checks': T('採点基準', 'Критерии оценки', 'Baholash mezonlari'),
+ 'condition': T('満たす条件', 'Условие', 'Shart'),
  'submit': T('確認・提出', 'Проверка и отправка', 'Tekshirish va yuborish'),
  'resume': T('次回の再開・結果の確認', 'Продолжение и результаты', 'Davom ettirish va natijalar'),
  'sources': T('参考資料', 'Справочные материалы', 'Ma’lumot manbalari'),
@@ -60,6 +59,15 @@ def emit_intro(lang, kind):
     out += [T('[日本語](../ja/' + kind + '.md) · [Русский](../ru/' + kind + '.md) · [O‘zbekcha](../uz/' + kind + '.md)',
               '[日本語](../ja/' + kind + '.md) · [Русский](../ru/' + kind + '.md) · [O‘zbekcha](../uz/' + kind + '.md)',
               '[日本語](../ja/' + kind + '.md) · [Русский](../ru/' + kind + '.md) · [O‘zbekcha](../uz/' + kind + '.md)')[lang], '']
+    if kind=='missions':
+        return out + ['## ' + L['intro'][lang], '',
+            T('Pで練習した方法を使い、同じ演習環境に課題用のファイルや設定を追加します。各Mで指定された値と、対応するPの手順を確認して作業を進めてください。',
+              'Используйте шаги из практики P, чтобы добавить файлы и настройки задания в ту же учебную среду. Сверяйтесь со значениями в каждом M и соответствующими шагами P.',
+              'P da mashq qilingan usul bilan shu muhitga topshiriq fayllari va sozlamalarini qo‘shing. Har bir M dagi qiymatlar va mos P qadamlariga qarang.')[lang], '',
+            ' → '.join(ACTIVE_ORDER), '',
+            T('P6で練習用アプリの設定を仕上げてから、M5で同じアプリを課題用DBに切り替えます。',
+              'Завершите тренировочные настройки в P6. Затем в M5 подключите то же приложение к основной базе.',
+              'P6 da mashq sozlamalarini yakunlang. Keyin M5 da ayni ilovani topshiriq bazasiga ulang.')[lang], '']
     out += ['## ' + L['intro'][lang], '', T(
       'まず各Pの課題文を読み、必要なら詳しい操作例を一段ずつ使う。Pは手順付きの練習である。Mは別の対象・値で自分で構築する。課題は授業回番号ではなく、自分の進度で進める。Pの完了はMの合格に置き換わらない。',
       'Сначала прочитайте задание P; при необходимости проходите подробный пример по шагам. P — тренировка с подробными шагами. В M самостоятельно используйте другие объекты/значения. Номера заданий не являются номерами занятий; идите в своём темпе. Выполнение P не означает выполнение M.',
@@ -112,24 +120,44 @@ def emit_end(lang):
 
 def task_spec(task, reg, lang):
     out = []
+    mission = task['id'].startswith('M')
     if 'expected' in task:
         e = task['expected']
         if 'file' in e:
-            out += ['- File: ' + e['file']]
+            label = T('配信ファイル', 'Файл для публикации', 'Tarqatiladigan fayl')[lang]
+            out += [f'- **{label}** `{e["file"]}`' if mission else '- File: ' + e['file']]
         if 'path' in e:
-            out += ['- URL path: ' + e['path']]
+            label = T('URLのパス', 'Путь URL', 'URL yo‘li')[lang]
+            out += [f'- **{label}** `{e["path"]}`' if mission else '- URL path: ' + e['path']]
         if 'body' in e or 'body_template' in e:
             out += ['', '```text', (e.get('body') or e['body_template']).rstrip('\n'), '```', '']
         if 'records' in e:
             out += ['| DNS name | A / IPv4 |', '| --- | --- |']
             out += [f'| {name} | {ip} |' for name, ip in e['records'].items()]
             out += ['']
-    if task.get('profile'):
+    if task.get('profile') and task['id'] != 'M6':
         profile = reg['profiles'][task['profile']]
-        out += ['- Profile: ' + task['profile'], '- Database: ' + profile['db_name'], '- Setup role: ' + profile['setup_role'], '- Runtime role: ' + profile['runtime_role']]
-        if task['id'][1:] in ('5', '6'):
-            out += ['- Application administrator: ' + profile['app_admin'], '', '| code | name | quantity | location | is_public |', '| --- | --- | --- | --- | --- |']
-            out += [f"| {r['code']} | {r['name']} | {r['quantity']} | {r['location']} | {str(r['is_public']).lower()} |" for r in profile['records']]
+        if mission:
+            if task['id']=='M4':
+                out += ['| '+T('設定する項目', 'Настройка', 'Sozlama')[lang]+' | '+T('値', 'Значение', 'Qiymat')[lang]+' |', '| --- | --- |']
+                for field, label in (
+                    ('db_name', T('データベース名', 'Имя базы данных', 'Baza nomi')),
+                    ('setup_role', T('構築用ロール', 'Роль настройки', 'Sozlash roli')),
+                    ('runtime_role', T('通常運用用ロール', 'Рабочая роль', 'Oddiy ish rejimi roli')),
+                ):
+                    out += [f'| {label[lang]} | `{profile[field]}` |']
+            else:
+                out += ['| '+T('備品コード | 名前 | 数量 | 保管場所 | 公開', 'Код | Название | Количество | Место хранения | Публикация', 'Kod | Nomi | Soni | Saqlash joyi | Ochiq')[lang]+' |',
+                        '| --- | --- | --- | --- | --- |']
+                for row in profile['records']:
+                    visibility = (T('公開する', 'Да', 'Ha') if row['is_public'] else T('公開しない', 'Нет', 'Yo‘q'))[lang]
+                    out += [f"| `{row['code']}` | {row['name']} | {row['quantity']} | {row['location']} | {visibility} |"]
+        else:
+            out += ['- Profile: ' + task['profile'], '- Database: ' + profile['db_name'], '- Setup role: ' + profile['setup_role'], '- Runtime role: ' + profile['runtime_role']]
+            if task['id'][1:] in ('5', '6'):
+                out += ['- Application administrator: ' + profile['app_admin'], '', '| code | name | quantity | location | is_public |', '| --- | --- | --- | --- | --- |']
+                out += [f"| {r['code']} | {r['name']} | {r['quantity']} | {r['location']} | {str(r['is_public']).lower()} |" for r in profile['records']]
+        if mission or task['id'][1:] in ('5', '6'):
             out += ['']
     return out
 
@@ -183,15 +211,16 @@ def illustrated_steps(lang, steps):
 
 def make_markdown(reg, lang, kind):
     out = emit_intro(lang, kind)
-    out += ['## ' + LABELS['read'][lang], '']
-    out += [p[lang] + '\n' for p in READING]
-    out += ['## ' + LABELS['routes'][lang], '',
-        '| ' + T('送信元', 'Источник', 'Manba')[lang] + ' | ' + T('宛先', 'Назначение', 'Manzil')[lang] + ' | Protocol / port | ' + T('目的', 'Цель', 'Maqsad')[lang] + ' |',
-        '| --- | --- | --- | --- |']
-    out += [f'| {source} | {target} | {protocol} | {purpose[lang]} |' for source,target,protocol,purpose in ROUTES]
-    out += ['', T('初期環境で提供されたSSMは、CloudShellから各EC2へ入る管理経路。上のWeb利用経路とは別に使う。表の内部IP/portはこのLabの仕様で、一般のWebシステム全てに同じ値を要求するものではない。',
-        'SSM начальной среды — отдельный путь управления из CloudShell в EC2. Он не включён в путь обычного Web-запроса. Внутренние IP и порты таблицы заданы этим Lab, а не всеми Web-системами.',
-        'Boshlang‘ich SSM CloudShell dan EC2 ga alohida management yo‘lidir. U oddiy Web request yo‘liga qo‘shilmaydi. Jadvaldagi ichki IP va portlar shu Lab uchun, barcha Web tizimlari uchun emas.')[lang], '']
+    if kind=='practice':
+        out += ['## ' + LABELS['read'][lang], '']
+        out += [p[lang] + '\n' for p in READING]
+        out += ['## ' + LABELS['routes'][lang], '',
+            '| ' + T('送信元', 'Источник', 'Manba')[lang] + ' | ' + T('宛先', 'Назначение', 'Manzil')[lang] + ' | Protocol / port | ' + T('目的', 'Цель', 'Maqsad')[lang] + ' |',
+            '| --- | --- | --- | --- |']
+        out += [f'| {source} | {target} | {protocol} | {purpose[lang]} |' for source,target,protocol,purpose in ROUTES]
+        out += ['', T('初期環境で提供されたSSMは、CloudShellから各EC2へ入る管理経路。上のWeb利用経路とは別に使う。表の内部IP/portはこのLabの仕様で、一般のWebシステム全てに同じ値を要求するものではない。',
+            'SSM начальной среды — отдельный путь управления из CloudShell в EC2. Он не включён в путь обычного Web-запроса. Внутренние IP и порты таблицы заданы этим Lab, а не всеми Web-системами.',
+            'Boshlang‘ich SSM CloudShell dan EC2 ga alohida management yo‘lidir. U oddiy Web request yo‘liga qo‘shilmaydi. Jadvaldagi ichki IP va portlar shu Lab uchun, barcha Web tizimlari uchun emas.')[lang], '']
     tasks = {t['id']: t for t in reg['tasks']}
     if kind == 'practice':
         for m in MODULES:
@@ -256,31 +285,36 @@ def make_markdown(reg, lang, kind):
                 out += ['### ' + LABELS['reflect'][lang], '', notes['question'][lang], '',
                         '**' + LABELS['answer'][lang] + ':** ' + notes['answer'][lang], '']
     else:
-        out += ['## ' + LABELS['plan'][lang], '']
-        out += [p[lang] + '\n' for p in MISSION_PLAN]
         for number in ACTIVE_NUMBERS:
             task = tasks['M' + str(number)]
             title = MODULES_BY_NUMBER[number]['title'][lang]
             points = f" ({task['raw_points_max']})"
-            out += [f"## {task['id']} {title}{points}", '', '### ' + L['requirements'][lang], '', MISSION_GUIDANCE[task['id']][lang], '']
+            out += [f"## {task['id']} {title}{points}", '', '### ' + L['requirements'][lang], '']
+            if task['requires_current']:
+                separator = '、' if lang=='ja' else ', '
+                dependencies = separator.join(f'[{mid}]({task_page(mid)})' for mid in task['requires_current'])
+                out += [T(f'始める前に、採点ページで {dependencies} が満点になっていることを確認する。',
+                          f'Перед началом убедитесь на странице оценок, что за {dependencies} получен полный балл.',
+                          f'Boshlashdan oldin baholash sahifasida {dependencies} uchun to‘liq ball olinganini tekshiring.')[lang], '']
+            out += [MISSION_GUIDANCE[task['id']][lang], '']
             out += diagram_markdown(task['id'],lang)
             if number==0:
                 out += instance_id_guide(lang)
                 out += session_connect_guide(lang)
             out += task_spec(task, reg, lang)
-            if task['requires_current']:
-                out += ['- ' + T('現在必要な前提', 'Текущие предпосылки', 'Joriy old shartlar')[lang] + ': ' + ', '.join(task['requires_current']), '']
             if task['id'] == 'M3':
                 out += [T('本文の{lab_id}は自分の匿名Lab IDに置き換える。file0644/root:root、親directory0755/root:root。停止はWebのみ、同じ元instance/volumeで行う。', 'Замените {lab_id} своим анонимным ID. Файл 0644/root:root, каталог 0755/root:root. Останавливайте только тот же исходный Web/volume.', '{lab_id} ni o‘z anonim ID ga almashtiring. Fayl 0644/root:root, katalog 0755/root:root. Faqat ayni asl Web/volume ni to‘xtating.')[lang], '']
             if number:
-                out += ['### ' + L['checks'][lang], '', '| ' + L['checkid'][lang] + ' | ' + L['condition'][lang] + ' |', '| --- | --- |']
-                for cid in task['progress_scored_checks']:
-                    text = reg['check_definitions'][cid]['pass_condition'] if lang == 'ja' else CHECKS[cid][lang]
-                    out += [f'| {cid} | {text} |']
-                out += ['', T('本人確認・管理・配布元・通信基盤・依存前提等の準備checkは上表の素点に加えない。必要前提が未完了なら、点が一部あっても次段階の準備完了ではない。', 'Проверки identity/управления/repo/сети/зависимостей не добавляют баллов. Частичные баллы не означают готовность следующего этапа при неисправных предпосылках.', 'Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.')[lang], '']
+                out += ['### ' + L['checks'][lang], '',
+                        T('各項目は1点。', 'Каждый критерий даёт 1 балл.', 'Har bir mezon 1 ball.')[lang], '',
+                        '| № | ' + L['condition'][lang] + ' |', '| --- | --- |']
+                for i, cid in enumerate(task['progress_scored_checks'], 1):
+                    out += [f'| {i} | {CHECKS[cid][lang]} |']
+                out += ['']
             out += ['### ' + L['submit'][lang], '', browser_check(task['id'], lang), '']
-    out += emit_end(lang)
-    text = '\n'.join(out).replace('\u2013', '-').replace('\u2014', '-')
+    if kind=='practice':
+        out += emit_end(lang)
+    text = display_missions('\n'.join(out)).replace('\u2013', '-').replace('\u2014', '-')
     # Labels form their own paragraphs so commands, explanations and results scan separately.
     return re.sub(r'^(\*\*[^\n]+?:\*\*) (.+)$', r'\1\n\n\2', text, flags=re.M)
 
@@ -374,7 +408,7 @@ def make_pdf(md, lang, target):
                 # Only external links are active in PDF; index/HTML keep local navigation.
                 result.append('</a>' if active_links.pop() else '')
         return ''.join(result)
-    flow=[];i=0;list_depth=0
+    flow=[];i=0;lists=[];list_marker=''
     while i<len(tokens):
         t=tokens[i]
         if t.type=='heading_open':
@@ -396,10 +430,19 @@ def make_pdf(md, lang, target):
                     flow.extend([picture,Spacer(1,8)])
                 i+=3;continue
             value=inline(tokens[i+1])
-            if list_depth:value='• '+value
+            if lists:
+                value=list_marker+value
+                list_marker=''
             flow.append(Paragraph(value,styles[0]));i+=3;continue
-        if t.type in ('bullet_list_open','ordered_list_open'):list_depth+=1
-        if t.type in ('bullet_list_close','ordered_list_close'):list_depth-=1
+        if t.type in ('bullet_list_open','ordered_list_open'):
+            lists.append(int(t.attrGet('start') or 1) if t.type=='ordered_list_open' else None)
+        if t.type=='list_item_open':
+            number=lists[-1]
+            list_marker=f'{number}. ' if number is not None else '• '
+            if number is not None:
+                lists[-1]+=1
+        if t.type in ('bullet_list_close','ordered_list_close'):
+            lists.pop()
         if t.type=='fence':
             chunks=re.split(r'(?m)(?=^(?:#|--) \d+\. )',t.content.rstrip('\n'))
             chunks=[chunk for chunk in chunks if chunk]
@@ -425,7 +468,8 @@ def make_pdf(md, lang, target):
                 if q.type=='tr_close':rows.append(row)
                 j+=1
             cols=len(rows[0])
-            if cols==2:widths=[width*.36,width*.64]
+            if cols==2 and rows[0][0].getPlainText()=='№':widths=[30,width-30]
+            elif cols==2:widths=[width*.36,width*.64]
             elif cols==4:widths=[width*.18,width*.22,width*.16,width*.44]
             else:widths=[width/cols]*cols
             table=Table(rows,colWidths=widths,repeatRows=1,hAlign='LEFT')
@@ -494,7 +538,7 @@ def main():
     links=[]
     for lang in LANGS:
         label={'ja':'日本語','ru':'Русский','uz':'O‘zbekcha'}[lang]
-        links.append(f'<article><h2>{label}</h2><p><a href="{lang}/practice.html">P0–P6</a> · <a href="{lang}/missions.html">M0–M6</a></p><p><a href="../pdf/web_lab_practice_{lang}.pdf">P PDF</a> · <a href="../pdf/web_lab_missions_{lang}.pdf">M PDF</a></p></article>')
+        links.append(f'<article><h2>{label}</h2><p><a href="{lang}/practice.html">P0–P6</a> · <a href="{lang}/missions.html">M0–M5</a></p><p><a href="../pdf/web_lab_practice_{lang}.pdf">P PDF</a> · <a href="../pdf/web_lab_missions_{lang}.pdf">M PDF</a></p></article>')
     (ROOT/'output/html/index.html').write_text('<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JDU Web P/M 教材</title><style>'+CSS+'</style></head><body><main><h1>Web Infrastructure · P / M</h1><p>手順付き練習と自力課題 / Практика и задания / Mashqlar va topshiriqlar</p>'+''.join(links)+'</main></body></html>',encoding='utf-8',newline='\n')
     package=ROOT/'output/web-lab-pm-r1.zip'
     members=[p for folder in ('docs','assets','resources','distribution','output/html','output/pdf') for p in (ROOT/folder).rglob('*') if p.is_file()]

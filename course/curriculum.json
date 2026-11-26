@@ -26,6 +26,11 @@
     "M5": 13,
     "M6": 16
   },
+  "mission_display_ids": {
+    "M4": "M3",
+    "M5": "M4",
+    "M6": "M5"
+  },
   "intro_points": {
     "P0": 1,
     "M0": 4

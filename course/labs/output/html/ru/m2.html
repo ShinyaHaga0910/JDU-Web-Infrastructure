@@ -13,15 +13,19 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Требуемый результат</a> · <a href="#section-2">Схема задания</a> · <a href="#section-3">Условия: 1 исходный балл за проверку</a> · <a href="#section-4">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M2 Внутренний DNS и системное разрешение имён (13)</h1>
-<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Требуемый результат</a> · <a href="#section-2">Схема задания</a> · <a href="#section-3">Критерии оценки</a> · <a href="#section-4">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M2 Внутренний DNS и системное разрешение имён (13)</h1>
+<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M5</a></p>
 <p><a href="../ja/m2.html">日本語</a> · <a href="../ru/m2.html">Русский</a> · <a href="../uz/m2.html">O‘zbekcha</a></p>
 <p>Связанное задание: <a href="p2.html">P2</a>.</p>
 <h2 id="section-1">Требуемый результат</h2>
-<p>Добавьте шесть основных имён в ту же zone lab.test. guide/practice-db можно сохранить. Нужны обычный resolver бастиона/Web, HTTP M1 по имени, имя DB, UDP/TCP, forwarding, NXDOMAIN, ACL и запрет AXFR.</p>
+<p>Перед началом убедитесь на странице оценок, что за <a href="m1.html">M1</a> получен полный балл.</p>
+<p>Добавьте шесть имён из таблицы во внутренний DNS, настроенный в P2. С бастиона должен открываться адрес <code>http://web.lab.test/mission.txt</code>.</p>
+<ol>
+<li><strong>DNS-сервер (P2.2-P2.4).</strong> Добавьте A-записи в существующую зону <code>lab.test</code>. Увеличьте серийный номер зоны, проверьте синтаксис и перечитайте настройки. Имена из P2 можно сохранить.</li>
+<li><strong>Бастион и Web-сервер (P2.5-P2.8).</strong> Проверьте прямой запрос к внутреннему DNS и обычное разрешение имён ОС. На бастионе откройте текст M1 по имени <code>web.lab.test</code>. На Web проверьте, что <code>db.lab.test</code> разрешается в <code>10.20.2.20</code>.</li>
+</ol>
 <h2 id="section-2">Схема задания</h2>
-<p><img src="../../../assets/ru/m2.png" alt="M2: HTTP по IP уже работает → Настроить DNS и resolver → Имя ведёт к тому же Web。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. По схеме самостоятельно выберите настройки из требований." width="1040" height="680" loading="lazy"></p>
-<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. По схеме самостоятельно выберите настройки из требований.</p>
+<p><img src="../../../assets/ru/m2.png" alt="Бастион и Web обращаются к внутреннему DNS. Бастион открывает Web по имени." width="1040" height="680" loading="lazy"></p>
 <table>
 <thead>
 <tr>
@@ -56,78 +60,75 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tr>
 </tbody>
 </table>
-<ul>
-<li>Текущие предпосылки: M1</li>
-</ul>
-<h2 id="section-3">Условия: 1 исходный балл за проверку</h2>
+<h2 id="section-3">Критерии оценки</h2>
+<p>Каждый критерий даёт 1 балл.</p>
 <table>
 <thead>
 <tr>
-<th scope="col">check ID (не менять)</th>
+<th scope="col">№</th>
 <th scope="col">Условие</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>WEB03_SERVICE</td>
+<td>1</td>
 <td>BIND/named работает (active).</td>
 </tr>
 <tr>
-<td>WEB03_CONFIG_VALID</td>
+<td>2</td>
 <td>Проверки named и zone lab.test завершаются успешно.</td>
 </tr>
 <tr>
-<td>WEB03_ZONE_AUTHORITY</td>
+<td>3</td>
 <td>SOA/NS zone lab.test и авторитетный ответ соответствуют схеме; NS - dns.lab.test.</td>
 </tr>
 <tr>
-<td>WEB03_REQUIRED_RECORDS</td>
+<td>4</td>
 <td>Все заданные A-записи profile дают нужные private IP; это один пункт.</td>
 </tr>
 <tr>
-<td>WEB03_UDP_RESPONSE</td>
+<td>5</td>
 <td>И бастион, и Web получают правильные ответы по UDP 53.</td>
 </tr>
 <tr>
-<td>WEB03_TCP_RESPONSE</td>
+<td>6</td>
 <td>И бастион, и Web получают правильные ответы по TCP 53.</td>
 </tr>
 <tr>
-<td>WEB03_NORMAL_RESOLVER</td>
+<td>7</td>
 <td>Обычный resolver бастиона/Web использует только BIND; нет подмены hosts или Firefox DoH.</td>
 </tr>
 <tr>
-<td>WEB03_NAMED_HTTP</td>
+<td>8</td>
 <td>С бастиона HTTP по имени profile и заданному пути возвращает 200 и правильный текст.</td>
 </tr>
 <tr>
-<td>WEB03_DB_NAME</td>
+<td>9</td>
 <td>Обычный resolver Web разрешает имя DB profile в 10.20.2.20.</td>
 </tr>
 <tr>
-<td>WEB03_FORWARD_ONLY</td>
+<td>10</td>
 <td>Forward only направлен только на 10.20.0.2; внешнее DNS-имя разрешается. Внешний HTTP не нужен.</td>
 </tr>
 <tr>
-<td>WEB03_NXDOMAIN</td>
+<td>11</td>
 <td>Новое отсутствующее имя этого запуска получает авторитетный NXDOMAIN.</td>
 </tr>
 <tr>
-<td>WEB03_CLIENT_ACL</td>
+<td>12</td>
 <td>Query/recursion/cache разрешены только localhost, бастиону и Web в BIND; одного SG недостаточно.</td>
 </tr>
 <tr>
-<td>WEB03_AXFR_DENIED</td>
+<td>13</td>
 <td>AXFR с бастиона/Web явно отклоняется при успешных обычных запросах того же запуска; таймаут не подходит.</td>
 </tr>
 </tbody>
 </table>
-<p>Проверки identity/управления/repo/сети/зависимостей не добавляют баллов. Частичные баллы не означают готовность следующего этапа при неисправных предпосылках.</p>
 <h2 id="section-4">Проверка и отправка</h2>
 <ol>
-<li>Откройте страницу заданий, которую использовали в P0. Войдите через учебный аккаунт Google и выберите свой Lab и <strong>M2</strong>.</li>
+<li>Откройте страницу оценок и выберите <strong>M2</strong>.</li>
 <li>Запустите проверку выбранного задания.</li>
-<li>Во время обработки обновляйте результат. Посмотрите, сколько критериев выполнено. Внесите нужные исправления и проверьте снова. Результат сохраняется автоматически.</li>
+<li>По завершении появятся число выполненных критериев и результат каждого. Исправьте пункты с пометкой «Исправить» и запустите проверку снова. «Не проверен» означает, что результат определить не удалось. Баллы отображаются в списке заданий.</li>
 </ol>
 <hr />
 <p><a href="p2.html">Предыдущее: P2</a> · <a href="p4.html">Следующее: P4</a></p>

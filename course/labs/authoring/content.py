@@ -469,10 +469,76 @@ MISSION_GUIDANCE = {
 | Bastion server | `-bastion` | `bastion` |
 
 Topshiriqlar sahifasida **M0** ni tanlang. Har bir to‘g‘ri fayl uchun 1 ball beriladi. Jami 4 ball.'''),
- 'M1': T('P1を参考に、指定された別fileと本文を独力でHTTP配信する。P1のpractice.txtを残す。file・service・listen・local/踏み台/public HTTP・今回要求のlogが対象。', 'По навыкам P1 самостоятельно выдайте другой заданный файл и текст. Сохраните practice.txt. Проверяются файл, сервис, слушатель, local/bastion/public HTTP и журнал текущего запроса.', 'P1 ko‘nikmasi bilan belgilangan boshqa fayl va matnni mustaqil tarqating. practice.txt ni saqlang. Fayl, service, listen, local/bastion/public HTTP va joriy so‘rov log i tekshiriladi.'),
- 'M2': T('同じlab.test zoneへ正式6名を設定する。P2のguide/practice-dbは保持してよい。踏み台/Webの通常resolver、名前によるM1 HTTP、DB名、UDP/TCP、外部forward、NXDOMAIN、ACL、AXFR拒否まで確認する。', 'Добавьте шесть основных имён в ту же zone lab.test. guide/practice-db можно сохранить. Нужны обычный resolver бастиона/Web, HTTP M1 по имени, имя DB, UDP/TCP, forwarding, NXDOMAIN, ACL и запрет AXFR.', 'Ayni lab.test zone ga oltita asosiy nomni qo‘shing. guide/practice-db qolishi mumkin. Bastion/Web odatiy resolver, nom orqali M1 HTTP, DB nomi, UDP/TCP, forwarding, NXDOMAIN, ACL va AXFR rad etilishi kerak.'),
+ 'M1': T(
+  '''P1と同じWebサーバーで、TCPの80番ポートから `/mission.txt` を配信する。P1で作った `/practice.txt` も引き続き開けるようにする。
+
+1. **Webサーバー（P1.2〜P1.3）**　下の本文を使って課題用ファイルを作る。所有者とグループを `root:root`、権限を `0644` にする。
+2. **Webサーバーと踏み台サーバー（P1.4〜P1.6）**　curlで `/mission.txt` にアクセスする。Webサーバー自身では `127.0.0.1`、踏み台からは `10.20.1.20` を指定し、両方でHTTP 200と下の本文が返ることを確認する。Webサーバーのアクセスログでリクエストを探す。''',
+  '''На том же Web-сервере настройте выдачу `/mission.txt` по HTTP на TCP-порту 80. Сохраните доступ к `/practice.txt`.
+
+1. **Web-сервер (P1.2–P1.3).** Создайте файл с указанным ниже текстом. Задайте владельца и группу `root:root` и права `0644`.
+2. **Web-сервер и бастион (P1.4–P1.6).** Запросите `/mission.txt` через curl. На самом Web используйте `127.0.0.1`, а на бастионе — `10.20.1.20`. В обоих случаях проверьте HTTP 200 и указанный ниже текст. Найдите запросы в журнале доступа Web-сервера.''',
+  '''Ayni Web serverda TCP 80 porti orqali `/mission.txt` faylini HTTP da tarqating. `/practice.txt` ham ochiq qolsin.
+
+1. **Web server (P1.2–P1.3).** Quyidagi matn bilan topshiriq faylini yarating. Egasi va guruhini `root:root`, ruxsatlarini `0644` qiling.
+2. **Web va Bastion serverlari (P1.4–P1.6).** curl bilan `/mission.txt` ni so‘rang. Web serverning o‘zida `127.0.0.1`, Bastion serverida `10.20.1.20` ni ishlating. Har ikkala joyda HTTP 200 va quyidagi matn qaytishini tekshiring. So‘rovlarni Web serverning access log faylidan toping.'''),
+ 'M2': T(
+  '''P2で構築した内部DNSに、下の6件の名前を追加する。踏み台サーバーから `http://web.lab.test/mission.txt` が開けるようにする。
+
+1. **DNSサーバー（P2.2〜P2.4）**　既存の `lab.test` ゾーンにAレコードを追加する。ゾーンファイルのシリアル番号を更新し、構文検査を通してから設定を読み込む。P2の名前は残してよい。
+2. **踏み台サーバーとWebサーバー（P2.5〜P2.8）**　内部DNSへ直接問い合わせた結果と、OSが普段使う名前解決の結果を確認する。踏み台では `web.lab.test` でM1の本文を開き、Webサーバーでは `db.lab.test` が `10.20.2.20` になることを確認する。''',
+  '''Добавьте шесть имён из таблицы во внутренний DNS, настроенный в P2. С бастиона должен открываться адрес `http://web.lab.test/mission.txt`.
+
+1. **DNS-сервер (P2.2–P2.4).** Добавьте A-записи в существующую зону `lab.test`. Увеличьте серийный номер зоны, проверьте синтаксис и перечитайте настройки. Имена из P2 можно сохранить.
+2. **Бастион и Web-сервер (P2.5–P2.8).** Проверьте прямой запрос к внутреннему DNS и обычное разрешение имён ОС. На бастионе откройте текст M1 по имени `web.lab.test`. На Web проверьте, что `db.lab.test` разрешается в `10.20.2.20`.''',
+  '''P2 da sozlangan ichki DNS ga jadvaldagi oltita nomni qo‘shing. Bastion serveridan `http://web.lab.test/mission.txt` ochilsin.
+
+1. **DNS server (P2.2–P2.4).** Mavjud `lab.test` zonasiga A yozuvlarini qo‘shing. Zona seriya raqamini oshiring, sintaksisni tekshiring va sozlamani qayta yuklang. P2 nomlarini saqlash mumkin.
+2. **Bastion va Web serverlari (P2.5–P2.8).** Ichki DNS ga to‘g‘ridan to‘g‘ri so‘rovni va OS ning odatiy nom yechimini tekshiring. Bastionda `web.lab.test` orqali M1 matnini oching. Web serverda `db.lab.test` manzili `10.20.2.20` bo‘lishini tekshiring.'''),
  'M3': T('M専用markerを自分のLab IDで作る。P3とは別のブラウザで停止前記録→AWS Stop→ブラウザで停止完了確認→AWS Start→ブラウザで再開後確認を行う。対象は同じWebと元root volume。単なるrebootでは不可。backup/restoreとdisk追加は不要。', 'Создайте отдельный marker M со своим Lab ID. Отдельно от P3 пройдите браузер: запись до остановки → AWS Stop → браузер: подтверждение остановки → AWS Start → браузер: проверка после запуска. Нужны тот же Web и исходный root volume; reboot не подходит. Backup/restore и новый диск не нужны.', 'O‘z Lab ID bilan alohida M marker yarating. P3 dan alohida brauzerda oldingi holat → AWS Stop → brauzerda to‘xtashni tekshirish → AWS Start → brauzerda saqlanishni tekshirish ketma-ketligini bajaring. Ayni Web va asl root volume kerak; oddiy reboot yetmaydi. Backup/restore va yangi disk kerak emas.'),
- 'M4': T('本課題用DB/roleを自分で構築する。P4.7の名前指定と同じ方法で、M2のdb.lab.testを使い、Webのruntime roleで認証SELECTを成功させる。HBAはWeb/32・正しいDB/roleだけ。既存passwordをWeb内のmission用helperへ保存し、practiceと混ぜない。app tableはまだ不要。', 'Самостоятельно настройте основную БД и роли. Используйте db.lab.test из M2 по аналогии с подключением по имени в P4.7 и выполните SELECT с Web runtime-role. HBA разрешает только Web/32 и правильную пару DB/role. Существующий пароль сохраните через helper mission на Web, отдельно от practice. Таблицы приложения пока не нужны.', 'Asosiy DB va rollarni mustaqil quring. P4.7 dagi nom bilan ulanish usulini qo‘llab, M2 dagi db.lab.test orqali Web runtime role orqali SELECT bajaring. HBA faqat Web/32 va to‘g‘ri DB/role juftiga ruxsat beradi. Mavjud parolni Web mission helper orqali practice dan alohida saqlang. App jadvallari hali kerak emas.'),
- 'M5': T('同じ教員アプリをmission DBへ接続する。P5のpractice手順を参考にprofile=missionを選ぶ。既存app/venvを再配置しない。アプリの停止はP6.3、通常接続の設定を作って選び、一時構築用の設定を作る流れはP5.4〜P5.5で練習した手順を使う。設定対象を課題用のmissionに置き換える。固定migration/seed/管理者と権限をそのDBへ構築し指定2件を登録する。P1/M1を保持する。完成後はmissionをactiveにする。', 'Подключите то же приложение к БД mission. Используйте навыки P5 с profile=mission, не копируйте заново app/venv. Остановите приложение по примеру P6.3. Используйте порядок P5.4–P5.5 для создания и активации runtime и подготовки временного setup, подставив профиль mission. Выполните migrations/seed/admin и grants в основной БД, добавьте две заданные записи. Сохраните P1/M1, оставьте mission активным.', 'Ayni app ni mission DB ga ulang. P5 ko‘nikmasi bilan profile=mission tanlang, app/venv ni qayta joylamang. Ilovani P6.3 dagi mashq kabi to‘xtating. Runtime yaratish va faollashtirish, so‘ng vaqtinchalik setup yaratishda P5.4–P5.5 tartibini mission profili bilan qo‘llang. Asosiy DB da migrations/seed/admin va grants ni bajaring, ikkita belgilangan yozuvni kiriting. P1/M1 ni saqlab mission ni active qoldiring.'),
- 'M6': T('mission側の最小権限を完成する。catalog_setupはNOLOGIN/password NULL、一時mission setup.envは残さない。root管理コード/venv、600秘密file、公開80からの管理拒否、private8080の正規成功、備品のview/add/changeだけの管理者、公開/非公開分離とSQL権限を確認する。ブラウザの機能確認は本人実演ではなく自動確認。', 'Завершите минимальные права mission: catalog_setup NOLOGIN/password NULL, временные setup-файлы удалены. Проверьте root-код/venv, секреты 600, запрет admin на 80, успешный private8080, права admin только view/add/change, разделение публичных данных и SQL-права. Функциональная проверка в браузере автоматическая; личная демонстрация не нужна.', 'Mission eng kam huquqini tugating: catalog_setup NOLOGIN/password NULL, vaqtinchalik setup fayllari qolmasin. Root kod/venv, 600 maxfiy fayl, 80 da admin rad etilishi, private8080 muvaffaqiyati, admin faqat view/add/change, ochiq/yopiq ma’lumot va SQL huquqlarini tekshiring. Brauzerdagi funksional tekshiruv avtomatik; shaxsiy namoyish kerak emas.'),
+ 'M4': T(
+  '''P4で使ったPostgreSQLに、下の課題用データベースと2つのロールを作る。アプリのテーブルはM5で用意する。
+
+1. **DBサーバー（P4.2〜P4.6）**　課題用DBとロールを作り、Webサーバー（`10.20.1.20/32`）から指定のDB・ロールで接続できるようにする。認証方式にはP4と同じSCRAMを使う。
+2. **Webサーバー（P4.7〜P4.8）**　`db.lab.test` に通常運用用ロールで接続し、SELECTが成功することを確かめる。P4.8と同じ方法で、既存パスワードを課題用（`mission`）として保存する。''',
+  '''В PostgreSQL из P4 создайте основную БД и две роли, указанные ниже. Таблицы приложения создаются в M5.
+
+1. **DB-сервер (P4.2–P4.6).** Создайте БД и роли и разрешите подключение к нужной БД с указанными ролями только с Web-сервера (`10.20.1.20/32`). Используйте SCRAM, как в P4.
+2. **Web-сервер (P4.7–P4.8).** Подключитесь к `db.lab.test` под рабочей ролью и выполните SELECT. Сохраните существующий пароль для профиля `mission` тем же способом, что и в P4.8.''',
+  '''P4 dagi PostgreSQL da quyida ko‘rsatilgan topshiriq ma’lumotlar bazasi va ikkita rolni yarating. Ilova jadvallari M5 da yaratiladi.
+
+1. **DB server (P4.2–P4.6).** Baza va rollarni yarating. Tegishli bazaga ko‘rsatilgan rollar bilan faqat Web serverdan (`10.20.1.20/32`) ulanishga ruxsat bering. P4 dagidek SCRAM ishlating.
+2. **Web server (P4.7–P4.8).** Oddiy ish rejimi roli bilan `db.lab.test` ga ulanib, SELECT bajarilishini tekshiring. Mavjud parolni P4.8 dagi usul bilan `mission` profili uchun saqlang.'''),
+ 'M5': T(
+  '''P5で動かした備品管理アプリを、M4で構築した課題用DBにつなぐ。P6で練習用の設定を仕上げてから始める。
+
+1. **Webサーバー（P6.3、P5.4〜P5.5）**　アプリを停止し、使用する設定を `mission` に切り替える。配備済みのアプリを使い、課題用DBにテーブルと初期データを用意し、アプリ管理者を作る。
+2. **DBサーバーとWebサーバー（P5.6〜P5.8）**　通常運用用ロールに権限を付け、アプリを起動する。公開ページと管理画面の両方を開き、`/practice.txt` と `/mission.txt` も引き続き開けることを確かめる。
+3. **踏み台サーバー（P5.9）**　`http://admin.lab.test:8080/admin/` に `lab_admin` で入り、下の2件を登録する。一般ページでは公開にした備品を確認する。''',
+  '''Подключите приложение инвентаризации из P5 к основной БД из M4. Перед переключением завершите настройку тренировочного профиля в P6.
+
+1. **Web-сервер (P6.3, P5.4–P5.5).** Остановите приложение и выберите профиль `mission`. Используйте уже развёрнутое приложение. Создайте таблицы, исходные данные и учётную запись администратора в основной БД.
+2. **DB- и Web-серверы (P5.6–P5.8).** Назначьте права рабочей роли и запустите приложение. Откройте публичную и административную страницы. Убедитесь, что `/practice.txt` и `/mission.txt` всё ещё доступны.
+3. **Бастион (P5.9).** Войдите в `http://admin.lab.test:8080/admin/` как `lab_admin` и внесите две записи из таблицы. На публичной странице проверьте опубликованную запись.''',
+  '''P5 dagi jihozlar ilovasini M4 da tayyorlangan topshiriq bazasiga ulang. Profilni almashtirishdan oldin P6 da mashq sozlamasini yakunlang.
+
+1. **Web server (P6.3, P5.4–P5.5).** Ilovani to‘xtating va `mission` profilini tanlang. Mavjud ilovadan foydalanib, topshiriq bazasida jadvallar, boshlang‘ich ma’lumotlar va administratorni yarating.
+2. **DB va Web serverlari (P5.6–P5.8).** Oddiy ish rejimi roliga huquqlarni bering va ilovani ishga tushiring. Ochiq sahifa hamda boshqaruv sahifasini oching. `/practice.txt` va `/mission.txt` ham ochilishini tekshiring.
+3. **Bastion serveri (P5.9).** `http://admin.lab.test:8080/admin/` manziliga `lab_admin` bilan kiring va jadvaldagi ikki yozuvni kiriting. Ochiq sahifada e’lon qilingan yozuvni tekshiring.'''),
+ 'M6': T(
+  '''P6で練習した方法で、M5の備品管理アプリを通常運用に切り替える。構築時だけ使った接続を閉じ、アプリと管理者に必要な権限を残す。
+
+1. **DBサーバー（P6.1〜P6.2）**　`catalog_app` の権限を確認する。構築用の `catalog_setup` はログイン不可にし、パスワードと既存の接続を残さない。
+2. **Webサーバー（P6.3〜P6.4）**　課題用の一時設定（`/etc/jdu-catalog/setup.env` と `/etc/jdu-catalog/profiles/mission.setup.env`）を片付け、通常運用用の `mission` 設定で起動する。実行ユーザーによるコードの書き換えを防ぎ、秘密を含む設定は `root:root`、`0600` にする。
+3. **一般ページと管理画面（P6.4〜P6.5）**　公開の80番ポートではM5の公開備品だけを表示する。踏み台から8080番ポートの管理画面に入り、`lab_admin` が備品を閲覧・追加・変更できることを確認する。''',
+  '''Переведите приложение M5 в обычный режим работы способом из P6. Закройте доступ, нужный только при настройке, и сохраните необходимые права приложения и администратора.
+
+1. **DB-сервер (P6.1–P6.2).** Проверьте права `catalog_app`. Запретите вход для роли настройки `catalog_setup`, удалите её пароль и завершите оставшиеся соединения.
+2. **Web-сервер (P6.3–P6.4).** Уберите временные настройки (`/etc/jdu-catalog/setup.env` и `/etc/jdu-catalog/profiles/mission.setup.env`) и запустите приложение с рабочим профилем `mission`. Пользователь сервиса не должен менять код. Файлы с секретами принадлежат `root:root` и имеют права `0600`.
+3. **Открытая и административная страницы (P6.4–P6.5).** На порту 80 должна отображаться только публичная запись из M5. Откройте панель управления с бастиона на порту 8080 и проверьте, что `lab_admin` может просматривать, добавлять и изменять предметы.''',
+  '''M5 ilovasini P6 dagi usul bilan oddiy ish rejimiga o‘tkazing. Faqat sozlashda kerak bo‘lgan kirishni yoping, ilova va administrator uchun zarur huquqlarni qoldiring.
+
+1. **DB server (P6.1–P6.2).** `catalog_app` huquqlarini tekshiring. Sozlash roli `catalog_setup` uchun kirishni yoping, parolini olib tashlang va qolgan ulanishlarini yakunlang.
+2. **Web server (P6.3–P6.4).** Vaqtinchalik sozlamalarni (`/etc/jdu-catalog/setup.env` va `/etc/jdu-catalog/profiles/mission.setup.env`) olib tashlang va ilovani oddiy ish uchun `mission` profili bilan ishga tushiring. Xizmat foydalanuvchisi kodni o‘zgartira olmasin. Maxfiy sozlamalar `root:root` ga tegishli bo‘lsin va `0600` ruxsatiga ega bo‘lsin.
+3. **Ochiq va boshqaruv sahifalari (P6.4–P6.5).** 80-portda M5 dagi faqat ochiq yozuv ko‘rinsin. Bastion orqali 8080-portdagi boshqaruv sahifasini oching. `lab_admin` jihozlarni ko‘rishi, qo‘shishi va o‘zgartirishi mumkinligini tekshiring.'''),
 }

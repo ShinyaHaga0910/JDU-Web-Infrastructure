@@ -1,4 +1,4 @@
-# Web Infrastructure: M0-M6 mustaqil topshiriqlar
+# Web Infrastructure: M0-M5 mustaqil topshiriqlar
 
 O‘qituvchi tekshiruvi uchun birinchi nashr. Talabaning qo‘llanma bo‘yicha boshidan oxirigacha o‘tishi hali tekshirilmagan.
 
@@ -6,67 +6,15 @@ Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga 
 
 [日本語](../ja/missions-full.md) · [Русский](../ru/missions-full.md) · [O‘zbekcha](../uz/missions-full.md)
 
-[Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M6](missions.md)
+[Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M5](missions.md)
 
 ## Qo‘llanmadan foydalanish
 
-Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P - batafsil qadamli mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.
+P da mashq qilingan usul bilan shu muhitga topshiriq fayllari va sozlamalarini qo‘shing. Har bir M dagi qiymatlar va mos P qadamlariga qarang.
 
-P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6
+P0 → M0 → P1 → M1 → P2 → M2 → P4 → M3 → P5 → P6 → M4 → M5
 
-P5 uchun ham M2 DNS kerak. P4 da DB ga IP va nom orqali ulanishni mashq qiling. Ilova db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating.
-
-P0=1, M0=4, M1=8, M2=13, M4=9, M5=13, M6=16: jami 64 xom ball. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.
-
-## Muhit va tayyorgarlik
-
-Avval boshlang‘ich tarqatma imzosi, yangi beshta server yoki mavjud muhitga install, ichki SSH va shaxsiy ro‘yxatni tugating. Yo‘riqnoma zip dagi distribution/STUDENT.md da. Maxfiy kalitni umumiy Windows ga saqlamang; shaxsiy Academy hisobining CloudShell idan foydalaning. O‘qituvchi anonim Lab ID, fingerprint va muddatni beradi.
-
-Umumiy private IP quyida; public IPv4 doimiy emas. AWS region us-east-1, Ubuntu24.04/amd64. RDP: labuser; SSM: ssm-user; ichki SSH: ubuntu. User nomi va server rolini adashtirmang.
-
-| Role | Private IPv4 | Vazifa |
-| --- | --- | --- |
-| bastion | 10.20.1.10 | RDP3389 / Firefox / SSH |
-| web | 10.20.1.20 | HTTP80 / private8080 / loopback8000 |
-| dns | 10.20.2.10 | BIND UDP/TCP53 |
-| db | 10.20.2.20 | PostgreSQL5432 |
-| repo | 10.20.2.30 | Oldindan saqlangan imzolangan resurslar HTTP80 |
-
-P0 va M0 da Session Manager’ni EC2 ro‘yxatidan oching. Keyingi qadam CloudShell orqali ulanishni so‘rasa, u yerda `aws ssm start-session --target i-server-ID` ni bajaring. Har ikkala holatda serverda `ssm-user` sifatida ishlaysiz.
-
-Nano: faylni ochish → matn yozish → Ctrl+O → Enter bilan saqlash → Ctrl+X bilan chiqish. Sozlama bloki shell buyrug‘i emas. Psql ichida prompt o‘zgaradi; SQL/\password shu yerga yoziladi, \q Ubuntu ga qaytaradi. Xatodan keyin natijani tekshirmay davom etmang.
-
-Raqamli izohlar shu qadamdagi tartib va maqsadni bildiradi. # shell, -- psql ichidagi izohdir. Izohni o‘zgartirish shart emas. Ulanish, editor va parol kiritish tugashini kutib, bittadan bajaring. Qatorga bo‘lingan buyruq bitta buyruq bo‘lib qoladi.
-
-## Qadamlarni qanday o‘qish kerak
-
-Har P da topshiriq, tushuntirish, qadamlar va savollar bor. Butun bo‘limni birdan joylamang: har command ni alohida bajarib natijani o‘qing. Qator oxiridagi backslash davom etishni bildiradi: keyingi qator ham shu command ning qismidir.
-
-Bash blokini ko‘rsatilgan muhit terminaliga kiriting. Text bloki config matni, psql ichidagi kiritish yoki natija namunasi bo‘lishi mumkin; oldingi izohni o‘qing. # bilan boshlangan izoh comment hisoblanadi. Terminaldagi $ yoki postgres=# prompt ini command ga qo‘shmang. YOUR- qiymatlarini o‘zingiznikiga almashtiring.
-
-Tekshirish tartibi: saqlangan fayl, sintaksis, service ga qo‘llash, haqiqiy ulanish. To‘g‘ri fayl ishlayotgan service yangi sozlamani ishlatayotganini hali isbotlamaydi. HTTP response, DNS answer yoki SQL natijasini log bilan solishtiring.
-
-## Tayyor tizim va ulanish yo‘llari
-
-| Manba | Manzil | Protocol / port | Maqsad |
-| --- | --- | --- | --- |
-| Windows PC | Web public IPv4 | TCP/80 | Internet Gateway orqali ochiq ro‘yxat va statik fayllarni ko‘rish. |
-| Windows PC | bastion public IPv4 | TCP/3389 | Ruxsatli CIDR dan RDP bilan bastion ish stoliga kirish. |
-| bastion | Web/DNS/DB/repo | TCP/22 | Boshqarish uchun ichki SSH; private key bastion ichida qoladi. |
-| bastion / Web | DNS 10.20.2.10 | UDP+TCP/53 | lab.test nomlarini yechish. DNS Web sahifa mazmunini qaytarmaydi. |
-| Web app | DB 10.20.2.20 | TCP/5432 | App DB role bilan SQL bajaradi. Windows dan DB ga bevosita ulanish ishlatilmaydi. |
-| bastion | Web 10.20.1.20 | TCP/8080 | admin.lab.test admin oynasi; ochiq 80 portdan alohida. |
-| Nginx on Web | 127.0.0.1 on Web | TCP/8000 | Shu Web ichidagi app ga uzatish; 127.0.0.1 - ayni joriy host. |
-
-Boshlang‘ich SSM CloudShell dan EC2 ga alohida management yo‘lidir. U oddiy Web request yo‘liga qo‘shilmaydi. Jadvaldagi ichki IP va portlar shu Lab uchun, barcha Web tizimlari uchun emas.
-
-## Mustaqil topshiriqdan oldin
-
-Talablardan qaysi serverdagi file, nom, DB yoki role o‘zgarishini ish jadvaliga yozing. P va M qiymatlarini solishtirib M obyektlarini tanlang. Tekshiruv jadvali command tartibi emas, kerakli tayyor holatni bildiradi.
-
-Keyin har talabni qayerdan va nima bilan tekshirishni belgilang. Faylni ko‘rish joyi bilan ulanishni sinash joyi bir xil bo‘lmasligi mumkin. Ruxsatli yo‘l muvaffaqiyati va taqiqlangan yo‘l rad etilishini alohida yozing.
-
-Brauzerda topshiriqni tanlab natija va saqlash holatini tekshiring. M5/M6 funksiyalari uchun app administratorining mavjud parolini yashirin kiriting. Baholar avtomatik saqlanadi. Tushunish savollari va qaydlar bahoga qo‘shimcha talab emas.
+P6 da mashq sozlamalarini yakunlang. Keyin M4 da ayni ilovani topshiriq bazasiga ulang.
 
 ## M0 Shaxsiy muhit va buyruqlarni bajarish joyi (4)
 
@@ -107,53 +55,57 @@ EC2 tafsilot oynasi. Connect yonidagi o‘ng strelkadan Connect with SSM Session
 
 ### Tayyor holat talablari
 
-P1 ko‘nikmasi bilan belgilangan boshqa fayl va matnni mustaqil tarqating. practice.txt ni saqlang. Fayl, service, listen, local/bastion/public HTTP va joriy so‘rov log i tekshiriladi.
+Ayni Web serverda TCP 80 porti orqali `/mission.txt` faylini HTTP da tarqating. `/practice.txt` ham ochiq qolsin.
+
+1. **Web server (P1.2-P1.3).** Quyidagi matn bilan topshiriq faylini yarating. Egasi va guruhini `root:root`, ruxsatlarini `0644` qiling.
+2. **Web va Bastion serverlari (P1.4-P1.6).** curl bilan `/mission.txt` ni so‘rang. Web serverning o‘zida `127.0.0.1`, Bastion serverida `10.20.1.20` ni ishlating. Har ikkala joyda HTTP 200 va quyidagi matn qaytishini tekshiring. So‘rovlarni Web serverning access log faylidan toping.
 
 ### Topshiriq diagrammasi
 
-![M1: HTTP topshirig‘i hali tayyor emas → Web ichida tarqatishni sozlash → Javob va log ni solishtirish。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.](../../assets/uz/m1.png)
+![Kompyuter va Bastiondan Web serverdagi mission.txt ga HTTP yo‘llari.](../../assets/uz/m1.png)
 
-Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.
-
-- File: /var/www/html/mission.txt
-- URL path: /mission.txt
+- **Tarqatiladigan fayl** `/var/www/html/mission.txt`
+- **URL yo‘li** `/mission.txt`
 
 ```text
 JDU WEB-02 mission: independent HTTP delivery.
 ```
 
-### Shartlar: har tekshiruvga 1 xom ball
+### Baholash mezonlari
 
-| check ID (o‘zgartirmang) | Shart |
+Har bir mezon 1 ball.
+
+| № | Shart |
 | --- | --- |
-| WEB02_NGINX_ACTIVE | Nginx ishlaydi (active). |
-| WEB02_CONFIG_VALID | nginx -t sozlamani muvaffaqiyatli tekshiradi. |
-| WEB02_LISTEN_80 | 80 port private IP/barcha interface da tinglaydi, faqat loopback emas. |
-| WEB02_FILE | Oddiy faylda aniq matn bor, egasi root:root, ruxsat 0644. |
-| WEB02_LOCAL_HTTP | Web loopback orqali HTTP 200 va aniq matn oladi. |
-| WEB02_BASTION_HTTP | Bastion private IP orqali HTTP 200 va aniq matn oladi. |
-| WEB02_PUBLIC_HTTP | CloudShell public IP orqali HTTP 200 va aniq matn oladi. |
-| WEB02_ACCESS_LOG | Access log aynan shu tekshiruv nonce li so‘rovni saqlaydi. |
-
-Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.
+| 1 | Nginx ishlaydi (active). |
+| 2 | nginx -t sozlamani muvaffaqiyatli tekshiradi. |
+| 3 | 80 port private IP/barcha interface da tinglaydi, faqat loopback emas. |
+| 4 | Oddiy faylda aniq matn bor, egasi root:root, ruxsat 0644. |
+| 5 | Web loopback orqali HTTP 200 va aniq matn oladi. |
+| 6 | Bastion private IP orqali HTTP 200 va aniq matn oladi. |
+| 7 | CloudShell public IP orqali HTTP 200 va aniq matn oladi. |
+| 8 | Access log aynan shu tekshiruv nonce li so‘rovni saqlaydi. |
 
 ### Tekshirish va yuborish
 
-1. P0 da ishlatgan topshiriqlar sahifasiga ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda **M1** ni tanlang.
+1. Baholash sahifasini oching va **M1** ni tanlang.
 2. Tanlangan topshiriq tekshiruvini boshlang.
-3. Ishlov davom etsa natijani yangilab kuting. Nechta band bajarilganini ko‘ring. Tuzatish kerak bo‘lgan bandlarni tuzatib, yana tekshiring. Natija avtomatik saqlanadi.
+3. Tekshiruv tugagach, bajarilgan mezonlar soni va har bir natija chiqadi. «Tuzating» deb belgilangan sozlamani to‘g‘rilab, yana tekshiring. «Tekshirilmagan» band natijasi aniqlanmagan. Ballarni topshiriqlar ro‘yxatidan ko‘ring.
 
 ## M2 Ichki DNS va odatiy nom yechimi (13)
 
 ### Tayyor holat talablari
 
-Ayni lab.test zone ga oltita asosiy nomni qo‘shing. guide/practice-db qolishi mumkin. Bastion/Web odatiy resolver, nom orqali M1 HTTP, DB nomi, UDP/TCP, forwarding, NXDOMAIN, ACL va AXFR rad etilishi kerak.
+Boshlashdan oldin baholash sahifasida [M1](m1.md) uchun to‘liq ball olinganini tekshiring.
+
+P2 da sozlangan ichki DNS ga jadvaldagi oltita nomni qo‘shing. Bastion serveridan `http://web.lab.test/mission.txt` ochilsin.
+
+1. **DNS server (P2.2-P2.4).** Mavjud `lab.test` zonasiga A yozuvlarini qo‘shing. Zona seriya raqamini oshiring, sintaksisni tekshiring va sozlamani qayta yuklang. P2 nomlarini saqlash mumkin.
+2. **Bastion va Web serverlari (P2.5-P2.8).** Ichki DNS ga to‘g‘ridan to‘g‘ri so‘rovni va OS ning odatiy nom yechimini tekshiring. Bastionda `web.lab.test` orqali M1 matnini oching. Web serverda `db.lab.test` manzili `10.20.2.20` bo‘lishini tekshiring.
 
 ### Topshiriq diagrammasi
 
-![M2: IP orqali HTTP ishlaydi → DNS va resolver ni sozlash → Nom ham ayni Web ga olib boradi。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.](../../assets/uz/m2.png)
-
-Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.
+![Bastion va Web ichki DNS ga murojaat qiladi. Bastion Web ga nomi bilan ulanadi.](../../assets/uz/m2.png)
 
 | DNS name | A / IPv4 |
 | --- | --- |
@@ -164,190 +116,163 @@ Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelka
 | repo.lab.test | 10.20.2.30 |
 | web.lab.test | 10.20.1.20 |
 
-- Joriy old shartlar: M1
+### Baholash mezonlari
 
-### Shartlar: har tekshiruvga 1 xom ball
+Har bir mezon 1 ball.
 
-| check ID (o‘zgartirmang) | Shart |
+| № | Shart |
 | --- | --- |
-| WEB03_SERVICE | BIND/named ishlaydi (active). |
-| WEB03_CONFIG_VALID | Named va lab.test zone tekshiruvlari muvaffaqiyatli. |
-| WEB03_ZONE_AUTHORITY | Lab.test SOA/NS va vakolatli javob tuzilmaga mos; NS - dns.lab.test. |
-| WEB03_REQUIRED_RECORDS | Profile dagi barcha A record kerakli private IP beradi; bu bitta band. |
-| WEB03_UDP_RESPONSE | Bastion ham, Web ham UDP 53 orqali to‘g‘ri javob oladi. |
-| WEB03_TCP_RESPONSE | Bastion ham, Web ham TCP 53 orqali to‘g‘ri javob oladi. |
-| WEB03_NORMAL_RESOLVER | Bastion/Web odatiy resolver faqat BIND dan foydalanadi; hosts yoki Firefox DoH bilan almashtirilmaydi. |
-| WEB03_NAMED_HTTP | Bastiondan profile nomi va belgilangan path orqali HTTP 200 hamda to‘g‘ri matn qaytadi. |
-| WEB03_DB_NAME | Web odatiy resolver profile DB nomini 10.20.2.20 ga yechadi. |
-| WEB03_FORWARD_ONLY | Forward only faqat 10.20.0.2 ga yo‘naltirilgan; tashqi DNS nomi yechiladi. Tashqi HTTP shart emas. |
-| WEB03_NXDOMAIN | Shu ishga tushirishdagi yangi mavjud bo‘lmagan nom vakolatli NXDOMAIN oladi. |
-| WEB03_CLIENT_ACL | BIND query/recursion/cache faqat localhost, bastion va Web ga ruxsat; SG ning o‘zi yetmaydi. |
-| WEB03_AXFR_DENIED | Ayni tekshiruv oddiy so‘rovlari o‘tgan holda bastion/Web AXFR aniq rad etiladi; timeout yetmaydi. |
-
-Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.
+| 1 | BIND/named ishlaydi (active). |
+| 2 | Named va lab.test zone tekshiruvlari muvaffaqiyatli. |
+| 3 | Lab.test SOA/NS va vakolatli javob tuzilmaga mos; NS - dns.lab.test. |
+| 4 | Profile dagi barcha A record kerakli private IP beradi; bu bitta band. |
+| 5 | Bastion ham, Web ham UDP 53 orqali to‘g‘ri javob oladi. |
+| 6 | Bastion ham, Web ham TCP 53 orqali to‘g‘ri javob oladi. |
+| 7 | Bastion/Web odatiy resolver faqat BIND dan foydalanadi; hosts yoki Firefox DoH bilan almashtirilmaydi. |
+| 8 | Bastiondan profile nomi va belgilangan path orqali HTTP 200 hamda to‘g‘ri matn qaytadi. |
+| 9 | Web odatiy resolver profile DB nomini 10.20.2.20 ga yechadi. |
+| 10 | Forward only faqat 10.20.0.2 ga yo‘naltirilgan; tashqi DNS nomi yechiladi. Tashqi HTTP shart emas. |
+| 11 | Shu ishga tushirishdagi yangi mavjud bo‘lmagan nom vakolatli NXDOMAIN oladi. |
+| 12 | BIND query/recursion/cache faqat localhost, bastion va Web ga ruxsat; SG ning o‘zi yetmaydi. |
+| 13 | Ayni tekshiruv oddiy so‘rovlari o‘tgan holda bastion/Web AXFR aniq rad etiladi; timeout yetmaydi. |
 
 ### Tekshirish va yuborish
 
-1. P0 da ishlatgan topshiriqlar sahifasiga ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda **M2** ni tanlang.
+1. Baholash sahifasini oching va **M2** ni tanlang.
 2. Tanlangan topshiriq tekshiruvini boshlang.
-3. Ishlov davom etsa natijani yangilab kuting. Nechta band bajarilganini ko‘ring. Tuzatish kerak bo‘lgan bandlarni tuzatib, yana tekshiring. Natija avtomatik saqlanadi.
+3. Tekshiruv tugagach, bajarilgan mezonlar soni va har bir natija chiqadi. «Tuzating» deb belgilangan sozlamani to‘g‘rilab, yana tekshiring. «Tekshirilmagan» band natijasi aniqlanmagan. Ballarni topshiriqlar ro‘yxatidan ko‘ring.
 
-## M4 PostgreSQL ga autentifikatsiya bilan ulanish (9)
+## M3 PostgreSQL ga autentifikatsiya bilan ulanish (9)
 
 ### Tayyor holat talablari
 
-Asosiy DB va rollarni mustaqil quring. P4.7 dagi nom bilan ulanish usulini qo‘llab, M2 dagi db.lab.test orqali Web runtime role orqali SELECT bajaring. HBA faqat Web/32 va to‘g‘ri DB/role juftiga ruxsat beradi. Mavjud parolni Web mission helper orqali practice dan alohida saqlang. App jadvallari hali kerak emas.
+Boshlashdan oldin baholash sahifasida [M2](m2.md) uchun to‘liq ball olinganini tekshiring.
+
+P4 dagi PostgreSQL da quyida ko‘rsatilgan topshiriq ma’lumotlar bazasi va ikkita rolni yarating. Ilova jadvallari M4 da yaratiladi.
+
+1. **DB server (P4.2-P4.6).** Baza va rollarni yarating. Tegishli bazaga ko‘rsatilgan rollar bilan faqat Web serverdan (`10.20.1.20/32`) ulanishga ruxsat bering. P4 dagidek SCRAM ishlating.
+2. **Web server (P4.7-P4.8).** Oddiy ish rejimi roli bilan `db.lab.test` ga ulanib, SELECT bajarilishini tekshiring. Mavjud parolni P4.8 dagi usul bilan `mission` profili uchun saqlang.
 
 ### Topshiriq diagrammasi
 
-![M4: Web dan DB ulanishini tayyorlash → DB, role va auth ni sozlash → Ruxsatli SELECT muvaffaqiyatli。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. CloudShell dan DB serverga SSM orqali ulanib, sozlang. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.](../../assets/uz/m4.png)
+![Web server DB server nomini aniqlaydi va PostgreSQL ga ulanadi.](../../assets/uz/m3.png)
 
-Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. CloudShell dan DB serverga SSM orqali ulanib, sozlang. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.
-
-- Profile: mission
-- Database: jdu_catalog
-- Setup role: catalog_setup
-- Runtime role: catalog_app
-- Joriy old shartlar: M2
-
-### Shartlar: har tekshiruvga 1 xom ball
-
-| check ID (o‘zgartirmang) | Shart |
+| Sozlama | Qiymat |
 | --- | --- |
-| WEB05_CLUSTER_ACTIVE | PostgreSQL 16/main ishlaydi (active). |
-| WEB05_CLUSTER_CONFIG | 16/main sozlamasi, standart data directory va OS postgres socket/peer to‘g‘ri. |
-| WEB05_LISTEN_5432 | PostgreSQL 10.20.2.20:5432 da tinglaydi. |
-| WEB05_DATABASE_OWNER | DB va public schema egasi tegishli setup role. |
-| WEB05_ROLE_ATTRIBUTES | Runtime LOGIN; superuser/CREATEDB/CREATEROLE/REPLICATION/BYPASSRLS va huquq oshiruvchi membership yo‘q. Setup qurishda LOGIN yoki tugagach NOLOGIN. |
-| WEB05_HBA_SCRAM | HBA faqat ko‘rsatilgan DB/role va Web /32 uchun SCRAM ga ruxsat beradi; keng ruxsat yo‘q. |
-| WEB05_WEB_SQL | Web dan yangi autentifikatsiyali SELECT kerakli DB/user/qiymatni qaytaradi; P IP bilan, M odatiy DNS orqali. |
-| WEB05_BAD_PASSWORD_DENIED | To‘g‘ri parol ishlagan ayni tekshiruvda bitta noto‘g‘ri parol aniq rad etiladi. |
-| WEB05_WRONG_TARGET_DENIED | Web dan postgres role, begona DB va boshqa profile taqiqlangan; hali yaratilmagan practice DB majburiy emas. |
+| Baza nomi | `jdu_catalog` |
+| Sozlash roli | `catalog_setup` |
+| Oddiy ish rejimi roli | `catalog_app` |
 
-Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.
+### Baholash mezonlari
+
+Har bir mezon 1 ball.
+
+| № | Shart |
+| --- | --- |
+| 1 | PostgreSQL 16/main ishlaydi (active). |
+| 2 | 16/main sozlamasi, standart data directory va OS postgres socket/peer to‘g‘ri. |
+| 3 | PostgreSQL 10.20.2.20:5432 da tinglaydi. |
+| 4 | DB va public schema egasi tegishli setup role. |
+| 5 | Runtime LOGIN; superuser/CREATEDB/CREATEROLE/REPLICATION/BYPASSRLS va huquq oshiruvchi membership yo‘q. Setup qurishda LOGIN yoki tugagach NOLOGIN. |
+| 6 | HBA faqat ko‘rsatilgan DB/role va Web /32 uchun SCRAM ga ruxsat beradi; keng ruxsat yo‘q. |
+| 7 | Web dan yangi autentifikatsiyali SELECT kerakli DB/user/qiymatni qaytaradi; P IP bilan, M odatiy DNS orqali. |
+| 8 | To‘g‘ri parol ishlagan ayni tekshiruvda bitta noto‘g‘ri parol aniq rad etiladi. |
+| 9 | Web dan postgres role, begona DB va boshqa profile taqiqlangan; hali yaratilmagan practice DB majburiy emas. |
 
 ### Tekshirish va yuborish
 
-1. P0 da ishlatgan topshiriqlar sahifasiga ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda **M4** ni tanlang.
+1. Baholash sahifasini oching va **M3** ni tanlang.
 2. Tanlangan topshiriq tekshiruvini boshlang.
-3. Ishlov davom etsa natijani yangilab kuting. Nechta band bajarilganini ko‘ring. Tuzatish kerak bo‘lgan bandlarni tuzatib, yana tekshiring. Natija avtomatik saqlanadi.
+3. Tekshiruv tugagach, bajarilgan mezonlar soni va har bir natija chiqadi. «Tuzating» deb belgilangan sozlamani to‘g‘rilab, yana tekshiring. «Tekshirilmagan» band natijasi aniqlanmagan. Ballarni topshiriqlar ro‘yxatidan ko‘ring.
 
-## M5 Berilgan app ni Web va DB bilan bog‘lash (13)
-
-### Tayyor holat talablari
-
-Ayni app ni mission DB ga ulang. P5 ko‘nikmasi bilan profile=mission tanlang, app/venv ni qayta joylamang. Ilovani P6.3 dagi mashq kabi to‘xtating. Runtime yaratish va faollashtirish, so‘ng vaqtinchalik setup yaratishda P5.4-P5.5 tartibini mission profili bilan qo‘llang. Asosiy DB da migrations/seed/admin va grants ni bajaring, ikkita belgilangan yozuvni kiriting. P1/M1 ni saqlab mission ni active qoldiring.
-
-### Topshiriq diagrammasi
-
-![M5: DNS va DB tayyor → Tayyor app ni ulash va yoqish → Amal natijasi DB va Web da。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.](../../assets/uz/m5.png)
-
-Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.
-
-- Profile: mission
-- Database: jdu_catalog
-- Setup role: catalog_setup
-- Runtime role: catalog_app
-- Application administrator: lab_admin
-
-| code | name | quantity | location | is_public |
-| --- | --- | --- | --- | --- |
-| M5-PUBLIC-001 | Mission monitor | 6 | Lab cabinet C | true |
-| M5-PRIVATE-001 | Mission router | 1 | Lab cabinet D | false |
-
-- Joriy old shartlar: M2, M4
-
-### Shartlar: har tekshiruvga 1 xom ball
-
-| check ID (o‘zgartirmang) | Shart |
-| --- | --- |
-| WEB06_ARTIFACTS | Kod va bog‘liqliklar berilgan aniq versiyaga mos. |
-| WEB06_SERVICE | jdu-catalog active va enabled, catalog nomidan ishlaydi. |
-| WEB06_LOOPBACK | Gunicorn faqat 127.0.0.1:8000 da tinglaydi. |
-| WEB06_PROFILE_DATABASE | Faol process kerakli profile DB va runtime role dan foydalanadi. |
-| WEB06_MIGRATIONS | Belgilangan migrations, 11 jadval va zarur sequence tanlangan DB da mavjud. |
-| WEB06_REQUIRED_RECORDS | Ikkala majburiy yozuv profile qiymatlariga mos; boshqa to‘g‘ri yozuvlar mumkin. |
-| WEB06_PUBLIC_DATA | Odatiy ochiq URL ishlayotgan DB dan to‘g‘ri yozuvlarni oladi. |
-| WEB06_ADMIN_ENTRY | Bastiondan odatiy DNS orqali admin.lab.test:8080/admin/ haqiqiy login shakli ochiladi. |
-| WEB06_STATIC | Static resurslar belgilangan yo‘l orqali ochiladi. |
-| WEB06_PASSWORD_LOGIN | Funksional rejim haqiqiy password/CSRF/cookie login dan o‘tadi, autentifikatsiya chetlab o‘tilmaydi. |
-| WEB06_CREATE_REFLECT | Shu tekshiruvda admin HTTP orqali bitta CK yozuv yaratilib, DB va ochiq sahifa qiymatlari mos keladi. |
-| WEB06_EDIT_REFLECT | Aynan shu CK yozuv miqdori o‘zgartiriladi; DB va ochiq sahifa o‘zgarishni tasdiqlaydi. |
-| WEB06_LOGOUT | POST logout session ni tugatadi: eski cookie bilan yana login talab etiladi. |
-
-Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.
-
-### Tekshirish va yuborish
-
-1. P0 da ishlatgan topshiriqlar sahifasiga ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda **M5** ni tanlang.
-2. Funksiya/huquq tekshiruvini tanlang, lab_admin mavjud parolini app administratorining yashirin maydoniga kiritib, shu parol bilan tekshiring. Bu RDP paroli emas. Faqat sozlama tekshiruvi funksiyalarni tasdiqlamaydi.
-3. Ishlov davom etsa natijani yangilab kuting. Nechta band bajarilganini ko‘ring. Tuzatish kerak bo‘lgan bandlarni tuzatib, yana tekshiring. Natija avtomatik saqlanadi.
-
-## M6 Eng kam huquq va ochiq kirish chegarasi (16)
+## M4 Berilgan app ni Web va DB bilan bog‘lash (13)
 
 ### Tayyor holat talablari
 
-Mission eng kam huquqini tugating: catalog_setup NOLOGIN/password NULL, vaqtinchalik setup fayllari qolmasin. Root kod/venv, 600 maxfiy fayl, 80 da admin rad etilishi, private8080 muvaffaqiyati, admin faqat view/add/change, ochiq/yopiq ma’lumot va SQL huquqlarini tekshiring. Brauzerdagi funksional tekshiruv avtomatik; shaxsiy namoyish kerak emas.
+Boshlashdan oldin baholash sahifasida [M2](m2.md), [M3](m3.md) uchun to‘liq ball olinganini tekshiring.
+
+P5 dagi jihozlar ilovasini M3 da tayyorlangan topshiriq bazasiga ulang. Profilni almashtirishdan oldin P6 da mashq sozlamasini yakunlang.
+
+1. **Web server (P6.3, P5.4-P5.5).** Ilovani to‘xtating va `mission` profilini tanlang. Mavjud ilovadan foydalanib, topshiriq bazasida jadvallar, boshlang‘ich ma’lumotlar va administratorni yarating.
+2. **DB va Web serverlari (P5.6-P5.8).** Oddiy ish rejimi roliga huquqlarni bering va ilovani ishga tushiring. Ochiq sahifa hamda boshqaruv sahifasini oching. `/practice.txt` va `/mission.txt` ham ochilishini tekshiring.
+3. **Bastion serveri (P5.9).** `http://admin.lab.test:8080/admin/` manziliga `lab_admin` bilan kiring va jadvaldagi ikki yozuvni kiriting. Ochiq sahifada e’lon qilingan yozuvni tekshiring.
 
 ### Topshiriq diagrammasi
 
-![M6: App allaqachon ishlaydi → Ortiqcha huquq va yo‘lni yopish → Ruxsat ishlaydi, taqiq rad etadi。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.](../../assets/uz/m6.png)
+![Oddiy foydalanuvchi va administrator bir ilovaga alohida kirish yo‘llaridan ulanadi.](../../assets/uz/m4.png)
 
-Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. 8000 faqat Web ichida; 8080 bastiondan boshqarish uchun. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.
-
-- Profile: mission
-- Database: jdu_catalog
-- Setup role: catalog_setup
-- Runtime role: catalog_app
-- Application administrator: lab_admin
-
-| code | name | quantity | location | is_public |
+| Kod | Nomi | Soni | Saqlash joyi | Ochiq |
 | --- | --- | --- | --- | --- |
-| M5-PUBLIC-001 | Mission monitor | 6 | Lab cabinet C | true |
-| M5-PRIVATE-001 | Mission router | 1 | Lab cabinet D | false |
+| `M5-PUBLIC-001` | Mission monitor | 6 | Lab cabinet C | Ha |
+| `M5-PRIVATE-001` | Mission router | 1 | Lab cabinet D | Yo‘q |
 
-- Joriy old shartlar: M5
+### Baholash mezonlari
 
-### Shartlar: har tekshiruvga 1 xom ball
+Har bir mezon 1 ball.
 
-| check ID (o‘zgartirmang) | Shart |
+| № | Shart |
 | --- | --- |
-| WEB07_PUBLIC_ADMIN_DENIED | Ochiq 80 soxta Host/header bilan ham admin ni ochmaydi; private yo‘l esa ishlaydi. |
-| WEB07_SECRET_PERMISSIONS | Maxfiy fayllar oddiy root:root 0600, link va qiymat ochilishi yo‘q. |
-| WEB07_CODE_PROTECTED | Login/sudo siz catalog kod, venv va ularning boshqaruv kataloglarini o‘zgartira olmaydi. |
-| WEB07_SECRET_HTTP_DENIED | Tekshiriladigan env/maxfiy path lar HTTP yoki static orqali ochilmaydi. |
-| WEB07_SETUP_RETIRED | Setup role NOLOGIN/password NULL, session lari yopilgan, vaqtinchalik setup.env lar o‘chirilgan. |
-| WEB07_ITEM_PRIVILEGES | catalog_item: faqat SELECT/INSERT/UPDATE; DELETE, TRUNCATE va huquq uzatish yo‘q. |
-| WEB07_AUTH_USER_PRIVILEGES | auth_user: SELECT va faqat last_login/password UPDATE; user yaratish/o‘chirish yo‘q. |
-| WEB07_AUTH_LOOKUP_PRIVILEGES | Guruh, permission, bog‘lanish va content type jadvallari faqat SELECT uchun. |
-| WEB07_SESSION_PRIVILEGES | django_session: faqat kerakli SELECT/INSERT/UPDATE/DELETE; ortiqcha huquq yo‘q. |
-| WEB07_AUDIT_PRIVILEGES | django_admin_log: faqat SELECT/INSERT. |
-| WEB07_MIGRATION_PRIVILEGES | Runtime da django_migrations huquqi, schema CREATE, obyekt egaligi va belgilanmagan qo‘shimcha huquq yo‘q. |
-| WEB07_SEQUENCE_PRIVILEGES | USAGE faqat jihoz va admin-log sequence lariga; ortiqcha SELECT/UPDATE/GRANT yo‘q. |
-| WEB07_ADMIN_PERMISSIONS | Faol staff, superuser emas: faqat jihoz view/add/change; delete/user management yo‘q. |
-| WEB07_ANONYMOUS_DENIED | Nazorat login o‘tgan holda anonim add/change DB ni o‘zgartirmay rad etiladi; faqat CSRF-403 yetmaydi. |
-| WEB07_BAD_PASSWORD_DENIED | Bitta noto‘g‘ri app paroli rad etiladi, ayni paytda to‘g‘ri login ishlaydi. |
-| WEB07_PRIVATE_DATA_HIDDEN | DB ishlagan holda topilgan barcha yopiq kodlar ochiq sahifada ko‘rinmaydi. |
-
-Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.
+| 1 | Kod va bog‘liqliklar berilgan aniq versiyaga mos. |
+| 2 | jdu-catalog active va enabled, catalog nomidan ishlaydi. |
+| 3 | Gunicorn faqat 127.0.0.1:8000 da tinglaydi. |
+| 4 | Faol process kerakli profile DB va runtime role dan foydalanadi. |
+| 5 | Belgilangan migrations, 11 jadval va zarur sequence tanlangan DB da mavjud. |
+| 6 | Ikkala majburiy yozuv profile qiymatlariga mos; boshqa to‘g‘ri yozuvlar mumkin. |
+| 7 | Odatiy ochiq URL ishlayotgan DB dan to‘g‘ri yozuvlarni oladi. |
+| 8 | Bastiondan odatiy DNS orqali admin.lab.test:8080/admin/ haqiqiy login shakli ochiladi. |
+| 9 | Static resurslar belgilangan yo‘l orqali ochiladi. |
+| 10 | Funksional rejim haqiqiy password/CSRF/cookie login dan o‘tadi, autentifikatsiya chetlab o‘tilmaydi. |
+| 11 | Shu tekshiruvda admin HTTP orqali bitta CK yozuv yaratilib, DB va ochiq sahifa qiymatlari mos keladi. |
+| 12 | Aynan shu CK yozuv miqdori o‘zgartiriladi; DB va ochiq sahifa o‘zgarishni tasdiqlaydi. |
+| 13 | POST logout session ni tugatadi: eski cookie bilan yana login talab etiladi. |
 
 ### Tekshirish va yuborish
 
-1. P0 da ishlatgan topshiriqlar sahifasiga ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda **M6** ni tanlang.
+1. Baholash sahifasini oching va **M4** ni tanlang.
 2. Funksiya/huquq tekshiruvini tanlang, lab_admin mavjud parolini app administratorining yashirin maydoniga kiritib, shu parol bilan tekshiring. Bu RDP paroli emas. Faqat sozlama tekshiruvi funksiyalarni tasdiqlamaydi.
-3. Ishlov davom etsa natijani yangilab kuting. Nechta band bajarilganini ko‘ring. Tuzatish kerak bo‘lgan bandlarni tuzatib, yana tekshiring. Natija avtomatik saqlanadi.
+3. Tekshiruv tugagach, bajarilgan mezonlar soni va har bir natija chiqadi. «Tuzating» deb belgilangan sozlamani to‘g‘rilab, yana tekshiring. «Tekshirilmagan» band natijasi aniqlanmagan. Ballarni topshiriqlar ro‘yxatidan ko‘ring.
 
-## Davom ettirish va natijalar
+## M5 Eng kam huquq va ochiq kirish chegarasi (16)
 
-Keyingi safar o‘z Lab va ayni besh serverni ishga tushirib, running/SSM Online va joriy public IP ni tekshiring. Web Portal ga maktab Google orqali kirib, M0 tayyorligidan boshlang. Yaratish, kalit va ro‘yxatni har safar takrorlamang. Muddat tugasa o‘qituvchidan yangilashni so‘rang.
+### Tayyor holat talablari
 
-Natijalar avtomatik saqlanadi. Ishlov paytida natijani yangilang; baholarni saqlangan baholar bo‘limidan ko‘ring. Nechta band bajarilganini va nimalarni tuzatish kerakligini ko‘ring. UNKNOWN o‘lchab bo‘lmagan holat, muvaffaqiyat yoki tasdiqlangan nol emas. Tekshirilmagan M ning tasdiqlangan ballari saqlanadi. Oxirgi baholanadigan natija olinadi; turli urinish PASS lari qo‘shilmaydi, maksimum avtomatik tanlanmaydi.
+Boshlashdan oldin baholash sahifasida [M4](m4.md) uchun to‘liq ball olinganini tekshiring.
 
-Parol/token/cookie/maxfiy kalit/env ni hisobot yoki chat ga yubormang.
+M4 ilovasini P6 dagi usul bilan oddiy ish rejimiga o‘tkazing. Faqat sozlashda kerak bo‘lgan kirishni yoping, ilova va administrator uchun zarur huquqlarni qoldiring.
 
-## Ma’lumot manbalari
+1. **DB server (P6.1-P6.2).** `catalog_app` huquqlarini tekshiring. Sozlash roli `catalog_setup` uchun kirishni yoping, parolini olib tashlang va qolgan ulanishlarini yakunlang.
+2. **Web server (P6.3-P6.4).** Vaqtinchalik sozlamalarni (`/etc/jdu-catalog/setup.env` va `/etc/jdu-catalog/profiles/mission.setup.env`) olib tashlang va ilovani oddiy ish uchun `mission` profili bilan ishga tushiring. Xizmat foydalanuvchisi kodni o‘zgartira olmasin. Maxfiy sozlamalar `root:root` ga tegishli bo‘lsin va `0600` ruxsatiga ega bo‘lsin.
+3. **Ochiq va boshqaruv sahifalari (P6.4-P6.5).** 80-portda M4 dagi faqat ochiq yozuv ko‘rinsin. Bastion orqali 8080-portdagi boshqaruv sahifasini oching. `lab_admin` jihozlarni ko‘rishi, qo‘shishi va o‘zgartirishi mumkinligini tekshiring.
 
-- [Nginx Beginner’s Guide](https://nginx.org/en/docs/beginners_guide.html)
-- [BIND 9: configurations and zones](https://bind9.readthedocs.io/en/v9.18.39/chapter3.html)
-- [PostgreSQL 16: pg_hba.conf](https://www.postgresql.org/docs/16/auth-pg-hba-conf.html)
-- [EC2 instance states](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html)
+### Topshiriq diagrammasi
+
+![Ochiq va boshqaruv kirishlari hamda Web dan DB ga ulanish cheklovlari.](../../assets/uz/m5.png)
+
+### Baholash mezonlari
+
+Har bir mezon 1 ball.
+
+| № | Shart |
+| --- | --- |
+| 1 | Ochiq 80 soxta Host/header bilan ham admin ni ochmaydi; private yo‘l esa ishlaydi. |
+| 2 | Maxfiy fayllar oddiy root:root 0600, link va qiymat ochilishi yo‘q. |
+| 3 | Login/sudo siz catalog kod, venv va ularning boshqaruv kataloglarini o‘zgartira olmaydi. |
+| 4 | Tekshiriladigan env/maxfiy path lar HTTP yoki static orqali ochilmaydi. |
+| 5 | Setup role NOLOGIN/password NULL, session lari yopilgan, vaqtinchalik setup.env lar o‘chirilgan. |
+| 6 | catalog_item: faqat SELECT/INSERT/UPDATE; DELETE, TRUNCATE va huquq uzatish yo‘q. |
+| 7 | auth_user: SELECT va faqat last_login/password UPDATE; user yaratish/o‘chirish yo‘q. |
+| 8 | Guruh, permission, bog‘lanish va content type jadvallari faqat SELECT uchun. |
+| 9 | django_session: faqat kerakli SELECT/INSERT/UPDATE/DELETE; ortiqcha huquq yo‘q. |
+| 10 | django_admin_log: faqat SELECT/INSERT. |
+| 11 | Runtime da django_migrations huquqi, schema CREATE, obyekt egaligi va belgilanmagan qo‘shimcha huquq yo‘q. |
+| 12 | USAGE faqat jihoz va admin-log sequence lariga; ortiqcha SELECT/UPDATE/GRANT yo‘q. |
+| 13 | Faol staff, superuser emas: faqat jihoz view/add/change; delete/user management yo‘q. |
+| 14 | Nazorat login o‘tgan holda anonim add/change DB ni o‘zgartirmay rad etiladi; faqat CSRF-403 yetmaydi. |
+| 15 | Bitta noto‘g‘ri app paroli rad etiladi, ayni paytda to‘g‘ri login ishlaydi. |
+| 16 | DB ishlagan holda topilgan barcha yopiq kodlar ochiq sahifada ko‘rinmaydi. |
+
+### Tekshirish va yuborish
+
+1. Baholash sahifasini oching va **M5** ni tanlang.
+2. Funksiya/huquq tekshiruvini tanlang, lab_admin mavjud parolini app administratorining yashirin maydoniga kiritib, shu parol bilan tekshiring. Bu RDP paroli emas. Faqat sozlama tekshiruvi funksiyalarni tasdiqlamaydi.
+3. Tekshiruv tugagach, bajarilgan mezonlar soni va har bir natija chiqadi. «Tuzating» deb belgilangan sozlamani to‘g‘rilab, yana tekshiring. «Tekshirilmagan» band natijasi aniqlanmagan. Ballarni topshiriqlar ro‘yxatidan ko‘ring.

@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createApp } from './router.mjs';
-import { checkToken,verifyCheckToken } from './checks.mjs';
+import { checkToken,verifyCheckToken,displayTask,tasks } from './checks.mjs';
+import { readFileSync } from 'node:fs';
 import { configFrom } from './auth.mjs';
 import {generateKeyPairSync,privateDecrypt,constants} from 'node:crypto';
 import {sealApplicationPassword} from './checks.mjs';
@@ -12,10 +13,21 @@ const headers={cookie,origin:env.PUBLIC_ORIGIN,'content-type':'application/x-www
 const credentials={env,verify:async t=>{if(t!==token)throw Error();return{sub:'1234567890'};},sessions:{check:async s=>s===session}};
 const request=(path,options={})=>new Request(env.PUBLIC_ORIGIN+path,{headers:{cookie},...options});
 function body(v=value){return new URLSearchParams({...v,csrf:checkToken(configFrom(env),session,token,v)}).toString();}
+test('displayed M1–M5 labels match the course, with stable grading IDs in form requests',()=>{
+  const policy=JSON.parse(readFileSync(new URL('../../../course/curriculum.json',import.meta.url),'utf8'));
+  const missions=tasks.filter(id=>id.startsWith('M'));
+  assert.deepEqual(missions.map(displayTask),['M0','M1','M2','M3','M4','M5']);
+  for(const id of missions) assert.equal(displayTask(id),policy.mission_display_ids[id]??id);
+});
 test('GET lists fixed tasks without invoking a checker; POST uses verified subject and redirects',async()=>{
   const calls=[];const app=createApp({...credentials,checker:async event=>{calls.push(event);return {status:'ok'};}});
   const get=await app(request('/checks'));assert.equal(get.status,200);assert.equal(calls.length,0);
-  assert.equal(get.headers.get('referrer-policy'),'same-origin');assert.match(await get.text(),/M6|P0/);
+  assert.equal(get.headers.get('referrer-policy'),'same-origin');
+  const html=await get.text();
+  assert.match(html,/task_id=M4">M3<\/a>/);
+  assert.match(html,/task_id=M5">M4<\/a>/);
+  assert.match(html,/task_id=M6">M5<\/a>/);
+  assert.doesNotMatch(html,/>M6<\/a>/);
   const post=await app(request('/checks',{method:'POST',headers,body:body()}));
   assert.equal(post.status,303);assert.match(post.headers.get('location'),/task_id=M1&job_id=/);
   assert.deepEqual(calls,[{subject:'1234567890',...value}]);

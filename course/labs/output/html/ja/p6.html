@@ -14,9 +14,9 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
 </style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">今回の見取り図</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">解答例（操作手順）</a> · <a href="#section-6">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P6 最小権限と公開範囲</h1>
-<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
+<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M5</a></p>
 <p><a href="../ja/p6.html">日本語</a> · <a href="../ru/p6.html">Русский</a> · <a href="../uz/p6.html">O‘zbekcha</a></p>
-<p>対応する自力課題は<a href="m6.html">M6</a>。</p>
+<p>対応する自力課題は<a href="m5.html">M5</a>。</p>
 <h2 id="section-1">学ぶこと</h2>
 <p>正しい動作を保ち、不要な管理経路・DB権限・秘密fileの公開を拒否する。</p>
 <h2 id="section-2">課題</h2>
@@ -107,12 +107,12 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 <p><strong>期待する結果と読み方:</strong></p>
 <p>ALTER ROLE成功。通常catalog_practice_appの動作を止めない。</p>
 <p><strong>うまくいかないとき:</strong></p>
-<p>この後setupをLOGINへ戻して常用しない。M5は別のmission setup roleで初期化する。</p>
+<p>この後setupをLOGINへ戻して常用しない。M4は別のmission setup roleで初期化する。</p>
 <h3>P6.3 一時設定を片付け、通常接続の設定を選び直す</h3>
 <p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
-<p>Webで対象のmetadataだけを確認する。rmの対象は練習setupの2fileに限定する。app.env、practice.app.env、DB runtime file、元command-state、SSH鍵、採点認証は残す。対象を片付けたらアプリを停止し、既存のpractice設定を明示的に選び直してから起動する。この順番を練習しておくと、M5でmissionを選ぶときにも使える。</p>
+<p>Webで対象のmetadataだけを確認する。rmの対象は練習setupの2fileに限定する。app.env、practice.app.env、DB runtime file、元command-state、SSH鍵、採点認証は残す。対象を片付けたらアプリを停止し、既存のpractice設定を明示的に選び直してから起動する。この順番を練習しておくと、M4でmissionを選ぶときにも使える。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. 指定ファイルの所有者・グループ・権限・名前を読む。
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
@@ -168,7 +168,7 @@ curl --noproxy '*' -i http://web.lab.test/static/app.env
 <p><strong>コマンド・設定値の意味:</strong></p>
 <p>正しい管理操作の成功と、誤password・setup・不要経路の拒否を一緒に確認する。拒否だけの成功で満点と考えない。P6を終えてからmission profileへ進み、checkerが自動でprofileを戻すとは考えない。</p>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>練習16項目と保存状態を読む。M6はmission profileで別に確認する。「保存済み成績を見る」でMの成績原本を確認できる。</p>
+<p>練習16項目と保存状態を読む。M5はmission profileで別に確認する。「保存済み成績を見る」でMの成績原本を確認できる。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>処理中は結果を更新する。UNKNOWNは原因を直して再確認する。満点表示のためにgrade fileを編集しない。</p>
 <h2 id="section-6">理解の確認（採点外）</h2>
@@ -176,5 +176,5 @@ curl --noproxy '*' -i http://web.lab.test/static/app.env
 <p><strong>考え方:</strong></p>
 <p>完成ではない。runtimeの接続設定・role・必要なtable権限を確認し、setupなしで正規機能が動く状態にする。</p>
 <hr />
-<p><a href="p5.html">前の課題: P5</a> · <a href="m5.html">次の課題: M5</a></p>
+<p><a href="p5.html">前の課題: P5</a> · <a href="m4.html">次の課題: M4</a></p>
 </main></body></html>

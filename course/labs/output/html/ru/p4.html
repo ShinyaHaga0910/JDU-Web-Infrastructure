@@ -14,9 +14,9 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
 </style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения (порядок действий)</a> · <a href="#section-6">Пример чтения вывода (не вводить)</a> · <a href="#section-7">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P4 Подключение к PostgreSQL с аутентификацией</h1>
-<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
+<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M5</a></p>
 <p><a href="../ja/p4.html">日本語</a> · <a href="../ru/p4.html">Русский</a> · <a href="../uz/p4.html">O‘zbekcha</a></p>
-<p>Связанное задание: <a href="m4.html">M4</a>.</p>
+<p>Связанное задание: <a href="m3.html">M3</a>.</p>
 <h2 id="section-1">Что изучаем</h2>
 <p>Различать database, role и schema; выполнять SQL с Web по установленному паролю.</p>
 <h2 id="section-2">Задание</h2>
@@ -80,7 +80,7 @@ password_encryption = 'scram-sha-256'
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DB-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
-<p>Сохраните pg_hba.conf, затем в sudo nano /etc/postgresql/16/main/pg_hba.conf запишите правила ниже. Действует первая совпавшая строка, поэтому прежние широкие разрешения не оставляйте. Системный postgres управляет через Unix socket/peer. Роли будущего M4 перечислены отдельно; учебной роли доступ к основной БД не даётся.</p>
+<p>Сохраните pg_hba.conf, затем в sudo nano /etc/postgresql/16/main/pg_hba.conf запишите правила ниже. Действует первая совпавшая строка, поэтому прежние широкие разрешения не оставляйте. Системный postgres управляет через Unix socket/peer. Роли будущего M3 перечислены отдельно; учебной роли доступ к основной БД не даётся.</p>
 <p>Конфигурация или данные: не выполнять как команды</p>
 <pre><code class="language-text">local all postgres peer
 local all all reject
@@ -209,7 +209,7 @@ exit
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p>Вывод D11_EXISTING_DB_PASSWORD_STORED_LOCALLY и девять учебных проверок. Неверный пароль и запрещённые DB/admin-role проверяются вместе с успешным контрольным подключением.</p>
 <p><strong>Если не получилось:</strong></p>
-<p>Если файл уже есть, не создавайте заново. В P5 тот же пароль вводится в настройку приложения. M4 использует отдельные БД/роли mission.</p>
+<p>Если файл уже есть, не создавайте заново. В P5 тот же пароль вводится в настройку приложения. M3 использует отдельные БД/роли mission.</p>
 <h2 id="section-6">Пример чтения вывода (не вводить)</h2>
 <pre><code class="language-text">current_database    | current_user         | value
 jdu_catalog_practice | catalog_practice_app | 1
@@ -220,5 +220,5 @@ jdu_catalog_practice | catalog_practice_app | 1
 <p><strong>Объяснение:</strong></p>
 <p>Аутентификация и SQL-права различны. Для runtime отказ в setup-операции может быть правильным.</p>
 <hr />
-<p><a href="m2.html">Предыдущее: M2</a> · <a href="m4.html">Следующее: M4</a></p>
+<p><a href="m2.html">Предыдущее: M2</a> · <a href="m3.html">Следующее: M3</a></p>
 </main></body></html>

@@ -14,9 +14,9 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
 </style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">学ぶこと</a> · <a href="#section-2">課題</a> · <a href="#section-3">今回の見取り図</a> · <a href="#section-4">仕組みを理解する</a> · <a href="#section-5">解答例（操作手順）</a> · <a href="#section-6">出力の読み取り例（入力しない）</a> · <a href="#section-7">理解の確認（採点外）</a></nav></header><main id="content" tabindex="-1"><h1>P4 PostgreSQLへの認証接続</h1>
-<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
+<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M5</a></p>
 <p><a href="../ja/p4.html">日本語</a> · <a href="../ru/p4.html">Русский</a> · <a href="../uz/p4.html">O‘zbekcha</a></p>
-<p>対応する自力課題は<a href="m4.html">M4</a>。</p>
+<p>対応する自力課題は<a href="m3.html">M3</a>。</p>
 <h2 id="section-1">学ぶこと</h2>
 <p>DB・role・schemaの違いを理解し、Webだけから既存パスワードでSQLを実行する。</p>
 <h2 id="section-2">課題</h2>
@@ -80,7 +80,7 @@ password_encryption = 'scram-sha-256'
 <p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
-<p>sudo cp -anでpg_hba.confを控え、sudo nano /etc/postgresql/16/main/pg_hba.confで以下を保存。最初に一致する行が使われるため、既存の広い許可行は残さない。OS postgresだけはUnix socketのpeerで管理できる。M4で作る別profileも明示列挙し、練習roleが本課題DBへ入る組合せは許さない。</p>
+<p>sudo cp -anでpg_hba.confを控え、sudo nano /etc/postgresql/16/main/pg_hba.confで以下を保存。最初に一致する行が使われるため、既存の広い許可行は残さない。OS postgresだけはUnix socketのpeerで管理できる。M3で作る別profileも明示列挙し、練習roleが本課題DBへ入る組合せは許さない。</p>
 <p>設定・入力データ（端末で実行するコマンドではない）</p>
 <pre><code class="language-text">local all postgres peer
 local all all reject
@@ -209,7 +209,7 @@ exit
 <p><strong>期待する結果と読み方:</strong></p>
 <p>D11_EXISTING_DB_PASSWORD_STORED_LOCALLYと練習9項目。誤password・他DB/管理roleの拒否も正常接続との対照で確認される。</p>
 <p><strong>うまくいかないとき:</strong></p>
-<p>既存fileありなら再生成しない。P5では同じDB passwordをapp設定にも入力する。M4はmission用の別DB/roleで構築する。</p>
+<p>既存fileありなら再生成しない。P5では同じDB passwordをapp設定にも入力する。M3はmission用の別DB/roleで構築する。</p>
 <h2 id="section-6">出力の読み取り例（入力しない）</h2>
 <pre><code class="language-text">current_database    | current_user         | value
 jdu_catalog_practice | catalog_practice_app | 1
@@ -220,5 +220,5 @@ jdu_catalog_practice | catalog_practice_app | 1
 <p><strong>考え方:</strong></p>
 <p>認証とSQL権限は別。runtime roleの役割に合った拒否なら正常で、setup用の操作をruntimeへ追加しない。</p>
 <hr />
-<p><a href="m2.html">前の課題: M2</a> · <a href="m4.html">次の課題: M4</a></p>
+<p><a href="m2.html">前の課題: M2</a> · <a href="m3.html">次の課題: M3</a></p>
 </main></body></html>

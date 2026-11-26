@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M4 PostgreSQLへの認証接続 (9)</title><style>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M4 教員アプリをWeb・DBへ接続する (13)</title><style>
 :root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
 *{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
 header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
@@ -13,76 +13,117 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">完成要件</a> · <a href="#section-2">今回の見取り図</a> · <a href="#section-3">合格条件：採点check各1素点</a> · <a href="#section-4">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M4 PostgreSQLへの認証接続 (9)</h1>
-<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">完成要件</a> · <a href="#section-2">今回の見取り図</a> · <a href="#section-3">採点基準</a> · <a href="#section-4">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M4 教員アプリをWeb・DBへ接続する (13)</h1>
+<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M5</a></p>
 <p><a href="../ja/m4.html">日本語</a> · <a href="../ru/m4.html">Русский</a> · <a href="../uz/m4.html">O‘zbekcha</a></p>
-<p>対応する詳しい練習は<a href="p4.html">P4</a>。</p>
+<p>対応する詳しい練習は<a href="p5.html">P5</a>。</p>
 <h2 id="section-1">完成要件</h2>
-<p>本課題用DB/roleを自分で構築する。P4.7の名前指定と同じ方法で、M2のdb.lab.testを使い、Webのruntime roleで認証SELECTを成功させる。HBAはWeb/32・正しいDB/roleだけ。既存passwordをWeb内のmission用helperへ保存し、practiceと混ぜない。app tableはまだ不要。</p>
+<p>始める前に、採点ページで <a href="m2.html">M2</a>、<a href="m3.html">M3</a> が満点になっていることを確認する。</p>
+<p>P5で動かした備品管理アプリを、M3で構築した課題用DBにつなぐ。P6で練習用の設定を仕上げてから始める。</p>
+<ol>
+<li><strong>Webサーバー（P6.3、P5.4〜P5.5）</strong>　アプリを停止し、使用する設定を <code>mission</code> に切り替える。配備済みのアプリを使い、課題用DBにテーブルと初期データを用意し、アプリ管理者を作る。</li>
+<li><strong>DBサーバーとWebサーバー（P5.6〜P5.8）</strong>　通常運用用ロールに権限を付け、アプリを起動する。公開ページと管理画面の両方を開き、<code>/practice.txt</code> と <code>/mission.txt</code> も引き続き開けることを確かめる。</li>
+<li><strong>踏み台サーバー（P5.9）</strong>　<code>http://admin.lab.test:8080/admin/</code> に <code>lab_admin</code> で入り、下の2件を登録する。一般ページでは公開にした備品を確認する。</li>
+</ol>
 <h2 id="section-2">今回の見取り図</h2>
-<p><img src="../../../assets/ja/m4.png" alt="M4: WebからDB接続を準備 → DB・role・認証を設定 → 許可したSELECTだけ成功。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 CloudShellからSSMでDBサーバーに接続して設定します。 図を参考に完成要件から設定値を自分で決めます。" width="1040" height="680" loading="lazy"></p>
-<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 CloudShellからSSMでDBサーバーに接続して設定します。 図を参考に完成要件から設定値を自分で決めます。</p>
-<ul>
-<li>Profile: mission</li>
-<li>Database: jdu_catalog</li>
-<li>Setup role: catalog_setup</li>
-<li>Runtime role: catalog_app</li>
-<li>現在必要な前提: M2</li>
-</ul>
-<h2 id="section-3">合格条件：採点check各1素点</h2>
+<p><img src="../../../assets/ja/m4.png" alt="一般利用者と管理者がそれぞれの入口から同じ備品管理アプリを利用する。" width="1040" height="680" loading="lazy"></p>
 <table>
 <thead>
 <tr>
-<th scope="col">check ID（変更しない）</th>
-<th scope="col">満たすこと</th>
+<th scope="col">備品コード</th>
+<th scope="col">名前</th>
+<th scope="col">数量</th>
+<th scope="col">保管場所</th>
+<th scope="col">公開</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>WEB05_CLUSTER_ACTIVE</td>
-<td>PostgreSQL16/mainがactiveである。</td>
+<td><code>M5-PUBLIC-001</code></td>
+<td>Mission monitor</td>
+<td>6</td>
+<td>Lab cabinet C</td>
+<td>公開する</td>
 </tr>
 <tr>
-<td>WEB05_CLUSTER_CONFIG</td>
-<td>16/mainの設定・標準data directory・postgres/socket peer管理が妥当である。</td>
-</tr>
-<tr>
-<td>WEB05_LISTEN_5432</td>
-<td>10.20.2.20:5432で待ち受ける。</td>
-</tr>
-<tr>
-<td>WEB05_DATABASE_OWNER</td>
-<td>P/M別DBとpublic schemaのownerが対応するsetup roleである。</td>
-</tr>
-<tr>
-<td>WEB05_ROLE_ATTRIBUTES</td>
-<td>対応runtime roleはLOGIN。両roleにsuperuser/CREATEDB/CREATEROLE/REPLICATION/BYPASSRLSや昇格membershipがない。setupは構築中LOGIN/完成後NOLOGINの両段階を認める。</td>
-</tr>
-<tr>
-<td>WEB05_HBA_SCRAM</td>
-<td>pg_hbaはWeb /32・列挙したprofile DB/roleだけにSCRAMを許可し、それ以外の広い許可がない。</td>
-</tr>
-<tr>
-<td>WEB05_WEB_SQL</td>
-<td>Pはprivate IP、Mは通常DNS名からruntime roleで新規認証接続し、current_database/current_user/SELECT結果が一致する。</td>
-</tr>
-<tr>
-<td>WEB05_BAD_PASSWORD_DENIED</td>
-<td>同じ回の正規接続を対照に、1回の誤password接続が明示認証拒否される。秘密値やhashは返さない。</td>
-</tr>
-<tr>
-<td>WEB05_WRONG_TARGET_DENIED</td>
-<td>Webからpostgres role・許可外DB・他profileへの接続をHBA等で明示拒否する。未作成practice DB自体は必須にしない。</td>
+<td><code>M5-PRIVATE-001</code></td>
+<td>Mission router</td>
+<td>1</td>
+<td>Lab cabinet D</td>
+<td>公開しない</td>
 </tr>
 </tbody>
 </table>
-<p>本人確認・管理・配布元・通信基盤・依存前提等の準備checkは上表の素点に加えない。必要前提が未完了なら、点が一部あっても次段階の準備完了ではない。</p>
+<h2 id="section-3">採点基準</h2>
+<p>各項目は1点。</p>
+<table>
+<thead>
+<tr>
+<th scope="col">№</th>
+<th scope="col">満たす条件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>配備済みのアプリ本体と指定バージョンの依存パッケージを使用している。</td>
+</tr>
+<tr>
+<td>2</td>
+<td>アプリが専用のOSユーザー <code>catalog</code> で動作し、OS起動時の自動起動が有効になっている。</td>
+</tr>
+<tr>
+<td>3</td>
+<td>GunicornはWebサーバー内の <code>127.0.0.1:8000</code> だけで接続を受け付ける。</td>
+</tr>
+<tr>
+<td>4</td>
+<td>アプリが <code>db.lab.test</code> を使い、<code>catalog_app</code> で課題用DBに接続している。</td>
+</tr>
+<tr>
+<td>5</td>
+<td>配布されたマイグレーションを適用し、課題用DBに11個のテーブルと必要な採番の仕組みがある。</td>
+</tr>
+<tr>
+<td>6</td>
+<td>表の備品2件が、すべて指定された値で課題用DBに保存されている。</td>
+</tr>
+<tr>
+<td>7</td>
+<td>一般ページがHTTP 200を返し、公開備品の表示がDBの内容と一致する。</td>
+</tr>
+<tr>
+<td>8</td>
+<td>踏み台サーバーから <code>http://admin.lab.test:8080/admin/</code> を開くと、管理画面のログインページが表示される。</td>
+</tr>
+<tr>
+<td>9</td>
+<td>一般ページと管理画面に必要なCSSなどが、それぞれの入口から取得できる。</td>
+</tr>
+<tr>
+<td>10</td>
+<td>指定のアプリ管理者が、管理画面にパスワードでログインできる。</td>
+</tr>
+<tr>
+<td>11</td>
+<td>管理画面で登録した確認用の備品がDBに保存され、一般ページにも反映される。</td>
+</tr>
+<tr>
+<td>12</td>
+<td>確認用備品の数量を管理画面から変更すると、DBと一般ページの表示が更新される。</td>
+</tr>
+<tr>
+<td>13</td>
+<td>ログアウト後に管理画面を開き直すと、再びログインを求められる。</td>
+</tr>
+</tbody>
+</table>
 <h2 id="section-4">確認・提出</h2>
 <ol>
-<li>P0で使った課題画面に学校のGoogleアカウントでログインし、自分のLabと <strong>M4</strong> を選ぶ。</li>
-<li>「この課題を確認する」を押す。</li>
-<li>処理中は「結果を更新する」で完了を待ち、クリアした項目数を確認する。「要修正」の項目があれば直してからもう一度確認する。結果は自動保存される。</li>
+<li>採点ページを開き、<strong>M4</strong> を選ぶ。</li>
+<li>「機能・権限を含めて確認する」を選び、lab_admin の既存パスワードを「アプリ管理者の既存パスワード」に非表示入力して「このパスワードで確認する」を押す。RDP用とは別。設定だけの確認では機能の合格を確定しない。</li>
+<li>確認が終わると、満たした項目数と項目ごとの結果が表示される。「要修正」は該当する設定を直して再度確認する。「未確認」は、その項目を判定できなかった状態を表す。点数は課題一覧で確認する。</li>
 </ol>
 <hr />
-<p><a href="p4.html">前の課題: P4</a> · <a href="p5.html">次の課題: P5</a></p>
+<p><a href="p6.html">前の課題: P6</a> · <a href="m5.html">次の課題: M5</a></p>
 </main></body></html>

@@ -6,17 +6,17 @@
 
 [日本語](../ja/practice-full.md) · [Русский](../ru/practice-full.md) · [O‘zbekcha](../uz/practice-full.md)
 
-[練習 P0〜P6](practice.md) · [課題 M0〜M6](missions.md)
+[練習 P0〜P6](practice.md) · [課題 M0〜M5](missions.md)
 
 ## 使い方と共通の約束
 
 まず各Pの課題文を読み、必要なら詳しい操作例を一段ずつ使う。Pは手順付きの練習である。Mは別の対象・値で自分で構築する。課題は授業回番号ではなく、自分の進度で進める。Pの完了はMの合格に置き換わらない。
 
-P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6
+P0 → M0 → P1 → M1 → P2 → M2 → P4 → M3 → P5 → P6 → M4 → M5
 
 P5にもM2のDNSが必要。P4ではIPと名前を使ったDB接続を練習する。アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。
 
-P0=1、M0=4、M1=8、M2=13、M4=9、M5=13、M6=16（計64素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。
+P0=1、M0=4、M1=8、M2=13、M3=9、M4=13、M5=16（計64素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。
 
 ## 対象・前提・準備
 
@@ -929,7 +929,7 @@ DBサーバーのSSM端末：ssm-user
 
 **目的と操作:**
 
-sudo cp -anでpg_hba.confを控え、sudo nano /etc/postgresql/16/main/pg_hba.confで以下を保存。最初に一致する行が使われるため、既存の広い許可行は残さない。OS postgresだけはUnix socketのpeerで管理できる。M4で作る別profileも明示列挙し、練習roleが本課題DBへ入る組合せは許さない。
+sudo cp -anでpg_hba.confを控え、sudo nano /etc/postgresql/16/main/pg_hba.confで以下を保存。最初に一致する行が使われるため、既存の広い許可行は残さない。OS postgresだけはUnix socketのpeerで管理できる。M3で作る別profileも明示列挙し、練習roleが本課題DBへ入る組合せは許さない。
 
 設定・入力データ（端末で実行するコマンドではない）
 
@@ -1140,7 +1140,7 @@ D11_EXISTING_DB_PASSWORD_STORED_LOCALLYと練習9項目。誤password・他DB/�
 
 **うまくいかないとき:**
 
-既存fileありなら再生成しない。P5では同じDB passwordをapp設定にも入力する。M4はmission用の別DB/roleで構築する。
+既存fileありなら再生成しない。P5では同じDB passwordをapp設定にも入力する。M3はmission用の別DB/roleで構築する。
 
 ### 出力の読み取り例（入力しない）
 
@@ -1722,7 +1722,7 @@ ALTER ROLE成功。通常catalog_practice_appの動作を止めない。
 
 **うまくいかないとき:**
 
-この後setupをLOGINへ戻して常用しない。M5は別のmission setup roleで初期化する。
+この後setupをLOGINへ戻して常用しない。M4は別のmission setup roleで初期化する。
 
 #### P6.3 一時設定を片付け、通常接続の設定を選び直す
 
@@ -1732,7 +1732,7 @@ WebサーバーのSSM端末：ssm-user
 
 **目的と操作:**
 
-Webで対象のmetadataだけを確認する。rmの対象は練習setupの2fileに限定する。app.env、practice.app.env、DB runtime file、元command-state、SSH鍵、採点認証は残す。対象を片付けたらアプリを停止し、既存のpractice設定を明示的に選び直してから起動する。この順番を練習しておくと、M5でmissionを選ぶときにも使える。
+Webで対象のmetadataだけを確認する。rmの対象は練習setupの2fileに限定する。app.env、practice.app.env、DB runtime file、元command-state、SSH鍵、採点認証は残す。対象を片付けたらアプリを停止し、既存のpractice設定を明示的に選び直してから起動する。この順番を練習しておくと、M4でmissionを選ぶときにも使える。
 
 入力するコマンド（番号はこの手順内の順番）
 
@@ -1820,7 +1820,7 @@ Web PortalでP6を選び、「機能・権限を含めて確認する」から�
 
 **期待する結果と読み方:**
 
-練習16項目と保存状態を読む。M6はmission profileで別に確認する。「保存済み成績を見る」でMの成績原本を確認できる。
+練習16項目と保存状態を読む。M5はmission profileで別に確認する。「保存済み成績を見る」でMの成績原本を確認できる。
 
 **うまくいかないとき:**
 

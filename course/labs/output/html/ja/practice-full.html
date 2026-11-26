@@ -17,12 +17,12 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>教材初版・教師確認用。学生の最初からの通し試読は未実施。</p>
 <p>ロシア語・ウズベク語は日本語原稿と同じ手順・条件の翻訳初稿。母語話者校閲は未実施。</p>
 <p><a href="../ja/practice-full.html">日本語</a> · <a href="../ru/practice-full.html">Русский</a> · <a href="../uz/practice-full.html">O‘zbekcha</a></p>
-<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
+<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M5</a></p>
 <h2 id="section-1">使い方と共通の約束</h2>
 <p>まず各Pの課題文を読み、必要なら詳しい操作例を一段ずつ使う。Pは手順付きの練習である。Mは別の対象・値で自分で構築する。課題は授業回番号ではなく、自分の進度で進める。Pの完了はMの合格に置き換わらない。</p>
-<p>P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6</p>
+<p>P0 → M0 → P1 → M1 → P2 → M2 → P4 → M3 → P5 → P6 → M4 → M5</p>
 <p>P5にもM2のDNSが必要。P4ではIPと名前を使ったDB接続を練習する。アプリはdb.lab.testを使う。練習profileから本課題profileへ切り替える前にP6でsetupを終了する。</p>
-<p>P0=1、M0=4、M1=8、M2=13、M4=9、M5=13、M6=16（計64素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。</p>
+<p>P0=1、M0=4、M1=8、M2=13、M3=9、M4=13、M5=16（計64素点）。本人実演・backup/restore・追加disk・アプリ開発は課さない。科目25点への換算は教師が別に行う。再提出は教師が案内する締切まで可能。別々の回のPASSを合算したり自動最高点選択はしない。</p>
 <h2 id="section-2">対象・前提・準備</h2>
 <p>初期配布の署名確認、新規5台または既存環境へのinstall、内部SSHと個別採点登録までを先に完了する。初期配布の手順は教材zipのdistribution/STUDENT.mdを読む。秘密鍵を共有Windowsへ置かず、CloudShellは本人Academy accountの中で使う。教師は本人用の匿名Lab ID・署名fingerprint・有効期限を案内する。</p>
 <p>共通IP表。public IPv4は固定しない。AWS regionはus-east-1、Ubuntu24.04/amd64。RDPはlabuser、SSMはssm-user、内部SSHはubuntu。user名とサーバー役割を混同しない。</p>
@@ -650,7 +650,7 @@ password_encryption = 'scram-sha-256'
 <p><strong>実行環境:</strong></p>
 <p>DBサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
-<p>sudo cp -anでpg_hba.confを控え、sudo nano /etc/postgresql/16/main/pg_hba.confで以下を保存。最初に一致する行が使われるため、既存の広い許可行は残さない。OS postgresだけはUnix socketのpeerで管理できる。M4で作る別profileも明示列挙し、練習roleが本課題DBへ入る組合せは許さない。</p>
+<p>sudo cp -anでpg_hba.confを控え、sudo nano /etc/postgresql/16/main/pg_hba.confで以下を保存。最初に一致する行が使われるため、既存の広い許可行は残さない。OS postgresだけはUnix socketのpeerで管理できる。M3で作る別profileも明示列挙し、練習roleが本課題DBへ入る組合せは許さない。</p>
 <p>設定・入力データ（端末で実行するコマンドではない）</p>
 <pre><code class="language-text">local all postgres peer
 local all all reject
@@ -779,7 +779,7 @@ exit
 <p><strong>期待する結果と読み方:</strong></p>
 <p>D11_EXISTING_DB_PASSWORD_STORED_LOCALLYと練習9項目。誤password・他DB/管理roleの拒否も正常接続との対照で確認される。</p>
 <p><strong>うまくいかないとき:</strong></p>
-<p>既存fileありなら再生成しない。P5では同じDB passwordをapp設定にも入力する。M4はmission用の別DB/roleで構築する。</p>
+<p>既存fileありなら再生成しない。P5では同じDB passwordをapp設定にも入力する。M3はmission用の別DB/roleで構築する。</p>
 <h3>出力の読み取り例（入力しない）</h3>
 <pre><code class="language-text">current_database    | current_user         | value
 jdu_catalog_practice | catalog_practice_app | 1
@@ -1183,12 +1183,12 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 <p><strong>期待する結果と読み方:</strong></p>
 <p>ALTER ROLE成功。通常catalog_practice_appの動作を止めない。</p>
 <p><strong>うまくいかないとき:</strong></p>
-<p>この後setupをLOGINへ戻して常用しない。M5は別のmission setup roleで初期化する。</p>
+<p>この後setupをLOGINへ戻して常用しない。M4は別のmission setup roleで初期化する。</p>
 <h4>P6.3 一時設定を片付け、通常接続の設定を選び直す</h4>
 <p><strong>実行環境:</strong></p>
 <p>WebサーバーのSSM端末：ssm-user</p>
 <p><strong>目的と操作:</strong></p>
-<p>Webで対象のmetadataだけを確認する。rmの対象は練習setupの2fileに限定する。app.env、practice.app.env、DB runtime file、元command-state、SSH鍵、採点認証は残す。対象を片付けたらアプリを停止し、既存のpractice設定を明示的に選び直してから起動する。この順番を練習しておくと、M5でmissionを選ぶときにも使える。</p>
+<p>Webで対象のmetadataだけを確認する。rmの対象は練習setupの2fileに限定する。app.env、practice.app.env、DB runtime file、元command-state、SSH鍵、採点認証は残す。対象を片付けたらアプリを停止し、既存のpractice設定を明示的に選び直してから起動する。この順番を練習しておくと、M4でmissionを選ぶときにも使える。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. 指定ファイルの所有者・グループ・権限・名前を読む。
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
@@ -1244,7 +1244,7 @@ curl --noproxy '*' -i http://web.lab.test/static/app.env
 <p><strong>コマンド・設定値の意味:</strong></p>
 <p>正しい管理操作の成功と、誤password・setup・不要経路の拒否を一緒に確認する。拒否だけの成功で満点と考えない。P6を終えてからmission profileへ進み、checkerが自動でprofileを戻すとは考えない。</p>
 <p><strong>期待する結果と読み方:</strong></p>
-<p>練習16項目と保存状態を読む。M6はmission profileで別に確認する。「保存済み成績を見る」でMの成績原本を確認できる。</p>
+<p>練習16項目と保存状態を読む。M5はmission profileで別に確認する。「保存済み成績を見る」でMの成績原本を確認できる。</p>
 <p><strong>うまくいかないとき:</strong></p>
 <p>処理中は結果を更新する。UNKNOWNは原因を直して再確認する。満点表示のためにgrade fileを編集しない。</p>
 <h3>理解の確認（採点外）</h3>

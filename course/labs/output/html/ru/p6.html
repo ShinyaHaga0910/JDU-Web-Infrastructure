@@ -14,9 +14,9 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
 </style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Что изучаем</a> · <a href="#section-2">Задание</a> · <a href="#section-3">Схема задания</a> · <a href="#section-4">Как это работает</a> · <a href="#section-5">Пример решения (порядок действий)</a> · <a href="#section-6">Проверка понимания (без баллов)</a></nav></header><main id="content" tabindex="-1"><h1>P6 Минимальные права и границы публикации</h1>
-<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
+<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M5</a></p>
 <p><a href="../ja/p6.html">日本語</a> · <a href="../ru/p6.html">Русский</a> · <a href="../uz/p6.html">O‘zbekcha</a></p>
-<p>Связанное задание: <a href="m6.html">M6</a>.</p>
+<p>Связанное задание: <a href="m5.html">M5</a>.</p>
 <h2 id="section-1">Что изучаем</h2>
 <p>Сохранить штатную работу, запретив лишние admin-маршруты, SQL-права и раскрытие секретов.</p>
 <h2 id="section-2">Задание</h2>
@@ -107,12 +107,12 @@ python3 -B profile_sql.py --profile practice 04_disable_setup.sql | sudo -u post
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p>ALTER ROLE успешен, работа catalog_practice_app сохраняется.</p>
 <p><strong>Если не получилось:</strong></p>
-<p>Не включайте setup обратно для обычной работы. M5 инициализируется отдельной setup-role mission.</p>
+<p>Не включайте setup обратно для обычной работы. M4 инициализируется отдельной setup-role mission.</p>
 <h3>P6.3 Убрать временные настройки и заново выбрать runtime</h3>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал Web-сервера: ssm-user</p>
 <p><strong>Цель и действия:</strong></p>
-<p>На Web проверьте только metadata. Удалите ровно два файла setup practice. app.env, practice.app.env, DB runtime, command-state, SSH-ключи и данные оценивания сохраняются. Затем остановите приложение, явно выберите существующий профиль practice и запустите приложение. Тот же порядок пригодится в M5 при выборе mission.</p>
+<p>На Web проверьте только metadata. Удалите ровно два файла setup practice. app.env, practice.app.env, DB runtime, command-state, SSH-ключи и данные оценивания сохраняются. Затем остановите приложение, явно выберите существующий профиль practice и запустите приложение. Тот же порядок пригодится в M4 при выборе mission.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Прочитать владельца, группу, права и имя указанных файлов.
 sudo stat -c '%U:%G %a %n' /etc/jdu-catalog/setup.env \
@@ -168,7 +168,7 @@ curl --noproxy '*' -i http://web.lab.test/static/app.env
 <p><strong>Смысл команд и настроек:</strong></p>
 <p>Проверьте разрешённое управление вместе с отказами неверного пароля, setup и ненужных путей. Одних отказов недостаточно. Переходите к mission после P6; checker сам профиль назад не переключает.</p>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
-<p>Прочитайте 16 учебных пунктов и статус сохранения. M6 проверяется отдельно в mission. Сохранённые оценки M доступны в разделе оценок.</p>
+<p>Прочитайте 16 учебных пунктов и статус сохранения. M5 проверяется отдельно в mission. Сохранённые оценки M доступны в разделе оценок.</p>
 <p><strong>Если не получилось:</strong></p>
 <p>Во время обработки обновляйте результат. Устраните причину UNKNOWN и проверьте заново. Не редактируйте grade-файлы ради баллов.</p>
 <h2 id="section-6">Проверка понимания (без баллов)</h2>
@@ -176,5 +176,5 @@ curl --noproxy '*' -i http://web.lab.test/static/app.env
 <p><strong>Объяснение:</strong></p>
 <p>Нет. Проверьте runtime-настройку, роль и необходимые права таблиц; обычная работа должна обходиться без setup.</p>
 <hr />
-<p><a href="p5.html">Предыдущее: P5</a> · <a href="m5.html">Следующее: M5</a></p>
+<p><a href="p5.html">Предыдущее: P5</a> · <a href="m4.html">Следующее: M4</a></p>
 </main></body></html>

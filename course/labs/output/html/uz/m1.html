@@ -13,70 +13,73 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Tayyor holat talablari</a> · <a href="#section-2">Topshiriq diagrammasi</a> · <a href="#section-3">Shartlar: har tekshiruvga 1 xom ball</a> · <a href="#section-4">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M1 HTTP orqali statik faylni qaytarish (8)</h1>
-<p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a></p>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Tayyor holat talablari</a> · <a href="#section-2">Topshiriq diagrammasi</a> · <a href="#section-3">Baholash mezonlari</a> · <a href="#section-4">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M1 HTTP orqali statik faylni qaytarish (8)</h1>
+<p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M5</a></p>
 <p><a href="../ja/m1.html">日本語</a> · <a href="../ru/m1.html">Русский</a> · <a href="../uz/m1.html">O‘zbekcha</a></p>
 <p>Mos topshiriq: <a href="p1.html">P1</a>.</p>
 <h2 id="section-1">Tayyor holat talablari</h2>
-<p>P1 ko‘nikmasi bilan belgilangan boshqa fayl va matnni mustaqil tarqating. practice.txt ni saqlang. Fayl, service, listen, local/bastion/public HTTP va joriy so‘rov log i tekshiriladi.</p>
+<p>Ayni Web serverda TCP 80 porti orqali <code>/mission.txt</code> faylini HTTP da tarqating. <code>/practice.txt</code> ham ochiq qolsin.</p>
+<ol>
+<li><strong>Web server (P1.2-P1.3).</strong> Quyidagi matn bilan topshiriq faylini yarating. Egasi va guruhini <code>root:root</code>, ruxsatlarini <code>0644</code> qiling.</li>
+<li><strong>Web va Bastion serverlari (P1.4-P1.6).</strong> curl bilan <code>/mission.txt</code> ni so‘rang. Web serverning o‘zida <code>127.0.0.1</code>, Bastion serverida <code>10.20.1.20</code> ni ishlating. Har ikkala joyda HTTP 200 va quyidagi matn qaytishini tekshiring. So‘rovlarni Web serverning access log faylidan toping.</li>
+</ol>
 <h2 id="section-2">Topshiriq diagrammasi</h2>
-<p><img src="../../../assets/uz/m1.png" alt="M1: HTTP topshirig‘i hali tayyor emas → Web ichida tarqatishni sozlash → Javob va log ni solishtirish。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
-<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. Chapda Internet, o‘ngdagi ramka AWS VPC sidir. IGW VPC chegarasida; barcha EC2, jumladan bastion, AWS tomonida. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
+<p><img src="../../../assets/uz/m1.png" alt="Kompyuter va Bastiondan Web serverdagi mission.txt ga HTTP yo‘llari." width="1040" height="680" loading="lazy"></p>
 <ul>
-<li>File: /var/www/html/mission.txt</li>
-<li>URL path: /mission.txt</li>
+<li><strong>Tarqatiladigan fayl</strong> <code>/var/www/html/mission.txt</code></li>
+<li><strong>URL yo‘li</strong> <code>/mission.txt</code></li>
 </ul>
 <pre><code class="language-text">JDU WEB-02 mission: independent HTTP delivery.
 </code></pre>
-<h2 id="section-3">Shartlar: har tekshiruvga 1 xom ball</h2>
+<h2 id="section-3">Baholash mezonlari</h2>
+<p>Har bir mezon 1 ball.</p>
 <table>
 <thead>
 <tr>
-<th scope="col">check ID (o‘zgartirmang)</th>
+<th scope="col">№</th>
 <th scope="col">Shart</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>WEB02_NGINX_ACTIVE</td>
+<td>1</td>
 <td>Nginx ishlaydi (active).</td>
 </tr>
 <tr>
-<td>WEB02_CONFIG_VALID</td>
+<td>2</td>
 <td>nginx -t sozlamani muvaffaqiyatli tekshiradi.</td>
 </tr>
 <tr>
-<td>WEB02_LISTEN_80</td>
+<td>3</td>
 <td>80 port private IP/barcha interface da tinglaydi, faqat loopback emas.</td>
 </tr>
 <tr>
-<td>WEB02_FILE</td>
+<td>4</td>
 <td>Oddiy faylda aniq matn bor, egasi root:root, ruxsat 0644.</td>
 </tr>
 <tr>
-<td>WEB02_LOCAL_HTTP</td>
+<td>5</td>
 <td>Web loopback orqali HTTP 200 va aniq matn oladi.</td>
 </tr>
 <tr>
-<td>WEB02_BASTION_HTTP</td>
+<td>6</td>
 <td>Bastion private IP orqali HTTP 200 va aniq matn oladi.</td>
 </tr>
 <tr>
-<td>WEB02_PUBLIC_HTTP</td>
+<td>7</td>
 <td>CloudShell public IP orqali HTTP 200 va aniq matn oladi.</td>
 </tr>
 <tr>
-<td>WEB02_ACCESS_LOG</td>
+<td>8</td>
 <td>Access log aynan shu tekshiruv nonce li so‘rovni saqlaydi.</td>
 </tr>
 </tbody>
 </table>
-<p>Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.</p>
 <h2 id="section-4">Tekshirish va yuborish</h2>
 <ol>
-<li>P0 da ishlatgan topshiriqlar sahifasiga ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda <strong>M1</strong> ni tanlang.</li>
+<li>Baholash sahifasini oching va <strong>M1</strong> ni tanlang.</li>
 <li>Tanlangan topshiriq tekshiruvini boshlang.</li>
-<li>Ishlov davom etsa natijani yangilab kuting. Nechta band bajarilganini ko‘ring. Tuzatish kerak bo‘lgan bandlarni tuzatib, yana tekshiring. Natija avtomatik saqlanadi.</li>
+<li>Tekshiruv tugagach, bajarilgan mezonlar soni va har bir natija chiqadi. «Tuzating» deb belgilangan sozlamani to‘g‘rilab, yana tekshiring. «Tekshirilmagan» band natijasi aniqlanmagan. Ballarni topshiriqlar ro‘yxatidan ko‘ring.</li>
 </ol>
 <hr />
 <p><a href="p1.html">Oldingi: P1</a> · <a href="p2.html">Keyingi: P2</a></p>

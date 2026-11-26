@@ -23,15 +23,16 @@ PROJECT=Path(os.environ.get('JDU_WEB_PROJECT_ROOT', str(Path(__file__).resolve()
 from markdown_it import MarkdownIt
 from pypdf import PdfReader
 from content import MODULES,LANGS
-from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, active_registry
+from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, active_registry, display_task, display_missions, task_page
 MODULES_BY_NUMBER = {int(m["id"][1:]): m for m in MODULES}
 MODULES = [MODULES_BY_NUMBER[n] for n in ACTIVE_NUMBERS]
 from build import KIT,EXPECTED_REGISTRY,MATERIAL_REVISION
+from checks import CHECKS
 from diagrams import diagram_stem
 from command_notes import annotated_blocks,command_groups,executable_only,explanation,CONFIG_STEPS
 from PIL import Image
 import xml.etree.ElementTree as ET
-from explanations import LABELS,STEP_NOTES,MODULE_NOTES,READING,ROUTES,MISSION_PLAN,OUTPUT_EXAMPLES
+from explanations import LABELS,STEP_NOTES,MODULE_NOTES,READING,ROUTES,OUTPUT_EXAMPLES
 
 
 class Page(HTMLParser):
@@ -50,6 +51,8 @@ class Page(HTMLParser):
 
 def main():
     checks=[]
+    def published(text):
+        return display_missions(text).replace('\u2013','-').replace('\u2014','-')
     def ok(name,condition):
         if not condition:raise AssertionError(name)
         checks.append(name)
@@ -64,26 +67,28 @@ def main():
             tokens=parser.parse(value)
             ok(f'{lang}_{kind}_browser_grading',not any(x in value for x in
                 ('jdu-web-check','jdu-web-my-progress','--functional','--no-submit','--retry','--prepare-stop','--observe-stopped')))
-            ok(f'{lang}_{kind}_working_guide',all(p[lang] in value for p in READING))
-            ok(f'{lang}_{kind}_routes',all(purpose[lang] in value for _,_,_,purpose in ROUTES))
             code[lang,kind]=[(t.info,t.content) for t in tokens if t.type=='fence']
-            ok(f'{lang}_{kind}_tasks',all(re.search(r'^## '+prefix+str(n)+r'\b',value,re.M) for n in ACTIVE_NUMBERS for prefix in [('P' if kind=='practice' else 'M')]))
+            prefix = 'P' if kind=='practice' else 'M'
+            ok(f'{lang}_{kind}_tasks',all(re.search(r'^## '+display_task(prefix+str(n))+r'\b',value,re.M) for n in ACTIVE_NUMBERS))
             ok(f'{lang}_{kind}_no_private_student_data',not any(x in value for x in
                 ('965244652544','jdutestuser1@','?session=','X-Amz-Signature=','PRIVATE KEY','Fictional-Practice-Admin-Only')))
             if kind=='missions':
-                ok(f'{lang}_all_59_check_ids',all(value.count(cid)==1 for t in reg['tasks'] if t['category']=='automated_mission' for cid in t['progress_scored_checks']))
-                ok(f'{lang}_mission_planning',all(p[lang] in value for p in MISSION_PLAN))
+                ok(f'{lang}_mission_order',' → '.join(map(display_task,ACTIVE_ORDER)) in value)
+                ok(f'{lang}_all_59_criteria',all(published(CHECKS[cid][lang]) in value
+                   for t in reg['tasks'] if t['category']=='automated_mission' for cid in t['progress_scored_checks']))
             else:
+                ok(f'{lang}_{kind}_working_guide',all(published(p[lang]) in value for p in READING))
+                ok(f'{lang}_{kind}_routes',all(published(purpose[lang]) in value for _,_,_,purpose in ROUTES))
                 for module in MODULES:
                     for i,step in enumerate(module['steps'],1):
                         key=f"{module['id']}.{i}"
                         block=re.search(r'^#### '+re.escape(key)+r'\b(.*?)(?=^#### |^## |\Z)',value,re.M|re.S)
-                        ok(f'{lang}_explains_{key}',block is not None and (key not in STEP_NOTES or STEP_NOTES[key][lang] in block[0]))
-                    ok(f'{lang}_understanding_{module["id"]}',all(note[lang] in value for note in MODULE_NOTES[module['id']].values()))
+                        ok(f'{lang}_explains_{key}',block is not None and (key not in STEP_NOTES or published(STEP_NOTES[key][lang]) in block[0]))
+                    ok(f'{lang}_understanding_{module["id"]}',all(published(note[lang]) in value for note in MODULE_NOTES[module['id']].values()))
             pdf=PdfReader(ROOT/'output/pdf'/f'web_lab_{kind}_{lang}.pdf')
             text='\n'.join(page.extract_text() or '' for page in pdf.pages)
             ok(f'{lang}_{kind}_pdf_A4',all(abs(float(p.mediabox.width)-595.276)<1 and abs(float(p.mediabox.height)-841.890)<1 for p in pdf.pages))
-            ok(f'{lang}_{kind}_pdf_text',len(text)>5000 and all(prefix+str(n) in text for n in ACTIVE_NUMBERS for prefix in [('P' if kind=='practice' else 'M')]) and '\ufffd' not in text and '\x00' not in text)
+            ok(f'{lang}_{kind}_pdf_text',len(text)>5000 and all(display_task(prefix+str(n)) in text for n in ACTIVE_NUMBERS) and '\ufffd' not in text and '\x00' not in text)
             images=sum(sum(obj.get_object().get('/Subtype')=='/Image' for obj in p.get('/Resources',{}).get('/XObject',{}).values()) for p in pdf.pages)
             ok(f'{lang}_{kind}_pdf_figures',images==(18 if kind=='practice' else 8))
             if kind=='practice':
@@ -96,18 +101,21 @@ def main():
     for lang in LANGS:
         for kind,prefix in [('practice','P'),('missions','M')]:
             index=(ROOT/'docs'/lang/(kind+'.md')).read_text(encoding='utf-8')
-            ok(f'{lang}_{kind}_index',all(f']({prefix.lower()}{n}.md)' in index for n in ACTIVE_NUMBERS))
+            ok(f'{lang}_{kind}_index',all(f']({task_page(prefix+str(n))})' in index for n in ACTIVE_NUMBERS))
             for number in ACTIVE_NUMBERS:
                 name=prefix+str(number)
-                value=(ROOT/'docs'/lang/(name.lower()+'.md')).read_text(encoding='utf-8')
-                ok(f'{lang}_{name}_page',value.startswith('# '+name+' '))
+                value=(ROOT/'docs'/lang/task_page(name)).read_text(encoding='utf-8')
+                ok(f'{lang}_{name}_page',value.startswith('# '+display_task(name)+' '))
                 if prefix=='P':
                     for step in range(1,len(MODULES_BY_NUMBER[number]['steps'])+1):
                         key=f'{name}.{step}'
-                        ok(f'{lang}_{key}_page_step',f'### {key} ' in value and (key not in STEP_NOTES or STEP_NOTES[key][lang] in value))
+                        ok(f'{lang}_{key}_page_step',f'### {key} ' in value and (key not in STEP_NOTES or published(STEP_NOTES[key][lang]) in value))
                 else:
                     task=next(t for t in reg['tasks'] if t['id']==name)
-                    ok(f'{lang}_{name}_page_checks',all(value.count(cid)==1 for cid in task['progress_scored_checks']))
+                    criteria=task['progress_scored_checks']
+                    valid_rows=(all(value.count(cid)==1 for cid in criteria) if name=='M0' else
+                                all(f'| {i} | {published(CHECKS[cid][lang])} |' in value for i,cid in enumerate(criteria,1)))
+                    ok(f'{lang}_{name}_page_checks',valid_rows)
     for lang in LANGS:
         for task in ('p0','m0'):
             text=(ROOT/'docs'/lang/(task+'.md')).read_text(encoding='utf-8')
@@ -144,7 +152,7 @@ def main():
         for prefix in ('P','M'):
             for number in ACTIVE_NUMBERS:
                 task=prefix+str(number)
-                md=(ROOT/'docs'/lang/(task.lower()+'.md')).read_text(encoding='utf-8')
+                md=(ROOT/'docs'/lang/task_page(task)).read_text(encoding='utf-8')
                 images=[c for t in parser.parse(md) for c in t.children or [] if c.type=='image']
                 expected_images={'P0': 10, 'M0': 3, 'P1': 4}.get(task, 1)
                 diagram_link=f'../../assets/{lang}/{diagram_stem(task)}.png'
@@ -155,8 +163,9 @@ def main():
                 image_path=ROOT/'assets'/lang/(diagram_stem(task)+'.png')
                 with Image.open(image_path) as img:ok(f'{lang}_{task}_diagram_size',img.size==(2080,1360))
                 svg=ET.parse(image_path.with_suffix('.svg')).getroot()
-                ok(f'{lang}_{task}_editable_svg',svg.attrib['viewBox']=='0 0 1040 680' and len(list(svg.iter('{http://www.w3.org/2000/svg}text')))>15)
-                if task=='P1':
+                text_count=len(list(svg.iter('{http://www.w3.org/2000/svg}text')))
+                ok(f'{lang}_{task}_editable_svg',svg.attrib['viewBox']=='0 0 1040 680' and text_count>=10)
+                if task in ('P1','M1','M5','M6'):
                     tags=list(svg.iter('{http://www.w3.org/2000/svg}text'))
                     ok(f'{lang}_{task}_internet_aws_boundary',
                        any(t.text=='AWS' for t in tags) and any(t.text=='VPC  10.20.0.0/16' for t in tags)

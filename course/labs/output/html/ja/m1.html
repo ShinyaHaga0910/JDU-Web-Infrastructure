@@ -13,70 +13,73 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">完成要件</a> · <a href="#section-2">今回の見取り図</a> · <a href="#section-3">合格条件：採点check各1素点</a> · <a href="#section-4">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M1 HTTPで静的ファイルを返す (8)</h1>
-<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">完成要件</a> · <a href="#section-2">今回の見取り図</a> · <a href="#section-3">採点基準</a> · <a href="#section-4">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M1 HTTPで静的ファイルを返す (8)</h1>
+<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M5</a></p>
 <p><a href="../ja/m1.html">日本語</a> · <a href="../ru/m1.html">Русский</a> · <a href="../uz/m1.html">O‘zbekcha</a></p>
 <p>対応する詳しい練習は<a href="p1.html">P1</a>。</p>
 <h2 id="section-1">完成要件</h2>
-<p>P1を参考に、指定された別fileと本文を独力でHTTP配信する。P1のpractice.txtを残す。file・service・listen・local/踏み台/public HTTP・今回要求のlogが対象。</p>
+<p>P1と同じWebサーバーで、TCPの80番ポートから <code>/mission.txt</code> を配信する。P1で作った <code>/practice.txt</code> も引き続き開けるようにする。</p>
+<ol>
+<li><strong>Webサーバー（P1.2〜P1.3）</strong>　下の本文を使って課題用ファイルを作る。所有者とグループを <code>root:root</code>、権限を <code>0644</code> にする。</li>
+<li><strong>Webサーバーと踏み台サーバー（P1.4〜P1.6）</strong>　curlで <code>/mission.txt</code> にアクセスする。Webサーバー自身では <code>127.0.0.1</code>、踏み台からは <code>10.20.1.20</code> を指定し、両方でHTTP 200と下の本文が返ることを確認する。Webサーバーのアクセスログでリクエストを探す。</li>
+</ol>
 <h2 id="section-2">今回の見取り図</h2>
-<p><img src="../../../assets/ja/m1.png" alt="M1: Webの練習配信は未完成 → Web内の配信を設定する → 本文とログを照合する。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 左はインターネット側、右の枠はAWSのVPCです。IGWはVPCの境界に置き、踏み台を含む全EC2はAWS側にあります。 図を参考に完成要件から設定値を自分で決めます。" width="1040" height="680" loading="lazy"></p>
-<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 左はインターネット側、右の枠はAWSのVPCです。IGWはVPCの境界に置き、踏み台を含む全EC2はAWS側にあります。 図を参考に完成要件から設定値を自分で決めます。</p>
+<p><img src="../../../assets/ja/m1.png" alt="学生PCと踏み台サーバーからWebサーバーのmission.txtへのHTTP経路。" width="1040" height="680" loading="lazy"></p>
 <ul>
-<li>File: /var/www/html/mission.txt</li>
-<li>URL path: /mission.txt</li>
+<li><strong>配信ファイル</strong> <code>/var/www/html/mission.txt</code></li>
+<li><strong>URLのパス</strong> <code>/mission.txt</code></li>
 </ul>
 <pre><code class="language-text">JDU WEB-02 mission: independent HTTP delivery.
 </code></pre>
-<h2 id="section-3">合格条件：採点check各1素点</h2>
+<h2 id="section-3">採点基準</h2>
+<p>各項目は1点。</p>
 <table>
 <thead>
 <tr>
-<th scope="col">check ID（変更しない）</th>
-<th scope="col">満たすこと</th>
+<th scope="col">№</th>
+<th scope="col">満たす条件</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>WEB02_NGINX_ACTIVE</td>
-<td>既存checkerでnginxのactiveを確認。</td>
+<td>1</td>
+<td>WebサーバーでNginxが起動している。</td>
 </tr>
 <tr>
-<td>WEB02_CONFIG_VALID</td>
-<td>既存checkerでnginx -tが成功。</td>
+<td>2</td>
+<td>Nginxの設定が構文検査に通る。</td>
 </tr>
 <tr>
-<td>WEB02_LISTEN_80</td>
-<td>既存checkerでprivate/all-interfaceの80番待受を確認。</td>
+<td>3</td>
+<td>NginxがWebサーバーの内部IPでTCPの80番ポートへの接続を受け付ける。</td>
 </tr>
 <tr>
-<td>WEB02_FILE</td>
-<td>既存checkerどおり指定本文・通常file・root所有・0644を確認。</td>
+<td>4</td>
+<td>配信用の <code>/var/www/html/mission.txt</code> が通常のファイルで、本文・所有者・権限が指定どおりになっている。</td>
 </tr>
 <tr>
-<td>WEB02_LOCAL_HTTP</td>
-<td>既存checkerでloopbackの200と本文完全一致。</td>
+<td>5</td>
+<td>Webサーバー自身から <code>127.0.0.1</code> の <code>/mission.txt</code> を開くと、HTTP 200と指定の本文が返る。</td>
 </tr>
 <tr>
-<td>WEB02_BASTION_HTTP</td>
-<td>既存checkerでprivate IP経由の200と本文完全一致。</td>
+<td>6</td>
+<td>踏み台サーバーから <code>10.20.1.20</code> の <code>/mission.txt</code> を開くと、HTTP 200と指定の本文が返る。</td>
 </tr>
 <tr>
-<td>WEB02_PUBLIC_HTTP</td>
-<td>既存checkerでCloudShellからpublic IP経由の200と本文完全一致。</td>
+<td>7</td>
+<td>Webサーバーの公開IPで <code>/mission.txt</code> を開くと、HTTP 200と指定の本文が返る。</td>
 </tr>
 <tr>
-<td>WEB02_ACCESS_LOG</td>
-<td>既存checkerで今回のnonce付き要求がaccess logに残る。</td>
+<td>8</td>
+<td>確認時の <code>/mission.txt</code> へのリクエストがNginxのアクセスログに残る。</td>
 </tr>
 </tbody>
 </table>
-<p>本人確認・管理・配布元・通信基盤・依存前提等の準備checkは上表の素点に加えない。必要前提が未完了なら、点が一部あっても次段階の準備完了ではない。</p>
 <h2 id="section-4">確認・提出</h2>
 <ol>
-<li>P0で使った課題画面に学校のGoogleアカウントでログインし、自分のLabと <strong>M1</strong> を選ぶ。</li>
+<li>採点ページを開き、<strong>M1</strong> を選ぶ。</li>
 <li>「この課題を確認する」を押す。</li>
-<li>処理中は「結果を更新する」で完了を待ち、クリアした項目数を確認する。「要修正」の項目があれば直してからもう一度確認する。結果は自動保存される。</li>
+<li>確認が終わると、満たした項目数と項目ごとの結果が表示される。「要修正」は該当する設定を直して再度確認する。「未確認」は、その項目を判定できなかった状態を表す。点数は課題一覧で確認する。</li>
 </ol>
 <hr />
 <p><a href="p1.html">前の課題: P1</a> · <a href="p2.html">次の課題: P2</a></p>

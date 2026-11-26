@@ -13,15 +13,19 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">完成要件</a> · <a href="#section-2">今回の見取り図</a> · <a href="#section-3">合格条件：採点check各1素点</a> · <a href="#section-4">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M2 内部DNSと通常の名前解決 (13)</h1>
-<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M6</a></p>
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">完成要件</a> · <a href="#section-2">今回の見取り図</a> · <a href="#section-3">採点基準</a> · <a href="#section-4">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M2 内部DNSと通常の名前解決 (13)</h1>
+<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M5</a></p>
 <p><a href="../ja/m2.html">日本語</a> · <a href="../ru/m2.html">Русский</a> · <a href="../uz/m2.html">O‘zbekcha</a></p>
 <p>対応する詳しい練習は<a href="p2.html">P2</a>。</p>
 <h2 id="section-1">完成要件</h2>
-<p>同じlab.test zoneへ正式6名を設定する。P2のguide/practice-dbは保持してよい。踏み台/Webの通常resolver、名前によるM1 HTTP、DB名、UDP/TCP、外部forward、NXDOMAIN、ACL、AXFR拒否まで確認する。</p>
+<p>始める前に、採点ページで <a href="m1.html">M1</a> が満点になっていることを確認する。</p>
+<p>P2で構築した内部DNSに、下の6件の名前を追加する。踏み台サーバーから <code>http://web.lab.test/mission.txt</code> が開けるようにする。</p>
+<ol>
+<li><strong>DNSサーバー（P2.2〜P2.4）</strong>　既存の <code>lab.test</code> ゾーンにAレコードを追加する。ゾーンファイルのシリアル番号を更新し、構文検査を通してから設定を読み込む。P2の名前は残してよい。</li>
+<li><strong>踏み台サーバーとWebサーバー（P2.5〜P2.8）</strong>　内部DNSへ直接問い合わせた結果と、OSが普段使う名前解決の結果を確認する。踏み台では <code>web.lab.test</code> でM1の本文を開き、Webサーバーでは <code>db.lab.test</code> が <code>10.20.2.20</code> になることを確認する。</li>
+</ol>
 <h2 id="section-2">今回の見取り図</h2>
-<p><img src="../../../assets/ja/m2.png" alt="M2: IP指定のHTTPが使える → DNSとresolverを設定する → 名前でも同じWebへ届く。 図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 図を参考に完成要件から設定値を自分で決めます。" width="1040" height="680" loading="lazy"></p>
-<p>図の太枠が今回の主な対象です。設定操作は各手順の実行場所で行い、図の矢印は接続・確認の向きを表します。 SGの通信許可は初期配備済みで、今回の課題はサーバー内の設定です。 図を参考に完成要件から設定値を自分で決めます。</p>
+<p><img src="../../../assets/ja/m2.png" alt="踏み台とWebから内部DNSへ問い合わせ、踏み台からWebへ名前で接続する。" width="1040" height="680" loading="lazy"></p>
 <table>
 <thead>
 <tr>
@@ -56,78 +60,75 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 </tr>
 </tbody>
 </table>
-<ul>
-<li>現在必要な前提: M1</li>
-</ul>
-<h2 id="section-3">合格条件：採点check各1素点</h2>
+<h2 id="section-3">採点基準</h2>
+<p>各項目は1点。</p>
 <table>
 <thead>
 <tr>
-<th scope="col">check ID（変更しない）</th>
-<th scope="col">満たすこと</th>
+<th scope="col">№</th>
+<th scope="col">満たす条件</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>WEB03_SERVICE</td>
-<td>BINDがactiveである。</td>
+<td>1</td>
+<td>DNSサーバーでBINDが起動している。</td>
 </tr>
 <tr>
-<td>WEB03_CONFIG_VALID</td>
-<td>named設定とlab.test zoneの構文検査が成功する。</td>
+<td>2</td>
+<td>BINDの設定と <code>lab.test</code> のゾーンファイルが構文検査に通る。</td>
 </tr>
 <tr>
-<td>WEB03_ZONE_AUTHORITY</td>
-<td>lab.testのSOA/NSと権威応答が設計と一致する。</td>
+<td>3</td>
+<td>内部DNSが <code>lab.test</code> の情報を保持し、指定どおりのSOA・NSレコードを返す。</td>
 </tr>
 <tr>
-<td>WEB03_REQUIRED_RECORDS</td>
-<td>P/M別の必須record全件が期待private IPを返す。6名を6点へ水増ししない。追加の正当な練習名を許す。</td>
+<td>4</td>
+<td>表の6件の名前が、すべて指定の内部IPアドレスになる。</td>
 </tr>
 <tr>
-<td>WEB03_UDP_RESPONSE</td>
-<td>踏み台・Webの両方からUDP53で必要な回答が得られる。</td>
+<td>5</td>
+<td>踏み台サーバーとWebサーバーの両方が、UDPの53番ポートでDNSの回答を得られる。</td>
 </tr>
 <tr>
-<td>WEB03_TCP_RESPONSE</td>
-<td>踏み台・Webの両方からTCP53で必要な回答が得られる。</td>
+<td>6</td>
+<td>踏み台サーバーとWebサーバーの両方が、TCPの53番ポートでDNSの回答を得られる。</td>
 </tr>
 <tr>
-<td>WEB03_NORMAL_RESOLVER</td>
-<td>踏み台/Webの通常resolverがBINDだけを使い、対象名をhostsやbrowser DoHで代用しない。</td>
+<td>7</td>
+<td>踏み台サーバーとWebサーバーが通常の名前解決で内部DNSだけを使う。</td>
 </tr>
 <tr>
-<td>WEB03_NAMED_HTTP</td>
-<td>踏み台の通常resolverを使い、P/M別host名と既存HTTP fileで200/正しい本文を確認する。</td>
+<td>8</td>
+<td>踏み台サーバーから <code>http://web.lab.test/mission.txt</code> を開くと、HTTP 200とM1の本文が返る。</td>
 </tr>
 <tr>
-<td>WEB03_DB_NAME</td>
-<td>Webの通常resolverでP/M別DB名が10.20.2.20になる。</td>
+<td>9</td>
+<td>Webサーバーの通常の名前解決で、<code>db.lab.test</code> が <code>10.20.2.20</code> になる。</td>
 </tr>
 <tr>
-<td>WEB03_FORWARD_ONLY</td>
-<td>forward only/転送先10.20.0.2の実効設定と外部名解決を確認する。外部Web接続成功は要求しない。</td>
+<td>10</td>
+<td>外部の名前は <code>10.20.0.2</code> だけに転送して解決できる。</td>
 </tr>
 <tr>
-<td>WEB03_NXDOMAIN</td>
-<td>その回で作る未登録lab.test名に権威NXDOMAINが返る。</td>
+<td>11</td>
+<td><code>lab.test</code> の未登録名を問い合わせると、存在しないことを示す <code>NXDOMAIN</code> が返る。</td>
 </tr>
 <tr>
-<td>WEB03_CLIENT_ACL</td>
-<td>BINDのquery/recursion/cache ACLがlocalhost・踏み台・Webのみを許す実効設定になっている。SGだけの遮断でBIND ACLの実証としない。</td>
+<td>12</td>
+<td>BINDが問い合わせ・再帰問い合わせ・キャッシュの利用を、DNSサーバー自身・踏み台・Webサーバーに限って許可する。</td>
 </tr>
 <tr>
-<td>WEB03_AXFR_DENIED</td>
-<td>通常問い合わせが同じ回に成功する踏み台/WebからAXFRが明示拒否される。timeoutだけではPASSにしない。</td>
+<td>13</td>
+<td>踏み台・Webサーバーからの通常の問い合わせは成功し、ゾーンの一括転送（AXFR）は明示的に拒否される。</td>
 </tr>
 </tbody>
 </table>
-<p>本人確認・管理・配布元・通信基盤・依存前提等の準備checkは上表の素点に加えない。必要前提が未完了なら、点が一部あっても次段階の準備完了ではない。</p>
 <h2 id="section-4">確認・提出</h2>
 <ol>
-<li>P0で使った課題画面に学校のGoogleアカウントでログインし、自分のLabと <strong>M2</strong> を選ぶ。</li>
+<li>採点ページを開き、<strong>M2</strong> を選ぶ。</li>
 <li>「この課題を確認する」を押す。</li>
-<li>処理中は「結果を更新する」で完了を待ち、クリアした項目数を確認する。「要修正」の項目があれば直してからもう一度確認する。結果は自動保存される。</li>
+<li>確認が終わると、満たした項目数と項目ごとの結果が表示される。「要修正」は該当する設定を直して再度確認する。「未確認」は、その項目を判定できなかった状態を表す。点数は課題一覧で確認する。</li>
 </ol>
 <hr />
 <p><a href="p2.html">前の課題: P2</a> · <a href="p4.html">次の課題: P4</a></p>

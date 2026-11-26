@@ -1,4 +1,5 @@
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
+import { displayTask } from './checks.mjs';
 
 const escape=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const labId=v=>typeof v==='string' && /^[a-z0-9][a-z0-9-]{2,31}$/.test(v);
@@ -62,14 +63,14 @@ export function teacherListHtml(lang,value,{validateGrade,maxima}) {
       const score=saved?`${saved.raw_earned} / ${maxima[m]}`:'—';
       const className=saved?(saved.raw_earned===maxima[m]?'score-full':'score-partial'):'';
       return `<td class="${className}"><a href="/teacher/student?lang=${lang}&amp;lab_id=${row.lab_id}&amp;task_id=${m}"
-        aria-label="${escape(m+' '+(saved?score:t.none))}">${score}</a></td>`;
+        aria-label="${escape(displayTask(m)+' '+(saved?score:t.none))}">${score}</a></td>`;
     }).join('');
     const dates=[...Object.values(grade.current||{}),...Object.values(grade.selected)].map(r=>r?.received_at).filter(v=>typeof v==='string' && Number.isFinite(Date.parse(v)));
     const latest=dates.sort((a,b)=>Date.parse(a)-Date.parse(b)).at(-1);
-    return `<tr>${name}<td class="teacher-total">${Object.keys(grade.selected).length?`${grade.raw_earned} / ${grade.raw_maximum}`:escape(t.none)}</td>${cells}<td>${escape(grade.current_unresolved.length?grade.current_unresolved.join(', '):t.ok)}</td><td>${escape(stamp(latest))}</td></tr>`;
+    return `<tr>${name}<td class="teacher-total">${Object.keys(grade.selected).length?`${grade.raw_earned} / ${grade.raw_maximum}`:escape(t.none)}</td>${cells}<td>${escape(grade.current_unresolved.length?grade.current_unresolved.map(displayTask).join(', '):t.ok)}</td><td>${escape(stamp(latest))}</td></tr>`;
   }).join('');
   const tabs=`<div class="page-toolbar">${['course','verification'].map(key=>`<a class="action" href="/teacher?lang=${lang}&amp;context=${key}"${key===context?' aria-current="page"':''}>${escape(t[key])}</a>`).join('')}<a class="action" href="/checks?lang=${lang}">${{ja:'学生用の課題',ru:'Задания студента',uz:'Talaba vazifalari'}[lang]}</a><form action="/auth/logout" method="post"><button type="submit">${{ja:'ログアウト',ru:'Выйти',uz:'Chiqish'}[lang]}</button></form></div>`;
-  const table=rows?`<div class="table-wrap teacher-table" tabindex="0" role="region" aria-labelledby="teacher-caption"><table><caption id="teacher-caption">${escape(t[context])}</caption><thead><tr><th scope="col">${escape(t.lab)}</th><th scope="col">${escape(t.total)}</th>${missions.map(m=>`<th scope="col">${m}</th>`).join('')}<th scope="col">${escape(t.unknown)}</th><th scope="col">${escape(t.latest)}</th></tr></thead><tbody>${rows}</tbody></table></div>`:`<p>${escape(t.empty)}</p>`;
+  const table=rows?`<div class="table-wrap teacher-table" tabindex="0" role="region" aria-labelledby="teacher-caption"><table><caption id="teacher-caption">${escape(t[context])}</caption><thead><tr><th scope="col">${escape(t.lab)}</th><th scope="col">${escape(t.total)}</th>${missions.map(m=>`<th scope="col">${displayTask(m)}</th>`).join('')}<th scope="col">${escape(t.unknown)}</th><th scope="col">${escape(t.latest)}</th></tr></thead><tbody>${rows}</tbody></table></div>`:`<p>${escape(t.empty)}</p>`;
   const next=value.next_after?`<p><a href="/teacher?lang=${lang}&amp;context=${context}&amp;after=${value.next_after}">${escape(t.next)}</a></p>`:'';
   return tabs+table+next;
 }

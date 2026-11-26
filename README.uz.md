@@ -95,7 +95,7 @@ O‘zingizga biriktirilgan **talaba uchun Learner Lab** muhitini ishga tushiring
 - [WEB-00 Yakuniy arxitektura](modules/WEB-00-overview/README.md)
 - [WEB-02 HTTP va Nginx](modules/WEB-02-http/README.md)
 
-Avvalgi 8-bob olib tashlangan va darslik boblari 1 dan 13 gacha ketma-ket raqamlangan. Amaliy topshiriqlarda P3/M3 raqamlari o‘tkazib yuborilgan. M1, M2, M4, M5 va M6 ning avtomatik tekshiruvlari jami 59 xom ball beradi.
+Avvalgi 8-bob olib tashlangan va darslik boblari 1 dan 13 gacha ketma-ket raqamlangan. Mashqlarda P3 o‘tkazib yuborilgan. Mustaqil topshiriqlar M1–M5 tartibida berilgan. M1, M2, M3, M4 va M5 ning avtomatik tekshiruvlari jami 59 xom ball beradi.
 
 ## P mashqlari va M mustaqil topshiriqlari
 

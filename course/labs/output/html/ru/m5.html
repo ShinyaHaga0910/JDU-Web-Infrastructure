@@ -1,4 +1,4 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M5 Соединить предоставленное приложение с Web и DB (13)</title><style>
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M5 Минимальные права и границы публикации (16)</title><style>
 :root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
 *{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
 header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
@@ -13,122 +13,102 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Требуемый результат</a> · <a href="#section-2">Схема задания</a> · <a href="#section-3">Условия: 1 исходный балл за проверку</a> · <a href="#section-4">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M5 Соединить предоставленное приложение с Web и DB (13)</h1>
-<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M6</a></p>
+</style></head><body><a class="skip" href="#content">Как пользоваться пособием</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Требуемый результат</a> · <a href="#section-2">Схема задания</a> · <a href="#section-3">Критерии оценки</a> · <a href="#section-4">Проверка и отправка</a></nav></header><main id="content" tabindex="-1"><h1>M5 Минимальные права и границы публикации (16)</h1>
+<p><a href="practice.html">Практика P0–P6</a> · <a href="missions.html">Задания M0–M5</a></p>
 <p><a href="../ja/m5.html">日本語</a> · <a href="../ru/m5.html">Русский</a> · <a href="../uz/m5.html">O‘zbekcha</a></p>
-<p>Связанное задание: <a href="p5.html">P5</a>.</p>
+<p>Связанное задание: <a href="p6.html">P6</a>.</p>
 <h2 id="section-1">Требуемый результат</h2>
-<p>Подключите то же приложение к БД mission. Используйте навыки P5 с profile=mission, не копируйте заново app/venv. Остановите приложение по примеру P6.3. Используйте порядок P5.4-P5.5 для создания и активации runtime и подготовки временного setup, подставив профиль mission. Выполните migrations/seed/admin и grants в основной БД, добавьте две заданные записи. Сохраните P1/M1, оставьте mission активным.</p>
+<p>Перед началом убедитесь на странице оценок, что за <a href="m4.html">M4</a> получен полный балл.</p>
+<p>Переведите приложение M4 в обычный режим работы способом из P6. Закройте доступ, нужный только при настройке, и сохраните необходимые права приложения и администратора.</p>
+<ol>
+<li><strong>DB-сервер (P6.1-P6.2).</strong> Проверьте права <code>catalog_app</code>. Запретите вход для роли настройки <code>catalog_setup</code>, удалите её пароль и завершите оставшиеся соединения.</li>
+<li><strong>Web-сервер (P6.3-P6.4).</strong> Уберите временные настройки (<code>/etc/jdu-catalog/setup.env</code> и <code>/etc/jdu-catalog/profiles/mission.setup.env</code>) и запустите приложение с рабочим профилем <code>mission</code>. Пользователь сервиса не должен менять код. Файлы с секретами принадлежат <code>root:root</code> и имеют права <code>0600</code>.</li>
+<li><strong>Открытая и административная страницы (P6.4-P6.5).</strong> На порту 80 должна отображаться только публичная запись из M4. Откройте панель управления с бастиона на порту 8080 и проверьте, что <code>lab_admin</code> может просматривать, добавлять и изменять предметы.</li>
+</ol>
 <h2 id="section-2">Схема задания</h2>
-<p><img src="../../../assets/ru/m5.png" alt="M5: DNS и БД уже готовы → Подключить и запустить app → Изменения видны в БД и Web。 Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. 8000 доступен только внутри Web; 8080 используется для управления с бастиона. Слева Интернет, справа VPC в AWS. IGW стоит на границе VPC; все EC2, включая бастион, находятся в AWS. По схеме самостоятельно выберите настройки из требований." width="1040" height="680" loading="lazy"></p>
-<p>Толстая рамка отмечает основной объект. Настраивайте в терминале, указанном в шаге; стрелки показывают направление подключения или проверки. Разрешения SG заданы начальным комплектом; здесь настраивается сервер. 8000 доступен только внутри Web; 8080 используется для управления с бастиона. Слева Интернет, справа VPC в AWS. IGW стоит на границе VPC; все EC2, включая бастион, находятся в AWS. По схеме самостоятельно выберите настройки из требований.</p>
-<ul>
-<li>Profile: mission</li>
-<li>Database: jdu_catalog</li>
-<li>Setup role: catalog_setup</li>
-<li>Runtime role: catalog_app</li>
-<li>Application administrator: lab_admin</li>
-</ul>
+<p><img src="../../../assets/ru/m5.png" alt="Ограничения публичного и административного входов и доступа от Web к DB." width="1040" height="680" loading="lazy"></p>
+<h2 id="section-3">Критерии оценки</h2>
+<p>Каждый критерий даёт 1 балл.</p>
 <table>
 <thead>
 <tr>
-<th scope="col">code</th>
-<th scope="col">name</th>
-<th scope="col">quantity</th>
-<th scope="col">location</th>
-<th scope="col">is_public</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>M5-PUBLIC-001</td>
-<td>Mission monitor</td>
-<td>6</td>
-<td>Lab cabinet C</td>
-<td>true</td>
-</tr>
-<tr>
-<td>M5-PRIVATE-001</td>
-<td>Mission router</td>
-<td>1</td>
-<td>Lab cabinet D</td>
-<td>false</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li>Текущие предпосылки: M2, M4</li>
-</ul>
-<h2 id="section-3">Условия: 1 исходный балл за проверку</h2>
-<table>
-<thead>
-<tr>
-<th scope="col">check ID (не менять)</th>
+<th scope="col">№</th>
 <th scope="col">Условие</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>WEB06_ARTIFACTS</td>
-<td>Код и зависимости точно соответствуют предоставленной фиксированной версии.</td>
+<td>1</td>
+<td>Публичный порт 80 не открывает admin даже с поддельными Host/header; частный путь при этом работает.</td>
 </tr>
 <tr>
-<td>WEB06_SERVICE</td>
-<td>jdu-catalog active и enabled, работает как catalog.</td>
+<td>2</td>
+<td>Секреты - обычные root:root 0600 файлы, без ссылок и раскрытия значений.</td>
 </tr>
 <tr>
-<td>WEB06_LOOPBACK</td>
-<td>Gunicorn слушает только 127.0.0.1:8000.</td>
+<td>3</td>
+<td>catalog без login/sudo не может менять код, venv и их управляющие каталоги.</td>
 </tr>
 <tr>
-<td>WEB06_PROFILE_DATABASE</td>
-<td>Активный процесс использует DB и runtime-role нужного profile.</td>
+<td>4</td>
+<td>Проверяемые env/секретные пути не доступны через HTTP или static.</td>
 </tr>
 <tr>
-<td>WEB06_MIGRATIONS</td>
-<td>Фиксированные migrations, 11 таблиц и нужные sequence находятся в выбранной БД.</td>
+<td>5</td>
+<td>Setup-role NOLOGIN/password NULL, её сессии закрыты, временные setup.env удалены.</td>
 </tr>
 <tr>
-<td>WEB06_REQUIRED_RECORDS</td>
-<td>Обе обязательные записи совпадают с параметрами profile; дополнительные допустимые записи разрешены.</td>
+<td>6</td>
+<td>catalog_item: только SELECT/INSERT/UPDATE, без DELETE, TRUNCATE и передачи прав.</td>
 </tr>
 <tr>
-<td>WEB06_PUBLIC_DATA</td>
-<td>Обычный публичный URL получает правильные записи из действующей БД.</td>
+<td>7</td>
+<td>auth_user: SELECT и UPDATE только last_login/password, без создания/удаления пользователей.</td>
 </tr>
 <tr>
-<td>WEB06_ADMIN_ENTRY</td>
-<td>С бастиона через обычный DNS доступна настоящая форма /admin/ на admin.lab.test:8080.</td>
+<td>8</td>
+<td>Таблицы групп, permissions, связей и content type доступны только для SELECT.</td>
 </tr>
 <tr>
-<td>WEB06_STATIC</td>
-<td>Static-ресурсы доступны по предусмотренному маршруту.</td>
+<td>9</td>
+<td>django_session: только необходимые SELECT/INSERT/UPDATE/DELETE, без лишних прав.</td>
 </tr>
 <tr>
-<td>WEB06_PASSWORD_LOGIN</td>
-<td>Функциональный режим проходит настоящий password/CSRF/cookie login, без обхода аутентификации.</td>
+<td>10</td>
+<td>django_admin_log: только SELECT/INSERT.</td>
 </tr>
 <tr>
-<td>WEB06_CREATE_REFLECT</td>
-<td>В этом запуске через admin HTTP создана одна CK-запись; значения совпали в DB и публичной странице.</td>
+<td>11</td>
+<td>У runtime нет прав на django_migrations, schema CREATE, владения объектами и незаданных дополнительных прав.</td>
 </tr>
 <tr>
-<td>WEB06_EDIT_REFLECT</td>
-<td>Количество именно этой CK-записи изменено; DB и публичная страница подтверждают изменение.</td>
+<td>12</td>
+<td>USAGE только sequence оборудования и admin-log; без лишних SELECT/UPDATE/GRANT.</td>
 </tr>
 <tr>
-<td>WEB06_LOGOUT</td>
-<td>POST logout завершает сессию: прежний cookie снова требует входа.</td>
+<td>13</td>
+<td>Активный staff, не superuser: только view/add/change оборудования, без delete/user management.</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Анонимные добавление/изменение отклонены без изменения БД при успешном контрольном login; одного CSRF-403 мало.</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Один неверный пароль приложения отклонён, при этом правильный login работает.</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Все найденные непубличные коды скрыты на публичной странице при доступной БД.</td>
 </tr>
 </tbody>
 </table>
-<p>Проверки identity/управления/repo/сети/зависимостей не добавляют баллов. Частичные баллы не означают готовность следующего этапа при неисправных предпосылках.</p>
 <h2 id="section-4">Проверка и отправка</h2>
 <ol>
-<li>Откройте страницу заданий, которую использовали в P0. Войдите через учебный аккаунт Google и выберите свой Lab и <strong>M5</strong>.</li>
+<li>Откройте страницу оценок и выберите <strong>M5</strong>.</li>
 <li>Выберите функциональную проверку с правами, скрыто введите существующий пароль lab_admin в поле администратора приложения и запустите с этим паролем. Это не пароль RDP. Проверка только настроек не подтверждает функции.</li>
-<li>Во время обработки обновляйте результат. Посмотрите, сколько критериев выполнено. Внесите нужные исправления и проверьте снова. Результат сохраняется автоматически.</li>
+<li>По завершении появятся число выполненных критериев и результат каждого. Исправьте пункты с пометкой «Исправить» и запустите проверку снова. «Не проверен» означает, что результат определить не удалось. Баллы отображаются в списке заданий.</li>
 </ol>
 <hr />
-<p><a href="p6.html">Предыдущее: P6</a> · <a href="m6.html">Следующее: M6</a></p>
+<p><a href="m4.html">Предыдущее: M4</a></p>
 </main></body></html>

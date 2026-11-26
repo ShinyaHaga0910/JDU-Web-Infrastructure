@@ -1,12 +1,27 @@
 """Active teaching subset of the immutable signed D11 assessment baseline."""
 import copy
 import json
+import re
 from pathlib import Path
 
 POLICY = json.loads((Path(__file__).resolve().parents[2] / 'curriculum.json').read_text(encoding='utf-8'))
 ACTIVE_NUMBERS = tuple(int(t[1:]) for t in POLICY['active_order'] if t.startswith('P'))
 ACTIVE_ORDER = tuple(POLICY['active_order'])
 RAW_MAXIMUM = POLICY['raw_maximum']
+DISPLAY_IDS = POLICY['mission_display_ids']
+
+
+def display_task(task):
+    return DISPLAY_IDS.get(task, task)
+
+
+def display_missions(text):
+    # Preserve application record codes such as M5-PUBLIC-001.
+    return re.sub(r'(?<![A-Za-z0-9_-])M[456](?![A-Za-z0-9_-])', lambda match: display_task(match[0]), text)
+
+
+def task_page(task):
+    return display_task(task).lower() + '.md'
 
 def active_registry(baseline):
     value = copy.deepcopy(baseline)

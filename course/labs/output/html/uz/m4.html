@@ -1,4 +1,4 @@
-<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M4 PostgreSQL ga autentifikatsiya bilan ulanish (9)</title><style>
+<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M4 Berilgan app ni Web va DB bilan bog‘lash (13)</title><style>
 :root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
 *{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
 header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
@@ -13,76 +13,117 @@ p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;bo
 img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 @media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
 @media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
-</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Tayyor holat talablari</a> · <a href="#section-2">Topshiriq diagrammasi</a> · <a href="#section-3">Shartlar: har tekshiruvga 1 xom ball</a> · <a href="#section-4">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M4 PostgreSQL ga autentifikatsiya bilan ulanish (9)</h1>
-<p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M6</a></p>
+</style></head><body><a class="skip" href="#content">Qo‘llanmadan foydalanish</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">Tayyor holat talablari</a> · <a href="#section-2">Topshiriq diagrammasi</a> · <a href="#section-3">Baholash mezonlari</a> · <a href="#section-4">Tekshirish va yuborish</a></nav></header><main id="content" tabindex="-1"><h1>M4 Berilgan app ni Web va DB bilan bog‘lash (13)</h1>
+<p><a href="practice.html">Mashqlar P0–P6</a> · <a href="missions.html">Topshiriqlar M0–M5</a></p>
 <p><a href="../ja/m4.html">日本語</a> · <a href="../ru/m4.html">Русский</a> · <a href="../uz/m4.html">O‘zbekcha</a></p>
-<p>Mos topshiriq: <a href="p4.html">P4</a>.</p>
+<p>Mos topshiriq: <a href="p5.html">P5</a>.</p>
 <h2 id="section-1">Tayyor holat talablari</h2>
-<p>Asosiy DB va rollarni mustaqil quring. P4.7 dagi nom bilan ulanish usulini qo‘llab, M2 dagi db.lab.test orqali Web runtime role orqali SELECT bajaring. HBA faqat Web/32 va to‘g‘ri DB/role juftiga ruxsat beradi. Mavjud parolni Web mission helper orqali practice dan alohida saqlang. App jadvallari hali kerak emas.</p>
+<p>Boshlashdan oldin baholash sahifasida <a href="m2.html">M2</a>, <a href="m3.html">M3</a> uchun to‘liq ball olinganini tekshiring.</p>
+<p>P5 dagi jihozlar ilovasini M3 da tayyorlangan topshiriq bazasiga ulang. Profilni almashtirishdan oldin P6 da mashq sozlamasini yakunlang.</p>
+<ol>
+<li><strong>Web server (P6.3, P5.4-P5.5).</strong> Ilovani to‘xtating va <code>mission</code> profilini tanlang. Mavjud ilovadan foydalanib, topshiriq bazasida jadvallar, boshlang‘ich ma’lumotlar va administratorni yarating.</li>
+<li><strong>DB va Web serverlari (P5.6-P5.8).</strong> Oddiy ish rejimi roliga huquqlarni bering va ilovani ishga tushiring. Ochiq sahifa hamda boshqaruv sahifasini oching. <code>/practice.txt</code> va <code>/mission.txt</code> ham ochilishini tekshiring.</li>
+<li><strong>Bastion serveri (P5.9).</strong> <code>http://admin.lab.test:8080/admin/</code> manziliga <code>lab_admin</code> bilan kiring va jadvaldagi ikki yozuvni kiriting. Ochiq sahifada e’lon qilingan yozuvni tekshiring.</li>
+</ol>
 <h2 id="section-2">Topshiriq diagrammasi</h2>
-<p><img src="../../../assets/uz/m4.png" alt="M4: Web dan DB ulanishini tayyorlash → DB, role va auth ni sozlash → Ruxsatli SELECT muvaffaqiyatli。 Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. CloudShell dan DB serverga SSM orqali ulanib, sozlang. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang." width="1040" height="680" loading="lazy"></p>
-<p>Qalin ramka asosiy obyektni bildiradi. Har qadamdagi terminalda sozlang; strelkalar ulanish yoki tekshirish yo‘nalishidir. SG ruxsatlari boshlang‘ich tarqatmada tayyor; bu topshiriqda server ichini sozlaysiz. CloudShell dan DB serverga SSM orqali ulanib, sozlang. Diagrammaga qarab talablardan sozlama qiymatlarini mustaqil tanlang.</p>
-<ul>
-<li>Profile: mission</li>
-<li>Database: jdu_catalog</li>
-<li>Setup role: catalog_setup</li>
-<li>Runtime role: catalog_app</li>
-<li>Joriy old shartlar: M2</li>
-</ul>
-<h2 id="section-3">Shartlar: har tekshiruvga 1 xom ball</h2>
+<p><img src="../../../assets/uz/m4.png" alt="Oddiy foydalanuvchi va administrator bir ilovaga alohida kirish yo‘llaridan ulanadi." width="1040" height="680" loading="lazy"></p>
 <table>
 <thead>
 <tr>
-<th scope="col">check ID (o‘zgartirmang)</th>
+<th scope="col">Kod</th>
+<th scope="col">Nomi</th>
+<th scope="col">Soni</th>
+<th scope="col">Saqlash joyi</th>
+<th scope="col">Ochiq</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>M5-PUBLIC-001</code></td>
+<td>Mission monitor</td>
+<td>6</td>
+<td>Lab cabinet C</td>
+<td>Ha</td>
+</tr>
+<tr>
+<td><code>M5-PRIVATE-001</code></td>
+<td>Mission router</td>
+<td>1</td>
+<td>Lab cabinet D</td>
+<td>Yo‘q</td>
+</tr>
+</tbody>
+</table>
+<h2 id="section-3">Baholash mezonlari</h2>
+<p>Har bir mezon 1 ball.</p>
+<table>
+<thead>
+<tr>
+<th scope="col">№</th>
 <th scope="col">Shart</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>WEB05_CLUSTER_ACTIVE</td>
-<td>PostgreSQL 16/main ishlaydi (active).</td>
+<td>1</td>
+<td>Kod va bog‘liqliklar berilgan aniq versiyaga mos.</td>
 </tr>
 <tr>
-<td>WEB05_CLUSTER_CONFIG</td>
-<td>16/main sozlamasi, standart data directory va OS postgres socket/peer to‘g‘ri.</td>
+<td>2</td>
+<td>jdu-catalog active va enabled, catalog nomidan ishlaydi.</td>
 </tr>
 <tr>
-<td>WEB05_LISTEN_5432</td>
-<td>PostgreSQL 10.20.2.20:5432 da tinglaydi.</td>
+<td>3</td>
+<td>Gunicorn faqat 127.0.0.1:8000 da tinglaydi.</td>
 </tr>
 <tr>
-<td>WEB05_DATABASE_OWNER</td>
-<td>DB va public schema egasi tegishli setup role.</td>
+<td>4</td>
+<td>Faol process kerakli profile DB va runtime role dan foydalanadi.</td>
 </tr>
 <tr>
-<td>WEB05_ROLE_ATTRIBUTES</td>
-<td>Runtime LOGIN; superuser/CREATEDB/CREATEROLE/REPLICATION/BYPASSRLS va huquq oshiruvchi membership yo‘q. Setup qurishda LOGIN yoki tugagach NOLOGIN.</td>
+<td>5</td>
+<td>Belgilangan migrations, 11 jadval va zarur sequence tanlangan DB da mavjud.</td>
 </tr>
 <tr>
-<td>WEB05_HBA_SCRAM</td>
-<td>HBA faqat ko‘rsatilgan DB/role va Web /32 uchun SCRAM ga ruxsat beradi; keng ruxsat yo‘q.</td>
+<td>6</td>
+<td>Ikkala majburiy yozuv profile qiymatlariga mos; boshqa to‘g‘ri yozuvlar mumkin.</td>
 </tr>
 <tr>
-<td>WEB05_WEB_SQL</td>
-<td>Web dan yangi autentifikatsiyali SELECT kerakli DB/user/qiymatni qaytaradi; P IP bilan, M odatiy DNS orqali.</td>
+<td>7</td>
+<td>Odatiy ochiq URL ishlayotgan DB dan to‘g‘ri yozuvlarni oladi.</td>
 </tr>
 <tr>
-<td>WEB05_BAD_PASSWORD_DENIED</td>
-<td>To‘g‘ri parol ishlagan ayni tekshiruvda bitta noto‘g‘ri parol aniq rad etiladi.</td>
+<td>8</td>
+<td>Bastiondan odatiy DNS orqali admin.lab.test:8080/admin/ haqiqiy login shakli ochiladi.</td>
 </tr>
 <tr>
-<td>WEB05_WRONG_TARGET_DENIED</td>
-<td>Web dan postgres role, begona DB va boshqa profile taqiqlangan; hali yaratilmagan practice DB majburiy emas.</td>
+<td>9</td>
+<td>Static resurslar belgilangan yo‘l orqali ochiladi.</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Funksional rejim haqiqiy password/CSRF/cookie login dan o‘tadi, autentifikatsiya chetlab o‘tilmaydi.</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Shu tekshiruvda admin HTTP orqali bitta CK yozuv yaratilib, DB va ochiq sahifa qiymatlari mos keladi.</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Aynan shu CK yozuv miqdori o‘zgartiriladi; DB va ochiq sahifa o‘zgarishni tasdiqlaydi.</td>
+</tr>
+<tr>
+<td>13</td>
+<td>POST logout session ni tugatadi: eski cookie bilan yana login talab etiladi.</td>
 </tr>
 </tbody>
 </table>
-<p>Identity/boshqaruv/repo/tarmoq/bog‘liqlik tayyorlik tekshiruvlari ball qo‘shmaydi. Old shart ishlamasa, qisman ball keyingi bosqichga tayyorlik emas.</p>
 <h2 id="section-4">Tekshirish va yuborish</h2>
 <ol>
-<li>P0 da ishlatgan topshiriqlar sahifasiga ta’lim muassasasining Google hisobi bilan kiring va o‘z Lab muhitingiz hamda <strong>M4</strong> ni tanlang.</li>
-<li>Tanlangan topshiriq tekshiruvini boshlang.</li>
-<li>Ishlov davom etsa natijani yangilab kuting. Nechta band bajarilganini ko‘ring. Tuzatish kerak bo‘lgan bandlarni tuzatib, yana tekshiring. Natija avtomatik saqlanadi.</li>
+<li>Baholash sahifasini oching va <strong>M4</strong> ni tanlang.</li>
+<li>Funksiya/huquq tekshiruvini tanlang, lab_admin mavjud parolini app administratorining yashirin maydoniga kiritib, shu parol bilan tekshiring. Bu RDP paroli emas. Faqat sozlama tekshiruvi funksiyalarni tasdiqlamaydi.</li>
+<li>Tekshiruv tugagach, bajarilgan mezonlar soni va har bir natija chiqadi. «Tuzating» deb belgilangan sozlamani to‘g‘rilab, yana tekshiring. «Tekshirilmagan» band natijasi aniqlanmagan. Ballarni topshiriqlar ro‘yxatidan ko‘ring.</li>
 </ol>
 <hr />
-<p><a href="p4.html">Oldingi: P4</a> · <a href="p5.html">Keyingi: P5</a></p>
+<p><a href="p6.html">Oldingi: P6</a> · <a href="m5.html">Keyingi: M5</a></p>
 </main></body></html>

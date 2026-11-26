@@ -1,0 +1,107 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>M3 PostgreSQLへの認証接続 (9)</title><style>
+:root{color-scheme:light;font:17px/1.85 system-ui,sans-serif;color:#172637;background:#eef2f6}
+*{box-sizing:border-box}body{margin:0}header,main,footer{max-width:900px;margin:auto;padding:1.5rem 2rem;background:white}
+header{border-bottom:5px solid #126e70}header p{margin:0;color:#415569}nav{display:flex;flex-wrap:wrap;gap:1rem}
+a{color:#085e80;text-underline-offset:.2em}a:focus-visible{outline:3px solid #b24a00;outline-offset:4px}
+.skip{position:absolute;left:-9999px}.skip:focus{position:fixed;left:1rem;top:1rem;background:white;padding:.5rem;z-index:2}
+h1{font-size:2rem;line-height:1.35}h2{margin-top:3rem;padding-top:.7rem;border-top:3px solid #126e70;font-size:1.55rem}
+h3{font-size:1.2rem;margin-top:2.5rem;padding-top:.5rem;border-top:1px solid #b8c6d0}h4{font-size:1.08rem;margin-top:2rem;color:#134c61}
+pre{background:#f0f4f7;border-left:4px solid #126e70;padding:1rem;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55;font: .83rem/1.6 Consolas,monospace}
+code{font-family:Consolas,monospace}table{width:100%;border-collapse:collapse;font-size:.9rem;margin:1rem 0;table-layout:fixed}
+th,td{border:1px solid #b8c6d0;padding:.5rem;vertical-align:top;overflow-wrap:anywhere}th{background:#e8f1f3;text-align:start}
+p,li{overflow-wrap:anywhere}li+li{margin-top:.5rem}blockquote{margin:1.5rem 0;border-left:4px solid #126e70;padding:.1rem 1rem;background:#f0f4f7}footer{font-size:.85rem;color:#415569;border-top:1px solid #b8c6d0}
+img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
+@media(max-width:600px){header,main,footer{padding:1rem}h1{font-size:1.6rem}}
+@media print{body{background:white;font-size:10pt}header,main,footer{max-width:none;padding:0}nav,.skip{display:none}h2{break-before:page}h2,h3,h4{break-after:avoid}pre{white-space:pre-wrap;break-inside:auto}tr{break-inside:avoid}}
+</style></head><body><a class="skip" href="#content">使い方と共通の約束</a><header><p>JDU · Web Infrastructure</p><nav aria-label="Contents"><a href="#section-1">完成要件</a> · <a href="#section-2">今回の見取り図</a> · <a href="#section-3">採点基準</a> · <a href="#section-4">確認・提出</a></nav></header><main id="content" tabindex="-1"><h1>M3 PostgreSQLへの認証接続 (9)</h1>
+<p><a href="practice.html">練習 P0〜P6</a> · <a href="missions.html">課題 M0〜M5</a></p>
+<p><a href="../ja/m3.html">日本語</a> · <a href="../ru/m3.html">Русский</a> · <a href="../uz/m3.html">O‘zbekcha</a></p>
+<p>対応する詳しい練習は<a href="p4.html">P4</a>。</p>
+<h2 id="section-1">完成要件</h2>
+<p>始める前に、採点ページで <a href="m2.html">M2</a> が満点になっていることを確認する。</p>
+<p>P4で使ったPostgreSQLに、下の課題用データベースと2つのロールを作る。アプリのテーブルはM4で用意する。</p>
+<ol>
+<li><strong>DBサーバー（P4.2〜P4.6）</strong>　課題用DBとロールを作り、Webサーバー（<code>10.20.1.20/32</code>）から指定のDB・ロールで接続できるようにする。認証方式にはP4と同じSCRAMを使う。</li>
+<li><strong>Webサーバー（P4.7〜P4.8）</strong>　<code>db.lab.test</code> に通常運用用ロールで接続し、SELECTが成功することを確かめる。P4.8と同じ方法で、既存パスワードを課題用（<code>mission</code>）として保存する。</li>
+</ol>
+<h2 id="section-2">今回の見取り図</h2>
+<p><img src="../../../assets/ja/m3.png" alt="WebサーバーがDBサーバーの名前を解決し、PostgreSQLへ接続する。" width="1040" height="680" loading="lazy"></p>
+<table>
+<thead>
+<tr>
+<th scope="col">設定する項目</th>
+<th scope="col">値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>データベース名</td>
+<td><code>jdu_catalog</code></td>
+</tr>
+<tr>
+<td>構築用ロール</td>
+<td><code>catalog_setup</code></td>
+</tr>
+<tr>
+<td>通常運用用ロール</td>
+<td><code>catalog_app</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="section-3">採点基準</h2>
+<p>各項目は1点。</p>
+<table>
+<thead>
+<tr>
+<th scope="col">№</th>
+<th scope="col">満たす条件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>DBサーバーでPostgreSQLの <code>16/main</code> が動作している。</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>16/main</code> が標準のデータ保存先を使い、サーバー内ではOSユーザー <code>postgres</code> がローカル接続して管理できる。</td>
+</tr>
+<tr>
+<td>3</td>
+<td>PostgreSQLが <code>10.20.2.20:5432</code> で接続を待ち受けている。</td>
+</tr>
+<tr>
+<td>4</td>
+<td>課題用DBとその <code>public</code> スキーマの所有者が <code>catalog_setup</code> になっている。</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>catalog_app</code> はログインできる。両ロールに管理者権限や、ロールの所属を通じた権限昇格がない。</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Webサーバーから課題用DBと指定ロールへの接続だけを、SCRAM認証で許可する。</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Webサーバーから <code>db.lab.test</code> に <code>catalog_app</code> で接続し、課題用DBで指定のSELECTが成功する。</td>
+</tr>
+<tr>
+<td>8</td>
+<td>正しいパスワードで接続でき、誤ったパスワードは拒否される。</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Webサーバーから許可外のデータベースやロールで接続しようとすると拒否される。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="section-4">確認・提出</h2>
+<ol>
+<li>採点ページを開き、<strong>M3</strong> を選ぶ。</li>
+<li>「この課題を確認する」を押す。</li>
+<li>確認が終わると、満たした項目数と項目ごとの結果が表示される。「要修正」は該当する設定を直して再度確認する。「未確認」は、その項目を判定できなかった状態を表す。点数は課題一覧で確認する。</li>
+</ol>
+<hr />
+<p><a href="p4.html">前の課題: P4</a> · <a href="p5.html">次の課題: P5</a></p>
+</main></body></html>

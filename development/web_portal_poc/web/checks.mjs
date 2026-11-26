@@ -4,6 +4,10 @@ import { readFileSync } from 'node:fs';
 const labels=JSON.parse(readFileSync(new URL('./check-labels.json',import.meta.url),'utf8'));
 
 export const tasks=Object.freeze([...[0,1,2,4].flatMap(i=>[`P${i}`,`M${i}`]),'P5','P6','M5','M6']);
+const missionDisplayIds=Object.freeze({M4:'M3',M5:'M4',M6:'M5'});
+export function displayTask(task) {
+  return Object.hasOwn(missionDisplayIds,task) ? missionDisplayIds[task] : task;
+}
 const uuid=v=>typeof v==='string' && /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(v);
 const escape=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const words={
@@ -125,7 +129,7 @@ export function taskDetailHtml(lang,task,grade,maximum,actions='') {
   }[lang];
   const checks=(Array.isArray(grade?.task_checks)?grade.task_checks:[]).slice(0,40).filter(validCriterion);
   const score=saved?`<p class="check-count">${scoreTitle} <strong>${saved.raw_earned} / ${maximum}</strong></p>`:maximum?`<p>${pending}</p>`:'';
-  return `<section class="task-detail"><div class="check-heading"><h2>${escape(task)}</h2>${score}</div>
+  return `<section class="task-detail"><div class="check-heading"><h2>${escape(displayTask(task))}</h2>${score}</div>
     ${actions?`<div class="task-actions">${actions}</div>`:''}
     ${checks.length?criteriaTable(lang,checks):''}</section>`;
 }
@@ -141,7 +145,7 @@ export function checkHtml(lang,{config,session,token,selected,result,grade,maxim
         {ja:'未採点',ru:'Без оценки',uz:'Baholanmagan'}[lang]:'—';
       const status=saved?(saved.raw_earned===maximum?'score-full':'score-partial'):'score-empty';
       const actions=blocked?'':taskActions(lang,task_id,{config,session,token});
-      return `<tr><th scope="row"><a href="/checks?lang=${lang}&amp;task_id=${task_id}">${task_id}</a></th><td><span class="task-score ${status}">${score}</span></td><td><div class="task-actions">${actions}</div></td></tr>`;
+      return `<tr><th scope="row"><a href="/checks?lang=${lang}&amp;task_id=${task_id}">${displayTask(task_id)}</a></th><td><span class="task-score ${status}">${score}</span></td><td><div class="task-actions">${actions}</div></td></tr>`;
     }).join('');
     const [taskTitle,scoreTitle,actionTitle]={
       ja:['課題','保存済みの点数','操作'],ru:['Задание','Сохранённые баллы','Действие'],
@@ -156,7 +160,7 @@ export function checkHtml(lang,{config,session,token,selected,result,grade,maxim
   const job=result.job;
   if (!job || job.job_id!==selected.job_id || job.task_id!==selected.task_id || !['queued','dispatching','observing','report_ready','failed','awaiting_password','awaiting_stop','awaiting_restart'].includes(job.phase)
       || selected.check_mode && job.check_mode!==selected.check_mode) throw Error('Invalid job');
-  let content=`<h2>${escape(selected.task_id)}</h2>`;
+  let content=`<h2>${escape(displayTask(selected.task_id))}</h2>`;
   if(job.phase==='awaiting_password') {
     if(selected.check_mode!=='functional')throw Error('Invalid functional step');
     const v={...selected,operation:'functional_start'};

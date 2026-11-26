@@ -6,17 +6,17 @@ Ruscha va o‘zbekcha matn yaponcha asl nusxa bilan bir xil qadam va shartlarga 
 
 [日本語](../ja/practice-full.md) · [Русский](../ru/practice-full.md) · [O‘zbekcha](../uz/practice-full.md)
 
-[Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M6](missions.md)
+[Mashqlar P0–P6](practice.md) · [Topshiriqlar M0–M5](missions.md)
 
 ## Qo‘llanmadan foydalanish
 
 Avval P topshirig‘ini o‘qing; kerak bo‘lsa batafsil namunani qadam-baqadam bajaring. P - batafsil qadamli mashq. M da boshqa obyekt/qiymatni mustaqil quring. Topshiriq raqami dars raqami emas; o‘z sur’atingizda ishlang. P tugashi M bajarilganini anglatmaydi.
 
-P0 → M0 → P1 → M1 → P2 → M2 → P4 → M4 → P5 → P6 → M5 → M6
+P0 → M0 → P1 → M1 → P2 → M2 → P4 → M3 → P5 → P6 → M4 → M5
 
 P5 uchun ham M2 DNS kerak. P4 da DB ga IP va nom orqali ulanishni mashq qiling. Ilova db.lab.test dan foydalanadi. Practice → mission almashishdan oldin P6 da setup ni tugating.
 
-P0=1, M0=4, M1=8, M2=13, M4=9, M5=13, M6=16: jami 64 xom ball. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.
+P0=1, M0=4, M1=8, M2=13, M3=9, M4=13, M5=16: jami 64 xom ball. Shaxsiy namoyish, backup/restore, qo‘shimcha disk va app dasturlash talab qilinmaydi. 25 ballga o‘tkazishni o‘qituvchi alohida qiladi. E’lon qilingan muddatgacha qayta yuborish mumkin. Turli urinish PASS lari qo‘shilmaydi; eng yuqori ball avtomatik tanlanmaydi.
 
 ## Muhit va tayyorgarlik
 
@@ -929,7 +929,7 @@ DB serverning SSM terminali: ssm-user
 
 **Maqsad va amallar:**
 
-pg_hba.conf nusxasini saqlab, sudo nano /etc/postgresql/16/main/pg_hba.conf ga quyidagi qoidalarni yozing. Birinchi mos qator ishlatiladi, shu sabab eski keng ruxsatlarni qoldirmang. OS postgres Unix socket/peer orqali boshqaradi. M4 rollari alohida ko‘rsatilgan; mashq roli asosiy DB ga kira olmaydi.
+pg_hba.conf nusxasini saqlab, sudo nano /etc/postgresql/16/main/pg_hba.conf ga quyidagi qoidalarni yozing. Birinchi mos qator ishlatiladi, shu sabab eski keng ruxsatlarni qoldirmang. OS postgres Unix socket/peer orqali boshqaradi. M3 rollari alohida ko‘rsatilgan; mashq roli asosiy DB ga kira olmaydi.
 
 Sozlama yoki ma’lumot: terminal buyrug‘i emas
 
@@ -1140,7 +1140,7 @@ D11_EXISTING_DB_PASSWORD_STORED_LOCALLY va to‘qqizta mashq tekshiruvi. Noto‘
 
 **Ishlamasa:**
 
-Fayl mavjud bo‘lsa qayta yaratmang. P5 da ayni DB paroli app sozlamasiga kiritiladi. M4 alohida mission DB/rollaridan foydalanadi.
+Fayl mavjud bo‘lsa qayta yaratmang. P5 da ayni DB paroli app sozlamasiga kiritiladi. M3 alohida mission DB/rollaridan foydalanadi.
 
 ### Natijani o‘qish namunasi (kiritmang)
 
@@ -1722,7 +1722,7 @@ ALTER ROLE muvaffaqiyatli; catalog_practice_app ishlashi saqlanadi.
 
 **Ishlamasa:**
 
-Keyin setup ni odatiy ish uchun LOGIN ga qaytarmang. M5 alohida mission setup role bilan tayyorlanadi.
+Keyin setup ni odatiy ish uchun LOGIN ga qaytarmang. M4 alohida mission setup role bilan tayyorlanadi.
 
 #### P6.3 Vaqtinchalik sozlamani olib tashlab, runtime ni qayta tanlash
 
@@ -1732,7 +1732,7 @@ Web serverning SSM terminali: ssm-user
 
 **Maqsad va amallar:**
 
-Web da faqat metadata ni tekshiring. Faqat ikkita practice setup faylini o‘chiring. app.env, practice.app.env, DB runtime, command-state, SSH kalit va baholash ma’lumoti qoladi. So‘ng ilovani to‘xtating, mavjud practice profilini aniq tanlab, ilovani ishga tushiring. Shu tartib M5 da mission ni tanlashda kerak bo‘ladi.
+Web da faqat metadata ni tekshiring. Faqat ikkita practice setup faylini o‘chiring. app.env, practice.app.env, DB runtime, command-state, SSH kalit va baholash ma’lumoti qoladi. So‘ng ilovani to‘xtating, mavjud practice profilini aniq tanlab, ilovani ishga tushiring. Shu tartib M4 da mission ni tanlashda kerak bo‘ladi.
 
 Buyruqlar: raqamlar shu qadam ichidagi tartib
 
@@ -1820,7 +1820,7 @@ To‘g‘ri admin amalini xato parol, setup va keraksiz yo‘l rad etilishi bila
 
 **Kutilgan natija va ma’nosi:**
 
-16 ta mashq bandi va saqlash holatini o‘qing. M6 mission profile da alohida tekshiriladi. Saqlangan baholar bo‘limida M asl bahosini ko‘rish mumkin.
+16 ta mashq bandi va saqlash holatini o‘qing. M5 mission profile da alohida tekshiriladi. Saqlangan baholar bo‘limida M asl bahosini ko‘rish mumkin.
 
 **Ishlamasa:**
 
