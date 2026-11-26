@@ -218,7 +218,7 @@ RDP передаёт экран и ввод бастиона. Запрос Firef
 
 ### Схема задания
 
-![IGW в AWS, Web-сервер, бастион, Repo-сервер и маршруты HTTP.](../../assets/ru/p1.png)
+![В публичной подсети VPC находятся Web-сервер и бастион, в приватной - сервер пакетов. Стрелки показывают маршруты HTTP.](../../assets/ru/p1.png)
 
 - File: /var/www/html/practice.txt
 - URL path: /practice.txt

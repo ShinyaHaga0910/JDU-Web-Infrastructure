@@ -218,7 +218,7 @@ Webサーバーの /var/www/html/practice.txt を HTTP 200 で配信する。
 
 ### 今回の見取り図
 
-![AWS内のIGW、Webサーバー、踏み台サーバー、配布サーバーとHTTPの経路。](../../assets/ja/p1.png)
+![VPCの公開サブネットにWebサーバーと踏み台サーバー、非公開サブネットに配布サーバーがあり、HTTPの経路を示す。](../../assets/ja/p1.png)
 
 - File: /var/www/html/practice.txt
 - URL path: /practice.txt
