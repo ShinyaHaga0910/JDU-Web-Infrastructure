@@ -62,7 +62,7 @@ def main():
     registry = json.loads((ROOT / 'assessment-registry.json').read_text())
     for name, raw in unpack((ROOT / 'catalog-app.tar.gz').read_bytes(), registry).items():
         retain(ROOT / 'app' / name, raw)
-    print('PUBLIC_APP_RESOURCES_VERIFIED; no application installed')
+    print('Complete: PUBLIC_APP_RESOURCES_VERIFIED')
     if not a.wheels:
         return
     if (ROOT / 'classroom-python-packages.json').is_file():
