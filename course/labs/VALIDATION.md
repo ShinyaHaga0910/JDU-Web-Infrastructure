@@ -20,6 +20,10 @@ P3の見取り図に非公開サブネットの配布サーバー（10.20.2.30�
 
 P3のDBサーバーとWebサーバーで実行するPostgreSQLインストールの2か所から、必須ではない `--no-install-recommends` を外しました。配布パッケージ収集の設定は推奨パッケージを含みます。3言語の原稿・HTML・Practice PDF・配布ZIPと生成元を同期しました。[今回の資料検査](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/blob/main/course/labs/validation-2026-11-27-p3-install.public.json)。稼働中のAWSでの追加インストール試験は実施していません。
 
+## P/M全資料のインストールコマンド簡略化（2026-11-27）
+
+P0〜P5・M0〜M5の全説明資料を確認し、残っていたP2・P4の推奨パッケージ抑制オプションを削除しました。日本語・ロシア語・ウズベク語の個別／統合Markdown、HTML、Practice PDF、配布ZIP、生成元を同期しました。全言語のP/M統合原稿に同オプションが再混入しないことを自動検査します。[今回の資料検査](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/blob/main/course/labs/validation-2026-11-27-simple-installs.public.json)。稼働中のAWSは変更していません。
+
 ## 練習番号と課題番号の対応
 
 DB接続をP3／M3、備品管理アプリの配置をP4／M4、公開範囲と最小権限をP5／M5と表示します。P4の練習用アプリをP5で整理し、M4で課題用DBに切り替える順序です。採点処理では既存の内部IDを使うため、保存済みの成績や署名済み配布物の番号は従来どおりです。

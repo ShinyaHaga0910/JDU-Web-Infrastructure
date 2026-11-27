@@ -30,7 +30,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <pre><code class="language-bash"># 1. Обновить список пакетов с внутреннего сервера.
 sudo apt-get update
 # 2. Установить bind9 bind9-utils и обязательные зависимости с сервера пакетов.
-sudo apt-get install --no-install-recommends bind9 bind9-utils
+sudo apt-get install bind9 bind9-utils
 # 3. Скопировать исходный файл в резервную копию, не затирая существующую.
 sudo cp -an /etc/bind/named.conf.options /etc/bind/named.conf.options.before-p2
 # 4. Скопировать исходный файл в резервную копию, не затирая существующую.

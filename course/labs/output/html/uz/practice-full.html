@@ -399,7 +399,7 @@ JDU WEB-02 practice: HTTP response verified.
 <pre><code class="language-bash"># 1. Ichki serverdagi paketlar ro‘yxatini yangilash.
 sudo apt-get update
 # 2. Paketlar serveridan bind9 bind9-utils va kerakli bog‘liqliklarni o‘rnatish.
-sudo apt-get install --no-install-recommends bind9 bind9-utils
+sudo apt-get install bind9 bind9-utils
 # 3. Asl fayldan nusxa olish; mavjud nusxani ustidan yozmaslik.
 sudo cp -an /etc/bind/named.conf.options /etc/bind/named.conf.options.before-p2
 # 4. Asl fayldan nusxa olish; mavjud nusxani ustidan yozmaslik.
@@ -742,7 +742,7 @@ getent ahostsv4 db.lab.test
 # 2. Odatiy resolver orqali admin.lab.test IPv4 sini olish.
 getent ahostsv4 admin.lab.test
 # 3. Paketlar serveridan python3-venv python3-pip va kerakli bog‘liqliklarni o‘rnatish.
-sudo apt-get install --no-install-recommends python3-venv python3-pip
+sudo apt-get install python3-venv python3-pip
 # 4. Imzo/hash ni tekshirib app va belgilangan wheel larni tayyorlash.
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py --wheels
 # 5. /var/lib/jdu-web/lesson-resources-r1/app dagi serverlarni sozlash fayllarini ro‘yxatlash.

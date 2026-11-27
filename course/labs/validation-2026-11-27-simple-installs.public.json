@@ -1,0 +1,79 @@
+{
+  "scope": "D12_P_M_materials_local_checks_not_AWS_walkthrough",
+  "checked_on": "2026-11-27",
+  "languages": [
+    "ja",
+    "ru",
+    "uz"
+  ],
+  "material_revision": "r1.5",
+  "practice_tasks": 6,
+  "practice_steps": 41,
+  "task_pages": 36,
+  "task_diagrams": 36,
+  "numbered_command_comments_per_language": 153,
+  "executable_source_preserved": false,
+  "explained_steps": 7,
+  "module_understanding_questions": 1,
+  "communication_routes": 7,
+  "worked_output_examples": 3,
+  "mission_tasks": 6,
+  "scored_checks": 123,
+  "raw_points": 123,
+  "checks_passed": 4619,
+  "bash_blocks_syntax_checked": 42,
+  "pdfs": [
+    {
+      "pdf": "web_lab_practice_ja.pdf",
+      "pages": 42,
+      "words_within_page": 3245
+    },
+    {
+      "pdf": "web_lab_practice_ru.pdf",
+      "pages": 42,
+      "words_within_page": 7476
+    },
+    {
+      "pdf": "web_lab_practice_uz.pdf",
+      "pages": 40,
+      "words_within_page": 7403
+    }
+  ],
+  "distribution_id": "web-course-class193548-20261103-r3",
+  "registry_sha256": "3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33",
+  "package_sha256": "76d7ea23962c613e7cc91d4eba6afd4c4bfdf18818b9d74944171f0a8e5222f8",
+  "new_material_AWS_walkthrough": false,
+  "native_language_review": false,
+  "teacher_visual_review": false,
+  "class_ready": false,
+  "pdf_pages_rendered": 124,
+  "pdf_words_within_pages": 18124,
+  "pdf_words_out_of_bounds": 0,
+  "all_student_documents_checked": 104,
+  "teaching_zip_student_docs_have_no_option": true,
+  "other_instruction_text_preserved": true,
+  "changed_markdown": [
+    "docs/ja/p2.md",
+    "docs/ja/p4.md",
+    "docs/ja/practice-full.md",
+    "docs/ru/p2.md",
+    "docs/ru/p4.md",
+    "docs/ru/practice-full.md",
+    "docs/uz/p2.md",
+    "docs/uz/p4.md",
+    "docs/uz/practice-full.md"
+  ],
+  "removed_occurrences": 12,
+  "changed_html": 9,
+  "changed_pdfs": 3,
+  "change_scope": "All P0-P5 and M0-M5 student explanations",
+  "removed_option": "--no-install-recommends",
+  "changed_tasks": [
+    "P2",
+    "P4"
+  ],
+  "source_commands_updated": true,
+  "grading_requirements_preserved": true,
+  "new_regression_checks": 6,
+  "existing_AWS_changed": false
+}

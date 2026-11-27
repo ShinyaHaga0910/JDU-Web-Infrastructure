@@ -399,7 +399,7 @@ JDU WEB-02 practice: HTTP response verified.
 <pre><code class="language-bash"># 1. 配布サーバーのパッケージ一覧を更新する。
 sudo apt-get update
 # 2. 配布サーバーから bind9 bind9-utils と、動作に必要なパッケージをインストールする。
-sudo apt-get install --no-install-recommends bind9 bind9-utils
+sudo apt-get install bind9 bind9-utils
 # 3. 元ファイルを控えへコピーする。既存の控えは上書きしない。
 sudo cp -an /etc/bind/named.conf.options /etc/bind/named.conf.options.before-p2
 # 4. 元ファイルを控えへコピーする。既存の控えは上書きしない。
@@ -742,7 +742,7 @@ getent ahostsv4 db.lab.test
 # 2. 通常のresolverで admin.lab.test のIPv4を調べる。
 getent ahostsv4 admin.lab.test
 # 3. 配布サーバーから python3-venv python3-pip と、動作に必要なパッケージをインストールする。
-sudo apt-get install --no-install-recommends python3-venv python3-pip
+sudo apt-get install python3-venv python3-pip
 # 4. 署名・hashを確認してアプリと固定wheelを教材領域へ展開する。
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py --wheels
 # 5. /var/lib/jdu-web/lesson-resources-r1/app に配置されたサーバー構築用ファイルを一覧する。

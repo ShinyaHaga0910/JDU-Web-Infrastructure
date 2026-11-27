@@ -71,6 +71,7 @@ def main():
     for lang in LANGS:
         for kind in ('practice','missions'):
             path=ROOT/'docs'/lang/(kind+'-full.md');value=path.read_text(encoding='utf-8');docs[lang,kind]=value
+            ok(f'{lang}_{kind}_simple_install_commands','--no-install-recommends' not in value)
             tokens=parser.parse(value)
             ok(f'{lang}_{kind}_browser_grading',not any(x in value for x in
                 ('jdu-web-check','jdu-web-my-progress','--functional','--no-submit','--retry','--prepare-stop','--observe-stopped')))
