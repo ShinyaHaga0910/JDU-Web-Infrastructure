@@ -128,6 +128,10 @@ def diagram_text(task,lang):
         return T('公開サブネットの踏み台・Webサーバーが、非公開サブネットのDNSサーバーへ問い合わせる。外部名はAWS提供のDNSへ転送する。',
                  'Бастион и Web-сервер в публичной подсети обращаются к DNS-серверу в приватной подсети. Внешние имена передаются DNS AWS.',
                  'Ochiq subnetdagi Bastion va Web serverlari yopiq subnetdagi DNS serveriga murojaat qiladi. Tashqi nomlar AWS DNS ga yuboriladi.')[lang],''
+    if task=='P4':
+        return T('非公開サブネットの配布サーバーからDBサーバーへPostgreSQLのパッケージを取得してインストールする。公開サブネットのWebサーバーは内部DNSでDBの名前を解決し、DBへ接続する。',
+                 'Сервер БД загружает пакеты PostgreSQL с Repo-сервера в приватной подсети и устанавливает их. Web-сервер в публичной подсети разрешает имя БД через внутренний DNS и подключается к БД.',
+                 'DB server yopiq subnetdagi Repo serveridan PostgreSQL paketlarini yuklab olib o‘rnatadi. Ochiq subnetdagi Web server ichki DNS orqali DB nomini aniqlaydi va DB ga ulanadi.')[lang],''
     return {
             1:T('学生PCと踏み台サーバーからWebサーバーのmission.txtへのHTTP経路。',
                 'Пути HTTP от компьютера и бастиона к mission.txt на Web.',
@@ -243,11 +247,25 @@ def subnet_frame(s):
 def database_diagram(s):
     lang=s.lang
     practice=s.task.startswith('P')
-    s.text(25,15,T('WebサーバーからDBサーバーへの接続',
+    title=T('DBサーバーの準備とWebサーバーからの接続',
+            'Подготовка БД и подключение Web-сервера',
+            'DB serverini tayyorlash va Web serverdan ulanish') if practice else T('WebサーバーからDBサーバーへの接続',
                   'Подключение Web-сервера к серверу БД',
-                  'Web serverdan DB serveriga ulanish')[lang],25)
+                  'Web serverdan DB serveriga ulanish')
+    s.text(25,15,title[lang],25)
     subnet_frame(s)
     s.node('web',714,215,True,w=239)
+    if practice:
+        s.node('dns',428,501,w=160)
+        s.node('db',600,501,True,w=160)
+        s.node('repo',785,501,True,w=160)
+        s.path([(834,301),(834,350),(680,350),(680,501)],'SQL / TCP 5432',(752,323))
+        s.path([(714,258),(508,258),(508,501)],'DNS / UDP + TCP 53',(535,320))
+        s.text(600,405,'practice-db.lab.test',14,center=True,max_width=150)
+        s.text(680,593,'jdu_catalog_practice',14,center=True,max_width=150)
+        s.text(834,398,T('PostgreSQLパッケージ','Пакеты PostgreSQL','PostgreSQL paketlari')[lang],16,center=True,max_width=235)
+        s.path([(865,501),(865,455),(745,455),(745,501)],'APT / HTTP / TCP 80',(834,431))
+        return
     s.node('dns',428,501,w=216)
     s.node('db',714,501,True,w=239)
     s.path([(834,301),(834,501)],'SQL / TCP 5432',(834,405))

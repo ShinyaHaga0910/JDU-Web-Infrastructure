@@ -179,9 +179,13 @@ def main():
                     expected=[('10.20.1.20',172,447)]
                     expected += [('10.20.2.10',468,628)] if task.endswith('4') else [('10.20.1.10',172,447)]
                     expected += [('10.20.2.10',468,600)] if task.endswith('2') else [('10.20.2.20',468,628)]
+                    if task=='P4':
+                        expected += [('10.20.2.30',468,628)]
+                        ok(f'{lang}_{task}_package_download_path',any('APT / HTTP / TCP 80'==t.text for t in tags)
+                           and any('PostgreSQL' in (t.text or '') for t in tags))
                     nodes=[r for r in svg.iter('{http://www.w3.org/2000/svg}rect')
                            if r.attrib.get('fill') in ('#e7f4f2','#f4f7fa')
-                           and float(r.attrib['width'])>=190 and float(r.attrib['height'])>=86]
+                           and float(r.attrib['width'])>=150 and float(r.attrib['height'])>=86]
                     def correct_subnet(ip,low,high):
                         points=[t for t in tags if t.text==ip]
                         if len(points)!=1:return False

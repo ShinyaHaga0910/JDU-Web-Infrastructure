@@ -814,7 +814,7 @@ DB serverda PostgreSQL ni sozlab, Web serverdan mashq DB siga parol bilan ulanin
 
 ### Topshiriq diagrammasi
 
-![Ochiq subnetdagi Web server yopiq subnetdagi DNS orqali DB server nomini aniqlaydi va yopiq subnetdagi DB ga ulanadi.](../../assets/uz/p3.png)
+![DB server yopiq subnetdagi Repo serveridan PostgreSQL paketlarini yuklab olib o‘rnatadi. Ochiq subnetdagi Web server ichki DNS orqali DB nomini aniqlaydi va DB ga ulanadi.](../../assets/uz/p3.png)
 
 ### Yechim namunasi (bajarish tartibi)
 
