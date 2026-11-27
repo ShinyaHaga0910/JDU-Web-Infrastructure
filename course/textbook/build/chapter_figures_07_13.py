@@ -47,7 +47,7 @@ def stack(ch,number,stem,title,entries,note):
 
 
 def chapter07():
-    s=Scene(1800,1150,'接続元のOSへ設定する問い合わせ先DNSのIPと、DNSサーバーが答えるWebサーバーのIPを区別する')
+    s=Scene(1800,1085,'接続元のOSへ設定する問い合わせ先DNSのIPと、DNSサーバーが答えるWebサーバーのIPを区別する')
     s.text(40,18,'図7-1  OSには問い合わせ先を設定し、DNSから接続先IPを得る',35)
     s.rect(40,130,1000,760,'#f7f9fc',BLUE)
     s.text(540,150,'EC2',26,center=True)
@@ -73,8 +73,7 @@ def chapter07():
     s.arrow([(1260,690),(980,690)],GREEN)
     s.text(1050,721,'接続先IPを回答',25,GREEN)
     s.text(55,945,'OSが尋ねる相手：10.20.2.10　　回答で得るWebサーバーのIP：10.20.1.20',28)
-    s.text(55,1010,'127.0.0.53は同じOS内の受付用アドレス。別のEC2のIPではない。',28)
-    s.text(55,1075,'必要な情報をDNSへ尋ねる場合の流れ。Webサーバー側のOSにも問い合わせ先を設定する。',28)
+    s.text(55,1010,'必要な情報をDNSへ尋ねる場合の流れ。Webサーバー側のOSにも問い合わせ先を設定する。',28)
     s.save('ch07-fig01-resolver')
     rows(7,2,'checks','確認する方法と、分かる範囲',[
         (['dig @10.20.2.10','DNSを直接指定'],['そのDNSが何と答えたか','SERVER・status・回答を読む']),

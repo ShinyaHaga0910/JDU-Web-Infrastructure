@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1150" viewBox="0 0 1800 1150" role="img">
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1085" viewBox="0 0 1800 1085" role="img">
 <title>接続元のOSへ設定する問い合わせ先DNSのIPと、DNSサーバーが答えるWebサーバーのIPを区別する</title>
 <rect width="100%" height="100%" fill="white"/>
 <text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図7-1  OSには問い合わせ先を設定し、DNSから接続先IPを得る</text>
@@ -26,6 +26,5 @@
 <polyline points="1260,690 980,690" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="980,690 994.4071536376429,683.0405514542203 994.4071536376429,696.9594485457797" fill="#16745b"/>
 <text x="1050" y="721" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">接続先IPを回答</text>
 <text x="55" y="945" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">OSが尋ねる相手：10.20.2.10　　回答で得るWebサーバーのIP：10.20.1.20</text>
-<text x="55" y="1010" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">127.0.0.53は同じOS内の受付用アドレス。別のEC2のIPではない。</text>
-<text x="55" y="1075" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">必要な情報をDNSへ尋ねる場合の流れ。Webサーバー側のOSにも問い合わせ先を設定する。</text>
+<text x="55" y="1010" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">必要な情報をDNSへ尋ねる場合の流れ。Webサーバー側のOSにも問い合わせ先を設定する。</text>
 </svg>

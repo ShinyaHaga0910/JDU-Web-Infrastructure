@@ -188,10 +188,10 @@
 - **7.3の後・7.4の前：設定する場所と確認する場所。** DNSサーバーには名前とIPの対応、踏み台・WebのOSには問い合わせ先DNSを設定する。ブラウザはOSの設定を使う準備済みの状態を維持する。digは設定変更ではなく問い合わせ確認のコマンドであることを先に説明し、続く7.4〜7.7の作業場所・目的を表で示す。
 - **7.4 DNSサーバー内で設定を検査し、反映する。** `named-checkconf`、`named-checkzone`、サービス、待受、DNS自身からの問い合わせを順に確認する。ゾーンの構文成功だけで設定完了とはしない。
 - **7.5 接続元からdigでDNSサーバーの回答を確認する。** digの読み方・目的と、@問い合わせ先・名前・種類の意味を説明する。踏み台・WebからDNSへUDP/TCPの両方で尋ね、問い合わせ先、status、権威応答、answer、TTLを読む。AXFRは通常の問い合わせと用途が異なると説明する。
-- **7.6 接続元のUbuntu OSに、普段使うDNSを設定する。** 問い合わせ先DNSのIPと、DNSから回答される接続先IPを区別し、hostsへの直接登録と混同させない。Netplan、systemd-resolved、ローカルstub、上流DNSの役割を必要な範囲で説明する。`resolvectl`で設定、`getent`で通常の経路を確認し、`127.0.0.53`を内部DNS本体のIPと混同しない。
+- **7.6 接続元のUbuntu OSに、普段使うDNSを設定する。** 問い合わせ先DNSのIPと、DNSから回答される接続先IPを区別し、hostsへの直接登録と混同させない。Netplanで問い合わせ先10.20.2.10を設定し、`resolvectl`で設定、`getent`で通常の経路を確認する。OS内部の受付用アドレスの説明は扱わない。
 - **7.7 名前指定のHTTPとDB名を確かめる。** 踏み台から名前で既存Webを開き、WebからDB名を解決する。`hosts`への直書きやブラウザ独自のDNSで、意図した経路を迂回していないかも確認する。
 
-**図と観測：** 問い合わせる側のOSと、別のEC2の内部DNSを分ける。OSへ設定する問い合わせ先DNSのIPと、DNSから回答されるWebのIPを図で区別する。ローカルstubの127.0.0.53は同じOS内の受付用アドレスとして説明する。`dig`出力を注釈し、正常回答、NXDOMAIN、REFUSED、timeoutの例を比較する。
+**図と観測：** 問い合わせる側のOSと、別のEC2の内部DNSを分ける。OSへ設定する問い合わせ先DNSのIPと、DNSから回答されるWebのIPを図で区別する。`dig`出力を注釈し、正常回答、NXDOMAIN、REFUSED、timeoutの例を比較する。
 
 **章末問題の例と解答の要点：** 「`dig @DNS-IP`成功だけで通常の名前解決も成功と言えるか」→通常使用する問い合わせ先は別に確認する。「AXFRのtimeoutだけで明示拒否を証明できるか」→到達不能などと区別できず、対照の正常問い合わせと拒否応答が必要である。
 
@@ -423,7 +423,7 @@ M2はP4の前に完了させる。現行推奨順のP0 → M0 → P1 → M1 → 
 | 4 | [RFC 9110 HTTP Semantics](https://www.rfc-editor.org/rfc/rfc9110.html) | 要求・応答、メソッド、状態、HTTP/HTTPSの位置付け |
 | 5、11〜12 | [Nginx Beginner’s Guide](https://nginx.org/en/docs/beginners_guide.html) | 静的配信、設定の適用、proxyへの転送 |
 | 6〜7 | [BIND 9 ゾーンと設定](https://bind9.readthedocs.io/en/v9.18.41/chapter3.html)、[設定リファレンス](https://bind9.readthedocs.io/en/v9.18.41/reference.html) | レコード、ゾーン、キャッシュ・転送、ACLの設定対象 |
-| 7 | [Ubuntuのネットワーク設定](https://ubuntu.com/server/docs/explanation/networking/configuring-networks/)、[systemd-resolved](https://www.freedesktop.org/software/systemd/man/latest/systemd-resolved.service.html) | Netplan、通常の名前解決、ローカルstubと上流DNSの区別。最新systemdの全機能をUbuntu 24.04へ持ち込まない |
+| 7 | [Ubuntuのネットワーク設定](https://ubuntu.com/server/docs/explanation/networking/configuring-networks/)、[systemd-resolved](https://www.freedesktop.org/software/systemd/man/latest/systemd-resolved.service.html) | Netplan、問い合わせ先DNSの設定、通常の名前解決。最新systemdの全機能をUbuntu 24.04へ持ち込まない |
 | 8 | [EC2の停止と開始](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Stop_Start.html) | EBS-backed instanceの停止と再開、公開IPの再確認 |
 | 8 | [PostgreSQL 16 Tutorial](https://www.postgresql.org/docs/16/tutorial.html) | リレーショナルDB、SQL、表の読み書きの学習順 |
 | 9 | [PostgreSQLのrole](https://www.postgresql.org/docs/16/database-roles.html)、[pg_hba.conf](https://www.postgresql.org/docs/16/auth-pg-hba-conf.html)、[パスワード認証](https://www.postgresql.org/docs/16/auth-password.html) | OSユーザーとの独立、最初に一致する認証規則、SCRAMの位置付け |
