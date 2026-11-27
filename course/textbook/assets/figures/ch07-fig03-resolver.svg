@@ -1,30 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1085" viewBox="0 0 1800 1085" role="img">
-<title>接続元のOSへ設定する問い合わせ先DNSのIPと、DNSサーバーが答えるWebサーバーのIPを区別する</title>
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1340" viewBox="0 0 1800 1340" role="img">
+<title>踏み台サーバーとWebサーバーのそれぞれのUbuntu OSで、Netplan設定ファイルに問い合わせ先DNSを書き、適用してOSのDNS設定へ反映する</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図7-3  OSには問い合わせ先を設定し、DNSから接続先IPを得る</text>
-<rect x="40" y="130" width="1000" height="760" rx="18" fill="#f7f9fc" stroke="#2165a7" stroke-width="2"/>
-<text x="540" y="150" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
-<text x="540" y="195" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="middle">踏み台サーバー（問い合わせる側）</text>
-<rect x="100" y="280" width="880" height="125" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
-<text x="540" y="318" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="31" dominant-baseline="text-before-edge" text-anchor="middle">ブラウザ・getentが名前解決を依頼する</text>
-<polyline points="540,405 540,510" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="540,510 533.0405514542203,495.5928463623572 546.9594485457797,495.5928463623572" fill="#2165a7"/>
-<rect x="100" y="510" width="880" height="250" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
-<text x="540" y="533" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="middle">OSの名前解決：systemd-resolved</text>
-<text x="540" y="612" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">問い合わせ先DNS：10.20.2.10</text>
-<text x="540" y="692" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">この問い合わせ先をNetplanで設定する</text>
-<rect x="1260" y="455" width="500" height="385" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
-<text x="1510" y="474" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
-<text x="1510" y="517" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">DNSサーバー</text>
-<text x="1510" y="579" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">10.20.2.10</text>
-<text x="1510" y="657" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">名前とIPの対応を管理する</text>
-<text x="1510" y="717" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">guide.lab.test</text>
-<text x="1510" y="775" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">→ 10.20.1.20</text>
-<text x="1060" y="370" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">DNS：UDP/TCP</text>
-<text x="1060" y="416" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">53番ポート</text>
-<polyline points="980,570 1260,570" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="1260,570 1245.5928463623572,576.9594485457797 1245.5928463623572,563.0405514542203" fill="#16745b"/>
-<text x="1045" y="515" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="start">名前を尋ねる</text>
-<polyline points="1260,690 980,690" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="980,690 994.4071536376429,683.0405514542203 994.4071536376429,696.9594485457797" fill="#16745b"/>
-<text x="1050" y="721" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="25" dominant-baseline="text-before-edge" text-anchor="start">接続先IPを回答</text>
-<text x="55" y="945" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">OSが尋ねる相手：10.20.2.10　　回答で得るWebサーバーのIP：10.20.1.20</text>
-<text x="55" y="1010" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">必要な情報をDNSへ尋ねる場合の流れ。Webサーバー側のOSにも問い合わせ先を設定する。</text>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図7-3  2台それぞれのOSに、問い合わせ先DNSを設定する</text>
+<rect x="35" y="110" width="1730" height="1160" rx="18" fill="#f8fafc" stroke="#7991aa" stroke-width="2"/>
+<text x="60" y="128" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">AWS</text>
+<rect x="65" y="185" width="1660" height="1045" rx="18" fill="#f3f8f5" stroke="#16745b" stroke-width="2"/>
+<text x="95" y="205" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">VPC（内部ネットワーク）</text>
+<rect x="110" y="275" width="750" height="905" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
+<text x="485" y="295" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
+<text x="485" y="341" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="middle">踏み台サーバー</text>
+<text x="485" y="402" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">10.20.1.10</text>
+<rect x="150" y="465" width="670" height="270" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
+<text x="485" y="484" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">① OSのネットワーク設定ファイル</text>
+<text x="485" y="540" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">/etc/netplan/ 内の既存のYAML</text>
+<text x="185" y="595" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">nameservers:</text>
+<text x="210" y="650" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">addresses: [10.20.2.10]</text>
+<polyline points="760,735 760,935" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="760,935 753.0405514542203,920.5928463623571 766.9594485457797,920.5928463623571" fill="#2165a7"/>
+<text x="180" y="765" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">② 保存した設定をOSへ適用する</text>
+<text x="180" y="823" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">sudo netplan generate</text>
+<text x="180" y="875" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">sudo netplan apply</text>
+<rect x="150" y="935" width="670" height="220" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
+<text x="485" y="955" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">③ 動作中のOSのDNS設定</text>
+<text x="485" y="1020" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">問い合わせ先：10.20.2.10</text>
+<text x="485" y="1085" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">resolvectl dns で確認する</text>
+<rect x="910" y="275" width="750" height="905" rx="18" fill="#edf5fc" stroke="#2165a7" stroke-width="2"/>
+<text x="1285" y="295" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
+<text x="1285" y="341" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="middle">Webサーバー</text>
+<text x="1285" y="402" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">10.20.1.20</text>
+<rect x="950" y="465" width="670" height="270" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
+<text x="1285" y="484" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">① OSのネットワーク設定ファイル</text>
+<text x="1285" y="540" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">/etc/netplan/ 内の既存のYAML</text>
+<text x="985" y="595" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">nameservers:</text>
+<text x="1010" y="650" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">addresses: [10.20.2.10]</text>
+<polyline points="1560,735 1560,935" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1560,935 1553.0405514542203,920.5928463623571 1566.9594485457797,920.5928463623571" fill="#2165a7"/>
+<text x="980" y="765" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">② 保存した設定をOSへ適用する</text>
+<text x="980" y="823" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">sudo netplan generate</text>
+<text x="980" y="875" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">sudo netplan apply</text>
+<rect x="950" y="935" width="670" height="220" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
+<text x="1285" y="955" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">③ 動作中のOSのDNS設定</text>
+<text x="1285" y="1020" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">問い合わせ先：10.20.2.10</text>
+<text x="1285" y="1085" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">resolvectl dns で確認する</text>
+<text x="55" y="1295" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="start">設定する10.20.2.10は、内部DNSサーバーのIPアドレスである。</text>
 </svg>

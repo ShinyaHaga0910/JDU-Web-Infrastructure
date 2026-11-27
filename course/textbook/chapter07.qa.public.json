@@ -3,9 +3,9 @@
   "chapter": 7,
   "pages": 17,
   "rendered_pages": 17,
-  "pdf_words_within_page": 927,
+  "pdf_words_within_page": 928,
   "figures": 4,
-  "diagram_text_boxes_checked": 94,
+  "diagram_text_boxes_checked": 105,
   "diagram_text_overlaps": 0,
   "local_references_checked": 12,
   "questions_and_answers": 3,
@@ -18,8 +18,9 @@
   "old_configuration_figure_removed": true,
   "other_chapter_drawing_functions_unchanged": true,
   "bind_binary_syntax_check": "not performed; named-checkconf unavailable locally",
-  "sha256": "8549880cfe4a975d59b60e8c5ca78035446b1c6edbb2c75fef5e8665778082fe",
+  "sha256": "f2a2d12e7e17fb9c0f8f0caf12cdc69cb158b625b888b505e90269ce7a5a2a2d",
   "teacher_visual_review": "not performed",
   "student_trial": "not performed",
-  "aws_operations": "none"
+  "aws_operations": "none",
+  "resolver_figure_shows_independent_local_os_settings": true
 }
