@@ -10,7 +10,7 @@ import re
 
 import progress_api as legacy
 from grade_reader import project_student
-from registry import COURSE_GRADED_TASKS
+from registry import COURSE_TASKS
 from identity_keys import subject_key
 
 CONTEXTS = {'course', 'verification'}
@@ -62,7 +62,7 @@ def valid(event):
     elif op == 'teacher_detail':
         fields |= {'lab_id'}
         if 'task_id' in event:
-            if not isinstance(event['task_id'], str) or event['task_id'] not in COURSE_GRADED_TASKS:
+            if not isinstance(event['task_id'], str) or event['task_id'] not in COURSE_TASKS:
                 return False
             fields.add('task_id')
     elif op != 'teacher_access':

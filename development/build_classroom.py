@@ -46,14 +46,14 @@ def build(output):
     grade_sources = ('registry.py', 'assessment-registry.json', 'grading.py', 'progress_api_v2.py')
     for filename, sources in (
         ('checker.zip', grade_sources + ('remote_guest.py', 'system_observer.py', 'transport.py', 'http_guest_v2.py', 'http_task_current.py')),
-        ('portal-services.zip', grade_sources),
+        ('portal-services.zip', grade_sources + ('grade_reader.py', 'teacher_progress.py')),
     ):
         with ZipFile(output / filename) as package:
             for source in sources:
                 if package.read(source) != (ASSESSMENT / source).read_bytes():
                     raise ValueError(f'{filename} does not contain the current {source}')
     with ZipFile(output / 'portal-web.zip') as package:
-        for source in ('checks.mjs', 'check-labels.json', 'router.mjs', 'teacher-progress.mjs'):
+        for source in ('checks.mjs', 'check-labels.json', 'check-points.json', 'router.mjs', 'teacher-progress.mjs'):
             if package.read(source) != (PORTAL / 'web' / source).read_bytes():
                 raise ValueError(f'portal-web.zip does not contain the current {source}')
 

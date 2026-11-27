@@ -74,6 +74,17 @@ class TeacherProgressTest(unittest.TestCase):
         self.assertEqual(serve(self.event(), self.pepper, self.bindings, self.grades), {'status': 'unauthorized'})
         self.assertEqual(self.grades.reads, [])
 
+    def test_every_active_task_has_an_authorized_teacher_detail_route(self):
+        for task in fixture.registry.COURSE_TASKS:
+            with self.subTest(task=task):
+                result = read_teacher(self.event('teacher_detail', lab_id='course-student', task_id=task),
+                                      self.pepper, self.bindings, self.grades)
+                self.assertEqual(result['student']['status'], 'ok')
+                self.assertIn('task_checks', result['student']['grade'])
+        for task in (*fixture.registry.RETIRED_TASKS, 'M99'):
+            self.assertEqual(serve(self.event('teacher_detail', lab_id='course-student', task_id=task),
+                                   self.pepper, self.bindings, self.grades), {'status': 'unauthorized'})
+
     def test_detail_and_cursors_cannot_read_an_unassigned_lab(self):
         for event in (self.event('teacher_detail', lab_id='not-assigned'), self.event(after='not-assigned')):
             self.assertEqual(serve(event, self.pepper, self.bindings, self.grades), {'status': 'unauthorized'})

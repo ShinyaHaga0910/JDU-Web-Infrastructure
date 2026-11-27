@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createApp } from './router.mjs';
 import { createTeacherClient } from './teacher-progress.mjs';
+import { tasks, CHECK_MAXIMA, displayTask } from './checks.mjs';
 
 const env={PORTAL_MODE:'enabled',PUBLIC_ORIGIN:'https://portal.example',GOOGLE_CLIENT_ID:'1234-example.apps.googleusercontent.com',GOOGLE_CLIENT_SECRET:'synthetic-test-only-no-real-key'};
 const claims={sub:'1234567890',email:'teacher@jdu.uz',email_verified:true,hd:'jdu.uz'};
@@ -100,6 +101,34 @@ test('selected teacher task reads only the authorized student detail',async()=>{
   assert.match(await result.text(),/<h2>M1<\/h2>/);
   assert.equal(calls[0].task_id,'M1');
   assert.equal(calls[0].lab_id,'course-student');
-  assert.equal((await instance(req('/teacher/student?lab_id=course-student&task_id=P1'))).status,403);
-  assert.equal(calls.length,1);
+  for(const task of tasks) {
+    const response=await instance(req(`/teacher/student?lab_id=course-student&task_id=${task}`));
+    assert.equal(response.status,200,task);
+    assert.match(await response.text(),new RegExp(`<h2>${displayTask(task)}</h2>`));
+    assert.equal(calls.at(-1).task_id,task);
+  }
+  const count=calls.length;
+  for(const task of ['P3','M3','M99'])assert.equal((await instance(req(`/teacher/student?lab_id=course-student&task_id=${task}`))).status,403);
+  assert.equal(calls.length,count);
+});
+
+test('the teacher service client forwards every active P/M detail and rejects retired tasks',async()=>{
+  const client=createTeacherClient({PORTAL_AWS_ACCOUNT_ID:'170126527713',GRADE_READER_FUNCTION_ARN:'arn:aws:lambda:us-east-1:170126527713:function:reader'},
+    {send:async()=>({StatusCode:200,Payload:Buffer.from(JSON.stringify({status:'ok',teacher:progress}))})});
+  for(const task_id of tasks)assert.equal((await client({subject:claims.sub,email:claims.email,operation:'teacher_detail',lab_id:'course-student',task_id})).status,'ok');
+  for(const task_id of ['P3','M3','M99'])await assert.rejects(()=>client({subject:claims.sub,email:claims.email,operation:'teacher_detail',lab_id:'course-student',task_id}));
+});
+
+test('teacher overview displays the saved P2 and M2 scores in every language',async()=>{
+  const dnsGrade={...grade,current:{...grade.current,P2:{raw_earned:12,raw_maximum:13}},
+    selected:{...grade.selected,M2:{raw_earned:11}},raw_earned:57};
+  const instance=app(async()=>({status:'ok',teacher:{...progress,students:[{...progress.students[0],grade:dnsGrade}]}}));
+  for(const lang of ['ja','ru','uz']) {
+    const response=await instance(req(`/teacher?lang=${lang}`));
+    const html=await response.text();
+    assert.equal(response.status,200);
+    assert.match(html,/task_id=P2[\s\S]*?>12 \/ 13<\/a>/);
+    assert.match(html,/task_id=M2[\s\S]*?>11 \/ 13<\/a>/);
+    assert.equal(CHECK_MAXIMA.P2,13);assert.equal(CHECK_MAXIMA.M2,13);
+  }
 });

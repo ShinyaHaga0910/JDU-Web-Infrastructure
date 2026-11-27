@@ -78,6 +78,36 @@ class GradeTest(unittest.TestCase):
                 student_grade(self.service, event)
         self.assertEqual(self.store.labs_calls, [])
 
+    def test_every_active_task_projects_its_score_and_only_its_criteria(self):
+        self.row['results'] = []
+        for task in registry.COURSE_TASKS:
+            with self.subTest(task=task):
+                identity = {'lab_id': 'test-lab', 'release_id': 'synthetic', 'deployment_id':
+                            '11111111-1111-4111-8111-111111111111',
+                            'instances': {r: 'i-' + format(i, '017x') for i, r in enumerate(legacy.ROLES, 1)}}
+                intro = task in registry.COURSE_INTRO_MARKERS
+                checks = registry.canonical_checks(task, intro=intro)
+                report = registry.build_report(task, identity, {c: True for c in checks},
+                    '22222222-2222-4222-8222-222222222222', mode='functional',
+                    checked_at='2026-11-27T00:00:00Z', intro=intro, http_revision=task in ('P1', 'M1'))
+                summary = registry.score(report)
+                self.row['deployment_id'] = identity['deployment_id']
+                row = {**summary, 'deployment_id': identity['deployment_id'],
+                       'contract_sha256': report['contract_sha256'], 'checks': report['checks']}
+                self.row['results'].append({**row, 'sk': grading.current_key(task, report['contract_sha256'])})
+                if summary['counts_toward_assessment']:
+                    self.row['results'].append({**row, 'sk': grading.grade_key(task, report['contract_sha256'])})
+                result = project_student(self.row, task)
+                maximum = registry.COURSE_POINTS.get(task, len(registry.TASKS[task]['progress_scored_checks']))
+                self.assertEqual((result['current'][task]['raw_earned'], result['current'][task]['raw_maximum']),
+                                 (maximum, maximum))
+                self.assertEqual(len(result['task_checks']), maximum)
+                self.assertTrue(all(c['status'] == 'PASS' for c in result['task_checks']))
+                self.assertEqual(task in result['selected'], summary['counts_toward_assessment'])
+        self.assertEqual((result['raw_earned'], result['raw_maximum']), (64, 64))
+        for retired in registry.RETIRED_TASKS:
+            self.assertEqual(project_student(self.row, retired)['task_checks'], [])
+
     def test_revoked_or_rebound_after_authentication_cannot_read(self):
         original_labs = self.store.labs
         def revoked(only_lab=None):

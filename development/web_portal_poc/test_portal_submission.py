@@ -13,6 +13,7 @@ from portal_submission import PortalSubmissions
 from portal_checker_handler import serve
 from registry import build_report, canonical_checks, COURSE_INTRO_MARKERS
 from grading import grade_key, current_key, project_lab, project_course_lab
+from grade_reader import project_student
 
 
 class SubmissionTest(unittest.TestCase):
@@ -183,6 +184,38 @@ class SubmissionTest(unittest.TestCase):
         self.assertEqual(self.call('submit')['submission'],answer['submission'])
         self.assertEqual(self.rows(),before)
         self.assertEqual(len(self.f.f.fixture.ssm.sends),1)
+
+    def test_dns_browser_checks_save_thirteen_criteria_and_reach_the_overview(self):
+        from assessment_command_jobs import sha
+        before = project_course_lab(self.grades.labs(self.meta['lab_id'])[0])['raw_earned']
+        for task in ('P2', 'M2'):
+            with self.subTest(task=task):
+                job = str(uuid.uuid4())
+                self.f.spec.update(task_id=task, job_id=job, run_id=job)
+                self.spec = copy.deepcopy(self.f.spec)
+                self.f.f.snapshot['spec_sha256'] = sha(self.spec)
+                report = self.f.f.generic()
+                next(c for c in report['checks'] if c['id'] == 'WEB03_CONFIG_VALID')['status'] = 'FAIL'
+                self.f.f.fixture.ssm.output = json.dumps({'report': report})
+                self.assertEqual(self.call('start')['job']['phase'], 'observing')
+                result = self.call('advance')
+                self.assertEqual(result['submission']['status'], 'saved')
+                self.assertEqual((result['result']['score']['raw_earned'], result['result']['score']['raw_maximum']), (12, 13))
+                self.assertEqual(len(result['result']['checks']), 13)
+                self.assertIn({'id': 'WEB03_CONFIG_VALID', 'status': 'FAIL'}, result['result']['checks'])
+                grade = project_student(self.grades.labs(self.meta['lab_id'])[0], task)
+                self.assertEqual((grade['current'][task]['raw_earned'], grade['current'][task]['raw_maximum']), (12, 13))
+                self.assertEqual(len(grade['task_checks']), 13)
+                if task == 'P2':
+                    self.assertNotIn('P2', grade['selected'])
+                    self.assertEqual(grade['raw_earned'], before)
+                else:
+                    self.assertEqual(grade['selected']['M2']['raw_earned'], 12)
+                    self.assertEqual(grade['raw_earned'], before - 1)
+                self.assertEqual(grade['raw_maximum'], 64)
+                rows = self.rows()
+                self.assertEqual(self.call('result')['submission'], result['submission'])
+                self.assertEqual(self.rows(), rows)
 
     def test_committed_but_lost_ack_is_found_by_get_without_a_second_grade_write(self):
         self.f.f.fixture.ssm.output = json.dumps(self.f.f.legacy_http()); self.call('start')

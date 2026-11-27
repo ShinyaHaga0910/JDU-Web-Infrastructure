@@ -197,7 +197,7 @@ export function checkHtml(lang,{config,session,token,selected,result,grade,maxim
   }
   if (!value || value.task_id!==selected.task_id || !Array.isArray(value.checks) || value.checks.length>40 || !Number.isInteger(s?.raw_earned) || !Number.isInteger(s?.raw_maximum) || s.raw_earned<0 || s.raw_earned>s.raw_maximum || !Number.isFinite(Date.parse(value.checked_at))) throw Error('Invalid result');
   if (!value.checks.every(validCriterion)) throw Error('Invalid check');
-  const showCriteria=s.counts_toward_assessment || selected.task_id==='P1';
+  const showCriteria=tasks.includes(selected.task_id) && s.raw_maximum>0;
   const outcome=!s.evaluable?'unknown':showCriteria && s.raw_earned<s.raw_maximum?'fix'
     :s.counts_toward_assessment?'pass':'practice';
   const copy=outcomes[lang];

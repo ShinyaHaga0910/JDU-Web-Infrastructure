@@ -234,7 +234,7 @@ export function createApp({env=process.env, verify=verifyGoogle, verifyTestStude
       const fields=detail?['lang','lab_id','task_id']:['lang','context','after'];
       if([...url.searchParams.keys()].some(k=>!fields.includes(k)) || [...url.searchParams.keys()].some(k=>url.searchParams.getAll(k).length!==1)
           || (!detail && (!['course','verification'].includes(context) || (after!=='' && !/^[a-z0-9][a-z0-9-]{2,31}$/.test(after))))
-          || (task!==null && !Object.hasOwn(MISSION_MAXIMA,task))
+          || (task!==null && !checkTasks.includes(task))
           || (detail && !/^[a-z0-9][a-z0-9-]{2,31}$/.test(url.searchParams.get('lab_id')||'')))return fail(tt.denied,403);
       try {
         const event={subject:identity.sub,email:identity.email,operation:detail?'teacher_detail':'teacher_list',...(detail?{lab_id:url.searchParams.get('lab_id'),...(task?{task_id:task}:{})}:{context,after})};
@@ -248,7 +248,7 @@ export function createApp({env=process.env, verify=verifyGoogle, verifyTestStude
           if(row.status!=='ok')return fail(tt.error,503);
           if(row.grade?.lab_id!==row.lab_id)throw Error('Wrong grade');
           const grade=checkedGrade(row.grade);
-          const summary=task ? taskDetailHtml(lang,task,grade,(grade.raw_maximum===59?LEGACY_MAXIMA:MISSION_MAXIMA)[task]) : gradeHtml(lang,grade);
+          const summary=task ? taskDetailHtml(lang,task,grade,(grade.raw_maximum===59?LEGACY_MAXIMA:MISSION_MAXIMA)[task]??CHECK_MAXIMA[task]) : gradeHtml(lang,grade);
           return response(page(lang,tt.title,`<p class="detail-back"><a href="/teacher?lang=${lang}&amp;context=${row.context}">${escape(tt.back)}</a></p><p>${escape(row.lab_id)}</p>`
             +summary,{teacher:true,params:{lab_id:row.lab_id,...(task?{task_id:task}:{})}}));
         }

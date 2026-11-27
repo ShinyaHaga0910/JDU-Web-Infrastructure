@@ -25,6 +25,29 @@ test('practice list and detail retain partial points without adding them to the 
   grade.current.P1.raw_earned='<script>';
   assert.doesNotMatch(checkHtml('ja',{grade,blocked:true}),/<script>/);
 });
+
+test('every active task shows its point count and criteria on completion and in the overview',()=>{
+  const registry=JSON.parse(readFileSync(new URL('../../01_roles/cyber_security/tools/web_lab_assessment/assessment-registry.json',import.meta.url),'utf8'));
+  for(const task of tasks) {
+    const maximum=CHECK_MAXIMA[task],counted=task==='P0' || task.startsWith('M');
+    const ids=task==='P0'?['WEB01_WEB_MARKER']:task==='M0'?['WEB01_DB_MARKER','WEB01_DNS_MARKER','WEB01_REPO_MARKER','WEB01_BASTION_MARKER']
+      :registry.tasks.find(t=>t.id===task).progress_scored_checks;
+    const checks=ids.map((id,i)=>({id,status:i===0?'FAIL':'PASS'}));
+    const score={raw_earned:maximum-1,raw_maximum:maximum,counts_toward_assessment:counted,evaluable:true};
+    const selected={...value,task_id:task},result={status:'ok',job:{...selected,phase:'report_ready'},
+      result:{task_id:task,checked_at:'2026-11-27T00:00:00Z',checks,score}};
+    const grade={current:{[task]:score},selected:counted?{[task]:score}:{}};
+    for(const lang of ['ja','ru','uz']) {
+      const html=checkHtml(lang,{selected,result,config:configFrom(env),session,token});
+      assert.ok(html.includes(`<strong>${maximum-1} / ${maximum}</strong>`),`${task}/${lang}`);
+      assert.equal((html.match(/data-check-id=/g)||[]).length,maximum,`${task}/${lang}`);
+      assert.match(html,/score-unmet/);
+      const list=checkHtml(lang,{grade,blocked:true});
+      assert.ok(list.includes(`${maximum-1} / ${maximum}`),`${task}/${lang}`);
+      assert.ok(taskDetailHtml(lang,task,{...grade,task_checks:checks}).includes(`<strong>${maximum-1} / ${maximum}</strong>`));
+    }
+  }
+});
 function body(v=value){return new URLSearchParams({...v,csrf:checkToken(configFrom(env),session,token,v)}).toString();}
 test('displayed P and M labels are consecutive and match the course',()=>{
   const policy=JSON.parse(readFileSync(new URL('../../../course/curriculum.json',import.meta.url),'utf8'));

@@ -1,5 +1,5 @@
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
-import { displayTask, CHECK_MAXIMA, taskScore } from './checks.mjs';
+import { displayTask, CHECK_MAXIMA, taskScore, tasks } from './checks.mjs';
 
 const escape=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const labId=v=>typeof v==='string' && /^[a-z0-9][a-z0-9-]{2,31}$/.test(v);
@@ -15,7 +15,7 @@ export function validTeacherEvent(v) {
   else if(v.operation==='teacher_detail'){
     fields.push('lab_id');
     if(Object.hasOwn(v,'task_id')){
-      if(!/^(?:P0|M[012456])$/.test(v.task_id||''))return false;
+      if(!tasks.includes(v.task_id))return false;
       fields.push('task_id');
     }
   }
