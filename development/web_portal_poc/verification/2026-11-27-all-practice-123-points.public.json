@@ -1,0 +1,51 @@
+{
+  "date": "2026-11-27",
+  "source_commit": "1f20364725514bba3b929d6e3fcc393d2e03f13a",
+  "policy": {
+    "all_active_practices_and_missions_count": true,
+    "practice_maximum": 60,
+    "mission_maximum": 63,
+    "course_maximum": 123,
+    "completed_intro_and_http_total": "1 + 4 + 8 + 8 = 21"
+  },
+  "correction": "Practice points were previously displayed separately and excluded from the course total. The current policy includes every active P and M.",
+  "previous_practice_results": "Reuse same-deployment, fully evaluated latest practice results under the current rubric without changing historical reports. Unknown or foreign-deployment results do not award points.",
+  "checks": {
+    "portal_python_tests": 109,
+    "linux_scoring_tests": 20,
+    "web_tests": 96,
+    "skipped": 0,
+    "all_completed_tasks_sum_to": "123/123",
+    "existing_p1_migration_without_regrading": "21/123",
+    "classroom_package_build": "passed"
+  },
+  "deployment": {
+    "teacher_portal_services": "UPDATE_COMPLETE",
+    "teacher_portal_checker": "UPDATE_COMPLETE",
+    "teacher_web": "UPDATE_COMPLETE",
+    "teacher_grading_api": "CloudFormation code-only update complete",
+    "student_checker": "code updated with RevisionId guard and SHA-256 verified",
+    "student_checker_code_sha256": "e9576342359ee28d41972b39616c78dfd0e2b76bc5b71a6622f8f4d0cf4038c3",
+    "student_exercise_answers_changed": false,
+    "stacks_recreated": false,
+    "credentials_changed": false
+  },
+  "live_browser": {
+    "course_score": "21/123",
+    "P0": "1/1",
+    "M0": "4/4",
+    "P1": "8/8",
+    "M1": "8/8",
+    "P2": "0/13",
+    "M2": "0/13"
+  },
+  "ci": {
+    "conclusion": "success",
+    "url": "https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/actions/runs/45944582580"
+  },
+  "limitations": [
+    "The later exercises were not solved on AWS; their scoring and totals are covered by synthetic regression tests.",
+    "Teacher visual approval and native language review are separate."
+  ],
+  "legacy_signed_registry_and_archives_changed": false
+}
