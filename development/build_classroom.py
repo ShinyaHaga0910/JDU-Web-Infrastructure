@@ -50,7 +50,8 @@ def build(output):
     ):
         with ZipFile(output / filename) as package:
             for source in sources:
-                if package.read(source) != (ASSESSMENT / source).read_bytes():
+                source_path = (PORTAL if source in ('grade_reader.py', 'teacher_progress.py') else ASSESSMENT) / source
+                if package.read(source) != source_path.read_bytes():
                     raise ValueError(f'{filename} does not contain the current {source}')
     with ZipFile(output / 'portal-web.zip') as package:
         for source in ('checks.mjs', 'check-labels.json', 'check-points.json', 'router.mjs', 'teacher-progress.mjs'):
