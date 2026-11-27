@@ -96,7 +96,13 @@ guide IN A 10.20.1.20</code></pre>
 <pre><code>sudo named-checkconf -z
 sudo named-checkzone lab.test /etc/bind/zones/db.lab.test</code></pre>
 <p><code>named-checkconf</code>はBINDの設定を検査し、<code>-z</code>ではprimaryゾーンの読み込みも検査する。<code>named-checkzone</code>は、指定したゾーン名とゾーンファイルを組み合わせて検査する。エラーがあれば、表示されたファイルや行を直してから再検査する。<a href="https://bind9.readthedocs.io/en/v9.18.39/manpages.html">BINDの検査コマンド</a></p>
-<p>検査後に設定をnamedサービスへ反映し、サービスの状態と、UDP・TCPそれぞれの53番ポートの待受を読む。ここまでの作業場所はDNSサーバーであり、踏み台サーバーやWebサーバーのOSのDNS設定はまだ変更しない。</p>
+<p>検査でエラーがないことを確認したら、<code>sudo systemctl restart named</code>でnamedサービスを再起動する。Ubuntu OSのsystemdがnamedのプロセスを停止して起動し直し、新しく起動したnamedが保存済みの設定ファイルとゾーンファイルを読み込む。ここでいう「設定を反映する」とは、この再起動によって、編集した内容を実際のDNSの動作に使わせることである。<a href="https://www.freedesktop.org/software/systemd/man/latest/systemctl.html#restart%20PATTERN%E2%80%A6">systemctlによるサービスの再起動</a></p>
+<p><strong>実行場所：DNSサーバーの管理用端末。設定の検査に成功した後に実行する。</strong></p>
+<pre><code>sudo systemctl restart named
+systemctl is-active named
+sudo ss -lntup</code></pre>
+<p><code>systemctl is-active named</code>で<code>active</code>と表示されることを確認する。続いて<code>ss</code>の出力を見て、namedがDNSサーバーの内部IP<code>10.20.2.10</code>と<code>127.0.0.1</code>の53番ポートで、UDP・TCPそれぞれの通信を受け付けていることを確認する。TCPの待受は<code>LISTEN</code>、UDPの受付は通常<code>UNCONN</code>と表示される。</p>
+<p>ここまでの作業場所はDNSサーバーであり、踏み台サーバーやWebサーバーのOSのDNS設定はまだ変更しない。</p>
 <p>次に、<strong>dig</strong>（ディグ）で問い合わせを送る。digは、DNSへ「この名前のAレコードを教えてほしい」と尋ね、返された情報を端末へ表示する。設定ファイルの検査が成功することと、動いているDNSから回答を得られることを、分けて確かめるために使う。<a href="https://bind9.readthedocs.io/en/v9.18.39/manpages.html#dig-dns-lookup-utility">digの使い方</a></p>
 <p><strong>実行場所：DNSサーバーの管理用端末。自分自身で動くBINDへ問い合わせる例。</strong></p>
 <pre><code>dig @127.0.0.1 guide.lab.test A</code></pre>

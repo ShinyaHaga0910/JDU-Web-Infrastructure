@@ -4,13 +4,13 @@
   "draft": "editable prose skeleton",
   "pages": 14,
   "a4": true,
-  "text_blocks_checked": 213,
+  "text_blocks_checked": 217,
   "missing_text": [],
   "figures": 2,
   "answer_starts_on_new_page": true,
   "teacher_visual_review": "not performed",
   "student_trial": "not performed",
   "aws_operations": "none",
-  "sha256": "8584a5362846606f27fc73143fc1aea5d1f92bab114e3417dd8a47a64519808a",
-  "code_blocks": 9
+  "sha256": "3c8e5d9f76cf8656f07f33fae14cb409e5b655245d2434f128458a193c3194ff",
+  "code_blocks": 10
 }
