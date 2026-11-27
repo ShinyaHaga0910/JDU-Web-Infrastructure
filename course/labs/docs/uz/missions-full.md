@@ -99,23 +99,25 @@ Har bir mezon 1 ball.
 
 Boshlashdan oldin baholash sahifasida [M1](m1.md) uchun to‘liq ball olinganini tekshiring.
 
-P2 da sozlangan ichki DNS ga jadvaldagi oltita nomni qo‘shing. Bastion serveridan `http://web.lab.test/mission.txt` ochilsin.
+P2 da sozlangan ichki DNS da jadvaldagi oltita nom ro‘yxatdan o‘tgan bo‘lsin. Bastion serveridan `http://web.lab.test/mission.txt` ochilsin.
 
 1. **DNS server (P2.2-P2.4).** Mavjud `lab.test` zonasiga A yozuvlarini qo‘shing. Zona seriya raqamini oshiring, sintaksisni tekshiring va sozlamani qayta yuklang. P2 nomlarini saqlash mumkin.
 2. **Bastion va Web serverlari (P2.5-P2.8).** Ichki DNS ga to‘g‘ridan to‘g‘ri so‘rovni va OS ning odatiy nom yechimini tekshiring. Bastionda `web.lab.test` orqali M1 matnini oching. Web serverda `db.lab.test` manzili `10.20.2.20` bo‘lishini tekshiring.
 
+Jadvaldagi IP lar nom orqali ulaniladigan serverlarning ichki IP manzillaridir. Barcha so‘rovlar uchun DNS manzili `10.20.2.10` bo‘lib qoladi: masalan, DB nomini `dig @10.20.2.10 db.lab.test A` bilan tekshiring. `admin.lab.test` va `web.lab.test` bir Web serverni ko‘rsatadi. P2 da yaratilgan `dns.lab.test` yozuvini takroran qo‘shmang; qiymati `10.20.2.10` ekanini tekshiring.
+
 ### Topshiriq diagrammasi
 
-![Ochiq subnetdagi Bastion va Web serverlari yopiq subnetdagi DNS serveriga murojaat qiladi. Tashqi nomlar AWS DNS ga yuboriladi.](../../assets/uz/m2.png)
+![So‘rov manbalari — ochiq subnetdagi Bastion 10.20.1.10 va Web server 10.20.1.20. Yopiq subnetdagi DNS server 10.20.2.10 UDP va TCP 53-portda tinglaydi; tashqi nomlar forwarders dagi AWS DNS 10.20.0.2 ga yuboriladi.](../../assets/uz/m2.png)
 
-| DNS name | A / IPv4 |
-| --- | --- |
-| admin.lab.test | 10.20.1.20 |
-| bastion.lab.test | 10.20.1.10 |
-| db.lab.test | 10.20.2.20 |
-| dns.lab.test | 10.20.2.10 |
-| repo.lab.test | 10.20.2.30 |
-| web.lab.test | 10.20.1.20 |
+| DNS name | Ulaniladigan server | A / IPv4 |
+| --- | --- | --- |
+| admin.lab.test | Web server | 10.20.1.20 |
+| bastion.lab.test | Bastion server | 10.20.1.10 |
+| db.lab.test | DB server | 10.20.2.20 |
+| dns.lab.test | DNS server | 10.20.2.10 |
+| repo.lab.test | Repo server | 10.20.2.30 |
+| web.lab.test | Web server | 10.20.1.20 |
 
 ### Baholash mezonlari
 

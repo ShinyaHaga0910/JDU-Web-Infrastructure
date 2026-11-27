@@ -389,7 +389,7 @@ JDU WEB-02 practice: HTTP response verified.
 <p><strong>Что сделать в Practice2</strong></p>
 <p>Запишите имена Web и DB во внутреннем DNS. Настройте бастион и Web на этот DNS и откройте файл P1 по имени.</p>
 <h3>Схема задания</h3>
-<p><img src="../../../assets/ru/p2.png" alt="Бастион и Web-сервер в публичной подсети обращаются к DNS-серверу в приватной подсети. Внешние имена передаются DNS AWS." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ru/p2.png" alt="Источники запросов — бастион 10.20.1.10 и Web-сервер 10.20.1.20 в публичной подсети. DNS-сервер 10.20.2.10 в приватной подсети слушает UDP и TCP 53; внешние имена передаются DNS AWS 10.20.0.2 из forwarders." width="1040" height="680" loading="lazy"></p>
 <h3>Пример решения (порядок действий)</h3>
 <h4>P2.1 Установить BIND с сервера пакетов</h4>
 <p><strong>Среда выполнения:</strong></p>
@@ -407,10 +407,37 @@ sudo cp -an /etc/bind/named.conf.local /etc/bind/named.conf.local.before-p2
 </code></pre>
 <p><strong>Ожидаемый результат и его смысл:</strong></p>
 <p>Установлены <code>bind9</code> и <code>bind9-utils</code>, появились две копии <code>.before-p2</code>.</p>
-<h4>P2.2 Указать, от кого DNS принимает запросы</h4>
+<h4>P2.2 Настроить адрес DNS и источники запросов</h4>
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминал DNS-сервера: ssm-user</p>
-<p>Разрешите запросы от DNS-сервера, бастиона и Web-сервера. Имена вне учебной зоны передаются DNS AWS (<code>10.20.0.2</code>).</p>
+<p>Измените настройки самого DNS-сервера. IP источника запроса, адрес DNS-сервера для приёма запросов и адрес DNS для внешних имён выполняют разные роли.</p>
+<table>
+<thead>
+<tr>
+<th scope="col">Параметр</th>
+<th scope="col">Что означает IP</th>
+<th scope="col">Значения в этой работе</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>jdu_clients</code></td>
+<td>Разрешённые источники запросов</td>
+<td>Проверка с самого DNS: <code>127.0.0.1</code>; бастион: <code>10.20.1.10</code>; Web-сервер: <code>10.20.1.20</code></td>
+</tr>
+<tr>
+<td><code>listen-on</code></td>
+<td>Собственные адреса DNS-сервера для приёма запросов</td>
+<td><code>127.0.0.1</code> и внутренний IP DNS-сервера <code>10.20.2.10</code></td>
+</tr>
+<tr>
+<td><code>forwarders</code></td>
+<td>DNS для передачи запросов о внешних именах</td>
+<td>DNS AWS <code>10.20.0.2</code></td>
+</tr>
+</tbody>
+</table>
+<p>В <code>jdu_clients</code> указывают источники запросов, а в <code>listen-on</code> — адреса самого DNS-сервера. Чтобы принимать запросы бастиона и Web-сервера, укажите в <code>listen-on</code> адрес <code>10.20.2.10</code>.</p>
 <p>Замените содержимое файлом настроек ниже. В nano для поиска используйте Ctrl+W, для сохранения Ctrl+O и Enter, для выхода Ctrl+X.</p>
 <pre><code class="language-bash">sudo nano /etc/bind/named.conf.options
 </code></pre>
@@ -491,6 +518,7 @@ dig @127.0.0.1 guide.lab.test A +tcp
 <p><strong>Среда выполнения:</strong></p>
 <p>SSM-терминалы бастиона и Web-сервера</p>
 <p>Выполните команды на обоих серверах. <code>@10.20.2.10</code> в <code>dig</code> задаёт DNS только для данного запроса. <code>AXFR</code> запрашивает передачу записей зоны целиком. Проверьте, что передача запрещена.</p>
+<p><code>@10.20.2.10</code> — адрес DNS-сервера, которому отправляют запрос. IP Web-сервера <code>10.20.1.20</code> и БД <code>10.20.2.20</code> возвращаются в ответах и выполняют другую роль. Строка <code>SERVER</code> показывает адрес DNS, а A-запись в <code>ANSWER SECTION</code> — IP запрошенного имени.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Запросить guide.lab.test по UDP 53 и прочитать ответ.
 dig @10.20.2.10 guide.lab.test A

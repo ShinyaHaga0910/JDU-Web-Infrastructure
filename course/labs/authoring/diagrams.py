@@ -125,9 +125,9 @@ def diagram_text(task,lang):
                  'В публичной подсети VPC находятся Web-сервер и бастион, в приватной — сервер пакетов. Стрелки показывают маршруты HTTP.',
                  'VPC ochiq subnetida Web va Bastion serverlari, yopiq subnetida paketlar serveri joylashgan. Strelkalar HTTP yo‘llarini ko‘rsatadi.')[lang],''
     if n==2:
-        return T('公開サブネットの踏み台・Webサーバーが、非公開サブネットのDNSサーバーへ問い合わせる。外部名はAWS提供のDNSへ転送する。',
-                 'Бастион и Web-сервер в публичной подсети обращаются к DNS-серверу в приватной подсети. Внешние имена передаются DNS AWS.',
-                 'Ochiq subnetdagi Bastion va Web serverlari yopiq subnetdagi DNS serveriga murojaat qiladi. Tashqi nomlar AWS DNS ga yuboriladi.')[lang],''
+        return T('問い合わせ元は公開サブネットの踏み台10.20.1.10とWebサーバー10.20.1.20。非公開サブネットのDNSサーバー10.20.2.10がUDP・TCPの53番ポートで待ち受け、外部名はforwardersに指定したAWSのDNS 10.20.0.2へ問い合わせる。',
+                 'Источники запросов — бастион 10.20.1.10 и Web-сервер 10.20.1.20 в публичной подсети. DNS-сервер 10.20.2.10 в приватной подсети слушает UDP и TCP 53; внешние имена передаются DNS AWS 10.20.0.2 из forwarders.',
+                 'So‘rov manbalari — ochiq subnetdagi Bastion 10.20.1.10 va Web server 10.20.1.20. Yopiq subnetdagi DNS server 10.20.2.10 UDP va TCP 53-portda tinglaydi; tashqi nomlar forwarders dagi AWS DNS 10.20.0.2 ga yuboriladi.')[lang],''
     if task=='P4':
         return T('非公開サブネットの配布サーバーからDBサーバーへPostgreSQLのパッケージを取得してインストールする。公開サブネットのWebサーバーは内部DNSでDBの名前を解決し、DBへ接続する。',
                  'Сервер БД загружает пакеты PostgreSQL с Repo-сервера в приватной подсети и устанавливает их. Web-сервер в публичной подсети разрешает имя БД через внутренний DNS и подключается к БД.',
@@ -213,23 +213,19 @@ def dns_diagram(s):
     s.text(25,15,T('内部DNSの設定で使うサーバーと通信経路',
                   'Серверы и маршруты внутреннего DNS',
                   'Ichki DNS serverlari va aloqa yo‘llari')[lang],25)
-    s.rect(224,65,790,575,fill='#f1f7fc',stroke='#7e9cb3',width=2)
-    s.text(247,77,'AWS',20)
-    s.rect(386,120,603,496,stroke='#7e9cb3',width=2)
-    s.text(417,135,'VPC  10.20.0.0/16',19)
-    s.rect(410,172,553,275,fill='#edf5fc',stroke='#86a6bf',width=2)
-    s.text(428,183,T('公開サブネット','Публичная подсеть','Ochiq subnet')[lang]+'  10.20.1.0/24',19)
-    s.rect(410,468,553,132,fill='#fcf6ec',stroke='#b1956c',width=2)
-    s.text(428,480,T('非公開サブネット','Приватная подсеть','Yopiq subnet')[lang]+'  10.20.2.0/24',19)
+    subnet_frame(s)
     s.node('web',714,215,w=239)
     s.node('bastion',428,347,w=216)
-    s.node('dns',714,501,True,w=239)
-    s.rect(730,125,224,42,fill='white',stroke='#7e9cb3')
-    s.text(842,134,'AWS DNS  10.20.0.2',16,center=True,max_width=212)
+    s.node('dns',714,501,True,w=239,h=112)
+    s.text(834,590,'listen-on / UDP + TCP 53',14,center=True,max_width=225)
+    s.rect(714,105,239,62,fill='white',stroke='#7e9cb3')
+    s.text(834,111,'AWS DNS',16,center=True,max_width=225)
+    s.text(834,138,'forwarders  10.20.0.2',14,center=True,max_width=225)
     s.path([(536,347),(536,258),(714,258)],'HTTP / TCP 80',(616,225))
+    s.text(616,280,'guide.lab.test' if s.task.startswith('P') else 'web.lab.test',15,center=True,max_width=190)
     s.path([(644,390),(680,390),(680,544),(714,544)],'DNS 53',(675,355))
     s.path([(834,301),(834,501)],'DNS / UDP + TCP 53',(834,405))
-    s.path([(953,544),(978,544),(978,146),(954,146)],'DNS 53',(977,335))
+    s.path([(953,544),(978,544),(978,136),(953,136)],'DNS 53',(977,335))
 
 
 def subnet_frame(s):

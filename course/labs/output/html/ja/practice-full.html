@@ -389,7 +389,7 @@ JDU WEB-02 practice: HTTP response verified.
 <p><strong>このPractice2で作業すること</strong></p>
 <p>内部DNSにWeb・DBサーバーの名前を登録する。踏み台サーバーとWebサーバーがこのDNSを使うように設定し、P1のファイルを名前で開く。</p>
 <h3>今回の見取り図</h3>
-<p><img src="../../../assets/ja/p2.png" alt="公開サブネットの踏み台・Webサーバーが、非公開サブネットのDNSサーバーへ問い合わせる。外部名はAWS提供のDNSへ転送する。" width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ja/p2.png" alt="問い合わせ元は公開サブネットの踏み台10.20.1.10とWebサーバー10.20.1.20。非公開サブネットのDNSサーバー10.20.2.10がUDP・TCPの53番ポートで待ち受け、外部名はforwardersに指定したAWSのDNS 10.20.0.2へ問い合わせる。" width="1040" height="680" loading="lazy"></p>
 <h3>解答例（操作手順）</h3>
 <h4>P2.1 配布サーバーからBINDをインストールする</h4>
 <p><strong>実行環境:</strong></p>
@@ -407,10 +407,37 @@ sudo cp -an /etc/bind/named.conf.local /etc/bind/named.conf.local.before-p2
 </code></pre>
 <p><strong>期待する結果と読み方:</strong></p>
 <p><code>bind9</code> と <code>bind9-utils</code> がインストールされ、2つの <code>.before-p2</code> ファイルができる。</p>
-<h4>P2.2 問い合わせを受け付けるサーバーを設定する</h4>
+<h4>P2.2 DNSサーバーの待受と問い合わせ元を設定する</h4>
 <p><strong>実行環境:</strong></p>
 <p>DNSサーバーのSSM端末：ssm-user</p>
-<p>問い合わせを受け付けるのは、DNSサーバー自身、踏み台サーバー、Webサーバーの3台。演習の外の名前はAWSのDNS（<code>10.20.0.2</code>）に問い合わせる。</p>
+<p>DNSサーバー自身の設定を変更する。問い合わせを送る側、問い合わせを受けるDNSサーバー、外部名の転送先では、指定するIPアドレスの役割が異なる。</p>
+<table>
+<thead>
+<tr>
+<th scope="col">設定項目</th>
+<th scope="col">IPアドレスが表すもの</th>
+<th scope="col">今回指定する値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>jdu_clients</code></td>
+<td>問い合わせを許可する送信元</td>
+<td>DNS自身からの確認は <code>127.0.0.1</code>、踏み台は <code>10.20.1.10</code>、Webサーバーは <code>10.20.1.20</code></td>
+</tr>
+<tr>
+<td><code>listen-on</code></td>
+<td>DNSサーバー自身が問い合わせを待ち受けるアドレス</td>
+<td><code>127.0.0.1</code> と、DNSサーバーの内部IP <code>10.20.2.10</code></td>
+</tr>
+<tr>
+<td><code>forwarders</code></td>
+<td>外部名の問い合わせを転送するDNS</td>
+<td>AWS提供のDNS <code>10.20.0.2</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>jdu_clients</code> に書くのは問い合わせ元、<code>listen-on</code> に書くのはDNSサーバー自身のアドレスである。踏み台・Webサーバーからの問い合わせを受けるため、<code>listen-on</code> に <code>10.20.2.10</code> を指定する。</p>
 <p>ファイルの内容を下の設定に置き換えて保存する。検索するときはnanoの Ctrl+W、保存するときは Ctrl+O、Enter、終了は Ctrl+X を使う。</p>
 <pre><code class="language-bash">sudo nano /etc/bind/named.conf.options
 </code></pre>
@@ -491,6 +518,7 @@ dig @127.0.0.1 guide.lab.test A +tcp
 <p><strong>実行環境:</strong></p>
 <p>踏み台サーバーとWebサーバーのSSM端末</p>
 <p>両方のサーバーで実行する。<code>dig</code> の <code>@10.20.2.10</code> は、その1回の問い合わせ先を指定する。<code>AXFR</code> はゾーンのレコードをまとめて転送するための指定で、この演習では拒否されることを確かめる。</p>
+<p><code>@10.20.2.10</code> は問い合わせを受けるDNSサーバーのアドレスである。回答されるWebサーバーのIP <code>10.20.1.20</code>、DBサーバーのIP <code>10.20.2.20</code> とは役割が異なる。<code>dig</code> の <code>SERVER</code> 行で問い合わせ先、<code>ANSWER SECTION</code> のAレコードで名前に対応するIPを確認する。</p>
 <p>入力するコマンド（番号はこの手順内の順番）</p>
 <pre><code class="language-bash"># 1. UDP 53で guide.lab.test を問い合わせ、応答を読む。
 dig @10.20.2.10 guide.lab.test A

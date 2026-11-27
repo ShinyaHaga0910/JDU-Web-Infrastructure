@@ -168,6 +168,22 @@ def main():
                    and images[0].attrGet('src')==diagram_link and bool(images[0].content.strip()))
                 if task=='P0':
                     ok(f'{lang}_P0_resources_already_staged','stage_resources.py' not in md and 'YOUR-INSTALLATION-DIRECTORY' not in md)
+                if task=='P2':
+                    options=re.search(r'```text\n(acl .*?)\n```',md,re.S).group(1)
+                    addresses=lambda pattern:set(re.search(pattern,options).group(1).replace(';',' ').split())
+                    ok(f'{lang}_P2_query_sources',addresses(r'acl "jdu_clients"\s*\{([^}]+)\}')=={'127.0.0.1','10.20.1.10','10.20.1.20'})
+                    ok(f'{lang}_P2_dns_listener',addresses(r'listen-on\s*\{([^}]+)\}')=={'127.0.0.1','10.20.2.10'})
+                    ok(f'{lang}_P2_forwarder',addresses(r'forwarders\s*\{([^}]+)\}')=={'10.20.0.2'})
+                    records=dict(re.findall(r'^(\S+) IN A (10\.20\.\d+\.\d+)$',md,re.M))
+                    expected=next(t for t in reg['tasks'] if t['id']=='P2')['expected']['records']
+                    ok(f'{lang}_P2_records_match_grader',records=={'dns':'10.20.2.10',**{k.removesuffix('.lab.test'):v for k,v in expected.items()}})
+                    ok(f'{lang}_P2_query_destinations',set(re.findall(r'dig @(\d+\.\d+\.\d+\.\d+)',md))=={'127.0.0.1','10.20.2.10'})
+                    ok(f'{lang}_P2_os_resolver',bool(re.search(r'nameservers:\s*\n\s*addresses: \[10\.20\.2\.10\]',md)))
+                if task=='M2':
+                    records=dict(re.findall(r'^\| ([\w-]+\.lab\.test) \| [^|]+ \| (10\.20\.\d+\.\d+) \|$',md,re.M))
+                    expected=next(t for t in reg['tasks'] if t['id']=='M2')['expected']['records']
+                    ok(f'{lang}_M2_records_match_grader',records==expected)
+                    ok(f'{lang}_M2_query_destination',set(re.findall(r'dig @(\d+\.\d+\.\d+\.\d+)',md))=={'10.20.2.10'})
                 image_path=ROOT/'assets'/lang/(diagram_stem(task)+'.png')
                 with Image.open(image_path) as img:ok(f'{lang}_{task}_diagram_size',img.size==(2080,1360))
                 svg=ET.parse(image_path.with_suffix('.svg')).getroot()
@@ -175,11 +191,16 @@ def main():
                 ok(f'{lang}_{task}_editable_svg',svg.attrib['viewBox']=='0 0 1040 680' and text_count>=10)
                 if task in ('P2','M2','P4','M4','P5','M5','P6','M6'):
                     tags=list(svg.iter('{http://www.w3.org/2000/svg}text'))
+                    if task in ('P2','M2'):
+                        ok(f'{lang}_{task}_dns_listener_and_forwarder_in_diagram',
+                           any(t.text=='listen-on / UDP + TCP 53' for t in tags)
+                           and any(t.text=='forwarders  10.20.0.2' for t in tags)
+                           and any(t.text==('guide.lab.test' if task=='P2' else 'web.lab.test') for t in tags))
                     ok(f'{lang}_{task}_subnet_labels',all(any(label in (t.text or '') for t in tags)
                        for label in ('10.20.1.0/24','10.20.2.0/24')))
                     expected=[('10.20.1.20',172,447)]
                     expected += [('10.20.2.10',468,628)] if task.endswith('4') else [('10.20.1.10',172,447)]
-                    expected += [('10.20.2.10',468,600)] if task.endswith('2') else [('10.20.2.20',468,628)]
+                    expected += [('10.20.2.10',468,628)] if task.endswith('2') else [('10.20.2.20',468,628)]
                     if task=='P4':
                         expected += [('10.20.2.30',468,628)]
                         ok(f'{lang}_{task}_package_download_path',any('APT / HTTP / TCP 80'==t.text for t in tags)

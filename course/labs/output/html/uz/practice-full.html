@@ -389,7 +389,7 @@ JDU WEB-02 practice: HTTP response verified.
 <p><strong>Practice2 da bajariladigan ishlar</strong></p>
 <p>Ichki DNS ga Web va DB nomlarini yozing. Bastion va Web ni shu DNS ga sozlab, P1 faylini nom bilan oching.</p>
 <h3>Topshiriq diagrammasi</h3>
-<p><img src="../../../assets/uz/p2.png" alt="Ochiq subnetdagi Bastion va Web serverlari yopiq subnetdagi DNS serveriga murojaat qiladi. Tashqi nomlar AWS DNS ga yuboriladi." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/uz/p2.png" alt="So‘rov manbalari — ochiq subnetdagi Bastion 10.20.1.10 va Web server 10.20.1.20. Yopiq subnetdagi DNS server 10.20.2.10 UDP va TCP 53-portda tinglaydi; tashqi nomlar forwarders dagi AWS DNS 10.20.0.2 ga yuboriladi." width="1040" height="680" loading="lazy"></p>
 <h3>Yechim namunasi (bajarish tartibi)</h3>
 <h4>P2.1 Paketlar serveridan BIND o‘rnatish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
@@ -407,10 +407,37 @@ sudo cp -an /etc/bind/named.conf.local /etc/bind/named.conf.local.before-p2
 </code></pre>
 <p><strong>Kutilgan natija va ma’nosi:</strong></p>
 <p><code>bind9</code> va <code>bind9-utils</code> o‘rnatiladi va ikkita <code>.before-p2</code> nusxasi yaratiladi.</p>
-<h4>P2.2 DNS so‘rovini yubora oladigan serverlarni belgilash</h4>
+<h4>P2.2 DNS tinglash manzili va so‘rov manbalarini sozlash</h4>
 <p><strong>Bajarish muhiti:</strong></p>
 <p>DNS serverning SSM terminali: ssm-user</p>
-<p>DNS serverning o‘zi, Bastion va Web serverlariga ruxsat bering. Mashq zonasidan tashqaridagi nomlar AWS DNS ga (<code>10.20.0.2</code>) yuboriladi.</p>
+<p>DNS serverning o‘z sozlamalarini o‘zgartiring. So‘rov yuboruvchining IP manzili, DNS server so‘rov qabul qiladigan manzil va tashqi nomlar uchun DNS manzili turli vazifalarni bajaradi.</p>
+<table>
+<thead>
+<tr>
+<th scope="col">Sozlama</th>
+<th scope="col">IP manzil nimani bildiradi</th>
+<th scope="col">Bu ishdagi qiymatlar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>jdu_clients</code></td>
+<td>So‘rov yuborishga ruxsat berilgan manbalar</td>
+<td>DNS serverning o‘zidan tekshirish: <code>127.0.0.1</code>; Bastion: <code>10.20.1.10</code>; Web server: <code>10.20.1.20</code></td>
+</tr>
+<tr>
+<td><code>listen-on</code></td>
+<td>DNS serverning so‘rov qabul qiladigan o‘z manzillari</td>
+<td><code>127.0.0.1</code> va DNS serverning ichki IP manzili <code>10.20.2.10</code></td>
+</tr>
+<tr>
+<td><code>forwarders</code></td>
+<td>Tashqi nomlar haqidagi so‘rov yuboriladigan DNS</td>
+<td>AWS DNS <code>10.20.0.2</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>jdu_clients</code> da so‘rov manbalari, <code>listen-on</code> da esa DNS serverning o‘z manzillari ko‘rsatiladi. Bastion va Web server so‘rovlarini qabul qilish uchun <code>listen-on</code> ga <code>10.20.2.10</code> ni yozing.</p>
 <p>Fayl tarkibini quyidagi sozlama bilan almashtiring. nano da Ctrl+W qidiradi, Ctrl+O va Enter saqlaydi, Ctrl+X chiqadi.</p>
 <pre><code class="language-bash">sudo nano /etc/bind/named.conf.options
 </code></pre>
@@ -491,6 +518,7 @@ dig @127.0.0.1 guide.lab.test A +tcp
 <p><strong>Bajarish muhiti:</strong></p>
 <p>Bastion va Web serverlarining SSM terminallari</p>
 <p>Buyruqlarni ikkala serverda bajaring. <code>dig</code> dagi <code>@10.20.2.10</code> faqat shu so‘rov uchun DNS serverni tanlaydi. <code>AXFR</code> zona yozuvlarini to‘liq ko‘chirishni so‘raydi. Unga ruxsat berilmaganini tekshiring.</p>
+<p><code>@10.20.2.10</code> — so‘rov yuboriladigan DNS server manzili. Javobdagi Web server IP manzili <code>10.20.1.20</code> va DB server IP manzili <code>10.20.2.20</code> boshqa vazifani bajaradi. <code>SERVER</code> qatorida DNS manzilini, <code>ANSWER SECTION</code> dagi A record da esa so‘ralgan nomning IP manzilini tekshiring.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. UDP 53 orqali guide.lab.test ni so‘rab javobini o‘qish.
 dig @10.20.2.10 guide.lab.test A

@@ -99,23 +99,25 @@ JDU WEB-02 mission: independent HTTP delivery.
 
 始める前に、採点ページで [M1](m1.md) が満点になっていることを確認する。
 
-P2で構築した内部DNSに、下の6件の名前を追加する。踏み台サーバーから `http://web.lab.test/mission.txt` が開けるようにする。
+P2で構築した内部DNSに、下の6件の名前が登録されている状態にする。踏み台サーバーから `http://web.lab.test/mission.txt` が開けるようにする。
 
 1. **DNSサーバー（P2.2〜P2.4）**　既存の `lab.test` ゾーンにAレコードを追加する。ゾーンファイルのシリアル番号を更新し、構文検査を通してから設定を読み込む。P2の名前は残してよい。
 2. **踏み台サーバーとWebサーバー（P2.5〜P2.8）**　内部DNSへ直接問い合わせた結果と、OSが普段使う名前解決の結果を確認する。踏み台では `web.lab.test` でM1の本文を開き、Webサーバーでは `db.lab.test` が `10.20.2.20` になることを確認する。
 
+表のIPは、各名前を使って接続するサーバーの内部IPである。DNSへの問い合わせ先はすべて `10.20.2.10` のままなので、例えばDBの名前を調べる場合も `dig @10.20.2.10 db.lab.test A` とする。`admin.lab.test` と `web.lab.test` は同じWebサーバーを指す。P2で登録済みの `dns.lab.test` は重複して追加せず、値が `10.20.2.10` であることを確認する。
+
 ### 今回の見取り図
 
-![公開サブネットの踏み台・Webサーバーが、非公開サブネットのDNSサーバーへ問い合わせる。外部名はAWS提供のDNSへ転送する。](../../assets/ja/m2.png)
+![問い合わせ元は公開サブネットの踏み台10.20.1.10とWebサーバー10.20.1.20。非公開サブネットのDNSサーバー10.20.2.10がUDP・TCPの53番ポートで待ち受け、外部名はforwardersに指定したAWSのDNS 10.20.0.2へ問い合わせる。](../../assets/ja/m2.png)
 
-| DNS name | A / IPv4 |
-| --- | --- |
-| admin.lab.test | 10.20.1.20 |
-| bastion.lab.test | 10.20.1.10 |
-| db.lab.test | 10.20.2.20 |
-| dns.lab.test | 10.20.2.10 |
-| repo.lab.test | 10.20.2.30 |
-| web.lab.test | 10.20.1.20 |
+| DNS name | 接続先のサーバー | A / IPv4 |
+| --- | --- | --- |
+| admin.lab.test | Webサーバ | 10.20.1.20 |
+| bastion.lab.test | 踏み台サーバ | 10.20.1.10 |
+| db.lab.test | DBサーバ | 10.20.2.20 |
+| dns.lab.test | DNSサーバ | 10.20.2.10 |
+| repo.lab.test | 配布サーバ | 10.20.2.30 |
+| web.lab.test | Webサーバ | 10.20.1.20 |
 
 ### 採点基準
 

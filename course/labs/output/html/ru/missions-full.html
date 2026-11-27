@@ -139,43 +139,51 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-4">M2 Внутренний DNS и системное разрешение имён (13)</h2>
 <h3>Требуемый результат</h3>
 <p>Перед началом убедитесь на странице оценок, что за <a href="m1.html">M1</a> получен полный балл.</p>
-<p>Добавьте шесть имён из таблицы во внутренний DNS, настроенный в P2. С бастиона должен открываться адрес <code>http://web.lab.test/mission.txt</code>.</p>
+<p>Настройте внутренний DNS из P2 так, чтобы в нём были зарегистрированы все шесть имён из таблицы. С бастиона должен открываться адрес <code>http://web.lab.test/mission.txt</code>.</p>
 <ol>
 <li><strong>DNS-сервер (P2.2-P2.4).</strong> Добавьте A-записи в существующую зону <code>lab.test</code>. Увеличьте серийный номер зоны, проверьте синтаксис и перечитайте настройки. Имена из P2 можно сохранить.</li>
 <li><strong>Бастион и Web-сервер (P2.5-P2.8).</strong> Проверьте прямой запрос к внутреннему DNS и обычное разрешение имён ОС. На бастионе откройте текст M1 по имени <code>web.lab.test</code>. На Web проверьте, что <code>db.lab.test</code> разрешается в <code>10.20.2.20</code>.</li>
 </ol>
+<p>В таблице указаны внутренние IP серверов, к которым подключаются по этим именам. Адрес DNS для всех запросов остаётся <code>10.20.2.10</code>: например, имя БД проверяют командой <code>dig @10.20.2.10 db.lab.test A</code>. Имена <code>admin.lab.test</code> и <code>web.lab.test</code> ведут на один Web-сервер. Уже созданную в P2 запись <code>dns.lab.test</code> повторно не добавляйте; проверьте её значение <code>10.20.2.10</code>.</p>
 <h3>Схема задания</h3>
-<p><img src="../../../assets/ru/m2.png" alt="Бастион и Web-сервер в публичной подсети обращаются к DNS-серверу в приватной подсети. Внешние имена передаются DNS AWS." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ru/m2.png" alt="Источники запросов — бастион 10.20.1.10 и Web-сервер 10.20.1.20 в публичной подсети. DNS-сервер 10.20.2.10 в приватной подсети слушает UDP и TCP 53; внешние имена передаются DNS AWS 10.20.0.2 из forwarders." width="1040" height="680" loading="lazy"></p>
 <table>
 <thead>
 <tr>
 <th scope="col">DNS name</th>
+<th scope="col">Сервер назначения</th>
 <th scope="col">A / IPv4</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>admin.lab.test</td>
+<td>Web-сервер</td>
 <td>10.20.1.20</td>
 </tr>
 <tr>
 <td>bastion.lab.test</td>
+<td>Bastion-сервер</td>
 <td>10.20.1.10</td>
 </tr>
 <tr>
 <td>db.lab.test</td>
+<td>DB-сервер</td>
 <td>10.20.2.20</td>
 </tr>
 <tr>
 <td>dns.lab.test</td>
+<td>DNS-сервер</td>
 <td>10.20.2.10</td>
 </tr>
 <tr>
 <td>repo.lab.test</td>
+<td>Repo-сервер</td>
 <td>10.20.2.30</td>
 </tr>
 <tr>
 <td>web.lab.test</td>
+<td>Web-сервер</td>
 <td>10.20.1.20</td>
 </tr>
 </tbody>

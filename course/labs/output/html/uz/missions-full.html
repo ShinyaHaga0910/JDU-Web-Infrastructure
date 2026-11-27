@@ -139,43 +139,51 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <h2 id="section-4">M2 Ichki DNS va odatiy nom yechimi (13)</h2>
 <h3>Tayyor holat talablari</h3>
 <p>Boshlashdan oldin baholash sahifasida <a href="m1.html">M1</a> uchun to‘liq ball olinganini tekshiring.</p>
-<p>P2 da sozlangan ichki DNS ga jadvaldagi oltita nomni qo‘shing. Bastion serveridan <code>http://web.lab.test/mission.txt</code> ochilsin.</p>
+<p>P2 da sozlangan ichki DNS da jadvaldagi oltita nom ro‘yxatdan o‘tgan bo‘lsin. Bastion serveridan <code>http://web.lab.test/mission.txt</code> ochilsin.</p>
 <ol>
 <li><strong>DNS server (P2.2-P2.4).</strong> Mavjud <code>lab.test</code> zonasiga A yozuvlarini qo‘shing. Zona seriya raqamini oshiring, sintaksisni tekshiring va sozlamani qayta yuklang. P2 nomlarini saqlash mumkin.</li>
 <li><strong>Bastion va Web serverlari (P2.5-P2.8).</strong> Ichki DNS ga to‘g‘ridan to‘g‘ri so‘rovni va OS ning odatiy nom yechimini tekshiring. Bastionda <code>web.lab.test</code> orqali M1 matnini oching. Web serverda <code>db.lab.test</code> manzili <code>10.20.2.20</code> bo‘lishini tekshiring.</li>
 </ol>
+<p>Jadvaldagi IP lar nom orqali ulaniladigan serverlarning ichki IP manzillaridir. Barcha so‘rovlar uchun DNS manzili <code>10.20.2.10</code> bo‘lib qoladi: masalan, DB nomini <code>dig @10.20.2.10 db.lab.test A</code> bilan tekshiring. <code>admin.lab.test</code> va <code>web.lab.test</code> bir Web serverni ko‘rsatadi. P2 da yaratilgan <code>dns.lab.test</code> yozuvini takroran qo‘shmang; qiymati <code>10.20.2.10</code> ekanini tekshiring.</p>
 <h3>Topshiriq diagrammasi</h3>
-<p><img src="../../../assets/uz/m2.png" alt="Ochiq subnetdagi Bastion va Web serverlari yopiq subnetdagi DNS serveriga murojaat qiladi. Tashqi nomlar AWS DNS ga yuboriladi." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/uz/m2.png" alt="So‘rov manbalari — ochiq subnetdagi Bastion 10.20.1.10 va Web server 10.20.1.20. Yopiq subnetdagi DNS server 10.20.2.10 UDP va TCP 53-portda tinglaydi; tashqi nomlar forwarders dagi AWS DNS 10.20.0.2 ga yuboriladi." width="1040" height="680" loading="lazy"></p>
 <table>
 <thead>
 <tr>
 <th scope="col">DNS name</th>
+<th scope="col">Ulaniladigan server</th>
 <th scope="col">A / IPv4</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>admin.lab.test</td>
+<td>Web server</td>
 <td>10.20.1.20</td>
 </tr>
 <tr>
 <td>bastion.lab.test</td>
+<td>Bastion server</td>
 <td>10.20.1.10</td>
 </tr>
 <tr>
 <td>db.lab.test</td>
+<td>DB server</td>
 <td>10.20.2.20</td>
 </tr>
 <tr>
 <td>dns.lab.test</td>
+<td>DNS server</td>
 <td>10.20.2.10</td>
 </tr>
 <tr>
 <td>repo.lab.test</td>
+<td>Repo server</td>
 <td>10.20.2.30</td>
 </tr>
 <tr>
 <td>web.lab.test</td>
+<td>Web server</td>
 <td>10.20.1.20</td>
 </tr>
 </tbody>

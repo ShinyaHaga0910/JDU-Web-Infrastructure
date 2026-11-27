@@ -17,7 +17,7 @@ PROJECT = Path(os.environ.get('JDU_WEB_PROJECT_ROOT', str(Path(__file__).resolve
 from markdown_it import MarkdownIt
 from pages import write_pages, browser_check
 from command_notes import annotated_blocks, CONFIG_STEPS
-from diagrams import diagram_markdown, write_diagrams, P1_STEP_DIAGRAMS
+from diagrams import diagram_markdown, write_diagrams, P1_STEP_DIAGRAMS, LABELS as SERVER_LABELS
 from content import LANGS, T, PLACES, MODULES, MISSION_GUIDANCE, RDP_STEPS
 from checks import CHECKS
 from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, RAW_MAXIMUM, active_registry, display_task, display_task_references, task_page
@@ -132,8 +132,14 @@ def task_spec(task, reg, lang):
         if 'body' in e or 'body_template' in e:
             out += ['', '```text', (e.get('body') or e['body_template']).rstrip('\n'), '```', '']
         if 'records' in e:
-            out += ['| DNS name | A / IPv4 |', '| --- | --- |']
-            out += [f'| {name} | {ip} |' for name, ip in e['records'].items()]
+            if task['id']=='M2':
+                out += ['| DNS name | '+T('接続先のサーバー', 'Сервер назначения', 'Ulaniladigan server')[lang]+' | A / IPv4 |', '| --- | --- | --- |']
+                for name,ip in e['records'].items():
+                    role='web' if name.split('.')[0]=='admin' else name.split('.')[0]
+                    out += [f'| {name} | {SERVER_LABELS[role][lang]} | {ip} |']
+            else:
+                out += ['| DNS name | A / IPv4 |', '| --- | --- |']
+                out += [f'| {name} | {ip} |' for name, ip in e['records'].items()]
             out += ['']
     if task.get('profile') and task['id'] != 'M6':
         profile = reg['profiles'][task['profile']]

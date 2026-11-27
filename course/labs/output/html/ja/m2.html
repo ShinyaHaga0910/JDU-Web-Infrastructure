@@ -19,43 +19,51 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p>対応する詳しい練習は<a href="p2.html">P2</a>。</p>
 <h2 id="section-1">完成要件</h2>
 <p>始める前に、採点ページで <a href="m1.html">M1</a> が満点になっていることを確認する。</p>
-<p>P2で構築した内部DNSに、下の6件の名前を追加する。踏み台サーバーから <code>http://web.lab.test/mission.txt</code> が開けるようにする。</p>
+<p>P2で構築した内部DNSに、下の6件の名前が登録されている状態にする。踏み台サーバーから <code>http://web.lab.test/mission.txt</code> が開けるようにする。</p>
 <ol>
 <li><strong>DNSサーバー（P2.2〜P2.4）</strong>　既存の <code>lab.test</code> ゾーンにAレコードを追加する。ゾーンファイルのシリアル番号を更新し、構文検査を通してから設定を読み込む。P2の名前は残してよい。</li>
 <li><strong>踏み台サーバーとWebサーバー（P2.5〜P2.8）</strong>　内部DNSへ直接問い合わせた結果と、OSが普段使う名前解決の結果を確認する。踏み台では <code>web.lab.test</code> でM1の本文を開き、Webサーバーでは <code>db.lab.test</code> が <code>10.20.2.20</code> になることを確認する。</li>
 </ol>
+<p>表のIPは、各名前を使って接続するサーバーの内部IPである。DNSへの問い合わせ先はすべて <code>10.20.2.10</code> のままなので、例えばDBの名前を調べる場合も <code>dig @10.20.2.10 db.lab.test A</code> とする。<code>admin.lab.test</code> と <code>web.lab.test</code> は同じWebサーバーを指す。P2で登録済みの <code>dns.lab.test</code> は重複して追加せず、値が <code>10.20.2.10</code> であることを確認する。</p>
 <h2 id="section-2">今回の見取り図</h2>
-<p><img src="../../../assets/ja/m2.png" alt="公開サブネットの踏み台・Webサーバーが、非公開サブネットのDNSサーバーへ問い合わせる。外部名はAWS提供のDNSへ転送する。" width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ja/m2.png" alt="問い合わせ元は公開サブネットの踏み台10.20.1.10とWebサーバー10.20.1.20。非公開サブネットのDNSサーバー10.20.2.10がUDP・TCPの53番ポートで待ち受け、外部名はforwardersに指定したAWSのDNS 10.20.0.2へ問い合わせる。" width="1040" height="680" loading="lazy"></p>
 <table>
 <thead>
 <tr>
 <th scope="col">DNS name</th>
+<th scope="col">接続先のサーバー</th>
 <th scope="col">A / IPv4</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>admin.lab.test</td>
+<td>Webサーバ</td>
 <td>10.20.1.20</td>
 </tr>
 <tr>
 <td>bastion.lab.test</td>
+<td>踏み台サーバ</td>
 <td>10.20.1.10</td>
 </tr>
 <tr>
 <td>db.lab.test</td>
+<td>DBサーバ</td>
 <td>10.20.2.20</td>
 </tr>
 <tr>
 <td>dns.lab.test</td>
+<td>DNSサーバ</td>
 <td>10.20.2.10</td>
 </tr>
 <tr>
 <td>repo.lab.test</td>
+<td>配布サーバ</td>
 <td>10.20.2.30</td>
 </tr>
 <tr>
 <td>web.lab.test</td>
+<td>Webサーバ</td>
 <td>10.20.1.20</td>
 </tr>
 </tbody>

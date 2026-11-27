@@ -24,6 +24,12 @@ P3のDBサーバーとWebサーバーで実行するPostgreSQLインストール
 
 P0〜P5・M0〜M5の全説明資料を確認し、残っていたP2・P4の推奨パッケージ抑制オプションを削除しました。日本語・ロシア語・ウズベク語の個別／統合Markdown、HTML、Practice PDF、配布ZIP、生成元を同期しました。全言語のP/M統合原稿に同オプションが再混入しないことを自動検査します。[今回の資料検査](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/blob/main/course/labs/validation-2026-11-27-simple-installs.public.json)。稼働中のAWSは変更していません。
 
+## P2・M2のIPアドレスと説明図の点検（2026-11-27）
+
+設定例・Aレコード・問い合わせ先・OSのDNS設定・採点条件・構築時の固定IPを照合し、IP値の不一致はありませんでした。P2.2では問い合わせ元ACL、DNS自身の待受、外部名の転送先を表で区別し、P2.5ではdigの問い合わせ先と回答のIPを説明しました。M2の表には対応するサーバーを併記し、同じWebサーバーの2つの名前と、P2で登録済みのdns.lab.testを重複追加しないことを明記しました。
+
+3言語のP2・M2の6図は、公開／非公開サブネットとサーバーの位置を保ち、DNSの待受とforwardersを明示しています。P2はguide.lab.test、M2はweb.lab.testでのHTTP閲覧を示しました。個別／統合Markdown・HTML・6冊のPDF・配布ZIP・生成元を同期し、IPと採点条件の一致を自動検査します。[今回の資料検査](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/blob/main/course/labs/validation-2026-11-27-dns-ip-audit.public.json)。設定例の実行コマンド、採点条件、稼働中AWSは変更していません。
+
 ## 練習番号と課題番号の対応
 
 DB接続をP3／M3、備品管理アプリの配置をP4／M4、公開範囲と最小権限をP5／M5と表示します。P4の練習用アプリをP5で整理し、M4で課題用DBに切り替える順序です。採点処理では既存の内部IDを使うため、保存済みの成績や署名済み配布物の番号は従来どおりです。
