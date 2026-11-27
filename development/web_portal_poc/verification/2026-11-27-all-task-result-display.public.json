@@ -1,0 +1,48 @@
+{
+  "date": "2026-11-27",
+  "source_commit": "953965b87c45e7a31854d967ce3087da012a69c1",
+  "scope": "All active P/M score displays, criteria and teacher detail navigation",
+  "fixed": [
+    "Teacher gateway and grade reader omitted criteria for practices after P1",
+    "Completed practice results after P1 hid their score and criterion table",
+    "Teacher practice links were rejected by the page, service client and backend"
+  ],
+  "local_checks": {
+    "python_tests_passed": 48,
+    "web_tests_passed": 94,
+    "skipped": 0,
+    "all_active_task_scores_and_criteria": true,
+    "all_active_teacher_task_routes": true,
+    "dns_browser_to_storage_and_projection": "P2 and M2 retain 12/13 and the failed criterion in synthetic Moto/SSM tests",
+    "classroom_package_build": "passed"
+  },
+  "deployment": {
+    "teacher_portal_services": "UPDATE_COMPLETE",
+    "teacher_portal_checker": "UPDATE_COMPLETE",
+    "teacher_web": "UPDATE_COMPLETE",
+    "grade_reader_source_matches_github": true,
+    "teacher_progress_source_matches_github": true,
+    "student_checker_changed": false,
+    "exercise_configuration_changed": false,
+    "stacks_recreated": false
+  },
+  "live_checks": {
+    "P2": {"earned": 0, "maximum": 13, "fail": 6, "unknown": 7, "saved": true},
+    "M2": {"earned": 0, "maximum": 13, "fail": 6, "unknown": 7, "saved": true},
+    "languages": ["ja", "ru", "uz"],
+    "all_overview_denominators_match_current_policy": true,
+    "course_total": "13/64",
+    "interpretation": "DNS service/configuration checks are unmet in the current unsolved environment; unknown results are not converted to passes."
+  },
+  "ci": {
+    "workflow": "Classroom build",
+    "conclusion": "success",
+    "url": "https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/actions/runs/45942662361"
+  },
+  "limitations": [
+    "Live P3-M5 exercise completion was not performed; all-task coverage uses synthetic regression tests.",
+    "Unknown attempts retain the existing selected-grade policy.",
+    "Teacher visual approval and native language review were not performed."
+  ],
+  "legacy_signed_registry_and_archives_changed": false
+}
