@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1240" viewBox="0 0 1800 1240" role="img">
+<title>DNSサーバー内の設定ファイル、namedのプロセス、管理用端末と、自分自身へのDNS問い合わせを示す</title>
+<rect width="100%" height="100%" fill="white"/>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図7-1  DNSサーバー内で設定を反映し、自分自身へ問い合わせる</text>
+<rect x="35" y="110" width="1730" height="1060" rx="18" fill="#f8fafc" stroke="#7991aa" stroke-width="2"/>
+<text x="60" y="128" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">AWS</text>
+<rect x="65" y="185" width="1660" height="950" rx="18" fill="#f3f8f5" stroke="#16745b" stroke-width="2"/>
+<text x="95" y="205" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="start">VPC</text>
+<rect x="110" y="270" width="1580" height="800" rx="18" fill="#edf7f0" stroke="#16745b" stroke-width="2"/>
+<text x="900" y="288" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
+<text x="900" y="335" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="middle">DNSサーバー</text>
+<text x="900" y="392" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">10.20.2.10</text>
+<rect x="160" y="465" width="600" height="280" rx="18" fill="#ffffff" stroke="#2165a7" stroke-width="2"/>
+<text x="460" y="484" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="30" dominant-baseline="text-before-edge" text-anchor="middle">① 設定ファイルを検査する</text>
+<text x="460" y="555" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">named.conf.options</text>
+<text x="460" y="609" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">named.conf.local</text>
+<text x="460" y="663" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">zones/db.lab.test</text>
+<rect x="1140" y="465" width="480" height="280" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
+<text x="1380" y="494" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="32" dominant-baseline="text-before-edge" text-anchor="middle">namedのプロセス</text>
+<text x="1380" y="579" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">53番ポートで受付</text>
+<text x="1380" y="648" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">UDP / TCP</text>
+<polyline points="760,610 1140,610" fill="none" stroke="#2165a7" stroke-width="4"/><polygon points="1140,610 1125.5928463623572,616.9594485457797 1125.5928463623572,603.0405514542203" fill="#2165a7"/>
+<text x="950" y="489" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">② namedを再起動</text>
+<text x="950" y="545" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">設定を読み込む</text>
+<rect x="160" y="820" width="600" height="190" rx="18" fill="#ffffff" stroke="#16745b" stroke-width="2"/>
+<text x="460" y="839" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="29" dominant-baseline="text-before-edge" text-anchor="middle">DNSサーバー内の端末</text>
+<text x="460" y="915" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">dig @127.0.0.1 guide.lab.test A</text>
+<polyline points="760,860 1320,860 1320,745" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="1320,745 1326.9594485457797,759.4071536376429 1313.0405514542203,759.4071536376429" fill="#16745b"/>
+<text x="1025" y="790" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="middle">③ 127.0.0.1へ問い合わせる</text>
+<polyline points="1510,745 1510,960 760,960" fill="none" stroke="#16745b" stroke-width="4"/><polygon points="760,960 774.4071536376429,953.0405514542203 774.4071536376429,966.9594485457797" fill="#16745b"/>
+<text x="1080" y="988" fill="#16745b" font-family="Noto Sans JP, sans-serif" font-size="28" dominant-baseline="text-before-edge" text-anchor="middle">④ 10.20.1.20 を回答</text>
+<text x="55" y="1190" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="27" dominant-baseline="text-before-edge" text-anchor="start">青：再起動したnamedが設定を読み込む　　緑：同じDNSサーバー内の問い合わせと回答</text>
+</svg>
