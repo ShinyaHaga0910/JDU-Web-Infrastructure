@@ -832,7 +832,7 @@ SSM-терминал DB-сервера: ssm-user
 # 1. Обновить список пакетов с внутреннего сервера.
 sudo apt-get update
 # 2. Установить postgresql-16 postgresql-client-16 и обязательные зависимости с сервера пакетов.
-sudo apt-get install --no-install-recommends postgresql-16 postgresql-client-16
+sudo apt-get install postgresql-16 postgresql-client-16
 # 3. Сверить фиксированный hash и распаковать приложение/SQL преподавателя.
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py
 # 4. Показать версию, кластер, порт и состояние PostgreSQL.
@@ -1007,7 +1007,7 @@ SSM-терминал Web-сервера: ssm-user
 
 ```bash
 # 1. Установить postgresql-client-16 и обязательные зависимости с сервера пакетов.
-sudo apt-get install --no-install-recommends postgresql-client-16
+sudo apt-get install postgresql-client-16
 # 2. Подключиться с Web к нужной БД с существующим паролем и выполнить SELECT.
 psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
   'SELECT current_database(),current_user,1 AS value;'

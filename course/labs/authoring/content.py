@@ -267,7 +267,7 @@ m = module('P4', T('PostgreSQLへの認証接続', 'Подключение к Po
  T('jdu_catalog_practice、catalog_practice_setup、catalog_practice_appを作る。Webの10.20.1.20/32だけからSCRAMで接続させる。P4時点ではappのtableは不要。', 'Создайте jdu_catalog_practice, catalog_practice_setup и catalog_practice_app. Разрешите SCRAM только с Web 10.20.1.20/32. Таблицы приложения на этапе P4 не нужны.', 'jdu_catalog_practice, catalog_practice_setup va catalog_practice_app ni yarating. Faqat Web 10.20.1.20/32 dan SCRAM ulanishiga ruxsat bering. P4 da app jadvallari hali kerak emas.'))
 step(m, T("配布サーバーからPostgreSQLをインストールする", "Установить PostgreSQL с сервера пакетов", "Paketlar serveridan PostgreSQL o‘rnatish"), 'db',
  T("DBサーバーにPostgreSQL 16をインストールする。続けて後の手順で使うSQLファイルを展開する。", "Установите PostgreSQL 16 на DB-сервере. Затем распакуйте файлы SQL для следующих шагов.", "DB serverda PostgreSQL 16 ni o‘rnating. Keyingi qadamlar uchun SQL fayllarini arxivdan chiqaring."),
- 'sudo apt-get update\nsudo apt-get install --no-install-recommends postgresql-16 postgresql-client-16\nsudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py\npg_lsclusters\nsudo -u postgres psql -X -d postgres -c "SHOW data_directory;"',
+ 'sudo apt-get update\nsudo apt-get install postgresql-16 postgresql-client-16\nsudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py\npg_lsclusters\nsudo -u postgres psql -X -d postgres -c "SHOW data_directory;"',
  T("`pg_lsclusters` にバージョン `16` とクラスタ名 `main` が表示される。データの保存先は `/var/lib/postgresql/16/main`。", "В `pg_lsclusters` видны версия `16` и кластер `main`. Каталог данных — `/var/lib/postgresql/16/main`.", "`pg_lsclusters` da `16` versiya va `main` klasteri chiqadi. Ma’lumot katalogi `/var/lib/postgresql/16/main`."),
  None)
 step(m, T("PostgreSQLの待受アドレス・ポートを設定する", "Настроить адрес и порт PostgreSQL", "PostgreSQL manzili va portini sozlash"), 'db',
@@ -311,7 +311,7 @@ step(m, T("それぞれのDBロールにパスワードを設定する", "Зад
  None)
 step(m, T("Webサーバーから練習用DBに接続する", "Подключиться к учебной БД с Web-сервера", "Web serveridan mashq DB ga ulanish"), 'web',
  T("P0と同じ方法でWebサーバーのSession Managerを開く。`psql` で最初はDBサーバーの内部IP、次はP2で登録した `practice-db.lab.test` を指定する。パスワードを聞かれたら、P4.6で `catalog_practice_app` に設定したものを入力する。", "Откройте Session Manager для Web-сервера как в P0. В `psql` сначала укажите внутренний IP DB, затем имя `practice-db.lab.test` из P2. В обоих случаях используйте пароль `catalog_practice_app` из P4.6.", "P0 dagidek Web server uchun Session Manager ni oching. `psql` da avval DB ichki IP manzilini, keyin P2 dagi `practice-db.lab.test` nomini kiriting. Har ikki ulanishda P4.6 dagi `catalog_practice_app` parolini ishlating."),
- '''sudo apt-get install --no-install-recommends postgresql-client-16
+ '''sudo apt-get install postgresql-client-16
 psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c 'SELECT current_database(),current_user,1 AS value;'
 getent ahostsv4 practice-db.lab.test
 psql -X -h practice-db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c 'SELECT current_database(),current_user,1 AS value;' ''',

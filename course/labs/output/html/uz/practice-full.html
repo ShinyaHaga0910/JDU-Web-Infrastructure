@@ -584,7 +584,7 @@ guide.lab.test.  300  IN  A  10.20.1.20
 <pre><code class="language-bash"># 1. Ichki serverdagi paketlar ro‘yxatini yangilash.
 sudo apt-get update
 # 2. Paketlar serveridan postgresql-16 postgresql-client-16 va kerakli bog‘liqliklarni o‘rnatish.
-sudo apt-get install --no-install-recommends postgresql-16 postgresql-client-16
+sudo apt-get install postgresql-16 postgresql-client-16
 # 3. Belgilangan hash ni tekshirib o‘qituvchi app/SQL resurslarini ochish.
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py
 # 4. PostgreSQL version, cluster, port va holatini o‘qish.
@@ -694,7 +694,7 @@ sudo -u postgres psql -X -d postgres
 <p>P0 dagidek Web server uchun Session Manager ni oching. <code>psql</code> da avval DB ichki IP manzilini, keyin P2 dagi <code>practice-db.lab.test</code> nomini kiriting. Har ikki ulanishda P3.6 dagi <code>catalog_practice_app</code> parolini ishlating.</p>
 <p>Buyruqlar: raqamlar shu qadam ichidagi tartib</p>
 <pre><code class="language-bash"># 1. Paketlar serveridan postgresql-client-16 va kerakli bog‘liqliklarni o‘rnatish.
-sudo apt-get install --no-install-recommends postgresql-client-16
+sudo apt-get install postgresql-client-16
 # 2. Web dan kerakli DB ga mavjud parol bilan ulanib SELECT natijasini o‘qish.
 psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
   'SELECT current_database(),current_user,1 AS value;'

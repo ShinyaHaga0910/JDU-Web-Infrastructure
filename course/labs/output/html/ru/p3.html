@@ -30,7 +30,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <pre><code class="language-bash"># 1. Обновить список пакетов с внутреннего сервера.
 sudo apt-get update
 # 2. Установить postgresql-16 postgresql-client-16 и обязательные зависимости с сервера пакетов.
-sudo apt-get install --no-install-recommends postgresql-16 postgresql-client-16
+sudo apt-get install postgresql-16 postgresql-client-16
 # 3. Сверить фиксированный hash и распаковать приложение/SQL преподавателя.
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py
 # 4. Показать версию, кластер, порт и состояние PostgreSQL.
@@ -140,7 +140,7 @@ sudo -u postgres psql -X -d postgres
 <p>Откройте Session Manager для Web-сервера как в P0. В <code>psql</code> сначала укажите внутренний IP DB, затем имя <code>practice-db.lab.test</code> из P2. В обоих случаях используйте пароль <code>catalog_practice_app</code> из P3.6.</p>
 <p>Команды: нумерация внутри этого шага</p>
 <pre><code class="language-bash"># 1. Установить postgresql-client-16 и обязательные зависимости с сервера пакетов.
-sudo apt-get install --no-install-recommends postgresql-client-16
+sudo apt-get install postgresql-client-16
 # 2. Подключиться с Web к нужной БД с существующим паролем и выполнить SELECT.
 psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
   'SELECT current_database(),current_user,1 AS value;'

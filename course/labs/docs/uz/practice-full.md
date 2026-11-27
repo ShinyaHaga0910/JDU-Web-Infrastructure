@@ -832,7 +832,7 @@ Buyruqlar: raqamlar shu qadam ichidagi tartib
 # 1. Ichki serverdagi paketlar ro‘yxatini yangilash.
 sudo apt-get update
 # 2. Paketlar serveridan postgresql-16 postgresql-client-16 va kerakli bog‘liqliklarni o‘rnatish.
-sudo apt-get install --no-install-recommends postgresql-16 postgresql-client-16
+sudo apt-get install postgresql-16 postgresql-client-16
 # 3. Belgilangan hash ni tekshirib o‘qituvchi app/SQL resurslarini ochish.
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py
 # 4. PostgreSQL version, cluster, port va holatini o‘qish.
@@ -1007,7 +1007,7 @@ Buyruqlar: raqamlar shu qadam ichidagi tartib
 
 ```bash
 # 1. Paketlar serveridan postgresql-client-16 va kerakli bog‘liqliklarni o‘rnatish.
-sudo apt-get install --no-install-recommends postgresql-client-16
+sudo apt-get install postgresql-client-16
 # 2. Web dan kerakli DB ga mavjud parol bilan ulanib SELECT natijasini o‘qish.
 psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
   'SELECT current_database(),current_user,1 AS value;'

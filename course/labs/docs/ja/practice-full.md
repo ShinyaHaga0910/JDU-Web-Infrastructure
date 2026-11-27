@@ -832,7 +832,7 @@ DBサーバーにPostgreSQL 16をインストールする。続けて後の手�
 # 1. 配布サーバーのパッケージ一覧を更新する。
 sudo apt-get update
 # 2. 配布サーバーから postgresql-16 postgresql-client-16 と、動作に必要なパッケージをインストールする。
-sudo apt-get install --no-install-recommends postgresql-16 postgresql-client-16
+sudo apt-get install postgresql-16 postgresql-client-16
 # 3. 固定hashを照合して教員提供アプリ・SQL資源を展開する。
 sudo python3 -B /var/lib/jdu-web/lesson-resources-r1/offline_assets.py
 # 4. PostgreSQLのversion・cluster・port・起動状態を読む。
@@ -1007,7 +1007,7 @@ P0と同じ方法でWebサーバーのSession Managerを開く。`psql` で最�
 
 ```bash
 # 1. 配布サーバーから postgresql-client-16 と、動作に必要なパッケージをインストールする。
-sudo apt-get install --no-install-recommends postgresql-client-16
+sudo apt-get install postgresql-client-16
 # 2. Webから指定DBへ既存パスワードで接続し、SELECT結果を読む。
 psql -X -h 10.20.2.20 -U catalog_practice_app -d jdu_catalog_practice -W -c \
   'SELECT current_database(),current_user,1 AS value;'
