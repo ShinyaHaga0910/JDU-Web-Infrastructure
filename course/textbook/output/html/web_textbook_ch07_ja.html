@@ -147,8 +147,8 @@ getent ahostsv4 guide.lab.test</code></pre>
 <p>getentはhostsの情報も利用できるため、その結果だけで、今回の内部DNSを使ったと決めることはできない。hostsで代用せず、Netplanの設定、resolvectlで表示する動作中の設定、実際に得たIPアドレスを対応させる。<a href="https://www.freedesktop.org/software/systemd/man/latest/systemd-resolved.service.html">systemd-resolvedの仕組み</a></p>
 <h2 id="77-名前を使って、既存のwebへ接続する">7.7 名前を使って、既存のWebへ接続する</h2>
 <p>最後に、踏み台サーバーのブラウザでIP指定と名前指定のURLを開く。例えば、同じファイルに対する<code>http://10.20.1.20/example.txt</code>と<code>http://guide.lab.test/example.txt</code>を比較する。名前指定では、先に名前解決を行い、その結果を使って同じWebサーバーへ接続する。</p>
-<figure><img src="../../assets/figures/ch07-fig02-checks.png" alt="DNSへの直接問い合わせ、通常の名前解決、HTTP取得の三段階を対応させる。" width="1600" height="1100"></figure>
-<p><strong>図7-2 確認ごとに分かることを積み重ねる。</strong> 問い合わせ先を指定したdig、通常経路を使うgetent、名前を使ったHTTP取得は、確かめる範囲が異なる。</p>
+<figure><img src="../../assets/figures/ch07-fig02-browser-fqdn.png" alt="AWSのVPC内にある踏み台サーバー上のブラウザが、guide.lab.testを内部DNSで名前解決し、Webサーバーの10.20.1.20へHTTPで接続する。" width="1800" height="1260"></figure>
+<p><strong>図7-2 踏み台サーバーのブラウザからFQDNでアクセスする。</strong> URLの<code>guide.lab.test</code>が接続先を表すFQDNである。①踏み台サーバーのOSが内部DNSへその名前を問い合わせ、②WebサーバーのIPである<code>10.20.1.20</code>を得る。③ブラウザはそのIPのWebサーバーの80番ポートへHTTPリクエストを送り、④HTTPレスポンスを受け取る。緑の矢印は名前解決、青の矢印はWebサーバーとの通信を示す。</p>
 <p>今回の踏み台サーバーのFirefoxは、OSの名前解決を使う準備が済んでいる。ブラウザが独自の外部DNSへ問い合わせる機能は、初期準備で無効にしているため、ここでブラウザへDNSのIPを追加設定する必要はない。7.6で設定した踏み台サーバーのOSを通じて、内部DNSへ名前を尋ねる。</p>
 <p>RDPの画面を表示している利用者PCと、ブラウザを実際に動かす踏み台サーバーは別のコンピューターである。踏み台サーバーのOSを設定しても、利用者PCのOSやブラウザのDNS設定が変わるわけではない。</p>
 <p>後にWebサーバーのアプリがDBへ接続するときも、Webサーバー自身がDBサーバーの名前を解決する。踏み台サーバーで成功した結果だけで済ませず、名前を使うサーバーごとに設定と結果を結び付ける。</p>

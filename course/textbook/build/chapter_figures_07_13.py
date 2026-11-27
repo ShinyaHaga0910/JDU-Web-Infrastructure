@@ -75,12 +75,49 @@ def chapter07():
     s.text(55,945,'OSが尋ねる相手：10.20.2.10　　回答で得るWebサーバーのIP：10.20.1.20',28)
     s.text(55,1010,'必要な情報をDNSへ尋ねる場合の流れ。Webサーバー側のOSにも問い合わせ先を設定する。',28)
     s.save('ch07-fig01-resolver')
-    rows(7,2,'checks','確認する方法と、分かる範囲',[
-        (['dig @10.20.2.10','DNSを直接指定'],['そのDNSが何と答えたか','SERVER・status・回答を読む']),
-        (['getent','OSの通常の名前解決'],['普段の経路でどのIPが得られるか','hostsや上流DNSの設定も関係する']),
-        (['名前指定のHTTP','踏み台サーバーで取得'],['名前解決後にWebへ接続できるか','Webサーバーの80番ポートを使う'])],
-        ['同じ名前でも、それぞれ確かめる範囲が異なる。',
-         'digは回答を見るためのコマンド。OSの問い合わせ先設定は変更しない。'])
+    s=Scene(1800,1260,'AWSのVPC内で、踏み台サーバー上のブラウザがFQDNを使い、内部DNSで得たIPのWebサーバーへHTTP接続するコンポーネント図')
+    s.text(40,18,'図7-2  踏み台サーバーのブラウザからFQDNでアクセスする',35)
+    s.rect(35,110,1730,1090,'#f8fafc','#7991aa')
+    s.text(60,127,'AWS',30)
+    s.rect(65,185,1660,985,'#f3f8f5',GREEN)
+    s.text(95,204,'VPC（内部ネットワーク）',30,GREEN)
+
+    s.rect(110,280,640,820,'#edf5fc',BLUE)
+    s.text(430,300,'EC2',26,center=True)
+    s.text(430,346,'踏み台サーバー',33,BLUE,center=True)
+    s.text(430,407,'10.20.1.10',27,center=True)
+    s.rect(150,465,560,225,'#ffffff',BLUE)
+    s.text(430,483,'ブラウザ',31,BLUE,center=True)
+    s.text(430,550,'http://guide.lab.test/example.txt',26,BLUE,center=True)
+    s.rect(150,820,560,200,'#ffffff',GREEN)
+    s.text(430,843,'OSの名前解決',30,GREEN,center=True)
+    s.text(430,915,'問い合わせ先：10.20.2.10',27,center=True)
+    s.arrow([(430,690),(430,820)],GREEN)
+    s.text(465,738,'名前解決を依頼する',27,GREEN)
+
+    s.rect(1220,290,470,380,'#ffffff',BLUE)
+    s.text(1455,311,'EC2',26,center=True)
+    s.text(1455,358,'Webサーバー',33,BLUE,center=True)
+    s.text(1455,423,'10.20.1.20',29,center=True)
+    s.text(1455,483,'HTTP：80番ポート',27,BLUE,center=True)
+    s.arrow([(710,555),(1220,555)],BLUE)
+    s.text(965,451,'③ HTTPリクエスト',29,BLUE,center=True)
+    s.text(965,502,'TCPで80番ポートへ',27,BLUE,center=True)
+    s.arrow([(1220,630),(710,630)],BLUE)
+    s.text(965,660,'④ HTTPレスポンス',29,BLUE,center=True)
+
+    s.rect(1220,820,470,280,'#ffffff',GREEN)
+    s.text(1455,840,'EC2',26,center=True)
+    s.text(1455,888,'DNSサーバー',33,GREEN,center=True)
+    s.text(1455,952,'10.20.2.10',29,center=True)
+    s.text(1455,1020,'DNS：53番ポート',27,GREEN,center=True)
+    s.arrow([(710,890),(1220,890)],GREEN)
+    s.text(965,777,'① guide.lab.test のIPv4は？',26,GREEN,center=True)
+    s.text(965,840,'DNS：UDP/TCP・53番ポート',25,GREEN,center=True)
+    s.arrow([(1220,995),(710,995)],GREEN)
+    s.text(965,1034,'② 10.20.1.20 を回答',28,GREEN,center=True)
+    s.text(55,1220,'緑：名前解決の通信　　青：名前解決の後に行うHTTP通信',28)
+    s.save('ch07-fig02-browser-fqdn')
 
 
 def chapter08():
