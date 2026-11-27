@@ -574,7 +574,7 @@ guide.lab.test.  300  IN  A  10.20.1.20
 <p><strong>Practice3 da bajariladigan ishlar</strong></p>
 <p>DB serverda PostgreSQL ni sozlab, Web serverdan mashq DB siga parol bilan ulaning.</p>
 <h3>Topshiriq diagrammasi</h3>
-<p><img src="../../../assets/uz/p3.png" alt="Web server DB server nomini aniqlaydi va PostgreSQL ga ulanadi." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/uz/p3.png" alt="Ochiq subnetdagi Web server yopiq subnetdagi DNS orqali DB server nomini aniqlaydi va yopiq subnetdagi DB ga ulanadi." width="1040" height="680" loading="lazy"></p>
 <h3>Yechim namunasi (bajarish tartibi)</h3>
 <h4>P3.1 Paketlar serveridan PostgreSQL o‘rnatish</h4>
 <p><strong>Bajarish muhiti:</strong></p>
@@ -730,7 +730,7 @@ jdu_catalog_practice | catalog_practice_app | 1
 <p><strong>Practice4 da bajariladigan ishlar</strong></p>
 <p>Web serverda jihozlar ilovasini ishga tushirib DB ga ulang. Ochiq ro‘yxat va Bastiondan boshqaruvni sozlang.</p>
 <h3>Topshiriq diagrammasi</h3>
-<p><img src="../../../assets/uz/p4.png" alt="Oddiy foydalanuvchi va administrator bir ilovaga alohida kirish yo‘llaridan ulanadi." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/uz/p4.png" alt="Foydalanuvchi ochiq subnetdagi Web serverga, administrator esa shu subnetdagi Bastion orqali ulanadi. Web server yopiq subnetdagi DB ga ulanadi." width="1040" height="680" loading="lazy"></p>
 <h3>Yechim namunasi (bajarish tartibi)</h3>
 <h4>P4.1 DNS ni tekshirish va Python paketlarini tayyorlash</h4>
 <p><strong>Bajarish muhiti:</strong></p>
@@ -987,7 +987,7 @@ psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &qu
 <p><strong>Practice5 da bajariladigan ishlar</strong></p>
 <p>DB sozlash roliga kirishni yoping. Ilovaning odatiy huquqlar bilan ishlashini va ochiq tomondan boshqaruv hamda sozlamalar yopilganini tekshiring.</p>
 <h3>Topshiriq diagrammasi</h3>
-<p><img src="../../../assets/uz/p5.png" alt="Ochiq va boshqaruv kirishlari hamda Web dan DB ga ulanish cheklovlari." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/uz/p5.png" alt="Web va Bastion ochiq subnetda, DB yopiq subnetda joylashgan. Tashqaridan boshqaruv sahifasiga kirish rad etiladi; DB ni sozlash roli NOLOGIN qilinadi." width="1040" height="680" loading="lazy"></p>
 <h3>Yechim namunasi (bajarish tartibi)</h3>
 <h4>P5.1 Ilova DB da bajara oladigan amallarni ko‘rish</h4>
 <p><strong>Bajarish muhiti:</strong></p>

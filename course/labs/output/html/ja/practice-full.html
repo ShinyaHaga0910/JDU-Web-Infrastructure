@@ -574,7 +574,7 @@ guide.lab.test.  300  IN  A  10.20.1.20
 <p><strong>このPractice3で作業すること</strong></p>
 <p>DBサーバーにPostgreSQLを設定し、Webサーバーから練習用DBへパスワードで接続する。</p>
 <h3>今回の見取り図</h3>
-<p><img src="../../../assets/ja/p3.png" alt="WebサーバーがDBサーバーの名前を解決し、PostgreSQLへ接続する。" width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ja/p3.png" alt="公開サブネットのWebサーバーが、非公開サブネットのDNSでDBサーバーの名前を解決し、同じ非公開サブネットのDBへ接続する。" width="1040" height="680" loading="lazy"></p>
 <h3>解答例（操作手順）</h3>
 <h4>P3.1 配布サーバーからPostgreSQLをインストールする</h4>
 <p><strong>実行環境:</strong></p>
@@ -730,7 +730,7 @@ jdu_catalog_practice | catalog_practice_app | 1
 <p><strong>このPractice4で作業すること</strong></p>
 <p>Webサーバーで備品管理アプリを起動し、DBサーバーにつなぐ。公開の一覧と、踏み台サーバーから使う管理画面を用意する。</p>
 <h3>今回の見取り図</h3>
-<p><img src="../../../assets/ja/p4.png" alt="一般利用者と管理者がそれぞれの入口から同じ備品管理アプリを利用する。" width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ja/p4.png" alt="公開サブネットのWebサーバーへ一般利用者が接続し、管理者は同じ公開サブネットの踏み台を経由する。Webサーバーは非公開サブネットのDBへ接続する。" width="1040" height="680" loading="lazy"></p>
 <h3>解答例（操作手順）</h3>
 <h4>P4.1 アプリに必要な名前解決とPythonパッケージを準備する</h4>
 <p><strong>実行環境:</strong></p>
@@ -987,7 +987,7 @@ psql -X -h db.lab.test -U catalog_practice_app -d jdu_catalog_practice -W -c &qu
 <p><strong>このPractice5で作業すること</strong></p>
 <p>DBの初期設定用ロールのログインを止める。アプリが通常の権限で動き、公開側から管理画面や内部設定を開けないことを確かめる。</p>
 <h3>今回の見取り図</h3>
-<p><img src="../../../assets/ja/p5.png" alt="公開・管理の入口とWebからDBへの接続で、許可する範囲を制限する。" width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ja/p5.png" alt="公開サブネットのWeb・踏み台と、非公開サブネットのDBを示す。公開側から管理画面へのアクセスを拒否し、構築用DBロールをNOLOGINにする。" width="1040" height="680" loading="lazy"></p>
 <h3>解答例（操作手順）</h3>
 <h4>P5.1 アプリがDBでできる操作を調べる</h4>
 <p><strong>実行環境:</strong></p>

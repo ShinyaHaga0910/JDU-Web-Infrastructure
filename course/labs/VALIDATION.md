@@ -6,6 +6,12 @@ P0〜P5・M0〜M5はすべて採点し、Pの60点とMの63点を合計した123
 
 同日、P2・M2の見取り図に公開／非公開サブネットを追加しました。踏み台・Webを公開サブネット、内部DNSを非公開サブネットに配置し、Web・踏み台の位置はP1とそろえています。3言語のMarkdown・HTML・PDF・配布ZIPへ反映しました。[今回の資料検査](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/blob/main/course/labs/validation-2026-11-27.public.json)。
 
+## P3〜P5・M3〜M5の見取り図（2026-11-27）
+
+3言語の18図にAWS・VPC・公開／非公開サブネットの枠を設けました。Webサーバーは公開サブネットの右上、踏み台サーバーは同じ公開サブネットの左下に配置し、DNS・DBサーバーは非公開サブネットへ配置しています。HTTP・RDP・DNS・SQLの矢印とポート番号を示し、Webサーバー内のソフトウェアとサーバー間の通信も分けています。
+
+課題の操作手順と採点条件は変更していません。画像の代替説明、個別ページ、統合Markdown、HTML、6冊のPDF、配布ZIPへ反映しました。[今回の資料検査](https://github.com/ShinyaHaga0910/JDU-Web-Infrastructure/blob/main/course/labs/validation-2026-11-27-later-subnets.public.json)。教員の目視確認と学生の通し試験は別途行います。
+
 ## 練習番号と課題番号の対応
 
 DB接続をP3／M3、備品管理アプリの配置をP4／M4、公開範囲と最小権限をP5／M5と表示します。P4の練習用アプリをP5で整理し、M4で課題用DBに切り替える順序です。採点処理では既存の内部IDを使うため、保存済みの成績や署名済み配布物の番号は従来どおりです。

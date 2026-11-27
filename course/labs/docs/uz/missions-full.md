@@ -156,7 +156,7 @@ P3 dagi PostgreSQL da quyida ko‘rsatilgan topshiriq ma’lumotlar bazasi va ik
 
 ### Topshiriq diagrammasi
 
-![Web server DB server nomini aniqlaydi va PostgreSQL ga ulanadi.](../../assets/uz/m3.png)
+![Ochiq subnetdagi Web server yopiq subnetdagi DNS orqali DB server nomini aniqlaydi va yopiq subnetdagi DB ga ulanadi.](../../assets/uz/m3.png)
 
 | Sozlama | Qiymat |
 | --- | --- |
@@ -200,7 +200,7 @@ P4 dagi jihozlar ilovasini M3 da tayyorlangan topshiriq bazasiga ulang. Profilni
 
 ### Topshiriq diagrammasi
 
-![Oddiy foydalanuvchi va administrator bir ilovaga alohida kirish yo‘llaridan ulanadi.](../../assets/uz/m4.png)
+![Foydalanuvchi ochiq subnetdagi Web serverga, administrator esa shu subnetdagi Bastion orqali ulanadi. Web server yopiq subnetdagi DB ga ulanadi.](../../assets/uz/m4.png)
 
 | Kod | Nomi | Soni | Saqlash joyi | Ochiq |
 | --- | --- | --- | --- | --- |
@@ -247,7 +247,7 @@ M4 ilovasini P5 dagi usul bilan oddiy ish rejimiga o‘tkazing. Faqat sozlashda 
 
 ### Topshiriq diagrammasi
 
-![Ochiq va boshqaruv kirishlari hamda Web dan DB ga ulanish cheklovlari.](../../assets/uz/m5.png)
+![Web va Bastion ochiq subnetda, DB yopiq subnetda joylashgan. Tashqaridan boshqaruv sahifasiga kirish rad etiladi; DB ni sozlash roli NOLOGIN qilinadi.](../../assets/uz/m5.png)
 
 ### Baholash mezonlari
 

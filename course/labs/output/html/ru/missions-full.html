@@ -259,7 +259,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <li><strong>Web-сервер (P3.7-P3.8).</strong> Подключитесь к <code>db.lab.test</code> под рабочей ролью и выполните SELECT. Сохраните существующий пароль для профиля <code>mission</code> тем же способом, что и в P3.8.</li>
 </ol>
 <h3>Схема задания</h3>
-<p><img src="../../../assets/ru/m3.png" alt="Web разрешает имя DB-сервера и подключается к PostgreSQL." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ru/m3.png" alt="Web-сервер в публичной подсети разрешает имя сервера БД через DNS в приватной подсети и подключается к БД в приватной подсети." width="1040" height="680" loading="lazy"></p>
 <table>
 <thead>
 <tr>
@@ -346,7 +346,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <li><strong>Бастион (P4.9).</strong> Войдите в <code>http://admin.lab.test:8080/admin/</code> как <code>lab_admin</code> и внесите две записи из таблицы. На публичной странице проверьте опубликованную запись.</li>
 </ol>
 <h3>Схема задания</h3>
-<p><img src="../../../assets/ru/m4.png" alt="Посетитель и администратор входят в одно приложение по разным путям." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ru/m4.png" alt="Пользователь обращается к Web-серверу в публичной подсети, администратор — через бастион в той же подсети. Web подключается к БД в приватной подсети." width="1040" height="680" loading="lazy"></p>
 <table>
 <thead>
 <tr>
@@ -454,7 +454,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <li><strong>Открытая и административная страницы (P5.4-P5.5).</strong> На порту 80 должна отображаться только публичная запись из M4. Откройте панель управления с бастиона на порту 8080 и проверьте, что <code>lab_admin</code> может просматривать, добавлять и изменять предметы.</li>
 </ol>
 <h3>Схема задания</h3>
-<p><img src="../../../assets/ru/m5.png" alt="Ограничения публичного и административного входов и доступа от Web к DB." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ru/m5.png" alt="Web-сервер и бастион находятся в публичной подсети, БД — в приватной. Доступ к администрированию снаружи запрещён; роль настройки БД переведена в NOLOGIN." width="1040" height="680" loading="lazy"></p>
 <h3>Критерии оценки</h3>
 <p>Каждый критерий даёт 1 балл.</p>
 <table>

@@ -259,7 +259,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <li><strong>Web server (P3.7-P3.8).</strong> Oddiy ish rejimi roli bilan <code>db.lab.test</code> ga ulanib, SELECT bajarilishini tekshiring. Mavjud parolni P3.8 dagi usul bilan <code>mission</code> profili uchun saqlang.</li>
 </ol>
 <h3>Topshiriq diagrammasi</h3>
-<p><img src="../../../assets/uz/m3.png" alt="Web server DB server nomini aniqlaydi va PostgreSQL ga ulanadi." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/uz/m3.png" alt="Ochiq subnetdagi Web server yopiq subnetdagi DNS orqali DB server nomini aniqlaydi va yopiq subnetdagi DB ga ulanadi." width="1040" height="680" loading="lazy"></p>
 <table>
 <thead>
 <tr>
@@ -346,7 +346,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <li><strong>Bastion serveri (P4.9).</strong> <code>http://admin.lab.test:8080/admin/</code> manziliga <code>lab_admin</code> bilan kiring va jadvaldagi ikki yozuvni kiriting. Ochiq sahifada e’lon qilingan yozuvni tekshiring.</li>
 </ol>
 <h3>Topshiriq diagrammasi</h3>
-<p><img src="../../../assets/uz/m4.png" alt="Oddiy foydalanuvchi va administrator bir ilovaga alohida kirish yo‘llaridan ulanadi." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/uz/m4.png" alt="Foydalanuvchi ochiq subnetdagi Web serverga, administrator esa shu subnetdagi Bastion orqali ulanadi. Web server yopiq subnetdagi DB ga ulanadi." width="1040" height="680" loading="lazy"></p>
 <table>
 <thead>
 <tr>
@@ -454,7 +454,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <li><strong>Ochiq va boshqaruv sahifalari (P5.4-P5.5).</strong> 80-portda M4 dagi faqat ochiq yozuv ko‘rinsin. Bastion orqali 8080-portdagi boshqaruv sahifasini oching. <code>lab_admin</code> jihozlarni ko‘rishi, qo‘shishi va o‘zgartirishi mumkinligini tekshiring.</li>
 </ol>
 <h3>Topshiriq diagrammasi</h3>
-<p><img src="../../../assets/uz/m5.png" alt="Ochiq va boshqaruv kirishlari hamda Web dan DB ga ulanish cheklovlari." width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/uz/m5.png" alt="Web va Bastion ochiq subnetda, DB yopiq subnetda joylashgan. Tashqaridan boshqaruv sahifasiga kirish rad etiladi; DB ni sozlash roli NOLOGIN qilinadi." width="1040" height="680" loading="lazy"></p>
 <h3>Baholash mezonlari</h3>
 <p>Har bir mezon 1 ball.</p>
 <table>

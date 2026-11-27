@@ -814,7 +814,7 @@ DB serverda PostgreSQL ni sozlab, Web serverdan mashq DB siga parol bilan ulanin
 
 ### Topshiriq diagrammasi
 
-![Web server DB server nomini aniqlaydi va PostgreSQL ga ulanadi.](../../assets/uz/p3.png)
+![Ochiq subnetdagi Web server yopiq subnetdagi DNS orqali DB server nomini aniqlaydi va yopiq subnetdagi DB ga ulanadi.](../../assets/uz/p3.png)
 
 ### Yechim namunasi (bajarish tartibi)
 
@@ -1067,7 +1067,7 @@ Web serverda jihozlar ilovasini ishga tushirib DB ga ulang. Ochiq ro‘yxat va B
 
 ### Topshiriq diagrammasi
 
-![Oddiy foydalanuvchi va administrator bir ilovaga alohida kirish yo‘llaridan ulanadi.](../../assets/uz/p4.png)
+![Foydalanuvchi ochiq subnetdagi Web serverga, administrator esa shu subnetdagi Bastion orqali ulanadi. Web server yopiq subnetdagi DB ga ulanadi.](../../assets/uz/p4.png)
 
 ### Yechim namunasi (bajarish tartibi)
 
@@ -1413,7 +1413,7 @@ DB sozlash roliga kirishni yoping. Ilovaning odatiy huquqlar bilan ishlashini va
 
 ### Topshiriq diagrammasi
 
-![Ochiq va boshqaruv kirishlari hamda Web dan DB ga ulanish cheklovlari.](../../assets/uz/p5.png)
+![Web va Bastion ochiq subnetda, DB yopiq subnetda joylashgan. Tashqaridan boshqaruv sahifasiga kirish rad etiladi; DB ni sozlash roli NOLOGIN qilinadi.](../../assets/uz/p5.png)
 
 ### Yechim namunasi (bajarish tartibi)
 

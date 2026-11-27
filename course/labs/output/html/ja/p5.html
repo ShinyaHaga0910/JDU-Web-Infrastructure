@@ -20,7 +20,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p><strong>このPractice5で作業すること</strong></p>
 <p>DBの初期設定用ロールのログインを止める。アプリが通常の権限で動き、公開側から管理画面や内部設定を開けないことを確かめる。</p>
 <h2 id="section-1">今回の見取り図</h2>
-<p><img src="../../../assets/ja/p5.png" alt="公開・管理の入口とWebからDBへの接続で、許可する範囲を制限する。" width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ja/p5.png" alt="公開サブネットのWeb・踏み台と、非公開サブネットのDBを示す。公開側から管理画面へのアクセスを拒否し、構築用DBロールをNOLOGINにする。" width="1040" height="680" loading="lazy"></p>
 <h2 id="section-2">解答例（操作手順）</h2>
 <h3>P5.1 アプリがDBでできる操作を調べる</h3>
 <p><strong>実行環境:</strong></p>

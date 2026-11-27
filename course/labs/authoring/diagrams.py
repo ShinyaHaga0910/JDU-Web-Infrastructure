@@ -135,15 +135,15 @@ def diagram_text(task,lang):
             2:T('踏み台とWebから内部DNSへ問い合わせ、踏み台からWebへ名前で接続する。',
                 'Бастион и Web обращаются к внутреннему DNS. Бастион открывает Web по имени.',
                 'Bastion va Web ichki DNS ga murojaat qiladi. Bastion Web ga nomi bilan ulanadi.'),
-            4:T('WebサーバーがDBサーバーの名前を解決し、PostgreSQLへ接続する。',
-                'Web разрешает имя DB-сервера и подключается к PostgreSQL.',
-                'Web server DB server nomini aniqlaydi va PostgreSQL ga ulanadi.'),
-            5:T('一般利用者と管理者がそれぞれの入口から同じ備品管理アプリを利用する。',
-                'Посетитель и администратор входят в одно приложение по разным путям.',
-                'Oddiy foydalanuvchi va administrator bir ilovaga alohida kirish yo‘llaridan ulanadi.'),
-            6:T('公開・管理の入口とWebからDBへの接続で、許可する範囲を制限する。',
-                'Ограничения публичного и административного входов и доступа от Web к DB.',
-                'Ochiq va boshqaruv kirishlari hamda Web dan DB ga ulanish cheklovlari.'),
+            4:T('公開サブネットのWebサーバーが、非公開サブネットのDNSでDBサーバーの名前を解決し、同じ非公開サブネットのDBへ接続する。',
+                'Web-сервер в публичной подсети разрешает имя сервера БД через DNS в приватной подсети и подключается к БД в приватной подсети.',
+                'Ochiq subnetdagi Web server yopiq subnetdagi DNS orqali DB server nomini aniqlaydi va yopiq subnetdagi DB ga ulanadi.'),
+            5:T('公開サブネットのWebサーバーへ一般利用者が接続し、管理者は同じ公開サブネットの踏み台を経由する。Webサーバーは非公開サブネットのDBへ接続する。',
+                'Пользователь обращается к Web-серверу в публичной подсети, администратор — через бастион в той же подсети. Web подключается к БД в приватной подсети.',
+                'Foydalanuvchi ochiq subnetdagi Web serverga, administrator esa shu subnetdagi Bastion orqali ulanadi. Web server yopiq subnetdagi DB ga ulanadi.'),
+            6:T('公開サブネットのWeb・踏み台と、非公開サブネットのDBを示す。公開側から管理画面へのアクセスを拒否し、構築用DBロールをNOLOGINにする。',
+                'Web-сервер и бастион находятся в публичной подсети, БД — в приватной. Доступ к администрированию снаружи запрещён; роль настройки БД переведена в NOLOGIN.',
+                'Web va Bastion ochiq subnetda, DB yopiq subnetda joylashgan. Tashqaridan boshqaruv sahifasiga kirish rad etiladi; DB ni sozlash roli NOLOGIN qilinadi.'),
         }[n][lang],''
 P1_STEP_DIAGRAMS={
     1:T('配布サーバーからWebサーバーへNginxのパッケージをダウンロードする。',
@@ -228,6 +228,67 @@ def dns_diagram(s):
     s.path([(953,544),(978,544),(978,146),(954,146)],'DNS 53',(977,335))
 
 
+def subnet_frame(s):
+    lang=s.lang
+    s.rect(224,65,790,595,fill='#f1f7fc',stroke='#7e9cb3',width=2)
+    s.text(247,77,'AWS',20)
+    s.rect(386,120,603,520,stroke='#7e9cb3',width=2)
+    s.text(417,135,'VPC  10.20.0.0/16',19)
+    s.rect(410,172,553,275,fill='#edf5fc',stroke='#86a6bf',width=2)
+    s.text(428,183,T('公開サブネット','Публичная подсеть','Ochiq subnet')[lang]+'  10.20.1.0/24',19)
+    s.rect(410,468,553,160,fill='#fcf6ec',stroke='#b1956c',width=2)
+    s.text(428,480,T('非公開サブネット','Приватная подсеть','Yopiq subnet')[lang]+'  10.20.2.0/24',19)
+
+
+def database_diagram(s):
+    lang=s.lang
+    practice=s.task.startswith('P')
+    s.text(25,15,T('WebサーバーからDBサーバーへの接続',
+                  'Подключение Web-сервера к серверу БД',
+                  'Web serverdan DB serveriga ulanish')[lang],25)
+    subnet_frame(s)
+    s.node('web',714,215,True,w=239)
+    s.node('dns',428,501,w=216)
+    s.node('db',714,501,True,w=239)
+    s.path([(834,301),(834,501)],'SQL / TCP 5432',(834,405))
+    s.path([(714,258),(678,258),(678,544),(644,544)],'DNS / UDP + TCP 53',(635,320))
+    s.text(600,360,'practice-db.lab.test' if practice else 'db.lab.test',16,center=True,max_width=235)
+    s.text(834,593,'jdu_catalog_practice' if practice else 'jdu_catalog',15,center=True,max_width=225)
+
+
+def application_diagram(s):
+    lang=s.lang
+    practice=s.task.startswith('P')
+    security=s.task.endswith('6')
+    s.text(25,15,T('備品管理アプリの利用経路とDB接続',
+                  'Доступ к приложению и подключение к БД',
+                  'Ilovadan foydalanish va DB ga ulanish')[lang],25)
+    subnet_frame(s)
+    s.simple(35,222,LABELS['pc'][lang],w=150)
+    s.simple(341,222,'IGW',w=90)
+    s.node('bastion',428,347,w=216)
+    s.rect(714,215,239,215,fill='#e7f4f2',stroke=TEAL,width=3)
+    s.text(834,223,'EC2',18,center=True)
+    s.text(834,248,LABELS['web'][lang],18,center=True,max_width=225)
+    s.text(834,276,IPS['web'],15,color=MUTED,center=True)
+    s.rect(729,305,209,31,stroke=TEAL)
+    s.text(834,308,'Nginx',17,center=True)
+    s.rect(729,388,209,31,stroke=TEAL)
+    s.text(834,391,'Gunicorn / Django',17,center=True,max_width=199)
+    s.path([(834,336),(834,388)],'127.0.0.1:8000',(834,349))
+    s.node('db',714,501,True,w=239)
+    s.path([(185,244),(341,244)])
+    s.path([(431,244),(714,244)],'HTTP / TCP 80',(565,218))
+    s.path([(185,273),(341,273)],'RDP / TCP 3389',(259,289),color='#306d9d')
+    s.path([(431,273),(470,273),(470,347)],color='#306d9d')
+    s.path([(536,347),(536,310),(714,310)],'HTTP / TCP 8080',(611,278))
+    s.path([(834,430),(834,501)],'SQL / TCP 5432',(834,452))
+    if security:
+        s.text(563,250,T('公開側の管理URLを拒否','Admin закрыт снаружи','Ochiq admin yopiq')[lang],14,center=True,color=RED,max_width=225)
+        role='catalog_practice_setup' if practice else 'catalog_setup'
+        s.text(834,593,f'{role}: NOLOGIN',14,center=True,color=RED,max_width=229)
+
+
 def mission_diagram(s):
     lang=s.lang
     n=int(s.task[1:])
@@ -235,11 +296,17 @@ def mission_diagram(s):
     if n==2:
         dns_diagram(s)
         return
+    if n==4:
+        database_diagram(s)
+        return
+    if n in (5,6):
+        application_diagram(s)
+        return
     s.rect(224,65,790,575,fill='#f1f7fc',stroke='#7e9cb3',width=2)
     s.text(247,77,'AWS',20)
     s.rect(386,120,603,477,stroke='#7e9cb3',width=2)
     s.text(417,135,'VPC  10.20.0.0/16',19)
-    if n==1 or n in (5,6):
+    if n==1:
         s.simple(35,221,LABELS['pc'][lang],w=150)
         s.simple(341,221,'IGW',w=90)
         s.path([(185,253),(341,253)])
@@ -250,31 +317,10 @@ def mission_diagram(s):
             s.path([(431,273),(470,273),(470,412)],color='#306d9d')
         s.path([(522,412),(522,295),(720,295)],
                'HTTP / TCP 80' if n==1 else 'HTTP / TCP 8080',(586,345))
-        if n==1:
-            s.node('web',720,209,True,w=239)
-            s.text(840,319,'Nginx /mission.txt',19,center=True)
-            s.text(840,350,'/var/www/jdu-mission',13,center=True)
-            s.text(840,382,'127.0.0.1:80',17,color=MUTED,center=True)
-        else:
-            s.rect(720,195,239,199,fill='#e7f4f2',stroke=TEAL,width=2)
-            s.text(736,205,'EC2 '+LABELS['web'][lang]+('ー' if lang=='ja' else ''),18)
-            s.text(736,236,'Nginx',18)
-            s.path([(840,269),(840,326)],'127.0.0.1:8000',(846,278))
-            s.text(736,335,'Gunicorn / Django',17)
-            s.node('db',720,481,True,w=239)
-            s.path([(840,394),(840,481)],'SQL / TCP 5432',(840,428))
-            if n==6:
-                s.text(563,266,T('公開側の管理URLを拒否','Admin закрыт снаружи','Ochiq admin yopiq')[lang],15,center=True,color=RED,max_width=225)
-                role='catalog_practice_setup' if practice else 'catalog_setup'
-                s.text(840,570,f'{role}: NOLOGIN',15,center=True,color=RED)
-    else:
-        s.node('web',410,225,True,w=210)
-        s.node('db',737,225,True,w=224)
-        s.node('dns',737,434,w=224)
-        s.path([(620,265),(737,265)],'TCP 5432',(677,230))
-        s.path([(515,311),(515,476),(737,476)],'DNS 53',(519,363))
-        s.text(849,330,'practice-db.lab.test' if practice else 'db.lab.test',19,center=True)
-        s.text(849,363,'jdu_catalog_practice' if practice else 'jdu_catalog',17,center=True)
+        s.node('web',720,209,True,w=239)
+        s.text(840,319,'Nginx /mission.txt',19,center=True)
+        s.text(840,350,'/var/www/jdu-mission',13,center=True)
+        s.text(840,382,'127.0.0.1:80',17,color=MUTED,center=True)
 
 def write_diagrams(root):
     counts={}

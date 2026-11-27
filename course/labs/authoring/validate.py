@@ -172,13 +172,26 @@ def main():
                 svg=ET.parse(image_path.with_suffix('.svg')).getroot()
                 text_count=len(list(svg.iter('{http://www.w3.org/2000/svg}text')))
                 ok(f'{lang}_{task}_editable_svg',svg.attrib['viewBox']=='0 0 1040 680' and text_count>=10)
-                if task in ('P2','M2'):
+                if task in ('P2','M2','P4','M4','P5','M5','P6','M6'):
                     tags=list(svg.iter('{http://www.w3.org/2000/svg}text'))
                     ok(f'{lang}_{task}_subnet_labels',all(any(label in (t.text or '') for t in tags)
                        for label in ('10.20.1.0/24','10.20.2.0/24')))
-                    ok(f'{lang}_{task}_servers_in_correct_subnets',all(
-                       any(t.text==ip and 410<float(t.attrib['x'])<963 and low<float(t.attrib['y'])<high for t in tags)
-                       for ip,low,high in (('10.20.1.10',172,447),('10.20.1.20',172,447),('10.20.2.10',468,600))))
+                    expected=[('10.20.1.20',172,447)]
+                    expected += [('10.20.2.10',468,628)] if task.endswith('4') else [('10.20.1.10',172,447)]
+                    expected += [('10.20.2.10',468,600)] if task.endswith('2') else [('10.20.2.20',468,628)]
+                    nodes=[r for r in svg.iter('{http://www.w3.org/2000/svg}rect')
+                           if r.attrib.get('fill') in ('#e7f4f2','#f4f7fa')
+                           and float(r.attrib['width'])>=190 and float(r.attrib['height'])>=86]
+                    def correct_subnet(ip,low,high):
+                        points=[t for t in tags if t.text==ip]
+                        if len(points)!=1:return False
+                        x,y=float(points[0].attrib['x']),float(points[0].attrib['y'])
+                        containers=[r for r in nodes if float(r.attrib['x'])<x<float(r.attrib['x'])+float(r.attrib['width'])
+                                    and float(r.attrib['y'])<y<float(r.attrib['y'])+float(r.attrib['height'])]
+                        return len(containers)==1 and all(
+                            410<=float(r.attrib['x']) and float(r.attrib['x'])+float(r.attrib['width'])<=963
+                            and low<=float(r.attrib['y']) and float(r.attrib['y'])+float(r.attrib['height'])<=high for r in containers)
+                    ok(f'{lang}_{task}_servers_in_correct_subnets',all(correct_subnet(*item) for item in expected))
                 if task in ('P1','P5','P6','M1','M5','M6'):
                     tags=list(svg.iter('{http://www.w3.org/2000/svg}text'))
                     ok(f'{lang}_{task}_internet_aws_boundary',

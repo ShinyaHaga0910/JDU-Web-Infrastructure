@@ -259,7 +259,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <li><strong>Webサーバー（P3.7〜P3.8）</strong>　<code>db.lab.test</code> に通常運用用ロールで接続し、SELECTが成功することを確かめる。P3.8と同じ方法で、既存パスワードを課題用（<code>mission</code>）として保存する。</li>
 </ol>
 <h3>今回の見取り図</h3>
-<p><img src="../../../assets/ja/m3.png" alt="WebサーバーがDBサーバーの名前を解決し、PostgreSQLへ接続する。" width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ja/m3.png" alt="公開サブネットのWebサーバーが、非公開サブネットのDNSでDBサーバーの名前を解決し、同じ非公開サブネットのDBへ接続する。" width="1040" height="680" loading="lazy"></p>
 <table>
 <thead>
 <tr>
@@ -346,7 +346,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <li><strong>踏み台サーバー（P4.9）</strong>　<code>http://admin.lab.test:8080/admin/</code> に <code>lab_admin</code> で入り、下の2件を登録する。一般ページでは公開にした備品を確認する。</li>
 </ol>
 <h3>今回の見取り図</h3>
-<p><img src="../../../assets/ja/m4.png" alt="一般利用者と管理者がそれぞれの入口から同じ備品管理アプリを利用する。" width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ja/m4.png" alt="公開サブネットのWebサーバーへ一般利用者が接続し、管理者は同じ公開サブネットの踏み台を経由する。Webサーバーは非公開サブネットのDBへ接続する。" width="1040" height="680" loading="lazy"></p>
 <table>
 <thead>
 <tr>
@@ -454,7 +454,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <li><strong>一般ページと管理画面（P5.4〜P5.5）</strong>　公開の80番ポートではM4の公開備品だけを表示する。踏み台から8080番ポートの管理画面に入り、<code>lab_admin</code> が備品を閲覧・追加・変更できることを確認する。</li>
 </ol>
 <h3>今回の見取り図</h3>
-<p><img src="../../../assets/ja/m5.png" alt="公開・管理の入口とWebからDBへの接続で、許可する範囲を制限する。" width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ja/m5.png" alt="公開サブネットのWeb・踏み台と、非公開サブネットのDBを示す。公開側から管理画面へのアクセスを拒否し、構築用DBロールをNOLOGINにする。" width="1040" height="680" loading="lazy"></p>
 <h3>採点基準</h3>
 <p>各項目は1点。</p>
 <table>

@@ -1,0 +1,81 @@
+{
+  "scope": "D12_P_M_materials_local_checks_not_AWS_walkthrough",
+  "checked_on": "2026-11-27",
+  "languages": [
+    "ja",
+    "ru",
+    "uz"
+  ],
+  "material_revision": "r1.5",
+  "practice_tasks": 6,
+  "practice_steps": 41,
+  "task_pages": 36,
+  "task_diagrams": 36,
+  "numbered_command_comments_per_language": 153,
+  "executable_source_preserved": true,
+  "explained_steps": 7,
+  "module_understanding_questions": 1,
+  "communication_routes": 7,
+  "worked_output_examples": 3,
+  "mission_tasks": 6,
+  "scored_checks": 123,
+  "raw_points": 123,
+  "checks_passed": 4610,
+  "bash_blocks_syntax_checked": 42,
+  "pdfs": [
+    {
+      "pdf": "web_lab_missions_ja.pdf",
+      "pages": 12,
+      "words_within_page": 635
+    },
+    {
+      "pdf": "web_lab_missions_ru.pdf",
+      "pages": 12,
+      "words_within_page": 1964
+    },
+    {
+      "pdf": "web_lab_missions_uz.pdf",
+      "pages": 12,
+      "words_within_page": 1936
+    },
+    {
+      "pdf": "web_lab_practice_ja.pdf",
+      "pages": 42,
+      "words_within_page": 3249
+    },
+    {
+      "pdf": "web_lab_practice_ru.pdf",
+      "pages": 42,
+      "words_within_page": 7480
+    },
+    {
+      "pdf": "web_lab_practice_uz.pdf",
+      "pages": 40,
+      "words_within_page": 7407
+    }
+  ],
+  "distribution_id": "web-course-class193548-20261103-r3",
+  "registry_sha256": "3feeb3d8a9225e6e19e06f68367b07c6cb4a657f05818c146ccb22cfcd654c33",
+  "package_sha256": "58b38148e28be98f9eafa82c2e0545dd4f4e379ae1c440e392ed398edec91291",
+  "new_material_AWS_walkthrough": false,
+  "native_language_review": false,
+  "teacher_visual_review": false,
+  "class_ready": false,
+  "pdf_pages_rendered": 160,
+  "pdf_words_within_pages": 22671,
+  "pdf_words_out_of_bounds": 0,
+  "diagram_scope": [
+    "P3",
+    "P4",
+    "P5",
+    "M3",
+    "M4",
+    "M5"
+  ],
+  "changed_diagrams": 18,
+  "diagram_text_boxes_checked": 396,
+  "diagram_text_overlaps": 0,
+  "earlier_diagrams_byte_identical": 18,
+  "servers_fully_inside_their_subnets": true,
+  "instruction_documents_unchanged_except_image_descriptions": 24
+}
