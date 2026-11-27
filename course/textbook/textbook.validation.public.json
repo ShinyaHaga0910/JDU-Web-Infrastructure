@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-26",
+  "date": "2026-11-27",
   "chapters": [
     {
       "chapter": 1,
@@ -7,7 +7,7 @@
       "source": "docs/ja/01-web-system.md",
       "source_sha256": "9665eba68addd55844979aab892e8d6612b980abc7d698fd44db8dcb3a94934d",
       "pdf": "output/pdf/web_textbook_ch01_ja.pdf",
-      "pdf_sha256": "17af3270497dd1260d96958302574dbe05b4710a5fa613c7e1c295da9f1b3969",
+      "pdf_sha256": "6b83b3a8b6ea4fc91cad660eadf63406142a7f25963e193266b8c9ce7df6c27f",
       "pages": 15,
       "start_page": 3,
       "end_page": 17,
@@ -45,7 +45,7 @@
       "source": "docs/ja/02-network-paths.md",
       "source_sha256": "f33c68a5e0a90d7b8d5eb32c1be759b95cf85b75f08298d9d4808744668d2dc2",
       "pdf": "output/pdf/web_textbook_ch02_ja.pdf",
-      "pdf_sha256": "431ea528ed096038760a9dd4ec700ec8549e503d68f1344bf404f50a3d5e2ddb",
+      "pdf_sha256": "4e78a2123da1aeaac8f5d4a027df4cdf44444dd9e83b9e90662e3690f1b91741",
       "pages": 12,
       "start_page": 18,
       "end_page": 29,
@@ -79,7 +79,7 @@
       "source": "docs/ja/03-connecting-and-working.md",
       "source_sha256": "4dbb6849aeca2f5a2aac71f6dc5916a07f83d2ba14db72f4e329a4310e1d71e3",
       "pdf": "output/pdf/web_textbook_ch03_ja.pdf",
-      "pdf_sha256": "030433365c69411cb5f69fe3aa9d7a8333878f43a8b04f740341bf4f6b028f37",
+      "pdf_sha256": "7702c6cf4cfdb879681ef85ed4e7de1c4ed49239340576418903d694693ffccc",
       "pages": 13,
       "start_page": 30,
       "end_page": 42,
@@ -117,7 +117,7 @@
       "source": "docs/ja/04-http-requests-and-responses.md",
       "source_sha256": "5f7d6d9d4c9d8e3e74aaba5bf71e566e45285be82e8e5fea1ed985808c9b75c9",
       "pdf": "output/pdf/web_textbook_ch04_ja.pdf",
-      "pdf_sha256": "6341e32c1a314a31282e2dd878682970116e37be7c45637b475a5c7781214b56",
+      "pdf_sha256": "abd6e9464f7b237998523f34b09525bd0ea9eca4ea2cf2a07e3b04547d080819",
       "pages": 13,
       "start_page": 43,
       "end_page": 55,
@@ -155,7 +155,7 @@
       "source": "docs/ja/05-nginx-static-files.md",
       "source_sha256": "d349cca1cdc4879c57ba0d34f190cee3cf282e130a1d948353ae2eef4bebb4df",
       "pdf": "output/pdf/web_textbook_ch05_ja.pdf",
-      "pdf_sha256": "1c78bbce86e0f2c25b2451760309e26b14d11714eee6e8c03b900123fa527e48",
+      "pdf_sha256": "9ee1231eea8c301234f942780ae20faf09f0c634f525f0d17f6555f53c4a514f",
       "pages": 12,
       "start_page": 56,
       "end_page": 67,
@@ -185,7 +185,7 @@
       "source": "docs/ja/06-dns-name-resolution.md",
       "source_sha256": "d7a20d6055ccd2f744f8007a839593dbefdeda44799db2ba9a6feee5276c163a",
       "pdf": "output/pdf/web_textbook_ch06_ja.pdf",
-      "pdf_sha256": "61bf8224d2d2fca825e16ff38ee940e33d8d313d44864a5cd84fe60571caa67a",
+      "pdf_sha256": "f026a3dcfedce0378a94693757900b781d8706786ea88f090434d27a8998a460",
       "pages": 15,
       "start_page": 68,
       "end_page": 82,
@@ -221,27 +221,23 @@
       "chapter": 7,
       "title": "第7章 内部DNSの設定と動作確認",
       "source": "docs/ja/07-internal-dns-configuration.md",
-      "source_sha256": "6e5cbc2fb3073e225576f2e08edc64d55532f9df06066255d093a787ece6cecf",
+      "source_sha256": "301a583724d1ddc03d55b8739b352f172fea22a0cafebeeccad1c2050d74ac2d",
       "pdf": "output/pdf/web_textbook_ch07_ja.pdf",
-      "pdf_sha256": "7004da3fe6094ca00fa39e5ec6cc1fe10f8bd4a5c43e9b797705afc71eefd4b2",
-      "pages": 12,
+      "pdf_sha256": "8584a5362846606f27fc73143fc1aea5d1f92bab114e3417dd8a47a64519808a",
+      "pages": 14,
       "start_page": 83,
-      "end_page": 94,
+      "end_page": 96,
       "figures": [
         {
-          "path": "assets/figures/ch07-fig01-configuration.png",
-          "sha256": "bbfc3399bffeb9470ed75014ff031cfe5eb20a22b18cba35fd1502185227b5f0"
+          "path": "assets/figures/ch07-fig01-resolver.png",
+          "sha256": "ffc1a6eb76d6ee58735d4aca10a62da09d580919d348b6578982b37a77703d96"
         },
         {
-          "path": "assets/figures/ch07-fig02-resolver.png",
-          "sha256": "2af71df23f5fb1e56fd8104ec4eeb49284e7e15f0d0a2a3e42a849882b8f0864"
-        },
-        {
-          "path": "assets/figures/ch07-fig03-checks.png",
-          "sha256": "97c353db80bc81652ac88dc8dc6da81e6beeb8ed6f476958bc9b1ae4d6cab4af"
+          "path": "assets/figures/ch07-fig02-checks.png",
+          "sha256": "4f48c7569ca58bd1b28a3cd02fb76edd4ab47e3eb8fd09fa6c63b92775f321a5"
         }
       ],
-      "text_blocks": 164
+      "text_blocks": 213
     },
     {
       "chapter": 8,
@@ -249,10 +245,10 @@
       "source": "docs/ja/08-databases-and-sql.md",
       "source_sha256": "c096ab35071a16b88e98980c2586c2e6d6fb7e300906ad0c3d40525239679c04",
       "pdf": "output/pdf/web_textbook_ch08_ja.pdf",
-      "pdf_sha256": "8f45f8da9107643115db3fb2b06b9f82a5a3e1caffef5b91754ae00a7a29c670",
+      "pdf_sha256": "876368147466a22f2dcb100558ab9d2cab7c5206a01cd3ec829e65c7f3b576ee",
       "pages": 9,
-      "start_page": 95,
-      "end_page": 103,
+      "start_page": 97,
+      "end_page": 105,
       "figures": [
         {
           "path": "assets/figures/ch08-fig01-dbms.png",
@@ -275,10 +271,10 @@
       "source": "docs/ja/09-postgresql-connections.md",
       "source_sha256": "e29599c846863a335718dc3d1291b151c5cc66336375ecc3e58163098b040d07",
       "pdf": "output/pdf/web_textbook_ch09_ja.pdf",
-      "pdf_sha256": "22579b6592f75ac40693bc26bae41430b211c7dc716e3beec7c6c5eda202b278",
+      "pdf_sha256": "0230ed58df1714ca171b353b3b52d3f1e003297173bd366169dd990415e7e2de",
       "pages": 7,
-      "start_page": 104,
-      "end_page": 110,
+      "start_page": 106,
+      "end_page": 112,
       "figures": [
         {
           "path": "assets/figures/ch09-fig01-connection.png",
@@ -293,10 +289,10 @@
       "source": "docs/ja/10-web-app-and-database.md",
       "source_sha256": "964ef26e09508f33f67ce4b968aae02d3156f6dbdd80bb573ea39a409ff471f5",
       "pdf": "output/pdf/web_textbook_ch10_ja.pdf",
-      "pdf_sha256": "b8fc832afce05ff5e17cbd47c36dac1a85ce4c1c518d833fc771115ade3b187b",
+      "pdf_sha256": "6b1eafb44d8c41d3ad406b2c21643a076a22cf690d5c50163e88caed677f618e",
       "pages": 11,
-      "start_page": 111,
-      "end_page": 121,
+      "start_page": 113,
+      "end_page": 123,
       "figures": [
         {
           "path": "assets/figures/ch10-fig01-components.png",
@@ -323,10 +319,10 @@
       "source": "docs/ja/11-application-deployment.md",
       "source_sha256": "120d9008700e7f8386c1a1861a145ea23bd82ee81443ae329f999017cb1d3bc2",
       "pdf": "output/pdf/web_textbook_ch11_ja.pdf",
-      "pdf_sha256": "b8aae1c33445510d4566c22742452a1da104570c1b0b0c0bdc3057b77f8b5db6",
+      "pdf_sha256": "41c7a5223c4f8f829be261d5794f56847ccd9fe11d839e79f4e2122cfe549c8f",
       "pages": 10,
-      "start_page": 122,
-      "end_page": 131,
+      "start_page": 124,
+      "end_page": 133,
       "figures": [
         {
           "path": "assets/figures/ch11-fig01-phases.png",
@@ -345,10 +341,10 @@
       "source": "docs/ja/12-access-and-least-privilege.md",
       "source_sha256": "3d09a8c501245827af6ebc72891005e8a67052e8c4d3491eb8a4347e66e39448",
       "pdf": "output/pdf/web_textbook_ch12_ja.pdf",
-      "pdf_sha256": "0113708fead24a71e4e61dbd41a8ac91c85f1fa728aba028e2d069fb9651f99d",
+      "pdf_sha256": "5f7427fe2a1c24869679cbfdd2d400056d50385d41e2e84c1cd9ebcf07b3958e",
       "pages": 9,
-      "start_page": 132,
-      "end_page": 140,
+      "start_page": 134,
+      "end_page": 142,
       "figures": [
         {
           "path": "assets/figures/ch12-fig01-boundaries.png",
@@ -367,15 +363,15 @@
       "source": "docs/ja/13-observation-and-recovery.md",
       "source_sha256": "2f0dd17fde1a7d09b9c99e1eb992bf4fd2b86297ab68478b0c38c882ed86a76e",
       "pdf": "output/pdf/web_textbook_ch13_ja.pdf",
-      "pdf_sha256": "89556350357b7129a280bd206bcbdfe6f1f280864709157bf76eb37ed53a9ceb",
+      "pdf_sha256": "bbe7d55a786a71e61fcfb98bbc9ef42c576886c95f4ea111bda0afbb75335ff2",
       "pages": 9,
-      "start_page": 141,
-      "end_page": 149,
+      "start_page": 143,
+      "end_page": 151,
       "figures": [],
       "text_blocks": 130
     }
   ],
-  "total_pages": 149,
+  "total_pages": 151,
   "front_matter_pages": 2,
   "chapter_count": 13,
   "contents_links": 13,
@@ -394,14 +390,14 @@
     "build\\build_chapter12.py": "324d5146b129d69a2e5aeddeb129d804a14d4c77b27c3060b7f6532a2e621b2c",
     "build\\build_chapter13.py": "4ee8642e0cca71017f3dabe87a2a3ef9c00ad3b60b64987b4d6a44f5459e13a5",
     "build\\build_textbook.py": "b75904a5cc997702901330475c6592884043447f6ef5a4fbfcfdeff8ff95ef06",
-    "build\\chapter_figures_07_13.py": "27f7a731770ea89c496ce69676faa96dc8f46e399917b5e75c50e2ef4cca8cc5",
+    "build\\chapter_figures_07_13.py": "443da0df624b63b7a6248f4a620dee65ae20ddc49895e2b0214dce3de0b5cc23",
     "docs\\ja\\01-web-system.md": "9665eba68addd55844979aab892e8d6612b980abc7d698fd44db8dcb3a94934d",
     "docs\\ja\\02-network-paths.md": "f33c68a5e0a90d7b8d5eb32c1be759b95cf85b75f08298d9d4808744668d2dc2",
     "docs\\ja\\03-connecting-and-working.md": "4dbb6849aeca2f5a2aac71f6dc5916a07f83d2ba14db72f4e329a4310e1d71e3",
     "docs\\ja\\04-http-requests-and-responses.md": "5f7d6d9d4c9d8e3e74aaba5bf71e566e45285be82e8e5fea1ed985808c9b75c9",
     "docs\\ja\\05-nginx-static-files.md": "d349cca1cdc4879c57ba0d34f190cee3cf282e130a1d948353ae2eef4bebb4df",
     "docs\\ja\\06-dns-name-resolution.md": "d7a20d6055ccd2f744f8007a839593dbefdeda44799db2ba9a6feee5276c163a",
-    "docs\\ja\\07-internal-dns-configuration.md": "6e5cbc2fb3073e225576f2e08edc64d55532f9df06066255d093a787ece6cecf",
+    "docs\\ja\\07-internal-dns-configuration.md": "301a583724d1ddc03d55b8739b352f172fea22a0cafebeeccad1c2050d74ac2d",
     "docs\\ja\\08-databases-and-sql.md": "c096ab35071a16b88e98980c2586c2e6d6fb7e300906ad0c3d40525239679c04",
     "docs\\ja\\09-postgresql-connections.md": "e29599c846863a335718dc3d1291b151c5cc66336375ecc3e58163098b040d07",
     "docs\\ja\\10-web-app-and-database.md": "964ef26e09508f33f67ce4b968aae02d3156f6dbdd80bb573ea39a409ff471f5",
@@ -413,7 +409,7 @@
     "C:\\Windows\\Fonts\\NotoSansJP-VF.ttf": "5113756f8a3b5d01b2211025e267c50121e3b36f465b7bbaf3cdaf4c3430bfd0",
     "C:\\Windows\\Fonts\\NotoSerifJP-VF.ttf": "b7e0d299a21bd2009eff27aca5e9508c75ab494de222f96bd0bbe355a8d8ced5"
   },
-  "sha256": "47f4f9db1df62a48e0a34d3c967b5c34c1b8b2799c3f57540fcae4171bc875f0",
+  "sha256": "21eb444de82efa4442aaa426f04f2466b8ad6be80c6b45a1d03d810795ee8cd0",
   "all_chapters_rebuilt": true,
   "source_inputs_unchanged_during_build": true,
   "chapter_text_preserved": true,

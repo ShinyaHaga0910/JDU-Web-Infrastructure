@@ -47,14 +47,8 @@ def stack(ch,number,stem,title,entries,note):
 
 
 def chapter07():
-    cards(7,1,'configuration','BINDの設定を三つに分ける',[
-        ('サーバー全体',['named.conf.options','待受・許可・転送先']),
-        ('担当ゾーンの登録',['named.conf.local','lab.test とファイルの対応']),
-        ('個々のレコード',['zones/db.lab.test','SOA・NS・Aなど'])],
-        ['いずれもDNSサーバー内の設定。namedが読み込んで回答に使う。',
-         'ファイルの保存、構文検査、サービスへの反映を区別する。'])
     s=Scene(1800,1150,'接続元のOSへ設定する問い合わせ先DNSのIPと、DNSサーバーが答えるWebサーバーのIPを区別する')
-    s.text(40,18,'図7-2  OSには問い合わせ先を設定し、DNSから接続先IPを得る',35)
+    s.text(40,18,'図7-1  OSには問い合わせ先を設定し、DNSから接続先IPを得る',35)
     s.rect(40,130,1000,760,'#f7f9fc',BLUE)
     s.text(540,150,'EC2',26,center=True)
     s.text(540,195,'踏み台サーバー（問い合わせる側）',33,BLUE,center=True)
@@ -81,8 +75,8 @@ def chapter07():
     s.text(55,945,'OSが尋ねる相手：10.20.2.10　　回答で得るWebサーバーのIP：10.20.1.20',28)
     s.text(55,1010,'127.0.0.53は同じOS内の受付用アドレス。別のEC2のIPではない。',28)
     s.text(55,1075,'必要な情報をDNSへ尋ねる場合の流れ。Webサーバー側のOSにも問い合わせ先を設定する。',28)
-    s.save('ch07-fig02-resolver')
-    rows(7,3,'checks','確認する方法と、分かる範囲',[
+    s.save('ch07-fig01-resolver')
+    rows(7,2,'checks','確認する方法と、分かる範囲',[
         (['dig @10.20.2.10','DNSを直接指定'],['そのDNSが何と答えたか','SERVER・status・回答を読む']),
         (['getent','OSの通常の名前解決'],['普段の経路でどのIPが得られるか','hostsや上流DNSの設定も関係する']),
         (['名前指定のHTTP','踏み台サーバーで取得'],['名前解決後にWebへ接続できるか','Webサーバーの80番ポートを使う'])],

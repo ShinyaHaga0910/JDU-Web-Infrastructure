@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1150" viewBox="0 0 1800 1150" role="img">
 <title>接続元のOSへ設定する問い合わせ先DNSのIPと、DNSサーバーが答えるWebサーバーのIPを区別する</title>
 <rect width="100%" height="100%" fill="white"/>
-<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図7-2  OSには問い合わせ先を設定し、DNSから接続先IPを得る</text>
+<text x="40" y="18" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="35" dominant-baseline="text-before-edge" text-anchor="start">図7-1  OSには問い合わせ先を設定し、DNSから接続先IPを得る</text>
 <rect x="40" y="130" width="1000" height="760" rx="18" fill="#f7f9fc" stroke="#2165a7" stroke-width="2"/>
 <text x="540" y="150" fill="#193047" font-family="Noto Sans JP, sans-serif" font-size="26" dominant-baseline="text-before-edge" text-anchor="middle">EC2</text>
 <text x="540" y="195" fill="#2165a7" font-family="Noto Sans JP, sans-serif" font-size="33" dominant-baseline="text-before-edge" text-anchor="middle">踏み台サーバー（問い合わせる側）</text>

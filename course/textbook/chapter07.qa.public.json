@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-27",
+  "chapter": 7,
+  "pages": 14,
+  "rendered_pages": 14,
+  "pdf_words_within_page": 866,
+  "figures": 2,
+  "diagram_text_boxes_checked": 36,
+  "diagram_text_overlaps": 0,
+  "local_references_checked": 8,
+  "questions_and_answers": 4,
+  "settings_table_and_explanation_numbers_match": 10,
+  "named_examples_scope_checked": true,
+  "old_configuration_figure_removed": true,
+  "other_chapter_drawing_functions_unchanged": true,
+  "bind_binary_syntax_check": "not performed; named-checkconf unavailable locally",
+  "sha256": "8584a5362846606f27fc73143fc1aea5d1f92bab114e3417dd8a47a64519808a",
+  "teacher_visual_review": "not performed",
+  "student_trial": "not performed",
+  "aws_operations": "none"
+}

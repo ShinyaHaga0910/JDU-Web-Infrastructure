@@ -2,44 +2,86 @@
 <h2 id="この章で分かること">この章で分かること</h2>
 <p>名前から接続先のIPアドレスを調べるには、情報を答えるDNSサーバーと、そのDNSを使う側の両方を準備する必要がある。学校の備品管理システムでは、DNSサーバーに内部名を登録し、踏み台サーバーとWebサーバーから利用する。</p>
 <p>本章では、BINDの設定が何を決めるかを整理し、DNSへ直接尋ねる確認から、Ubuntu OSが普段使う名前解決、名前を使ったWeb閲覧へ進む。それぞれをどのサーバーで行うかに注目しよう。</p>
-<h2 id="71-bindの設定を三つのまとまりで読む">7.1 BINDの設定を三つのまとまりで読む</h2>
+<h2 id="71-bind-9の三つの設定">7.1 BIND 9の三つの設定</h2>
 <p>DNSサーバー上では、BIND 9がDNSの処理を行う。実行するプログラムの名前は<code>named</code>であり、今回のUbuntu OSでは<code>named</code>サービスとして管理する。BINDはソフトウェアの名前、namedは実際に動くプログラムやサービスの名前として結び付けて理解する。</p>
 <p>設定には、サーバー全体の方針、担当するゾーンの登録、そのゾーンのレコードという三つのまとまりがある。今回のUbuntu OSでは、中心となる<code>/etc/bind/named.conf</code>から、それぞれの設定ファイルを読み込む。</p>
 <div class="table-wrap"><table><thead><tr><th scope="col">ファイル</th><th scope="col">決める内容</th></tr></thead><tbody><tr><td>/etc/bind/named.conf.options</td><td>接続を待ち受けるIP、問い合わせを許す相手、外部名の転送先など</td></tr><tr><td>/etc/bind/named.conf.local</td><td>lab.testというゾーンを担当することと、ゾーンファイルの保存先</td></tr><tr><td>/etc/bind/zones/db.lab.test</td><td>ゾーンの管理情報と、名前に対応するIPアドレスなどのレコード</td></tr></tbody></table></div>
-<figure><img src="../../assets/figures/ch07-fig01-configuration.png" alt="サーバー全体の設定、担当ゾーンの登録、ゾーンファイル、namedによる回答を対応させる。" width="1600" height="910"></figure>
-<p><strong>図7-1 設定ファイルの役割。</strong> 枠は設定内容のまとまりを示す。すべてDNSサーバー内の設定であり、ファイルごとに別のサーバーが必要になるわけではない。</p>
 <p>設定ファイルを保存した後は、検査してからサービスへ反映する。保存した文章と、namedが現在使っている設定を区別することは、Nginxと同じである。<a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BINDの設定とゾーン</a></p>
-<h2 id="72-ゾーンの登録とレコードを結び付ける">7.2 ゾーンの登録とレコードを結び付ける</h2>
-<p>例えば、<code>lab.test</code>ゾーンのレコードを<code>/etc/bind/zones/db.lab.test</code>に保存する場合、namedにその関係を知らせる。</p>
-<p><strong>設定の説明例：DNSサーバーのnamed.conf.local内に書くゾーンの登録。</strong></p>
+<h2 id="72-設定項目と、記載するファイルを対応させる">7.2 設定項目と、記載するファイルを対応させる</h2>
+<p>まず、説明する設定項目と、その記載先を一覧で確認する。<code>named.conf.options</code>にはサーバー全体の方針、<code>named.conf.local</code>には担当するゾーンの登録を書く。どちらもDNSサーバー内のファイルである。</p>
+<p><strong>ACLの定義は、<code>options { ... }</code>や<code>zone &quot;lab.test&quot; { ... }</code>の外側に書く。</strong> 一方、<code>allow-query</code>などは、そのACLを参照して問い合わせを許す相手を指定する設定項目である。すべてを<code>zone</code>の中に並べるわけではない。<a href="https://bind9.readthedocs.io/en/v9.18.39/reference.html#namedconf-statement-acl">BINDの設定ブロック</a></p>
+<p>表の「記載先」は今回の設定例における場所を示す。複数の場所に書ける項目もある。例えば<code>allow-transfer</code>は<code>options</code>にも<code>zone</code>にも書け、<code>zone</code>内の指定はそのゾーンに適用される。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">設定項目</th><th scope="col">今回の記載先</th><th scope="col">決める内容</th></tr></thead><tbody><tr><td>1. acl</td><td>named.conf.options内、optionsの外側</td><td>問い合わせ元として使うIPアドレスのリストに名前を付ける</td></tr><tr><td>2. listen-on / listen-on-v6</td><td>named.conf.optionsのoptions内</td><td>DNSサーバー自身の、どのIPアドレスで問い合わせを受け付けるか</td></tr><tr><td>3. recursion</td><td>named.conf.optionsのoptions内</td><td>外部名などの名前解決を取りまとめる機能を使うか</td></tr><tr><td>4. allow-query</td><td>named.conf.optionsのoptions内</td><td>DNSへの問い合わせを許す相手</td></tr><tr><td>5. allow-recursion</td><td>named.conf.optionsのoptions内</td><td>名前解決を取りまとめる処理の利用を許す相手</td></tr><tr><td>6. allow-query-cache</td><td>named.conf.optionsのoptions内</td><td>保存したキャッシュの情報を回答する相手</td></tr><tr><td>7. forward / forwarders</td><td>named.conf.optionsのoptions内</td><td>外部名の問い合わせ先と、転送先だけを使う方針</td></tr><tr><td>8. zone / type / file</td><td>named.conf.localでzoneを定義し、その中にtypeとfileを書く</td><td>管理する名前の範囲、管理方式、ゾーンファイルの保存先</td></tr><tr><td>9. allow-transfer</td><td>named.conf.localのzone内</td><td>ゾーン情報一式を別のDNSサーバーへ渡してよい相手</td></tr><tr><td>10. allow-update</td><td>named.conf.localのzone内</td><td>DNSの通信によるレコードの動的更新を許す相手</td></tr></tbody></table></div>
+<p>次の二つの例を見比べ、その後で表と同じ番号の説明を読む。</p>
+<h3 id="設定例a：etcbindnamedconfoptions">設定例A：/etc/bind/named.conf.options</h3>
+<p>サーバー全体の設定を書くファイルである。次は、この節で説明する項目を抜粋した例である。ACLを定義する<code>acl</code>と、全体の動作を指定する<code>options</code>は、同じ外側の階層に並べて書く。</p>
+<pre><code>acl &quot;jdu_clients&quot; {
+    127.0.0.1;
+    10.20.1.10;
+    10.20.1.20;
+};
+
+options {
+    listen-on { 127.0.0.1; 10.20.2.10; };
+    listen-on-v6 { none; };
+    recursion yes;
+    allow-query { jdu_clients; };
+    allow-recursion { jdu_clients; };
+    allow-query-cache { jdu_clients; };
+    forward only;
+    forwarders { 10.20.0.2; };
+};</code></pre>
+<p><code>jdu_clients</code>は、この例でIPアドレスのリストに付けた名前である。リスト名は自分で付けられるが、定義した名前と参照するときの名前をそろえる必要がある。</p>
+<h3 id="設定例b：etcbindnamedconflocal">設定例B：/etc/bind/named.conf.local</h3>
+<p>担当するゾーンを登録する、例Aとは別のファイルである。ここでは<code>lab.test</code>のレコードを<code>/etc/bind/zones/db.lab.test</code>に保存することを指定する。</p>
 <pre><code>zone &quot;lab.test&quot; {
     type primary;
     file &quot;/etc/bind/zones/db.lab.test&quot;;
     allow-transfer { none; };
     allow-update { none; };
 };</code></pre>
-<p><code>zone</code>は担当する名前の範囲、<code>type primary</code>は元となるゾーン情報を管理すること、<code>file</code>はレコードを保存したファイルを指定する。<code>allow-transfer</code>は、このゾーンの登録情報一式を他のDNSサーバーへコピーする「ゾーン転送」を許す相手を指定する。<code>allow-update</code>は、DNSの通信による動的な更新を許す相手を指定する。ここでは、どちらも許可しない。ゾーン転送の用途は7.3で説明する。</p>
-<p>ゾーンファイルには、第6章で説明したSOA、NS、Aなどを記録する。例えば<code>guide IN A 10.20.1.20</code>という行は、基準が<code>lab.test.</code>であれば<code>guide.lab.test.</code>をWebサーバーの内部IPへ対応させる。名前のつづり、ゾーンの基準、返すIPをそれぞれ読む。設定の構文が正しくても、別のIPを書けば、その別のIPが回答になる。</p>
-<p>SOAのserialは、ゾーンの変更に合わせて増やす。ファイル名を<code>db.lab.test</code>にしただけではゾーン登録にはならず、ゾーン登録だけがあってもレコードの内容が正しいとは限らない。</p>
-<h2 id="73-問い合わせを許す相手と、転送先を決める">7.3 問い合わせを許す相手と、転送先を決める</h2>
-<h3 id="許可する送信元をまとめる">許可する送信元をまとめる</h3>
-<p><strong>ACL</strong>（Access Control List）は、許可する相手などをまとめるリストである。今回のBINDでは、DNSサーバー自身、踏み台サーバー、Webサーバーからの問い合わせを扱う。</p>
-<p><strong>設定の説明例：問い合わせ元のリストと、それを使う設定項目。</strong></p>
-<pre><code>acl &quot;internal_clients&quot; {
-    127.0.0.1;
-    10.20.1.10;
-    10.20.1.20;
-};</code></pre>
-<p>このリストは、後の設定で相手の範囲を指定するときに使う。ACLを定義するだけで、すべての処理へ自動的に適用されるわけではない。</p>
-<div class="table-wrap"><table><thead><tr><th scope="col">設定項目</th><th scope="col">制御すること</th></tr></thead><tbody><tr><td>listen-on</td><td>DNSサーバー自身の、どのIPv4アドレスで接続を受け付けるか</td></tr><tr><td>allow-query</td><td>DNSへの問い合わせを許す相手</td></tr><tr><td>allow-recursion</td><td>外部名などの名前解決を取りまとめる処理を許す相手</td></tr><tr><td>allow-query-cache</td><td>保存しているキャッシュの情報を回答する相手</td></tr></tbody></table></div>
-<p>例えば、<code>allow-query { internal_clients; };</code>は、先ほどのACLに含まれる相手へ問い合わせを許す指定である。問い合わせを受けること、外部名を調べること、キャッシュを利用させることには、別々の設定がある。<a href="https://bind9.readthedocs.io/en/v9.18.39/reference.html">BINDのアクセス制御</a></p>
-<h3 id="外部名の解決と、ゾーン転送を区別する">外部名の解決と、ゾーン転送を区別する</h3>
-<p><code>forwarders</code>には外部名を調べる際の依頼先として<code>10.20.0.2</code>を指定し、<code>forward only</code>でその転送先を使う。これは、名前解決の問い合わせを他のDNSへ依頼する設定である。</p>
-<p>一方、<strong>ゾーン転送</strong>は、あるゾーンに登録したレコード一式を、別のDNSサーバーへコピーするための処理である。例えば、二台のDNSサーバーから同じ情報を回答したい場合、一台で管理する<code>lab.test</code>の登録情報をもう一台へ渡すために使う。そのゾーンの全レコードをまとめて転送する方式を<strong>AXFR</strong>（エー・エックス・エフ・アール）という。<a href="https://www.rfc-editor.org/rfc/rfc5936.html">ゾーン転送の仕様</a></p>
-<div class="table-wrap"><table><thead><tr><th scope="col">問い合わせ</th><th scope="col">求める情報の例</th><th scope="col">主な用途</th></tr></thead><tbody><tr><td>通常のAレコードの問い合わせ</td><td>「guide.lab.testのIPv4アドレスを教えてほしい」</td><td>ブラウザやアプリが接続先を調べる</td></tr><tr><td>ゾーン転送の問い合わせ（AXFR）</td><td>「lab.testゾーンに登録されたレコード一式を渡してほしい」</td><td>別のDNSサーバーにも同じ登録情報を持たせる</td></tr></tbody></table></div>
-<p>今回の構成では、内部DNSをもう一台に複製する作業は行わない。7.2の<code>allow-transfer { none; };</code>は、ゾーンの登録情報一式を渡す相手を許可しない設定である。これを設定しても、許可された相手からの通常のAレコードの問い合わせには回答できる。名前解決を他のDNSへ依頼する<code>forwarders</code>と、ゾーンの登録情報をコピーするAXFRは、用途が異なる。<a href="https://bind9.readthedocs.io/en/v9.18.39/reference.html#namedconf-statement-allow-transfer">BINDのゾーン転送の許可設定</a></p>
+<p>例Aを、この<code>zone { ... }</code>の中へ入れるわけではない。<code>file</code>で指定した<code>db.lab.test</code>は、さらに別のファイルであり、そこへ名前とIPアドレスの対応を記録する。レコードの例は7.3で説明する。</p>
+<h3 id="1-acl：問い合わせ元のリストを定義する">1. acl：問い合わせ元のリストを定義する</h3>
+<p><strong>ACL</strong>（Access Control List）は、相手のIPアドレスなどをまとめたリストである。例Aの<code>jdu_clients</code>には、DNSサーバー自身を表す<code>127.0.0.1</code>、踏み台サーバーの<code>10.20.1.10</code>、Webサーバーの<code>10.20.1.20</code>を入れている。</p>
+<p>ACLを定義しただけでは、問い合わせを許可する設定にはならない。4〜6の各項目で<code>jdu_clients</code>を参照することで、それぞれの処理にリストを適用する。</p>
+<h3 id="2-listen-on--listen-on-v6：受け付けるipアドレスを決める">2. listen-on / listen-on-v6：受け付けるIPアドレスを決める</h3>
+<p><code>listen-on</code>は、DNSサーバー自身のどのIPv4アドレスで問い合わせを受け付けるかを指定する。例Aでは、DNSサーバー内からの確認に使う<code>127.0.0.1</code>と、他のサーバーから問い合わせる際の宛先となる内部IP<code>10.20.2.10</code>を指定している。</p>
+<p><code>listen-on-v6</code>はIPv6側の待受設定であり、この例では<code>none</code>で受け付けない。ここに書くのはDNSサーバー自身のIPであり、利用する踏み台サーバーやWebサーバーのIPではない。</p>
+<h3 id="3-recursion：名前解決を取りまとめる機能を使う">3. recursion：名前解決を取りまとめる機能を使う</h3>
+<p><code>recursion yes;</code>は、BINDが問い合わせ元に代わって必要な名前の情報を調べる機能を有効にする。例えば、内部DNSが自分のゾーンに持っていない<code>google.com</code>の情報を、転送先DNSへ依頼する際に使う。自分が管理する<code>lab.test</code>のレコードから回答する処理とは役割が違う。</p>
+<h3 id="4-allow-query：問い合わせを許す相手を決める">4. allow-query：問い合わせを許す相手を決める</h3>
+<p><code>allow-query { jdu_clients; };</code>は、ACLに含まれる相手からのDNS問い合わせを許す。例えば、踏み台サーバーが<code>guide.lab.test</code>のAレコードを尋ねる場合が該当する。<code>listen-on</code>が受け付ける側のIPを指定するのに対し、こちらは問い合わせる側のIPを指定する。</p>
+<h3 id="5-allow-recursion：名前解決の取りまとめを許す相手を決める">5. allow-recursion：名前解決の取りまとめを許す相手を決める</h3>
+<p><code>allow-recursion { jdu_clients; };</code>は、3で有効にした機能を利用できる相手を指定する。例Aでは、外部名の調査を依頼できる相手も同じACLに限定する。機能を有効にする<code>recursion yes</code>と、利用する相手を限定する<code>allow-recursion</code>を組み合わせて使う。</p>
+<h3 id="6-allow-query-cache：キャッシュを回答する相手を決める">6. allow-query-cache：キャッシュを回答する相手を決める</h3>
+<p><code>allow-query-cache { jdu_clients; };</code>は、BINDが保存しているDNS情報を回答できる相手を指定する。例えば、先ほど調べた外部名の情報がキャッシュに残っている場合、その情報を同じACLの相手へ回答できる。</p>
+<p>4〜6にはそれぞれ、問い合わせの受付、名前解決の取りまとめ、キャッシュからの回答という用途がある。今回の例では、三つとも同じACLを指定する。<a href="https://bind9.readthedocs.io/en/v9.18.39/reference.html#access-control">BINDのアクセス制御</a></p>
+<h3 id="7-forward--forwarders：外部名の問い合わせ先を決める">7. forward / forwarders：外部名の問い合わせ先を決める</h3>
+<p><code>forwarders { 10.20.0.2; };</code>は、自分のゾーンにない外部名を調べる際の依頼先を指定する。今回はAWS提供のDNSを使う。<code>forward only;</code>は、その転送先だけを使い、転送先に依頼できないときにBIND自身がルートDNSから直接調べ直す方法へ切り替えない指定である。使えるキャッシュがあれば、それを利用する。<a href="https://bind9.readthedocs.io/en/v9.18.39/reference.html#namedconf-statement-forward">BINDのフォワーダー</a></p>
+<h3 id="8-zone--type--file：担当ゾーンと保存先を登録する">8. zone / type / file：担当ゾーンと保存先を登録する</h3>
+<p><code>zone &quot;lab.test&quot;</code>は、このブロックで設定する名前の範囲を指定する。<code>type primary;</code>は、元となるゾーン情報をこのDNSサーバーで管理する指定である。<code>file</code>は、その情報を記録したゾーンファイルの保存先を指定する。</p>
+<p><code>file &quot;/etc/bind/zones/db.lab.test&quot;;</code>と書くことと、その場所に正しいレコードを保存することの両方が必要になる。ファイル名を<code>db.lab.test</code>にしただけで、BINDへゾーンを登録したことにはならない。</p>
+<h3 id="9-allow-transfer：ゾーン情報一式を渡す相手を決める">9. allow-transfer：ゾーン情報一式を渡す相手を決める</h3>
+<p><strong>ゾーン転送</strong>は、あるゾーンに登録したレコード一式を別のDNSサーバーへコピーする処理である。例えば、二台のDNSサーバーから同じ情報を回答したい場合、一台で管理する<code>lab.test</code>の情報をもう一台へ渡すために使う。全レコードをまとめて転送する方式を<strong>AXFR</strong>（エー・エックス・エフ・アール）という。<a href="https://www.rfc-editor.org/rfc/rfc5936.html">ゾーン転送の仕様</a></p>
+<p><code>allow-transfer</code>は、このコピーを許す相手を指定する設定項目である。例Bの<code>allow-transfer { none; };</code>は、<code>lab.test</code>のレコード一式を渡す相手を許可しない指定である。今回は複製先のDNSサーバーを構築しないため、この設定を使う。演習P2では例Aの<code>options</code>にも同じ指定を置き、サーバー全体の既定方針としても転送を許可しない。</p>
+<div class="table-wrap"><table><thead><tr><th scope="col">問い合わせ</th><th scope="col">求める情報</th><th scope="col">今回の扱い</th></tr></thead><tbody><tr><td>通常のAレコードの問い合わせ</td><td>guide.lab.testのIPv4アドレス</td><td>許可した問い合わせ元へ回答する</td></tr><tr><td>ゾーン転送の問い合わせ（AXFR）</td><td>lab.testのレコード一式</td><td>allow-transferで許可しない</td></tr></tbody></table></div>
+<p>ゾーン転送を許可しなくても、通常のAレコードの問い合わせには回答できる。7の<code>forwarders</code>は名前解決の依頼先であり、ゾーン情報をコピーする相手ではない。<a href="https://bind9.readthedocs.io/en/v9.18.39/reference.html#namedconf-statement-allow-transfer">BINDのゾーン転送の許可設定</a></p>
+<h3 id="10-allow-update：通信によるレコードの更新を許す相手を決める">10. allow-update：通信によるレコードの更新を許す相手を決める</h3>
+<p><code>allow-update</code>は、DNSの通信を使ってレコードを追加・変更する動的更新を許す相手を指定する。例Bでは<code>allow-update { none; };</code>として、その更新を許可しない。管理者がDNSサーバー内でゾーンファイルを編集し、検査してから読み直させる作業とは別の処理である。</p>
+<h2 id="73-ゾーンファイルに名前とipアドレスを記録する">7.3 ゾーンファイルに名前とIPアドレスを記録する</h2>
+<p>ここで扱うのは、7.2の例Bの<code>file</code>で指定した<strong><code>/etc/bind/zones/db.lab.test</code></strong>である。これは<code>named.conf.options</code>や<code>named.conf.local</code>とは別のファイルであり、この中へSOA、NS、Aなどのレコードを書く。</p>
+<p><strong>設定例C：DNSサーバーの/etc/bind/zones/db.lab.test。</strong></p>
+<pre><code>$ORIGIN lab.test.
+$TTL 300
+@ IN SOA dns.lab.test. hostmaster.lab.test. (
+    2026112701 3600 600 604800 300 )
+@ IN NS dns.lab.test.
+dns   IN A 10.20.2.10
+guide IN A 10.20.1.20</code></pre>
+<p><code>$ORIGIN lab.test.</code>は、このファイルで使う名前の基準である。<code>guide IN A 10.20.1.20</code>は、<code>guide.lab.test</code>という名前にWebサーバーの内部IPを対応させる。<code>@</code>は基準である<code>lab.test.</code>を表す。SOA、NS、TTLの読み方は第6章で説明した内容と同じである。</p>
+<p>SOAのserialは、ゾーンの変更に合わせて増やす。設定の構文が正しくても、別のIPを書けば、その別のIPが回答になるため、名前のつづり、基準となる名前、返すIPをそれぞれ読む。</p>
 <h3 id="ここから行う確認と、接続元の設定">ここから行う確認と、接続元の設定</h3>
-<p>ここまでで、DNSサーバーのBINDへ登録する情報や、問い合わせを許す相手について説明した。ここからは、DNSが正しく答えることを確認し、そのDNSを普段使うように接続元のOSを設定する。</p>
+<p>ここまでで、DNSサーバー内の三つのファイルと、それぞれに書く設定やレコードを説明した。ここからは、DNSが正しく答えることを確認し、そのDNSを普段使うように接続元のOSを設定する。</p>
 <p>学校の備品管理システムで、踏み台サーバーのブラウザから<code>http://guide.lab.test/example.txt</code>を開く場合を考える。ブラウザは、まず<code>guide.lab.test</code>に対応するIPアドレスを調べ、そのIPのWebサーバーへ接続する。この名前解決を利用するには、<strong>情報を答えるDNSサーバーの設定</strong>と、<strong>そのDNSへ尋ねる接続元のOSの設定</strong>が必要になる。</p>
 <p>ここでいう接続元は、名前を使って通信を始めるコンピューターである。ブラウザを動かす踏み台サーバーも、後でDBへ接続するWebサーバーも、DNSに尋ねるときには利用する側になる。一台のサーバーであっても、相手にサービスを提供する役割と、別のサービスを利用する役割がある。</p>
 <div class="table-wrap"><table><thead><tr><th scope="col">場所</th><th scope="col">設定する内容</th><th scope="col">今回の例</th></tr></thead><tbody><tr><td>DNSサーバーのBIND</td><td>名前とIPの対応、問い合わせを受け付ける相手、外部名の転送先</td><td>guide.lab.testに対して10.20.1.20と答える</td></tr><tr><td>接続元のOS：踏み台サーバーとWebサーバーのそれぞれ</td><td>普段、どのDNSサーバーへ問い合わせるか</td><td>問い合わせ先を内部DNSの10.20.2.10にする</td></tr><tr><td>踏み台サーバーのブラウザ</td><td>OSの名前解決を利用する設定</td><td>今回は準備済みの設定を使うため、追加の設定変更は行わない</td></tr></tbody></table></div>
@@ -90,8 +132,8 @@ nameservers:
 <p>Netplanの設定ファイルを保存した後、<code>sudo netplan generate</code>で設定を生成・検査し、<code>sudo netplan apply</code>でネットワークへ適用する。ファイルの保存だけで、動作中の問い合わせ先まで変更されたとは限らない。digは、この設定の保存や適用には使わない。</p>
 <h3 id="1270053と内部dnsを混同しない">127.0.0.53と内部DNSを混同しない</h3>
 <p>Ubuntu OSの<code>/etc/resolv.conf</code>に<code>127.0.0.53</code>が表示される場合がある。これは同じコンピューター内のsystemd-resolvedが提供する<strong>ローカルスタブ</strong>のアドレスであり、別のEC2の内部DNSを表しているわけではない。</p>
-<figure><img src="../../assets/figures/ch07-fig02-resolver.png" alt="踏み台サーバーのOSが10.20.2.10へ問い合わせ、DNSサーバーからWebサーバーのIPである10.20.1.20を得る。" width="1800" height="1150"></figure>
-<p><strong>図7-2 設定する問い合わせ先と、回答される接続先IP。</strong> 左のOSに設定するのはDNSサーバーの<code>10.20.2.10</code>である。右のDNSサーバーは、管理している名前とIPの対応から、Webサーバーの<code>10.20.1.20</code>を答える。<code>127.0.0.53</code>は、左のOS内でDNSの問い合わせを受け付けるためのアドレスであり、右のDNSサーバーのIPではない。</p>
+<figure><img src="../../assets/figures/ch07-fig01-resolver.png" alt="踏み台サーバーのOSが10.20.2.10へ問い合わせ、DNSサーバーからWebサーバーのIPである10.20.1.20を得る。" width="1800" height="1150"></figure>
+<p><strong>図7-1 設定する問い合わせ先と、回答される接続先IP。</strong> 左のOSに設定するのはDNSサーバーの<code>10.20.2.10</code>である。右のDNSサーバーは、管理している名前とIPの対応から、Webサーバーの<code>10.20.1.20</code>を答える。<code>127.0.0.53</code>は、左のOS内でDNSの問い合わせを受け付けるためのアドレスであり、右のDNSサーバーのIPではない。</p>
 <p>設定の適用後は、次の二つを区別して確認する。</p>
 <p><strong>実行場所：踏み台サーバーとWebサーバーのそれぞれの端末。</strong></p>
 <pre><code>resolvectl dns
@@ -100,8 +142,8 @@ getent ahostsv4 guide.lab.test</code></pre>
 <p>getentはhostsの情報も利用できるため、その結果だけで、今回の内部DNSを使ったと決めることはできない。hostsで代用せず、Netplanの設定、resolvectlで表示する動作中の設定、実際に得たIPアドレスを対応させる。<a href="https://www.freedesktop.org/software/systemd/man/latest/systemd-resolved.service.html">systemd-resolvedの仕組み</a></p>
 <h2 id="77-名前を使って、既存のwebへ接続する">7.7 名前を使って、既存のWebへ接続する</h2>
 <p>最後に、踏み台サーバーのブラウザでIP指定と名前指定のURLを開く。例えば、同じファイルに対する<code>http://10.20.1.20/example.txt</code>と<code>http://guide.lab.test/example.txt</code>を比較する。名前指定では、先に名前解決を行い、その結果を使って同じWebサーバーへ接続する。</p>
-<figure><img src="../../assets/figures/ch07-fig03-checks.png" alt="DNSへの直接問い合わせ、通常の名前解決、HTTP取得の三段階を対応させる。" width="1600" height="1100"></figure>
-<p><strong>図7-3 確認ごとに分かることを積み重ねる。</strong> 問い合わせ先を指定したdig、通常経路を使うgetent、名前を使ったHTTP取得は、確かめる範囲が異なる。</p>
+<figure><img src="../../assets/figures/ch07-fig02-checks.png" alt="DNSへの直接問い合わせ、通常の名前解決、HTTP取得の三段階を対応させる。" width="1600" height="1100"></figure>
+<p><strong>図7-2 確認ごとに分かることを積み重ねる。</strong> 問い合わせ先を指定したdig、通常経路を使うgetent、名前を使ったHTTP取得は、確かめる範囲が異なる。</p>
 <p>今回の踏み台サーバーのFirefoxは、OSの名前解決を使う準備が済んでいる。ブラウザが独自の外部DNSへ問い合わせる機能は、初期準備で無効にしているため、ここでブラウザへDNSのIPを追加設定する必要はない。7.6で設定した踏み台サーバーのOSを通じて、内部DNSへ名前を尋ねる。</p>
 <p>RDPの画面を表示している利用者PCと、ブラウザを実際に動かす踏み台サーバーは別のコンピューターである。踏み台サーバーのOSを設定しても、利用者PCのOSやブラウザのDNS設定が変わるわけではない。</p>
 <p>後にWebサーバーのアプリがDBへ接続するときも、Webサーバー自身がDBサーバーの名前を解決する。踏み台サーバーで成功した結果だけで済ませず、名前を使うサーバーごとに設定と結果を結び付ける。</p>
@@ -125,7 +167,7 @@ getent ahostsv4 guide.lab.test</code></pre>
 <h3 id="問4">問4</h3>
 <p>判断できない。通信不能も考えられるため、通常問い合わせの成功と、AXFRに対する明示的な拒否を合わせて読む。</p>
 <h2 id="参考資料">参考資料</h2>
-<p>確認日：2026-11-03。digとOSの名前解決の説明は2026-11-05、ゾーン転送の説明は2026-11-13に再確認した。設定・出力は説明例である。</p>
+<p>確認日：2026-11-03。digとOSの名前解決の説明は2026-11-05、ゾーン転送の説明は2026-11-13、設定の記載場所は2026-11-27に再確認した。設定・出力は説明例である。</p>
 <p class="bullet">・ <a href="https://bind9.readthedocs.io/en/v9.18.39/chapter3.html">BINDの設定とゾーン</a></p>
 <p class="bullet">・ <a href="https://www.rfc-editor.org/rfc/rfc5936.html">RFC 5936 DNS Zone Transfer Protocol (AXFR)</a></p>
 <p class="bullet">・ <a href="https://bind9.readthedocs.io/en/v9.18.39/reference.html">BIND設定リファレンス</a></p>
