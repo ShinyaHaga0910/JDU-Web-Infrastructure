@@ -21,21 +21,21 @@ PとMは、同じ演習環境の5台を使います。練習で導入したソ�
 
 MではPで練習した操作を、課題で指定されたファイル名・DNS名・DB・ロールなどに適用します。M3のDB名での接続はP3.7で、M4で使う接続設定の作成・有効化と一時設定の作成はP4.4〜P4.5で、稼働中のアプリを止めて切り替える手順はP5.3で先に練習します。
 
-表を上から順に進めます。各行で教科書を先に読み、その行のP・Mに取り組みます。点数のあるMは、授業の課題画面で表の点数に達したことを確認してから次に進みます。
+表を上から順に進めます。各行で教科書を先に読み、その行のP・Mに取り組みます。すべてのP・Mは、授業の課題画面で表の点数に達したことを確認してから次に進みます。
 
 | 学ぶテーマ | 先に読む教科書 | 次に取り組む演習 | 課題画面で確認する点数 |
 | --- | --- | --- | --- |
-| システムの全体像と接続 | [C1 Webシステムの構成](../textbook/docs/ja/01-web-system.md)<br>[C2 AWSのネットワークと通信経路](../textbook/docs/ja/02-network-paths.md)<br>[C3 サーバーへの接続と作業場所](../textbook/docs/ja/03-connecting-and-working.md) | [P0 環境と実行場所](#p0-共通登録コード方式で接続を練習する) → [M0 環境と実行場所](docs/ja/m0.md) | 授業で案内 |
+| システムの全体像と接続 | [C1 Webシステムの構成](../textbook/docs/ja/01-web-system.md)<br>[C2 AWSのネットワークと通信経路](../textbook/docs/ja/02-network-paths.md)<br>[C3 サーバーへの接続と作業場所](../textbook/docs/ja/03-connecting-and-working.md) | [P0 環境と実行場所](#p0-共通登録コード方式で接続を練習する) → [M0 環境と実行場所](docs/ja/m0.md) | P0は1/1、M0は4/4 |
 | HTTPでファイルを配信する | [C4 HTTPの仕組み](../textbook/docs/ja/04-http-requests-and-responses.md)<br>[C5 Nginxで静的ファイルを配信](../textbook/docs/ja/05-nginx-static-files.md) | [P1](docs/ja/p1.md) → [M1](docs/ja/m1.md) | 8/8 |
 | DNSで名前を解決する | [C6 DNSによる名前解決](../textbook/docs/ja/06-dns-name-resolution.md)<br>[C7 内部DNSの設定と動作確認](../textbook/docs/ja/07-internal-dns-configuration.md) | [P2](docs/ja/p2.md) → [M2](docs/ja/m2.md) | 13/13 |
 | PostgreSQLの接続と認証 | [C8 リレーショナルDBとSQL](../textbook/docs/ja/08-databases-and-sql.md)<br>[C9 PostgreSQLの接続と認証](../textbook/docs/ja/09-postgresql-connections.md) | [P3](docs/ja/p3.md) → [M3](docs/ja/m3.md) | 9/9 |
-| 提供アプリを練習用DBへ接続する | [C10 Web・アプリ・DBの連携](../textbook/docs/ja/10-web-app-and-database.md)<br>[C11 提供アプリの配置と初期設定](../textbook/docs/ja/11-application-deployment.md) | [P4](docs/ja/p4.md) | — |
-| 練習環境の公開範囲と権限を整える | [C12 公開範囲と最小権限](../textbook/docs/ja/12-access-and-least-privilege.md) | [P5](docs/ja/p5.md) | — |
+| 提供アプリを練習用DBへ接続する | [C10 Web・アプリ・DBの連携](../textbook/docs/ja/10-web-app-and-database.md)<br>[C11 提供アプリの配置と初期設定](../textbook/docs/ja/11-application-deployment.md) | [P4](docs/ja/p4.md) | 13/13 |
+| 練習環境の公開範囲と権限を整える | [C12 公開範囲と最小権限](../textbook/docs/ja/12-access-and-least-privilege.md) | [P5](docs/ja/p5.md) | 16/16 |
 | 提供アプリを自力課題用DBへ接続する | 必要な箇所をC10・C11で読み返す | [M4](docs/ja/m4.md) | 13/13 |
 | 自力課題の公開範囲と権限を仕上げる | 必要な箇所をC12で読み返す | [M5](docs/ja/m5.md) | 16/16 |
 | 運用・保守と障害への対応 | [C13 運用・保守と障害への対応](../textbook/docs/ja/13-observation-and-recovery.md) | M5の後に読みます。演習中にエラーが出たときも参照できます。 | — |
 
-P0は1点、M0は4点です。M1・M2・M3・M4・M5の59点を合わせ、自動採点は計**64素点**です。授業の配点は教師の案内に従ってください。
+P0〜P5・M0〜M5はすべて採点対象です。Pは60点、Mは63点で、合計**123素点**です。授業の配点は教師の案内に従ってください。
 
 ### C1 → C2 → C3 → P0 → M0の進め方
 

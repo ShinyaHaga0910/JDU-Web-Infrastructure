@@ -3,6 +3,7 @@ import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
 import { readFileSync } from 'node:fs';
 const labels=JSON.parse(readFileSync(new URL('./check-labels.json',import.meta.url),'utf8'));
 export const CHECK_MAXIMA=Object.freeze(JSON.parse(readFileSync(new URL('./check-points.json',import.meta.url),'utf8')));
+export const ASSESSMENT_MAXIMUM=Object.values(CHECK_MAXIMA).reduce((sum,n)=>sum+n,0);
 
 export const tasks=Object.freeze([...[0,1,2,4].flatMap(i=>[`P${i}`,`M${i}`]),'P5','P6','M5','M6']);
 const displayIds=Object.freeze({P4:'P3',P5:'P4',P6:'P5',M4:'M3',M5:'M4',M6:'M5'});
@@ -132,6 +133,7 @@ function practiceScore(grade,task) {
 }
 
 export function taskScore(grade,task) {
+  if(grade?.raw_maximum===ASSESSMENT_MAXIMUM)return grade?.selected?.[task];
   return task.startsWith('P') && task!=='P0'?practiceScore(grade,task):grade?.selected?.[task];
 }
 

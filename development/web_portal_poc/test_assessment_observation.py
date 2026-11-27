@@ -117,11 +117,11 @@ class ObservationTest(unittest.TestCase):
             self.snapshot[field] = dict(reversed(list(self.snapshot[field].items())))
         self.assertEqual(self.observer().command(self.spec), before)
 
-    def test_practice_http_uses_its_own_fixed_body_and_stays_ungraded(self):
+    def test_practice_http_uses_its_own_fixed_body_and_counts_toward_the_course(self):
         self.select('P1')
         result = self.observer().finish(self.spec, json.dumps(self.legacy_http()))
         self.assertEqual(self.probes[0][1], '/practice.txt')
-        self.assertFalse(score(result['report'])['counts_toward_assessment'])
+        self.assertTrue(score(result['report'])['counts_toward_assessment'])
 
     def test_external_failure_and_unknown_are_not_silently_passed(self):
         self.probe_result = False

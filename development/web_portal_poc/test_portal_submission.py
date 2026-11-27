@@ -97,12 +97,12 @@ class SubmissionTest(unittest.TestCase):
         self.assertEqual(view['raw_earned'],62)
         self.assertIn('M5',view['current_unresolved'])
 
-    def test_practice_and_preparation_never_create_selected_grade(self):
+    def test_practice_creates_selected_grade_but_preparation_without_markers_does_not(self):
         for task in ('P1','M0'):
             self.spec = self.new_spec(task)
             receipt = self.save(self.report(task))
-            self.assertFalse(receipt['counts_toward_assessment'])
-            self.assertIsNone(self.grades.get(self.meta['pk'],grade_key(task)))
+            self.assertEqual(receipt['counts_toward_assessment'], task == 'P1')
+            self.assertEqual(self.grades.get(self.meta['pk'],grade_key(task)) is not None, task == 'P1')
         self.assertEqual(project_lab(self.grades.labs(self.meta['lab_id'])[0])['raw_earned'],62)
 
     def test_connection_grades_use_student_evidence_and_preserve_legacy_scores(self):
@@ -207,12 +207,12 @@ class SubmissionTest(unittest.TestCase):
                 self.assertEqual((grade['current'][task]['raw_earned'], grade['current'][task]['raw_maximum']), (12, 13))
                 self.assertEqual(len(grade['task_checks']), 13)
                 if task == 'P2':
-                    self.assertNotIn('P2', grade['selected'])
-                    self.assertEqual(grade['raw_earned'], before)
+                    self.assertEqual(grade['selected']['P2']['raw_earned'], 12)
+                    self.assertEqual(grade['raw_earned'], before + 12)
                 else:
                     self.assertEqual(grade['selected']['M2']['raw_earned'], 12)
-                    self.assertEqual(grade['raw_earned'], before - 1)
-                self.assertEqual(grade['raw_maximum'], 64)
+                    self.assertEqual(grade['raw_earned'], before + 12 - 1)
+                self.assertEqual(grade['raw_maximum'], 123)
                 rows = self.rows()
                 self.assertEqual(self.call('result')['submission'], result['submission'])
                 self.assertEqual(self.rows(), rows)

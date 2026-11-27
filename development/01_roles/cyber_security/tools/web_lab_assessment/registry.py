@@ -17,7 +17,7 @@ assert MAXIMUM == 62 and len(MISSIONS) == 6
 
 # The signed D11 wire contract above is immutable. The current curriculum is a
 # teacher-owned subset; retired tasks never contribute to current course totals.
-COURSE_ID = 'web-2026-11-20-with-connection-checks'
+COURSE_ID = 'web-2026-11-27-all-practice-points'
 RETIRED_TASKS = frozenset({'P3', 'M3'})
 COURSE_TASKS = {tid: task for tid, task in TASKS.items() if tid not in RETIRED_TASKS}
 COURSE_MISSIONS = tuple(tid for tid in MISSIONS if tid in COURSE_TASKS)
@@ -38,8 +38,8 @@ COURSE_INTRO_MARKERS = {
 M0_CONTRACT_ID = CONTRACT_ID + '-connection-v2'
 M0_CONTRACT_SHA256 = hashlib.sha256(json.dumps(
     [CONTRACT_SHA256, M0_CONTRACT_ID, COURSE_INTRO_MARKERS['M0']], sort_keys=True).encode()).hexdigest()
-COURSE_POINTS = {tid: len(markers) for tid, markers in COURSE_INTRO_MARKERS.items()} | {
-    tid: TASKS[tid]['raw_points_max'] for tid in COURSE_MISSIONS}
+COURSE_POINTS = {tid: len(COURSE_INTRO_MARKERS[tid]) if tid in COURSE_INTRO_MARKERS
+                else len(task['progress_scored_checks']) for tid, task in COURSE_TASKS.items()}
 COURSE_GRADED_TASKS = tuple(COURSE_POINTS)
 COURSE_MAXIMUM = sum(COURSE_POINTS.values())
 STATUSES = {'PASS', 'FAIL', 'UNKNOWN', 'NOT_APPLICABLE'}
@@ -116,7 +116,8 @@ def score(report):
     return dict(raw_earned=passed, raw_maximum=len(scored), unresolved=unresolved,
                 readiness_ok=ready_ok, evaluable=ready_ok and unresolved == 0,
                 complete=ready_ok and unresolved == 0 and passed == len(scored),
-                counts_toward_assessment=intro or task['category'] == 'automated_mission')
+                counts_toward_assessment=intro or task['category'] == 'automated_mission'
+                    or (task['id'] in COURSE_TASKS and bool(scored)))
 
 
 def build_report(task_id, identity, observations, run_id, *, mode='read_only', checked_at, intro=False, http_revision=False):

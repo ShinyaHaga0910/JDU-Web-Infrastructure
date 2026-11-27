@@ -51,7 +51,7 @@ def project_course_lab(lab):
         grade = http_rows.get(grade_key(task, HTTP_CONTRACT_SHA256))
         if latest:
             current[task] = latest
-        if grade and task == 'M1':
+        if grade:
             selected[task] = grade
     intro_rows = {r['sk']: r for r in lab.get('results', []) if r.get('contract_sha256') in (INTRO_CONTRACT_SHA256, M0_CONTRACT_SHA256)
                   and r.get('deployment_id') == lab.get('deployment_id')}
@@ -69,6 +69,17 @@ def project_course_lab(lab):
         elif 'M0' in target:
             target['M0'] = {**target['M0'], 'raw_maximum': COURSE_POINTS['M0'],
                             'unresolved': COURSE_POINTS['M0'] - 1, 'complete': False, 'evaluable': False}
+    # Before practices counted toward the course, their validated latest report
+    # was saved without a GRADE row. Reuse a fully evaluated same-deployment
+    # result, including its original rubric, rather than asking for a new check.
+    # An unknown observation never replaces an existing selected grade.
+    for task in COURSE_GRADED_TASKS:
+        latest = current.get(task)
+        if (task.startswith('P') and task not in INTRO_MARKERS and task not in selected and latest
+                and latest.get('deployment_id') == lab.get('deployment_id')
+                and latest.get('evaluable') is True
+                and latest.get('raw_maximum') == COURSE_POINTS[task]):
+            selected[task] = latest
     pending = [mid for mid in COURSE_GRADED_TASKS if mid not in selected]
     uncertain = [mid for mid in COURSE_GRADED_TASKS if mid in current and not current[mid].get('evaluable')]
     return {**view, 'curriculum_id': COURSE_ID, 'raw_maximum': COURSE_MAXIMUM,

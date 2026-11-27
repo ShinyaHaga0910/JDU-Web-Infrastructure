@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createApp } from './router.mjs';
-import { checkToken,verifyCheckToken,displayTask,tasks,checkHtml,taskDetailHtml,CHECK_MAXIMA } from './checks.mjs';
+import { createApp, checkedGrade } from './router.mjs';
+import { checkToken,verifyCheckToken,displayTask,tasks,checkHtml,taskDetailHtml,CHECK_MAXIMA,ASSESSMENT_MAXIMUM } from './checks.mjs';
 import { readFileSync } from 'node:fs';
 import { configFrom } from './auth.mjs';
 import {generateKeyPairSync,privateDecrypt,constants} from 'node:crypto';
@@ -12,7 +12,7 @@ const value={operation:'start',task_id:'M1',job_id:'11111111-1111-4111-8111-1111
 const headers={cookie,origin:env.PUBLIC_ORIGIN,'content-type':'application/x-www-form-urlencoded'};
 const credentials={env,verify:async t=>{if(t!==token)throw Error();return{sub:'1234567890'};},sessions:{check:async s=>s===session}};
 const request=(path,options={})=>new Request(env.PUBLIC_ORIGIN+path,{headers:{cookie},...options});
-test('practice list and detail retain partial points without adding them to the course total',()=>{
+test('legacy practice list and detail retain their old score projection',()=>{
   const grade={raw_earned:5,raw_maximum:64,selected:{P0:{raw_earned:1},M0:{raw_earned:4}},
     current:{P1:{raw_earned:3,raw_maximum:8,evaluable:false}}};
   for(const lang of ['ja','ru','uz']) {
@@ -26,10 +26,26 @@ test('practice list and detail retain partial points without adding them to the 
   assert.doesNotMatch(checkHtml('ja',{grade,blocked:true}),/<script>/);
 });
 
+test('all P/M count toward 123 points and the completed P0/M0/P1/M1 total is 21',async()=>{
+  assert.equal(ASSESSMENT_MAXIMUM,123);
+  const selected={P0:{raw_earned:1},M0:{raw_earned:4},P1:{raw_earned:8},M1:{raw_earned:8}};
+  const grade={raw_earned:21,raw_maximum:123,selected,current:selected,current_unresolved:[],missing_or_unresolved:['P2','M2']};
+  assert.equal(checkedGrade(grade),grade);
+  for(const lang of ['ja','ru','uz']) {
+    const app=createApp({...credentials,env,getGrade:async()=>({status:'ok',grade}),checker:async()=>{throw Error('GET cannot grade');}});
+    const response=await app(request(`/checks?lang=${lang}`));
+    const html=await response.text();
+    assert.equal(response.status,200);
+    assert.match(html,/<strong>21<\/strong>\s*<span>\/ 123<\/span>/);
+    assert.match(html,/task_id=P1[\s\S]*?8 \/ 8/);
+  }
+  assert.throws(()=>checkedGrade({...grade,raw_earned:13}));
+});
+
 test('every active task shows its point count and criteria on completion and in the overview',()=>{
   const registry=JSON.parse(readFileSync(new URL('../../01_roles/cyber_security/tools/web_lab_assessment/assessment-registry.json',import.meta.url),'utf8'));
   for(const task of tasks) {
-    const maximum=CHECK_MAXIMA[task],counted=task==='P0' || task.startsWith('M');
+    const maximum=CHECK_MAXIMA[task],counted=true;
     const ids=task==='P0'?['WEB01_WEB_MARKER']:task==='M0'?['WEB01_DB_MARKER','WEB01_DNS_MARKER','WEB01_REPO_MARKER','WEB01_BASTION_MARKER']
       :registry.tasks.find(t=>t.id===task).progress_scored_checks;
     const checks=ids.map((id,i)=>({id,status:i===0?'FAIL':'PASS'}));

@@ -109,9 +109,9 @@ class AssessmentTests(unittest.TestCase):
         self.assertEqual(self.call('POST /api/web/enroll', admission, shared)['statusCode'], 200)
         self.assertEqual(self.call('POST /api/web/register', self.identity)['statusCode'], 200)
         self.assertEqual(self.call('POST /api/web/submit', self.report(), shared)['statusCode'], 401)
-        for task in ('M1', 'M2', 'M4', 'M5', 'M6'):
+        for task in ('P1', 'M1', 'P2', 'M2', 'P4', 'M4', 'P5', 'P6', 'M5', 'M6'):
             report = self.report(task)
-            if task == 'M1':
+            if task in ('P1', 'M1'):
                 report.update(contract_id=HTTP_CONTRACT_ID, contract_sha256=HTTP_CONTRACT_SHA256)
             self.submit(report)
         for task, markers in COURSE_INTRO_MARKERS.items():
@@ -126,14 +126,14 @@ class AssessmentTests(unittest.TestCase):
         self.assertEqual(self.call('POST /api/web/admin/assessment-context', classification, self.admin)['statusCode'], 200)
         export = json.loads(self.call('POST /api/web/admin/grades', {}, self.admin)['body'])
         row = export['students'][0]
-        self.assertEqual((row['lab_id'], row['raw_earned'], export['raw_maximum']), ('new-student', 64, 64))
+        self.assertEqual((row['lab_id'], row['raw_earned'], export['raw_maximum']), ('new-student', 123, 123))
         for task in COURSE_INTRO_MARKERS:
             self.assertEqual(row['missions'][task]['selected']['raw_earned'], COURSE_POINTS[task])
         self.assertNotIn('M3', row['missions'])
         student_session = self.call('POST /api/web/student/session', {'lab_id': 'new-student'})
         url = json.loads(student_session['body'])['url']
         dashboard = self.app.handle({'routeKey': 'GET /dashboard', 'queryStringParameters': {'session': url.split('session=')[1]}})
-        self.assertIn('64 / 64', dashboard['body'])
+        self.assertIn('123 / 123', dashboard['body'])
         self.assertNotIn('M3 /', dashboard['body'])
 
     def test_all_missions_exactly_62_and_preparation_zero(self):

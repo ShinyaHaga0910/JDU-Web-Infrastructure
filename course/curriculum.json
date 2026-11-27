@@ -1,6 +1,6 @@
 {
-  "curriculum_id": "web-2026-11-20-with-connection-checks",
-  "effective_date": "2026-11-20",
+  "curriculum_id": "web-2026-11-27-all-practice-points",
+  "effective_date": "2026-11-27",
   "retired_tasks": [
     "P3",
     "M3"
@@ -26,6 +26,13 @@
     "M5": 13,
     "M6": 16
   },
+  "practice_points": {
+    "P1": 8,
+    "P2": 13,
+    "P4": 9,
+    "P5": 13,
+    "P6": 16
+  },
   "mission_display_ids": {
     "M4": "M3",
     "M5": "M4",
@@ -40,7 +47,7 @@
     "P0": 1,
     "M0": 4
   },
-  "raw_maximum": 64,
+  "raw_maximum": 123,
   "active_textbook_chapters": [
     1,
     2,

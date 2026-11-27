@@ -46,7 +46,7 @@ class GradeTest(unittest.TestCase):
 
     def test_saved_score_and_unknown_current_use_existing_projection(self):
         result = student_grade(self.service, self.event())
-        self.assertEqual((result['raw_earned'], result['raw_maximum']), (59, 64))
+        self.assertEqual((result['raw_earned'], result['raw_maximum']), (59, 123))
         self.assertIn('M5', result['current_unresolved'])
         self.assertEqual(result['selected']['M5']['raw_earned'], 13)
         self.assertEqual(self.store.labs_calls, ['test-lab'])
@@ -104,7 +104,7 @@ class GradeTest(unittest.TestCase):
                 self.assertEqual(len(result['task_checks']), maximum)
                 self.assertTrue(all(c['status'] == 'PASS' for c in result['task_checks']))
                 self.assertEqual(task in result['selected'], summary['counts_toward_assessment'])
-        self.assertEqual((result['raw_earned'], result['raw_maximum']), (64, 64))
+        self.assertEqual((result['raw_earned'], result['raw_maximum']), (123, 123))
         for retired in registry.RETIRED_TASKS:
             self.assertEqual(project_student(self.row, retired)['task_checks'], [])
 

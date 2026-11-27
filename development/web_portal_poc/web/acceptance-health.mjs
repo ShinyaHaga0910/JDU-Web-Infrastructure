@@ -1,5 +1,6 @@
 import { DynamoDBClient, GetItemCommand, QueryCommand } from '@aws-sdk/client-dynamodb';
 import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
+import { ASSESSMENT_MAXIMUM } from './checks.mjs';
 
 // Temporary closed-mode acceptance only. No HTTP input selects a Lab, table,
 // function or identity. Public output contains availability booleans only.
@@ -31,7 +32,7 @@ export function createAcceptanceHealth(env=process.env,
         {abortSignal:AbortSignal.timeout(12000)});
       if (result.StatusCode===200 && !result.FunctionError && result.Payload?.length<=65536) {
         const value=JSON.parse(Buffer.from(result.Payload).toString('utf8'));
-        gradeService=value.status==='ok' && value.grade?.lab_id===lab && [59,61,64].includes(value.grade?.raw_maximum)
+        gradeService=value.status==='ok' && value.grade?.lab_id===lab && [59,61,64,ASSESSMENT_MAXIMUM].includes(value.grade?.raw_maximum)
           && Number.isInteger(value.grade?.raw_earned) && value.grade.raw_earned>=0 && value.grade.raw_earned<=value.grade.raw_maximum;
       }
     } catch { /* Availability only; never return a score or upstream body. */ }

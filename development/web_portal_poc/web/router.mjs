@@ -5,7 +5,7 @@ import { enrollmentHtml, enrollmentText, checkedEnrollment } from './enrollment-
 import { preparationText, checkPreparationToken, checkedPreparation, preparationHtml,
   preparationTemplate, createPreparationLink } from './preparation.mjs';
 import { bootstrapTemplate, createBootstrapLink } from './bootstrap-link.mjs';
-import { words as checkWords, validOperation, verifyCheckToken, checkHtml, taskActions, taskDetailHtml, tasks as checkTasks, progressScript, resumeCheckLink, sealApplicationPassword, displayTask, CHECK_MAXIMA, taskScore } from './checks.mjs';
+import { words as checkWords, validOperation, verifyCheckToken, checkHtml, taskActions, taskDetailHtml, tasks as checkTasks, progressScript, resumeCheckLink, sealApplicationPassword, displayTask, CHECK_MAXIMA, ASSESSMENT_MAXIMUM, taskScore } from './checks.mjs';
 import { teacherText, hasTeacherScope, checkedTeacher, teacherListHtml } from './teacher-progress.mjs';
 import { createInitialDelivery } from './initial-delivery.mjs';
 
@@ -39,7 +39,8 @@ const text = {
 };
 const escape = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LEGACY_MAXIMA=Object.freeze({M1:8,M2:13,M4:9,M5:13,M6:16});
-export const MISSION_MAXIMA=Object.freeze({P0:1,M0:4,...LEGACY_MAXIMA});
+const PRE_PRACTICE_MAXIMA=Object.freeze({P0:1,M0:4,...LEGACY_MAXIMA});
+export const MISSION_MAXIMA=CHECK_MAXIMA;
 const stateText={
   ja:{running:'稼働中',stopped:'停止中',pending:'起動中',stopping:'停止処理中','shutting-down':'終了処理中',terminated:'終了済み',unknown:'確認できない',Online:'接続可',ConnectionLost:'接続なし',Inactive:'非アクティブ'},
   ru:{running:'Работает',stopped:'Остановлен',pending:'Запускается',stopping:'Останавливается','shutting-down':'Завершается',terminated:'Завершён',unknown:'Неизвестно',Online:'Доступно',ConnectionLost:'Нет связи',Inactive:'Неактивно'},
@@ -68,8 +69,8 @@ export function portalExpired(env) {
 }
 
 export function checkedGrade(grade) {
-  if (!grade || !Number.isInteger(grade.raw_earned) || ![59,61,64].includes(grade.raw_maximum) || grade.raw_earned < 0 || grade.raw_earned > grade.raw_maximum || !Array.isArray(grade.current_unresolved) || !Array.isArray(grade.missing_or_unresolved) || !grade.selected || typeof grade.selected !== 'object') throw new Error('Invalid grade');
-  const maxima=grade.raw_maximum===59?LEGACY_MAXIMA:grade.raw_maximum===61?{...MISSION_MAXIMA,M0:1}:MISSION_MAXIMA;
+  if (!grade || !Number.isInteger(grade.raw_earned) || ![59,61,64,ASSESSMENT_MAXIMUM].includes(grade.raw_maximum) || grade.raw_earned < 0 || grade.raw_earned > grade.raw_maximum || !Array.isArray(grade.current_unresolved) || !Array.isArray(grade.missing_or_unresolved) || !grade.selected || typeof grade.selected !== 'object') throw new Error('Invalid grade');
+  const maxima=grade.raw_maximum===59?LEGACY_MAXIMA:grade.raw_maximum===61?{...PRE_PRACTICE_MAXIMA,M0:1}:grade.raw_maximum===64?PRE_PRACTICE_MAXIMA:MISSION_MAXIMA;
   if (Object.keys(grade.selected).some(id => !Object.hasOwn(maxima,id) || !Number.isInteger(grade.selected[id]?.raw_earned) || grade.selected[id].raw_earned < 0 || grade.selected[id].raw_earned > maxima[id]) || Object.values(grade.selected).reduce((sum,row)=>sum+row.raw_earned,0)!==grade.raw_earned) throw new Error('Invalid selected scores');
   return grade;
 }
@@ -309,7 +310,7 @@ export function createApp({env=process.env, verify=verifyGoogle, verifyTestStude
         const sumLabel={ja:'合計点',ru:'Сумма баллов',uz:'Jami ball'}[lang];
         const total=grade ? `<section class="score-overview" aria-labelledby="score-total-title">
           <h2 id="score-total-title">${sumLabel}</h2>
-          <p><strong>${Object.keys(grade.selected).length?grade.raw_earned:'—'}</strong> <span>/ ${grade.raw_maximum}</span></p>
+          <p><strong>${grade.raw_earned}</strong> <span>/ ${grade.raw_maximum}</span></p>
         </section>` : '';
         const bar=`<div class="page-toolbar"><form action="/auth/logout" method="post"><button type="submit">${escape(t.logout)}</button></form></div>`;
         const report=selected ? `<section class="check-report" aria-label="${escape(ct.done)}">${checkHtml(lang,{config,session,token,selected,result})}</section>` : '';

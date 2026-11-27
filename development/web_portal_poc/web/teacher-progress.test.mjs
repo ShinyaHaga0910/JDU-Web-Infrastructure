@@ -132,3 +132,17 @@ test('teacher overview displays the saved P2 and M2 scores in every language',as
     assert.equal(CHECK_MAXIMA.P2,13);assert.equal(CHECK_MAXIMA.M2,13);
   }
 });
+
+test('teacher overview and student detail count P1 in the 21/123 course total',async()=>{
+  const counted={P0:{raw_earned:1},M0:{raw_earned:4},P1:{raw_earned:8},M1:{raw_earned:8}};
+  const currentGrade={...grade,raw_earned:21,raw_maximum:123,selected:counted,current:counted};
+  const currentProgress={...progress,students:[{...progress.students[0],grade:currentGrade}]};
+  const instance=app(async e=>({status:'ok',teacher:e.operation==='teacher_detail'
+    ?{classroom:true,student:currentProgress.students[0]}:currentProgress}));
+  for(const lang of ['ja','ru','uz']) {
+    const list=await instance(req(`/teacher?lang=${lang}`));
+    assert.equal(list.status,200);assert.match(await list.text(),/21 \/ 123/);
+    const detail=await instance(req(`/teacher/student?lang=${lang}&lab_id=course-student&task_id=P1`));
+    assert.equal(detail.status,200);assert.match(await detail.text(),/<strong>8 \/ 8<\/strong>/);
+  }
+});

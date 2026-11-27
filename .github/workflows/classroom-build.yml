@@ -37,7 +37,7 @@ jobs:
           AWS_DEFAULT_REGION: us-east-1
         run: |
           python -m pip install -r pairing-test-requirements.txt
-          python -B -m unittest -q test_grade_reader test_teacher_progress test_portal_submission test_browser_checks test_assessment_observation
+          python -B -m unittest -q test_grade_reader test_teacher_progress test_portal_submission test_browser_checks test_assessment_observation test_curriculum_retirement
       - name: Install portal dependencies and test
         working-directory: development/web_portal_poc/web
         run: |

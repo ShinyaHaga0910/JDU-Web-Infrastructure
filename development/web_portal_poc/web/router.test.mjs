@@ -17,7 +17,7 @@ test('score bounds match the course points and signed mission weights',async()=>
   const registry=JSON.parse(await readFile(new URL('../../01_roles/cyber_security/tools/web_lab_assessment/assessment-registry.json',import.meta.url),'utf8'));
   const curriculum=JSON.parse(await readFile(new URL('../../../course/curriculum.json',import.meta.url),'utf8'));
   const maxima=Object.fromEntries(registry.tasks.filter(t=>t.category==='automated_mission' && t.id!=='M3').map(t=>[t.id,t.raw_points_max]));
-  assert.deepEqual(MISSION_MAXIMA,{...curriculum.intro_points,...maxima});
+  assert.deepEqual(MISSION_MAXIMA,{...curriculum.intro_points,...curriculum.practice_points,...maxima});
   assert.equal(Object.values(MISSION_MAXIMA).reduce((sum,value)=>sum+value,0),curriculum.raw_maximum);
 });
 
