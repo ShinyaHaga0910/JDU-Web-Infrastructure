@@ -1,5 +1,6 @@
 """Validate the authored P/M material and public-resource helpers. Does not use AWS."""
 import ast
+import argparse
 from datetime import date
 import hashlib
 from html.parser import HTMLParser
@@ -23,7 +24,7 @@ PROJECT=Path(os.environ.get('JDU_WEB_PROJECT_ROOT', str(Path(__file__).resolve()
 from markdown_it import MarkdownIt
 from pypdf import PdfReader
 from content import MODULES,LANGS
-from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, active_registry, display_task, display_task_references, task_page
+from curriculum import ACTIVE_NUMBERS, ACTIVE_ORDER, RAW_MAXIMUM, POLICY, active_registry, display_task, display_task_references, task_page
 MODULES_BY_NUMBER = {int(m["id"][1:]): m for m in MODULES}
 MODULES = [MODULES_BY_NUMBER[n] for n in ACTIVE_NUMBERS]
 from build import KIT,EXPECTED_REGISTRY,MATERIAL_REVISION
@@ -50,6 +51,9 @@ class Page(HTMLParser):
 
 
 def main():
+    parser_args=argparse.ArgumentParser()
+    parser_args.add_argument('--output',type=Path,default=ROOT/'validation.public.json')
+    args=parser_args.parse_args()
     checks=[]
     def published(text):
         return display_task_references(text).replace('\u2013','-').replace('\u2014','-')
@@ -59,6 +63,9 @@ def main():
     registry_raw=(KIT/'assessment/assessment-registry.json').read_bytes();reg=active_registry(json.loads(registry_raw))
     ok('frozen_registry_sha256',hashlib.sha256(registry_raw).hexdigest()==EXPECTED_REGISTRY)
     ok('active_mission_points_59',reg['raw_points_by_mission']==dict(M1=8,M2=13,M4=9,M5=13,M6=16))
+    ok('all_active_tasks_count_toward_the_total',reg['raw_points_by_task']==
+       POLICY['intro_points']|POLICY['practice_points']|POLICY['mission_points']
+       and sum(reg['raw_points_by_task'].values())==RAW_MAXIMUM)
     parser=MarkdownIt('commonmark',{'html':False}).enable('table')
     docs={};code={};fences=0
     for lang in LANGS:
@@ -165,6 +172,13 @@ def main():
                 svg=ET.parse(image_path.with_suffix('.svg')).getroot()
                 text_count=len(list(svg.iter('{http://www.w3.org/2000/svg}text')))
                 ok(f'{lang}_{task}_editable_svg',svg.attrib['viewBox']=='0 0 1040 680' and text_count>=10)
+                if task in ('P2','M2'):
+                    tags=list(svg.iter('{http://www.w3.org/2000/svg}text'))
+                    ok(f'{lang}_{task}_subnet_labels',all(any(label in (t.text or '') for t in tags)
+                       for label in ('10.20.1.0/24','10.20.2.0/24')))
+                    ok(f'{lang}_{task}_servers_in_correct_subnets',all(
+                       any(t.text==ip and 410<float(t.attrib['x'])<963 and low<float(t.attrib['y'])<high for t in tags)
+                       for ip,low,high in (('10.20.1.10',172,447),('10.20.1.20',172,447),('10.20.2.10',468,600))))
                 if task in ('P1','P5','P6','M1','M5','M6'):
                     tags=list(svg.iter('{http://www.w3.org/2000/svg}text'))
                     ok(f'{lang}_{task}_internet_aws_boundary',
@@ -252,12 +266,12 @@ def main():
         languages=list(LANGS),material_revision=MATERIAL_REVISION,practice_tasks=6,practice_steps=41,
         task_pages=36,task_diagrams=36,numbered_command_comments_per_language=annotations,executable_source_preserved=True,
         explained_steps=sum(key.split(".")[0] in ACTIVE_ORDER for key in STEP_NOTES),module_understanding_questions=sum('question' in MODULE_NOTES[module['id']] for module in MODULES),communication_routes=len(ROUTES),
-        worked_output_examples=len(OUTPUT_EXAMPLES),mission_tasks=6,scored_checks=64,raw_points=64,
+        worked_output_examples=len(OUTPUT_EXAMPLES),mission_tasks=6,scored_checks=RAW_MAXIMUM,raw_points=RAW_MAXIMUM,
         checks_passed=len(checks),bash_blocks_syntax_checked=fences,
         pdfs={p.name:dict(pages=len(PdfReader(p).pages),bytes=p.stat().st_size) for p in (ROOT/'output/pdf').glob('*.pdf')},
         distribution_id=pins['distribution_id'],registry_sha256=EXPECTED_REGISTRY,package_sha256=hashlib.sha256(package.read_bytes()).hexdigest(),
         new_material_AWS_walkthrough=False,native_language_review=False,teacher_visual_review=False,class_ready=False)
-    (ROOT/'validation.public.json').write_text(json.dumps(result,indent=2,ensure_ascii=False)+'\n',encoding='utf-8',newline='\n')
+    args.output.write_text(json.dumps(result,indent=2,ensure_ascii=False)+'\n',encoding='utf-8',newline='\n')
     print(json.dumps(result,ensure_ascii=True))
 
 if __name__=='__main__':main()

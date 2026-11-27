@@ -521,7 +521,7 @@ Ichki DNS ga Web va DB nomlarini yozing. Bastion va Web ni shu DNS ga sozlab, P1
 
 ### Topshiriq diagrammasi
 
-![Bastion va Web ichki DNS ga so‘raydi, ichki DNS tashqi nomlarni AWS DNS ga yuboradi.](../../assets/uz/p2.png)
+![Ochiq subnetdagi Bastion va Web serverlari yopiq subnetdagi DNS serveriga murojaat qiladi. Tashqi nomlar AWS DNS ga yuboriladi.](../../assets/uz/p2.png)
 
 ### Yechim namunasi (bajarish tartibi)
 

@@ -106,7 +106,7 @@ P2 da sozlangan ichki DNS ga jadvaldagi oltita nomni qo‘shing. Bastion serveri
 
 ### Topshiriq diagrammasi
 
-![Bastion va Web ichki DNS ga murojaat qiladi. Bastion Web ga nomi bilan ulanadi.](../../assets/uz/m2.png)
+![Ochiq subnetdagi Bastion va Web serverlari yopiq subnetdagi DNS serveriga murojaat qiladi. Tashqi nomlar AWS DNS ga yuboriladi.](../../assets/uz/m2.png)
 
 | DNS name | A / IPv4 |
 | --- | --- |

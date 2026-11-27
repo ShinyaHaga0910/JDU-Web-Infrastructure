@@ -20,7 +20,7 @@ img{display:block;max-inline-size:100%;block-size:auto;margin:1.5rem 0}
 <p><strong>このPractice2で作業すること</strong></p>
 <p>内部DNSにWeb・DBサーバーの名前を登録する。踏み台サーバーとWebサーバーがこのDNSを使うように設定し、P1のファイルを名前で開く。</p>
 <h2 id="section-1">今回の見取り図</h2>
-<p><img src="../../../assets/ja/p2.png" alt="踏み台とWebから内部DNSへ問い合わせる。内部DNSは外部名をAWSのDNSへ転送する。" width="1040" height="680" loading="lazy"></p>
+<p><img src="../../../assets/ja/p2.png" alt="公開サブネットの踏み台・Webサーバーが、非公開サブネットのDNSサーバーへ問い合わせる。外部名はAWS提供のDNSへ転送する。" width="1040" height="680" loading="lazy"></p>
 <h2 id="section-2">解答例（操作手順）</h2>
 <h3>P2.1 配布サーバーからBINDをインストールする</h3>
 <p><strong>実行環境:</strong></p>

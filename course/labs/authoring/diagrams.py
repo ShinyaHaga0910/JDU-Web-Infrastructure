@@ -124,10 +124,10 @@ def diagram_text(task,lang):
         return T('VPCの公開サブネットにWebサーバーと踏み台サーバー、非公開サブネットに配布サーバーがあり、HTTPの経路を示す。',
                  'В публичной подсети VPC находятся Web-сервер и бастион, в приватной — сервер пакетов. Стрелки показывают маршруты HTTP.',
                  'VPC ochiq subnetida Web va Bastion serverlari, yopiq subnetida paketlar serveri joylashgan. Strelkalar HTTP yo‘llarini ko‘rsatadi.')[lang],''
-    if task=='P2':
-        return T('踏み台とWebから内部DNSへ問い合わせる。内部DNSは外部名をAWSのDNSへ転送する。',
-                 'Бастион и Web запрашивают внутренний DNS, который передаёт внешние имена DNS AWS.',
-                 'Bastion va Web ichki DNS ga so‘raydi, ichki DNS tashqi nomlarni AWS DNS ga yuboradi.')[lang],''
+    if n==2:
+        return T('公開サブネットの踏み台・Webサーバーが、非公開サブネットのDNSサーバーへ問い合わせる。外部名はAWS提供のDNSへ転送する。',
+                 'Бастион и Web-сервер в публичной подсети обращаются к DNS-серверу в приватной подсети. Внешние имена передаются DNS AWS.',
+                 'Ochiq subnetdagi Bastion va Web serverlari yopiq subnetdagi DNS serveriga murojaat qiladi. Tashqi nomlar AWS DNS ga yuboriladi.')[lang],''
     return {
             1:T('学生PCと踏み台サーバーからWebサーバーのmission.txtへのHTTP経路。',
                 'Пути HTTP от компьютера и бастиона к mission.txt на Web.',
@@ -204,10 +204,37 @@ def p1_diagram(s,step=None):
         s.text(834,351,'/practice.txt',15,center=True)
 
 
+def dns_diagram(s):
+    lang=s.lang
+    s.text(25,15,T('内部DNSの設定で使うサーバーと通信経路',
+                  'Серверы и маршруты внутреннего DNS',
+                  'Ichki DNS serverlari va aloqa yo‘llari')[lang],25)
+    s.rect(224,65,790,575,fill='#f1f7fc',stroke='#7e9cb3',width=2)
+    s.text(247,77,'AWS',20)
+    s.rect(386,120,603,496,stroke='#7e9cb3',width=2)
+    s.text(417,135,'VPC  10.20.0.0/16',19)
+    s.rect(410,172,553,275,fill='#edf5fc',stroke='#86a6bf',width=2)
+    s.text(428,183,T('公開サブネット','Публичная подсеть','Ochiq subnet')[lang]+'  10.20.1.0/24',19)
+    s.rect(410,468,553,132,fill='#fcf6ec',stroke='#b1956c',width=2)
+    s.text(428,480,T('非公開サブネット','Приватная подсеть','Yopiq subnet')[lang]+'  10.20.2.0/24',19)
+    s.node('web',714,215,w=239)
+    s.node('bastion',428,347,w=216)
+    s.node('dns',714,501,True,w=239)
+    s.rect(730,125,224,42,fill='white',stroke='#7e9cb3')
+    s.text(842,134,'AWS DNS  10.20.0.2',16,center=True,max_width=212)
+    s.path([(536,347),(536,258),(714,258)],'HTTP / TCP 80',(616,225))
+    s.path([(644,390),(680,390),(680,544),(714,544)],'DNS 53',(675,355))
+    s.path([(834,301),(834,501)],'DNS / UDP + TCP 53',(834,405))
+    s.path([(953,544),(978,544),(978,146),(954,146)],'DNS 53',(977,335))
+
+
 def mission_diagram(s):
     lang=s.lang
     n=int(s.task[1:])
     practice=s.task.startswith('P')
+    if n==2:
+        dns_diagram(s)
+        return
     s.rect(224,65,790,575,fill='#f1f7fc',stroke='#7e9cb3',width=2)
     s.text(247,77,'AWS',20)
     s.rect(386,120,603,477,stroke='#7e9cb3',width=2)
@@ -240,19 +267,6 @@ def mission_diagram(s):
                 s.text(563,266,T('公開側の管理URLを拒否','Admin закрыт снаружи','Ochiq admin yopiq')[lang],15,center=True,color=RED,max_width=225)
                 role='catalog_practice_setup' if practice else 'catalog_setup'
                 s.text(840,570,f'{role}: NOLOGIN',15,center=True,color=RED)
-    elif n==2:
-        s.node('bastion',410,225,w=210)
-        s.node('web',410,434,w=210)
-        s.node('dns',737,225,True,w=224)
-        s.path([(620,265),(737,265)],'DNS 53',(677,230))
-        if practice:
-            s.path([(620,476),(700,476),(700,287),(737,287)],'DNS / UDP + TCP 53',(738,508))
-            s.simple(737,390,'AWS DNS  10.20.0.2',w=224)
-            s.path([(849,311),(849,390)],T('外部名','Внешние имена','Tashqi nomlar')[lang],(899,347))
-        else:
-            s.path([(620,476),(849,476),(849,311)],'DNS / UDP + TCP 53',(802,436))
-        s.path([(515,311),(515,434)],'HTTP 80',(515,361))
-        s.text(742,327,'lab.test',17)
     else:
         s.node('web',410,225,True,w=210)
         s.node('db',737,225,True,w=224)
